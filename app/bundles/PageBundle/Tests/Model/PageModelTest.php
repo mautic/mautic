@@ -1,14 +1,6 @@
 <?php
 
 declare(strict_types=1);
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\PageBundle\Tests\Model;
 
@@ -19,12 +11,11 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Tests\PageTestAbstract;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
 {
-    public function testUtf8CharsInTitleWithTransletirationEnabled()
+    public function testUtf8CharsInTitleWithTransletirationEnabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = 'ni hao, shi jie';
@@ -43,7 +34,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testUtf8CharsInTitleWithTransletirationDisabled()
+    public function testUtf8CharsInTitleWithTransletirationDisabled(): void
     {
         $providedTitle = '你好，世界';
         $expectedTitle = '你好，世界';
@@ -62,19 +53,52 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testGenerateUrl_WhenCalled_ReturnsValidUrl()
+    public function testGenerateUrlWhenCalledReturnsValidUrl(): void
     {
         $page = new Page();
         $page->setAlias('this-is-a-test');
         $pageModel = $this->getPageModel();
-        $url       = $pageModel->generateUrl($page);
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback(
+                function (string $route, array $routeParams, int $referenceType) {
+                    $this->assertSame('mautic_page_public', $route);
+                    $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
+                    $this->assertSame(0, $referenceType);
+
+                    return '/'.$routeParams['slug'];
+                }
+            );
+
+        $url = $pageModel->generateUrl($page);
         $this->assertStringContainsString('/this-is-a-test', $url);
     }
 
-    public function testCleanQuery_WhenCalled_ReturnsSafeAndValidData()
+    public function testUrlTitleFallbacksToPageTitleWhenNotInQuery(): void
+    {
+        $providedTitle = '你好，世界';
+        $expectedTitle = 'ni hao, shi jie';
+        $hit           = new Hit();
+        $page          = new Page();
+        $request       = new Request();
+        $contact       = new Lead();
+        $ipAddress     = new IpAddress();
+        $pageModel     = $this->getPageModel();
+
+        $page->setTitle($providedTitle);
+        $hit->setIpAddress($ipAddress);
+        $hit->setQuery([]);
+
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+
+        $this->assertSame($expectedTitle, $hit->getUrlTitle());
+    }
+
+    public function testCleanQueryWhenCalledReturnsSafeAndValidData(): void
     {
         $pageModel           = $this->getPageModel();
-        $pageModelReflection = new ReflectionClass(get_class($pageModel));
+        $pageModelReflection = new \ReflectionClass($pageModel::class);
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
         $cleanQueryMethod->setAccessible(true);
         $res = $cleanQueryMethod->invokeArgs($pageModel, [
@@ -123,7 +147,7 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
-    private function assertUtmQuery(array $query)
+    private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
         $this->assertArrayHasKey('utm_medium', $query, 'utm_medium not found');
@@ -131,8 +155,8 @@ class PageModelTest extends PageTestAbstract
         $this->assertArrayHasKey('utm_content', $query, 'utm_content not found');
         // evaluate all utm tags that they contain the key name in the value
         foreach ($query as $key => $value) {
-            if (false !== strpos($key, 'utm_')) {
-                $this->assertNotFalse(strpos($value, $key), sprintf('%s not found in %s', $key, $value));
+            if (str_contains($key, 'utm_')) {
+                $this->assertNotFalse(strpos($value, (string) $key), sprintf('%s not found in %s', $key, $value));
             }
         }
     }

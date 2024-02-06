@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\ListParser;
 
 use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
@@ -22,7 +13,7 @@ class ArrayListParser implements ListParserInterface
         }
 
         if (
-            isset($list[0])
+            array_key_exists(0, $list)
             && !is_array($list[0])
             && array_keys($list) === range(0, count($list) - 1)
         ) {

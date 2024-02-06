@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Loader\EnvVars;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -21,7 +12,7 @@ class ApiEnvVars implements EnvVarsInterface
         $envVars->set('MAUTIC_API_OAUTH2_ACCESS_TOKEN_LIFETIME', is_int($accessTokenLifetime) ? $accessTokenLifetime * 60 : 3600);
 
         $refreshTokenLifetime = $config->get('api_oauth2_refresh_token_lifetime');
-        $envVars->set('MAUTIC_API_OAUTH2_REFRESH_TOKEN_LIFETIME', is_int($refreshTokenLifetime) ? $refreshTokenLifetime * 60 * 60 * 24 : 1209600);
+        $envVars->set('MAUTIC_API_OAUTH2_REFRESH_TOKEN_LIFETIME', is_int($refreshTokenLifetime) ? $refreshTokenLifetime * 60 * 60 * 24 : 1_209_600);
 
         $apiRateLimitEnabled = 0 === (int) $config->get('api_rate_limiter_limit') ? false : true;
         $envVars->set('MAUTIC_API_RATE_LIMIT_ENABLED', $apiRateLimitEnabled);

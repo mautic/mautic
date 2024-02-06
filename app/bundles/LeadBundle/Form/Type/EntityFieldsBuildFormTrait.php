@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;
@@ -22,6 +13,7 @@ use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
+use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -39,7 +31,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait EntityFieldsBuildFormTrait
 {
-    private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead')
+    /**
+     * @return array<string, 'html'|'raw'>
+     */
+    private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead'): array
     {
         $cleaningRules = [];
         $fieldValues   = [];
@@ -63,7 +58,7 @@ trait EntityFieldsBuildFormTrait
 
             try {
                 $type = FieldAliasToFqcnMap::getFqcn($type);
-            } catch (FieldNotFoundException $e) {
+            } catch (FieldNotFoundException) {
             }
 
             if ($field['isUniqueIdentifer']) {
@@ -71,10 +66,9 @@ trait EntityFieldsBuildFormTrait
             }
 
             if ($isObject) {
-                $value = (isset($fieldValues[$group][$alias]['value'])) ?
-                    $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
+                $value = $fieldValues[$group][$alias]['value'] ?? $field['defaultValue'];
             } else {
-                $value = (isset($fieldValues[$alias])) ? $fieldValues[$alias] : '';
+                $value = $fieldValues[$alias] ?? '';
             }
 
             $constraints = [];
@@ -91,7 +85,7 @@ trait EntityFieldsBuildFormTrait
                 case NumberType::class:
                     if (empty($properties['scale'])) {
                         $properties['scale'] = null;
-                    } //ensure default locale is used
+                    } // ensure default locale is used
                     else {
                         $properties['scale'] = (int) $properties['scale'];
                     }
@@ -129,67 +123,66 @@ trait EntityFieldsBuildFormTrait
                         'constraints' => $constraints,
                     ];
 
-                if (!empty($options['ignore_date_type'])) {
-                    $type = TextType::class;
-                } else {
-                    $opts['html5']  = false;
-                    $opts['input']  = 'string';
-                    $opts['widget'] = 'single_text';
-                    if ($value) {
-                        try {
-                            $dtHelper = new DateTimeHelper($value, null, 'local');
-                        } catch (\Exception $e) {
-                            // Rather return empty value than break the page
-                            $value = null;
-                        }
-                    }
-                    if (DateTimeType::class === $type) {
-                        $opts['attr']['data-toggle'] = 'datetime';
-                        $opts['model_timezone']      = 'UTC';
-                        $opts['view_timezone']       = date_default_timezone_get();
-                        $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
-                        $opts['with_seconds']        = true;
-
-                        $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                    } elseif (DateType::class === $type) {
-                        $opts['attr']['data-toggle'] = 'date';
-                        $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                    if (!empty($options['ignore_date_type'])) {
+                        $type = TextType::class;
                     } else {
-                        $opts['attr']['data-toggle'] = 'time';
-                        $opts['model_timezone']      = 'UTC';
-                        // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
-                        $opts['view_timezone'] = date_default_timezone_get();
-                        $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
-                    }
+                        $opts['html5']  = false;
+                        $opts['input']  = 'string';
+                        $opts['widget'] = 'single_text';
+                        $opts['html5']  = false;
+                        if ($value) {
+                            try {
+                                $dtHelper = new DateTimeHelper($value, null, 'local');
+                            } catch (\Exception) {
+                                // Rather return empty value than break the page
+                                $value = null;
+                            }
+                        }
+                        if (DateTimeType::class === $type) {
+                            $opts['attr']['data-toggle'] = 'datetime';
+                            $opts['model_timezone']      = 'UTC';
+                            $opts['view_timezone']       = date_default_timezone_get();
+                            $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
+                            $opts['with_seconds']        = true;
 
-                    $builder->addEventListener(
-                        FormEvents::PRE_SUBMIT,
-                        function (FormEvent $event) use ($alias, $type) {
-                            $data = $event->getData();
+                            $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
+                        } elseif (DateType::class === $type) {
+                            $opts['attr']['data-toggle'] = 'date';
+                            $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                        } else {
+                            $opts['attr']['data-toggle'] = 'time';
+                            // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
+                            $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                        }
 
-                            if (!empty($data[$alias])) {
-                                if (false === ($timestamp = strtotime($data[$alias]))) {
-                                    $timestamp = null;
-                                }
-                                if ($timestamp) {
-                                    $dtHelper = new DateTimeHelper(date('Y-m-d H:i:s', $timestamp), null, 'local');
-                                    switch ($type) {
-                                        case DateTimeType::class:
-                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d H:i:s');
-                                            break;
-                                        case DateType::class:
-                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d');
-                                            break;
-                                        case TimeType::class:
-                                            $data[$alias] = $dtHelper->toLocalString('H:i:s');
-                                            break;
+                        $builder->addEventListener(
+                            FormEvents::PRE_SUBMIT,
+                            function (FormEvent $event) use ($alias, $type): void {
+                                $data = $event->getData();
+
+                                if (!empty($data[$alias])) {
+                                    if (false === ($timestamp = strtotime($data[$alias]))) {
+                                        $timestamp = null;
+                                    }
+                                    if ($timestamp) {
+                                        $dtHelper = new DateTimeHelper(date('Y-m-d H:i:s', $timestamp), null, 'local');
+                                        switch ($type) {
+                                            case DateTimeType::class:
+                                                $data[$alias] = $dtHelper->toLocalString('Y-m-d H:i:s');
+                                                break;
+                                            case DateType::class:
+                                                $data[$alias] = $dtHelper->toLocalString('Y-m-d');
+                                                break;
+                                            case TimeType::class:
+                                                $data[$alias] = $dtHelper->toLocalString('H:i:s');
+                                                break;
+                                        }
                                     }
                                 }
+                                $event->setData($data);
                             }
-                            $event->setData($data);
-                        }
-                    );
-                }
+                        );
+                    }
 
                     $builder->add($alias, $type, $opts);
                     break;
@@ -255,6 +248,7 @@ trait EntityFieldsBuildFormTrait
                     switch ($type) {
                         case LookupType::class:
                             $attr['data-target'] = $alias;
+                            $constraints[]       = new Length(['max' => 191]);
                             if (!empty($properties['list'])) {
                                 $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
                             }
@@ -262,11 +256,7 @@ trait EntityFieldsBuildFormTrait
                         case EmailType::class:
                             // Enforce a valid email
                             $attr['data-encoding'] = 'email';
-                            $constraints[]         = new Email(
-                                [
-                                    'message' => 'mautic.core.email.required',
-                                ]
-                            );
+                            $constraints[]         = new EmailAddress();
                             break;
                         case TextType::class:
                             $constraints[] = new Length(['max' => 191]);

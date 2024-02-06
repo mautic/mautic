@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Internal;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
@@ -32,17 +23,17 @@ class ObjectChangeGeneratorTest extends TestCase
     /**
      * @var SyncJudgeInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncJudge;
+    private \PHPUnit\Framework\MockObject\MockObject $syncJudge;
 
     /**
      * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $valueHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
     /**
      * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     protected function setUp(): void
     {
@@ -55,9 +46,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -73,9 +62,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $integrationInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $integrationInformationChangeRequest
             );
 
         $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
@@ -116,9 +103,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -134,9 +119,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
             );
 
         $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(

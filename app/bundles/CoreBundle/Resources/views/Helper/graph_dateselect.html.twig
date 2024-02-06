@@ -1,0 +1,17 @@
+{% set class = class is defined ? class : '' %}
+
+{{ form_start(dateRangeForm, {'attr' : {'class': 'form-filter ' ~ class, 'style': 'max-width: 380px'}}) }}
+<div class="input-group">
+	<span class="input-group-addon">
+		{{ form_label(dateRangeForm.date_from) }}
+	</span>
+	{{ form_widget(dateRangeForm.date_from) }}
+	<span class="input-group-addon" style="border-left: 0;border-right: 0;">
+		{{ form_label(dateRangeForm.date_to) }}
+	</span>
+	{{ form_widget(dateRangeForm.date_to) }}
+	<span class="input-group-btn">
+		{{ form_row(dateRangeForm.apply) }}
+	</span>
+</div>
+{{ form_end(dateRangeForm) }}

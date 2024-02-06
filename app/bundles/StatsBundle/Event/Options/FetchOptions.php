@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Event\Options;
 
 class FetchOptions
 {
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options = [];
 
     /**
      * @var int|null
@@ -58,16 +46,11 @@ class FetchOptions
 
     /**
      * @param string $key
-     * @param null   $default
      *
      * @return mixed
      */
     public function getOption($key, $default = null)
     {
-        if (isset($this->options[$key])) {
-            return $this->options[$key];
-        }
-
-        return $default;
+        return $this->options[$key] ?? $default;
     }
 }

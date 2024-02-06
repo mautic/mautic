@@ -1,25 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
 class MailboxContainer
 {
-    /**
-     * @var ConfigAccessor
-     */
-    protected $config;
-
     /**
      * @var array
      */
@@ -35,19 +21,12 @@ class MailboxContainer
      */
     protected $messages = [];
 
-    /**
-     * MailboxAccessor constructor.
-     */
-    public function __construct(ConfigAccessor $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        protected ConfigAccessor $config
+    ) {
     }
 
-    /**
-     * @param $criteria
-     * @param $mailbox
-     */
-    public function addCriteria($criteria, $mailbox)
+    public function addCriteria($criteria, $mailbox): void
     {
         if (!isset($this->criteria[$criteria])) {
             $this->criteria[$criteria] = [];
@@ -59,7 +38,7 @@ class MailboxContainer
     /**
      * Keep the messages in this mailbox as unseen.
      */
-    public function keepAsUnseen()
+    public function keepAsUnseen(): void
     {
         $this->markAsSeen = false;
     }

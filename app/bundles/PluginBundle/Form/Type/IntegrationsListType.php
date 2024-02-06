@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -17,26 +8,20 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class IntegrationsListType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        private IntegrationHelper $integrationHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
         $integrations       = ['' => ''];
@@ -45,10 +30,11 @@ class IntegrationsListType extends AbstractType
             $settings = $object->getIntegrationSettings();
 
             if ($settings->isPublished()) {
-                if (!isset($integrations[$settings->getPlugin()->getName()])) {
-                    $integrations[$settings->getPlugin()->getName()] = [];
+                $pluginName = $settings->getPlugin()->getName();
+                if (!isset($integrations[$pluginName])) {
+                    $integrations[$pluginName] = [];
                 }
-                $integrations[$settings->getPlugin()->getName()][$object->getDisplayName()] = $object->getName();
+                $integrations[$pluginName][$object->getDisplayName()] = $object->getName();
             }
         }
 
@@ -72,14 +58,16 @@ class IntegrationsListType extends AbstractType
                         ['message' => 'mautic.core.value.required']
                     ),
                 ],
-                ]
+            ]
         );
 
-        $formModifier = function (FormInterface $form, $data) use ($integrationObjects) {
+        $formModifier = function (FormEvent $event) use ($integrationObjects): void {
+            $data            = $event->getData();
+            $form            = $event->getForm();
             $statusChoices   = [];
             $campaignChoices = [];
 
-            if (isset($data['integration'])) {
+            if (!empty($data['integration'])) {
                 $integrationObject = $this->integrationHelper->getIntegrationObject($data['integration']);
                 if (method_exists($integrationObject, 'getCampaigns')) {
                     $campaigns = $integrationObject->getCampaigns();
@@ -108,9 +96,9 @@ class IntegrationsListType extends AbstractType
                     'attr'  => [
                         'class' => 'integration-config-container',
                     ],
-                    'integration' => (isset($integrationObjects[$data['integration']])) ? $integrationObjects[$data['integration']] : null,
+                    'integration' => isset($data['integration'], $integrationObjects[$data['integration']]) ? $integrationObjects[$data['integration']] : null,
                     'campaigns'   => $campaignChoices,
-                    'data'        => (isset($data['config'])) ? $data['config'] : [],
+                    'data'        => $data['config'] ?? [],
                 ]
             );
 
@@ -124,32 +112,17 @@ class IntegrationsListType extends AbstractType
                         'class' => 'integration-campaigns-status'.$hideClass,
                     ],
                     'campaignContactStatus' => $statusChoices,
-                    'data'                  => (isset($data['campaign_member_status'])) ? $data['campaign_member_status'] : [],
+                    'data'                  => $data['campaign_member_status'] ?? [],
                 ]
             );
         };
 
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
-                $data = $event->getData();
-                $formModifier($event->getForm(), $data);
-            }
-        );
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $formModifier);
 
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
-                $data = $event->getData();
-                $formModifier($event->getForm(), $data);
-            }
-        );
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $formModifier);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['supported_features']);
         $resolver->setDefaults(
@@ -159,9 +132,6 @@ class IntegrationsListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_list';

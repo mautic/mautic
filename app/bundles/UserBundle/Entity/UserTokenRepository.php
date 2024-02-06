@@ -1,29 +1,18 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class UserTokenRepository.
+ * @extends CommonRepository<UserToken>
  */
 final class UserTokenRepository extends CommonRepository implements UserTokenRepositoryInterface
 {
     /**
      * @param string $secret
-     *
-     * @return bool
      */
-    public function isSecretUnique($secret)
+    public function isSecretUnique($secret): bool
     {
         $tokens = $this->createQueryBuilder('ut')
             ->where('ut.secret = :secret')
@@ -34,10 +23,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
         return 0 === count($tokens);
     }
 
-    /**
-     * @return bool
-     */
-    public function verify(UserToken $token)
+    public function verify(UserToken $token): bool
     {
         /** @var UserToken[] $userTokens */
         $userTokens = $this->createQueryBuilder('ut')
@@ -60,10 +46,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteExpired($isDryRun = false)
+    public function deleteExpired($isDryRun = false): int
     {
         $qb = $this->createQueryBuilder('ut');
 
@@ -75,7 +58,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
 
         return (int) $qb
             ->where('ut.expiration <= :current_datetime')
-            ->setParameter(':current_datetime', new \DateTime())
+            ->setParameter('current_datetime', new \DateTime())
             ->getQuery()
             ->execute();
     }

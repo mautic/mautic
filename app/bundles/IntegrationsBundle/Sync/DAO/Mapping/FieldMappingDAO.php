@@ -2,52 +2,13 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class FieldMappingDAO
 {
-    /**
-     * @var string
-     */
-    private $internalObject;
+    private bool $isRequired;
 
     /**
-     * @var string
-     */
-    private $internalField;
-
-    /**
-     * @var string
-     */
-    private $integrationObject;
-
-    /**
-     * @var string
-     */
-    private $integrationField;
-
-    /**
-     * @var string
-     */
-    private $syncDirection;
-
-    /**
-     * @var bool
-     */
-    private $isRequired;
-
-    /**
-     * FieldMappingDAO constructor.
-     *
      * @param string $internalObject
      * @param string $internalField
      * @param string $integrationObject
@@ -55,13 +16,14 @@ class FieldMappingDAO
      * @param string $syncDirection
      * @param bool   $isRequired
      */
-    public function __construct($internalObject, $internalField, $integrationObject, $integrationField, $syncDirection, $isRequired)
-    {
-        $this->internalObject    = $internalObject;
-        $this->internalField     = $internalField;
-        $this->integrationObject = $integrationObject;
-        $this->integrationField  = $integrationField;
-        $this->syncDirection     = $syncDirection;
+    public function __construct(
+        private $internalObject,
+        private $internalField,
+        private $integrationObject,
+        private $integrationField,
+        private $syncDirection,
+        $isRequired
+    ) {
         $this->isRequired        = (bool) $isRequired;
     }
 

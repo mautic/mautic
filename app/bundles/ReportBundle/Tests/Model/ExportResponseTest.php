@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\ReportBundle\Model\ExportResponse;
@@ -16,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ExportResponseTest extends \PHPUnit\Framework\TestCase
 {
-    public function testResponse()
+    public function testResponse(): void
     {
         $responce = new Response();
         ExportResponse::setResponseHeaders($responce, 'fileName.csv');

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -23,12 +14,9 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadModel|MockObject
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
-    /**
-     * @var PointSubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\PointSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -36,7 +24,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new PointSubscriber($this->leadModel);
     }
 
-    public function testOnPointTriggerExecutedIfNotChangeTagsTyoe()
+    public function testOnPointTriggerExecutedIfNotChangeTagsTyoe(): void
     {
         $triggerEvent = new TriggerEvent();
         $contact      = new Lead();
@@ -48,7 +36,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 
-    public function testOnPointTriggerExecutedForChangeTagsTyoe()
+    public function testOnPointTriggerExecutedForChangeTagsTyoe(): void
     {
         $triggerEvent = new TriggerEvent();
         $contact      = new Lead();

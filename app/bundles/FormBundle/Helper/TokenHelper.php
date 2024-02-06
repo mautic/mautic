@@ -1,49 +1,19 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    /**
-     * TokenHelper constructor.
-     */
-    public function __construct(FormModel $formModel, CorePermissions $security)
-    {
-        $this->formModel = $formModel;
-        $this->security  = $security;
+    public function __construct(
+        protected FormModel $formModel,
+        protected CorePermissions $security
+    ) {
     }
 
-    /**
-     * @param $content
-     *
-     * @return array
-     */
-    public function findFormTokens($content)
+    public function findFormTokens($content): array
     {
         $tokens = [];
 
@@ -65,10 +35,10 @@ class TokenHelper
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form, false) :
+                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form) :
                         '';
 
-                    //pouplate get parameters
+                    // pouplate get parameters
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
 
                     $tokens[$token] = $formHtml;

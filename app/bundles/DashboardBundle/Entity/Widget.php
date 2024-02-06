@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -19,9 +10,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Widget.
- */
 class Widget extends FormEntity
 {
     /**
@@ -45,7 +33,7 @@ class Widget extends FormEntity
     private $height;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $ordering;
 
@@ -80,7 +68,7 @@ class Widget extends FormEntity
     private $loadTime = 0;
 
     /**
-     * @var int (minutes)
+     * @var int|null (minutes)
      */
     private $cacheTimeout;
 
@@ -96,21 +84,21 @@ class Widget extends FormEntity
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('widgets');
         $builder->setCustomRepositoryClass(WidgetRepository::class);
         $builder->addIdColumns('name', false);
-        $builder->addField('type', Type::STRING);
-        $builder->addField('width', Type::INTEGER);
-        $builder->addField('height', Type::INTEGER);
-        $builder->addNullableField('cacheTimeout', Type::INTEGER, 'cache_timeout');
-        $builder->addNullableField('ordering', Type::INTEGER);
-        $builder->addNullableField('params', Type::TARRAY);
+        $builder->addField('type', Types::STRING);
+        $builder->addField('width', Types::INTEGER);
+        $builder->addField('height', Types::INTEGER);
+        $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
+        $builder->addNullableField('ordering', Types::INTEGER);
+        $builder->addNullableField('params', Types::ARRAY);
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('type', new NotBlank([
             'message' => 'mautic.core.type.required',
@@ -375,7 +363,7 @@ class Widget extends FormEntity
     /**
      * Set cached flag.
      *
-     * @param string $cached
+     * @param bool $cached
      *
      * @return Widget
      */
@@ -399,7 +387,7 @@ class Widget extends FormEntity
     /**
      * Set loadTime.
      *
-     * @param string $loadTime
+     * @param string|float|int $loadTime
      *
      * @return Widget
      */
@@ -420,10 +408,7 @@ class Widget extends FormEntity
         return $this->loadTime;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'name'     => $this->getName(),

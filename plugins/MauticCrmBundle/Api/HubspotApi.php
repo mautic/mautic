@@ -4,7 +4,11 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 
+/**
+ * @property HubspotIntegration $integration
+ */
 class HubspotApi extends CrmApi
 {
     protected $requestSettings = [
@@ -13,8 +17,11 @@ class HubspotApi extends CrmApi
 
     protected function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
     {
-        $hapikey = $this->integration->getHubSpotApiKey();
-        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
+        if ('oauth2' === $this->integration->getAuthenticationType()) {
+            $url     = sprintf('%s/%s/%s/', $this->integration->getApiUrl(), $object, $operation);
+        } else {
+            $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $this->integration->getHubSpotApiKey());
+        }
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
         if (isset($request['status']) && 'error' == $request['status']) {
             $message = $request['message'];
@@ -29,6 +36,20 @@ class HubspotApi extends CrmApi
             }
         }
 
+        if (isset($request['error']) && 401 == $request['error']['code']) {
+            $response = json_decode($request['error']['message'] ?? null, true);
+
+            if (isset($response)) {
+                throw new ApiErrorException($response['message'], $request['error']['code']);
+            } else {
+                throw new ApiErrorException('401 Unauthorized - Error with Hubspot API', $request['error']['code']);
+            }
+        }
+
+        if (isset($request['error'])) {
+            throw new ApiErrorException($request['error']['message']);
+        }
+
         return $request;
     }
 
@@ -38,7 +59,7 @@ class HubspotApi extends CrmApi
     public function getLeadFields($object = 'contacts')
     {
         if ('company' == $object) {
-            $object = 'companies'; //hubspot company object name
+            $object = 'companies'; // hubspot company object name
         }
 
         return $this->request('v2/properties', [], 'GET', $object);
@@ -57,9 +78,9 @@ class HubspotApi extends CrmApi
          */
         $email  = $data['email'];
         $result = [];
-        //Check if the is a valid email
+        // Check if the is a valid email
         MailHelper::validateEmail($email);
-        //Format data for request
+        // Format data for request
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
         if ($formattedLeadData) {
             $result = $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
@@ -93,7 +114,6 @@ class HubspotApi extends CrmApi
     }
 
     /**
-     * @param        $propertyName
      * @param string $object
      *
      * @return mixed|string

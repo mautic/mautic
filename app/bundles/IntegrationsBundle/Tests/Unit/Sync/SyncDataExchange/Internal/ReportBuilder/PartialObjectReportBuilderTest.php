@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
@@ -42,44 +33,41 @@ class PartialObjectReportBuilderTest extends TestCase
     /**
      * @var FieldChangeRepository|MockObject
      */
-    private $fieldChangeRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
 
     /**
      * @var FieldHelper|MockObject
      */
-    private $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var FieldBuilder|MockObject
      */
-    private $fieldBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
 
     /**
      * @var ObjectProvider|MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
-    /**
-     * @var PartialObjectReportBuilder
-     */
-    private $reportBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {
         $this->fieldChangeRepository = $this->createMock(FieldChangeRepository::class);
         $this->fieldHelper           = $this->getMockBuilder(FieldHelper::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getNormalizedFieldType'])
+            ->onlyMethods(['getFieldChangeObject', 'getFieldObjectName'])
             ->getMock();
-        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
-        $this->fieldBuilder          = $this->createMock(FieldBuilder::class);
-        $this->objectProvider        = $this->createMock(ObjectProvider::class);
-        $this->reportBuilder         = new PartialObjectReportBuilder(
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $this->fieldBuilder   = $this->createMock(FieldBuilder::class);
+        $this->objectProvider = $this->createMock(ObjectProvider::class);
+        $this->reportBuilder  = new PartialObjectReportBuilder(
             $this->fieldChangeRepository,
             $this->fieldHelper,
             $this->fieldBuilder,
@@ -153,7 +141,6 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame([1], $event->getIds());
@@ -168,7 +155,8 @@ class PartialObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
@@ -244,7 +232,6 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame([1], $event->getIds());
                     $this->assertSame($internalObject, $event->getObject());
@@ -259,7 +246,8 @@ class PartialObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);

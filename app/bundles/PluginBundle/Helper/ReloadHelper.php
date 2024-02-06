@@ -1,46 +1,35 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Event\PluginInstallEvent;
+use Mautic\PluginBundle\Event\PluginUpdateEvent;
+use Mautic\PluginBundle\PluginEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Caution: none of the methods persist data.
  */
 class ReloadHelper
 {
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher,
+        private MauticFactory $factory
+    ) {
     }
 
     /**
      * Disables plugins that are in the database but are missing in the filesystem.
-     *
-     * @return array
      */
-    public function disableMissingPlugins(array $allPlugins, array $installedPlugins)
+    public function disableMissingPlugins(array $allPlugins, array $installedPlugins): array
     {
         $disabledPlugins = [];
 
         foreach ($installedPlugins as $plugin) {
             if (!isset($allPlugins[$plugin->getBundle()]) && !$plugin->getIsMissing()) {
-                //files are no longer found
+                // files are no longer found
                 $plugin->setIsMissing(true);
                 $disabledPlugins[$plugin->getBundle()] = $plugin;
             }
@@ -52,16 +41,14 @@ class ReloadHelper
     /**
      * Re-enables plugins that were disabled because they were missing in the filesystem
      * but appeared in it again.
-     *
-     * @return array
      */
-    public function enableFoundPlugins(array $allPlugins, array $installedPlugins)
+    public function enableFoundPlugins(array $allPlugins, array $installedPlugins): array
     {
         $enabledPlugins = [];
 
         foreach ($installedPlugins as $plugin) {
             if (isset($allPlugins[$plugin->getBundle()]) && $plugin->getIsMissing()) {
-                //files are no longer found
+                // files are no longer found
                 $plugin->setIsMissing(false);
                 $enabledPlugins[$plugin->getBundle()] = $plugin;
             }
@@ -72,10 +59,8 @@ class ReloadHelper
 
     /**
      * Updates plugins that exist in the filesystem and in the database and their version changed.
-     *
-     * @return array
      */
-    public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas)
+    public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
         $updatedPlugins = [];
 
@@ -85,16 +70,19 @@ class ReloadHelper
                 $oldVersion   = $plugin->getVersion();
                 $plugin       = $this->mapConfigToPluginEntity($plugin, $pluginConfig);
 
-                //compare versions to see if an update is necessary
+                // compare versions to see if an update is necessary
                 if (!empty($oldVersion) && -1 == version_compare($oldVersion, $plugin->getVersion())) {
-                    //call the update callback
-                    $callback = $pluginConfig['bundleClass'];
-                    $metadata = isset($pluginMetadata[$pluginConfig['namespace']])
-                        ? $pluginMetadata[$pluginConfig['namespace']] : null;
+                    // call the update callback
+                    $callback        = $pluginConfig['bundleClass'];
+                    $metadata        = $pluginMetadata[$pluginConfig['namespace']] ?? null;
                     $installedSchema = isset($installedPluginsSchemas[$pluginConfig['namespace']])
                         ? $installedPluginsSchemas[$allPlugins[$bundle]['namespace']] : null;
 
                     $callback::onPluginUpdate($plugin, $this->factory, $metadata, $installedSchema);
+
+                    $event = new PluginUpdateEvent($plugin, $oldVersion);
+
+                    $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_UPDATE);
 
                     unset($metadata, $installedSchema);
 
@@ -108,10 +96,8 @@ class ReloadHelper
 
     /**
      * Installs plugins that does not exist in the database yet.
-     *
-     * @return array
      */
-    public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas)
+    public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
         $installedPlugins = [];
 
@@ -121,7 +107,7 @@ class ReloadHelper
 
                 // Call the install callback
                 $callback        = $pluginConfig['bundleClass'];
-                $metadata        = isset($pluginMetadata[$pluginConfig['namespace']]) ? $pluginMetadata[$pluginConfig['namespace']] : null;
+                $metadata        = $pluginMetadata[$pluginConfig['namespace']] ?? null;
                 $installedSchema = null;
 
                 if (isset($installedPluginsSchemas[$pluginConfig['namespace']]) && 0 !== count($installedPluginsSchemas[$pluginConfig['namespace']]->getTables())) {
@@ -130,6 +116,10 @@ class ReloadHelper
 
                 $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
 
+                $event = new PluginInstallEvent($entity);
+
+                $this->eventDispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL);
+
                 $installedPlugins[$entity->getBundle()] = $entity;
             }
         }
@@ -137,10 +127,7 @@ class ReloadHelper
         return $installedPlugins;
     }
 
-    /**
-     * @return Plugin
-     */
-    private function mapConfigToPluginEntity(Plugin $plugin, array $config)
+    private function mapConfigToPluginEntity(Plugin $plugin, array $config): Plugin
     {
         $plugin->setBundle($config['bundle']);
 
@@ -152,7 +139,7 @@ class ReloadHelper
             }
 
             $plugin->setName(
-                isset($details['name']) ? $details['name'] : $config['base']
+                $details['name'] ?? $config['base']
             );
 
             if (isset($details['description'])) {

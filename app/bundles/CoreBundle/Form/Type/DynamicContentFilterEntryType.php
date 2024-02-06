@@ -1,16 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
@@ -21,43 +14,71 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DynamicContentFilterEntryType extends AbstractType
 {
-    private $fieldChoices    = [];
-    private $countryChoices  = [];
-    private $regionChoices   = [];
-    private $timezoneChoices = [];
-    private $localeChoices   = [];
+    /**
+     * @var mixed[]
+     */
+    private $fieldChoices = [];
 
     /**
-     * @var StageModel
+     * @var mixed[]
      */
-    private $stageModel;
+    private array $countryChoices;
 
-    public function __construct(ListModel $listModel, StageModel $stageModel)
-    {
+    /**
+     * @var mixed[]
+     */
+    private array $regionChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $timezoneChoices;
+
+    /**
+     * @var mixed[]
+     */
+    private array $localeChoices;
+
+    public function __construct(
+        ListModel $listModel,
+        private StageModel $stageModel,
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    ) {
         $this->fieldChoices = $listModel->getChoiceFields();
 
         $this->filterFieldChoices();
 
-        $this->countryChoices  = FormFieldHelper::getCountryChoices();
-        $this->regionChoices   = FormFieldHelper::getRegionChoices();
-        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
-        $this->localeChoices   = FormFieldHelper::getLocaleChoices();
-        $this->stageModel      = $stageModel;
+        $this->countryChoices            = FormFieldHelper::getCountryChoices();
+        $this->regionChoices             = FormFieldHelper::getRegionChoices();
+        $this->timezoneChoices           = FormFieldHelper::getTimezonesChoices();
+        $this->localeChoices             = FormFieldHelper::getLocaleChoices();
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $extraClasses = '';
+
+        try {
+            $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
+            $mauticBuilder->getName();
+        } catch (IntegrationNotFoundException) {
+            // Assume legacy builder
+            $extraClasses = ' legacy-builder';
+        }
+
         $builder->add(
             'content',
             TextareaType::class,
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
                 'attr'  => [
-                    'class' => 'form-control editor editor-dynamic-content',
+                    'class' => 'form-control editor editor-dynamic-content'.$extraClasses,
                 ],
             ]
         );
@@ -90,18 +111,12 @@ class DynamicContentFilterEntryType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $this->fieldChoices;
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -111,38 +126,28 @@ class DynamicContentFilterEntryType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'dynamic_content_filter_entry';
-    }
-
-    private function filterFieldChoices()
+    private function filterFieldChoices(): void
     {
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
-            function ($key) {
-                return !in_array(
-                    $key,
-                    [
-                        'company',
-                        'leadlist',
-                        'campaign',
-                        'device_type',
-                        'device_brand',
-                        'device_os',
-                        'lead_email_received',
-                        'tags',
-                        'dnc_bounced',
-                        'dnc_unsubscribed',
-                        'dnc_bounced_sms',
-                        'dnc_unsubscribed_sms',
-                        'hit_url',
-                    ]
-                );
-            },
+            fn ($key): bool => !in_array(
+                $key,
+                [
+                    'company',
+                    'leadlist',
+                    'campaign',
+                    'device_type',
+                    'device_brand',
+                    'device_os',
+                    'lead_email_received',
+                    'tags',
+                    'dnc_bounced',
+                    'dnc_unsubscribed',
+                    'dnc_bounced_sms',
+                    'dnc_unsubscribed_sms',
+                    'hit_url',
+                ]
+            ),
             ARRAY_FILTER_USE_KEY
         );
     }

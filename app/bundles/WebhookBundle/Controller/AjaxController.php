@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -18,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    protected function sendHookTestAction(Request $request)
+    public function sendHookTestAction(Request $request, Client $client): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $url = InputHelper::url($request->request->get('url'));
 
@@ -45,7 +36,7 @@ class AjaxController extends CommonAjaxController
 
         // set the response
         /** @var Psr\Http\Message\ResponseInterface $response */
-        $response = $this->get('mautic.webhook.http.client')->post($url, $payloads, InputHelper::string($request->request->get('secret')));
+        $response = $client->post($url, $payloads, InputHelper::string($request->request->get('secret')));
 
         // default to an error message
         $dataArray = [
@@ -72,7 +63,10 @@ class AjaxController extends CommonAjaxController
      * @param $types array
      * @return array
      */
-    public function getPayloadPaths($types)
+    /**
+     * @return non-falsy-string[]
+     */
+    public function getPayloadPaths($types): array
     {
         $payloadPaths = [];
 
@@ -101,7 +95,7 @@ class AjaxController extends CommonAjaxController
 
             $prefixParts = explode('.', $prefix);
 
-            $bundleName = (array_pop($prefixParts));
+            $bundleName = array_pop($prefixParts);
 
             $payloadPath .= '/'.ucfirst($bundleName).'Bundle/Assets/WebhookPayload/'.$bundleName.'_'.$eventName.'.json';
 
@@ -117,7 +111,10 @@ class AjaxController extends CommonAjaxController
      * @param  $paths array
      * @return $payload array
      */
-    public function loadPayloads($paths)
+    /**
+     * @return mixed[]
+     */
+    public function loadPayloads($paths): array
     {
         $payloads = [];
 

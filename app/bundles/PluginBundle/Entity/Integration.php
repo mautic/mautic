@@ -1,32 +1,23 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class Integration.
- */
-class Integration extends CommonEntity
+class Integration extends CommonEntity implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'IntegrationSettings';
+
     /**
      * @var int
      */
     private $id;
 
     /**
-     * @var Plugin
+     * @var Plugin|null
      */
     private $plugin;
 
@@ -55,15 +46,15 @@ class Integration extends CommonEntity
      */
     private $featureSettings = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugin_integration_settings')
-            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationRepository');
+            ->setCustomRepositoryClass(\Mautic\PluginBundle\Entity\IntegrationRepository::class);
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -102,7 +93,7 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @return Plugin
+     * @return Plugin|null
      */
     public function getPlugin()
     {
@@ -163,6 +154,11 @@ class Integration extends CommonEntity
         $this->isPublished = $isPublished;
 
         return $this;
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->isPublished;
     }
 
     /**
@@ -227,5 +223,10 @@ class Integration extends CommonEntity
         $this->featureSettings = $featureSettings;
 
         return $this;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
     }
 }

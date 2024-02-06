@@ -1,14 +1,5 @@
 <?php
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
@@ -18,8 +9,11 @@ use PHPUnit\Framework\TestCase;
 class YearStatTest extends TestCase
 {
     private $year     = '2019';
+
     private $month    = 11;
-    private $yearStat;
+
+    private \Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat $yearStat;
+
     private $monthStat;
 
     protected function setUp(): void
@@ -28,7 +22,7 @@ class YearStatTest extends TestCase
         $this->monthStat = $this->yearStat->getMonth($this->month);
     }
 
-    public function testGetMonth()
+    public function testGetMonth(): void
     {
         $this->assertInstanceOf(MonthStat::class, $this->monthStat);
         $month = $this->yearStat->getMonth($this->month);
@@ -41,13 +35,13 @@ class YearStatTest extends TestCase
         $this->assertSame(2, $this->yearStat->getCount());
     }
 
-    public function testGetStats()
+    public function testGetStats(): void
     {
         $result = $this->yearStat->getStats();
         $this->assertSame(["$this->year-$this->month" => $this->monthStat], $result);
     }
 
-    public function testGetSum()
+    public function testGetSum(): void
     {
         $this->yearStat  = new YearStat($this->year);
         $this->yearStat->getMonth($this->month);
@@ -58,7 +52,7 @@ class YearStatTest extends TestCase
         $this->assertSame(2, $this->yearStat->getCount());
     }
 
-    public function testGetCount()
+    public function testGetCount(): void
     {
         $this->yearStat  = new YearStat($this->year);
         $this->yearStat->getMonth($this->month);

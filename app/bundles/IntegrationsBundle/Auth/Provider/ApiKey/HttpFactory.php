@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Auth\Provider\ApiKey;
 
 use GuzzleHttp\Client;
@@ -33,19 +24,16 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 class HttpFactory implements AuthProviderInterface
 {
-    const NAME = 'api_key';
+    public const NAME = 'api_key';
 
     /**
      * Cache of initialized clients.
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
-    /**
-     * @var HeaderCredentialsInterface|ParameterCredentialsInterface
-     */
-    private $credentials;
+    private HeaderCredentialsInterface|ParameterCredentialsInterface|null $credentials = null;
 
     public function getAuthType(): string
     {
@@ -53,7 +41,7 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
+     * @param HeaderCredentialsInterface|ParameterCredentialsInterface $credentials
      *
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
@@ -115,11 +103,9 @@ class HttpFactory implements AuthProviderInterface
 
         $handler->unshift(
             Middleware::mapRequest(
-                function (Request $request) {
-                    return $request->withUri(
-                        Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
-                    );
-                }
+                fn (Request $request) => $request->withUri(
+                    Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
+                )
             )
         );
 

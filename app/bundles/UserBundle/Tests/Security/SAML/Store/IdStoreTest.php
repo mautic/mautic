@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use Doctrine\Persistence\ObjectManager;
@@ -23,17 +14,14 @@ class IdStoreTest extends TestCase
     /**
      * @var ObjectManager|MockObject
      */
-    private $manager;
+    private \PHPUnit\Framework\MockObject\MockObject $manager;
 
     /**
      * @var TimeProviderInterface|MockObject
      */
-    private $timeProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $timeProvider;
 
-    /**
-     * @var IdStore
-     */
-    private $store;
+    private \Mautic\UserBundle\Security\SAML\Store\IdStore $store;
 
     protected function setUp(): void
     {
@@ -42,12 +30,12 @@ class IdStoreTest extends TestCase
         $this->store        = new IdStore($this->manager, $this->timeProvider);
     }
 
-    public function testNewIdEntryCreatedIfEntityIdNotFound()
+    public function testNewIdEntryCreatedIfEntityIdNotFound(): void
     {
         $expiry = new \DateTime('+5 minutes');
         $this->manager->expects($this->once())
             ->method('persist')
-            ->willReturnCallback(function (IdEntry $idEntry) use ($expiry) {
+            ->willReturnCallback(function (IdEntry $idEntry) use ($expiry): void {
                 $this->assertEquals('foobar', $idEntry->getEntityId());
                 $this->assertEquals('abc', $idEntry->getId());
                 $this->assertEquals($expiry->getTimestamp(), $idEntry->getExpiryTime()->getTimestamp());
@@ -56,7 +44,7 @@ class IdStoreTest extends TestCase
         $this->store->set('foobar', 'abc', $expiry);
     }
 
-    public function testIdEntryUpdatedIfEntityIdFound()
+    public function testIdEntryUpdatedIfEntityIdFound(): void
     {
         $expiry  = new \DateTime('+5 minutes');
         $idEntry = new IdEntry();
@@ -75,7 +63,7 @@ class IdStoreTest extends TestCase
         $this->store->set('foobar', 'abc', $expiry);
     }
 
-    public function testIdEntryIsFoundAndNotExpired()
+    public function testIdEntryIsFoundAndNotExpired(): void
     {
         $expiry  = new \DateTime('+5 minutes');
         $idEntry = new IdEntry();
@@ -90,7 +78,7 @@ class IdStoreTest extends TestCase
         $this->assertTrue($this->store->has('foobar', 'abc'));
     }
 
-    public function testIdEntryIsFoundButIsExpired()
+    public function testIdEntryIsFoundButIsExpired(): void
     {
         $this->timeProvider->expects($this->once())
             ->method('getTimestamp')
@@ -109,7 +97,7 @@ class IdStoreTest extends TestCase
         $this->assertFalse($this->store->has('foobar', 'abc'));
     }
 
-    public function testIdEntryIsNotFound()
+    public function testIdEntryIsNotFound(): void
     {
         $this->timeProvider->expects($this->never())
             ->method('getTimestamp');

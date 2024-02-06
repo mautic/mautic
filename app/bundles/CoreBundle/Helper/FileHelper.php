@@ -1,21 +1,12 @@
 <?php
 
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see         http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 class FileHelper
 {
-    const BYTES_TO_MEGABYTES_RATIO = 1048576;
+    public const BYTES_TO_MEGABYTES_RATIO = 1_048_576;
 
-    public static function convertBytesToMegabytes($b)
+    public static function convertBytesToMegabytes($b): float
     {
         return round($b / self::BYTES_TO_MEGABYTES_RATIO, 2);
     }
@@ -25,7 +16,7 @@ class FileHelper
         return $mb * self::BYTES_TO_MEGABYTES_RATIO;
     }
 
-    public static function getMaxUploadSizeInBytes()
+    public static function getMaxUploadSizeInBytes(): int
     {
         $maxPostSize   = self::convertPHPSizeToBytes(ini_get('post_max_size'));
         $maxUploadSize = self::convertPHPSizeToBytes(ini_get('upload_max_filesize'));
@@ -34,7 +25,7 @@ class FileHelper
         return min($maxPostSize, $maxUploadSize, $memoryLimit);
     }
 
-    public static function getMaxUploadSizeInMegabytes()
+    public static function getMaxUploadSizeInMegabytes(): float
     {
         $maxUploadSizeInBytes = self::getMaxUploadSizeInBytes();
 
@@ -43,10 +34,8 @@ class FileHelper
 
     /**
      * @param string $sSize
-     *
-     * @return int
      */
-    public static function convertPHPSizeToBytes($sSize)
+    public static function convertPHPSizeToBytes($sSize): int
     {
         $sSize = trim($sSize);
 
@@ -55,9 +44,9 @@ class FileHelper
         }
 
         $sSuffix = substr($sSize, -1);
-        $iValue  = substr($sSize, 0, -1);
+        $iValue  = (int) substr($sSize, 0, -1);
 
-        //missing breaks are important
+        // missing breaks are important
         switch (strtoupper($sSuffix)) {
             case 'P':
                 $iValue *= 1024;

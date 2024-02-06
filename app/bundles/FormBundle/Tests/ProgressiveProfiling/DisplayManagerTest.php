@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\ProgressiveProfiling;
 
 use Mautic\FormBundle\Entity\Field;
@@ -18,20 +9,11 @@ use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 
 class DisplayManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Form
-     */
-    private $form;
+    private \Mautic\FormBundle\Entity\Form $form;
 
-    /**
-     * @var array
-     */
-    private $viewOnlyFields;
+    private array $viewOnlyFields;
 
-    /**
-     * @var DisplayCounter
-     */
-    private $displayCounter;
+    private \Mautic\FormBundle\ProgressiveProfiling\DisplayCounter $displayCounter;
 
     public function setUp(): void
     {
@@ -40,7 +22,7 @@ class DisplayManagerTest extends \PHPUnit\Framework\TestCase
         $this->displayCounter = new DisplayCounter($this->form);
     }
 
-    public function testShowForField()
+    public function testShowForField(): void
     {
         $form           = new Form();
         $viewOnlyFields = ['button'];

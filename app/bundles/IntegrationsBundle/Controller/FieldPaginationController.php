@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -20,36 +11,41 @@ use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
 use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class FieldPaginationController extends CommonController
 {
     /**
-     * @return mixed
+     * @return Response
      */
-    public function paginateAction(string $integration, string $object, int $page, Request $request)
-    {
+    public function paginateAction(
+        Request $request,
+        FormFactoryInterface $formFactory,
+        ConfigIntegrationsHelper $integrationsHelper,
+        string $integration,
+        string $object,
+        int $page
+    ) {
         // Check ACL
-        if (!$this->get('mautic.security')->isGranted('plugin:plugins:manage')) {
+        if (!$this->security->isGranted('plugin:plugins:manage')) {
             return $this->accessDenied();
         }
 
         // Find the integration
-        /** @var ConfigIntegrationsHelper $integrationsHelper */
-        $integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
-
         try {
             /** @var ConfigFormSyncInterface $integrationObject */
             $integrationObject        = $integrationsHelper->getIntegration($integration);
             $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
 
         $keyword         = $request->get('keyword');
         $featureSettings = $integrationConfiguration->getFeatureSettings();
-        $currentFields   = $this->getFields($integrationObject, $featureSettings, $object);
+        $currentFields   = $this->getFields($request, $integrationObject, $featureSettings, $object);
 
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
         if ($keyword) {
@@ -59,7 +55,7 @@ class FieldPaginationController extends CommonController
         }
 
         // Create the form
-        $form = $this->get('form.factory')->create(
+        $form = $formFactory->create(
             IntegrationSyncSettingsObjectFieldMappingType::class,
             $currentFields,
             [
@@ -74,7 +70,7 @@ class FieldPaginationController extends CommonController
         );
 
         $html = $this->render(
-            'IntegrationsBundle:Config:field_mapping.html.php',
+            '@Integrations/Config/field_mapping.html.twig',
             [
                 'form'        => $form->createView(),
                 'integration' => $integration,
@@ -85,7 +81,7 @@ class FieldPaginationController extends CommonController
 
         $prefix   = "integration_config[featureSettings][sync][fieldMappings][$object]";
         $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-        if ('_' == substr($idPrefix, -1)) {
+        if (str_ends_with($idPrefix, '_')) {
             $idPrefix = substr($idPrefix, 0, -1);
         }
 
@@ -101,7 +97,7 @@ class FieldPaginationController extends CommonController
         );
     }
 
-    private function getFields(ConfigFormSyncInterface $integrationObject, array $featureSettings, string $object): array
+    private function getFields(Request $request, ConfigFormSyncInterface $integrationObject, array $featureSettings, string $object): array
     {
         $fields = $featureSettings['sync']['fieldMappings'] ?? [];
 
@@ -110,7 +106,7 @@ class FieldPaginationController extends CommonController
         }
 
         // Pull those changed from session
-        $session       = $this->get('session');
+        $session       = $request->getSession();
         $sessionFields = $session->get(sprintf('%s-fields', $integrationObject->getName()), []);
 
         if (!isset($sessionFields[$object])) {

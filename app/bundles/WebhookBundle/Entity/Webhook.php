@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,6 +17,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Webhook extends FormEntity
 {
+    public const LOGS_DISPLAY_LIMIT = 100;
+
     /**
      * @var int
      */
@@ -36,7 +30,7 @@ class Webhook extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -46,22 +40,22 @@ class Webhook extends FormEntity
     private $webhookUrl;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $secret;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Log>
      */
     private $logs;
 
@@ -87,7 +81,7 @@ class Webhook extends FormEntity
      * ASC or DESC order for fetching order of the events when queue mode is on.
      * Null means use the global default.
      *
-     * @var string
+     * @var string|null
      */
     private $eventsOrderbyDir;
 
@@ -97,7 +91,7 @@ class Webhook extends FormEntity
         $this->logs   = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhooks')
@@ -124,17 +118,15 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        $builder->addNamedField('webhookUrl', Types::STRING, 'webhook_url');
+        $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
         $builder->addField('secret', Types::STRING);
         $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hook')
             ->addListProperties(
@@ -152,7 +144,7 @@ class Webhook extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -265,7 +257,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param string $secret
+     * @param ?string $secret
      *
      * @return Webhook
      */
@@ -278,7 +270,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getSecret()
     {
@@ -313,8 +305,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param $events
-     *
      * @return $this
      */
     public function setEvents($events)
@@ -332,10 +322,8 @@ class Webhook extends FormEntity
 
     /**
      * This builds a simple array with subscribed events.
-     *
-     * @return array
      */
-    public function buildTriggers()
+    public function buildTriggers(): void
     {
         foreach ($this->events as $event) {
             $this->triggers[] = $event->getEventType();
@@ -345,7 +333,7 @@ class Webhook extends FormEntity
     /**
      * Takes the array of triggers and builds events from them if they don't exist already.
      */
-    public function setTriggers(array $triggers)
+    public function setTriggers(array $triggers): void
     {
         foreach ($triggers as $key) {
             $this->addTrigger($key);
@@ -356,10 +344,8 @@ class Webhook extends FormEntity
      * Takes a trigger (event type) and builds the Event object form it if it doesn't exist already.
      *
      * @param string $key
-     *
-     * @return bool
      */
-    public function addTrigger($key)
+    public function addTrigger($key): bool
     {
         if ($this->eventExists($key)) {
             return false;
@@ -377,10 +363,8 @@ class Webhook extends FormEntity
      * Check if an event exists comared to its type.
      *
      * @param string $key
-     *
-     * @return bool
      */
-    public function eventExists($key)
+    public function eventExists($key): bool
     {
         foreach ($this->events as $event) {
             if ($event->getEventType() === $key) {
@@ -445,6 +429,17 @@ class Webhook extends FormEntity
     }
 
     /**
+     * @return Collection<int, \Mautic\WebhookBundle\Entity\Log>
+     */
+    public function getLimitedLogs(): Collection
+    {
+        $criteria = Criteria::create()
+            ->setMaxResults(self::LOGS_DISPLAY_LIMIT);
+
+        return $this->logs->matching($criteria);
+    }
+
+    /**
      * @return $this
      */
     public function addLogs($logs)
@@ -497,7 +492,7 @@ class Webhook extends FormEntity
         return $this;
     }
 
-    public function wasModifiedRecently()
+    public function wasModifiedRecently(): bool
     {
         $dateModified = $this->getDateModified();
 

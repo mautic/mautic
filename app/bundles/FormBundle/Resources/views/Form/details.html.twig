@@ -1,0 +1,296 @@
+{#
+  Variables
+    - activeForm
+    - submissionCounts
+    - page
+    - logs
+    - permissions
+    - stats.submissionsInTime
+    - dateRangeForm
+    - activeFormActions
+    - activeFormFields
+    - formScript
+    - formContent
+    - availableActions
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}form{% endblock %}
+
+{% block headerTitle %}{{ activeForm.name }}{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+            'item': activeForm,
+            'templateButtons': {
+                'edit': securityHasEntityAccess(permissions['form:forms:editown'], permissions['form:forms:editother'], activeForm.createdBy),
+                'clone': permissions['form:forms:create'],
+                'delete': securityHasEntityAccess(permissions['form:forms:deleteown'], permissions['form:forms:deleteother'], activeForm.createdBy),
+                'close': securityHasEntityAccess(permissions['form:forms:viewown'], permissions['form:forms:viewother'], activeForm.createdBy),
+            },
+            'routeBase': 'form',
+            'langVar': 'form',
+            'customButtons': [
+                {
+                    'attr': {
+                        'data-toggle': '',
+                        'target': '_blank',
+                        'href': path('mautic_form_action', {'objectAction': 'preview', 'objectId': activeForm.id}),
+                    },
+                    'iconClass': 'fa fa-camera',
+                    'btnText': 'mautic.form.form.preview',
+                    'btnClass': 'btn btn-default btn-nospin',
+                },
+                {
+                    'attr': {
+                        'data-toggle': 'ajax',
+                        'href': path('mautic_form_action', {'objectAction': 'results', 'objectId': activeForm.id}),
+                    },
+                    'iconClass': 'fa fa-database',
+                    'btnText': 'mautic.form.form.results',
+                },
+            ],
+    }) }}
+{% endblock %}
+
+{% block publishStatus %}
+    {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activeForm}) }}
+{% endblock %}
+
+{% block content %}
+{% set showActions = activeFormActions|length %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 bg-white height-auto">
+        <div class="bg-auto">
+            <!-- form detail header -->
+            <div class="pr-md pl-md pt-lg pb-lg">
+                <div class="box-layout">
+                    <div class="col-xs-10">
+                        <div class="text-muted">{{ activeForm.description|purify }}</div>
+                    </div>
+                </div>
+            </div>
+            <!--/ form detail header -->
+
+            <!-- form detail collapseable -->
+            <div class="collapse" id="form-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <tbody>
+                            {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeForm}) }}
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b">{{ 'mautic.form.stats.submission_counts'|trans }}</span>
+                                </td>
+                                <td>
+                                    {{ submissionCounts['unique'] }} / {{ submissionCounts['total'] }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--/ form detail collapseable -->
+        </div>
+
+        <div class="bg-auto bg-dark-xs">
+            <!-- form detail collapseable toggler -->
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip"
+                      title="{{ 'mautic.form.details.detail'|trans }}">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#form-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
+                </span>
+            </div>
+            <!--/ form detail collapseable toggler -->
+
+            <!-- stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-xs-6 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-download"></span>
+                                        {{ 'mautic.form.graph.line.submissions'|trans }}
+                                    </h5>
+                                </div>
+                                <div class="col-xs-6 va-m">
+                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats['submissionsInTime'], 'chartType': 'line', 'chartHeight': 300}) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
+
+            {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                {% if showActions %}
+                    <li class="active">
+                        <a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a>
+                    </li>
+                {% endif %}
+                <li class="{% if not showActions %}active{% endif %}">
+                    <a href="#fields-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.fields'|trans }}</a>
+                </li>
+            </ul>
+            <!--/ tabs controls -->
+        </div>
+
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            {% if showActions %}
+                <!-- #actions-container -->
+                <div class="tab-pane active fade in bdr-w-0" id="actions-container">
+                    {% for group, groupActions in activeFormActions %}
+                        <h5 class="fw-sb mb-xs">{{ group|title }}</h5>
+                        <ul class="list-group">
+                            {# @var \Mautic\FormBundle\Entity\Action $action #}
+                            {% for action in groupActions %}
+                                <li class="list-group-item bg-auto bg-light-xs">
+                                    <div class="box-layout">
+                                        {% set icon = null %}
+                                        {% if 'lead' == group %}
+                                          {% set icon = 'fa-user' %}
+                                        {% elseif 'asset' == group %}
+                                          {% set icon = 'fa-cloud-download' %}
+                                        {% endif %}
+                                        {% if icon is not empty %}
+                                            <div class="col-md-1 va-m">
+                                                <h3><span class="fa {{ icon }} text-white dark-xs"></span></h3>
+                                            </div>
+                                        {% endif %}
+                                        <div class="col-md-7 va-m">
+                                            <h5 class="fw-sb text-primary mb-xs">{{ action.name }}</h5>
+                                            <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
+                                        </div>
+                                        <div class="col-md-4 va-m text-right">
+                                            <em class="text-white dark-sm">{% if availableActions[action.type] is defined %}{{ availableActions[action.type]['label']|trans }}{% else %}{{ action.type }}{% endif %}</em>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
+                </div>
+                <!--/ #actions-container -->
+            {% endif %}
+
+            <!-- #fields-container -->
+            <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
+                <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
+                <ul class="list-group mb-xs">
+                    {# @var \Mautic\FormBundle\Entity\Field $field #}
+                    {% for field in activeFormFields %}
+                      {% if not field.parent %}
+                      <li class="list-group-item bg-auto bg-light-xs mt-10">
+                          {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': field}) }}
+                      </li>
+                      {% endif %}
+                      {# @var \Mautic\FormBundle\Entity\Field $field #}
+                      {% for fieldChild in activeFormFields %}
+                          {% if fieldChild.parent == field.id %}
+                              <li class="list-group-item bg-auto bg-light-xs ml-20">
+                                  {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': fieldChild}) }}
+                              </li>
+                          {% endif %}
+                      {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <!--/ #fields-container -->
+        </div>
+        <!--/ end: tab-content -->
+    </div>
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bg-white bdr-l height-auto">
+        <!-- form HTML -->
+        <div class="pa-md">
+            <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
+                <div class="panel-body">
+                    <h5 class="fw-sb mb-sm">{{ 'mautic.form.form.header.copy'|trans }}</h5>
+                    <p class="mb-sm">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
+                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-automatic-copy">{{ 'mautic.form.form.header.automaticcopy'|trans }}</a>
+                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-manual-copy">{{ 'mautic.form.form.header.manualcopy'|trans }}</a>
+                </div>
+            </div>
+        </div>
+        <!--/ form HTML -->
+
+        <hr class="hr-w-2" style="width:50%">
+
+        {# we can leverage data from audit_log table and build activity feed from it #}
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+            <!-- recent activity -->
+            {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
+        </div>
+    </div>
+    <!--/ right section -->
+
+    <!-- #modal-automatic-copy -->
+    <div class="modal fade" id="modal-automatic-copy">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.automaticcopy'|trans }}</h5>
+                </div>
+                <div class="modal-body">
+                    <p>{{ 'mautic.form.form.help.automaticcopy'|trans }}</p>
+                    <h3>{{ 'mautic.form.form.help.automaticcopy.js'|trans }}</h3>
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="{{ url('mautic_form_generateform', {'id': activeForm.id}, true) }}"&gt;&lt;/script&gt;</textarea>
+                    <h3 class="pt-lg">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
+                    <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="{{ url('mautic_form_preview', {'id': activeForm.id}, true) }}" width="300" height="300"&gt;&lt;p&gt;Your browser does not support iframes.&lt;/p&gt;&lt;/iframe&gt;</textarea>
+                    <i>{{ 'mautic.form.form.help.automaticcopy.iframe.note'|trans }}</i>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'mautic.core.close'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ #modal-automatic-copy -->
+
+    <!-- #modal-manual-copy -->
+    <div class="modal fade" id="modal-manual-copy">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.manualcopy'|trans }}</h5>
+                </div>
+                <div class="panel-body">
+                    <p>{{ 'mautic.form.form.help.manualcopy'|trans }}</p>
+
+                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.manualcopy.script'|trans }}</h4>
+                    <textarea class="form-html form-control" readonly
+                              onclick="this.setSelectionRange(0, this.value.length);">{{ formScript|purify }}</textarea>
+
+                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.manualcopy.body'|trans }}</h4>
+                    <textarea class="form-html form-control" readonly
+                              onclick="this.setSelectionRange(0, this.value.length);">{{ formContent|raw }}</textarea>
+                </div>
+                <div class="panel-footer text-right">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'mautic.core.close'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ #modal-manual-copy -->
+</div>
+<!--/ end: box layout -->
+
+<input type="hidden" name="entityId" id="entityId" value="{{ activeForm.id|e }}"/>
+{% endblock %}

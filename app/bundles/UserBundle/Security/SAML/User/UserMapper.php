@@ -1,35 +1,20 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\SAML\User;
 
 use LightSaml\Model\Assertion\Assertion;
 use LightSaml\Model\Protocol\Response;
-use LightSaml\SamlConstants;
 use LightSaml\SpBundle\Security\User\UsernameMapperInterface;
 use Mautic\UserBundle\Entity\User;
 
 class UserMapper implements UsernameMapperInterface
 {
     /**
-     * @var string[]
+     * @param array<string, mixed> $attributes
      */
-    private $attributes;
-
-    /**
-     * UserMapper constructor.
-     */
-    public function __construct(array $attributes)
-    {
-        $this->attributes = $attributes;
+    public function __construct(
+        private array $attributes
+    ) {
     }
 
     public function getUser(Response $response): User
@@ -47,12 +32,9 @@ class UserMapper implements UsernameMapperInterface
     {
         $user = $this->getUser($response);
 
-        return $user->getUsername();
+        return $user->getUserIdentifier();
     }
 
-    /**
-     * @return string|null
-     */
     private function setValuesFromAssertion(Assertion $assertion, User $user): void
     {
         $attributes = $this->extractAttributes($assertion);
@@ -81,6 +63,10 @@ class UserMapper implements UsernameMapperInterface
         $attributes = [];
 
         foreach ($this->attributes as $key => $attributeName) {
+            if (!$attributeName) {
+                continue;
+            }
+
             foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
                 $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
                 if ($attribute && $attribute->getFirstAttributeValue()) {

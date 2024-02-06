@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -28,39 +19,13 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelper
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private array $fieldList = [];
 
-    /**
-     * @var VariableExpresserHelperInterface
-     */
-    private $variableExpresserHelper;
-
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var array
-     */
-    private $fieldList = [];
-
-    /**
-     * @var array
-     */
-    private $requiredFieldList = [];
+    private array $requiredFieldList = [];
 
     /**
      * @var array
@@ -72,25 +37,15 @@ class FieldHelper
      */
     private $eventDispatcher;
 
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
     public function __construct(
-        FieldModel $fieldModel,
-        VariableExpresserHelperInterface $variableExpresserHelper,
-        ChannelListHelper $channelListHelper,
-        TranslatorInterface $translator,
+        private FieldModel $fieldModel,
+        private VariableExpresserHelperInterface $variableExpresserHelper,
+        private ChannelListHelper $channelListHelper,
+        private TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        ObjectProvider $objectProvider
+        private ObjectProvider $objectProvider
     ) {
-        $this->fieldModel              = $fieldModel;
-        $this->variableExpresserHelper = $variableExpresserHelper;
-        $this->channelListHelper       = $channelListHelper;
-        $this->translator              = $translator;
         $this->eventDispatcher         = $eventDispatcher;
-        $this->objectProvider          = $objectProvider;
     }
 
     public function getFieldList(string $object): array
@@ -104,18 +59,14 @@ class FieldHelper
 
     public function getNormalizedFieldType(string $type): string
     {
-        switch ($type) {
-            case 'boolean':
-                return NormalizedValueDAO::BOOLEAN_TYPE;
-            case 'date':
-            case 'datetime':
-            case 'time':
-                return NormalizedValueDAO::DATETIME_TYPE;
-            case 'number':
-                return NormalizedValueDAO::FLOAT_TYPE;
-            default:
-                return NormalizedValueDAO::STRING_TYPE;
-        }
+        return match ($type) {
+            'boolean' => NormalizedValueDAO::BOOLEAN_TYPE,
+            'date', 'datetime', 'time' => NormalizedValueDAO::DATETIME_TYPE,
+            'number'      => NormalizedValueDAO::FLOAT_TYPE,
+            'select'      => NormalizedValueDAO::SELECT_TYPE,
+            'multiselect' => NormalizedValueDAO::MULTISELECT_TYPE,
+            default       => NormalizedValueDAO::STRING_TYPE,
+        };
     }
 
     /**
@@ -125,7 +76,7 @@ class FieldHelper
     {
         try {
             return $this->objectProvider->getObjectByName($objectName)->getEntityName();
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throwing different exception to keep BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }
@@ -161,14 +112,14 @@ class FieldHelper
 
         // Dispatch event to add possibility to add field from some listener
         $event                                     = new MauticSyncFieldsLoadEvent($objectName, $this->syncFields[$objectName]);
-        $event                                     = $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD, $event);
+        $event                                     = $this->eventDispatcher->dispatch($event, IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD);
         $this->syncFields[$event->getObjectName()] = $event->getFields();
 
         // Add ID as a read only field
         $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
 
         if (Contact::NAME !== $objectName) {
-            uasort($this->syncFields[$objectName], 'strnatcmp');
+            uksort($this->syncFields[$objectName], 'strnatcmp');
 
             return $this->syncFields[$objectName];
         }
@@ -182,7 +133,7 @@ class FieldHelper
         // Add the timeline link
         $this->syncFields[$objectName]['mautic_internal_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
 
-        uasort($this->syncFields[$objectName], 'strnatcmp');
+        uksort($this->syncFields[$objectName], 'strnatcmp');
 
         return $this->syncFields[$objectName];
     }

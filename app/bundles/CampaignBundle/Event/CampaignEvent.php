@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class CampaignEvent.
- */
 class CampaignEvent extends CommonEvent
 {
     /**
@@ -41,7 +29,7 @@ class CampaignEvent extends CommonEvent
     /**
      * Sets the Campaign entity.
      */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): void
     {
         $this->entity = $campaign;
     }

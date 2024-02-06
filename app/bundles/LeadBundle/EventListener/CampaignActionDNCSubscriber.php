@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -24,29 +15,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionDNCSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * CampaignActionDNCSubscriber constructor.
-     */
-    public function __construct(DoNotContact $doNotContact, LeadModel $leadModel)
-    {
-        $this->doNotContact = $doNotContact;
-        $this->leadModel    = $leadModel;
+    public function __construct(
+        private DoNotContact $doNotContact,
+        private LeadModel $leadModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['configureAction', 0],
@@ -55,7 +30,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function configureAction(CampaignBuilderEvent $event)
+    public function configureAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'lead.adddnc',
@@ -78,7 +53,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function addDoNotContact(PendingEvent $event)
+    public function addDoNotContact(PendingEvent $event): void
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
@@ -103,7 +78,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $event->passAll();
     }
 
-    public function removeDoNotContact(PendingEvent $event)
+    public function removeDoNotContact(PendingEvent $event): void
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);

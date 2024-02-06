@@ -2,22 +2,11 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Test\Listeners;
 
-use Closure;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Framework\TestListenerDefaultImplementation;
-use ReflectionObject;
 
 /**
  * Prevents memory leaks by resetting all the test properties.
@@ -28,10 +17,10 @@ class CleanupListener implements TestListener
 
     public function endTest(Test $test, float $time): void
     {
-        $reflection = new ReflectionObject($test);
+        $reflection = new \ReflectionObject($test);
 
         foreach ($reflection->getProperties() as $property) {
-            if (!$property->isStatic() && 0 !== strpos($property->getDeclaringClass()->getName(), 'PHPUnit\\')) {
+            if (!$property->isStatic() && !str_starts_with($property->getDeclaringClass()->getName(), 'PHPUnit\\')) {
                 $this->unsetProperty($test, $property->getName());
             }
         }
@@ -39,10 +28,10 @@ class CleanupListener implements TestListener
 
     private function unsetProperty(object $object, string $property): void
     {
-        $closure = function (object $object) use ($property) {
+        $closure = function (object $object) use ($property): void {
             unset($object->$property);
         };
 
-        Closure::bind($closure, null, $object)($object);
+        \Closure::bind($closure, null, $object)($object);
     }
 }

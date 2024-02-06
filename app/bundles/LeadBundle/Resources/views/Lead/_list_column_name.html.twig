@@ -1,0 +1,18 @@
+<td>
+    <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+        {% if item.id in noContactList|keys %}
+            <div class="pull-right">
+                {{ include('@MauticLead/Lead/dnc_small.html.twig', {
+                    'dncList': noContactList[item.id],
+                }) }}
+            </div>
+        {% endif %}
+        {% set primaryIdentifier = item.isAnonymous ? item.primaryIdentifier|trans : item.primaryIdentifier|purify %}
+        <div>
+            {{ primaryIdentifier }}
+        </div>
+        {% if 'company' in columns|keys and primaryIdentifier != item.secondaryIdentifier and item.secondaryIdentifier %}
+            <div class="small">{{ item.secondaryIdentifier|purify }}</div>
+        {% endif %}
+    </a>
+</td>

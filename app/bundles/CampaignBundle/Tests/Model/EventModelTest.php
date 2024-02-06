@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -22,12 +13,12 @@ class EventModelTest extends TestCase
     /**
      * @var LeadEventLogRepository
      */
-    private $leadEventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     /**
      * @var EventModel
      */
-    private $eventModel;
+    private \PHPUnit\Framework\MockObject\MockObject $eventModel;
 
     protected function setUp(): void
     {

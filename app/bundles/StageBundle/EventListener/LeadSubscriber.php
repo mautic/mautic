@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
@@ -18,46 +9,19 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var StagesChangeLogRepository
-     */
-    private $stagesChangeLogRepository;
-
-    /**
-     * @var LeadStageLogRepository
-     */
-    private $leadStageLogRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     public function __construct(
-        StagesChangeLogRepository $stagesChangeLogRepository,
-        LeadStageLogRepository $leadStageLogRepository,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private StagesChangeLogRepository $stagesChangeLogRepository,
+        private LeadStageLogRepository $leadStageLogRepository,
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->stagesChangeLogRepository = $stagesChangeLogRepository;
-        $this->leadStageLogRepository    = $leadStageLogRepository;
-        $this->translator                = $translator;
-        $this->router                    = $router;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -68,7 +32,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'stage.changed';
@@ -116,7 +80,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadStageLogRepository->updateLead(
             $event->getLoser()->getId(),

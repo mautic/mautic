@@ -1,45 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
 
-/**
- * Class FacebookIntegration.
- */
 class FacebookIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Facebook';
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): array
     {
         return [
             'facebook',
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'share_button',
@@ -48,33 +30,22 @@ class FacebookIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://www.facebook.com/dialog/oauth';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://graph.facebook.com/oauth/access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthScope()
+    public function getAuthScope(): string
     {
         return 'email';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $data
      * @param bool   $postAuthorization
      *
@@ -94,21 +65,13 @@ class FacebookIntegration extends SocialIntegration
         return $values;
     }
 
-    /**
-     * @param $endpoint
-     *
-     * @return string
-     */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint): string
     {
         return "https://graph.facebook.com/$endpoint";
     }
 
     /**
      * Get public data.
-     *
-     * @param $identifier
-     * @param $socialCache
      *
      * @return array
      */
@@ -158,10 +121,7 @@ class FacebookIntegration extends SocialIntegration
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'about'       => ['type' => 'string'],
@@ -182,10 +142,7 @@ class FacebookIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return FacebookType::class;
     }

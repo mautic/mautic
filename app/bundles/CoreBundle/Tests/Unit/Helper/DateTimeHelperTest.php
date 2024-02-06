@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,7 +12,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\DateTimeHelper::guessTimezoneFromOffset
      */
-    public function testGuessTimezoneFromOffset()
+    public function testGuessTimezoneFromOffset(): void
     {
         $helper   = new DateTimeHelper();
         $timezone = $helper->guessTimezoneFromOffset();
@@ -33,14 +25,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($timezone, 'America/New_York');
     }
 
-    public function testBuildIntervalWithBadUnit()
+    public function testBuildIntervalWithBadUnit(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $helper = new DateTimeHelper();
         $helper->buildInterval(4, 'j');
     }
 
-    public function testBuildIntervalWithRightUnits()
+    public function testBuildIntervalWithRightUnits(): void
     {
         $helper   = new DateTimeHelper();
         $interval = $helper->buildInterval(4, 'Y');
@@ -53,13 +45,13 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateInterval('PT4S'), $interval);
     }
 
-    public function testvalidateMysqlDateTimeUnitWillThrowExceptionOnBadUnit()
+    public function testvalidateMysqlDateTimeUnitWillThrowExceptionOnBadUnit(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         DateTimeHelper::validateMysqlDateTimeUnit('D');
     }
 
-    public function testvalidateMysqlDateTimeUnitWillNotThrowExceptionOnExpectedUnit()
+    public function testvalidateMysqlDateTimeUnitWillNotThrowExceptionOnExpectedUnit(): void
     {
         DateTimeHelper::validateMysqlDateTimeUnit('s');
         DateTimeHelper::validateMysqlDateTimeUnit('i');
@@ -70,5 +62,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         DateTimeHelper::validateMysqlDateTimeUnit('Y');
 
         $this->assertTrue(true, 'Just to avoid the risky test warning...');
+    }
+
+    public function testGetLocalTimezoneOffset(): void
+    {
+        $timezone = (new ParameterLoader())->getParameterBag()->get('default_timezone');
+        $helper   = new DateTimeHelper('now', DateTimeHelper::FORMAT_DB, $timezone);
+        $date     = new \DateTime();
+        $date->setTimezone(new \DateTimeZone($timezone));
+        $this->assertEquals($date->format('P'), $helper->getLocalTimezoneOffset());
     }
 }

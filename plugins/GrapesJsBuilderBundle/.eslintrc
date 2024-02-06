@@ -6,7 +6,8 @@
   "parser": "babel-eslint",
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": ["error"]
+    "prettier/prettier": ["error"],
+    "no-restricted-syntax": 0
   },
   "ignorePatterns": ["Assets/library/js/dist","node_modules","*.min.js"],
   "globals": {

@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -21,41 +13,22 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * TimelineEventLogSegmentSubscriber constructor.
-     */
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
-        UserHelper $userHelper,
-        TranslatorInterface $translator,
-        EntityManagerInterface $em
+        private UserHelper $userHelper,
+        Translator $translator,
+        private EntityManagerInterface $em
     ) {
         $this->eventLogRepository = $eventLogRepository;
-        $this->userHelper         = $userHelper;
         $this->translator         = $translator;
-        $this->em                 = $em;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_LIST_CHANGE       => 'onChange',
@@ -64,7 +37,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onChange(ListChangeEvent $event)
+    public function onChange(ListChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
             return;
@@ -73,11 +46,12 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             [$contact],
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,
@@ -89,7 +63,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onBatchChange(ListChangeEvent $event)
+    public function onBatchChange(ListChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
             return;
@@ -98,14 +72,12 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             $contacts,
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
-    /**
-     * @param $action
-     */
-    private function writeEntries(array $contacts, LeadList $segment, $action)
+    private function writeEntries(array $contacts, LeadList $segment, $action, \DateTime $date = null): void
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];
@@ -114,7 +86,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         foreach ($contacts as $key => $contact) {
             if (!$contact instanceof Lead) {
                 $id                      = is_array($contact) ? $contact['id'] : $contact;
-                $contact                 = $this->em->getReference('MauticLeadBundle:Lead', $id);
+                $contact                 = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $id);
                 $contacts[$key]          = $contact;
                 $detachContactReferences = true;
             }
@@ -133,11 +105,15 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
                     ]
                 );
 
+            if ($date) {
+                $log->setDateAdded($date);
+            }
+
             $logs[] = $log;
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
 
         if ($detachContactReferences) {
             foreach ($contacts as $contact) {

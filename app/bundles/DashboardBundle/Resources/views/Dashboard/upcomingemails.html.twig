@@ -1,0 +1,32 @@
+{% if upcomingEmails %}
+    <ul class="list-group mb-0">
+        {% for email in upcomingEmails %}
+            <li class="list-group-item bg-auto bg-light-xs">
+                <div class="box-layout">
+                    <div class="col-md-1 va-m">
+                        <h3><span class="fa {{ icons.email|default('') }} fw-sb text-success"></span></h3>
+                    </div>
+                    <div class="col-md-4 va-m">
+                        <h5 class="fw-sb text-primary">
+                            <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': email.campaign_id}) }}" data-toggle="ajax">
+                                {{ email.campaign_name }}
+                            </a>
+                        </h5>
+                        <span class="text-white dark-sm">{{ email.event_name }}</span>
+                    </div>
+                    <div class="col-md-4 va-m text-right">
+                        <a class="btn btn-sm btn-success"  href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': email.lead_id}) }}" data-toggle="ajax">
+                            <span class="fa {{ icons.lead|default('') }}"></span>
+                            {{ email.lead_name }}
+                        </a>
+                    </div>
+                    <div class="col-md-3 va-m text-right">
+                        {{ dateToFull(email.trigger_date) }}
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <div class="alert alert-warning" role="alert">{{ 'mautic.note.no.upcoming.emails'|trans }}</div>
+{% endif %}

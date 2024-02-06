@@ -1,0 +1,97 @@
+name: 'Split up the monorepo into subrepositories for composer purposes'
+
+on:
+    push:
+        # Only trigger for specific branches or changes in specific paths.
+        branches:
+            - '[0-9].*'
+            - 'gitsplit-action-debug'
+        paths:
+            - app/**
+            - plugins/**
+            - themes/**
+            # also run when actions are being modified for testing purposes.
+            - .github/** 
+        # Tag push events should be ignored, they will be handled with the create event below.
+        tags-ignore:
+            - '*'
+    create:
+        tags:
+            - '*'
+        branches:
+            - '[0-9].*'
+            - 'gitsplit-action-debug'
+    delete:
+        tags:
+            - '*'
+        branches:
+            - '[0-9].*'
+            - 'gitsplit-action-debug'
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+jobs:
+    sync:
+        if: github.repository == 'mautic/mautic'
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                config:
+                    - core-lib
+                    - plugin-clearbit
+                    - plugin-cloudstorage
+                    - plugin-crm
+                    - plugin-emailmarketing
+                    - plugin-focus
+                    - plugin-fullcontact
+                    - plugin-gmail
+                    - plugin-grapesjs
+                    - plugin-outlook
+                    - plugin-social
+                    - plugin-tagmanager
+                    - plugin-zapier
+                    - theme-aurora
+                    - theme-blank
+                    - theme-brienz
+                    - theme-cards
+                    - theme-confirmme
+                    - theme-fresh-center
+                    - theme-fresh-fixed
+                    - theme-fresh-left
+                    - theme-fresh-wide
+                    - theme-goldstar
+                    - theme-neopolitan
+                    - theme-oxygen
+                    - theme-paprika
+                    - theme-skyline
+                    - theme-sparse
+                    - theme-sunday
+                    - theme-trulypersonal
+                    - theme-vibrant
+        name: Sync commits into mautic/${{ matrix.config }}
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    persist-credentials: false
+                    fetch-depth: 0
+
+            # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
+            -   uses: frankdejonge/use-github-token@1.0.1
+                with:
+                    authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+                    user_name: 'Mautic CI'
+                    user_email: 'ci@mautic.org'
+
+            # Cache the splitsh executable to speedup future runs
+            -   name: Cache splitsh-lite
+                uses: actions/cache@v4
+                with:
+                    path: './splitsh'
+                    key: '${{ runner.os }}-${{ matrix.config }}-splitsh-v101'
+
+            # Sync commits and tags for the configured subtree splits
+            -   name: subtree split
+                uses: acrobat/subtree-splitter@v1.0.0
+                with:
+                    config-path: .github/workflows/gitsplit/${{ matrix.config }}.json # Reference the location where you saved your config file

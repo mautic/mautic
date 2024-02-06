@@ -1,16 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Provider;
 
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\User;
@@ -19,87 +12,58 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-/**
- * Class UserProvider.
- */
 class UserProvider implements UserProviderInterface
 {
-    /**
-     * @var UserRepository
-     */
-    protected $userRepository;
-
-    /**
-     * @var PermissionRepository
-     */
-    protected $permissionRepository;
-
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var UserPasswordEncoder
-     */
-    protected $encoder;
-
     public function __construct(
-        UserRepository $userRepository,
-        PermissionRepository $permissionRepository,
-        Session $session,
-        EventDispatcherInterface $dispatcher,
-        UserPasswordEncoder $encoder
+        protected UserRepository $userRepository,
+        protected PermissionRepository $permissionRepository,
+        protected Session $session,
+        protected EventDispatcherInterface $dispatcher,
+        protected UserPasswordHasher $encoder
     ) {
-        $this->userRepository       = $userRepository;
-        $this->permissionRepository = $permissionRepository;
-        $this->session              = $session;
-        $this->dispatcher           = $dispatcher;
-        $this->encoder              = $encoder;
     }
 
     /**
      * @param string $username
      *
      * @return User
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function loadUserByUsername($username)
     {
-        $q = $this->userRepository
+        return $this->loadUserByIdentifier($username);
+    }
+
+    public function loadUserByIdentifier(string $identifier): User
+    {
+        $qb = $this->userRepository
             ->createQueryBuilder('u')
             ->select('u, r')
             ->leftJoin('u.role', 'r')
             ->where('u.username = :username OR u.email = :username')
             ->andWhere('u.isPublished = :true')
             ->setParameter('true', true, 'boolean')
-            ->setParameter('username', $username);
-
-        $user = $q->getQuery()->getOneOrNullResult();
+            ->setParameter('username', $identifier);
+        $query = $qb->getQuery();
+        ResultCacheHelper::enableOrmQueryCache($query, new ResultCacheOptions(User::CACHE_NAMESPACE, 5 * 60));
+        $user = $query->getOneOrNullResult();
 
         if (empty($user)) {
             $message = sprintf(
                 'Unable to find an active admin MauticUserBundle:User object identified by "%s".',
-                $username
+                $identifier
             );
-            throw new UsernameNotFoundException($message, 0);
+            throw new UserNotFoundException($message, 0);
         }
 
-        //load permissions
+        // load permissions
         if ($user->getId()) {
             $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
             $user->setActivePermissions($permissions);
@@ -108,26 +72,19 @@ class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function refreshUser(UserInterface $user)
     {
-        $class = get_class($user);
+        $class = $user::class;
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
 
-        return $this->loadUserByUsername($user->getUsername());
+        return $this->loadUserByIdentifier($user->getUserIdentifier());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
+    public function supportsClass(string $class): bool
     {
-        return $this->userRepository->getClassName() === $class
-        || is_subclass_of($class, $this->userRepository->getClassName());
+        return User::class === $class || is_subclass_of($class, User::class);
     }
 
     /**
@@ -155,7 +112,7 @@ class UserProvider implements UserProviderInterface
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
         }
 
-        if (!$user->getUsername()) {
+        if (!$user->getUserIdentifier()) {
             throw new AuthenticationException('mautic.integration.sso.error.no_username');
         }
 
@@ -172,25 +129,25 @@ class UserProvider implements UserProviderInterface
         if ($plainPassword) {
             // Encode plain text
             $user->setPassword(
-                $this->encoder->encodePassword($user, $plainPassword)
+                $this->encoder->hashPassword($user, $plainPassword)
             );
         } elseif (!$password = $user->getPassword()) {
             // Generate and encode a random password
             $user->setPassword(
-                $this->encoder->encodePassword($user, EncryptionHelper::generateKey())
+                $this->encoder->hashPassword($user, EncryptionHelper::generateKey())
             );
         }
 
         $event = new UserEvent($user, $isNew);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
-            $event = $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+            $event = $this->dispatcher->dispatch($event, UserEvents::USER_PRE_SAVE);
         }
 
         $this->userRepository->saveEntity($user);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
-            $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
         }
 
         return $user;
@@ -203,14 +160,14 @@ class UserProvider implements UserProviderInterface
     {
         try {
             // Try by username
-            $user = $this->loadUserByUsername($user->getUsername());
+            $user = $this->loadUserByIdentifier($user->getUserIdentifier());
 
             return $user;
-        } catch (UsernameNotFoundException $exception) {
+        } catch (UserNotFoundException) {
             // Try by email
             try {
-                return $this->loadUserByUsername($user->getEmail());
-            } catch (UsernameNotFoundException $exception) {
+                return $this->loadUserByIdentifier($user->getEmail());
+            } catch (UserNotFoundException) {
             }
         }
 

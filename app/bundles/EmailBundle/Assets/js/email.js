@@ -1,5 +1,8 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
+    Mautic.internalDynamicContentItemCreateListeners = [];
+    Mautic.internalDynamicContentFilterCreateListeners = [];
+
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
         var plaintext = mQuery('#emailform_plainText');
@@ -63,7 +66,8 @@ Mautic.emailOnLoad = function (container, response) {
                     }
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         }
     }
@@ -74,6 +78,20 @@ Mautic.emailOnLoad = function (container, response) {
         mQuery("#emailGraphStats").load(graphUrl, function () {
             Mautic.renderCharts();
             Mautic.initDateRangePicker('#emailGraphStats #daterange_date_from', '#emailGraphStats #daterange_date_to');
+        });
+    }
+
+    var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
+    if ($loadDeliveredElements.length) {
+        $loadDeliveredElements.each(function(i, el) {
+           Mautic.loadEmailDeliveredStat(mQuery(el));
+        });
+    }
+
+    var $loadEmailUsage = mQuery('[data-fetch-email-usages]');
+    if ($loadEmailUsage.length) {
+        $loadEmailUsage.each(function(i, el) {
+           Mautic.loadEmailUsages(mQuery(el));
         });
     }
 };
@@ -239,7 +257,7 @@ Mautic.getTotalAttachmentSize = function() {
         };
         Mautic.ajaxActionRequest('email:getAttachmentsSize', assets, function(response) {
             mQuery('#attachment-size').text(response.size);
-        });
+        }, false, false, "GET");
     } else {
         mQuery('#attachment-size').text('0');
     }
@@ -330,12 +348,20 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     var textarea      = itemContainer.find('.editor');
     var firstInput    = itemContainer.find('input[type="text"]').first();
 
-    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-        // Set custom buttons with separator between them.
-        toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-        heightMin: 100
-    }));
+    if (mauticFroalaEnabled && textarea.hasClass('legacy-builder')) {
+        textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+            // Set custom buttons with separator between them.
+            toolbarSticky: false,
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
+            heightMin: 100
+        }));
+    }
+
+    if (Mautic.internalDynamicContentItemCreateListeners) {
+        Mautic.internalDynamicContentItemCreateListeners.forEach(function(callback) {
+            callback(textarea);
+        });
+    }
 
     tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
     newTab.find('a').tab('show');
@@ -348,6 +374,10 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
 
     return tabId;
 };
+
+Mautic.dynamicContentAddNewItemListener = function(callback) {
+    Mautic.internalDynamicContentItemCreateListeners.push(callback);
+}
 
 Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     // To support the parent.mQuery from the builder
@@ -393,12 +423,20 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
         }
     });
 
-    altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-        // Set custom buttons with separator between them.
-        toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-        heightMin: 100
-    }));
+    if (mauticFroalaEnabled && altTextarea.hasClass('legacy-builder')) {
+        altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+            // Set custom buttons with separator between them.
+            toolbarSticky: false,
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
+            heightMin: 100
+        }));
+    }
+
+    if (Mautic.internalDynamicContentFilterCreateListeners) {
+        Mautic.internalDynamicContentFilterCreateListeners.forEach(function(callback) {
+            callback(altTextarea);
+        });
+    }
 
     Mautic.initRemoveEvents(removeButton, mQuery);
 
@@ -406,6 +444,10 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     return filterContainerId;
 };
+
+Mautic.dynamicContentAddNewFilterListener = function(callback) {
+    Mautic.internalDynamicContentFilterCreateListeners.push(callback);
+}
 
 Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
     // To support the parent.mQuery from the builder
@@ -421,6 +463,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         $el = mQuery(tabId);
     }
 
+    // add a click event listener for adding a new dynamic content variant
     $el.find('.addNewDynamicContentFilter').on('click', function (e) {
         e.preventDefault();
 
@@ -669,7 +712,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
 
     var operators = mQuery(selectedOption).data('field-operators');
     mQuery('#' + filterIdBase + '_operator').html('');
-    mQuery.each(operators, function (value, label) {
+    mQuery.each(operators, function (label, value) {
         var newOption = mQuery('<option/>').val(value).text(label);
         newOption.appendTo(mQuery('#' + filterIdBase + '_operator'));
     });
@@ -753,4 +796,29 @@ Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
 
         Mautic.activateChosenSelect(filterEl, false, mQuery);
     }
+};
+
+Mautic.copySubjectToName = function(elemSubject) {
+    let elemName = mQuery("#emailform_name");
+    if (elemName.val() === "") {
+        elemName.val(elemSubject.val());
+    }
+};
+
+Mautic.loadEmailDeliveredStat = function($el) {
+    var emailId = $el.data('email-stat-delivered-for');
+    Mautic.ajaxActionRequest('email:getEmailDeliveredCount', {id: emailId}, function(response){
+        if (response.success) {
+            var delivered = response.delivered;
+            $el.html(delivered);
+        }
+    }, false, true, "GET");
+};
+
+Mautic.loadEmailUsages = function($el) {
+    var emailId = $el.data('fetch-email-usages');
+    Mautic.ajaxActionRequest('email:getEmailUsages', {id: emailId}, function(response){
+        var usagesHtml = response.usagesHtml;
+        $el.html(usagesHtml);
+    }, false, true, "GET");
 };

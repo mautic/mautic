@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\SmsBundle\Tests\DependencyInjection\Compiler;
 
@@ -18,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SmsTransportPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new SmsTransportPass());
@@ -46,7 +38,7 @@ class SmsTransportPassTest extends TestCase
 
         $container
             ->register('mautic.sms.transport_chain')
-            ->setClass(get_class($transport))
+            ->setClass($transport::class)
             ->setArguments(['foo', $this->createMock(IntegrationHelper::class)])
             ->setShared(false)
             ->setSynthetic(true)

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Model\RoleModel;
@@ -16,22 +7,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class RoleListType extends AbstractType
 {
-    /**
-     * @var RoleModel
-     */
-    private $roleModel;
-
-    public function __construct(RoleModel $roleModel)
-    {
-        $this->roleModel = $roleModel;
+    public function __construct(
+        private RoleModel $roleModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -47,23 +33,12 @@ class RoleListType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
-    {
-        return 'role_list';
-    }
-
-    /**
-     * @return string
-     */
     public function getParent()
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getRoleChoices()
+    private function getRoleChoices(): array
     {
         $choices = [];
         $roles   = $this->roleModel->getRepository()->getEntities(
@@ -84,7 +59,7 @@ class RoleListType extends AbstractType
             $choices[$role->getName(true)] = $role->getId();
         }
 
-        //sort by name
+        // sort by name
         ksort($choices);
 
         return $choices;

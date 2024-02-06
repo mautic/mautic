@@ -9,33 +9,18 @@ use Mautic\MarketplaceBundle\Collection\VersionCollection;
 
 final class PackageDetail
 {
-    public PackageBase $packageBase;
-    public GitHubInfo $githubInfo;
-    public int $monthlyDownloads;
-    public int $dailyDownloads;
-    public \DateTimeInterface $time;
-    public MaintainerCollection $maintainers;
-    public VersionCollection $versions;
-
     public function __construct(
-        PackageBase $packageBase,
-        VersionCollection $versions,
-        MaintainerCollection $maintainers,
-        GitHubInfo $githubInfo,
-        int $monthlyDownloads,
-        int $dailyDownloads,
-        \DateTimeInterface $time
+        public PackageBase $packageBase,
+        public VersionCollection $versions,
+        public MaintainerCollection $maintainers,
+        public GitHubInfo $githubInfo,
+        public int $monthlyDownloads,
+        public int $dailyDownloads,
+        public \DateTimeInterface $time
     ) {
-        $this->packageBase      = $packageBase;
-        $this->versions         = $versions;
-        $this->maintainers      = $maintainers;
-        $this->githubInfo       = $githubInfo;
-        $this->monthlyDownloads = $monthlyDownloads;
-        $this->dailyDownloads   = $dailyDownloads;
-        $this->time             = $time;
     }
 
-    public static function fromArray(array $array)
+    public static function fromArray(array $array): self
     {
         return new self(
             new PackageBase(
@@ -44,7 +29,9 @@ final class PackageDetail
                 $array['repository'],
                 $array['description'],
                 (int) $array['downloads']['total'],
-                (int) $array['favers']
+                (int) $array['favers'],
+                $array['type'] ?? null,
+                $array['display_name'] ?? null
             ),
             VersionCollection::fromArray($array['versions']),
             MaintainerCollection::fromArray($array['maintainers']),

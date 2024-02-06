@@ -1,0 +1,87 @@
+{#
+  Variables
+    - item
+#}
+{% set now = dateTimeGetUtcDateTime() %}
+{% set hoursSinceLastBuilt = null %}
+{% if item.lastBuiltDate is not null %}
+    {% set lastBuiltDate = date(item.lastBuiltDate.timestamp) %}
+    {% set now = date() %}
+    {% set diffInSeconds = now.timestamp - lastBuiltDate.timestamp %}
+    {% set hoursSinceLastBuilt = diffInSeconds / 3600 | round %}
+{% endif %}
+{% set mauticTemplateVars = mauticTemplateVars|default([])|merge([{'item': item}]) %}
+<tr>
+    <td>
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                'item': item,
+                'templateButtons': {
+                    'edit': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),
+                    'clone': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),
+                    'delete': securityHasEntityAccess(true, permissions['lead:lists:deleteother'], item.createdBy),
+                },
+                'routeBase': 'segment',
+                'langVar': 'lead.list',
+                'custom': [
+                    {
+                        'attr': {
+                            'data-toggle': 'ajax',
+                            'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias}),
+                        },
+                        'icon': 'fa-users',
+                        'label': 'mautic.lead.list.view_contacts',
+                    },
+                ],
+        }) }}
+    </td>
+    <td>
+        <div>
+            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.list'}) }}
+            {% if securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy) %}
+                <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                  {{ item.name }} ({{ item.alias }})
+                </a>
+            {% else %}
+                {{ item.name }} ({{ item.alias }})
+            {% endif %}
+            {% if not item.isGlobal and app.user.id != item.createdBy %}
+                <br/>
+                <span class="small">({{ item.createdByUser }})</span>
+            {% endif %}
+            {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans }}" class="fa fa-fw fa-globe"></i>{% endif %}
+            {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans }}" class="fa fa-fw fa-filter"></i>{% endif %}
+            {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
+                <label class="control-label" data-toggle="tooltip"
+                       data-container="body" data-placement="top" title=""
+                       data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt}) }}">
+                    <i class="fa text-danger fa-exclamation-circle"></i></label>
+            {% endif %}
+            {% if item.lastBuiltTime >= segmentBuildWarningThreshold %}
+                <label class="control-label" data-toggle="tooltip"
+                       data-container="body" data-placement="top" title=""
+                       data-original-title="{{ 'mautic.lead.list.form.config.segment_build_time.message'|trans({'%count%': item.lastBuiltTime}) }}">
+                    <i class="fa text-danger fa-clock-o"></i></label>
+            {% endif %}
+            {{ customContent('segment.name', mauticTemplateVars|default([])) }}
+        </div>
+        {% if item.description %}
+            <div class="text-muted mt-4">
+                <small>{{ item.description|purify }}</small>
+            </div>
+        {% endif %}
+    </td>
+    <td class="visible-md visible-lg">
+        <a class="label label-primary col-count"
+           data-id="{{ item.id }}"
+           href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
+           data-toggle="ajax">{{ 'mautic.lead.list.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}</a>
+    </td>
+    <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
+        {% if item.getDateAdded %}{{ dateToDate(item.dateAdded) }}{% endif %}
+    </td>
+    <td class="visible-md visible-lg" title="{% if item.dateModified %}{{ dateToFullConcat(item.dateModified) }}{% endif %}">
+        {% if item.getDateModified %}{{ dateToDate(item.dateModified) }}{% endif %}
+    </td>
+    <td class="visible-md visible-lg">{{ item.createdByUser|purify }}</td>
+    <td class="visible-md visible-lg">{{ item.id }}</td>
+</tr>

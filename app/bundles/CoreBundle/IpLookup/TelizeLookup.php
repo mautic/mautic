@@ -1,38 +1,20 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 class TelizeLookup extends AbstractRemoteDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return '<a href="https://market.mashape.com/fcambus/telize/" target="_blank">Telize</a> is a paid lookup service.';
     }
 
-    /**
-     * @return string
-     */
-    protected function getUrl()
+    protected function getUrl(): string
     {
         return "https://telize-v1.p.mashape.com/geoip/{$this->ip}";
     }
 
-    /**
-     * @return array
-     */
-    protected function getHeaders()
+    protected function getHeaders(): array
     {
         return [
             'X-Mashape-Key' => $this->auth,

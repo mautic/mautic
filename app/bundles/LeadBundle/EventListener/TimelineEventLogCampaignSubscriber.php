@@ -1,51 +1,33 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * TimelineEventLogCampaignSubscriber constructor.
-     */
-    public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, TranslatorInterface $translator)
-    {
+    public function __construct(
+        LeadEventLogRepository $eventLogRepository,
+        private UserHelper $userHelper,
+        Translator $translator
+    ) {
         $this->eventLogRepository = $eventLogRepository;
-        $this->userHelper         = $userHelper;
         $this->translator         = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_LEADCHANGE     => 'onChange',
@@ -54,7 +36,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onChange(CampaignLeadChangeEvent $event)
+    public function onChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
             return;
@@ -67,7 +49,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onBatchChange(CampaignLeadChangeEvent $event)
+    public function onBatchChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
             return;
@@ -80,7 +62,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
             $event,
@@ -94,9 +76,8 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @param Lead[] $contacts
-     * @param        $action
      */
-    private function writeEntries(array $contacts, Campaign $campaign, $action)
+    private function writeEntries(array $contacts, Campaign $campaign, $action): void
     {
         $user = $this->userHelper->getUser();
 
@@ -122,6 +103,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
     }
 }

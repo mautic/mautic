@@ -1,40 +1,20 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use MatthiasMullie\Minify;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class BuildJsEvent.
- */
 class BuildJsEvent extends Event
 {
     /**
-     * @var string
+     * @param bool   $debugMode
+     * @param string $js
      */
-    protected $js = '';
-
-    /**
-     * @var bool
-     */
-    protected $debugMode;
-
-    /**
-     * @param bool $debugMode
-     */
-    public function __construct($js, $debugMode = false)
-    {
-        $this->js        = $js;
-        $this->debugMode = $debugMode;
+    public function __construct(
+        protected $js,
+        protected $debugMode = false
+    ) {
     }
 
     /**
@@ -42,7 +22,7 @@ class BuildJsEvent extends Event
      */
     public function getJs()
     {
-        return $this->debugMode ? $this->js : \JSMin::minify($this->js);
+        return $this->debugMode ? $this->js : (new Minify\JS($this->js))->minify();
     }
 
     /**

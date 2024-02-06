@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
-use DOMDocument;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -24,20 +14,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class IntegrationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
@@ -48,7 +30,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
     /*
      * Request event
      */
-    public function onRequest(PluginIntegrationRequestEvent $event)
+    public function onRequest(PluginIntegrationRequestEvent $event): void
     {
         $name     = strtoupper($event->getIntegrationName());
         $headers  = var_export($event->getHeaders(), true);
@@ -82,17 +64,17 @@ class IntegrationSubscriber implements EventSubscriberInterface
     /*
      * Response event
      */
-    public function onResponse(PluginIntegrationRequestEvent $event)
+    public function onResponse(PluginIntegrationRequestEvent $event): void
     {
         $response = $event->getResponse();
         $headers  = var_export($response->getHeaders(), true);
         $name     = strtoupper($event->getIntegrationName());
-        $isJson   = isset($response->getHeaders()['Content-Type']) && preg_match('/application\/json/', $response->getHeaders()['Content-Type']);
+        $isJson   = isset($response->getHeaders()['Content-Type']) && preg_grep('/application\/json/', $response->getHeaders()['Content-Type']);
         $json     = $isJson ? str_replace('    ', '  ', json_encode(json_decode($response->getBody()), JSON_PRETTY_PRINT)) : '';
         $xml      = '';
-        $isXml    = isset($response->getHeaders()['Content-Type']) && preg_match('/text\/xml/', $response->getHeaders()['Content-Type']);
+        $isXml    = isset($response->getHeaders()['Content-Type']) && preg_grep('/text\/xml/', $response->getHeaders()['Content-Type']);
         if ($isXml) {
-            $doc                     = new DomDocument('1.0');
+            $doc                     = new \DOMDocument('1.0');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput       = true;
             $doc->loadXML($response->getBody());

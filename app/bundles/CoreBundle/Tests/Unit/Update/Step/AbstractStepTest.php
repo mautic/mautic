@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use PHPUnit\Framework\MockObject\MockObject;
@@ -37,10 +28,15 @@ abstract class AbstractStepTest extends TestCase
 
     protected function setUp(): void
     {
+        $formatter = $this->createMock(OutputFormatterInterface::class);
+        $formatter->method('isDecorated')
+          ->willReturn(false);
+
         $this->input      = $this->createMock(InputInterface::class);
         $this->output     = $this->createMock(OutputInterface::class);
+
         $this->output->method('getFormatter')
-            ->willReturn($this->createMock(OutputFormatterInterface::class));
+            ->willReturn($formatter);
 
         $this->progressBar = new ProgressBar($this->output);
     }

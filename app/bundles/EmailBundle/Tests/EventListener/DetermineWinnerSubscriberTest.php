@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,24 +13,21 @@ use Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|EntityManagerInterface
      */
-    private $em;
+    private \PHPUnit\Framework\MockObject\MockObject $em;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private \Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -50,7 +38,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
     }
 
-    public function testOnDetermineOpenRateWinner()
+    public function testOnDetermineOpenRateWinner(): void
     {
         $parentMock = $this->createMock(Email::class);
         $children   = [2 => $this->createMock(Email::class)];
@@ -124,7 +112,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 
-    public function testOnDetermineOClickthroughRateWinner()
+    public function testOnDetermineOClickthroughRateWinner(): void
     {
         $parentMock    = $this->createMock(Email::class);
         $children      = [2 => $this->createMock(Email::class)];

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
@@ -23,32 +14,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UploadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var FileUploadValidator
-     */
-    private $fileUploadValidator;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->assetModel           = $assetModel;
-        $this->fileUploadValidator  = $fileUploadValidator;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private AssetModel $assetModel,
+        private FileUploadValidator $fileUploadValidator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UploadEvents::POST_UPLOAD => ['onPostUpload', 0],
@@ -60,7 +33,7 @@ class UploadSubscriber implements EventSubscriberInterface
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
      */
-    public function onPostUpload(PostUploadEvent $event)
+    public function onPostUpload(PostUploadEvent $event): void
     {
         $request   = $event->getRequest()->request;
         $response  = $event->getResponse();
@@ -83,7 +56,7 @@ class UploadSubscriber implements EventSubscriberInterface
      *
      * @throws ValidationException
      */
-    public function onUploadValidation(ValidationEvent $event)
+    public function onUploadValidation(ValidationEvent $event): void
     {
         $file       = $event->getFile();
         $extensions = $this->coreParametersHelper->get('allowed_extensions');

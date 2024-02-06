@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -26,22 +17,19 @@ class TokenHelperTest extends TestCase
     /**
      * @var FocusModel|MockObject
      */
-    private $model;
+    private \PHPUnit\Framework\MockObject\MockObject $model;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var CorePermissions|MockObject
      */
-    private $security;
+    private \PHPUnit\Framework\MockObject\MockObject $security;
 
-    /**
-     * @var TokenHelper
-     */
-    private $helper;
+    private \MauticPlugin\MauticFocusBundle\Helper\TokenHelper $helper;
 
     protected function setUp(): void
     {
@@ -105,7 +93,7 @@ class TokenHelperTest extends TestCase
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
             ->with(
-            'focus:items:viewown',
+                'focus:items:viewown',
                 'focus:items:viewother',
                 $focusItem->getCreatedBy()
             )

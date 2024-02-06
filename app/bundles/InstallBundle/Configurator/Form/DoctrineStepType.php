@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Form;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -25,14 +16,14 @@ use Symfony\Component\Validator\Constraints\Choice;
  * Doctrine Form Type.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
  * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Form\DoctrineStepType
+ *
+ * @extends AbstractType<mixed>
  */
 class DoctrineStepType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'driver',
@@ -71,7 +62,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'port',
-          TextType::class,
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -82,7 +73,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'name',
-          TextType::class,
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -93,7 +84,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'table_prefix',
-          TextType::class,
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.table.prefix',
                 'label_attr' => ['class' => 'control-label'],
@@ -104,7 +95,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'user',
-          TextType::class,
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.user',
                 'label_attr' => ['class' => 'control-label'],
@@ -115,7 +106,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'password',
-             PasswordType::class,
+            PasswordType::class,
             [
                 'label'      => 'mautic.install.form.database.password',
                 'label_attr' => ['class' => 'control-label'],
@@ -179,9 +170,6 @@ class DoctrineStepType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'install_doctrine_step';

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
@@ -19,20 +10,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageQueueSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SmsModel
-     */
-    private $model;
-
-    public function __construct(SmsModel $model)
-    {
-        $this->model = $model;
+    public function __construct(
+        private SmsModel $model
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
@@ -42,7 +25,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
     /**
      * Sends campaign emails.
      */
-    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
+    public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {
         if (!$event->checkContext('sms')) {
             return;

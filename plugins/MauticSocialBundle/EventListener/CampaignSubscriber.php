@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -19,39 +10,18 @@ use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignEventHelper
-     */
-    private $campaignEventHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        CampaignEventHelper $campaignEventHelper,
-        IntegrationHelper $integrationHelper,
-        TranslatorInterface $translator
+        private CampaignEventHelper $campaignEventHelper,
+        private IntegrationHelper $integrationHelper,
+        private TranslatorInterface $translator
     ) {
-        $this->campaignEventHelper = $campaignEventHelper;
-        $this->integrationHelper   = $integrationHelper;
-        $this->translator          = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -59,7 +29,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('Twitter');
         if ($integration && $integration->getIntegrationSettings()->isPublished()) {

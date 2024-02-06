@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -21,17 +12,12 @@ use Mautic\EmailBundle\Model\EmailModel;
 
 class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(EmailModel $emailModel)
-    {
-        $this->emailModel = $emailModel;
+    public function __construct(
+        private EmailModel $emailModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $emails = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');
 

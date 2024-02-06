@@ -1,67 +1,131 @@
 <?php
 
-use Rector\Core\Configuration\Option;
+declare(strict_types=1);
+
+use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
+use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
-use Rector\DeadCode\Rector\Class_\RemoveUnusedDoctrineEntityMethodAndPropertyRector;
-use Rector\DeadCode\Rector\ClassConst\RemoveUnusedClassConstantRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveDeadRecursiveClassMethodRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector;
-use Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector;
-use Rector\DeadCode\Rector\If_\SimplifyIfElseWithSameContentRector;
-use Rector\DeadCode\Rector\MethodCall\RemoveDefaultArgumentValueRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
-use Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector;
-use Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector;
-use Rector\Php74\Rector\Property\TypedPropertyRector;
+use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Set\ValueObject\SetList;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\BoolReturnTypeFromStrictScalarReturnsRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictBoolReturnExprRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    // here we can define, what sets of rules will be applied
-    $parameters = $containerConfigurator->parameters();
-    $parameters->set(Option::SETS, [SetList::DEAD_CODE]);
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->paths([
+        __DIR__.'/app/bundles',
+        __DIR__.'/plugins',
+    ]);
 
-    $parameters->set(
-        Option::PATHS,
-        [
-            __DIR__ . '/app/bundles',
-            __DIR__ . '/plugins'
-        ]
-    );
+    $rectorConfig->skip([
+        '*/Test/*',
+        '*/Tests/*',
+        '*.html.php',
+        ReturnTypeFromReturnDirectArrayRector::class => [
+            // require bit test update
+            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
+            // array vs doctrine collection
+            __DIR__.'/app/bundles/CoreBundle/Entity/TranslationEntityTrait.php',
+        ],
 
-    $parameters->set(
-        Option::SKIP,
-        [
-            __DIR__ . '/*/tests/*',
-            __DIR__ . '/*/tests/*',
-            __DIR__ . '/*/Tests/*',
-            __DIR__ . '/*/Test/*',
-            __DIR__ . '/*/test/*',
-            __DIR__ . '/*/InstallFixtures/*',
-            __DIR__ . '/*/Fixtures/*',
-            __DIR__ . '/*.html.php',
-            __DIR__ . '/*.less.php',
-            __DIR__ . '/*.inc.php',
-            __DIR__ . '/*.js.php',
-            __DIR__ . '/app/bundles/LeadBundle/Entity/LeadField.php',
-            __DIR__ . '/app/bundles/WebhookBundle/Entity/Webhook.php',
-            __DIR__ . '/app/bundles/UserBundle/Entity/UserToken.php',
-            __DIR__ . '/app/bundles/EmailBundle/Entity/EmailReplyRepository.php',
-            RemoveUnusedParameterRector::class, # Causes BC breaks and broken services. Use only manually with caution.
-            RemoveDefaultArgumentValueRector::class, # Doesn't play nicely every time.
-            SimplifyIfElseWithSameContentRector::class, # Removes code that is not the same.
-            RemoveDeadIfForeachForRector::class, # Problematic with some copy-pasted code.
-            TernaryToBooleanOrFalseToBooleanAndRector::class, # see https://github.com/rectorphp/rector/issues/2765
-            RemoveDuplicatedCaseInSwitchRector::class, # see https://github.com/rectorphp/rector/issues/2730
-            RecastingRemovalRector::class, # Does some dangerous changes in e.g. queries
-            RemoveUnusedDoctrineEntityMethodAndPropertyRector::class, # Incorrectly removes loadMetadata() methods
-            RemoveUnusedPrivatePropertyRector::class, # Incorrectly removes some private properties
-            RemoveUnusedClassConstantRector::class, # Incorrectly removes some class constants that we use
-            RemoveDeadRecursiveClassMethodRector::class # Changed quite some code, didn't have time to check if it's correct
-        ]
-    );
+        // lets handle later, once we have more type declaratoins
+        RecastingRemovalRector::class,
 
-    // register single rule
-    //$services = $containerConfigurator->services();
-    //$services->set(TypedPropertyRector::class);
+        RemoveUnusedPrivatePropertyRector::class => [
+            // entities
+            __DIR__.'/app/bundles/UserBundle/Entity',
+            // typo fallback
+            __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
+        ],
+
+        ReturnTypeFromStrictBoolReturnExprRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Segment/Decorator/BaseDecorator.php',
+            // requires quite a refactoring
+            __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
+        ],
+
+        RemoveUnusedVariableAssignRector::class => [
+            // unset variable to clear garbage collector
+            __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
+        ],
+
+        TypedPropertyFromStrictConstructorRector::class => [
+            // entities magic
+            __DIR__.'/app/bundles/LeadBundle/Entity',
+
+            // fixed in rector dev-main
+            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
+        ],
+
+        ClassPropertyAssignToConstructorPromotionRector::class => [
+            __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
+            __DIR__.'/app/bundles/ReportBundle/Event/ReportBuilderEvent.php',
+            // false positive
+            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
+        ],
+
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+            '*/Entity/*',
+        ],
+
+        // handle later with full PHP 8.0 upgrade
+        \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
+        \Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
+        \Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
+
+        // handle later, case by case as lot of chnaged code
+        \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
+            __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
+            __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
+            __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
+            // watch out on this one - the variables are set magically via $$name
+            // @see app/bundles/FormBundle/Form/Type/FieldType.php:99
+            __DIR__.'/app/bundles/FormBundle/Form/Type/FieldType.php',
+        ],
+    ]);
+
+    // Define what rule sets will be applied
+    $rectorConfig->sets([
+        SetList::DEAD_CODE,
+        SetList::PHP_80,
+        // SetList::TYPE_DECLARATION,
+    ]);
+
+    // Define what single rules will be applied
+    $rectorConfig->rules([
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
+        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
+
+        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
+        NumericReturnTypeFromStrictScalarReturnsRector::class,
+        ReturnTypeFromReturnNewRector::class,
+        ReturnTypeFromStrictNativeCallRector::class,
+        ReturnTypeFromStrictNewArrayRector::class,
+        ReturnTypeFromStrictParamRector::class,
+        ReturnTypeFromStrictTernaryRector::class,
+        ClassPropertyAssignToConstructorPromotionRector::class,
+        BoolReturnTypeFromStrictScalarReturnsRector::class,
+        AddVoidReturnTypeWhereNoReturnRector::class,
+        TypedPropertyFromStrictConstructorRector::class,
+        TypedPropertyFromStrictSetUpRector::class,
+        RemoveUnusedVariableAssignRector::class,
+        RemoveUselessVarTagRector::class,
+        SimplifyUselessVariableRector::class,
+        ReturnTypeFromStrictBoolReturnExprRector::class,
+        ReturnTypeFromStrictConstantReturnRector::class,
+        ReturnTypeFromReturnDirectArrayRector::class,
+    ]);
 };

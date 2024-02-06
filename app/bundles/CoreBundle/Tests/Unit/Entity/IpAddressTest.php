@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 
 class IpAddressTest extends \PHPUnit\Framework\TestCase
 {
-    public function testExactIp()
+    public function testExactIp(): void
     {
         $ipAddress = new IpAddress();
         $ipAddress->setDoNotTrackList(
@@ -30,7 +21,7 @@ class IpAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($ipAddress->isTrackable());
     }
 
-    public function testIpRange()
+    public function testIpRange(): void
     {
         // HostMin:   172.16.0.1
         // HostMax:   172.31.255.255
@@ -54,7 +45,7 @@ class IpAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($ipAddress->isTrackable());
     }
 
-    public function testIpWildcard()
+    public function testIpWildcard(): void
     {
         $ipAddress = new IpAddress();
         $ipAddress->setDoNotTrackList(

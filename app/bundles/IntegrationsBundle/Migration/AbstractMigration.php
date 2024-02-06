@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\IntegrationsBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -19,38 +10,23 @@ use Doctrine\ORM\EntityManager;
 abstract class AbstractMigration implements MigrationInterface
 {
     /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var string
-     */
-    protected $tablePrefix;
-
-    /**
      * @var string[]
      */
-    private $queries = [];
+    private array $queries = [];
 
-    public function __construct(EntityManager $entityManager, string $tablePrefix)
-    {
-        $this->entityManager = $entityManager;
-        $this->tablePrefix   = $tablePrefix;
+    public function __construct(
+        protected EntityManager $entityManager,
+        protected string $tablePrefix
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldExecute(): bool
     {
-        return $this->isApplicable($this->entityManager->getConnection()->getSchemaManager()->createSchema());
+        return $this->isApplicable($this->entityManager->getConnection()->createSchemaManager()->introspectSchema());
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function execute(): void
     {
@@ -64,7 +40,7 @@ abstract class AbstractMigration implements MigrationInterface
 
         foreach ($this->queries as $sql) {
             $stmt = $connection->prepare($sql);
-            $stmt->execute();
+            $stmt->executeStatement();
         }
     }
 
@@ -118,9 +94,7 @@ abstract class AbstractMigration implements MigrationInterface
         $hash        = implode(
             '',
             array_map(
-                function ($column) {
-                    return dechex(crc32($column));
-                },
+                fn ($column): string => dechex(crc32($column)),
                 $columnNames
             )
         );

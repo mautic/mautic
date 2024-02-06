@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\Update\Github;
 
 use GuzzleHttp\Client;
@@ -20,26 +11,21 @@ use Mautic\CoreBundle\Release\Metadata;
 
 class ReleaseParser
 {
-    /**
-     * @var Client
-     */
-    private $client;
-
-    public function __construct(Client $client)
-    {
-        $this->client = $client;
+    public function __construct(
+        private Client $client
+    ) {
     }
 
     /**
      * @throws LatestVersionSupportedException
      * @throws UpdatePackageNotFoundException
      */
-    public function getLatestSupportedRelease(array $releases, string $phpVersion, string $mauticVersion, string $allowedStability): Release
+    public function getLatestSupportedRelease(array $releases, string $mauticVersion, string $allowedStability): Release
     {
         foreach ($releases as $release) {
             try {
                 $metadata = $this->getMetadata($release['html_url']);
-            } catch (MetadataNotFoundException $exception) {
+            } catch (MetadataNotFoundException) {
                 continue;
             }
 
@@ -48,14 +34,6 @@ class ReleaseParser
                 ('stable' !== $metadata->getStability() && version_compare($allowedStability, $metadata->getStability(), 'gt'))
             ) {
                 // This Mautic does support the given release's stability so continue
-                continue;
-            }
-
-            if (
-                version_compare($phpVersion, $metadata->getMinSupportedPHPVersion(), 'lt') ||
-                version_compare($phpVersion, $metadata->getMaxSupportedPHPVersion(), 'gt')
-            ) {
-                // This PHP version is not supported by the given release so continue
                 continue;
             }
 
@@ -104,7 +82,7 @@ class ReleaseParser
             }
 
             return new Metadata($metadata);
-        } catch (GuzzleException $exception) {
+        } catch (GuzzleException) {
             throw new MetadataNotFoundException();
         }
     }

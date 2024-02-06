@@ -1,14 +1,5 @@
 <?php
 
-/*
-* @copyright   2019 Mautic, Inc. All rights reserved
-* @author      Mautic, Inc.
-*
-* @link        https://mautic.com
-*
-* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
 namespace Mautic\WebhookBundle\Http;
 
 use GuzzleHttp\Psr7\Request;
@@ -19,42 +10,29 @@ use Psr\Http\Message\ResponseInterface;
 class Client
 {
     /**
-     * @var CoreParametersHelper
+     * @param GuzzleClient $httpClient
      */
-    private $coreParametersHelper;
-
-    /**
-     * @var GuzzleClient
-     */
-    private $httpClient;
-
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        $httpClient
+        private CoreParametersHelper $coreParametersHelper,
+        private $httpClient
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->httpClient           = $httpClient;
     }
 
     /**
-     * @param string      $url
-     * @param string|null $secret
+     * @param string $url
      *
      * @return ResponseInterface
      */
 
     /**
-     * @param $url
-     * @param null $secret
-     *
      * @return mixed|ResponseInterface
      *
      * @throws \Http\Client\Exception
      */
-    public function post($url, array $payload, $secret = null)
+    public function post($url, array $payload, string $secret = null)
     {
         $jsonPayload = json_encode($payload);
-        $signature   = base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));
+        $signature   = null === $secret ? null : base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));
         $headers     = [
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $this->coreParametersHelper->get('site_url'),

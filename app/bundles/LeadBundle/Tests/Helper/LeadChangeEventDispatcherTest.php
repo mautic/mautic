@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -26,7 +17,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that date identified change dispatches correct event
      */
-    public function testDateIdentifiedEventIsDispatched()
+    public function testDateIdentifiedEventIsDispatched(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -38,8 +29,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_IDENTIFIED,
-                $event
+                $event,
+                LeadEvents::LEAD_IDENTIFIED
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -50,7 +41,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that point changes dispatches correct event
      */
-    public function testPointChangeEventIsDispatched()
+    public function testPointChangeEventIsDispatched(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -62,8 +53,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_POINTS_CHANGE,
-                $pointsEvent
+                $pointsEvent,
+                LeadEvents::LEAD_POINTS_CHANGE
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -74,7 +65,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that points change event is not dispatched if we did an import
      */
-    public function testPointChangeEventIsNotDispatchedWithImport()
+    public function testPointChangeEventIsNotDispatchedWithImport(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -96,7 +87,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that points change event is not dispatched if points are empty (false positive)
      */
-    public function testPointChangeEventIsNotDispatchedWithEmptyPoints()
+    public function testPointChangeEventIsNotDispatchedWithEmptyPoints(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -116,7 +107,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that points change event is dispatched if points are changed from something to nothing
      */
-    public function testPointChangeEventIsDispatchedWithPointsChangedToZero()
+    public function testPointChangeEventIsDispatchedWithPointsChangedToZero(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -128,8 +119,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_POINTS_CHANGE,
-                $pointsEvent
+                $pointsEvent,
+                LeadEvents::LEAD_POINTS_CHANGE
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -140,7 +131,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that points change event is not dispatched if this is a new Lead
      */
-    public function testPointChangeEventIsNotDispatchedWithNewContact()
+    public function testPointChangeEventIsNotDispatchedWithNewContact(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -159,7 +150,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that utm event is dispatched
      */
-    public function testUtmTagsChangeEventIsDispatched()
+    public function testUtmTagsChangeEventIsDispatched(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -172,8 +163,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_UTMTAGS_ADD,
-                $utmTagsEvent
+                $utmTagsEvent,
+                LeadEvents::LEAD_UTMTAGS_ADD
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -184,7 +175,7 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that channel subscription changes are dispatched
      */
-    public function testChannelSubscriptionChangeEventIsDispatched()
+    public function testChannelSubscriptionChangeEventIsDispatched(): void
     {
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
@@ -198,8 +189,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
-                $dncEvent
+                $dncEvent,
+                LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);

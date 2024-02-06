@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,12 +16,12 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var ArrayCollection
+     * @var mixed
      **/
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface
+     * @var mixed
      **/
     private $translationParent;
 
@@ -41,7 +32,6 @@ trait TranslationEntityTrait
 
     /**
      * @param ClassMetadata $builder
-     * @param               $entityClass
      * @param string        $languageColumnName
      */
     protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
@@ -79,7 +69,7 @@ trait TranslationEntityTrait
     /**
      * Remove translation.
      */
-    public function removeTranslationChild(TranslationEntityInterface $child)
+    public function removeTranslationChild(TranslationEntityInterface $child): void
     {
         $this->translationChildren->removeElement($child);
     }
@@ -113,7 +103,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent.
      *
-     * @return $this
+     * @return mixed
      */
     public function getTranslationParent()
     {
@@ -123,7 +113,7 @@ trait TranslationEntityTrait
     /**
      * Remove translation parent.
      */
-    public function removeTranslationParent()
+    public function removeTranslationParent(): void
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('translationParent', '');
@@ -179,10 +169,8 @@ trait TranslationEntityTrait
 
     /**
      * Check if this entity has translations.
-     *
-     * @return int
      */
-    public function hasTranslations()
+    public function hasTranslations(): int
     {
         $children = $this->getTranslationChildren();
 
@@ -192,7 +180,7 @@ trait TranslationEntityTrait
     /**
      * Clear translations.
      */
-    public function clearTranslations()
+    public function clearTranslations(): void
     {
         $this->translationChildren = new ArrayCollection();
         $this->translationParent   = null;
@@ -231,15 +219,13 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param $getter
-     *
      * @return mixed
      */
     protected function getAccumulativeTranslationCount($getter, $variantParent = null)
     {
         $count = 0;
 
-        list($parent, $children) = $this->getTranslations();
+        [$parent, $children] = $this->getTranslations();
         if ($variantParent != $parent) {
             $count = $parent->$getter();
         }

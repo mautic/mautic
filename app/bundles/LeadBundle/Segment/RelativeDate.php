@@ -1,32 +1,17 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RelativeDate
 {
-    /** @var TranslatorInterface */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getRelativeDateStrings()
+    public function getRelativeDateStrings(): array
     {
         $keys = $this->getRelativeDateTranslationKeys();
 
@@ -38,10 +23,7 @@ class RelativeDate
         return $strings;
     }
 
-    /**
-     * @return array
-     */
-    private function getRelativeDateTranslationKeys()
+    private function getRelativeDateTranslationKeys(): array
     {
         return [
             'mautic.lead.list.month_last',

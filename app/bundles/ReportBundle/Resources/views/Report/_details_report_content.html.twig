@@ -1,0 +1,167 @@
+{%- set showGraphsAboveTable =  report.settings.showGraphsAboveTable|default(false) -%}
+{%- set dataCount = data|length %}
+{%- set columnOrder = report.columns -%}
+{%- set graphOrder = report.graphs -%}
+{%- set aggregatorOrder = report.aggregators -%}
+{%- set aggregatorCount = report.aggregators|length -%}
+{%- set groupBy = report.groupBy -%}
+{%- set groupByCount = report.groupBy|length -%}
+{%- set startCount = totalResults > limit ? (reportPage * limit) - limit + 1 : 1 -%}
+{%- set graphContent = include('@MauticReport/Report/details_data_graphs.html.twig', {'graphOrder': graphOrder, 'graphs': graphs, 'report': report}, with_context=false) -%}
+
+{% if showGraphsAboveTable %}{{ graphContent|raw }}{% endif %}
+
+{% if columnOrder is not empty or aggregatorOrder is not empty %}
+    <!-- table section -->
+    <div class="col-xs-12">
+        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+            <div class="page-list">
+                <div class="table-responsive table-responsive-force">
+                    <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+                        <thead>
+                        <tr>
+                            <th class="col-report-count"></th>
+                            {% for key in columnOrder %}
+                                {% if columns[key] is defined %}
+                                    {# order by alias if exists, if not then by column name #}
+                                    {%- set orderBy = columns[key].alias|default((key starts with 'channel.') ? key|replace({'.': '_'}) : key) -%}
+                                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                        'sessionVar': 'report.' ~ report.id,
+                                        'orderBy': orderBy,
+                                        'text': columns[key].label,
+                                        'class': 'col-report-' ~ columns[key].type,
+                                        'dataToggle': (columns[key].type in ['date', 'datetime']) ? 'date' : '',
+                                        'target': '.report-content',
+                                    }) }}
+                                {% endif %}
+                            {% endfor %}
+                            {% if aggregatorCount %}
+                                {% for aggregator in aggregatorOrder %}
+                                    {%- set columnName = columns[aggregator.column].label ?? columns[aggregator.column].alias|default('') -%}
+                                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                        'sessionVar': 'report.' ~ report.id,
+                                        'text': aggregator.function ~ ' ' ~ columnName,
+                                        'orderBy': '`' ~ aggregator.function ~ ' ' ~ aggregator.column ~ '`',
+                                        'dataToggle': '',
+                                        'target': '.report-content',
+                                    }) }}
+                                {% endfor %}
+                            {% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if dataCount %}
+                            {% for row in data %}
+                                <tr>
+                                    <td>{{ startCount }}</td>
+                                    {% for key in columnOrder|filter(v => columns[v] is defined) %}
+                                        <td>
+                                            {%- set closeLink = false -%}
+                                            {% if columns[key].link is defined and row[columns[key].alias] is defined and row[columns[key].alias] is not empty %}
+                                                {%- set closeLink = true -%}
+                                                {% if columns[key].linkParameters is defined %}
+                                                    {% set parameters = {} %}
+                                                    {% for k,v in columns[key].linkParameters %}
+                                                        {% set parameters = parameters|merge({ (k) : (v is same as "%alias%" ? row[columns[key].alias] : v)}) %}
+                                                    {% endfor %}
+                                                    <a href="{{ path(columns[key].link, parameters) }}" {{ parameters.objectId is defined ? 'class="label label-success"' : '' }}>
+                                                {% else %}
+                                                    <a href="{{ path(columns[key].link, {'objectAction': 'view', 'objectId': row[columns[key].alias]}) }}" class="label label-success">
+                                                {% endif %}
+                                            {% endif %}
+                                            {%- set cellType = columns[key].type -%}
+                                            {%- set cellVal = row[columns[key].alias] -%}
+                                            {# For grouping by datetime fields, so we don't get the timestamp on them #}
+                                            {% if 'datetime' is same as cellType and 10 is same as cellVal|length %}
+                                                {%- set cellType = 'date' -%}
+                                            {% endif %}
+                                            {% if cellVal is not empty %}
+                                                {% if 'datetime' is same as cellType %}
+                                                    {{ dateToFullConcat(cellVal, 'UTC') }}
+                                                {% elseif 'date' is same as cellType %}
+                                                    {{ dateToShort(cellVal, 'UTC') }}
+                                                {% else %}
+                                                    {{ format(cellVal, cellType) }}
+                                                {% endif %}
+                                            {% endif %}
+                                            {% if closeLink %}</a>{% endif %}
+                                        </td>
+                                    {% endfor %}
+                                    {% if aggregatorCount %}
+                                        {% for aggregator in aggregatorOrder %}
+                                            {%- set _key = aggregator.function ~ ' ' ~ aggregator.column %}
+                                            <td>
+                                                {% if row[_key] is defined %}
+                                                    {{ format(row[_key], 'text') }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                                {%- set startCount = startCount + 1 %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td>&nbsp;</td>
+                                {% for key in columnOrder %}
+                                    <td>&nbsp;</td>
+                                {% endfor %}
+                            </tr>
+                        {% endif %}
+                        <tr class="cm-strong">
+                            <td>{{ 'mautic.report.report.groupby.totals'|trans }}</td>
+                            {% for key in columnOrder %}
+                                <td>&nbsp;</td>
+                            {% endfor %}
+                            {% if aggregatorCount %}
+                                {% for aggregator in aggregatorOrder %}
+                                    {%- set i = aggregator.function ~ ' ' ~ aggregator.column %}
+                                    <td>
+                                        {% if reportDataResult.totals[i] is defined %}
+                                            {{ format(reportDataResult.totals[i], reportDataResult.getType(i)) }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            {% endif %}
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    {{ include('@MauticCore/Helper/pagination.html.twig', {
+                        'totalItems': totalResults,
+                        'page': reportPage,
+                        'limit': limit,
+                        'baseUrl': path('mautic_report_view', {'objectId': report.id}),
+                        'sessionVar': 'report.' ~ report.id,
+                        'target': '.report-content',
+                    }, with_context=false) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ table section -->
+{% endif %}
+
+{% if not showGraphsAboveTable %}{{ graphContent|raw }}{% endif %}
+
+<script>
+    mQuery(document).ready(function() {
+        mQuery('.datetimepicker').datetimepicker({
+            format:'Y-m-d H:i:s',
+            closeOnDateSelect: true,
+            validateOnBlur: false,
+            scrollMonth: false,
+            scrollInput: false
+        });
+    });
+    mQuery(document).ready(function() {
+        mQuery('.datepicker').datetimepicker({
+            format:'Y-m-d',
+            closeOnDateSelect: true,
+            validateOnBlur: false,
+            scrollMonth: false,
+            scrollInput: false
+        });
+    });
+</script>

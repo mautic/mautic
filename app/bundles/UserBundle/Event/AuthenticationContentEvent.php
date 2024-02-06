@@ -1,29 +1,12 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class AuthenticationContentEvent.
- */
 class AuthenticationContentEvent extends Event
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-
     /**
      * @var array
      */
@@ -34,12 +17,9 @@ class AuthenticationContentEvent extends Event
      */
     protected $postLogout = false;
 
-    /**
-     * AuthenticationContentEvent constructor.
-     */
-    public function __construct(Request $request)
-    {
-        $this->request    = $request;
+    public function __construct(
+        protected Request $request
+    ) {
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }
 
@@ -59,18 +39,12 @@ class AuthenticationContentEvent extends Event
         return $this->postLogout;
     }
 
-    /**
-     * @param $content
-     */
-    public function addContent($content)
+    public function addContent($content): void
     {
         $this->content[] = $content;
     }
 
-    /**
-     * @return string
-     */
-    public function getContent()
+    public function getContent(): string
     {
         return implode("\n\n", $this->content);
     }

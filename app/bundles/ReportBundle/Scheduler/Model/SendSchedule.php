@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Model;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
@@ -18,35 +9,17 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class SendSchedule
 {
-    /**
-     * @var MailHelper
-     */
-    private $mailer;
-
-    /**
-     * @var MessageSchedule
-     */
-    private $messageSchedule;
-
-    /**
-     * @var FileHandler
-     */
-    private $fileHandler;
+    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,
-        MessageSchedule $messageSchedule,
-        FileHandler $fileHandler
+        private MessageSchedule $messageSchedule,
+        private FileHandler $fileHandler
     ) {
         $this->mailer          = $mailer->getMailer();
-        $this->messageSchedule = $messageSchedule;
-        $this->fileHandler     = $fileHandler;
     }
 
-    /**
-     * @param string $filePath
-     */
-    public function send(Scheduler $scheduler, $csvFilePath)
+    public function send(Scheduler $scheduler, $csvFilePath): void
     {
         $this->mailer->reset(true);
 
@@ -60,13 +33,13 @@ class SendSchedule
             // Try to send the CSV file as an email attachement.
             $this->fileHandler->fileCanBeAttached($csvFilePath);
             $this->mailer->attachFile($csvFilePath, basename($csvFilePath), 'text/csv');
-        } catch (FileTooBigException $e) {
+        } catch (FileTooBigException) {
             $zipFilePath = $this->fileHandler->zipIt($csvFilePath);
             try {
                 // Try to send the ZIP file as an email attachement.
                 $this->fileHandler->fileCanBeAttached($zipFilePath);
                 $this->mailer->attachFile($zipFilePath, basename($zipFilePath), 'application/zip');
-            } catch (FileTooBigException $e) {
+            } catch (FileTooBigException) {
                 // Send the ZIP file as link in the email message.
                 $this->fileHandler->moveZipToPermanentLocation($report, $zipFilePath);
                 $message = $this->messageSchedule->getMessageForLinkedFile($report);

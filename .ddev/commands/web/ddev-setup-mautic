@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+source ./.ddev/mautic-setup.sh
+echo "ddev-managed" > ./.ddev/mautic-preference
+setup_mautic

@@ -1,0 +1,77 @@
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_LIST_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN'),
+    item
+) }}
+
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+{# Workaround to get variables from action_button_helper here #}
+{{ restore('action_button_helper') }}
+
+{% if item is iterable and item.id is defined and item.name is defined %}
+    {% set id, name = item.id, item.name %}
+{% else %}
+    {% set id, name = item.getId(), attribute(item, nameGetter) %}
+{% endif %}
+
+<div class="input-group input-group-sm">
+    <span class="input-group-addon">
+        <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb{{ id }}" value="{{ id|escape }}"/>
+    </span>
+
+    <div class="input-group-btn">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+            <i class="fa fa-angle-down "></i>
+        </button>
+        {% if tooltip is defined and tooltip is not empty %}<i class="fa fa-question-circle"></i>{% endif %}
+        <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
+            {% if templateButtons.edit is defined and templateButtons.edit is not empty %}
+            {{ buttonAdd({
+                attr: editAttr|merge({
+                    class: 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    href: path(
+                        actionRoute,
+                        query|merge({objectAction: 'edit', objectId: id})
+                    ),
+                    'data-toggle': editMode
+                }),
+                iconClass: 'fa fa-pencil-square-o',
+                btnText: 'mautic.core.form.edit'|trans,
+                primary: true
+            }) }}
+            {% endif %}
+            {% if templateButtons.clone is defined and templateButtons.clone is not empty %}
+            {{ buttonAdd({
+                attr: editAttr|merge({
+                    class: 'hidden-xs btn btn-default btn-sm btn-nospin',
+                    href: path(
+                        actionRoute,
+                        query|merge({objectAction: 'clone', objectId: id})
+                    ),
+                    'data-toggle': 'ajax'
+                }),
+                iconClass: 'fa fa-copy',
+                btnText: 'mautic.core.form.clone'|trans,
+                priority: 200
+            }) }}
+            {% endif %}
+            {% if templateButtons.delete is defined and templateButtons.delete is not empty %}
+            {{ buttonAdd({
+                confirm: {
+                    btnClass: false,
+                    btnText: 'mautic.core.form.delete'|trans,
+                    message: (translationBase ~ '.form.confirmdelete')|trans({'%name%': (name ~ ' (' ~ id ~ ')')}),
+                    confirmAction: path(
+                        actionRoute,
+                        query|merge({objectAction: 'delete', objectId: id})
+                    ),
+                    template: 'delete'
+                },
+                priority: -1
+            }) }}
+            {% endif %}
+            
+            {{ buttonsRender()|raw }}
+        </ul>
+    </div>
+</div>

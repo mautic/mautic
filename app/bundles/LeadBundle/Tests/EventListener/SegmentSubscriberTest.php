@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -18,11 +9,11 @@ use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $ipLookupHelper   = $this->createMock(IpLookupHelper::class);
         $auditLogModel    = $this->createMock(AuditLogModel::class);
@@ -41,13 +32,13 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnSegmentPostSave()
+    public function testOnSegmentPostSave(): void
     {
         $this->onSegmentPostSaveMethodCall(false); // update segment log
         $this->onSegmentPostSaveMethodCall(true); // create segment log
     }
 
-    public function testOnSegmentDelete()
+    public function testOnSegmentDelete(): void
     {
         $segmentId        = 1;
         $segmentName      = 'name';
@@ -95,7 +86,7 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
      *
      * @param bool $isNew
      */
-    private function onSegmentPostSaveMethodCall($isNew)
+    private function onSegmentPostSaveMethodCall($isNew): void
     {
         $segmentId = 1;
         $changes   = ['changes'];

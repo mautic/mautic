@@ -2,19 +2,11 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
@@ -23,44 +15,30 @@ use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class CompanyObjectSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CompanyObjectHelper
-     */
-    private $companyObjectHelper;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
     public function __construct(
-        CompanyObjectHelper $companyObjectHelper,
-        Router $router
+        private CompanyObjectHelper $companyObjectHelper,
+        private RouterInterface $router
     ) {
-        $this->companyObjectHelper = $companyObjectHelper;
-        $this->router              = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
-            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateCompanies', 0],
-            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS  => ['createCompanies', 0],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS    => [
+            IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS    => ['collectInternalObjects', 0],
+            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS     => ['updateCompanies', 0],
+            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS     => ['createCompanies', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS       => [
                 ['findCompaniesByIds', 0],
                 ['findCompaniesByDateRange', 0],
                 ['findCompaniesByFieldValues', 0],
             ],
             IntegrationEvents::INTEGRATION_FIND_OWNER_IDS              => ['findOwnerIdsForCompanies', 0],
             IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => ['buildCompanyRoute', 0],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD        => ['findCompanyById', 0],
         ];
     }
 
@@ -165,5 +143,21 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
             )
         );
         $event->stopPropagation();
+    }
+
+    public function findCompanyById(InternalObjectFindByIdEvent $event): void
+    {
+        if (null === $event->getId() || Company::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $company = $this->companyObjectHelper->findObjectById($event->getId());
+
+        if (null === $company) {
+            return;
+        }
+
+        $this->companyObjectHelper->setFieldValues($company);
+        $event->setEntity($company);
     }
 }

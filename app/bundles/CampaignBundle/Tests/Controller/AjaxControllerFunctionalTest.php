@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -25,15 +16,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testCancelScheduledCampaignEventAction()
+    public function testCancelScheduledCampaignEventAction(): void
     {
         $contact  = $this->createContact();
         $campaign = $this->createCampaign();
         $this->addContactToCampaign($contact, $campaign);
 
-        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        Assert::assertStringContainsString('1 total event was scheduled', $output);
+        Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
         $payload = [
             'action'    => 'campaign:cancelScheduledCampaignEvent',
@@ -44,7 +35,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/s/ajax', $payload, [], $this->createAjaxHeaders());
 
         // Ensure we'll fetch fresh data from the database and not from entity manager.
-        $this->em->clear();
+        $this->em->detach($contact);
+        $this->em->detach($campaign);
 
         /** @var LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);

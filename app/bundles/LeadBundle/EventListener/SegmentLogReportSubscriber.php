@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -19,22 +10,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
-    const SEGMENT_LOG = 'segment.log';
+    public const SEGMENT_LOG = 'segment.log';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    public function __construct(FieldsBuilder $fieldsBuilder)
-    {
-        $this->fieldsBuilder = $fieldsBuilder;
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
@@ -45,7 +28,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
             return;
@@ -85,7 +68,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
             return;
@@ -97,13 +80,13 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
             ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_event_log', 'log_removed', $this->generateLeftJoinCondition('log_removed', 'removed').' AND log_removed.object_id = log_added.object_id ');
 
         $qb->andWhere(
-            $qb->expr()->orX(
+            $qb->expr()->or(
                 $qb->expr()->isNotNull('log_added.date_added'),
                 $qb->expr()->isNotNull('log_removed.date_added')
             )
         );
-        $qb->setParameter(':dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
-        $qb->setParameter(':dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
+        $qb->setParameter('dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
+        $qb->setParameter('dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
 
         if (!$event->hasGroupBy()) {
             $qb->groupBy('l.id,log_added.object_id');
@@ -122,11 +105,9 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     /**
      * @param string $alias
      * @param string $action
-     *
-     * @return string
      */
-    private function generateLeftJoinCondition($alias, $action)
+    private function generateLeftJoinCondition($alias, $action): string
     {
-        return'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
+        return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }
 }

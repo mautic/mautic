@@ -1,0 +1,14 @@
+{%- set less -%}
+  {{- include('@MauticFocus/Builder/Bar/parent.less.twig', with_context=false) -}}
+  {{- include('@MauticFocus/Builder/Modal/parent.less.twig', with_context=false) -}}
+  {{- include('@MauticFocus/Builder/Notification/parent.less.twig', with_context=false) -}}
+  {{- include('@MauticFocus/Builder/Page/parent.less.twig', with_context=false) -}}
+{%- endset -%}
+
+{%- set css = less|less_compile -%}
+
+{%- if preview is empty and 'dev' is same as app.environment -%}
+    {%- set css = css|css_minify -%}
+{%- endif -%}
+
+{{- css|raw -}}

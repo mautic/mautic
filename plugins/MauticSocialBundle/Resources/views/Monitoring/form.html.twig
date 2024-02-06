@@ -1,0 +1,68 @@
+{#
+  Variables
+    - entity
+    - form
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'monitoring' %}
+
+{% block headerTitle %}
+  {% if entity.id %}
+    {{ 'mautic.social.monitoring.menu.edit'|trans({'%name%': entity.title|trans}) }}
+  {% else %}
+    {{ 'mautic.social.monitoring.menu.new'|trans }}
+  {% endif %}
+{% endblock %}
+
+{% block modal %}
+  {{ include('@MauticCore/Helper/modal.html.twig', {
+        'id': 'formComponentModal',
+        'header': false,
+        'footerButtons': true,
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {{ includeScript('plugins/MauticSocialBundle/Assets/js/social.js') }}
+
+  {{ form_start(form) }}
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <!-- container -->
+      <div class="col-md-9 bg-auto height-auto bdr-r">
+          <div class="pa-md">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="row">
+                          <div class="col-md-6">{{ form_row(form.title) }}</div>
+                          <div class="col-md-6">{{ form_row(form.networkType) }}</div>
+                      </div>
+                      <div id="properties-container">
+                          <div class="row">
+                          {% if form.properties is defined %}
+                            {% for child in form.properties %}
+                                <div class="col-md-6">
+                                    {{ form_row(child) }}
+                                </div>
+                            {% endfor %}
+                          {% endif %}
+                          </div>
+                      </div>
+                      {{ form_row(form.description) }}
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 bg-white height-auto">
+          <div class="pr-lg pl-lg pt-md pb-md">
+              {{ form_row(form.isPublished) }}
+              {{ form_row(form.publishUp) }}
+              {{ form_row(form.publishDown) }}
+              {{ form_row(form.category) }}
+              {{ form_row(form.lists) }}
+          </div>
+      </div>
+  </div>
+  {{ form_end(form) }}
+{% endblock %}

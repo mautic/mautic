@@ -1,44 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\DataObject;
 
 class LeadManipulator
 {
     /**
-     * @var string|null
-     */
-    private $bundleName;
-
-    /**
-     * @var string|null
-     */
-    private $objectName;
-
-    /**
-     * @var int|null
-     */
-    private $objectId;
-
-    /**
-     * @var string|null
-     */
-    private $objectDescription;
-
-    /**
      * If true then the manipulator was logged and should not be logged for the second time.
-     *
-     * @var bool
      */
-    private $logged = false;
+    private bool $logged = false;
 
     /**
      * @param ?string $bundleName
@@ -46,12 +15,12 @@ class LeadManipulator
      * @param ?int    $objectId
      * @param ?string $objectDescription
      */
-    public function __construct($bundleName = null, $objectName = null, $objectId = null, $objectDescription = null)
-    {
-        $this->bundleName        = $bundleName;
-        $this->objectName        = $objectName;
-        $this->objectId          = $objectId;
-        $this->objectDescription = $objectDescription;
+    public function __construct(
+        private $bundleName = null,
+        private $objectName = null,
+        private $objectId = null,
+        private $objectDescription = null
+    ) {
     }
 
     /**
@@ -88,10 +57,8 @@ class LeadManipulator
 
     /**
      * Check if the manipulator was logged already or not.
-     *
-     * @return bool
      */
-    public function wasLogged()
+    public function wasLogged(): bool
     {
         return $this->logged;
     }
@@ -99,7 +66,7 @@ class LeadManipulator
     /**
      * Set manipulator as logged so it wouldn't be logged for the second time in the same request.
      */
-    public function setAsLogged()
+    public function setAsLogged(): void
     {
         $this->logged = true;
     }

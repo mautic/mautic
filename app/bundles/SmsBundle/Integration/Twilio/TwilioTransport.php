@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Integration\Twilio;
 
 use libphonenumber\NumberParseException;
@@ -23,33 +14,12 @@ use Twilio\Rest\Client;
 
 class TwilioTransport implements TransportInterface
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
+    private ?\Twilio\Rest\Client $client = null;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * @var string
-     */
-    private $sendingPhoneNumber;
-
-    /**
-     * TwilioTransport constructor.
-     */
-    public function __construct(Configuration $configuration, LoggerInterface $logger)
-    {
-        $this->logger        = $logger;
-        $this->configuration = $configuration;
+    public function __construct(
+        private Configuration $configuration,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
@@ -66,39 +36,37 @@ class TwilioTransport implements TransportInterface
         }
 
         try {
+            $messagingServiceSid = $this->configuration->getMessagingServiceSid();
             $this->configureClient();
 
             $this->client->messages->create(
                 $this->sanitizeNumber($number),
-                [
-                    'from' => $this->sendingPhoneNumber,
-                    'body' => $content,
-                ]
+                $this->createPayload($messagingServiceSid, $content)
             );
 
             return true;
-        } catch (NumberParseException $exception) {
-            $this->logger->addWarning(
-                $exception->getMessage(),
-                ['exception' => $exception]
+        } catch (NumberParseException $numberParseException) {
+            $this->logger->warning(
+                $numberParseException->getMessage(),
+                ['exception' => $numberParseException]
             );
 
-            return $exception->getMessage();
-        } catch (ConfigurationException $exception) {
-            $message = ($exception->getMessage()) ? $exception->getMessage() : 'mautic.sms.transport.twilio.not_configured';
-            $this->logger->addWarning(
+            return $numberParseException->getMessage();
+        } catch (ConfigurationException $configurationException) {
+            $message = $configurationException->getMessage() ?: 'mautic.sms.transport.twilio.not_configured';
+            $this->logger->warning(
                 $message,
-                ['exception' => $exception]
+                ['exception' => $configurationException]
             );
 
             return $message;
-        } catch (TwilioException $exception) {
-            $this->logger->addWarning(
-                $exception->getMessage(),
-                ['exception' => $exception]
+        } catch (TwilioException $twilioException) {
+            $this->logger->warning(
+                $twilioException->getMessage(),
+                ['exception' => $twilioException]
             );
 
-            return $exception->getMessage();
+            return $twilioException->getMessage();
         }
     }
 
@@ -118,17 +86,27 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
+     * @return mixed[]
+     */
+    private function createPayload(string $messagingServiceSid, string $content): array
+    {
+        return [
+            'messagingServiceSid' => $messagingServiceSid,
+            'body'                => $content,
+        ];
+    }
+
+    /**
      * @throws ConfigurationException
      */
-    private function configureClient()
+    private function configureClient(): void
     {
         if ($this->client) {
             // Already configured
             return;
         }
 
-        $this->sendingPhoneNumber = $this->configuration->getSendingNumber();
-        $this->client             = new Client(
+        $this->client = new Client(
             $this->configuration->getAccountSid(),
             $this->configuration->getAuthToken()
         );

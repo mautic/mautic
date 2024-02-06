@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\SmsBundle\DependencyInjection\Compiler;
 
@@ -16,12 +8,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class SmsTransportPass implements CompilerPassInterface
 {
-    /**
-     * @var ContainerBuilder
-     */
-    private $container;
+    private ?\Symfony\Component\DependencyInjection\ContainerBuilder $container = null;
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->container = $container;
 
@@ -29,7 +18,7 @@ class SmsTransportPass implements CompilerPassInterface
         $this->registerCallbacks();
     }
 
-    private function registerTransports()
+    private function registerTransports(): void
     {
         if (!$this->container->has('mautic.sms.transport_chain')) {
             return;
@@ -47,7 +36,7 @@ class SmsTransportPass implements CompilerPassInterface
         }
     }
 
-    private function registerCallbacks()
+    private function registerCallbacks(): void
     {
         if (!$this->container->has('mautic.sms.callback_handler_container')) {
             return;

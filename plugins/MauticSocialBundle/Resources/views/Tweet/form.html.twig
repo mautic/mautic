@@ -1,0 +1,62 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'tweet' %}
+
+{% block headerTitle %}
+  {% if entity.id %}
+    {{ 'mautic.social.tweet.menu.edit'|trans({'%name%': entity.name|trans}) }}
+  {% else %}
+    {{ 'mautic.social.tweet.menu.new'|trans }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {{ includeScript('plugins/MauticSocialBundle/Assets/js/social.js', 'composeSocialWatcher', 'composeSocialWatcher') }}
+
+  {{ form_start(form) }}
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <!-- container -->
+      <div class="col-md-9 bg-auto height-auto bdr-r">
+          <div class="pa-md">
+              <div class="row">
+                  <div class="col-md-4">
+                      {{ form_row(form.name) }}
+                      {{ form_row(form.description) }}
+                  </div>
+
+                  <div class="col-md-8">
+                      {{ form_row(form.text) }}
+
+                      <div class="row">
+                          <div class="col-md-3">
+                              <label class="control-label">
+                                  {{ 'mautic.social.twitter.tweet.handle'|trans }}
+                              </label>
+                              {{ form_row(form.handle) }}
+                          </div>
+                          <div class="col-md-3">
+                              {{ form_row(form.asset) }}
+                          </div>
+                          <div class="col-md-3">
+                              {{ form_row(form.page) }}
+                          </div>
+                          <div class="col-md-3">
+                              <div id="character-count" class="text-right small">
+                                  {{ 'mautic.social.twitter.tweet.count'|trans }}
+                                  <span></span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-3 bg-white height-auto">
+          <div class="pr-lg pl-lg pt-md pb-md">
+              {{ form_row(form.category) }}
+          </div>
+      </div>
+  </div>
+  {{ form_end(form) }}
+{% endblock %}

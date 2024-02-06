@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -16,7 +7,7 @@ use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testFixValueTypeForBooleans()
+    public function testFixValueTypeForBooleans(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, null));
         $this->assertTrue(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, 1));
@@ -28,7 +19,7 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, 0));
     }
 
-    public function testFixValueTypeForNumbers()
+    public function testFixValueTypeForNumbers(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_NUMBER, null));
         $this->assertEquals(1, CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_NUMBER, 1));
@@ -39,7 +30,7 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_NUMBER, '0'));
     }
 
-    public function testFixValueTypeForSelect()
+    public function testFixValueTypeForSelect(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, null));
         $this->assertEquals('1', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, true));
@@ -49,7 +40,7 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('one', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, 'one'));
     }
 
-    public function testFieldsValuesTransformerWithoutRelativesDates()
+    public function testFieldsValuesTransformerWithoutRelativesDates(): void
     {
         $values = [
             'customdate'         => '2020-11-01',
@@ -76,7 +67,7 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($values, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
     }
 
-    public function testFieldsValuesTransformerWithRelativesDates()
+    public function testFieldsValuesTransformerWithRelativesDates(): void
     {
         $values = [
             'customdate'         => '-1 day',
@@ -101,16 +92,16 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         ];
 
         $expected = [
-            'customdate'         => (new DateTimeHelper('-1 day'))->getString('Y-m-d'),
-            'customdatetime'     => (new DateTimeHelper('-1 day'))->getString('Y-m-d H:i:s'),
-            'customtime'         => (new DateTimeHelper('-20 minutes'))->getString('H:i:s'),
+            'customdate'         => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d'),
+            'customdatetime'     => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d H:i:s'),
+            'customtime'         => (new DateTimeHelper('-20 minutes'))->toLocalString('H:i:s'),
             'customnulldatetime' => null,
         ];
 
         $this->assertSame($expected, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
     }
 
-    public function testFieldsValuesWithNullsOrEmptyStringsAreNotTransformedToRelativesDates()
+    public function testFieldsValuesWithNullsOrEmptyStringsAreNotTransformedToRelativesDates(): void
     {
         $values = [
             'customdate'        => null,
@@ -144,7 +135,7 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
     }
 
-    public function testFieldsValuesTransformerForDifferingValueTypes()
+    public function testFieldsValuesTransformerForDifferingValueTypes(): void
     {
         $fields = [
             'select'      => [

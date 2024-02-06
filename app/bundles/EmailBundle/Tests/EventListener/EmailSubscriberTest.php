@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -19,46 +10,44 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Mautic\EmailBundle\EventListener\EmailSubscriber;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|AuditLogModel
      */
-    private $auditLogModel;
+    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
 
     /**
      * @var MockObject|EmailModel
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $em;
+    private \PHPUnit\Framework\MockObject\MockObject $em;
 
     /**
-     * @var MockObject|\Swift_Message
+     * @var MockObject|MauticMessage
      */
-    private $mockSwiftMessage;
+    private \PHPUnit\Framework\MockObject\MockObject $mockMessage;
 
-    /**
-     * @var EmailSubscriber
-     */
-    private $subscriber;
+    private \Mautic\EmailBundle\EventListener\EmailSubscriber $subscriber;
 
     protected function setup(): void
     {
@@ -69,15 +58,18 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
         $this->em               = $this->createMock(EntityManager::class);
-        $this->mockSwiftMessage = $this->createMock(\Swift_Message::class);
+        $this->mockMessage      = $this->createMock(MauticMessage::class);
         $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->em);
     }
 
     public function testOnEmailResendWhenShouldTryAgain(): void
     {
-        $this->mockSwiftMessage->leadIdHash = 'idhash';
+        $this->mockMessage
+        ->expects($this->once())
+        ->method('getLeadIdHash')
+        ->willReturn('idhash');
 
-        $queueEmailEvent = new QueueEmailEvent($this->mockSwiftMessage);
+        $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
         $stat = new Stat();
         $stat->setRetryCount(2);
@@ -92,13 +84,16 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWhenShouldNotTryAgain(): void
     {
-        $this->mockSwiftMessage->leadIdHash = 'idhash';
+        $this->mockMessage
+        ->expects($this->once())
+        ->method('getLeadIdHash')
+        ->willReturn('idhash');
 
-        $this->mockSwiftMessage->expects($this->once())
+        $this->mockMessage->expects($this->once())
             ->method('getSubject')
             ->willReturn('Subject');
 
-        $queueEmailEvent = new QueueEmailEvent($this->mockSwiftMessage);
+        $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
         $stat = new Stat();
         $stat->setRetryCount(3);

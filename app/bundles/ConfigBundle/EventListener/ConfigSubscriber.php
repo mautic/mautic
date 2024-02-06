@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -18,14 +9,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ConfigChangeLogger
-     */
-    private $configChangeLogger;
-
-    public function __construct(ConfigChangeLogger $configChangeLogger)
-    {
-        $this->configChangeLogger = $configChangeLogger;
+    public function __construct(
+        private ConfigChangeLogger $configChangeLogger
+    ) {
     }
 
     public static function getSubscribedEvents(): array

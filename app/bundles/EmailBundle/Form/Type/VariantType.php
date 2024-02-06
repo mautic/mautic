@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\EmailBundle\Model\EmailModel;
@@ -20,19 +11,17 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class VariantType extends AbstractType
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(EmailModel $emailModel)
-    {
-        $this->emailModel = $emailModel;
+    public function __construct(
+        private EmailModel $emailModel
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('weight',
             IntegerType::class,
@@ -78,7 +67,7 @@ class VariantType extends AbstractType
                 ]
             );
 
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria): void {
                 $form = $event->getForm();
                 $data = $event->getData();
 

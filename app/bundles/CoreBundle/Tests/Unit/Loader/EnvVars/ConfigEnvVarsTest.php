@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\ConfigEnvVars;
@@ -39,7 +30,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testGetEnvWorks()
+    public function testGetEnvWorks(): void
     {
         putenv('MAUTIC_FOOBAR=bar');
         $this->config->set('foo', 'getenv(MAUTIC_FOOBAR)');
@@ -49,7 +40,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->assertEquals('bar', $this->envVars->get('MAUTIC_FOO'));
     }
 
-    public function testLocalValueIsSet()
+    public function testLocalValueIsSet(): void
     {
         $this->config->set('foo', 'bar');
 
@@ -58,7 +49,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->assertEquals('bar', $this->envVars->get('MAUTIC_FOO'));
     }
 
-    public function testValueIsJsonEncodedIfArray()
+    public function testValueIsJsonEncodedIfArray(): void
     {
         $this->config->set('foo', ['bar']);
 
@@ -67,7 +58,7 @@ class ConfigEnvVarsTest extends TestCase
         $this->assertEquals('["bar"]', $this->envVars->get('MAUTIC_FOO'));
     }
 
-    public function testDefaultValueIsJsonEncodedIfArray()
+    public function testDefaultValueIsJsonEncodedIfArray(): void
     {
         $this->config->set('foo', null);
         $this->defaultConfig->set('foo', ['bar']);

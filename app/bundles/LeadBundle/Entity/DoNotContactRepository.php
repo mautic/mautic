@@ -1,21 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
- * DoNotContactRepository.
+ * @extends CommonRepository<DoNotContact>
  */
 class DoNotContactRepository extends CommonRepository
 {
@@ -34,11 +26,11 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $channel
-     * @param null $ids
-     * @param null $reason
-     * @param null $listId
-     * @param bool $combined
+     * @param string|null                         $channel
+     * @param array<int,int|string>|int|null      $ids
+     * @param int|null                            $reason
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -77,13 +69,13 @@ class DoNotContactRepository extends CommonRepository
                         ->groupBy('cs.leadlist_id');
                 } elseif (is_array($listId)) {
                     $q->andWhere(
-                        $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
+                        $q->expr()->in('cs.leadlist_id', ':segmentIds')
                     );
 
-                    if (!$combined) {
-                        $q->addSelect('cs.leadlist_id')
-                            ->groupBy('cs.leadlist_id');
-                    }
+                    $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
+
+                    $q->addSelect('cs.leadlist_id')
+                        ->groupBy('cs.leadlist_id');
                 } else {
                     $q->andWhere('cs.leadlist_id = :list_id')
                         ->setParameter('list_id', $listId);
@@ -93,8 +85,10 @@ class DoNotContactRepository extends CommonRepository
                 $subQ->select('distinct(list.lead_id)')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
                     ->andWhere(
-                        $q->expr()->in('list.leadlist_id', array_map('intval', $listId))
+                        $q->expr()->in('list.leadlist_id', ':segmentIds')
                     );
+
+                $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
 
                 $q->innerJoin('dnc', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = dnc.lead_id');
             }
@@ -104,7 +98,7 @@ class DoNotContactRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_added', 'dnc');
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -120,8 +114,6 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadId
-     *
      * @return array
      */
     public function getTimelineStats($leadId = null, array $options = [])
@@ -145,12 +137,9 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param       $channel
      * @param array $contacts Array of contacts to filter by
-     *
-     * @return array
      */
-    public function getChannelList($channel, array $contacts = null)
+    public function getChannelList($channel, array $contacts = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
@@ -170,7 +159,7 @@ class DoNotContactRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Tracker\Service\ContactTrackingService;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
@@ -28,27 +19,27 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|CookieHelper
      */
-    private $cookieHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $cookieHelperMock;
 
     /**
      * @var MockObject|LeadDeviceRepository
      */
-    private $leadDeviceRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepositoryMock;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private $leadRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|RequestStack
      */
-    private $requestStackMock;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
 
     /**
      * @var MockObject|MergeRecordRepository
      */
-    private $mergeRecordRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepository;
 
     protected function setUp(): void
     {

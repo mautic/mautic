@@ -1,64 +1,24 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event as Events;
-use Mautic\CampaignBundle\Service\Campaign as CampaignService;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var CampaignService
-     */
-    private $campaignService;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        CampaignService $campaignService,
-        FlashBag $flashBag
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private CampaignAuditService $campaignAuditService,
     ) {
-        $this->ipLookupHelper   = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->campaignService  = $campaignService;
-        $this->flashBag         = $flashBag;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
@@ -69,16 +29,16 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onCampaignPostSave(Events\CampaignEvent $event)
+    public function onCampaignPostSave(Events\CampaignEvent $event): void
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
 
-        if ($campaign->isPublished() && $this->campaignService->hasUnpublishedEmail($campaign->getId())) {
-            $this->setUnpublishedMailFlashMessage($campaign);
+        if ($campaign->isPublished()) {
+            $this->campaignAuditService->addWarningForUnpublishedEmails($campaign);
         }
 
-        //don't set leads
+        // don't set leads
         unset($details['leads']);
 
         if (!empty($details)) {
@@ -97,7 +57,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onCampaignDelete(Events\CampaignEvent $event)
+    public function onCampaignDelete(Events\CampaignEvent $event): void
     {
         $campaign = $event->getCampaign();
         $log      = [
@@ -109,15 +69,5 @@ class CampaignSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
-    }
-
-    private function setUnpublishedMailFlashMessage(Campaign $campaign)
-    {
-        $this->flashBag->add(
-            'mautic.core.notice.campaign.unpublished.email',
-            [
-                '%name%' => $campaign->getName(),
-            ]
-        );
     }
 }

@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationEvent.
- */
 class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
 {
     public function __construct(UnifiedIntegrationInterface $integration)
@@ -32,7 +20,7 @@ class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
         return $this->integration->getIntegrationSettings();
     }
 
-    public function setEntity(Integration $integration)
+    public function setEntity(Integration $integration): void
     {
         $this->integration->setIntegrationSettings($integration);
     }

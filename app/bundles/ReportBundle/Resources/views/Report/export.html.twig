@@ -1,0 +1,95 @@
+{% extends '@MauticCore/Default/slim.html.twig' %}
+
+{% block pageTitle pageTitle %}
+
+{% block headerTitle report.name %}
+
+{% block mauticContent 'report' %}
+
+{% block _content %}
+  {#$showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));#}
+  {%- set showGraphsAboveTable = report.settings.showGraphsAboveTable is defined -%}
+
+  {%- set dataCount = reportDataResult.getData()|length -%}
+  {%- set columnOrder = report.columns -%}
+  {%- set graphOrder = report.graphs -%}
+  {%- set aggregatorOrder = report.aggregators -%}
+  <style>
+      #app-content.content-only.container {
+          overflow-x: scroll;
+      }
+  </style>
+
+  <div class="pa-md">
+      <h3>{{ report.name }}</h3>
+      <div class="small">
+          {{ dateToDate(reportDataResult.getDateFrom(), 'UTC') }} - {{ dateToDate(reportDataResult.getDateTo(), 'UTC') }}
+      </div>
+  </div>
+
+  {% if showGraphsAboveTable is not empty %}
+      {{ include('@MauticReport/Report/details_data_graphs.html.twig', {
+              'graphOrder': graphOrder,
+              'graphs': reportDataResult.getGraphs(),
+              'report': report,
+      }) }}
+  {% endif %}
+
+
+  {% if columnOrder is not empty %}
+      <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+          <thead>
+          <tr>
+              <th class="col-report-count"></th>
+
+              {% for header in reportDataResult.headers %}
+                  <th>{{ header }}</th>
+              {% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+          {% if dataCount %}
+              {% for count, data in reportDataResult.data %}
+                  <tr>
+                      <td>{{ count + 1 }}</td>
+                      {% for k, v in data %}
+                          <td>{{ format(v, reportDataResult.getType(k)) }}</td>
+                      {% endfor %}
+                  </tr>
+              {% endfor %}
+              {% if reportDataResult.totals %}
+                  <tr class="cm-strong">
+                      <td>{{ 'mautic.report.report.groupby.totals'|trans }}</td>
+                      {% for key in columnOrder %}
+                          <td>&nbsp;</td>
+                      {% endfor %}
+                      {% for aggregator in aggregatorOrder %}
+                      {%- set i = aggregator.function ~ ' ' ~ aggregator.column %}
+                              <td>
+                                  {% if reportDataResult.totals[i] is defined %}
+                                      {{ format(reportDataResult.totals[i], reportDataResult.getType(i)) }}
+                                  {% endif %}
+                              </td>
+                      {% endfor %}
+                  </tr>
+              {% endif %}
+          {% else %}
+              <tr>
+                  <td>&nbsp;</td>
+                  {% for key in columnOrder %}
+                      <td>&nbsp;</td>
+                  {% endfor %}
+              </tr>
+          {% endif %}
+          </tbody>
+      </table>
+  {% endif %}
+
+  {% if showGraphsAboveTable is empty %}
+      {{ include('@MauticReport/Report/details_data_graphs.html.twig', {
+              'graphOrder': graphOrder,
+              'graphs': reportDataResult.getGraphs(),
+              'report': report,
+      }) }}
+  {% endif %}
+{% endblock %}

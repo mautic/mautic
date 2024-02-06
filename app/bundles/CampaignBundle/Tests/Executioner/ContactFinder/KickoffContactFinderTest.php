@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,12 +16,12 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
      */
-    private $campaignRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
 
     protected function setUp(): void
     {
@@ -43,7 +34,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testNoContactsFoundExceptionIsThrown()
+    public function testNoContactsFoundExceptionIsThrown(): void
     {
         $this->campaignRepository->expects($this->once())
             ->method('getPendingContactIds')
@@ -55,7 +46,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->getContacts(1, $limiter);
     }
 
-    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
+    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound(): void
     {
         $contactIds = [1, 2];
 
@@ -65,7 +56,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository->expects($this->once())
             ->method('getContactCollection')
-            ->willReturn([]);
+            ->willReturn(new ArrayCollection([]));
 
         $this->expectException(NoContactsFoundException::class);
 
@@ -73,7 +64,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->getContacts(1, $limiter);
     }
 
-    public function testArrayCollectionIsReturnedForFoundContacts()
+    public function testArrayCollectionIsReturnedForFoundContacts(): void
     {
         $contactIds = [1, 2];
 

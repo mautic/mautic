@@ -1,23 +1,9 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
 abstract class AbstractEventAccessor
 {
-    /**
-     * @var array
-     */
-    protected $config = [];
-
     /**
      * @var array
      */
@@ -33,18 +19,11 @@ abstract class AbstractEventAccessor
         'channelIdField',
     ];
 
-    /**
-     * @var array
-     */
-    private $extraProperties = [];
+    private array $extraProperties = [];
 
-    /**
-     * AbstractEventAccessor constructor.
-     */
-    public function __construct(array $config)
-    {
-        $this->config = $config;
-
+    public function __construct(
+        protected array $config
+    ) {
         $this->filterExtraProperties();
     }
 
@@ -144,13 +123,13 @@ abstract class AbstractEventAccessor
      */
     protected function getProperty($property, $default = null)
     {
-        return (isset($this->config[$property])) ? $this->config[$property] : $default;
+        return $this->config[$property] ?? $default;
     }
 
     /**
      * Calculate the difference in systemProperties and what was fed to the class.
      */
-    private function filterExtraProperties()
+    private function filterExtraProperties(): void
     {
         $this->extraProperties = array_diff_key($this->config, array_flip($this->systemProperties));
     }

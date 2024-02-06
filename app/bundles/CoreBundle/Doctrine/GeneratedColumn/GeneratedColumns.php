@@ -2,38 +2,22 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 final class GeneratedColumns implements GeneratedColumnsInterface
 {
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * Simple array of generated columns.
-     *
-     * @var array
      */
-    private $generatedColumns = [];
+    private array $generatedColumns = [];
 
     /**
      * Array structure holding the generated columns that allows to
      * search by date column and unit without need for a loop.
-     *
-     * @var array
      */
-    private $dateColumnIndex = [];
+    private array $dateColumnIndex = [];
 
     public function add(GeneratedColumn $generatedColumn): void
     {
@@ -57,27 +41,27 @@ final class GeneratedColumns implements GeneratedColumnsInterface
         throw new \UnexpectedValueException("Generated column for original date column {$originalDateColumn} with unit {$unit} does not exist.");
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->generatedColumns[$this->position];
     }
 
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->generatedColumns[$this->position]);
     }

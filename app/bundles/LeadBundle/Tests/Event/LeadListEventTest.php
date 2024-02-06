@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\CategoryBundle\Entity\Category;
@@ -17,7 +8,7 @@ use Mautic\LeadBundle\Event\LeadListEvent;
 
 class LeadListEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructGettersSetters()
+    public function testConstructGettersSetters(): void
     {
         $segment = new LeadList();
         $event   = new LeadListEvent($segment);

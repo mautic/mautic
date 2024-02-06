@@ -1,0 +1,14 @@
+{% if showMore is defined and showMore is not empty %}
+    <a href="{{ url('mautic_stage_index', {'search' : searchString}) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
+    </a>
+</div>
+{% else %}
+{% if canEdit %}
+<a href="{{ url('mautic_stage_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}" data-toggle="ajax">
+    {{ item.getName() }}
+</a>
+{% else %}
+<span>{{ item.getName() }}</span>
+{% endif %}
+{% endif %}

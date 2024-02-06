@@ -1,43 +1,27 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<array<mixed>, array<mixed>>
+ */
 class SortableListTransformer implements DataTransformerInterface
 {
     /**
-     * @var bool
-     */
-    private $withLabels = true;
-
-    /**
-     * @var bool
-     */
-    private $useKeyValuePairs = false;
-
-    /**
      * @param bool $withLabels
-     * @param bool $atRootLevel
+     * @param bool $useKeyValuePairs
      */
-    public function __construct($withLabels = true, $useKeyValuePairs = false)
-    {
-        $this->withLabels       = $withLabels;
-        $this->useKeyValuePairs = $useKeyValuePairs;
+    public function __construct(
+        private $withLabels = true,
+        private $useKeyValuePairs = false
+    ) {
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function transform($array)
     {
@@ -49,7 +33,7 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function reverseTransform($array)
     {
@@ -61,9 +45,11 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $array
+     * @param array<mixed>|null $array
+     *
+     * @return array<mixed>
      */
-    private function formatList($array)
+    private function formatList(?array $array): array
     {
         if (null === $array || !isset($array['list'])) {
             return ['list' => []];
@@ -82,11 +68,9 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $array
-     *
-     * @return array
+     * @return array<mixed>
      */
-    private function transformKeyValuePair($array)
+    private function transformKeyValuePair($array): array
     {
         if (null === $array) {
             return ['list' => []];
@@ -105,11 +89,11 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $array
+     * @param array<mixed> $array
      *
-     * @return array
+     * @return array<mixed>
      */
-    private function reverseTransformKeyValuePair($array)
+    private function reverseTransformKeyValuePair(?array $array): array
     {
         if (null === $array || !isset($array['list'])) {
             return [];

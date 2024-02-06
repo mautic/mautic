@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
@@ -16,29 +7,19 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 
 class Parser
 {
-    /**
-     * @var Message
-     */
-    protected $message;
-
-    /**
-     * Parser constructor.
-     */
-    public function __construct(Message $message)
-    {
-        $this->message = $message;
+    public function __construct(
+        protected Message $message
+    ) {
     }
 
     /**
-     * @return UnsubscribedEmail
-     *
      * @throws UnsubscriptionNotFound
      */
-    public function parse()
+    public function parse(): UnsubscribedEmail
     {
         $unsubscriptionEmail = null;
         foreach ($this->message->to as $to => $name) {
-            if (false !== strpos($to, '+unsubscribe')) {
+            if (str_contains($to, '+unsubscribe')) {
                 $unsubscriptionEmail = $to;
 
                 break;

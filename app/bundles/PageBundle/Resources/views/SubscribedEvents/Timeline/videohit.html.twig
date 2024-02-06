@@ -1,0 +1,49 @@
+{% set viewTime = 'mautic.core.unknown'|trans %}
+{% set duration = 'mautic.core.unknown'|trans %}
+{% set percentage = 'mautic.core.unknown'|trans %}
+{% set unknown = 'mautic.core.unknown'|trans %}
+{% set icon = event.icon|default('') %}
+
+{% if event.extra.hit.time_watched is defined %}
+    {% set viewTimeActual = event.extra.hit.time_watched %}
+    {% set viewTime = event.extra.hit.time_watched %}
+
+    {# format the time #}
+    {% if viewTime > 60 %}
+        {% set sec = viewTime % 60 %}
+        {% set min = (viewTime / 60)|round(0, 'floor') %}
+        {% set viewTime = min ~ 'm ' ~ sec ~ 's' %}
+    {% else %}
+        {% set viewTime = viewTime ~ 's' %}
+    {% endif %}
+{% endif %}
+
+{% if event.extra.hit.duration is defined %}
+    {% set durationActual = event.extra.hit.duration %}
+    {% set duration = event.extra.hit.duration %}
+
+    {# format the time #}
+    {% if duration > 60 %}
+        {% set sec = duration % 60 %}
+        {% set min = (duration / 60)|round(0, 'floor') %}
+        {% set duration = min ~ 'm ' ~ sec ~ 's' %}
+    {% else %}
+        {% set duration = duration ~ 's' %}
+    {% endif %}
+{% endif %}
+
+{% if viewTime != unknown and duration != unknown %}
+    {% set percentage = ((viewTimeActual / durationActual) * 100)|round %}
+{% endif %}
+
+<dl class="dl-horizontal">
+    <dt>{{ 'mautic.page.time.on.video'|trans }}:</dt>
+    <dd class="ellipsis">{{ 'mautic.page.time.on.video.value'|trans({'%time_watched%': viewTime, '%duration%': duration, '%percentage%': percentage}) }}</dd>
+    <dt>{{ 'mautic.page.referrer'|trans }}:</dt>
+    <dd class="ellipsis">{% if event.extra.hit.referer is defined and event.extra.hit.referer is not empty %}{{ assetMakeLinks(event['extra']['hit']['referer']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
+    <dt>{{ 'mautic.video.url'|trans }}:</dt>
+    <dd class="ellipsis">{% if event.hit.url is defined and event.hit.url is not empty %}{{ assetMakeLinks(event['extra']['hit']['url']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
+</dl>
+<div class="small">
+    {{ inputClean(event.extra.hit.user_agent) }}
+</div>

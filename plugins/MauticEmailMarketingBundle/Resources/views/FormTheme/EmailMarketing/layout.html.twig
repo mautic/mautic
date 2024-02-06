@@ -1,0 +1,30 @@
+{% block emailmarketing_constantcontact_row %}
+  <div class="row">
+      <div class="col-md-8">
+          {{ form_row(form.list) }}
+      </div>
+  </div>
+  {{ form_row(form.sendWelcome) }}
+{% endblock %}
+
+{% block emailmarketing_icontact_row %}
+<div class="row">
+    <div class="col-md-8">
+        {{ form_row(form.list) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block emailmarketing_mailchimp_row %}
+<div class="alert alert-info">
+    {{ 'mautic.emailmarketing.list.update'|trans }}
+</div>
+<div class="row">
+    <div class="col-md-8">
+        {{ form_row(form.list) }}
+    </div>
+</div>
+
+{{ form_row(form.doubleOptin) }}
+{{ form_row(form.sendWelcome) }}
+{% endblock %}

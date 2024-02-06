@@ -1,0 +1,70 @@
+<script>
+    {% for key, string in mauticLang %}
+    mauticLang.{{ key }} = "{{ string|trans }}";
+    {% endfor %}
+</script>
+<div class="{{ typePrefix }}-type-modal-backdrop" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #000000; opacity: 0.9; z-index: 9000"></div>
+
+<div class="modal fade in {{ typePrefix }}-type-modal" style="display: block; z-index: 9999;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <a href="javascript: void(0);" onclick="Mautic.closeModalAndRedirect('.{{ typePrefix }}-type-modal', '{{ path(cancelUrl) }}');" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </a>
+                <h4 class="modal-title">{{ header|trans }}</h4>
+                <div class="modal-loading-bar"></div>
+            </div>
+            <div class="modal-body form-select-modal">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                <div class="col-xs-8 col-sm-10 np">
+                                    <h3 class="panel-title">{{ typeOneHeader|trans }}</h3>
+                                </div>
+                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
+                                    <i class="hidden-xs fa {{ typeOneIconClass }} fa-lg"></i>
+                                    <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-primary" onclick="{{ typeOneOnClick }}">
+                                        {{ 'mautic.core.select' }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                {{ typeOneDescription|trans }}
+                            </div>
+                            <div class="hidden-xs panel-footer text-center">
+                                <button class="btn btn-lg btn-default btn-nospin text-success" onclick="{{ typeOneOnClick }}">
+                                    {{ 'mautic.core.select'|trans }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="col-xs-8 col-sm-10 np">
+                                    <h3 class="panel-title">{{ typeTwoHeader|trans }}</h3>
+                                </div>
+                                <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
+                                    <i class="hidden-xs fa {{ typeTwoIconClass }} fa-lg"></i>
+                                    <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-primary" onclick="{{ typeTwoOnClick }}">
+                                        {{ 'mautic.core.select'|trans }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                {{ typeTwoDescription|trans }}
+                            </div>
+                            <div class="hidden-xs panel-footer text-center">
+                                <button class="btn btn-lg btn-default btn-nospin text-primary" onclick="{{ typeTwoOnClick }}">
+                                    {{ 'mautic.core.select'|trans }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

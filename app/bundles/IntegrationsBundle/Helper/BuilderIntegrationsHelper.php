@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic. All rights reserved
- * @author      Mautic Contributors.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Helper;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -22,16 +13,11 @@ class BuilderIntegrationsHelper
     /**
      * @var BuilderInterface[]
      */
-    private $builders = [];
+    private array $builders = [];
 
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
-
-    public function __construct(IntegrationsHelper $integrationsHelper)
-    {
-        $this->integrationsHelper = $integrationsHelper;
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    ) {
     }
 
     /**

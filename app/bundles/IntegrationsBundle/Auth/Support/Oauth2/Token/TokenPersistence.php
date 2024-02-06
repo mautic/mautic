@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
@@ -21,19 +12,11 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistence implements TokenPersistenceInterface
 {
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
+    private ?\Mautic\PluginBundle\Entity\Integration $integration = null;
 
-    /**
-     * @var Integration|null
-     */
-    private $integration;
-
-    public function __construct(IntegrationsHelper $integrationsHelper)
-    {
-        $this->integrationsHelper = $integrationsHelper;
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    ) {
     }
 
     /**
@@ -46,7 +29,7 @@ class TokenPersistence implements TokenPersistenceInterface
     public function restoreToken(TokenInterface $token): TokenInterface
     {
         $apiKeys               = $this->getIntegration()->getApiKeys();
-        $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
+        $apiKeys['expires_at'] ??= null;
 
         return new IntegrationToken(
             empty($apiKeys['access_token']) ? null : $apiKeys['access_token'],

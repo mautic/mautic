@@ -1,38 +1,37 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\IpAddressModel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModelTest extends \PHPUnit\Framework\TestCase
+class IpAddressModelTest extends TestCase
 {
-    private $entityManager;
-    private $logger;
-    private $ipAddressModel;
+    /**
+     * @var EntityManager|MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+
+    /**
+     * @var MockObject|LoggerInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
+
+    private \Mautic\LeadBundle\Model\IpAddressModel $ipAddressModel;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager  = $this->createMock(EntityManager::class);
         $this->logger         = $this->createMock(LoggerInterface::class);
@@ -42,7 +41,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
     /**
      * This test ensures it won't fail if there are no IP addresses.
      */
-    public function testSaveIpAddressReferencesForContactWhenNoIps()
+    public function testSaveIpAddressReferencesForContactWhenNoIps(): void
     {
         $this->entityManager->expects($this->never())
             ->method('getConnection');
@@ -50,7 +49,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
         $this->ipAddressModel->saveIpAddressesReferencesForContact(new Lead());
     }
 
-    public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges()
+    public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges(): void
     {
         $contact      = $this->createMock(Lead::class);
         $ipAddress    = $this->createMock(IpAddress::class);
@@ -68,7 +67,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
         $this->ipAddressModel->saveIpAddressesReferencesForContact($contact);
     }
 
-    public function testSaveIpAddressReferencesForContactThatHasIpsWithSomeAdded()
+    public function testSaveIpAddressReferencesForContactThatHasIpsWithSomeAdded(): void
     {
         $contact        = $this->createMock(Lead::class);
         $ipAddressAdded = $this->createMock(IpAddress::class);
@@ -105,7 +104,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn('1.2.3.999');
 
         $queryBuilder->expects($this->once())
-            ->method('execute');
+            ->method('executeStatement');
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')
@@ -120,7 +119,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $contact->getIpAddresses());
     }
 
-    public function testSaveIpAddressReferencesForContactWhenSomeIpsIfTheReferenceExistsAlready()
+    public function testSaveIpAddressReferencesForContactWhenSomeIpsIfTheReferenceExistsAlready(): void
     {
         $contact      = $this->createMock(Lead::class);
         $ipAddress    = $this->createMock(IpAddress::class);
@@ -149,8 +148,8 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn('1.2.3.4');
 
         $queryBuilder->expects($this->once())
-            ->method('execute')
-            ->willThrowException(new UniqueConstraintViolationException('', $this->createMock(DriverException::class)));
+            ->method('executeStatement')
+            ->willThrowException(new UniqueConstraintViolationException($this->createMock(DriverException::class), null));
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')

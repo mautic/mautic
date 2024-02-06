@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -24,35 +15,22 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var PrimaryCompanyHelper
-     */
-    private $primaryCompanyHelper;
-
-    public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
-    {
-        $this->dispatcher           = $dispatcher;
-        $this->primaryCompanyHelper = $primaryCompanyHelper;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private PrimaryCompanyHelper $primaryCompanyHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 254],
             EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 254],
-            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 254],
+            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', -254],
         ];
     }
 
-    public function decodeTokens(EmailSendEvent $event)
+    public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
             // prevent a loop
@@ -61,11 +39,11 @@ class TokenSubscriber implements EventSubscriberInterface
 
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();
-        $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content, -1, $count);
+        $content = $this->urlDecodeTokens($content);
         $event->setContent($content);
 
         if ($plainText = $event->getPlainText()) {
-            $plainText = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $plainText);
+            $plainText = $this->urlDecodeTokens($plainText);
             $event->setPlainText($plainText);
         }
 
@@ -82,14 +60,15 @@ class TokenSubscriber implements EventSubscriberInterface
                     'dynamicContent' => $dynamicContentAsArray,
                     'idHash'         => $event->getIdHash(),
                 ],
-                $email
+                $email,
+                $event->isInternalSend()
             );
-            $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch($tokenEvent, EmailEvents::TOKEN_REPLACEMENT);
             $event->addTokens($tokenEvent->getTokens());
         }
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 
@@ -114,6 +93,7 @@ class TokenSubscriber implements EventSubscriberInterface
             foreach ($data['filters'] as $filter) {
                 if ($this->matchFilterForLead($filter['filters'], $lead)) {
                     $filterContent = $filter['content'];
+                    break;
                 }
             }
 
@@ -130,10 +110,16 @@ class TokenSubscriber implements EventSubscriberInterface
                 true
             );
 
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
-            $untokenizedContent = $emailSendEvent->getContent(true);
+            $this->dispatcher->dispatch($emailSendEvent, EmailEvents::EMAIL_ON_DISPLAY);
+
+            $untokenizedContent = $emailSendEvent->getContent(!$event->isInternalSend());
 
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
+    }
+
+    private function urlDecodeTokens(string $content): string
+    {
+        return preg_replace('/(%7B)(.*?)(%3D|=)(.*?)(%7D)/i', '{$2=$4}', $content);
     }
 }

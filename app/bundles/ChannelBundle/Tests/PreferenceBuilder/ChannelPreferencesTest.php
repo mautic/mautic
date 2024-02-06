@@ -1,25 +1,15 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
-use Psr\Log\NullLogger;
 
 class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLogsAreOrganizedByPriority()
+    public function testLogsAreOrganizedByPriority(): void
     {
         $campaign = new Campaign();
         $event    = new Event();
@@ -47,8 +37,6 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $channel
-     *
      * @return ChannelPreferences
      */
     private function getChannelPreference($channel, Event $event)

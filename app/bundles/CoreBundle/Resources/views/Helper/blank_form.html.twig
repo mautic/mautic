@@ -1,0 +1,13 @@
+{%- if formTheme is defined %}
+  {%- form_theme form formTheme %}
+{%- endif %}
+{%- set function = function|default('form') %}
+{%- set variables = variables|default([]) %}
+{%- if function is same as 'row' %}
+  {{ form_row(form, variables) }}
+{%- elseif function is same as 'widget' %}
+  {{ form_widget(form, variables) }}
+{%- else %}
+  {{ form(form, variables) }}
+{%- endif %}
+

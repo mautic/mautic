@@ -1,0 +1,7 @@
+#!/bin/bash
+
+## Description: Run redis-cli inside the redis container
+## Usage: redis-cli [flags] [args]
+## Example: "redis-cli KEYS *" or "ddev redis-cli INFO" or "ddev redis-cli --version"
+
+redis-cli -p 6379 -h redis $@

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -17,19 +8,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigMonitoredEmailType extends AbstractType
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (function_exists('imap_open')) {
             $data  = $options['data'];
@@ -38,7 +27,7 @@ class ConfigMonitoredEmailType extends AbstractType
             // Default email bundles
             $event->addFolder('general', '', 'mautic.email.config.monitored_email.general');
 
-            $this->dispatcher->dispatch(EmailEvents::MONITORED_EMAIL_CONFIG, $event);
+            $this->dispatcher->dispatch($event, EmailEvents::MONITORED_EMAIL_CONFIG);
 
             $folderSettings = $event->getFolders();
             foreach ($folderSettings as $key => $settings) {
@@ -59,9 +48,6 @@ class ConfigMonitoredEmailType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'monitored_email';

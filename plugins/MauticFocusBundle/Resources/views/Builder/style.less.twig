@@ -1,0 +1,86 @@
+{#
+#}
+{% set preview = preview|default(false) %}
+{% set less %}
+.mf-bar-iframe {
+    z-index: 19000;
+}
+
+.mf-content {
+    line-height: 1.1;
+
+    .mf-inner-container {
+        margin-top: 20px;
+    }
+
+    a.mf-link, .mauticform-button, .mauticform-pagebreak {
+        padding: 5px 15px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+    }
+
+    a.mf-link:hover, .mauticform-button:hover, .mauticform-pagebreak:hover {
+        opacity: 0.9;
+        text-decoration: none;
+        border: none;
+    }
+
+    .mauticform-pagebreak {
+        width: auto !important;
+    }
+}
+
+.mautic-focus {
+    {% if preview %}
+    .mauticform-row {
+        min-height: 0px;
+    }
+    {% endif %}
+
+    .mauticform_wrapper form {
+        padding: 0;
+        margin: 0;
+    }
+
+    .mauticform-input, select {
+        border-radius: 2px;
+        padding: 5px 8px;
+        color: #757575;
+        border: 1px solid #ababab;
+    }
+
+    .mauticform-input:focus, select:focus {
+        outline: none;
+        border: 1px solid #757575;
+    }
+}
+
+{{ include('@MauticFocus/Builder/Bar/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
+
+{{ include('@MauticFocus/Builder/Modal/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
+
+{{ include('@MauticFocus/Builder/Notification/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
+
+{{ include('@MauticFocus/Builder/Page/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
+{% endset %}
+
+{% set css = less|less_compile %}
+
+{% if preview is empty and 'dev' is same as app.environment %}
+    {% set css = css|css_minify %}
+{% endif %}
+
+{{ css|raw }}

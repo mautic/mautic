@@ -1,0 +1,22 @@
+{#
+  Variables
+    - field
+#}
+<div class="box-layout">
+    <div class="col-md-1 va-m">
+        {% set requiredTitle = field.isRequired ? 'mautic.core.required' : 'mautic.core.not_required' %}
+        <h3><span class="fa fa-{% if field.isRequired %}check{% else %}times{% endif %} text-white dark-xs" data-toggle="tooltip"
+                  data-placement="left"
+                  title="{{ requiredTitle|trans }}"></span>
+        </h3>
+    </div>
+    <div class="col-md-7 va-m">
+        <h5 class="fw-sb text-primary mb-xs">{{ field.label }}</h5>
+        <h6 class="text-white dark-md">{{ 'mautic.form.details.field_type'|trans({'%type%': field.type}) }}</h6>
+    </div>
+    <div class="col-md-4 va-m text-right">
+        {% if not field.parent %}
+            <em class="text-white dark-sm">{{ 'mautic.form.details.field_order'|trans({'%order%': field.order}) }}</em>
+        {% endif %}
+    </div>
+</div>

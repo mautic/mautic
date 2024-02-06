@@ -2,20 +2,10 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
-use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
@@ -27,23 +17,18 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private $versionProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $versionProvider;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var GeneratedColumnsProvider
-     */
-    private $provider;
+    private \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider $provider;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $this->versionProvider = $this->createMock(VersionProviderInterface::class);
         $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
@@ -65,7 +50,6 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
 
         $generatedColumns = $this->provider->getGeneratedColumns();
 
-        $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
         $this->assertCount(0, $generatedColumns);
     }
 
@@ -79,7 +63,6 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                CoreEvents::ON_GENERATED_COLUMNS_BUILD,
                 $this->callback(
                     // Emulate a subscriber.
                     function (GeneratedColumnsEvent $event) {
@@ -87,15 +70,15 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                )
+                ),
+                CoreEvents::ON_GENERATED_COLUMNS_BUILD
             );
 
         $generatedColumns = $this->provider->getGeneratedColumns();
-        $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
 
         /** @var GeneratedColumn $generatedColumn */
         $generatedColumn = $generatedColumns->current();
-        $this->assertSame('page_hits', $generatedColumn->getTableName());
+        $this->assertSame(MAUTIC_TABLE_PREFIX.'page_hits', $generatedColumn->getTableName());
 
         // Ensure that the cache works and dispatcher is called only once
         $generatedColumns = $this->provider->getGeneratedColumns();

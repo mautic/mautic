@@ -1,0 +1,39 @@
+{#
+  Variables
+    - pageTitle
+    - results
+    - page
+#}
+{% set contentOnly = true %}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.page.result.header.index'|trans({'%name%': page.getName()}) }}{% endblock %}
+
+{% block content %}
+<div class="pageresults">
+    <table class="table table-hover table-striped table-bordered pageresult-list">
+        <thead>
+        <tr>
+            <th class="col-pageresult-id">{{ 'mautic.form.report.submission.id'|trans }}</th>
+            <th class="col-pageresult-leadId">{{ 'mautic.lead.report.contact_id'|trans }}</th>
+            <th class="col-pageresult-formId">{{ 'mautic.form.report.form_id'|trans }}</th>
+            <th class="col-pageresult-date">{{ 'mautic.form.result.thead.date'|trans }}</th>
+            <th class="col-pageresult-ip">{{ 'mautic.core.ipaddress'|trans }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in results %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.leadId }}</td>
+                <td>{{ item.formId }}</td>
+                <td>{{ dateToFull(item.dateSubmitted, 'UTC') }}</td>
+                <td>{{ item.ipAddress }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

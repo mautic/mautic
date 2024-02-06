@@ -1,0 +1,25 @@
+<div id="compose-tweet">
+    <div id="character-count" class="text-right small">
+        {{ 'mautic.social.twitter.tweet.count'|trans }}
+        <span></span>
+    </div>
+    {{ form_row(form.tweet_text) }}
+
+    <div class="row">
+        <div id="handle" class="col-md-2">
+            <label class="control-label">
+                {{ 'mautic.social.twitter.tweet.handle'|trans }}
+            </label>
+            {{ form_row(form.handle) }}
+        </div>
+
+        <div id="asset" class="col-md-5">
+            {{ form_row(form.asset_link) }}
+        </div>
+
+        <div id="page" class="col-md-5">
+            {{ form_row(form.page_link) }}
+        </div>
+    </div>
+</div>
+{{ includeScript('plugins/MauticSocialBundle/Assets/js/social.js', 'composeSocialWatcher', 'composeSocialWatcher') }}

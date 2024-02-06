@@ -1,0 +1,146 @@
+{#
+  Variables
+    - type
+    - isCodeMode
+    - sectionForm
+    - builderAssets
+    - slots
+    - sections
+    - objectId
+    - previewUrl
+#}
+<div class="hide builder {{ type }}-builder {% if isCodeMode %}code-mode{% endif %}">
+    <script type="text/html" data-builder-assets>
+        {{ builderAssets }}
+    </script>
+    <div class="builder-content">
+        <input type="hidden" id="builder_url" value="{{ path('mautic_' ~ type ~ '_action', {'objectAction': 'builder', 'objectId': objectId}) }}" />
+    </div>
+    <div class="builder-panel">
+        <div class="builder-panel-top">
+            {{ include('@MauticCore/Helper/builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');'}, with_context=false) }}
+
+            <div class="code-mode-toolbar {% if not isCodeMode %}hide{% endif %}">
+                <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.media.manager.desc'|trans }}">
+                    <i class="fa fa-photo"></i>
+                    {{ 'mautic.core.media.manager'|trans }}
+                </button>
+                <button class="btn btn-default btn-nospin" onclick="Mautic.formatCode()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.format.code.desc'|trans }}">
+                    <i class="fa fa-indent"></i>
+                    {{ 'mautic.core.format.code'|trans }}
+                </button>
+            </div>
+        </div>
+
+        {% if previewUrl %}
+            <div class="panel panel-default" id="preview">
+                <div class="panel-heading">
+                    <h4 class="panel-title">{{ 'mautic.email.urlvariant'|trans }}</h4>
+                </div>
+                <div class="panel-body">
+                    <div id="public-preview-container" class="col-md-12">
+                        <div class="input-group">
+                            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl }}"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
+                                    <i class="fa fa-external-link"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="code-editor {% if not isCodeMode %}hide{% endif %}">
+            <div id="customHtmlContainer"></div>
+            <i class="text-muted">{{ 'mautic.core.code.mode.token.dropdown.hint'|trans|purify }}</i>
+        </div>
+        <div class="builder-toolbar {% if isCodeMode %}hide{% endif %}">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">{{ 'mautic.core.slot.types'|trans }}</h4>
+                </div>
+                <div class="panel-body">
+                    {% if slots is defined and slots is iterable %}
+                        <div id="slot-type-container" class="col-md-12">
+                            {% for slotKey, slot in slots %}
+                                <div class="slot-type-handle btn btn-default btn-lg btn-nospin" data-slot-type="{{ slotKey }}">
+                                    <i class="fa fa-{{ slot.icon }}" aria-hidden="true"></i>
+                                    <br>
+                                    <span class="slot-caption">{{ slot.header|raw }}</span>
+                                    <!-- slot template: "{{ slot.content }}" -->
+                                    <script type="text/html">
+                                        {{- include(slot.content, slot.params|default([]), with_context=false) -}}
+                                    </script>
+                                </div>
+                            {% endfor %}
+                            <div class="clearfix"></div>
+                        </div>
+                    {% endif %}
+                    <p class="text-muted pt-md text-center"><i>{{ 'mautic.core.drag.info'|trans }}</i></p>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">{{ 'mautic.core.section.types'|trans }}</h4>
+                </div>
+                <div class="panel-body">
+                    {% if sections is defined and sections is iterable %}
+                        <div id="section-type-container" class="col-md-12">
+                            {% for sectionKey, section in sections %}
+                                <div class="section-type-handle btn btn-default btn-lg btn-nospin" data-section-type="{{ sectionKey }}">
+                                    <i class="fa fa-{{ section.icon }}" aria-hidden="true"></i>
+                                    <br>
+                                    <span class="slot-caption">{{ section.header }}</span>
+                                    <!-- section template: "{{ section.content }}" -->
+                                    <script type="text/html">
+                                        {{- include(section.content, with_context=false)|e -}}
+                                    </script>
+                                </div>
+                            {% endfor %}
+                            <div class="clearfix"></div>
+                        </div>
+                    {% endif %}
+                    <p class="text-muted pt-md text-center"><i>{{ 'mautic.core.drag.info'|trans }}</i></p>
+                </div>
+            </div>
+
+            <div class="panel panel-default" id="customize-slot-panel">
+                <div class="panel-heading">
+                    <h4 class="panel-title">{{ 'mautic.core.customize.slot'|trans }}</h4>
+                </div>
+                <div class="panel-body" id="customize-form-container">
+                    <div id="slot-form-container" class="col-md-12">
+                        <p class="text-muted pt-md text-center">
+                            <i>{{ 'mautic.core.slot.customize.info'|trans }}</i>
+                        </p>
+                    </div>
+                    {% if slots is defined and slots is iterable %}
+                        {% for slotKey, slot in slots %}
+                            <script type="text/html" data-slot-type-form="{{ slotKey }}">
+                                {{ form(slot.form) }}
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="panel panel-default" id="section">
+                <div class="panel-heading">
+                    <h4 class="panel-title">{{ 'mautic.core.customize.section'|trans }}</h4>
+                </div>
+                <div class="panel-body" id="customize-form-container">
+                    <div id="section-form-container" class="col-md-12">
+                        <p class="text-muted pt-md text-center">
+                            <i>{{ 'mautic.core.section.customize.info'|trans }}</i>
+                        </p>
+                    </div>
+                    <script type="text/html" data-section-form>
+                        {{ form(sectionForm) }}
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

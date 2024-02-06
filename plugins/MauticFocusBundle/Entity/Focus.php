@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -19,9 +10,6 @@ use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Focus.
- */
 class Focus extends FormEntity
 {
     /**
@@ -30,22 +18,22 @@ class Focus extends FormEntity
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $editor;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $html;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $htmlMode;
 
@@ -62,7 +50,7 @@ class Focus extends FormEntity
     private $type;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $website;
 
@@ -72,12 +60,12 @@ class Focus extends FormEntity
     private $style;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -89,16 +77,16 @@ class Focus extends FormEntity
     private $utmTags = [];
 
     /**
-     * @var int
+     * @var int|null
      */
     private $form;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cache;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -131,15 +119,16 @@ class Focus extends FormEntity
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('focus')
-            ->setCustomRepositoryClass('MauticPlugin\MauticFocusBundle\Entity\FocusRepository')
+            ->setCustomRepositoryClass(\MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class)
             ->addIndex(['focus_type'], 'focus_type')
             ->addIndex(['style'], 'focus_style')
-            ->addIndex(['form_id'], 'focus_form');
+            ->addIndex(['form_id'], 'focus_form')
+            ->addIndex(['name'], 'focus_name');
 
         $builder->addIdColumns();
 
@@ -176,10 +165,8 @@ class Focus extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata
             ->addListProperties(
@@ -209,10 +196,7 @@ class Focus extends FormEntity
             ->build();
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return get_object_vars($this);
     }

@@ -1,0 +1,12 @@
+{% if showMore is defined and showMore is not empty %}
+    <a href="{{ path('mautic_email_index', {'search' : searchString }) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans ({ '%count%' : remaining }) }}</span>
+    </a>
+{% else %}
+    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : email.id}) }}" data-toggle="ajax">
+        {{ email.getName() }}
+        <span class="label label-default pull-right" data-toggle="tooltip" title="{{ 'mautic.email.readcount'|trans }}" data-placement="left">
+            {{ email.readCount }}
+        </span>
+    </a>
+{% endif %}

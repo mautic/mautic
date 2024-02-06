@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -28,12 +19,12 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     protected function setUp(): void
     {
@@ -52,7 +43,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new Expr());
     }
 
-    public function testSpecificContactId()
+    public function testSpecificContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, 1);
 
@@ -68,7 +59,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testListOfContacts()
+    public function testListOfContacts(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [1, 2, 3]);
 
@@ -84,7 +75,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMinContactId()
+    public function testMinContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
@@ -100,7 +91,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testBatchMinContactId()
+    public function testBatchMinContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 4, null);
 
@@ -117,7 +108,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMaxContactId()
+    public function testMaxContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, 10);
 
@@ -133,7 +124,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMinAndMaxContactId()
+    public function testMinAndMaxContactId(): void
     {
         $contactLimiter = new ContactLimiter(50, null, 1, 10);
 
@@ -150,7 +141,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testThreads()
+    public function testThreads(): void
     {
         $contactLimiter = new ContactLimiter(50, null, null, null, [], 1, 5);
 
@@ -167,7 +158,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(50, $qb->getMaxResults());
     }
 
-    public function testMaxResultsIgnoredForCountQueries()
+    public function testMaxResultsIgnoredForCountQueries(): void
     {
         $contactLimiter = new ContactLimiter(50, 1);
 

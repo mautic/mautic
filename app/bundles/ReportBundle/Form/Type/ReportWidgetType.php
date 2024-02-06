@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\Serializer;
@@ -17,19 +8,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class ReportWidgetType extends AbstractType
 {
-    /**
-     * @var ReportModel
-     */
-    protected $model;
-
-    public function __construct(ReportModel $reportModel)
-    {
-        $this->model = $reportModel;
+    public function __construct(
+        protected ReportModel $model
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
         if ($reports = $this->model->getReportsWithGraphs()) {
@@ -66,13 +55,5 @@ class ReportWidgetType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'report_widget';
     }
 }

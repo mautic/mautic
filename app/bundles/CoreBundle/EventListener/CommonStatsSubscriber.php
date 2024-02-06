@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -22,51 +13,36 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 abstract class CommonStatsSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var CommonRepository[]
+     * @var mixed[]
      */
     protected $repositories = [];
 
     /**
-     * @var null
+     * @var array<string, mixed>
      */
-    protected $selects;
+    protected array $selects = [];
 
     /**
      * @var array
      */
     protected $permissions = [];
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
     public function __construct(
-        CorePermissions $security,
-        EntityManager $entityManager
+        protected CorePermissions $security,
+        protected EntityManager $entityManager
     ) {
-        $this->security      = $security;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::LIST_STATS => ['onStatsFetch', 0],
         ];
     }
 
-    public function onStatsFetch(StatsEvent $event)
+    public function onStatsFetch(StatsEvent $event): void
     {
-        /** @var CommonRepository $repository */
+        /** @var CommonRepository<object> $repository */
         foreach ($this->repositories as $repository) {
             $table = $repository->getTableName();
 
@@ -74,7 +50,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $permissions  = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
+            $permissions  = $this->permissions[$table] ?? [];
             $allowedJoins = [];
 
             foreach ($permissions as $tableAlias => $permBase) {
@@ -116,7 +92,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 throw new AccessDeniedException(sprintf('You do not have the view permission to load data from the %s table', $tableAlias));
             }
 
-            $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
+            $select = $this->selects[$table] ?? null;
             $event->setSelect($select)->setRepository($repository, $allowedJoins);
         }
     }

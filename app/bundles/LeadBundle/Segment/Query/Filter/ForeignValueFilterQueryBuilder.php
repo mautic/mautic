@@ -1,35 +1,29 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-/**
- * Class ForeignValueFilterQueryBuilder.
- */
 class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /** {@inheritdoc} */
-    public static function getServiceId()
+    use LeadBatchLimiterTrait;
+
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.foreign.value';
     }
 
-    /** {@inheritdoc} */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $filterOperator = $filter->getOperator();
-
+        $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+        $filterOperator   = $filter->getOperator();
+        $batchLimiters    = $filter->getBatchLimiters();
         $filterParameters = $filter->getParameterValue();
+
+        // allow use of `contact_id` column instead of deprecated `lead_id`
+        $foreignContactColumn = $filter->getForeignContactColumn();
 
         if (is_array($filterParameters)) {
             $parameters = [];
@@ -44,10 +38,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
-        $subQueryBuilder
-            ->select('NULL')->from($filter->getTable(), $tableAlias)
-            ->andWhere($tableAlias.'.lead_id = l.id');
+        $subQueryBuilder = $queryBuilder->createQueryBuilder();
 
         if (!is_null($filter->getWhere())) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
@@ -55,14 +46,24 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         switch ($filterOperator) {
             case 'empty':
-                $subQueryBuilder->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $subQueryBuilder->select($tableAlias.'.'.$foreignContactColumn)->from($filter->getTable(), $tableAlias);
+                $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notEmpty':
-                $subQueryBuilder->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $subQueryBuilder->select($tableAlias.'.'.$foreignContactColumn)->from($filter->getTable(), $tableAlias);
+
+                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
+
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
                 break;
             case 'notIn':
+                $subQueryBuilder
+                    ->select('NULL')->from($filter->getTable(), $tableAlias)
+                    ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
+
                 // The use of NOT EXISTS here requires the use of IN instead of NOT IN to prevent a "double negative."
                 // We are not using EXISTS...NOT IN because it results in including everyone who has at least one entry that doesn't
                 // match the criteria. For example, with tags, if the contact has the tag in the filter but also another tag, they'll
@@ -76,7 +77,11 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'neq':
-                $expression = $subQueryBuilder->expr()->orX(
+                $subQueryBuilder
+                    ->select('NULL')->from($filter->getTable(), $tableAlias)
+                    ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
+
+                $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
                 );
@@ -86,7 +91,11 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notLike':
-                $expression = $subQueryBuilder->expr()->orX(
+                $subQueryBuilder
+                    ->select('NULL')->from($filter->getTable(), $tableAlias)
+                    ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
+
+                $expression = $subQueryBuilder->expr()->or(
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
                 );
@@ -97,21 +106,34 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'regexp':
             case 'notRegexp':
+                $subQueryBuilder->select($tableAlias.'.'.$foreignContactColumn)
+                    ->from($filter->getTable(), $tableAlias);
+
+                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
+
                 $not        = ('notRegexp' === $filterOperator) ? ' NOT' : '';
                 $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
 
                 $subQueryBuilder->andWhere($expression);
 
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
                 break;
             default:
+                $subQueryBuilder->select($tableAlias.'.'.$foreignContactColumn)
+                    ->from($filter->getTable(), $tableAlias);
+
+                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
+
                 $expression = $subQueryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
                 $subQueryBuilder->andWhere($expression);
 
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
         }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);

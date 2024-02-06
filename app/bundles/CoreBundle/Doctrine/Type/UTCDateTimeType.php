@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -16,15 +7,9 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-/**
- * Class UTCDateTimeType.
- */
 class UTCDateTimeType extends DateTimeType
 {
-    /**
-     * @var \DateTimeZone
-     */
-    private static $utc;
+    private static ?\DateTimeZone $utc = null;
 
     /**
      * @param \DateTime $value
@@ -56,7 +41,7 @@ class UTCDateTimeType extends DateTimeType
     /**
      * @param mixed $value
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      *
      * @throws ConversionException
      */
@@ -78,7 +63,9 @@ class UTCDateTimeType extends DateTimeType
 
         // Set to local timezone
         date_default_timezone_set($timezone);
-        $value->setTimezone(new \DateTimeZone($timezone));
+        if ($value instanceof \DateTime) {
+            $value->setTimezone(new \DateTimeZone($timezone));
+        }
 
         return $value;
     }

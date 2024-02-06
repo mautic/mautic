@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadDeviceRepository.
+ * @extends CommonRepository<LeadDevice>
  */
 class LeadDeviceRepository extends CommonRepository
 {
@@ -34,23 +25,12 @@ class LeadDeviceRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'd';
     }
 
     /**
-     * @param      $lead
-     * @param null $deviceNames
-     * @param null $deviceBrands
-     * @param null $deviceModels
-     * @param null $deviceId
-     *
      * @return array
      */
     public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
@@ -117,8 +97,8 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        //get totals
-        $device = $sq->execute()->fetchAll();
+        // get totals
+        $device = $sq->executeQuery()->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
     }
@@ -140,10 +120,8 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * Check if there is at least one device with filled tracking code assigned to Lead.
-     *
-     * @return bool
      */
-    public function isAnyLeadDeviceTracked(Lead $lead)
+    public function isAnyLeadDeviceTracked(Lead $lead): bool
     {
         $alias = $this->getTableAlias();
         $qb    = $this->createQueryBuilder($alias);
@@ -160,10 +138,7 @@ class LeadDeviceRepository extends CommonRepository
         return !empty($devices);
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadDevices(Lead $lead)
+    public function getLeadDevices(Lead $lead): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -172,22 +147,19 @@ class LeadDeviceRepository extends CommonRepository
             ->where('lead_id = :leadId')
             ->setParameter('leadId', (int) $lead->getId())
             ->orderBy('date_added', 'desc')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_devices')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }

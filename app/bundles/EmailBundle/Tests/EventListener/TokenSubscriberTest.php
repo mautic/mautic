@@ -1,45 +1,60 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\Mailer;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDynamicContentCustomTokens()
+    public function testDynamicContentCustomTokens(): void
     {
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&MauticFactory $mockFactory */
+        $mockFactory = $this->createMock(MauticFactory::class);
 
-        $swiftMailer = $this->getMockBuilder(\Swift_Mailer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var MockObject&FromEmailHelper $fromEmailHelper */
+        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
 
-        $tokens = [
-            '{test}' => 'value',
-        ];
+        /** @var MockObject&CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $mailHelper = new MailHelper($mockFactory, $swiftMailer);
+        /** @var MockObject&Mailbox $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
+        /** @var MockObject&LoggerInterface $logger */
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $mailHashHelper = new MailHashHelper($coreParametersHelper);
+
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_from_name', null, 'No Body'],
+                ]
+            );
+
+        $tokens = ['{test}' => 'value'];
+
+        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper);
         $mailHelper->setTokens($tokens);
 
         $email = new Email();
+        $email->setSubject('Test subject');
         $email->setCustomHtml(
             <<<'CONTENT'
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -120,10 +135,11 @@ CONTENT
         );
         $mailHelper->addTokens($eventTokens);
         $mailerTokens = $mailHelper->getTokens();
-        $mailHelper->message->setBody($email->getCustomHtml());
+        $mailHelper->message->html($email->getCustomHtml());
+        $mailHelper->message->subject($email->getSubject());
 
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
-        $parsedBody = $mailHelper->message->getBody();
+        $parsedBody = $mailHelper->message->getHtmlBody();
 
         $this->assertNotFalse(strpos($parsedBody, 'DEC value'));
         $this->assertNotFalse(strpos($parsedBody, 'value test We'));

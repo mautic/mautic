@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -27,16 +18,16 @@ class LeadTriggerLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      **/
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $dateFired;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -69,7 +60,7 @@ class LeadTriggerLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired($dateFired)
+    public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
     }
@@ -85,7 +76,7 @@ class LeadTriggerLog
     /**
      * @param mixed $ipAddress
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress($ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
@@ -101,7 +92,7 @@ class LeadTriggerLog
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -117,7 +108,7 @@ class LeadTriggerLog
     /**
      * @param mixed $event
      */
-    public function setEvent($event)
+    public function setEvent($event): void
     {
         $this->event = $event;
     }

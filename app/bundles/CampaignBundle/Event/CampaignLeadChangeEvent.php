@@ -1,60 +1,33 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class CampaignLeadChangeEvent.
- */
 class CampaignLeadChangeEvent extends Event
 {
-    /**
-     * @var Campaign
-     */
-    private $campaign;
-
     /**
      * @var Lead
      */
     private $lead;
 
-    /**
-     * @var array
-     */
-    private $leads = [];
+    private array $leads = [];
 
     /**
-     * @var string
+     * @param string $action
      */
-    private $action;
-
-    /**
-     * CampaignLeadChangeEvent constructor.
-     *
-     * @param $leads
-     * @param $action
-     */
-    public function __construct(Campaign $campaign, $leads, $action)
-    {
-        $this->campaign = $campaign;
+    public function __construct(
+        private Campaign $campaign,
+        $leads,
+        private $action
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
             $this->lead = $leads;
         }
-        $this->action = $action;
     }
 
     /**
@@ -99,20 +72,16 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Lead was removed from the campaign.
-     *
-     * @return bool
      */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
         return 'removed' == $this->action;
     }
 
     /**
      * Lead was added to the campaign.
-     *
-     * @return bool
      */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return 'added' == $this->action;
     }

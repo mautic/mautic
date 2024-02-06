@@ -1,25 +1,17 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\DAO;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
+use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 use PHPUnit\Framework\TestCase;
 
 class StatsDAOTest extends TestCase
 {
-    public function testGetYearsReturnsYears()
+    public function testGetYearsReturnsYears(): void
     {
         $expected = [
             2018,
@@ -29,12 +21,12 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getYears();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(YearStat::class, $stat);
         });
     }
 
-    public function testGetMonthsReturnsFlattenedMonths()
+    public function testGetMonthsReturnsFlattenedMonths(): void
     {
         $expected = [
             '2018-12',
@@ -45,12 +37,28 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getMonths();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(MonthStat::class, $stat);
         });
     }
 
-    public function testGetDaysReturnsFlattenedDays()
+    public function testGetWeekReturnsFlattenedMonths(): void
+    {
+        $expected = [
+            '2018-49',
+            '2019-45',
+            '2019-49',
+        ];
+
+        $stats = $this->getStats()->getWeeks();
+        $this->assertEquals($expected, array_keys($stats));
+
+        array_walk($stats, function ($stat): void {
+            $this->assertInstanceOf(WeekStat::class, $stat);
+        });
+    }
+
+    public function testGetDaysReturnsFlattenedDays(): void
     {
         $expected = [
             '2018-12-07',
@@ -62,12 +70,12 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getDays();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(DayStat::class, $stat);
         });
     }
 
-    public function testGetHoursReturnsFlattenedHours()
+    public function testGetHoursReturnsFlattenedHours(): void
     {
         $expected = [
             '2018-12-07 12',
@@ -81,15 +89,12 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getHours();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
-            $this->assertTrue(is_int($stat));
+        array_walk($stats, function ($stat): void {
+            $this->assertTrue(is_int($stat->getCount()));
         });
     }
 
-    /**
-     * @return StatsDAO
-     */
-    private function getStats()
+    private function getStats(): StatsDAO
     {
         $stats = new StatsDAO();
 

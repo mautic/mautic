@@ -1,0 +1,54 @@
+{#
+  Variables
+    - widget
+    - columnName
+    - value
+    - width
+    - link
+    - chartType
+    - chartHeight
+    - chartItems
+    - stages
+    - devices
+#}
+{% for key, chartData in chartItems %}
+  <div style="float: left; width: {{ width }}%; " class="pt-sd pr-md pb-md pl-md">
+    <div class="chart-wrapper">
+      <div>
+        <div class="chart-legend pull-left-lg"><h4>{{ columnName[key] }}</h4></div>
+        <div class="clearfix"></div>
+        <div class="pull-left"><a href="{{ link[key] }}"> {{ value[key] }} Contacts</div></a>
+        <div class="clearfix"></div>
+        <div style="height:{{ chartHeight / 2.3 }}px;">
+          <canvas class="chart {{ chartType }}-chart" style="font-size:9px!important;">{{ chartData|json_encode }}</canvas>
+        </div>
+        <div class="legend" style="font-size: 9px;"></div>
+      </div>
+    </div>
+    {% if stages[key] %}
+      <div class="chart-wrapper">
+        <div>
+          <div class="chart-legend pt-sd pr-md pb-md pl-md"><h5>{{ 'mautic.lead.lifecycle.graph.stage.cycle'|trans }}</h5></div>
+          <div class="clearfix"></div>
+          <div style="height:{{ chartHeight / 2.3 }}px;">
+            <canvas class="chart liefechart-bar-chart" style="font-size: 9px!important;">{{ stages[key]|json_encode }}</canvas>
+          </div>
+          <div class="legend" style="font-size: 9px;"></div>
+        </div>
+      </div>
+    {% endif %}
+    {% if devices[key] %}
+        <div class="chart-wrapper">
+            <div>
+                <div class="chart-legend pt-sd pr-md pb-md pl-md"><h5>{{ 'mautic.lead.lifecycle.graph.device.granularity'|trans }}</h5></div>
+                <div class="clearfix"></div>
+                <div style="height:{{ chartHeight / 5 }}px;">
+                    <canvas class="chart horizontal-bar-chart" style="font-size: 9px!important;">{{ devices[key]|json_encode }}</canvas>
+                </div>
+                <div class="legend" style="font-size: 9px;"></div>
+            </div>
+        </div>
+    {% endif %}
+  </div>
+{% endfor %}
+<div class="clearfix"></div>

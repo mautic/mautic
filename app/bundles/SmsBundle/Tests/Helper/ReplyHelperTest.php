@@ -1,44 +1,30 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
-use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /**
-     * @var NullLogger
-     */
-    private $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     protected function setUp(): void
     {
@@ -47,12 +33,14 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker  = $this->createMock(ContactTracker::class);
     }
 
-    public function testFoundContactsDispatchEvent()
+    public function testFoundContactsDispatchEvent(): void
     {
         $handler = $this->createMock(CallbackInterface::class);
         $handler->expects($this->once())
             ->method('getContacts')
             ->willReturn(new ArrayCollection([new Lead()]));
+
+        $handler->method('getMessage')->willReturn('some message');
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -63,42 +51,13 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $this->getHelper()->handleRequest($handler, new Request());
     }
 
-    public function testHandlerResponseIsReturnedIfResponseInterface()
-    {
-        $handler = new class() implements CallbackInterface, ResponseInterface {
-            public function getResponse()
-            {
-                return new Response('hi');
-            }
-
-            public function getContacts(Request $request)
-            {
-                return new ArrayCollection([new Lead()]);
-            }
-
-            public function getMessage(Request $request)
-            {
-                return '';
-            }
-
-            public function getTransportName()
-            {
-                return '';
-            }
-        };
-
-        $response = $this->getHelper()->handleRequest($handler, new Request());
-
-        $this->assertEquals(new Response('hi'), $response);
-    }
-
-    public function testContactsNotFoundDoesNotDispatchEvent()
+    public function testContactsNotFoundDoesNotDispatchEvent(): void
     {
         $handler = $this->createMock(CallbackInterface::class);
         $handler->expects($this->once())
             ->method('getContacts')
             ->willReturnCallback(
-                function () {
+                function (): void {
                     throw new NumberNotFoundException('');
                 }
             );

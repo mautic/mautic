@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -17,6 +8,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\PageBundle\Form\Type\PageListType;
+use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -26,19 +18,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<Tweet>
+ */
 class TweetType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        protected EntityManager $em
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
@@ -96,9 +86,9 @@ class TweetType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticAssetBundle:Asset', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\AssetBundle\Entity\Asset::class, 'id');
         $builder->add(
-                $builder->create(
+            $builder->create(
                 'asset',
                 AssetListType::class,
                 [
@@ -114,7 +104,7 @@ class TweetType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
         $builder->add(
             $builder->create(
                 'page',
@@ -143,7 +133,7 @@ class TweetType extends AbstractType
             ]
         );
 
-        //add category
+        // add category
         $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);
@@ -176,7 +166,7 @@ class TweetType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }

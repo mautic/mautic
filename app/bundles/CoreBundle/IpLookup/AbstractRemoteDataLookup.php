@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 abstract class AbstractRemoteDataLookup extends AbstractLookup
@@ -28,8 +19,6 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     abstract protected function getUrl();
 
     /**
-     * @param $response
-     *
      * @return mixed
      */
     abstract protected function parseResponse($response);

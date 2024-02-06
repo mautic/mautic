@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,65 +7,31 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
+use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \DateTimeInterface|null $earliestInactiveDate = null;
 
-    /**
-     * @var InactiveContactFinder
-     */
-    private $inactiveContactFinder;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
-
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var \DateTime
-     */
-    private $earliestInactiveDate;
-
-    /**
-     * InactiveHelper constructor.
-     */
     public function __construct(
-        EventScheduler $scheduler,
-        InactiveContactFinder $inactiveContactFinder,
-        LeadEventLogRepository $eventLogRepository,
-        EventRepository $eventRepository,
-        LoggerInterface $logger
+        private EventScheduler $scheduler,
+        private InactiveContactFinder $inactiveContactFinder,
+        private LeadEventLogRepository $eventLogRepository,
+        private EventRepository $eventRepository,
+        private LoggerInterface $logger,
+        private DecisionHelper $decisionHelper
     ) {
-        $this->scheduler               = $scheduler;
-        $this->inactiveContactFinder   = $inactiveContactFinder;
-        $this->eventLogRepository      = $eventLogRepository;
-        $this->eventRepository         = $eventRepository;
-        $this->logger                  = $logger;
     }
 
     /**
-     * @param ArrayCollection|Event[] $decisions
+     * @param ArrayCollection<int, Event> $decisions
      */
-    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions)
+    public function removeDecisionsWithoutNegativeChildren(ArrayCollection $decisions): void
     {
         /**
-         * @var int
+         * @var int   $key
          * @var Event $decision
          */
         foreach ($decisions as $key => $decision) {
@@ -94,14 +51,22 @@ class InactiveHelper
         \DateTime $now,
         ArrayCollection $contacts,
         $lastActiveEventId,
-        ArrayCollection $negativeChildren
-    ) {
+        ArrayCollection $negativeChildren,
+        Event $event
+    ): void {
         $contactIds                 = $contacts->getKeys();
         $lastActiveDates            = $this->getLastActiveDates($lastActiveEventId, $contactIds);
         $this->earliestInactiveDate = $now;
 
-        /* @var Event $event */
         foreach ($contactIds as $contactId) {
+            try {
+                $this->decisionHelper->checkIsDecisionApplicableForContact($event, $contacts->get($contactId));
+            } catch (DecisionNotApplicableException $e) {
+                $this->logger->debug($e->getMessage());
+                $contacts->remove($contactId);
+                continue;
+            }
+
             if (!isset($lastActiveDates[$contactId])) {
                 // This contact does not have a last active date so likely the event is scheduled
                 $contacts->remove($contactId);
@@ -135,19 +100,14 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getEarliestInactiveDateTime()
     {
         return $this->earliestInactiveDate;
     }
 
-    /**
-     * @param $decisionId
-     *
-     * @return ArrayCollection
-     */
-    public function getCollectionByDecisionId($decisionId)
+    public function getCollectionByDecisionId($decisionId): ArrayCollection
     {
         $collection = new ArrayCollection();
 
@@ -160,11 +120,9 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime|null
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate)
+    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface
     {
         $earliestDate = null;
         foreach ($negativeChildren as $event) {
@@ -178,11 +136,9 @@ class InactiveHelper
     }
 
     /**
-     * @param $lastActiveEventId
-     *
-     * @return array|ArrayCollection
+     * @return array<string, \DateTimeInterface>|null
      */
-    private function getLastActiveDates($lastActiveEventId, array $contactIds)
+    private function getLastActiveDates($lastActiveEventId, array $contactIds): ?array
     {
         // If there is a parent ID, get last active dates based on when that event was executed for the given contact
         // Otherwise, use when the contact was added to the campaign for comparison

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
@@ -17,22 +8,33 @@ class InputHelper
 {
     /**
      * String filter.
-     *
-     * @var InputFilter
      */
-    private static $stringFilter;
+    private static ?\Joomla\Filter\InputFilter $stringFilter = null;
 
     /**
      * HTML filter.
-     *
-     * @var InputFilter
      */
-    private static $htmlFilter;
+    private static ?\Joomla\Filter\InputFilter $htmlFilter = null;
+
+    private static ?\Joomla\Filter\InputFilter $strictHtmlFilter = null;
 
     /**
-     * @var InputFilter
+     * Adjust the boolean values from text to boolean.
+     * Do not convert null to false.
+     * Do not convert invalid values to false, but return null.
+     *
+     * @param bool|int|string|null $value
+     *
+     * @return bool|null
      */
-    private static $strictHtmlFilter;
+    public static function boolean($value)
+    {
+        return match (strtoupper((string) $value)) {
+            'T', 'Y' => true,
+            'F', 'N' => false,
+            default => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+        };
+    }
 
     /**
      * @param bool $html
@@ -86,19 +88,14 @@ class InputHelper
             self::$stringFilter = new InputFilter();
         }
 
-        switch (true) {
-            case $html:
-                return ($strict) ? self::$strictHtmlFilter : self::$htmlFilter;
-            default:
-                return self::$stringFilter;
-        }
+        return match (true) {
+            $html   => ($strict) ? self::$strictHtmlFilter : self::$htmlFilter,
+            default => self::$stringFilter,
+        };
     }
 
     /**
      * Wrapper to InputHelper.
-     *
-     * @param $name
-     * @param $arguments
      *
      * @return mixed
      */
@@ -126,28 +123,30 @@ class InputHelper
                     if (array_key_exists($k, $mask)) {
                         if (is_array($mask[$k])) {
                             $useMask = $mask[$k];
-                        } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
+                        } elseif (method_exists(self::class, $mask[$k])) {
                             $useMask = $mask[$k];
                         }
                     } elseif (is_array($v)) {
                         // Likely a collection so use the same mask
                         $useMask = $mask;
                     }
-                } elseif (method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
+                } elseif (method_exists(self::class, $mask)) {
                     $useMask = $mask;
                 }
 
                 if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
-                } elseif ('filter' == $useMask) {
+                } elseif ('filter' === $useMask) {
                     $v = self::getFilter()->clean($v, $useMask);
-                } else {
+                } elseif (null !== $v) {
                     $v = self::$useMask($v, $urldecode);
                 }
             }
 
             return $value;
-        } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
+        } elseif (null === $value) {
+            return $value;
+        } elseif (is_string($mask) && method_exists(self::class, $mask)) {
             return self::$mask($value, $urldecode);
         } else {
             return self::getFilter()->clean($value, $mask);
@@ -157,7 +156,6 @@ class InputHelper
     /**
      * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return mixed|string
@@ -179,32 +177,22 @@ class InputHelper
 
     /**
      * Strips tags.
-     *
-     * @param            $value
-     * @param bool|false $urldecode
-     *
-     * @return mixed
      */
-    public static function string($value, $urldecode = false)
+    public static function string(string $value, bool $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
         }
 
-        return filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        return self::filter_string_polyfill($value);
     }
 
     /**
      * Strips non-alphanumeric characters.
      *
-     * @param            $value
-     * @param bool|false $urldecode
-     * @param bool|false $convertSpacesTo
-     * @param array      $allowedCharacters
-     *
-     * @return string
+     * @param string[] $allowedCharacters
      */
-    public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = [])
+    public static function alphanum(string $value, bool $urldecode = false, ?string $convertSpacesTo = null, array $allowedCharacters = []): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -226,7 +214,7 @@ class InputHelper
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
 
-        return trim(preg_replace($regex, '', $value));
+        return trim(preg_replace($regex, '', (string) $value));
     }
 
     /**
@@ -255,7 +243,6 @@ class InputHelper
     /**
      * Returns raw value.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return string
@@ -272,12 +259,11 @@ class InputHelper
     /**
      * Removes all characters except those allowed in URLs.
      *
-     * @param            $value
-     * @param bool|false $urldecode
-     * @param null       $allowedProtocols
-     * @param null       $defaultProtocol
-     * @param array      $removeQuery
-     * @param bool|false $ignoreFragment
+     * @param bool|false         $urldecode
+     * @param array<string>|null $allowedProtocols
+     * @param mixed              $defaultProtocol
+     * @param array<string>      $removeQuery
+     * @param bool|false         $ignoreFragment
      *
      * @return mixed|string
      */
@@ -302,7 +288,7 @@ class InputHelper
             return self::clean($value);
         }
 
-        $parts['scheme'] = $parts['scheme'] ?? $defaultProtocol;
+        $parts['scheme'] ??= $defaultProtocol;
         if (!in_array($parts['scheme'], $allowedProtocols)) {
             $parts['scheme'] = $defaultProtocol;
         }
@@ -342,12 +328,9 @@ class InputHelper
     /**
      * Removes all characters except those allowed in emails.
      *
-     * @param            $value
      * @param bool|false $urldecode
-     *
-     * @return mixed
      */
-    public static function email($value, $urldecode = false)
+    public static function email($value, $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -355,7 +338,6 @@ class InputHelper
 
         $value = substr($value, 0, 254);
         $value = filter_var($value, FILTER_SANITIZE_EMAIL);
-        $value = str_replace('..', '.', $value);
 
         return trim($value);
     }
@@ -363,7 +345,6 @@ class InputHelper
     /**
      * Returns a clean array.
      *
-     * @param            $value
      * @param bool|false $urldecode
      *
      * @return array|mixed|string
@@ -388,7 +369,7 @@ class InputHelper
     /**
      * Returns clean HTML.
      *
-     * @param $value
+     * @param string[]|string $value
      *
      * @return mixed|string
      */
@@ -400,9 +381,9 @@ class InputHelper
             }
         } else {
             // Special handling for doctype
-            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', $value, $doctype);
+            $doctypeFound = preg_match('/(<!DOCTYPE(.*?)>)/is', (string) $value, $doctype);
             // Special handling for CDATA tags
-            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], $value, $cdataCount);
+            $value = str_replace(['<![CDATA[', ']]>'], ['<mcdata>', '</mcdata>'], (string) $value, $cdataCount);
             // Special handling for conditional blocks
             preg_match_all("/<!--\[if(.*?)\]>(.*?)(?:\<\!\-\-)?<!\[endif\]-->/is", $value, $matches);
             if (!empty($matches[0])) {
@@ -412,7 +393,7 @@ class InputHelper
                     $from[]   = $match;
                     $startTag = '<mcondition>';
                     $endTag   = '</mcondition>';
-                    if (false !== strpos($match, '<!--<![endif]-->')) {
+                    if (str_contains($match, '<!--<![endif]-->')) {
                         $startTag = '<mconditionnonoutlook>';
                         $endTag   = '</mconditionnonoutlook>';
                     }
@@ -424,17 +405,13 @@ class InputHelper
             // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
                 "/<\/*[o|w|v]:[^>]*>/is",
-                function ($matches) {
-                    return '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>';
-                },
+                fn ($matches): string => '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>',
                 $value, -1, $needsDecoding);
 
             // Slecial handling for script tags
             $value = preg_replace_callback(
                 "/<script>(.*?)<\/script>/is",
-                function ($matches) {
-                    return '<mscript>'.base64_encode($matches[0]).'</mscript>';
-                },
+                fn ($matches): string => '<mscript>'.base64_encode($matches[0]).'</mscript>',
                 $value, -1, $needsScriptDecoding);
 
             // Special handling for HTML comments
@@ -443,16 +420,13 @@ class InputHelper
             // detect if there is any unicode character in the passed string
             $hasUnicode = strlen($value) != strlen(utf8_decode($value));
 
-            // Encode the incoming value before cleaning, it convert unicode to encoded strings
-            $value = $hasUnicode ? rawurlencode($value) : $value;
-
-            $value = self::getFilter(true)->clean($value, 'html');
+            $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 
             // After cleaning encode the value
             $value = $hasUnicode ? rawurldecode($value) : $value;
 
             // Was a doctype found?
-            if ($doctypeFound) {
+            if ($doctypeFound && false === $hasUnicode) {
                 $value = "$doctype[0]$value";
             }
 
@@ -473,18 +447,14 @@ class InputHelper
             if ($needsDecoding) {
                 $value = preg_replace_callback(
                     "/<mencoded>(.*?)<\/mencoded>/is",
-                    function ($matches) {
-                        return htmlspecialchars_decode($matches[1]);
-                    },
+                    fn ($matches): string => htmlspecialchars_decode($matches[1]),
                     $value);
             }
 
             if ($needsScriptDecoding) {
                 $value = preg_replace_callback(
                     "/<mscript>(.*?)<\/mscript>/is",
-                    function ($matches) {
-                        return base64_decode($matches[1]);
-                    },
+                    fn ($matches): string => base64_decode($matches[1]),
                     $value);
             }
         }
@@ -494,8 +464,6 @@ class InputHelper
 
     /**
      * Allows tags 'b', 'i', 'u', 'em', 'strong', 'a', 'span'.
-     *
-     * @param $data
      *
      * @return mixed|string
      */
@@ -513,8 +481,6 @@ class InputHelper
     /**
      * Converts UTF8 into Latin.
      *
-     * @param $value
-     *
      * @return mixed
      */
     public static function transliterate($value)
@@ -526,5 +492,102 @@ class InputHelper
         }
 
         return \URLify::transliterate((string) $value);
+    }
+
+    public static function transliterateFilename(string $filename): string
+    {
+        $pathInfo = pathinfo($filename);
+        $filename = self::alphanum(self::transliterate($pathInfo['filename']), false, '-');
+        if (isset($pathInfo['extension'])) {
+            $filename .= '.'.$pathInfo['extension'];
+        }
+
+        return $filename;
+    }
+
+    public static function minifyHTML(string $html): string
+    {
+        if ('' === trim($html)) {
+            return $html;
+        }
+        // Remove extra white-space(s) between HTML attribute(s)
+        $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', fn ($matches): string => '<'.$matches[1].preg_replace(
+            '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
+            ' $1$2',
+            $matches[2]
+        ).$matches[3].'>', str_replace("\r", '', $html));
+        // Minify inline CSS declaration(s)
+        if (str_contains($html, ' style=')) {
+            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', fn ($matches): string => '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2], $html);
+        }
+
+        $html = preg_replace(
+            [
+                // t = text
+                // o = tag open
+                // c = tag close
+                // Keep important white-space(s) after self-closing HTML tag(s)
+                '#<(img|input)(>| .*?>)#s',
+                // Remove a line break and two or more white-space(s) between tag(s)
+                '#(<!--.*?-->)|(>)(?:\n*|\s{2,})(<)|^\s*|\s*$#s',
+                '#(<!--.*?-->)|(?<!\>)\s+(<\/.*?>)|(<[^\/]*?>)\s+(?!\<)#s',
+                // t+c || o+t
+                '#(<!--.*?-->)|(<[^\/]*?>)\s+(<[^\/]*?>)|(<\/.*?>)\s+(<\/.*?>)#s',
+                // o+o || c+c
+                '#(<!--.*?-->)|(<\/.*?>)\s+(\s)(?!\<)|(?<!\>)\s+(\s)(<[^\/]*?\/?>)|(<[^\/]*?\/?>)\s+(\s)(?!\<)#s',
+                // c+t || t+o || o+t -- separated by long white-space(s)
+                '#(<!--.*?-->)|(<[^\/]*?>)\s+(<\/.*?>)#s',
+                // empty tag
+                '#<(img|input)(>| .*?>)<\/\1>#s',
+                // reset previous fix
+                '#(&nbsp;)&nbsp;(?![<\s])#',
+                // clean up ...
+                '#(?<=\>)(&nbsp;)(?=\<)#',
+                // --ibid
+            ],
+            [
+                '<$1$2</$1>',
+                '$1$2$3',
+                '$1$2$3',
+                '$1$2$3$4$5',
+                '$1$2$3$4$5$6$7',
+                '$1$2$3',
+                '<$1$2',
+                '$1 ',
+                '$1',
+            ],
+            $html
+        );
+
+        return str_replace(["\r", "\n"], ' ', $html);
+    }
+
+    private static function minifyCss(string $css): string
+    {
+        $css = preg_replace('/\s*([:;{}])\s*/', '$1', preg_replace('/\s+/', ' ', $css));
+        // Remove comments
+        $css = preg_replace('/\/\*[^*]*\*+([^\/*][^*]*\*+)*\//', '', $css);
+        // Remove whitespace
+        $css = preg_replace('/\s+/', ' ', $css);
+        // Remove leading and trailing whitespace
+        $css = trim($css);
+        // Replace multiple semicolons with one
+        $css = preg_replace('/;(?=;)/', '', $css);
+        // Replace multiple whitespaces with one
+        $css = preg_replace('/(\s+)/', ' ', $css);
+        // Replace 0(px,em,%, etc) with 0
+        $css = preg_replace('/(:| )0(\.\d+)?(%|em|ex|px|in|cm|mm|pt|pc)/i', '${1}0', $css);
+
+        return $css;
+    }
+
+    /**
+     * Needed to support PHP 8.1 without changing behavior.
+     *
+     * @see https://stackoverflow.com/questions/69207368/constant-filter-sanitize-string-is-deprecated
+     */
+    private static function filter_string_polyfill(string $string): string
+    {
+        return preg_replace('/\x00|<[^>]*>?/', '', $string);
     }
 }

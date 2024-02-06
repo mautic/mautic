@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
@@ -21,17 +12,17 @@ class ConfigMetadataTest extends TestCase
     /**
      * @var BundleMetadata|MockObject
      */
-    private $metadata;
+    private \PHPUnit\Framework\MockObject\MockObject $metadata;
 
     protected function setUp(): void
     {
         $this->metadata = $this->getMockBuilder(BundleMetadata::class)
-            ->setMethodsExcept(['setConfig', 'toArray'])
+            ->onlyMethods(['getDirectory'])
             ->disableOriginalConstructor()
             ->getMock();
     }
 
-    public function testMissingConfigIsIgnored()
+    public function testMissingConfigIsIgnored(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -43,7 +34,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertEquals([], $this->metadata->toArray()['config']);
     }
 
-    public function testBadConfigIsIgnored()
+    public function testBadConfigIsIgnored(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -55,7 +46,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertEquals([], $this->metadata->toArray()['config']);
     }
 
-    public function testIpLookupServicesAreLoaded()
+    public function testIpLookupServicesAreLoaded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -68,14 +59,14 @@ class ConfigMetadataTest extends TestCase
             [
                 'extreme-ip' => [
                     'display_name' => 'Extreme-IP',
-                    'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+                    'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
                 ],
             ],
             $configMetadata->getIpLookupServices()
         );
     }
 
-    public function testConfigIsLoaded()
+    public function testConfigIsLoaded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -89,7 +80,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertTrue(isset($config['parameters']['log_path']));
     }
 
-    public function testOptionalMissingServicesAreIgnored()
+    public function testOptionalMissingServicesAreIgnored(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -102,7 +93,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertFalse(isset($config['services']['fixtures']['mautic.test.fixture']));
     }
 
-    public function testParameterArgumentsAreEncoded()
+    public function testParameterArgumentsAreEncoded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -117,7 +108,7 @@ class ConfigMetadataTest extends TestCase
         $this->assertEquals('%%mautic.bundles%%', $config['services']['helpers']['mautic.helper.bundle']['arguments'][0]);
     }
 
-    public function testParametersAreEncoded()
+    public function testParametersAreEncoded(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -129,10 +120,10 @@ class ConfigMetadataTest extends TestCase
         $config = $this->metadata->toArray()['config'];
         $this->assertTrue(isset($config['parameters']['log_path']));
 
-        $this->assertEquals('%%kernel.root_dir%%/../var/logs', $config['parameters']['log_path']);
+        $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
     }
 
-    public function testParameterTypesArePreserved()
+    public function testParameterTypesArePreserved(): void
     {
         $this->metadata->expects($this->once())
             ->method('getDirectory')
@@ -144,7 +135,7 @@ class ConfigMetadataTest extends TestCase
         $config = $this->metadata->toArray()['config'];
         $this->assertTrue(isset($config['parameters']['log_path']));
 
-        $this->assertEquals('%%kernel.root_dir%%/../var/logs', $config['parameters']['log_path']);
+        $this->assertEquals('%%kernel.project_dir%%/var/logs', $config['parameters']['log_path']);
         $this->assertEquals(7, $config['parameters']['max_log_files']);
         $this->assertEquals('media/images', $config['parameters']['image_path']);
         $this->assertEquals(false, $config['parameters']['bool_value']);

@@ -1,32 +1,19 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Model;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
 
 /**
- * Class PostCountModel.
+ * @extends AbstractCommonModel<PostCount>
  */
 class PostCountModel extends AbstractCommonModel
 {
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?PostCount
     {
         if (null !== $id) {
             $repo = $this->getRepository();
@@ -47,7 +34,7 @@ class PostCountModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticSocialBundle:PostCount');
+        return $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\PostCount::class);
     }
 
     /*
@@ -55,7 +42,7 @@ class PostCountModel extends AbstractCommonModel
      *
      * @return boolean
      */
-    public function updatePostCount($monitor, \DateTime $postDate)
+    public function updatePostCount($monitor, \DateTime $postDate): bool
     {
         // query the db for posts on this date
         $q    = $this->getRepository()->createQueryBuilder($this->getRepository()->getTableAlias());

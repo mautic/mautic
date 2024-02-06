@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Internal;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
@@ -38,17 +29,17 @@ class MauticSyncProcessTest extends TestCase
     /**
      * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
      * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectChangeGenerator;
+    private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
 
     /**
      * @var MauticSyncDataExchange|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
     protected function setUp(): void
     {

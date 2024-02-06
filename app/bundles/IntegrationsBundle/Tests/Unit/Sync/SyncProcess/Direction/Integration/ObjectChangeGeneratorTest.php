@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Integration;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
@@ -30,7 +21,7 @@ class ObjectChangeGeneratorTest extends TestCase
     /**
      * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $valueHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
     protected function setUp(): void
     {
@@ -41,9 +32,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -92,9 +81,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
-                    return $normalizedValueDAO;
-                }
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
             );
 
         $integration = 'Test';

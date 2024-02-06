@@ -1,32 +1,17 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use GeoIp2\Database\Reader;
 
 class MaxmindDownloadLookup extends AbstractLocalDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return 'Free lookup that leverages GeoLite2 data created by MaxMind, available from <a href="https://maxmind.com" target="_blank">maxmind.com</a>. Databases must be downloaded and periodically updated.';
     }
 
-    /**
-     * @return string
-     */
-    public function getLocalDataStoreFilepath()
+    public function getLocalDataStoreFilepath(): string
     {
         return $this->getDataDir().'/GeoLite2-City.mmdb';
     }
@@ -49,10 +34,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
         }
     }
 
-    /**
-     * @return string
-     */
-    private function getLicenceKey()
+    private function getLicenceKey(): string
     {
         $auth = explode(':', $this->auth, 2);
         if (array_key_exists(1, $auth)) {
@@ -88,7 +70,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $this->longitude = $record->location->longitude;
             $this->timezone  = $record->location->timeZone;
             $this->zipcode   = $record->location->postalCode;
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
     }
 }

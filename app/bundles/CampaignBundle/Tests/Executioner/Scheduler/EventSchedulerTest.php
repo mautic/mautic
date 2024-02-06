@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -28,51 +19,38 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var EventLogger|MockObject
      */
-    private $eventLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
 
-    /**
-     * @var Interval
-     */
-    private $intervalScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval $intervalScheduler;
 
-    /**
-     * @var DateTime
-     */
-    private $dateTimeScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime $dateTimeScheduler;
 
     /**
      * @var EventCollector|MockObject
      */
-    private $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParamtersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParamtersHelper;
 
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
     protected function setUp(): void
     {
@@ -80,9 +58,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParamtersHelper->method('get')
             ->willReturnCallback(
-                function () {
-                    return 'America/New_York';
-                }
+                fn () => 'America/New_York'
             );
         $this->eventLogger       = $this->createMock(EventLogger::class);
         $this->intervalScheduler = new Interval($this->logger, $this->coreParamtersHelper);
@@ -100,7 +76,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldScheduleIgnoresSeconds()
+    public function testShouldScheduleIgnoresSeconds(): void
     {
         $this->assertFalse(
             $this->scheduler->shouldSchedule(
@@ -110,7 +86,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldSchedule()
+    public function testShouldSchedule(): void
     {
         $this->assertTrue(
             $this->scheduler->shouldSchedule(
@@ -120,7 +96,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldScheduleForInactive()
+    public function testShouldScheduleForInactive(): void
     {
         $date  = new \DateTime();
         $now   = clone $date;
@@ -144,7 +120,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduler->shouldScheduleEvent($event, $date, $now));
     }
 
-    public function testGetExecutionDateForInactivity()
+    public function testGetExecutionDateForInactivity(): void
     {
         $date = new \DateTime();
         $now  = clone $date;
@@ -161,7 +137,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($date, $resultDate);
     }
 
-    public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated()
+    public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -194,7 +170,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
-            ->willReturn('1');
+            ->willReturn(1);
         $contact->method('getTimezone')
             ->willReturn('America/New_York');
 
@@ -214,7 +190,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
-    public function testEventIsRescheduledForRelativeTimeIfAppropriate()
+    public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -247,7 +223,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
-            ->willReturn('1');
+            ->willReturn(1);
         $contact->method('getTimezone')
             ->willReturn('America/New_York');
 
@@ -267,7 +243,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
-    public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated()
+    public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
     {
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')
@@ -300,7 +276,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
-            ->willReturn('1');
+            ->willReturn(1);
         $contact->method('getTimezone')
             ->willReturn('America/New_York');
 
@@ -354,7 +330,6 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    CampaignEvents::ON_EVENT_SCHEDULED,
                     $this->callback(
                         function (ScheduledEvent $event) use ($now) {
                             // The first log was scheduled to 10 minutes.
@@ -364,9 +339,9 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    CampaignEvents::ON_EVENT_SCHEDULED,
                 ],
                 [
-                    CampaignEvents::ON_EVENT_SCHEDULED,
                     $this->callback(
                         function (ScheduledEvent $event) use ($now) {
                             // The second log was not scheduled so the default interval is used.
@@ -376,9 +351,9 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    CampaignEvents::ON_EVENT_SCHEDULED,
                 ],
                 [
-                    CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
                     $this->callback(
                         function (ScheduledBatchEvent $event) {
                             Assert::assertCount(2, $event->getScheduled());
@@ -386,6 +361,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
                 ]
             );
 

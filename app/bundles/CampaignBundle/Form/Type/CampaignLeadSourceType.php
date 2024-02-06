@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -20,13 +11,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CampaignLeadSourceType.
+ * @extends AbstractType<mixed>
  */
 class CampaignLeadSourceType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $sourceType = $options['data']['sourceType'];
+        $sourceType    = $options['data']['sourceType'];
+        $sourceChoices = $options['source_choices'] ?? [];
+        foreach ($sourceChoices as $key => $val) {
+            $sourceChoices[$key] = $val.' ('.$key.')';
+        }
 
         switch ($sourceType) {
             case 'lists':
@@ -34,7 +29,7 @@ class CampaignLeadSourceType extends AbstractType
                     'lists',
                     ChoiceType::class,
                     [
-                        'choices'           => array_flip($options['source_choices']),
+                        'choices'           => array_flip($sourceChoices),
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.lists',
                         'label_attr'        => ['class' => 'control-label'],
@@ -56,7 +51,7 @@ class CampaignLeadSourceType extends AbstractType
                     'forms',
                     ChoiceType::class,
                     [
-                        'choices'           => array_flip($options['source_choices']),
+                        'choices'           => array_flip($sourceChoices),
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.forms',
                         'label_attr'        => ['class' => 'control-label'],
@@ -101,7 +96,7 @@ class CampaignLeadSourceType extends AbstractType
         ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['source_choices']);
     }

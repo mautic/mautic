@@ -8,7 +8,7 @@ use Mautic\MauticApi;
 require __DIR__.'/vendor/autoload.php';
 
 if ('cli' !== php_sapi_name()) {
-    die('This script can only run on the command line');
+    exit('This script can only run on the command line');
 }
 
 $vars = [
@@ -22,7 +22,7 @@ $vars = [
 
 foreach ($vars as $id => $var) {
     if (empty($_SERVER['argv'][$id])) {
-        echo "Argument ${id} (${var}) is missing. Run this script as \"php upload.php ".implode(' ', $vars)."\"\n";
+        echo "Argument {$id} ({$var}) is missing. Run this script as \"php upload.php ".implode(' ', $vars)."\"\n";
         exit(1);
     }
 
@@ -72,7 +72,7 @@ if (!isset($response['file']) || !isset($response['file']['name'])) {
  * Create the actual asset based on the file we just uploaded.
  */
 $data = [
-    'title'           => "Mautic ${mauticVersion}",
+    'title'           => "Mautic {$mauticVersion}",
     'storageLocation' => 'local',
     'file'            => $response['file']['name'],
     'category'        => $assetCategoryId,

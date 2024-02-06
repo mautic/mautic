@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -21,24 +12,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProcessReplySubscriber implements EventSubscriberInterface
 {
-    const BUNDLE     = 'EmailBundle';
-    const FOLDER_KEY = 'replies';
-    const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
+    public const BUNDLE     = 'EmailBundle';
 
-    /**
-     * @var Reply
-     */
-    private $replier;
+    public const FOLDER_KEY = 'replies';
 
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cache;
+    public const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
@@ -47,21 +27,18 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * ProcessReplySubscriber constructor.
-     */
-    public function __construct(Reply $replier, CacheStorageHelper $cache)
-    {
-        $this->replier = $replier;
-        $this->cache   = $cache;
+    public function __construct(
+        private Reply $replier,
+        private CacheStorageHelper $cache
+    ) {
     }
 
-    public function onEmailConfig(MonitoredEmailEvent $event)
+    public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.reply_folder');
     }
 
-    public function onEmailPreFetch(ParseEmailEvent $event)
+    public function onEmailPreFetch(ParseEmailEvent $event): void
     {
         if (!$lastFetchedUID = $this->cache->get(self::CACHE_KEY)) {
             return;
@@ -70,12 +47,12 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         $startingUID = $lastFetchedUID + 1;
 
         // Using * will return the last UID even if the starting UID doesn't exist so let's just use a highball number
-        $endingUID = $startingUID + 1000000000;
+        $endingUID = $startingUID + 1_000_000_000;
 
         $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." $startingUID:$endingUID");
     }
 
-    public function onEmailParse(ParseEmailEvent $event)
+    public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
             // Process the messages

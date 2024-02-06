@@ -1,0 +1,292 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block headerTitle %}{{ packageDetail.packageBase.getHumanPackageName()|escape }}{% endblock %}
+
+{% set buttons = {
+    0: {
+        'attr' : {
+            'href' : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
+        },
+        'btnText'   : 'mautic.core.form.close'|trans,
+        'iconClass' : 'fa fa-remove',
+        'primary'   : true,
+}
+ } %}
+
+{% set latestVersion = packageDetail.versions.findLatestStableVersionPackage() %}
+
+{% if not latestVersion %}
+    {% set latestVersion = packageDetail.versions.findLatestVersionPackage() %}
+{% endif %}
+
+{% if latestVersion and latestVersion.issues %}
+    {% set buttons = buttons|merge({0: {
+        'attr' : {
+            'href'        : latestVersion.issues,
+            'target'      : '_blank',
+            'rel'         : 'noopener noreferrer',
+            'data-toggle' : '',
+        },
+        'btnText'   : 'marketplace.package.issue.tracker'|trans,
+        'iconClass' : 'fa fa-question',
+        'primary'   : false,
+    }}) %}
+{% endif %}
+
+{% if latestVersion and latestVersion.wiki %}
+    {% set buttons = buttons|merge({0:{
+        'attr' : {
+            'href'        : latestVersion.wiki,
+            'target'      : '_blank',
+            'rel'         : 'noopener noreferrer',
+            'data-toggle' : '',
+        },
+        'btnText'   : 'marketplace.package.wiki'|trans,
+        'iconClass' : 'fa fa-book',
+        'primary'   : false,
+    }}) %}
+{% endif %}
+
+{% if security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and not isInstalled and isComposerEnabled %}
+    {% set installRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_INSTALL'),
+        {
+            'vendor' : packageDetail.packageBase.getVendorName(),
+            'package' : packageDetail.packageBase.getPackageName(),
+        }
+    ) %}
+
+    {% set buttons = buttons|merge({0:{
+        'attr' : {
+            'data-toggle' : 'ajaxmodal',
+            'data-target' : '#InstallationInProgressModal',
+            'href'        : installRoute,
+        },
+        'btnText'   : 'marketplace.package.install'|trans,
+        'iconClass' : 'fa fa-download',
+        'primary'   : true,
+    }}) %}
+
+{% elseif security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and isComposerEnabled %}
+    {% set removeRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_REMOVE'),
+        {'vendor' : packageDetail.packageBase.getVendorName(),
+        'package' : packageDetail.packageBase.getPackageName(),
+        }) %}
+
+    {% set buttons = buttons|merge({ 0: {
+        'attr' : {
+            'data-toggle' : 'ajaxmodal',
+            'data-target' :'#RemovalInProgressModal',
+            'href'        : removeRoute,
+    },
+        'btnText'   : 'marketplace.package.remove'|trans,
+        'iconClass' : 'fa fa-trash',
+        'primary'   : true,
+    }}) %}
+{% endif %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'customButtons' : buttons
+    }) -}}
+{% endblock %}
+
+{% block content %}
+<div class="col-md-9">
+    {% if packageDetail.packageBase.description %}
+    <div class="bg-auto">
+        <div class="pr-md pl-md pt-lg pb-lg">
+            <div class="box-layout">
+                <div class="col-xs-10">
+                    <div class="text-muted">{{ packageDetail.packageBase.description|purify }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">{% trans %}marketplace.package.cli.install{% endtrans %}</div>
+        </div>
+        <div class="panel-body">{{ 'marketplace.package.cli.install.descr'|trans({
+            '%vendor%' : packageDetail.packageBase.getVendorName(),
+            '%package%' : packageDetail.packageBase.getPackageName(),
+        })|purify }}</div>
+    </div>
+
+    <div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans %}marketplace.package.latest.stable.version{% endtrans %}</div>
+    </div>
+    <table class="table table-bordered table-striped mb-0">
+        <tr>
+            <th>{% trans %}marketplace.package.version{% endtrans %}</th>
+            <td>
+                {% if not latestVersion %}
+                    <div class="text-danger">
+                        {% trans %}marketplace.latest.version.missing{% endtrans %}
+                    </div>
+                {% else %}
+                    <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ latestVersion.version|escape }}" id="latest-version" target="_blank" rel="noopener noreferrer">
+                        <strong>{{ latestVersion.version }}</strong>
+                    </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% if latestVersion is not empty %}
+            <tr>
+                <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
+                <td title="{{ dateToText(latestVersion.time) }}">
+                    {{ dateToDate(latestVersion.time) }}
+                </td>
+            </tr>
+            <tr>
+                <th>{% trans %}marketplace.package.license{% endtrans %}</th>
+                <td>{{ latestVersion.license|join(', ')|escape }}</td>
+            </tr>
+            {% if latestVersion.homepage %}
+                <tr>
+                    <th>{% trans %}marketplace.package.homepage{% endtrans %}</th>
+                    <td>{{ latestVersion.homepage|escape }}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <th>
+                    {% trans %}marketplace.package.required.packages{% endtrans %}
+                    ({{ latestVersion.require|length }})
+                </th>
+                <td>{{ latestVersion.require|keys|join(', ')|escape }}</td>
+            </tr>
+        {% endif %}
+    </table>
+    </div>
+
+    <div class="panel">
+    <div class="panel-heading">
+        <div class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</div>
+    </div>
+    <table class="table table-bordered table-striped mb-0">
+        <tr>
+            <th>{% trans %}marketplace.package.version{% endtrans %}</th>
+            <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
+        </tr>
+        {% for version in packageDetail.versions.sortByLatest() %}
+        <tr>
+            <td>
+                {% if version.isStable() or version.isPreRelease() %}
+                    <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ version.version|escape }}" target="_blank" rel="noopener noreferrer" >
+                    {% if version.isStable() %}
+                        <b>{{ version.version|escape }}</b>
+                    {% else %}
+                        {{ version.version|escape }}
+                    {% endif %}
+                    </a>
+                {% else %}
+                    <i>{{ version.version|escape }}</i>
+                {% endif %}
+            </td>
+            <td title="{{ dateToText(version.time) }}">
+                {{ dateToFullConcat(version.time) }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+</div>
+
+<div class="col-md-3 panel pb-lg">
+    <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.maintainers{% endtrans %}</h3>
+    {% for maintainer in packageDetail.maintainers %}
+        <div class="box-layout">
+            <div class="col-xs-3 va-m">
+                <div class="panel-body">
+                    <span class="img-wrapper img-rounded">
+                        <img class="img" src="{{ maintainer.avatar|escape }}">
+                    </span>
+                </div>
+            </div>
+            <div class="col-xs-9 va-t">
+                <div class="panel-body">
+                    <h4 class="fw-sb mb-xs ellipsis">
+                        {{ maintainer.name|title|escape }}
+                    </h4>
+                    <a href="https://packagist.org/packages/{{ maintainer.name|escape }}" target="_blank" rel="noopener noreferrer">
+                        {{ 'marketplace.other.packages'|trans({'%name%' : maintainer.name}) }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.github.info{% endtrans %}</h3>
+    <table class="table mb-0">
+        <tr>
+            <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+            <td>
+                <a href="{{ packageDetail.packageBase.repository|escape }}" target="_blank" rel="noopener noreferrer" >
+                    {{ packageDetail.packageBase.name|escape }}
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.github.stars{% endtrans %}</th>
+            <td>{{ packageDetail.githubInfo.stars|escape }}</td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.github.watchers{% endtrans %}</th>
+            <td>{{ packageDetail.githubInfo.watchers|escape }}</td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.github.forks{% endtrans %}</th>
+            <td>{{ packageDetail.githubInfo.forks|escape }}</td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.github.open.issues{% endtrans %}</th>
+            <td>{{ packageDetail.githubInfo.openIssues|escape }}</td>
+        </tr>
+    </table>
+
+    <h3 class="pt-lg pb-lg pl-sm">{% trans %}marketplace.package.packagist.info{% endtrans %}</h3>
+    <table class="table mb-0">
+        <tr>
+            <th>{% trans %}marketplace.package.repository{% endtrans %}</th>
+            <td>
+                <a href="{{ packageDetail.packageBase.url|escape }}" target="_blank" rel="noopener noreferrer" >
+                    {{ packageDetail.packageBase.name|escape }}
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.total.downloads{% endtrans %}</th>
+            <td>{{ packageDetail.packageBase.downloads|escape }}</td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.monthly.downloads{% endtrans %}</th>
+            <td>{{ packageDetail.monthlyDownloads|escape }}</td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.daily.downloads{% endtrans %}</th>
+            <td>{{ packageDetail.dailyDownloads|escape }}</td>
+        </tr>
+        <tr>
+            <th>{% trans %}marketplace.package.create.date{% endtrans %}</th>
+            <td title="{{ dateToText(packageDetail.time) }}">
+                {{ dateToDate(packageDetail.time) }}
+            </td>
+        </tr>
+    </table>
+</div>
+
+{{- include('@MauticCore/Helper/modal.html.twig', {
+    'id'            : 'InstallationInProgressModal',
+    'header'        : 'Installing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
+    'size'          : 'md',
+    'footerButtons' : false,
+}) -}}
+
+{{- include('@MauticCore/Helper/modal.html.twig', {
+    'id'            : 'RemovalInProgressModal',
+    'header'        : 'Removing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
+    'size'          : 'md',
+    'footerButtons' : false,
+}) -}}
+{% endblock %}

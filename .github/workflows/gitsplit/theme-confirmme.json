@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-confirmme",
+            "directory": "themes/confirmme",
+            "target": "git@github.com:mautic/theme-confirmme.git"
+        }
+    ]
+}

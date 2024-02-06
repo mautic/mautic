@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,28 +10,18 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FacebookLoginType.
+ * @extends AbstractType<array<mixed>>
  */
 class SocialLoginType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $helper;
-    private $formModel;
-    private $coreParametersHelper;
-
-    /**
-     * SocialLoginType constructor.
-     */
-    public function __construct(IntegrationHelper $helper, FormModel $form, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->helper               = $helper;
-        $this->formModel            = $form;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private IntegrationHelper $helper,
+        private FormModel $formModel,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrations       = '';
         $integrationObjects = $this->helper->getIntegrationObjects(null, 'login_button');
