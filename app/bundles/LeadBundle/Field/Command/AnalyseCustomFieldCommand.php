@@ -16,25 +16,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AnalyseCustomFieldCommand extends Command
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(FieldModel $fieldModel, LeadModel $leadModel, TranslatorInterface $translator)
+    public function __construct(private FieldModel $fieldModel, private LeadModel $leadModel, private TranslatorInterface $translator)
     {
         parent::__construct();
-        $this->fieldModel   = $fieldModel;
-        $this->leadModel    = $leadModel;
-        $this->translator   = $translator;
     }
 
     /**
