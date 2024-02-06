@@ -54,14 +54,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * @property LeadDeviceRepository|(LeadDeviceRepository&object&MockObject)|(LeadDeviceRepository&MockObject)|(object&MockObject)|MockObject $leadDeviceRepository
- */
 class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
     public const SEGMENT_A = 'segment A';
 
     public const SEGMENT_B = 'segment B';
+
+    /**
+     * @var Connection|LeadDeviceRepository
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepository;
 
     /**
      * @var Connection|MockObject
