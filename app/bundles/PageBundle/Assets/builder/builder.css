@@ -52,7 +52,7 @@ div[contentEditable=true]:empty:not(:focus):before {
 a.inline-token {
   color: #000000;
   text-decoration: none;
-  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  font-family: "Source Sans 3", Helvetica, Arial, sans-serif;
   line-height: 1.3856;
 }
 a.inline-token:hover,
