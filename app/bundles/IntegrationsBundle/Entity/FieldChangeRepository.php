@@ -149,9 +149,10 @@ class FieldChangeRepository extends CommonRepository
     {
         $totalDeleted      = 0;
         $limit             = 1000;
+        $totalLimit        = 100000;
         $deletedInLastLoop = $limit;
 
-        while ($deletedInLastLoop === $limit && $deleted = $this->doDeleteOrphanLeadChanges($limit)) {
+        while ($totalDeleted < $totalLimit && $deletedInLastLoop === $limit && $deleted = $this->doDeleteOrphanLeadChanges($limit)) {
             $deletedInLastLoop = $deleted;
             $totalDeleted += $deleted;
         }
