@@ -139,6 +139,115 @@ class FieldModelTest extends MauticMysqlTestCase
         $this->assertTrue($model->isUsedField($leadField));
     }
 
+    public function testUniqueIdentifierIndexToggleForContacts()
+    {
+        // Log queries so we can detect if alter queries were executed
+        $stack                    = new class() implements SQLLogger {
+            /** @var mixed[] */
+            private $indexQueries = [];
+
+            public function startQuery($sql, ?array $params = null, ?array $types = null)
+            {
+                if (false !== stripos($sql, 'create index')) {
+                    $this->indexQueries[] = $sql;
+                }
+
+                if (false !== stripos($sql, 'drop index')) {
+                    $this->indexQueries[] = $sql;
+                }
+            }
+
+            public function stopQuery()
+            {
+                // not used
+            }
+
+            /**
+             * @return mixed[]
+             */
+            public function getIndexQueries(): array
+            {
+                return $this->indexQueries;
+            }
+
+            public function resetQueries(): void
+            {
+                $this->indexQueries = [];
+            }
+        };
+
+        $this->connection->getConfiguration()->setSQLLogger($stack);
+
+        $fieldModel = $this->container->get('mautic.lead.model.field');
+
+        // Ensure the index exists
+        $emailField = $fieldModel->getEntityByAlias('email');
+        $fieldModel->saveEntity($emailField);
+        $columns = $this->getUniqueIdentifierIndexColumns('leads');
+        Assert::assertCount(1, $columns);
+        Assert::assertEquals('email', $columns[0]['COLUMN_NAME']);
+        $stack->resetQueries();
+
+        // Test updating the index
+        $ui1Field = new LeadField();
+        $ui1Field->setName('UI1')
+            ->setAlias('ui1')
+            ->setType('string')
+            ->setObject('lead')
+            ->setIsUniqueIdentifier(true);
+        $fieldModel->saveEntity($ui1Field);
+        $columns = $this->getUniqueIdentifierIndexColumns('leads');
+        Assert::assertCount(2, $columns);
+        Assert::assertEquals('email', $columns[0]['COLUMN_NAME']);
+        Assert::assertEquals('ui1', $columns[1]['COLUMN_NAME']);
+        $alteredIndexes = $stack->getIndexQueries();
+        Assert::assertCount(3, $alteredIndexes);
+        Assert::assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
+        Assert::assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
+        Assert::assertEquals(sprintf('CREATE INDEX %1$sui1_search ON %1$sleads (ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
+        $stack->resetQueries();
+
+        // Test only the first 3 columns are used for the index
+        $ui2Field = new LeadField();
+        $ui2Field->setName('UI2')
+            ->setAlias('ui2')
+            ->setType('string')
+            ->setObject('lead')
+            ->setIsUniqueIdentifier(true);
+        $ui3Field = new LeadField();
+        $ui3Field->setName('UI3')
+            ->setAlias('ui3')
+            ->setType('string')
+            ->setObject('lead')
+            ->setIsUniqueIdentifier(true);
+        $fieldModel->saveEntities([$ui2Field, $ui3Field]);
+        $columns = $this->getUniqueIdentifierIndexColumns('leads');
+        Assert::assertCount(3, $columns);
+        Assert::assertEquals('email', $columns[0]['COLUMN_NAME']);
+        Assert::assertEquals('ui1', $columns[1]['COLUMN_NAME']);
+        Assert::assertEquals('ui2', $columns[2]['COLUMN_NAME']);
+        $alteredIndexes = $stack->getIndexQueries();
+        Assert::assertCount(4, $alteredIndexes);
+        Assert::assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
+        Assert::assertEquals(
+            sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX),
+            $alteredIndexes[1]
+        );
+        Assert::assertEquals(sprintf('CREATE INDEX %1$sui2_search ON %1$sleads (ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
+        Assert::assertEquals(sprintf('CREATE INDEX %1$sui3_search ON %1$sleads (ui3)', MAUTIC_TABLE_PREFIX), $alteredIndexes[3]);
+        $stack->resetQueries();
+
+        // Test that the index was not touched if only the label was updated
+        $ui1Field->setLabel('UI1 Patched Again');
+        $fieldModel->saveEntity($ui1Field);
+        $columns = $this->getUniqueIdentifierIndexColumns('leads');
+        Assert::assertCount(3, $columns);
+        Assert::assertCount(0, $stack->getIndexQueries());
+
+        // Cleanup
+        $fieldModel->deleteEntities([$ui1Field->getId(), $ui2Field->getId(), $ui3Field->getId()]);
+    }
+
     /**
      * @return array
      */

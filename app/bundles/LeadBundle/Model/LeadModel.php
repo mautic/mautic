@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Entity\Category;
@@ -1816,6 +1817,27 @@ class LeadModel extends FormModel
         }
 
         return $mapData;
+    }
+
+    /**
+     * @param string[] $aliases
+     *
+     * @return mixed[]
+     *
+     * @throws DBALException
+     */
+    public function getCustomLeadFieldLength(array $aliases): array
+    {
+        $columns = [];
+        foreach ($aliases as $alias) {
+            $columns[] = sprintf('max(CHAR_LENGTH(%s)) %s', $alias, $alias);
+        }
+
+        $query = $this->em->getConnection()->createQueryBuilder();
+        $query->select(implode(', ', $columns))
+            ->from(MAUTIC_TABLE_PREFIX.'leads');
+
+        return $query->execute()->fetch();
     }
 
     /**
