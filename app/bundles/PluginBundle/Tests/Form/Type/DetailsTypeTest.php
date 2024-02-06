@@ -150,7 +150,7 @@ class DetailsTypeTest extends TestCase
         self::assertSame(2, $calls);
     }
 
-    public function authorizedDataProvider(): \Generator
+    public static function authorizedDataProvider(): \Generator
     {
         yield 'authorized' => [true, 'reauthorize'];
         yield 'not authorized' => [false, 'authorize'];
@@ -232,7 +232,7 @@ class DetailsTypeTest extends TestCase
         self::assertSame(2, $calls);
     }
 
-    public function withFeaturesProvider(): \Generator
+    public static function withFeaturesProvider(): \Generator
     {
         yield 'create integration' => [null, ['non-configured']];
         yield 'edit integration' => [1, ['configured']];

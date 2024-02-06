@@ -11,9 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ThemeController.
- */
 class ThemeController extends FormController
 {
     /**
@@ -264,14 +261,12 @@ class ThemeController extends FormController
 
     /**
      * A helper method to keep the code DRY.
-     *
-     * @return array
      */
-    public function getIndexPostActionVars()
+    public function getIndexPostActionVars(): array
     {
         return [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),
-            'contentTemplate' => 'Mautic\CoreBundle\Controller\themeController::indexAction',
+            'contentTemplate' => 'Mautic\CoreBundle\Controller\ThemeController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_themes_index',
                 'mauticContent' => 'theme',

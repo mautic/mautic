@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
+    public const TABLE_NAME = 'campaigns';
     /**
      * @var int
      */
@@ -41,6 +42,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      * @var \DateTimeInterface|null
      */
     private $publishDown;
+
+    public ?\DateTimeInterface $deleted = null;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -72,10 +75,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     private $canvasSettings = [];
 
-    /**
-     * @var int
-     */
-    private $allowRestart = 0;
+    private bool $allowRestart = false;
 
     public function __construct()
     {
@@ -96,11 +96,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaigns')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CampaignRepository::class);
 
         $builder->addIdColumns();
@@ -141,10 +141,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->nullable()
             ->build();
 
-        $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
+        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
+        $builder->addNullableField('deleted', 'datetime');
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -159,7 +160,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaign')
             ->addListProperties(
@@ -191,15 +192,13 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                     'events',
                     'publishUp',
                     'publishDown',
+                    'deleted',
                 ]
             )
             ->build();
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -224,8 +223,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -300,8 +297,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Add events.
      *
-     * @param \Mautic\CampaignBundle\Entity\Event $event
-     *
      * @return Campaign
      */
     public function addEvent($key, Event $event)
@@ -317,7 +312,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove events.
      */
-    public function removeEvent(Event $event)
+    public function removeEvent(Event $event): void
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
 
@@ -334,12 +329,14 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this->events;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getRootEvents()
+    public function getRootEvents(): ArrayCollection
     {
-        $criteria = Criteria::create()->where(Criteria::expr()->isNull('parent'));
+        $criteria = Criteria::create()->where(
+            Criteria::expr()->andX(
+                Criteria::expr()->isNull('parent'),
+                Criteria::expr()->isNull('deleted')
+            )
+        );
         $events   = $this->getEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
@@ -355,10 +352,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getInactionBasedEvents()
+    public function getInactionBasedEvents(): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
         $events   = $this->getEvents()->matching($criteria);
@@ -376,10 +370,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getEventsByType($type)
+    public function getEventsByType($type): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
         $events   = $this->getEvents()->matching($criteria);
@@ -458,7 +449,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -483,7 +474,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove lead.
      */
-    public function removeLead(Lead $lead)
+    public function removeLead(Lead $lead): void
     {
         $leadEntity                                              = $lead->getLead();
         $this->changes['leads']['removed'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
@@ -525,7 +516,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove list.
      */
-    public function removeList(LeadList $list)
+    public function removeList(LeadList $list): void
     {
         $this->changes['lists']['removed'][$list->getId()] = $list->getName();
         $this->lists->removeElement($list);
@@ -556,7 +547,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Remove form.
      */
-    public function removeForm(Form $form)
+    public function removeForm(Form $form): void
     {
         $this->changes['forms']['removed'][$form->getId()] = $form->getName();
         $this->forms->removeElement($form);
@@ -570,23 +561,17 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this->canvasSettings;
     }
 
-    public function setCanvasSettings(array $canvasSettings)
+    public function setCanvasSettings(array $canvasSettings): void
     {
         $this->canvasSettings = $canvasSettings;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAllowRestart()
+    public function getAllowRestart(): bool
     {
         return (bool) $this->allowRestart;
     }
 
-    /**
-     * @return bool
-     */
-    public function allowRestart()
+    public function allowRestart(): bool
     {
         return $this->getAllowRestart();
     }
@@ -598,11 +583,23 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     public function setAllowRestart($allowRestart)
     {
+        $allowRestart = (bool) $allowRestart;
         $this->isChanged('allowRestart', $allowRestart);
 
-        $this->allowRestart = (int) $allowRestart;
+        $this->allowRestart = $allowRestart;
 
         return $this;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deleted): void
+    {
+        $this->isChanged('deleted', $deleted);
+        $this->deleted = $deleted;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
     }
 
     /**

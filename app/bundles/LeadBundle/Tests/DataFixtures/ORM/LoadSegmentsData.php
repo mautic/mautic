@@ -11,26 +11,13 @@ use Mautic\LeadBundle\Model\ListModel;
 
 class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(ListModel $listModel, LeadModel $contactModel)
-    {
-        $this->listModel    = $listModel;
-        $this->contactModel = $contactModel;
+    public function __construct(
+        private ListModel $listModel,
+        private LeadModel $contactModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $segments = [
             [ // ID 2

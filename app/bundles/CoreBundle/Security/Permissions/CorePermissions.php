@@ -12,80 +12,31 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CorePermissions
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private array $permissionClasses = [];
 
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
+    private array $permissionObjectsByClass = [];
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private array $permissionObjectsByName = [];
 
-    /**
-     * @var array
-     */
-    private $bundles;
+    private array $grantedPermissions = [];
 
-    /**
-     * @var array
-     */
-    private $pluginBundles;
+    private array $checkedPermissions = [];
 
-    /**
-     * @var array
-     */
-    private $permissionClasses = [];
-
-    /**
-     * @var array
-     */
-    private $permissionObjectsByClass = [];
-
-    /**
-     * @var array
-     */
-    private $permissionObjectsByName = [];
-
-    /**
-     * @var array
-     */
-    private $grantedPermissions = [];
-
-    /**
-     * @var array
-     */
-    private $checkedPermissions = [];
-
-    /**
-     * @var bool
-     */
-    private $permissionObjectsGenerated = false;
+    private bool $permissionObjectsGenerated = false;
 
     public function __construct(
-        UserHelper $userHelper,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper,
-        array $bundles,
-        array $pluginBundles
+        protected UserHelper $userHelper,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
+        private array $bundles,
+        private array $pluginBundles
     ) {
-        $this->userHelper           = $userHelper;
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->bundles              = $bundles;
-        $this->pluginBundles        = $pluginBundles;
-
         $this->registerPermissionClasses();
     }
 
     public function setPermissionObject(AbstractPermissions $permissionObject): void
     {
-        $this->permissionObjectsByClass[get_class($permissionObject)] = $permissionObject;
+        $this->permissionObjectsByClass[$permissionObject::class]     = $permissionObject;
         $this->permissionObjectsByName[$permissionObject->getName()]  = $permissionObject;
     }
 
@@ -103,7 +54,7 @@ class CorePermissions
         foreach ($this->getPermissionClasses() as $class) {
             try {
                 $this->getPermissionObject($class);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
             }
         }
 
@@ -153,11 +104,9 @@ class CorePermissions
     /**
      * Generates the bit value for the bundle's permission.
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
      */
-    public function generatePermissions(array $permissions)
+    public function generatePermissions(array $permissions): array
     {
         $entities = [];
 
@@ -406,10 +355,8 @@ class CorePermissions
      * Retrieves all permissions.
      *
      * @param bool $forJs
-     *
-     * @return array
      */
-    public function getAllPermissions($forJs = false)
+    public function getAllPermissions($forJs = false): array
     {
         $permissionObjects = $this->getPermissionObjects();
         $permissions       = [];
@@ -429,10 +376,7 @@ class CorePermissions
         return $permissions;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAnonymous()
+    public function isAnonymous(): bool
     {
         $userEntity = $this->userHelper->getUser();
 
@@ -463,10 +407,7 @@ class CorePermissions
         return $this->pluginBundles;
     }
 
-    /**
-     * @return array
-     */
-    protected function getParams()
+    protected function getParams(): array
     {
         return $this->coreParametersHelper->all();
     }
@@ -520,7 +461,7 @@ class CorePermissions
     /**
      * Register permission classes.
      */
-    private function registerPermissionClasses()
+    private function registerPermissionClasses(): void
     {
         foreach ($this->getBundles() as $bundle) {
             if (!empty($bundle['permissionClasses'])) {

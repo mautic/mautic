@@ -22,42 +22,39 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|ColumnSchemaHelper
      */
-    private $columnSchemaHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $columnSchemaHelper;
 
     /**
      * @var MockObject|SchemaDefinition
      */
-    private $schemaDefinition;
+    private \PHPUnit\Framework\MockObject\MockObject $schemaDefinition;
 
     /**
      * @var MockObject|Logger
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var MockObject|LeadFieldSaver
      */
-    private $leadFieldSaver;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldSaver;
 
     /**
      * @var MockObject|CustomFieldIndex
      */
-    private $customFieldIndex;
+    private \PHPUnit\Framework\MockObject\MockObject $customFieldIndex;
 
     /**
      * @var MockObject|FieldColumnDispatcher
      */
-    private $fieldColumnDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldColumnDispatcher;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var CustomFieldColumn
-     */
-    private $customFieldColumn;
+    private \Mautic\LeadBundle\Field\CustomFieldColumn $customFieldColumn;
 
     protected function setUp(): void
     {

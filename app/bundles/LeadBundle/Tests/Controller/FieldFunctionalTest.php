@@ -17,22 +17,22 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
     public function testNewFieldVarcharFieldWith191Length(): void
     {
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $field      = $this->createField('a');
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertEquals(ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH, $columns[$field->getAlias()]->getLength());
     }
 
     public function testNewMultiSelectField(): void
     {
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $field      = $this->createField('s', 'select', ['properties' => ['list' => ['choice_a' => 'Choice A']]]);
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertArrayHasKey('field_s', $columns);
     }

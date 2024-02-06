@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 declare(strict_types=1);
 
 namespace Mautic\PageBundle\Event;
@@ -20,25 +11,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TrackingEvent extends Event
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private \Symfony\Component\HttpFoundation\ParameterBag $response;
 
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var ParameterBag
-     */
-    private $response;
-
-    public function __construct(Lead $contact, Request $request, array $mtcSessionResponses)
-    {
-        $this->contact  = $contact;
-        $this->request  = $request;
+    public function __construct(
+        private Lead $contact,
+        private Request $request,
+        array $mtcSessionResponses
+    ) {
         $this->response = new ParameterBag($mtcSessionResponses);
     }
 

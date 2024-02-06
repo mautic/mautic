@@ -10,49 +10,16 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 class ObjectChangeDAO
 {
     /**
-     * @var string
+     * @var FieldDAO[]
      */
-    private $integration;
+    private array $fields = [];
 
-    /**
-     * @var string
-     */
-    private $object;
-
-    /**
-     * @var mixed
-     */
-    private $objectId;
-
-    /**
-     * @var string
-     */
-    private $mappedObject;
-
-    /**
-     * @var mixed
-     */
-    private $mappedId;
-
-    /**
-     * @var \DateTimeInterface
-     */
-    private $changeDateTime;
+    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
 
     /**
      * @var FieldDAO[]
      */
-    private $fields = [];
-
-    /**
-     * @var ObjectMapping
-     */
-    private $objectMapping;
-
-    /**
-     * @var FieldDAO[]
-     */
-    private $fieldsByState = [
+    private array $fieldsByState = [
         ReportFieldDAO::FIELD_CHANGED   => [],
         ReportFieldDAO::FIELD_UNCHANGED => [],
         ReportFieldDAO::FIELD_REQUIRED  => [],
@@ -66,14 +33,14 @@ class ObjectChangeDAO
      * @param mixed              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
-    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId, ?\DateTimeInterface $changeDateTime = null)
-    {
-        $this->integration    = $integration;
-        $this->object         = $object;
-        $this->objectId       = $objectId;
-        $this->mappedObject   = $mappedObject;
-        $this->mappedId       = $mappedId;
-        $this->changeDateTime = $changeDateTime;
+    public function __construct(
+        private $integration,
+        private $object,
+        private $objectId,
+        private $mappedObject,
+        private $mappedId,
+        private ?\DateTimeInterface $changeDateTime = null
+    ) {
     }
 
     public function getIntegration(): string
@@ -146,11 +113,7 @@ class ObjectChangeDAO
      */
     public function getField($name)
     {
-        if (isset($this->fields[$name])) {
-            return $this->fields[$name];
-        }
-
-        return null;
+        return $this->fields[$name] ?? null;
     }
 
     /**
@@ -204,8 +167,6 @@ class ObjectChangeDAO
     }
 
     /**
-     * @param \DateTimeInterface $changeDateTime
-     *
      * @return ObjectChangeDAO
      */
     public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null)

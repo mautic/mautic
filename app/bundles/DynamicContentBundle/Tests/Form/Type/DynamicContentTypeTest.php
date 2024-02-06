@@ -99,7 +99,7 @@ class DynamicContentTypeTest extends TestCase
                     'filters',
                     CollectionType::class,
                     [
-                        'entry_type'     => 'Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType',
+                        'entry_type'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
                         'entry_options'  => [
                             'countries'    => FormFieldHelper::getCountryChoices(),
                             'regions'      => FormFieldHelper::getRegionChoices(),

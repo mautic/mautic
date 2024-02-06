@@ -7,6 +7,9 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class PublishUpDateType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

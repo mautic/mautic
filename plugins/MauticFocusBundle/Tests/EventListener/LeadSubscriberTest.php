@@ -23,22 +23,22 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @var Translator|MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var RouterInterface|MockObject
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var FocusModel|(FocusModel&MockObject)|MockObject
      */
-    private $focusModel;
+    private \PHPUnit\Framework\MockObject\MockObject $focusModel;
 
     /**
      * @var StatRepository|(StatRepository&MockObject)|MockObject
      */
-    private $statRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
 
     /**
      * @var string

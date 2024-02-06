@@ -19,31 +19,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
-    private CampaignRepository $campaignRepository;
-
-    private TranslatorInterface $translator;
-    private MembershipBuilder $membershipBuilder;
-    private LoggerInterface $logger;
-    private FormatterHelper $formatterHelper;
     private int $runLimit = 0;
+
     private ContactLimiter $contactLimiter;
+
     private bool $quiet = false;
 
     public function __construct(
-        CampaignRepository $campaignRepository,
-        TranslatorInterface $translator,
-        MembershipBuilder $membershipBuilder,
-        LoggerInterface $logger,
-        FormatterHelper $formatterHelper,
+        private CampaignRepository $campaignRepository,
+        private TranslatorInterface $translator,
+        private MembershipBuilder $membershipBuilder,
+        private LoggerInterface $logger,
+        private FormatterHelper $formatterHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->campaignRepository = $campaignRepository;
-        $this->translator         = $translator;
-        $this->membershipBuilder  = $membershipBuilder;
-        $this->logger             = $logger;
-        $this->formatterHelper    = $formatterHelper;
-
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
@@ -148,17 +138,14 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         } else {
             $campaigns = $this->campaignRepository->getEntities(
                 [
-                    'iterator_mode' => true,
+                    'iterable_mode' => true,
                 ]
             );
 
-            while (false !== ($results = $campaigns->next())) {
-                // Get first item; using reset as the key will be the ID and not 0
-                $campaign = reset($results);
-
+            foreach ($campaigns as $campaign) {
                 $this->updateCampaign($campaign);
 
-                unset($results, $campaign);
+                unset($campaign);
             }
         }
 
@@ -170,7 +157,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     /**
      * @throws \Exception
      */
-    private function updateCampaign(Campaign $campaign)
+    private function updateCampaign(Campaign $campaign): void
     {
         if (!$campaign->isPublished()) {
             return;
@@ -201,5 +188,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->output->writeln('');
     }
+
     protected static $defaultDescription = 'Rebuild campaigns based on contact segments.';
 }

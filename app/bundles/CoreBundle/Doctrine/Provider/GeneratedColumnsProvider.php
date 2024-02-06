@@ -25,27 +25,12 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      */
     public const MARIADB_MINIMUM_VERSION = '10.2.6';
 
-    /**
-     * @var VersionProviderInterface
-     */
-    private $versionProvider;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var GeneratedColumns
-     */
-    private $generatedColumns;
+    private ?\Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns $generatedColumns = null;
 
     public function __construct(
-        VersionProviderInterface $versionProvider,
-        EventDispatcherInterface $dispatcher
+        private VersionProviderInterface $versionProvider,
+        private EventDispatcherInterface $dispatcher
     ) {
-        $this->versionProvider = $versionProvider;
-        $this->dispatcher      = $dispatcher;
     }
 
     public function getGeneratedColumns(): GeneratedColumns

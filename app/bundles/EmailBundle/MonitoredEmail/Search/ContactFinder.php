@@ -10,34 +10,15 @@ use Psr\Log\LoggerInterface;
 
 class ContactFinder
 {
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * ContactFinder constructor.
-     */
-    public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LoggerInterface $logger)
-    {
-        $this->statRepository = $statRepository;
-        $this->leadRepository = $leadRepository;
-        $this->logger         = $logger;
+    public function __construct(
+        private StatRepository $statRepository,
+        private LeadRepository $leadRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
      * @param string $returnPathEmail
-     * @param null   $contactEmail
      *
      * @return Result
      */
@@ -57,10 +38,7 @@ class ContactFinder
         return $this->findByAddress($contactEmail);
     }
 
-    /**
-     * @return Result
-     */
-    public function findByHash($hash)
+    public function findByHash($hash): Result
     {
         $result = new Result();
         $this->logger->debug('MONITORED EMAIL: Searching for a contact by hash '.$hash);
@@ -76,10 +54,7 @@ class ContactFinder
         return $result;
     }
 
-    /**
-     * @return Result
-     */
-    public function findByAddress($address)
+    public function findByAddress($address): Result
     {
         $result = new Result();
         // Search by email address

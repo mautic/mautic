@@ -29,14 +29,14 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @var EventDispatcherInterface&MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     private ForeignValueFilterQueryBuilder $queryBuilder;
 
     /**
      * @var Connection&MockObject
      */
-    private $connectionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
 
     public function setUp(): void
     {

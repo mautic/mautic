@@ -30,97 +30,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcess
 {
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManualDAO;
-
-    /**
-     * @var MauticSyncDataExchange
-     */
-    private $internalSyncDataExchange;
-
-    /**
-     * @var SyncDataExchangeInterface
-     */
-    private $integrationSyncDataExchange;
-
-    /**
-     * @var SyncDateHelper
-     */
-    private $syncDateHelper;
-
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var RelationsHelper
-     */
-    private $relationsHelper;
-
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integrationSyncProcess;
-
-    /**
-     * @var MauticSyncProcess
-     */
-    private $mauticSyncProcess;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var Notifier
-     */
-    private $notifier;
-
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
-
-    /**
-     * @var int
-     */
-    private $syncIteration;
-
-    /**
-     * @var SyncServiceInterface
-     */
-    private $syncService;
+    private ?int $syncIteration = null;
 
     public function __construct(
-        SyncDateHelper $syncDateHelper,
-        MappingHelper $mappingHelper,
-        RelationsHelper $relationsHelper,
-        IntegrationSyncProcess $integrationSyncProcess,
-        MauticSyncProcess $mauticSyncProcess,
-        EventDispatcherInterface $eventDispatcher,
-        Notifier $notifier,
-        MappingManualDAO $mappingManualDAO,
-        SyncDataExchangeInterface $internalSyncDataExchange,
-        SyncDataExchangeInterface $integrationSyncDataExchange,
-        InputOptionsDAO $inputOptionsDAO,
-        SyncServiceInterface $syncService
+        private SyncDateHelper $syncDateHelper,
+        private MappingHelper $mappingHelper,
+        private RelationsHelper $relationsHelper,
+        private IntegrationSyncProcess $integrationSyncProcess,
+        private MauticSyncProcess $mauticSyncProcess,
+        private EventDispatcherInterface $eventDispatcher,
+        private Notifier $notifier,
+        private MappingManualDAO $mappingManualDAO,
+        private MauticSyncDataExchange $internalSyncDataExchange,
+        private SyncDataExchangeInterface $integrationSyncDataExchange,
+        private InputOptionsDAO $inputOptionsDAO,
+        private SyncServiceInterface $syncService
     ) {
-        $this->syncDateHelper              = $syncDateHelper;
-        $this->mappingHelper               = $mappingHelper;
-        $this->relationsHelper             = $relationsHelper;
-        $this->integrationSyncProcess      = $integrationSyncProcess;
-        $this->mauticSyncProcess           = $mauticSyncProcess;
-        $this->eventDispatcher             = $eventDispatcher;
-        $this->notifier                    = $notifier;
-        $this->mappingManualDAO            = $mappingManualDAO;
-        $this->internalSyncDataExchange    = $internalSyncDataExchange;
-        $this->integrationSyncDataExchange = $integrationSyncDataExchange;
-        $this->inputOptionsDAO             = $inputOptionsDAO;
-        $this->syncService                 = $syncService;
     }
 
     /**
@@ -157,7 +82,7 @@ class SyncProcess
             DebugLogger::log(
                 $this->mappingManualDAO->getIntegration(),
                 sprintf('Integration to Mautic; syncing iteration %s', $this->syncIteration),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $syncReport = $this->integrationSyncProcess->getSyncReport($this->syncIteration);
@@ -165,7 +90,7 @@ class SyncProcess
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
                     'Integration to Mautic; no objects were mapped to be synced',
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 break;
@@ -183,7 +108,7 @@ class SyncProcess
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
                     'Integration to Mautic; no object changes were recorded possible due to field direction configurations',
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 break;
@@ -195,7 +120,7 @@ class SyncProcess
                     'Integration to Mautic; syncing %d total objects',
                     $syncOrder->getObjectCount()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Execute the sync instructions
@@ -225,7 +150,7 @@ class SyncProcess
             DebugLogger::log(
                 $this->mappingManualDAO->getIntegration(),
                 sprintf('Mautic to integration; syncing iteration %s', $this->syncIteration),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $syncReport = $this->mauticSyncProcess->getSyncReport($this->syncIteration);
@@ -234,7 +159,7 @@ class SyncProcess
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
                     'Mautic to integration; no objects were mapped to be synced',
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 break;
@@ -247,7 +172,7 @@ class SyncProcess
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
                     'Mautic to integration; no object changes were recorded possible due to field direction configurations',
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
 
                 // Finalize notifications such as injecting user notifications
@@ -262,7 +187,7 @@ class SyncProcess
                     'Mautic to integration; syncing %d total objects',
                     $syncOrder->getObjectCount()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Execute the sync instructions

@@ -4,18 +4,12 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class GeoipsLookup extends AbstractRemoteDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return '<a href="http://www.geoips.com/" target="_blank">GeoIPs</a> offers tiered subscriptions for lookups.';
     }
 
-    /**
-     * @return string
-     */
-    protected function getUrl()
+    protected function getUrl(): string
     {
         return "http://api.geoips.com/ip/{$this->ip}/key/{$this->auth}/output/json";
     }

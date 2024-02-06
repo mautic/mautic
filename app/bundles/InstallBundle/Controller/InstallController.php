@@ -26,15 +26,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InstallController extends CommonController
 {
-    private Configurator $configurator;
-
-    private InstallService $installer;
-
-    public function __construct(Configurator $configurator, InstallService $installer, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
-        $this->configurator = $configurator;
-        $this->installer    = $installer;
-
+    public function __construct(
+        private Configurator $configurator,
+        private InstallService $installer,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -233,7 +238,7 @@ class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    public function finalAction(Request $request, PathsHelper $pathsHelper)
+    public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();
 
@@ -282,20 +287,13 @@ class InstallController extends CommonController
     /**
      * Handle installer errors.
      */
-    private function handleInstallerErrors(Form $form, array $messages)
+    private function handleInstallerErrors(Form $form, array $messages): void
     {
         foreach ($messages as $type => $message) {
-            switch ($type) {
-                case 'warning':
-                case 'error':
-                case 'notice':
-                    $this->addFlashMessage($message, [], $type);
-                    break;
-                default:
-                    // If type not a flash type, assume form field error
-                    $form[$type]->addError(new FormError($message));
-                    break;
-            }
+            match ($type) {
+                'warning', 'error', 'notice' => $this->addFlashMessage($message, [], $type),
+                default => $form[$type]->addError(new FormError($message)),
+            };
         }
     }
 }

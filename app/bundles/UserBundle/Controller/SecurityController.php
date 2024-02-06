@@ -23,7 +23,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $controller = $event->getRequest()->attributes->get('_controller');
         \assert(is_string($controller));
 
-        if (false === strpos($controller, self::class)) {
+        if (!str_contains($controller, self::class)) {
             return;
         }
 
@@ -44,7 +44,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator)
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -112,26 +112,22 @@ class SecurityController extends CommonController implements EventSubscriberInte
     /**
      * Do nothing.
      */
-    public function loginCheckAction()
+    public function loginCheckAction(): void
     {
     }
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginAction($integration)
+    public function ssoLoginAction($integration): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('login'));
     }
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginCheckAction($integration)
+    public function ssoLoginCheckAction($integration): RedirectResponse
     {
         // The plugin should be handling this in it's listener
 

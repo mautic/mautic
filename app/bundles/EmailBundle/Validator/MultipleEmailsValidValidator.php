@@ -10,20 +10,15 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class MultipleEmailsValidValidator extends ConstraintValidator
 {
-    /**
-     * @var EmailValidator
-     */
-    private $emailValidator;
-
-    public function __construct(EmailValidator $emailValidator)
-    {
-        $this->emailValidator = $emailValidator;
+    public function __construct(
+        private EmailValidator $emailValidator
+    ) {
     }
 
     /**
      * @param string $emailsInString
      */
-    public function validate($emailsInString, Constraint $constraint)
+    public function validate($emailsInString, Constraint $constraint): void
     {
         if (!$emailsInString) {
             return;

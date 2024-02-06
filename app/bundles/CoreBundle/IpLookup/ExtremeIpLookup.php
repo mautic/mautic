@@ -6,20 +6,16 @@ class ExtremeIpLookup extends AbstractRemoteDataLookup
 {
     /**
      * Return attribution HTML displayed in the configuration UI.
-     *
-     * @return string
      */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return '<a href="https://extreme-ip-lookup.com/" target="_blank">extreme-ip-lookup.com</a> is a free lookup service that does not require an api key.';
     }
 
     /**
      * Get the URL to fetch data from.
-     *
-     * @return string
      */
-    protected function getUrl()
+    protected function getUrl(): string
     {
         $auth = !empty($this->auth) ? '?key='.$this->auth : '';
 

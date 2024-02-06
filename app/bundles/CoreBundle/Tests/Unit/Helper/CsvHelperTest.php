@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 
 class CsvHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSanitizeHeaders()
+    public function testSanitizeHeaders(): void
     {
         $headers = [
             'withoutSpaces',
@@ -25,7 +25,7 @@ class CsvHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, CsvHelper::sanitizeHeaders($headers));
     }
 
-    public function testConvertHeadersIntoFields()
+    public function testConvertHeadersIntoFields(): void
     {
         $headers = [
             'České znáčky',

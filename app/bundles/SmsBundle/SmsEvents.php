@@ -3,7 +3,6 @@
 namespace Mautic\SmsBundle;
 
 /**
- * Class SmsEvents
  * Events available for SmsBundle.
  */
 final class SmsEvents

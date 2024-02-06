@@ -24,12 +24,12 @@ class Lead
      */
     private $dateAdded;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitoring_leads')
-            ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\LeadRepository');
+            ->setCustomRepositoryClass(\MauticPlugin\MauticSocialBundle\Entity\LeadRepository::class);
 
         $builder->createManyToOne('monitor', 'Monitoring')
             ->isPrimaryKey()

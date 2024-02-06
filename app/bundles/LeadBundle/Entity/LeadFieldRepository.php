@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
@@ -19,10 +19,8 @@ class LeadFieldRepository extends CommonRepository
      * @param bool   $publishedOnly
      * @param bool   $includeEntityFields
      * @param string $object              name of object using the custom fields
-     *
-     * @return array
      */
-    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead')
+    public function getAliases($exludingId, $publishedOnly = false, $includeEntityFields = true, $object = 'lead'): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.alias')
@@ -55,7 +53,7 @@ class LeadFieldRepository extends CommonRepository
 
         if ($includeEntityFields) {
             // add lead main column names to prevent attempt to create a field with the same name
-            $leadRepo = $this->_em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
+            $leadRepo = $this->_em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getBaseColumns(\Mautic\LeadBundle\Entity\Lead::class, true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
 
@@ -94,10 +92,7 @@ class LeadFieldRepository extends CommonRepository
         return array_column($results, null, 'alias');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'f';
     }
@@ -105,10 +100,8 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param object                                                       $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -123,7 +116,7 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['f.order', 'ASC'],
@@ -134,10 +127,8 @@ class LeadFieldRepository extends CommonRepository
      * Get field aliases for lead table columns.
      *
      * @param string $object name of object using the custom fields
-     *
-     * @return array
      */
-    public function getFieldAliases($object = 'lead')
+    public function getFieldAliases($object = 'lead'): array
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
@@ -170,7 +161,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
-    private function addCompanyLeftJoin($q)
+    private function addCompanyLeftJoin($q): void
     {
         $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
         $q->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'company', 'companies_lead.company_id = company.id');
@@ -182,7 +173,7 @@ class LeadFieldRepository extends CommonRepository
      * @param string                                                       $field
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
-    public function getPropertyByField($field, $q)
+    public function getPropertyByField($field, $q): string
     {
         $columnAlias = 'l.';
         // Join company tables If we're trying search by company fields
@@ -307,14 +298,14 @@ class LeadFieldRepository extends CommonRepository
 
                     $q->where($expr)
                         ->setParameter('lead', (int) $lead)
-                        ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);
+                        ->setParameter('values', $values, ArrayParameterType::STRING);
                 }
             } else {
                 $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
                 );
 
-                if ('neq' == $operatorExpr) {
+                if ('neq' === $operatorExpr) {
                     // include null
                     $expr = $expr->with(
                         $q->expr()->or(
@@ -347,7 +338,7 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             }
-            if (0 === strpos($property, 'u.')) {
+            if (str_starts_with($property, 'u.')) {
                 // Match only against the latest UTM properties.
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);
@@ -364,10 +355,8 @@ class LeadFieldRepository extends CommonRepository
      * @param int    $lead  ID
      * @param int    $field alias
      * @param string $value to compare with
-     *
-     * @return bool
      */
-    public function compareDateValue($lead, $field, $value)
+    public function compareDateValue($lead, $field, $value): bool
     {
         $q        = $this->_em->getConnection()->createQueryBuilder();
         $property = $this->getPropertyByField($field, $q);
@@ -394,10 +383,8 @@ class LeadFieldRepository extends CommonRepository
      * @param int    $lead  ID
      * @param int    $field alias
      * @param object $value Date object to compare with
-     *
-     * @return bool
      */
-    public function compareDateMonthValue($lead, $field, $value)
+    public function compareDateMonthValue($lead, $field, $value): bool
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
@@ -437,16 +424,93 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * @return string[]
+     */
+    public function getSearchCommands(): array
+    {
+        $commands = [
+            'mautic.core.searchcommand.ispublished',
+            'mautic.core.searchcommand.isunpublished',
+            'mautic.core.searchcommand.ismine',
+            'mautic.lead.field.searchcommand.isindexed',
+            'mautic.lead.field.searchcommand.isunique',
+            'mautic.lead.field.searchcommand.type',
+            'mautic.lead.field.searchcommand.group',
+        ];
+
+        return array_merge($commands, parent::getSearchCommands());
+    }
+
+    /**
      * @return mixed[]
      */
     public function getFieldSchemaData(string $object): array
     {
         return $this->_em->createQueryBuilder()
-            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer')
+            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit')
             ->from($this->getEntityName(), 'f', 'f.alias')
             ->where('f.object = :object')
             ->setParameter('object', $object)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \StdClass                                                    $filter
+     *
+     * @return mixed[]
+     */
+    protected function addSearchCommandWhereClause($q, $filter): array
+    {
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $prefix          = $this->getTableAlias();
+
+        switch ($command) {
+            case $this->translator->trans('mautic.lead.field.searchcommand.isindexed'):
+                $expr            = $q->expr()->eq($prefix.'.isIndex', ":$unique");
+                $forceParameters = [$unique => true];
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.isunique'):
+                $expr            = $q->expr()->eq($prefix.'.isUniqueIdentifer', ":$unique");
+                $forceParameters = [$unique => true];
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.type'):
+                $forceParameters = [
+                    $unique     => $filter->string,
+                ];
+                $expr            = $q->expr()->like($prefix.'.type', ":$unique");
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.field.searchcommand.group'):
+                $forceParameters = [
+                    $unique     => $filter->string,
+                ];
+                $expr            = $q->expr()->like($prefix.'.group', ":$unique");
+                $returnParameter = true;
+                break;
+        }
+
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        } elseif ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = ["$unique" => $string];
+        }
+
+        return [$expr, $parameters];
     }
 }

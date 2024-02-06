@@ -32,52 +32,49 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Request
      */
-    private $requestMock;
+    private \PHPUnit\Framework\MockObject\MockObject $requestMock;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private $securityMock;
+    private \PHPUnit\Framework\MockObject\MockObject $securityMock;
 
     /**
      * @var MockObject|Translator
      */
-    private $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
     /**
      * @var MockObject|ModelFactory<DashboardModel>
      */
-    private $modelFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|DashboardModel
      */
-    private $dashboardModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $dashboardModelMock;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private $routerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $routerMock;
 
     /**
      * @var MockObject|Session
      */
-    private $sessionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
 
     /**
      * @var MockObject|FlashBag
      */
-    private $flashBagMock;
+    private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
 
     /**
      * @var MockObject|Container
      */
-    private $containerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
 
-    /**
-     * @var DashboardController
-     */
-    private $controller;
+    private \Mautic\DashboardBundle\Controller\DashboardController $controller;
 
     protected function setUp(): void
     {

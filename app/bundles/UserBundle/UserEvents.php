@@ -3,9 +3,7 @@
 namespace Mautic\UserBundle;
 
 /**
- * Class UserEvents.
- *
- * Events available for UserBundle
+ * Events available for UserBundle.
  */
 final class UserEvents
 {

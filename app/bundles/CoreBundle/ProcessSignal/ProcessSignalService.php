@@ -22,7 +22,7 @@ class ProcessSignalService
             return;
         }
 
-        $handler = function (int $signal) use ($beforeCallback) {
+        $handler = function (int $signal) use ($beforeCallback): void {
             if ($beforeCallback) {
                 call_user_func($beforeCallback, $signal);
             }

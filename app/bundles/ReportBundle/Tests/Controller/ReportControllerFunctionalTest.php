@@ -2,13 +2,44 @@
 
 namespace Mautic\ReportBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\NotSupported;
+use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testCreatingNewReportAndClone(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $saveButton = $crawler->selectButton('Save');
+        $form       = $saveButton->form();
+        $form['report[name]']->setValue('Report ABC');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $saveButton = $crawler->selectButton('Save');
+        $form       = $saveButton->form();
+        $form['report[name]']->setValue('Report ABC - cloned');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
+
+        Assert::assertSame($report->getId() + 1, $reportClone->getId());
+    }
+
     public function testContactReportwithComanyDateAddedColumn(): void
     {
         $report = new Report();
@@ -21,7 +52,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -30,7 +61,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
         $payload = [
@@ -112,7 +143,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        self::$container->get('mautic.report.model.report')->saveEntity($report);
+        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [
@@ -144,5 +175,143 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame($expected, $result);
         Assert::assertCount($tbody->childElementCount, $expected);
+    }
+
+    public function testContactReportNotLikeExpression(): void
+    {
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+
+        // Create and save contacts
+        $payload = [
+            [
+                'email'     => 'test1@example.com',
+                'firstname' => 'Tester',
+            ],
+            [
+                'email'     => 'test2@example.com',
+                'firstname' => 'Example',
+            ],
+        ];
+
+        foreach ($payload as $item) {
+            $contact = new Lead();
+            $contact->setEmail($item['email']);
+            $contact->setFirstname($item['firstname']);
+
+            $contactModel->saveEntity($contact);
+        }
+
+        $report = new Report();
+        $report->setName('Contact report');
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource('leads');
+        $coulmns = [
+            'l.firstname',
+        ];
+        $report->setColumns($coulmns);
+        $report->setFilters([
+            [
+                'column'    => 'l.firstname',
+                'glue'      => 'and',
+                'value'     => 'Test',
+                'condition' => 'notLike',
+            ]]
+        );
+
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        // Check the details page
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $response = $this->client->getResponse();
+        $content  = $response->getContent();
+
+        $dom     = new \DOMDocument('1.0', 'utf-8');
+
+        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
+        $rows  = $tbody->getElementsByTagName('tr');
+
+        for ($i = 0; $i < count($rows); ++$i) {
+            $cells = $rows[$i]->getElementsByTagName('td');
+            foreach ($cells as $c) {
+                $result[$i][] = htmlentities(trim($c->nodeValue));
+            }
+        }
+        $this->assertEquals(2, count($result));
+    }
+
+    /**
+     * @dataProvider scheduleProvider
+     *
+     * @throws NotSupported
+     * @throws MappingException
+     */
+    public function testScheduleEdit(string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
+    {
+        $report = new Report();
+        $report->setName('Checking for schedule change');
+        $report->setDescription('<b>This is a report</b>');
+        $report->setSource('leads');
+        $columns = [
+            'l.firstname',
+        ];
+        $report->setColumns($columns);
+
+        $report->setIsScheduled(true);
+        $report->setScheduleUnit($oldScheduleUnit);
+        $report->setScheduleDay($oldScheduleDay);
+        $report->setScheduleMonthFrequency($oldScheduleMonthFrequency);
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        $schedule = $report->getSchedule();
+
+        $this->assertIsArray($schedule, 'Schedule should be an array');
+        $this->assertArrayHasKey('schedule_unit', $schedule);
+        $this->assertArrayHasKey('schedule_day', $schedule);
+        $this->assertArrayHasKey('schedule_month_frequency', $schedule);
+        $this->assertEquals(['schedule_unit' => $oldScheduleUnit, 'schedule_day' => $oldScheduleDay, 'schedule_month_frequency' => $oldScheduleMonthFrequency], $schedule, 'Old schedule should be set correctly');
+
+        $crawler        = $this->client->request(Request::METHOD_GET, 's/reports/edit/'.$report->getId());
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['report[scheduleUnit]']->setValue($newScheduleUnit);
+        if (!is_null($newScheduleDay)) {
+            $form['report[scheduleDay]']->setValue($newScheduleDay);
+        }
+        if (!is_null($newScheduleMonthFrequency)) {
+            $form['report[scheduleMonthFrequency]']->setValue($newScheduleMonthFrequency);
+        }
+
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $report   = $this->em->getRepository(Report::class)->find($report->getId());
+        $schedule = $report->getSchedule();
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        $this->em->clear();
+
+        $this->assertEquals(['schedule_unit' => $newScheduleUnit, 'schedule_day' => $newScheduleDay, 'schedule_month_frequency' => $newScheduleMonthFrequency], $schedule, 'Schedule should be edited correctly');
+    }
+
+    /**
+     * @return array<mixed>[]
+     */
+    public function scheduleProvider(): array
+    {
+        return [
+            'daily_to_weekly'  => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
+            'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'],
+
+            'weekly_to_daily'   => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null],
+            'weekly_to_weekly'  => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null],
+            'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'],
+
+            'monthly_to_daily'   => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null],
+            'monthly_to_weekly'  => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null],
+            'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'],
+        ];
     }
 }

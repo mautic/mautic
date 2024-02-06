@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
@@ -118,7 +109,7 @@ class PageController extends FormController
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
         $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
-        if (false === strpos($search, "{$langSearchCommand}:")) {
+        if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
 
@@ -823,7 +814,7 @@ class PageController extends FormController
         $model = $this->getModel('page.page');
 
         // permission check
-        if (false !== strpos($objectId, 'new')) {
+        if (str_contains((string) $objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('page:pages:create')) {
                 return $this->accessDenied();
@@ -985,7 +976,7 @@ class PageController extends FormController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity)
+    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
         $slotsHelper->inBuilder(true);
 
@@ -1007,7 +998,7 @@ class PageController extends FormController
                 $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
 
             $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }
@@ -1231,7 +1222,7 @@ class PageController extends FormController
         return 'page';
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }

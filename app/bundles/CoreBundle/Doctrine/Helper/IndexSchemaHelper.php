@@ -11,19 +11,9 @@ use Mautic\CoreBundle\Exception\SchemaException;
 class IndexSchemaHelper
 {
     /**
-     * @var Connection
-     */
-    protected $db;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $sm;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema
@@ -58,11 +48,11 @@ class IndexSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
-    {
-        $this->db     = $db;
-        $this->prefix = $prefix;
-        $this->sm     = $this->db->getSchemaManager();
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
+        $this->sm = $this->db->createSchemaManager();
     }
 
     /**
@@ -76,12 +66,12 @@ class IndexSchemaHelper
             throw new SchemaException("Table $name does not exist!");
         }
 
-        $this->table = $this->sm->listTableDetails($this->prefix.$name);
+        $this->table = $this->sm->introspectTable($this->prefix.$name);
 
         return $this;
     }
 
-    public function allowColumn($name)
+    public function allowColumn($name): void
     {
         $this->allowedColumns[] = $name;
     }
@@ -134,9 +124,9 @@ class IndexSchemaHelper
     /**
      * Execute changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
-        $platform = $this->sm->getDatabasePlatform();
+        $platform = $this->db->getDatabasePlatform();
 
         $sql = [];
         if (count($this->changedIndexes)) {
@@ -169,11 +159,9 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns)
+    private function getTextColumns($columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];

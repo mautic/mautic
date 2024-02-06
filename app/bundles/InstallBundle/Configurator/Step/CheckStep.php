@@ -13,22 +13,8 @@ class CheckStep implements StepInterface
 {
     /**
      * Flag if the configuration file is writable.
-     *
-     * @var bool
      */
-    private $configIsWritable;
-
-    /**
-     * Path to the kernel root.
-     *
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * @var OpenSSLCipher
-     */
-    private $openSSLCipher;
+    private bool $configIsWritable;
 
     /**
      * Absolute path to cache directory.
@@ -67,38 +53,26 @@ class CheckStep implements StepInterface
      */
     public function __construct(
         Configurator $configurator,
-        string $projectDir,
+        private string $projectDir,
         RequestStack $requestStack,
-        OpenSSLCipher $openSSLCipher
+        private OpenSSLCipher $openSSLCipher
     ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        $this->projectDir       = $projectDir;
         if (!empty($request)) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
-        $this->openSSLCipher    = $openSSLCipher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return CheckStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         $messages = [];
-
-        if (version_compare(PHP_VERSION, '7.2.21', '<')) {
-            $messages[] = 'mautic.install.php.version.not.supported';
-        }
 
         if (!is_dir($this->projectDir.'/vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
@@ -177,10 +151,7 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         $messages = [];
 
@@ -217,7 +188,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if (!$this->site_url || 'https' !== substr($this->site_url, 0, 5)) {
+        if (!$this->site_url || !str_starts_with($this->site_url, 'https')) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
@@ -242,7 +213,7 @@ class CheckStep implements StepInterface
                 if (is_null(new \Collator('fr_FR'))) {
                     $messages[] = 'mautic.install.intl.config';
                 }
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
         }
@@ -254,18 +225,15 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return '@MauticInstall/Install/check.html.twig';
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed[]
      */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         $parameters = [];
 

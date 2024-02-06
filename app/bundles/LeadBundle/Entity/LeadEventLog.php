@@ -8,9 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class LeadEventLog.
- *
- * Store here contact events
+ * Store here contact events.
  */
 class LeadEventLog
 {
@@ -74,7 +72,7 @@ class LeadEventLog
         $this->setDateAdded(new \DateTime());
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('lead_event_log')
@@ -104,7 +102,7 @@ class LeadEventLog
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('import')
             ->addListProperties(
@@ -126,10 +124,8 @@ class LeadEventLog
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }

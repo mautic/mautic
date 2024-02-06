@@ -33,19 +33,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     use TargetPathTrait;
 
     public const LOGIN_ROUTE       = 'login';
+
     public const LOGIN_CHECK_ROUTE = 'mautic_user_logincheck';
-
-    private UserPasswordHasher $hasher;
-
-    private EventDispatcherInterface $dispatcher;
-
-    private IntegrationHelper $integrationHelper;
-
-    private ?RequestStack $requestStack;
-
-    private CsrfTokenManagerInterface $csrfTokenManager;
-
-    private UrlGeneratorInterface $urlGenerator;
 
     /**
      * @var string|null After upgrade to Symfony 5.2 we should use Passport system to store the authenticatingService
@@ -55,19 +44,13 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     private ?Response $authEventResponse = null;
 
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        UserPasswordHasher $hasher,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        CsrfTokenManagerInterface $csrfTokenManager,
-        UrlGeneratorInterface $urlGenerator
+        private IntegrationHelper $integrationHelper,
+        private UserPasswordHasher $hasher,
+        private EventDispatcherInterface $dispatcher,
+        private ?RequestStack $requestStack,
+        private CsrfTokenManagerInterface $csrfTokenManager,
+        private UrlGeneratorInterface $urlGenerator
     ) {
-        $this->hasher            = $hasher;
-        $this->dispatcher        = $dispatcher;
-        $this->integrationHelper = $integrationHelper;
-        $this->requestStack      = $requestStack;
-        $this->csrfTokenManager  = $csrfTokenManager;
-        $this->urlGenerator      = $urlGenerator;
     }
 
     public function supports(Request $request): bool
@@ -102,8 +85,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
         try {
             /** @var User $user */
-            $user = $userProvider->loadUserByUsername($credentials['username']);
-        } catch (UserNotFoundException $e) {
+            $user = $userProvider->loadUserByIdentifier($credentials['username']);
+        } catch (UserNotFoundException) {
             /** @var string $user */
             $user = $credentials['username'];
         }
@@ -159,12 +142,10 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     {
         // Temp solution to remap a UserInterface object to a PasswordAuthenticatedUserInterface object
         $newUser = new User();
-        $newUser->setUsername($user->getUserName());
+        $newUser->setUsername($user->getUserIdentifier());
         $newUser->setPassword($user->getPassword());
 
-        $authenticated = $this->hasher->isPasswordValid($newUser, $this->getPassword($credentials));
-
-        return $authenticated;
+        return $this->hasher->isPasswordValid($newUser, $this->getPassword($credentials));
     }
 
     public function getPassword($credentials): ?string

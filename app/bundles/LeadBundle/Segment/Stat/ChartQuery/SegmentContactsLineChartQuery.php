@@ -14,11 +14,6 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 class SegmentContactsLineChartQuery extends ChartQuery
 {
     /**
-     * @var array
-     */
-    private $filters;
-
-    /**
      * @var int
      */
     private $segmentId;
@@ -28,38 +23,30 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private $firstEventLog;
 
-    /**
-     * @var array
-     */
-    private $addedEventLogStats;
+    private ?array $addedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $removedEventLogStats;
+    private ?array $removedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $addedLeadListStats;
+    private ?array $addedLeadListStats = null;
 
-    /**
-     * @var bool
-     */
-    private $statsFromEventLog;
+    private ?bool $statsFromEventLog = null;
 
     /**
      * @param string|null $unit
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, array $filters = [], $unit = null)
-    {
+    public function __construct(
+        Connection $connection,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        private array $filters = [],
+        $unit = null
+    ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;
         $this->unit       = $unit;
-        $this->filters    = $filters;
 
         if (!isset($this->filters['leadlist_id']['value'])) {
             throw new SegmentNotFoundException('Segment ID required');
@@ -68,16 +55,13 @@ class SegmentContactsLineChartQuery extends ChartQuery
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
     }
 
-    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
+    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): void
     {
         parent::setDateRange($dateFrom, $dateTo);
         $this->init();
     }
 
-    /**
-     * @return array
-     */
-    public function getTotalStats(int $total)
+    public function getTotalStats(int $total): array
     {
         $totalCountDateTo = $this->getTotalToDateRange($total);
         // count array SUM and then reverse
@@ -113,10 +97,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
      * Get data about add/remove from segment based on LeadEventLog.
      *
      * @param string $action
-     *
-     * @return array
      */
-    public function getDataFromLeadEventLog($action)
+    public function getDataFromLeadEventLog($action): array
     {
         $qb = $this->prepareTimeDataQuery(
             'lead_event_log',
@@ -135,10 +117,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
 
     /**
      * Get data about add from segment based on LeadListLead before upgrade to 2.15.
-     *
-     * @return array
      */
-    public function getDataFromLeadListLeads()
+    public function getDataFromLeadListLeads(): array
     {
         $q = $this->prepareTimeDataQuery('lead_lists_leads', 'date_added', $this->filters);
         if ($this->firstEventLog) {
@@ -243,9 +223,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $compositeExpressionReflectionParts = $compositeExpressionReflection->getProperty('parts');
         $compositeExpressionReflectionParts->setAccessible(true);
         $parts    = $compositeExpressionReflectionParts->getValue($compositeExpression);
-        $newParts = array_filter($parts, function ($val) use ($joinAlias) {
-            return 0 !== strpos($val, "$joinAlias.");
-        });
+        $newParts = array_filter($parts, fn ($val): bool => !str_starts_with($val, "$joinAlias."));
         $compositeExpressionReflectionParts->setValue($compositeExpression, $newParts);
         $compositeExpressionReflectionParts->setAccessible(false);
     }

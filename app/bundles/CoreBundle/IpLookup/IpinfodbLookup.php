@@ -4,18 +4,12 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class IpinfodbLookup extends AbstractRemoteDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return '<a href="http://www.ipinfodb.com/" target="_blank">iPInfoDB</a> offers a free service (2 lookups per second) that leverages data from IP2Location. API key required.';
     }
 
-    /**
-     * @return string
-     */
-    protected function getUrl()
+    protected function getUrl(): string
     {
         return "http://api.ipinfodb.com/v3/ip-city/?key={$this->auth}&format=json&ip={$this->ip}";
     }

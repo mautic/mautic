@@ -26,7 +26,7 @@ final class EmailAddressHelperTest extends TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function emailProvider(): array
+    public static function emailProvider(): array
     {
         return [
             ['test@example.com', 'test@example.com'],
@@ -52,7 +52,7 @@ final class EmailAddressHelperTest extends TestCase
     /**
      * @return array<int, array<int, array<int, string>|string>>
      */
-    public function variationsProvider(): array
+    public static function variationsProvider(): array
     {
         return [
             ['test@example.com', ['test@example.com']],

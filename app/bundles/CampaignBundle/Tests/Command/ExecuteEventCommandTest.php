@@ -6,7 +6,7 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
-    public function testEventsAreExecutedForInactiveEventWithSingleContact()
+    public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
@@ -41,7 +41,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $lastId = array_pop($logIds);
 
         // Wait 6 seconds to go past scheduled time
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
         $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 

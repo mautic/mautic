@@ -17,6 +17,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     public const DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
 
     public const TIMEZONE        = 'Europe/Paris';
+
     public const TIMEZONE_CUSTOM = 'America/Chicago';
 
     public function testGetTokens(): void

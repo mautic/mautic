@@ -7,12 +7,15 @@ use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class LeadTest extends \PHPUnit\Framework\TestCase
+class LeadTest extends TestCase
 {
     use RequestTrait;
 
-    public function testPreferredChannels()
+    public function testPreferredChannels(): void
     {
         $frequencyRules = [
             'channel1' => [
@@ -80,7 +83,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
     }
 
-    public function testAdjustPoints()
+    public function testAdjustPoints(): void
     {
         // new lead
         $this->adjustPointsTest(5, $this->getLeadChangedArray(0, 5), new Lead());
@@ -99,7 +102,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->adjustPointsTest(10, $this->getLeadChangedArray(150, 15), $lead, 'divide');
     }
 
-    public function testCustomFieldGetterSetters()
+    public function testCustomFieldGetterSetters(): void
     {
         $lead = new Lead();
 
@@ -130,7 +133,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('hello', $lead->getTest());
     }
 
-    public function testDataIsCleanedCorrectly()
+    public function testDataIsCleanedCorrectly(): void
     {
         $fields = [
             'core' => [
@@ -169,11 +172,11 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $testDateObject = new \DateTime('12-12-2017 22:03:59');
 
         $this->assertEquals($testDateObject->format('Y-m-d H:i:s'), $data['dateField']);
-        $this->assertEquals((int) true, $data['boolean']);
+        $this->assertEquals(1, $data['boolean']);
         $this->assertEquals(['a', 'b'], $data['multi']);
     }
 
-    public function testCleanBooleanAndNumberAsNullAreNotConverted()
+    public function testCleanBooleanAndNumberAsNullAreNotConverted(): void
     {
         $fields = [
             'core' => [
@@ -203,7 +206,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $data['number']);
     }
 
-    public function testAttributionDateIsAdded()
+    public function testAttributionDateIsAdded(): void
     {
         $lead = new Lead();
         $lead->addUpdatedField('attribution', 100);
@@ -212,7 +215,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($lead->getChanges());
     }
 
-    public function testAttributionDateIsRemoved()
+    public function testAttributionDateIsRemoved(): void
     {
         $lead = new Lead();
         $lead->setFields(
@@ -236,7 +239,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($lead->getChanges());
     }
 
-    public function testAttributionDateIsNotChangedWhen0ChangedToNull()
+    public function testAttributionDateIsNotChangedWhen0ChangedToNull(): void
     {
         $lead = new Lead();
         $lead->setFields(
@@ -258,7 +261,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($lead->getChanges());
     }
 
-    public function testChangingPropertiesHydratesFieldChanges()
+    public function testChangingPropertiesHydratesFieldChanges(): void
     {
         $email = 'foo@bar.com';
         $lead  = new Lead();
@@ -272,7 +275,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($email, $changes['fields']['email'][1]);
     }
 
-    public function testIpAddressChanges()
+    public function testIpAddressChanges(): void
     {
         $ip1 = (new IpAddress())->setIpAddress('1.2.3.4');
         $ip2 = (new IpAddress())->setIpAddress('1.2.3.5');
@@ -282,7 +285,6 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $contact->getChanges());
 
         $contact->addIpAddress($ip1);
-        $changes = $contact->getChanges();
 
         $this->assertSame(['1.2.3.4' => $ip1], $contact->getChanges()['ipAddressList']);
 
@@ -291,10 +293,27 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['1.2.3.4' => $ip1, '1.2.3.5' => $ip2], $contact->getChanges()['ipAddressList']);
     }
 
+    public function testGetLastEventLogByAction(): void
+    {
+        $lead = new Lead();
+
+        $lead->addEventLog((new LeadEventLog())->setAction('first'));
+        $lead->addEventLog((new LeadEventLog())->setAction('first'));
+        $lead->addEventLog($lastFirst = (new LeadEventLog())->setAction('first'));
+
+        $lead->addEventLog((new LeadEventLog())->setAction('second'));
+        $lead->addEventLog((new LeadEventLog())->setAction('second'));
+        $lead->addEventLog($lastSecond = (new LeadEventLog())->setAction('second'));
+
+        Assert::assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
+        Assert::assertSame($lastSecond, $lead->getLastEventLogByAction('second'));
+        Assert::assertNull($lead->getLastEventLogByAction('third'));
+    }
+
     /**
      * @param bool $operator
      */
-    private function adjustPointsTest($points, $expected, Lead $lead, $operator = false)
+    private function adjustPointsTest($points, $expected, Lead $lead, $operator = false): void
     {
         if ($operator) {
             $lead->adjustPoints($points, $operator);
