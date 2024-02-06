@@ -211,7 +211,7 @@ class LeadTest extends TestCase
         $lead = new Lead();
         $lead->addUpdatedField('attribution', 100);
         $lead->checkAttributionDate();
-        $this->assertEquals((new \Datetime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
+        $this->assertEquals((new \DateTime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
         $this->assertNotEmpty($lead->getChanges());
     }
 
