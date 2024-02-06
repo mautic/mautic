@@ -187,9 +187,13 @@ class EmailSendType extends AbstractType
                             'onchange'               => 'Mautic.showSendToDncConfirmation(mQuery(this))',
                             'data-toggle'            => 'confirmation',
                             'data-message'           => $this->translator->trans('mautic.email.send.dnc.confirmation'),
-                            'data-confirm-text'      => $this->translator->trans('mautic.email.send.dnc.confirmation.confirm.text'),
+                            'data-confirm-text'      => $this->translator->trans(
+                                'mautic.email.send.dnc.confirmation.confirm.text'
+                            ),
                             'data-confirm-callback'  => 'dismissConfirmation',
-                            'data-cancel-text'       => $this->translator->trans('mautic.email.send.dnc.confirmation.cancel.text'),
+                            'data-cancel-text'       => $this->translator->trans(
+                                'mautic.email.send.dnc.confirmation.cancel.text'
+                            ),
                             'data-cancel-callback'   => 'setSendToDncToNo',
                             'data-confirm-btn-class' => 'btn btn-success',
                             'tooltip'                => 'mautic.email.send.dnc.tooltip',
