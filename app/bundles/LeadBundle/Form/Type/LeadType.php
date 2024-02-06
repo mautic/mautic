@@ -45,7 +45,7 @@ class LeadType extends AbstractType
                 'mautic.lead.lead.field.custom_avatar' => 'custom',
             ];
 
-            $cache = $options['data']->getSocialCache();
+            $cache = $options['data']->getSocialCache() ?? [];
             if (count($cache)) {
                 foreach ($cache as $key => $data) {
                     $imageChoices[$key] = $key;
@@ -109,12 +109,7 @@ class LeadType extends AbstractType
             ]
         );
 
-        $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
-        $companies       = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
-        $leadCompanies   = [];
-        foreach ($companies as $company) {
-            $leadCompanies[(string) $company['company_id']] = (string) $company['company_id'];
-        }
+        $companyIds = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId());
 
         $builder->add(
             'companies',
@@ -125,7 +120,7 @@ class LeadType extends AbstractType
                 'multiple'   => true,
                 'required'   => false,
                 'mapped'     => false,
-                'data'       => $leadCompanies,
+                'data'       => array_combine($companyIds, $companyIds),
             ]
         );
 

@@ -65,6 +65,27 @@ class CompanyLeadRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
+    /**
+     * @return string[]
+     */
+    public function getCompanyIdsByLeadId(string $leadId): array
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('cl.company_id')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->where('cl.lead_id = :leadId')
+            ->setParameter('leadId', $leadId);
+
+        return array_map(
+            fn (array $company) => (string) $company['company_id'],
+            $q->executeQuery()->fetchAllAssociative()
+        );
+    }
+
+    /**
+     * @param int $companyId
+     */
     public function getCompanyLeads($companyId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();

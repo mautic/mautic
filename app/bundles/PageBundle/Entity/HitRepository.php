@@ -112,7 +112,7 @@ class HitRepository extends CommonRepository
 
         $query->andWhere($query->expr()->eq('h.code', (int) $code));
 
-        return $hits = $query->getQuery()->getArrayResult();
+        return $query->getQuery()->getArrayResult();
     }
 
     /**
@@ -529,5 +529,23 @@ class HitRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
             ->executeStatement();
+    }
+
+    public function getLatestHitDateByLead(int $leadId, string $trackingId = null): ?\DateTime
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select('MAX(date_hit)')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits')
+            ->where('lead_id = :leadId')
+            ->setParameter('leadId', $leadId);
+
+        if (null != $trackingId) {
+            $q->andWhere('tracking_id = :trackingId')
+                ->setParameter('trackingId', $trackingId);
+        }
+
+        $result = $q->executeQuery()->fetchOne();
+
+        return $result ? new \DateTime($result, new \DateTimeZone('UTC')) : null;
     }
 }
