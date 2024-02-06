@@ -23,7 +23,7 @@ class SmsRepository extends CommonRepository
             ->select($this->getTableAlias())
             ->from(\Mautic\SmsBundle\Entity\Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
@@ -32,7 +32,27 @@ class SmsRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
+    /**
+     * @depreacated The method is replaced by getPublishedBroadcastsIterable
+     *
+     * @param numeric|null $id
+     *
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult<Sms>
+     */
     public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    {
+        return $this->getPublishedBroadcastsQuery($id)->iterate();
+    }
+
+    /**
+     * @return iterable<Sms>
+     */
+    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    {
+        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+    }
+
+    private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -41,14 +61,14 @@ class SmsRepository extends CommonRepository
             $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
         );
 
-        if (!empty($id)) {
+        if (null !== $id && 0 !== $id) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
         $qb->where($expr);
 
-        return $qb->getQuery()->iterate();
+        return $qb->getQuery();
     }
 
     /**

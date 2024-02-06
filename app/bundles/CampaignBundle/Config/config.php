@@ -223,7 +223,6 @@ return [
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.removed_contact_tracker',
-                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.kickoff'     => [
@@ -362,6 +361,7 @@ return [
         ],
         'services' => [
             'mautic.campaign.service.campaign'=> [
+                /** @phpstan-ignore-next-line */
                 'class'     => \Mautic\CampaignBundle\Service\Campaign::class,
                 'arguments' => [
                     'mautic.campaign.repository.campaign',

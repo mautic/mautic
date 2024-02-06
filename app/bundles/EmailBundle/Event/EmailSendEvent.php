@@ -206,7 +206,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return array|object|null
+     * @return array|Lead|null
      */
     public function getLead()
     {

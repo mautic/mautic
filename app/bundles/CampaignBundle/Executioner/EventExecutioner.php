@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
@@ -37,7 +36,6 @@ class EventExecutioner
         private LoggerInterface $logger,
         private EventScheduler $scheduler,
         private RemovedContactTracker $removedContactTracker,
-        private LeadRepository $leadRepository
     ) {
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
@@ -182,12 +180,6 @@ class EventExecutioner
                 $config         = $this->collector->getEventConfig($event);
                 $jumpLogs[$key] = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $contacts, $isInactive);
             }
-
-            // Increment the campaign rotation for the given contacts and current campaign
-            $this->leadRepository->incrementCampaignRotationForContacts(
-                $contacts->getKeys(),
-                $jumpEvents->first()->getCampaign()->getId()
-            );
 
             // Process the jump to events
             foreach ($jumpLogs as $key => $logs) {
