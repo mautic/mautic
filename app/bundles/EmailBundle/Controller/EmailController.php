@@ -850,7 +850,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::viewAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
