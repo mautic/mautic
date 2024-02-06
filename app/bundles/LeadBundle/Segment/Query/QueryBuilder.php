@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
@@ -72,29 +71,18 @@ class QueryBuilder extends BaseQueryBuilder
         $sql   = &$this->parentProperty('sql');
         $state = &$this->parentProperty('state');
 
-        if (null !== $sql && self::STATE_CLEAN === $state) {
+        if (null !== $sql && 1 /* self::STATE_CLEAN */ === $state) {
             return $sql;
         }
 
-        switch ($this->getType()) {
-            case self::INSERT:
-                $sql = $this->parentMethod('getSQLForInsert');
-                break;
-            case self::DELETE:
-                $sql = $this->parentMethod('getSQLForDelete');
-                break;
+        $sql = match ($this->getType()) { /** @phpstan-ignore-line this method is deprecated. We'll have to find a way how to refactor this method. */
+            3 /* self::INSERT */ => $this->parentMethod('getSQLForInsert'),
+            1 /* self::DELETE */ => $this->parentMethod('getSQLForDelete'),
+            2 /* self::UPDATE */ => $this->parentMethod('getSQLForUpdate'),
+            default              => $this->getSQLForSelect(),
+        };
 
-            case self::UPDATE:
-                $sql = $this->parentMethod('getSQLForUpdate');
-                break;
-
-            case self::SELECT:
-            default:
-                $sql = $this->getSQLForSelect();
-                break;
-        }
-
-        $state = self::STATE_CLEAN;
+        $state = 1 /* self::STATE_CLEAN */;
 
         return $sql;
     }
@@ -107,9 +95,9 @@ class QueryBuilder extends BaseQueryBuilder
             implode(', ', $sqlParts['select']);
 
         $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $sqlParts['where'] ? ' WHERE '.((string) $sqlParts['where']) : '')
+            .(null !== $sqlParts['where'] ? ' WHERE '.($sqlParts['where']) : '')
             .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $sqlParts['groupBy']) : '')
-            .(null !== $sqlParts['having'] ? ' HAVING '.((string) $sqlParts['having']) : '')
+            .(null !== $sqlParts['having'] ? ' HAVING '.($sqlParts['having']) : '')
             .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $sqlParts['orderBy']) : '');
 
         if ($this->parentMethod('isLimitQuery')) {
@@ -123,6 +111,9 @@ class QueryBuilder extends BaseQueryBuilder
         return $query;
     }
 
+    /**
+     * @return string[]
+     */
     private function getFromClauses(): array
     {
         $fromClauses  = [];
@@ -144,9 +135,11 @@ class QueryBuilder extends BaseQueryBuilder
 
             $knownAliases[$tableReference] = true;
 
-            $fromClauses[$tableReference] = $tableSql.Closure::bind(function ($tableReference, &$knownAliases) {
-                return $this->{'getSQLForJoins'}($tableReference, $knownAliases);
-            }, $this, parent::class)($tableReference, $knownAliases);
+            $fromClauses[$tableReference] = $tableSql.\Closure::bind(
+                fn ($tableReference, &$knownAliases) => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
+                $this,
+                parent::class
+            )($tableReference, $knownAliases);
         }
 
         $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
@@ -155,11 +148,9 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @deprecated this method is not used anywhere and will be removed in the future
+     * @param string $alias
      *
-     * @param $alias
-     *
-     * @return bool
+     * @return string|false
      */
     public function getJoinCondition($alias)
     {
@@ -213,8 +204,6 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @deprecated this method is not used anywhere and will be removed in the future
-     *
      * @return $this
      */
     public function replaceJoinCondition($alias, $expr)
@@ -465,9 +454,7 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function createQueryBuilder(Connection $connection = null): QueryBuilder
     {
-        $connection = $connection ?: $this->getConnection();
-
-        return new self($connection);
+        return new self($connection ?: $this->connection);
     }
 
     /**
@@ -477,7 +464,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function &parentProperty(string $property)
     {
-        return Closure::bind(function &() use ($property) {
+        return \Closure::bind(function &() use ($property) {
             return $this->$property;
         }, $this, parent::class)();
     }
@@ -489,7 +476,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function parentMethod(string $method, ...$arguments)
     {
-        return Closure::bind(function () use ($method, $arguments) {
+        return \Closure::bind(function () use ($method, $arguments) {
             return $this->$method(...$arguments);
         }, $this, parent::class)();
     }

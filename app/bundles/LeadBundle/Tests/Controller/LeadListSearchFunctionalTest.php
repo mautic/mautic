@@ -2,18 +2,8 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
 use Doctrine\ORM\ORMException;
@@ -24,8 +14,11 @@ use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class LeadListSearchFunctionalTest extends MauticMysqlTestCase
+final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @var mixed[]
+     */
     protected array $clientOptions = ['debug' => true];
 
     /** @noinspection SqlResolve */
@@ -47,7 +40,7 @@ class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $this->client->enableProfiler();
-        $prefix          = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix          = static::getContainer()->getParameter('mautic.db_table_prefix');
         $previousQueries = [];
 
         // non-existent segment search
@@ -103,6 +96,10 @@ class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /**
+     * @param string[] $expectedQueries
+     * @param string[] $previousQueries
+     */
     private function assertQueries(array $expectedQueries, array &$previousQueries): void
     {
         /** @var DoctrineDataCollector $dbCollector */
@@ -162,7 +159,7 @@ class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $listLead = new ListLead();
         $listLead->setLead($leadOne);
         $listLead->setList($sourceList);
-        $listLead->setDateAdded(new DateTime());
+        $listLead->setDateAdded(new \DateTime());
         $this->em->persist($listLead);
     }
 }

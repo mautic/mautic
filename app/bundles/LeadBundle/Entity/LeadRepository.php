@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception\DriverException;
-use Doctrine\DBAL\FetchMode;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -689,7 +689,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -761,7 +761,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $sq->select('1')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lla')
                     ->where(
-                        $q->expr()->andX(
+                        $q->expr()->and(
                             $q->expr()->eq('l.id', 'lla.lead_id'),
                             $q->expr()->eq('lla.manually_removed', 0),
                             $q->expr()->in('lla.leadlist_id', ":$unique")
@@ -773,7 +773,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 $filter->strict  = true;
                 $q->andWhere($q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL()));
-                $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], Connection::PARAM_INT_ARRAY);
+                $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
@@ -1404,6 +1404,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return $qb;
     }
 
+    /**
+     * @return string[]
+     */
     private function getListIdsByAlias(string $alias): array
     {
         return $this->getEntityManager()

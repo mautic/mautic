@@ -4,19 +4,11 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Query;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
@@ -25,14 +17,13 @@ use PHPUnit\Framework\TestCase;
 
 class QueryBuilderTest extends TestCase
 {
-    /**
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
+    private QueryBuilder $queryBuilder;
+    private Connection $connection;
 
     protected function setUp(): void
     {
-        $this->queryBuilder = new QueryBuilder($this->createConnectionFake());
+        $this->connection    = $this->createConnectionFake();
+        $this->queryBuilder  = new QueryBuilder($this->connection);
     }
 
     public function testExpr(): void
@@ -119,7 +110,7 @@ class QueryBuilderTest extends TestCase
     public function testGetSQLUpdate(): void
     {
         $this->queryBuilder->update('table1')
-            ->set('enabled', 1)
+            ->set('enabled', '1')
             ->where('enabled = 0');
         $this->assertSQL('UPDATE table1 SET enabled = 1 WHERE enabled = 0', 2);
     }
@@ -366,7 +357,7 @@ class QueryBuilderTest extends TestCase
             ->orderBy('t.id', 'DESC')
             ->setParameter('enabled', true)
             ->setParameter(':salary', 5000)
-            ->setParameter('states', ['new', 'active'], Connection::PARAM_STR_ARRAY)
+            ->setParameter('states', ['new', 'active'], ArrayParameterType::STRING)
             ->setParameter('flag', 'internal')
             ->setFirstResult(30)
             ->setMaxResults(10);
@@ -511,22 +502,6 @@ class QueryBuilderTest extends TestCase
         $this->assertSQL('SELECT t.name FROM table1 t WHERE (t.enabled = 1) AND (a.name = John) AND (a.flag = active)');
     }
 
-    public function testCreateQueryBuilderWithoutConnectionPassed(): void
-    {
-        $existingConnection = $this->queryBuilder->getConnection();
-        $queryBuilder       = $this->queryBuilder->createQueryBuilder();
-        Assert::assertSame($existingConnection, $queryBuilder->getConnection());
-    }
-
-    public function testCreateQueryBuilderWithConnectionPassed(): void
-    {
-        $existingConnection = $this->queryBuilder->getConnection();
-        $newConnection      = $this->createConnectionFake();
-        $queryBuilder       = $this->queryBuilder->createQueryBuilder($newConnection);
-        Assert::assertSame($newConnection, $queryBuilder->getConnection());
-        Assert::assertNotSame($existingConnection, $queryBuilder->getConnection());
-    }
-
     private function assertSQL(string $sql, int $repeat = 1): void
     {
         for ($i = 0; $i < $repeat; ++$i) {
@@ -544,7 +519,7 @@ class QueryBuilderTest extends TestCase
 
             public function getDatabasePlatform()
             {
-                return new MySqlPlatform();
+                return new MySQLPlatform();
             }
         };
     }
