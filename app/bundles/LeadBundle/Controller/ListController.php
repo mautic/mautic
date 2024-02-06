@@ -10,9 +10,9 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
-use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -50,7 +50,7 @@ class ListController extends FormController
         $model   = $this->getModel('lead.list');
         $session = $request->getSession();
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted([
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
@@ -65,99 +65,100 @@ class ListController extends FormController
         // If no permission set to the current user.
         if (!in_array(1, $permissions)) {
             $this->accessDenied();
-        // Lists can be managed by anyone who has access to leads
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-            return $this->accessDenied();
-        }
-
-        $this->setListFilters();
-
-        // set limits
-        $limit = $session->get('mautic.lead.list.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $search = $request->get('search', $session->get('mautic.segment.filter', ''));
-        $session->set('mautic.segment.filter', $search);
-
-        // do some default filtering
-        $orderBy    = $session->get('mautic.lead.list.orderby', 'l.dateModified');
-        $orderByDir = $session->get('mautic.lead.list.orderbydir', $this->getDefaultOrderDirection());
-
-        $filter = [
-            'string' => $search,
-        ];
-
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-
-        if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
-            $translator      = $this->translator;
-            $mine            = $translator->trans('mautic.core.searchcommand.ismine');
-            $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
-            $filter['force'] = "($mine or $global)";
-        }
-
-        [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
-
-        if ($count && $count < ($start + 1)) {
-            // the number of entities are now less then the current page so redirect to the last page
-            if (1 === $count) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (ceil($count / $limit)) ?: 1;
+            // Lists can be managed by anyone who has access to leads
+            if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+                return $this->accessDenied();
             }
-            $session->set('mautic.segment.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $lastPage]);
 
-            return $this->postActionRedirect([
-                'returnUrl'      => $returnUrl,
-                'viewParameters' => [
-                    'page' => $lastPage,
-                    'tmpl' => $tmpl,
+            $this->setListFilters();
+
+            // set limits
+            $limit = $session->get('mautic.lead.list.limit', $this->coreParametersHelper->get('default_pagelimit'));
+            $start = (1 === $page) ? 0 : (($page - 1) * $limit);
+            if ($start < 0) {
+                $start = 0;
+            }
+
+            $search = $request->get('search', $session->get('mautic.segment.filter', ''));
+            $session->set('mautic.segment.filter', $search);
+
+            // do some default filtering
+            $orderBy    = $session->get('mautic.lead.list.orderby', 'l.dateModified');
+            $orderByDir = $session->get('mautic.lead.list.orderbydir', $this->getDefaultOrderDirection());
+
+            $filter = [
+                'string' => $search,
+            ];
+
+            $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+
+            if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
+                $translator      = $this->translator;
+                $mine            = $translator->trans('mautic.core.searchcommand.ismine');
+                $global          = $translator->trans('mautic.lead.list.searchcommand.isglobal');
+                $filter['force'] = "($mine or $global)";
+            }
+
+            [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
+
+            if ($count && $count < ($start + 1)) {
+                // the number of entities are now less then the current page so redirect to the last page
+                if (1 === $count) {
+                    $lastPage = 1;
+                } else {
+                    $lastPage = (ceil($count / $limit)) ?: 1;
+                }
+                $session->set('mautic.segment.page', $lastPage);
+                $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $lastPage]);
+
+                return $this->postActionRedirect([
+                    'returnUrl'      => $returnUrl,
+                    'viewParameters' => [
+                        'page' => $lastPage,
+                        'tmpl' => $tmpl,
+                    ],
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_segment_index',
+                        'mauticContent' => 'leadlist',
+                    ],
+                ]);
+            }
+
+            // set what page currently on so that we can return here after form submission/cancellation
+            $session->set('mautic.segment.page', $page);
+
+            $listIds    = array_keys($items->getIterator()->getArrayCopy());
+            $leadCounts = (!empty($listIds)) ? $model->getSegmentContactCountFromCache($listIds) : [];
+
+            $parameters = [
+                'items'                          => $items,
+                'leadCounts'                     => $leadCounts,
+                'page'                           => $page,
+                'limit'                          => $limit,
+                'permissions'                    => $permissions,
+                'security'                       => $this->security,
+                'tmpl'                           => $tmpl,
+                'currentUser'                    => $this->user,
+                'searchValue'                    => $search,
+                'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
+                'segmentBuildWarningThreshold'   => $this->coreParametersHelper->get('segment_build_time_warning'),
+            ];
+
+            return $this->delegateView(
+                $this->getViewArguments([
+                    'viewParameters'  => $parameters,
+                    'contentTemplate' => '@MauticLead/List/list.html.twig',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_segment_index',
+                        'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
+                        'mauticContent' => 'leadlist',
+                    ],
                 ],
-                'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_segment_index',
-                    'mauticContent' => 'leadlist',
-                ],
-            ]);
+                    'index'
+                )
+            );
         }
-
-        // set what page currently on so that we can return here after form submission/cancellation
-        $session->set('mautic.segment.page', $page);
-
-        $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = (!empty($listIds)) ? $model->getSegmentContactCountFromCache($listIds) : [];
-
-        $parameters = [
-            'items'                          => $items,
-            'leadCounts'                     => $leadCounts,
-            'page'                           => $page,
-            'limit'                          => $limit,
-            'permissions'                    => $permissions,
-            'security'                       => $this->security,
-            'tmpl'                           => $tmpl,
-            'currentUser'                    => $this->user,
-            'searchValue'                    => $search,
-            'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
-            'segmentBuildWarningThreshold'   => $this->coreParametersHelper->get('segment_build_time_warning'),
-        ];
-
-        return $this->delegateView(
-            $this->getViewArguments([
-                'viewParameters'  => $parameters,
-                'contentTemplate' => '@MauticLead/List/list.html.twig',
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_segment_index',
-                    'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
-                    'mauticContent' => 'leadlist',
-                ],
-            ],
-                'index'
-            )
-        );
     }
 
     /**

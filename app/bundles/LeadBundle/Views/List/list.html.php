@@ -11,7 +11,7 @@
 
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 
-//Check to see if the entire page should be displayed or just main content
+// Check to see if the entire page should be displayed or just main content
 if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
@@ -37,35 +37,35 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     ]
                 );
 
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'segment',
-                        'orderBy'    => 'l.name',
-                        'text'       => 'mautic.core.name',
-                        'class'      => 'col-leadlist-name',
-                    ]
-                );
+    echo $view->render(
+        'MauticCoreBundle:Helper:tableheader.html.php',
+        [
+            'sessionVar' => 'segment',
+            'orderBy'    => 'l.name',
+            'text'       => 'mautic.core.name',
+            'class'      => 'col-leadlist-name',
+        ]
+    );
 
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'segment',
-                        'text'       => 'mautic.lead.list.thead.leadcount',
-                        'class'      => 'visible-md visible-lg col-leadlist-leadcount',
-                    ]
-                );
+    echo $view->render(
+        'MauticCoreBundle:Helper:tableheader.html.php',
+        [
+            'sessionVar' => 'segment',
+            'text'       => 'mautic.lead.list.thead.leadcount',
+            'class'      => 'visible-md visible-lg col-leadlist-leadcount',
+        ]
+    );
 
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'segment',
-                        'orderBy'    => 'l.id',
-                        'text'       => 'mautic.core.id',
-                        'class'      => 'visible-md visible-lg col-leadlist-id',
-                    ]
-                );
-                ?>
+    echo $view->render(
+        'MauticCoreBundle:Helper:tableheader.html.php',
+        [
+            'sessionVar' => 'segment',
+            'orderBy'    => 'l.id',
+            'text'       => 'mautic.core.id',
+            'class'      => 'visible-md visible-lg col-leadlist-id',
+        ]
+    );
+    ?>
             </tr>
             </thead>
             <tbody>
@@ -74,35 +74,35 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 <tr>
                     <td>
                         <?php
-                        echo $view->render(
-                            'MauticCoreBundle:Helper:list_actions.html.php',
-                            [
-                                'item'            => $item,
-                                'templateButtons' => [
-                                    'edit'   => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
-                                    'clone'  => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
-                                    'delete' => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_DELETE_OTHER], $item->getCreatedBy()),
-                                ],
-                                'routeBase' => 'segment',
-                                'langVar'   => 'lead.list',
-                                'custom'    => [
+            echo $view->render(
+                'MauticCoreBundle:Helper:list_actions.html.php',
+                [
+                    'item'            => $item,
+                    'templateButtons' => [
+                        'edit'   => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
+                        'clone'  => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_EDIT_OTHER], $item->getCreatedBy()),
+                        'delete' => $view['security']->hasEntityAccess(true, $permissions[LeadPermissions::LISTS_DELETE_OTHER], $item->getCreatedBy()),
+                    ],
+                    'routeBase' => 'segment',
+                    'langVar'   => 'lead.list',
+                    'custom'    => [
+                        [
+                            'attr' => [
+                                'data-toggle' => 'ajax',
+                                'href'        => $view['router']->path(
+                                    'mautic_contact_index',
                                     [
-                                        'attr' => [
-                                            'data-toggle' => 'ajax',
-                                            'href'        => $view['router']->path(
-                                                'mautic_contact_index',
-                                                [
-                                                    'search' => "$listCommand:{$item->getAlias()}",
-                                                ]
-                                            ),
-                                        ],
-                                        'icon'  => 'fa-users',
-                                        'label' => 'mautic.lead.list.view_contacts',
-                                    ],
-                                ],
-                            ]
-                        );
-                        ?>
+                                        'search' => "$listCommand:{$item->getAlias()}",
+                                    ]
+                                ),
+                            ],
+                            'icon'  => 'fa-users',
+                            'label' => 'mautic.lead.list.view_contacts',
+                        ],
+                    ],
+                ]
+            );
+                ?>
                     </td>
                     <td>
                         <div>

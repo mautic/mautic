@@ -219,7 +219,7 @@ $view['slots']->set(
             'title' => $view['translator']->trans('mautic.lead.segments.usages'),
             'stats' => $usageStats,
             ]);
-        ?>
+?>
 
         <!-- activity feed -->
         <?php // echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]);?>
