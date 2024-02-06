@@ -877,15 +877,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class,
                 'arguments' => ['mautic.helper.cache_storage'],
             ],
-            'mautic.lead.command.analyse_custom_field' => [
-                'class'     => \Mautic\LeadBundle\Field\Command\AnalyseCustomFieldCommand::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.lead.model.lead',
-                    'translator',
-                ],
-                'tag' => 'console.command',
-            ],
         ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [

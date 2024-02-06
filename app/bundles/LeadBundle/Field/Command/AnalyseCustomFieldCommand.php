@@ -7,14 +7,14 @@ namespace Mautic\LeadBundle\Field\Command;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AnalyseCustomFieldCommand extends ContainerAwareCommand
+class AnalyseCustomFieldCommand extends Command
 {
     /**
      * @var FieldModel
