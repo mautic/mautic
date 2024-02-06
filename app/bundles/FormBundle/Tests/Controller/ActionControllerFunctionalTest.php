@@ -36,7 +36,7 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
 
         // Save new Send Form Results action
