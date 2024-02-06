@@ -41,7 +41,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->listRepo = $this->listModel->getRepository();
         \assert($this->listRepo instanceof LeadListRepository);
         /** @var LeadModel $leadModel */
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        $leadModel      = static::getContainer()->get('mautic.lead.model.lead');
         $this->leadRepo = $leadModel->getRepository();
     }
 

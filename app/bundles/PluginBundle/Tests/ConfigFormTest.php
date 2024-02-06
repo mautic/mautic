@@ -114,7 +114,7 @@ class ConfigFormTest extends KernelTestCase
 
         $registeredPluginBundles = static::getContainer()->getParameter('mautic.plugin.bundles');
         $mauticPlugins           = static::getContainer()->getParameter('mautic.bundles');
-        $bundleHelper->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
+        $bundleHelper->method('getPluginBundles')->willReturn($registeredPluginBundles);
 
         $bundleHelper->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
         $integrationEntityRepository = $this
@@ -159,10 +159,5 @@ class ConfigFormTest extends KernelTestCase
         );
 
         return $integrationHelper;
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
     }
 }

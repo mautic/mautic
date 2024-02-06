@@ -22,7 +22,6 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;

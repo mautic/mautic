@@ -111,13 +111,12 @@ class BouncedEmail
         return $this;
     }
 
-
     /**
-     * @return int
+     * @return bool
      */
     public function isFinal()
     {
-        return $this->final ? 1 : 0;
+        return $this->final;
     }
 
     /**
