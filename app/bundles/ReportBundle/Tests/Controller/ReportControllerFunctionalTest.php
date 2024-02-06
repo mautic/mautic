@@ -2,9 +2,12 @@
 
 namespace Mautic\ReportBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\NotSupported;
+use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -236,5 +239,79 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
             }
         }
         $this->assertEquals(2, count($result));
+    }
+
+    /**
+     * @dataProvider scheduleProvider
+     *
+     * @throws NotSupported
+     * @throws MappingException
+     */
+    public function testScheduleEdit(string $oldScheduleUnit, ?string $oldScheduleDay, ?string $oldScheduleMonthFrequency, string $newScheduleUnit, ?string $newScheduleDay, ?string $newScheduleMonthFrequency): void
+    {
+        $report = new Report();
+        $report->setName('Checking for schedule change');
+        $report->setDescription('<b>This is a report</b>');
+        $report->setSource('leads');
+        $columns = [
+            'l.firstname',
+        ];
+        $report->setColumns($columns);
+
+        $report->setIsScheduled(true);
+        $report->setScheduleUnit($oldScheduleUnit);
+        $report->setScheduleDay($oldScheduleDay);
+        $report->setScheduleMonthFrequency($oldScheduleMonthFrequency);
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        $schedule = $report->getSchedule();
+
+        $this->assertIsArray($schedule, 'Schedule should be an array');
+        $this->assertArrayHasKey('schedule_unit', $schedule);
+        $this->assertArrayHasKey('schedule_day', $schedule);
+        $this->assertArrayHasKey('schedule_month_frequency', $schedule);
+        $this->assertEquals(['schedule_unit' => $oldScheduleUnit, 'schedule_day' => $oldScheduleDay, 'schedule_month_frequency' => $oldScheduleMonthFrequency], $schedule, 'Old schedule should be set correctly');
+
+        $crawler        = $this->client->request(Request::METHOD_GET, 's/reports/edit/'.$report->getId());
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['report[scheduleUnit]']->setValue($newScheduleUnit);
+        if (!is_null($newScheduleDay)) {
+            $form['report[scheduleDay]']->setValue($newScheduleDay);
+        }
+        if (!is_null($newScheduleMonthFrequency)) {
+            $form['report[scheduleMonthFrequency]']->setValue($newScheduleMonthFrequency);
+        }
+
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $report   = $this->em->getRepository(Report::class)->find($report->getId());
+        $schedule = $report->getSchedule();
+        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        $this->em->clear();
+
+        $this->assertEquals(['schedule_unit' => $newScheduleUnit, 'schedule_day' => $newScheduleDay, 'schedule_month_frequency' => $newScheduleMonthFrequency], $schedule, 'Schedule should be edited correctly');
+    }
+
+    /**
+     * @return array<mixed>[]
+     */
+    public function scheduleProvider(): array
+    {
+        return [
+            'daily_to_weekly'  => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null],
+            'daily_to_monthly' => [SchedulerEnum::UNIT_DAILY, null, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_MO, '1'],
+
+            'weekly_to_daily'   => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_DAILY, null, null],
+            'weekly_to_weekly'  => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_MO, null, SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_TU, null],
+            'weekly_to_monthly' => [SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_WE, null, SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_TH, '-1'],
+
+            'monthly_to_daily'   => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '-1', SchedulerEnum::UNIT_DAILY, null, null],
+            'monthly_to_weekly'  => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_WEEKLY, SchedulerEnum::DAY_SA, null],
+            'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'],
+        ];
     }
 }
