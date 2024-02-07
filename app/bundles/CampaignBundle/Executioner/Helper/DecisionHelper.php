@@ -44,8 +44,9 @@ class DecisionHelper
         $parentEvent = $event->getParent();
 
         if (null !== $parentEvent && !$parentEvent->isDeleted() && null !== $event->getDecisionPath()) {
-            $rotation    = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
-            $log         = $parentEvent->getLogByContactAndRotation($contact, $rotation);
+            $rotation      = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
+            $rotationValue = isset($rotation[$contact->getId()]) ? $rotation[$contact->getId()]['rotation'] : null;
+            $log           = $parentEvent->getLogByContactAndRotation($contact, $rotationValue);
 
             if (null === $log) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");

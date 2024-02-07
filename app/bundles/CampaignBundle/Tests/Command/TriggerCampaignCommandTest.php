@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -550,6 +551,60 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
         Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
         Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+    }
+
+    public function testCampaignActionAfterChangeMembership(): void
+    {
+        $campaign  = $this->createCampaign('Campaign 1');
+        $lead      = $this->createLead('Lead');
+        $this->createCampaignLead($campaign, $lead);
+        $this->em->flush();
+        $property = ['removeFrom' => ['this']];
+        $event1   = $this->createEvent('Event', $campaign, 'campaign.addremovelead', 'action', $property);
+        $property = ['points' => 1];
+        $event2   = $this->createEvent('Event', $campaign, 'lead.changepoints', 'action', $property);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
+        Assert::assertCount(1, $campaignLeads);
+        Assert::assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
+        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+
+        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
+        Assert::assertCount(1, $campaignEventLogs);
+        Assert::assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
+        Assert::assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
+    }
+
+    public function testCampaignActionBeforeChangeMembership(): void
+    {
+        $campaign  = $this->createCampaign('Campaign 1');
+        $lead      = $this->createLead('Lead');
+        $this->createCampaignLead($campaign, $lead);
+        $this->em->flush();
+        $property = ['points' => 1];
+        $event1   = $this->createEvent('Event', $campaign, 'lead.changepoints', 'action', $property);
+        $property = ['removeFrom' => ['this']];
+        $event2   = $this->createEvent('Event', $campaign, 'campaign.addremovelead', 'action', $property);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
+        Assert::assertCount(1, $campaignLeads);
+        Assert::assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
+        Assert::assertTrue($campaignLeads[0]->getManuallyRemoved());
+
+        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
+        Assert::assertCount(2, $campaignEventLogs);
+        Assert::assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
+        Assert::assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
+        Assert::assertSame($campaign->getId(), $campaignEventLogs[1]->getCampaign()->getId());
+        Assert::assertSame($event2->getId(), $campaignEventLogs[1]->getEvent()->getId());
     }
 
     /**
