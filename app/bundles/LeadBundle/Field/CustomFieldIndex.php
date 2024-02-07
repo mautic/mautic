@@ -102,7 +102,7 @@ class CustomFieldIndex
         return $this->indexSchemaHelper->hasIndex($leadField);
     }
 
-    public function hasMatchingUniqueIdentifierIndex(LeadField $leadField)
+    public function hasMatchingUniqueIdentifierIndex(LeadField $leadField): bool
     {
         $hasIndex           = $this->indexSchemaHelper->hasUniqueIdentifierIndex($leadField);
         $isUniqueIdentifier = $leadField->getIsUniqueIdentifier();
@@ -132,18 +132,16 @@ class CustomFieldIndex
     }
 
     /**
-     * @param LeadField $leadField
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function updateUniqueIdentifierIndex(LeadField $leadField)
+    public function updateUniqueIdentifierIndex(LeadField $leadField): void
     {
         if ($this->hasMatchingUniqueIdentifierIndex($leadField)) {
             return;
         }
 
-        /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+        /** @var IndexSchemaHelper $modifySchema */
         $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
         $indexColumns = $this->getUniqueIdentifierIndexColumns();
@@ -158,12 +156,10 @@ class CustomFieldIndex
     }
 
     /**
-     * @param LeadField $leadField
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    private function dropIndexForUniqueIdentifiers(LeadField $leadField)
+    private function dropIndexForUniqueIdentifiers(LeadField $leadField): void
     {
         if (!$this->indexSchemaHelper->hasUniqueIdentifierIndex($leadField)) {
             return;
@@ -179,9 +175,9 @@ class CustomFieldIndex
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
-    private function getUniqueIdentifierIndexColumns()
+    private function getUniqueIdentifierIndexColumns(): array
     {
         // Get list of current uniques
         $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();

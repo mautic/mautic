@@ -169,7 +169,10 @@ class IndexSchemaHelper
         return $this->table->hasIndex($this->prefix."{$alias}_search");
     }
 
-    public function hasMatchingUniqueIdentifierIndex(LeadField $leadField, array $uniqueIdentifierColumns)
+    /**
+     * @param array<mixed> $uniqueIdentifierColumns
+     */
+    public function hasMatchingUniqueIdentifierIndex(LeadField $leadField, array $uniqueIdentifierColumns): bool
     {
         $this->setName($leadField->getCustomFieldObject());
 
@@ -184,8 +187,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param LeadField $leadField
-     *
      * @return bool
      *
      * @throws SchemaException

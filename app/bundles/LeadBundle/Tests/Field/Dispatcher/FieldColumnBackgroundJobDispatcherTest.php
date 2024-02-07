@@ -160,7 +160,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($dispatcher);
 
         $this->expectException(AbortColumnUpdateException::class);
-        $this->expectExceptionMessage('Column cannot be created now');
+        $this->expectExceptionMessage('Column cannot be updated now');
 
         $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent($leadField);
     }

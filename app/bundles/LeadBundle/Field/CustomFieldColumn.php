@@ -50,7 +50,7 @@ class CustomFieldColumn
             if ($columnExists && $this->customFieldIndex->isUpdatePending($leadField)) {
                 try {
                     $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
-                } catch (NoListenerException $e) {
+                } catch (NoListenerException) {
                 }
                 $this->processUpdateLeadColumn($leadField);
             }

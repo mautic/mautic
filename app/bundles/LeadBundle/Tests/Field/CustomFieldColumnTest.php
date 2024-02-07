@@ -220,6 +220,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $leadField = new LeadField();
+        $leadField->setAlias('text');
         $leadField->setIsUniqueIdentifier(true);
 
         $schemaDefinition->expects($this->once())
@@ -243,7 +244,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->processCreateLeadColumn($leadField);
     }
 
-    public function testNoErrorWithAddColumnWithoutIndexOrUniqueIdentifier()
+    public function testNoErrorWithAddColumnWithoutIndexOrUniqueIdentifier(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -264,6 +265,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $leadField = new LeadField();
+        $leadField->setAlias('text');
 
         $schemaDefinition->expects($this->once())
             ->method('getSchemaDefinitionNonStatic')
@@ -404,7 +406,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->method('saveLeadFieldEntity')
             ->with($leadField, true);
 
-        $this->customFieldIndex->expects($this->never())
+        $this->customFieldIndex->expects($this->once())
             ->method('addIndexOnColumn')
             ->with($leadField);
 
