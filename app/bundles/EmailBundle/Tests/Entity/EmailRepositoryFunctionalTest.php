@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use DateTime;
 use Doctrine\ORM\ORMException;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -136,10 +135,10 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $result = $this->emailRepository->getEmailPendingQuery($email->getId())
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
 
-        $actualLeadIds  = array_column($result, 'id');
+        $actualLeadIds  = array_map('intval',array_column($result, 'id'));
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadTwo->getId(), $leadThree->getId(), $leadFour->getId()];
@@ -186,7 +185,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $listLead = new ListLead();
         $listLead->setLead($leadOne);
         $listLead->setList($sourceList);
-        $listLead->setDateAdded(new DateTime());
+        $listLead->setDateAdded(new \DateTime());
         $this->em->persist($listLead);
     }
 

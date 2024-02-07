@@ -39,12 +39,12 @@ final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticM
         $this->em->flush();
         $this->em->clear();
 
-        $this->runCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
-        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
-        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $this->testSymfonyCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+        $this->testSymfonyCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
         /** @var LeadEventLogRepository $logRepo */
-        $logRepo  = self::$container->get('mautic.campaign.repository.lead_event_log');
+        $logRepo  = static::getContainer()->get('mautic.campaign.repository.lead_event_log');
         $metaData = [];
         foreach ($logRepo->getLeadLogs() as $leadLog) {
             if ($leadLog['metadata']) {

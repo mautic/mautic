@@ -22,8 +22,8 @@ class LeadCategoryRepository extends CommonRepository
             ->andWhere('lc.manually_removed = 0')
             ->setParameter('lead', $lead->getId());
 
-        $results = $q->execute()
-            ->fetchAll();
+        $results = $q->executeQuery()
+            ->fetchAllAssociative();
 
         $categories = [];
         foreach ($results as $category) {
@@ -45,7 +45,6 @@ class LeadCategoryRepository extends CommonRepository
             ->where('lc.lead_id = :lead')
             ->andWhere('lc.manually_removed = 1')
             ->setParameter('lead', $lead->getId());
-
 
         $results = $q->executeQuery()->fetchAllAssociative();
 

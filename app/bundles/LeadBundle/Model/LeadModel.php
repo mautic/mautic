@@ -1055,7 +1055,6 @@ class LeadModel extends FormModel
         return $results;
     }
 
-    public function removeFromCategories($categories): void
     /**
      * @param mixed[] $categories
      */
@@ -1071,7 +1070,7 @@ class LeadModel extends FormModel
             $unsubscribedCats[] = $category;
 
             if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($category->getLead(), $category->getCategory(), false));
+                $this->dispatcher->dispatch(new CategoryChangeEvent($category->getLead(), $category->getCategory(), false), LeadEvents::LEAD_CATEGORY_CHANGE);
             }
         }
 
@@ -1080,10 +1079,7 @@ class LeadModel extends FormModel
         }
     }
 
-    /**
-     * @param $categories
-     */
-    public function removeFromCategories($categories)
+    public function removeFromCategories($categories): void
     {
         $deleteCats = [];
         if (is_array($categories)) {
