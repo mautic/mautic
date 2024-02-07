@@ -10,16 +10,16 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Field\Helper\IndexHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Field\Helper\IndexHelper;
 use Mautic\LeadBundle\Field\IdentifierFields;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -39,10 +39,8 @@ class FieldType extends AbstractType
 {
     /**
      * For which types will be character limits applicable.
-     *
-     * @var array
      */
-    private $indexableFieldsWithLimits = [
+    private array $indexableFieldsWithLimits = [
         'text',
         'select',
         'phone',
@@ -251,7 +249,7 @@ class FieldType extends AbstractType
          * @see FormEvents::PRE_SET_DATA
          * Used as as form modifier before trying to set data
          */
-        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue, $new):array {
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue, $new): array {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();
@@ -262,8 +260,8 @@ class FieldType extends AbstractType
                 case 'select':
                 case 'lookup':
                     $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    // no break
                 case 'multiselect':
-
                     $cleaningRules['defaultValue'] = 'raw';
 
                     if (is_array($data)) {
@@ -291,14 +289,14 @@ class FieldType extends AbstractType
                         'defaultValue',
                         ChoiceType::class,
                         [
-                            'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label is-chosen'],
-                            'attr'       => ['class' => 'form-control'],
-                            'required'   => false,
-                            'choices'    => array_flip($list),
-                            'multiple'   => 'multiselect' === $type,
-                            'data'       => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
-                            'disabled'   => $disableDefaultValue,
+                            'label'       => 'mautic.core.defaultvalue',
+                            'label_attr'  => ['class' => 'control-label is-chosen'],
+                            'attr'        => ['class' => 'form-control'],
+                            'required'    => false,
+                            'choices'     => array_flip($list),
+                            'multiple'    => 'multiselect' === $type,
+                            'data'        => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
+                            'disabled'    => $disableDefaultValue,
                             'constraints' => $constraints,
                         ]
                     );
@@ -423,6 +421,7 @@ class FieldType extends AbstractType
                 case 'url':
                 case 'email':
                     $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    // no break
                 case 'number':
                     $form->add(
                         'defaultValue',
@@ -485,7 +484,7 @@ class FieldType extends AbstractType
                 EntityType::class,
                 [
                     'label'         => 'mautic.core.order',
-                    'class'         => \Mautic\LeadBundle\Entity\LeadField::class,
+                    'class'         => LeadField::class,
                     'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],
@@ -567,7 +566,7 @@ class FieldType extends AbstractType
             new IsFalse(['message' => 'mautic.lead.field.form.index.error', 'groups' => 'uniqueIndex']),
         ];
 
-        if ($options['data']->isIsindex() === false && $this->indexHelper->isNewIndexAllowed() === false) {
+        if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
             $constraints[] = new IsFalse(['message' => 'mautic.lead.field.form.index_count.error']);
         }
 
@@ -642,7 +641,7 @@ class FieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'        => LeadField::class,
-                'validation_groups' => function (FormInterface $form) {
+                'validation_groups' => function (FormInterface $form): array {
                     $data = $form->getData();
 
                     $groups = ['Default'];
@@ -670,10 +669,9 @@ class FieldType extends AbstractType
     }
 
     /**
-     * @param string                    $value
-     * @param ExecutionContextInterface $context
+     * @param string $value
      */
-    public static function validateDefaultValue($value, ExecutionContextInterface $context)
+    public static function validateDefaultValue($value, ExecutionContextInterface $context): void
     {
         if (!empty($value)) {
             $root  = $context->getRoot();
@@ -686,11 +684,9 @@ class FieldType extends AbstractType
     }
 
     /**
-     * @param FormInterface $form
-     *
      * @param bool $new
      */
-    private function addLengthValidationField(FormInterface $form, $new = true)
+    private function addLengthValidationField(FormInterface $form, $new = true): void
     {
         $typesWithMaxLength = implode('","', $this->indexableFieldsWithLimits);
 
@@ -701,7 +697,7 @@ class FieldType extends AbstractType
              }',
         ];
 
-        if ($new === false) {
+        if (false === $new) {
             $attr['readonly'] = 'readonly';
         }
 

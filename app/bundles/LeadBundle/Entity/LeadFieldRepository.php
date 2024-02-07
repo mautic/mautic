@@ -53,7 +53,7 @@ class LeadFieldRepository extends CommonRepository
 
         if ($includeEntityFields) {
             // add lead main column names to prevent attempt to create a field with the same name
-            $leadRepo = $this->_em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getBaseColumns(\Mautic\LeadBundle\Entity\Lead::class, true);
+            $leadRepo = $this->_em->getRepository(Lead::class)->getBaseColumns(Lead::class, true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
 
@@ -470,7 +470,7 @@ class LeadFieldRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
         $prefix          = $this->getTableAlias();
 
         switch ($command) {

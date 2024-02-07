@@ -13,18 +13,12 @@ class UpdateColumnEvent extends Event
     ) {
     }
 
-    /**
-     * @return LeadField
-     */
-    public function getLeadField()
+    public function getLeadField(): LeadField
     {
         return $this->leadField;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldProcessInBackground()
+    public function shouldProcessInBackground(): bool
     {
         return $this->shouldProcessInBackground;
     }

@@ -57,8 +57,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $name
-     *
      * @return self
      *
      * @throws SchemaException
@@ -80,7 +78,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param mixed  $columns
      * @param string $name
      * @param array  $options
      *
@@ -106,7 +103,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param mixed  $columns
      * @param string $name
      * @param array  $options
      *
@@ -164,7 +160,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param LeadField $leadField
      * @return bool
      *
      * @throws SchemaException
@@ -178,10 +173,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $columns
-     *
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     private function getTextColumns($columns): array

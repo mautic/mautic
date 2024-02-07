@@ -38,14 +38,13 @@ class CustomFieldNotification
     }
 
     /**
-     * @param LeadField $leadField
-     * @param int       $userId
+     * @param int $userId
      */
-    public function customFieldWasUpdated(LeadField $leadField, $userId)
+    public function customFieldWasUpdated(LeadField $leadField, $userId): void
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 

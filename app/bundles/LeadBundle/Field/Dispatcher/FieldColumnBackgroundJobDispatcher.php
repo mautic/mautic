@@ -42,12 +42,10 @@ class FieldColumnBackgroundJobDispatcher
     }
 
     /**
-     * @param LeadField $leadField
-     *
      * @throws AbortColumnUpdateException
      * @throws NoListenerException
      */
-    public function dispatchPreUpdateColumnEvent(LeadField $leadField)
+    public function dispatchPreUpdateColumnEvent(LeadField $leadField): void
     {
         $action = LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB;
 

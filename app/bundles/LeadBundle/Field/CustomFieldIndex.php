@@ -10,8 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class CustomFieldIndex
- * @package Mautic\LeadBundle\Field
+ * Class CustomFieldIndex.
  */
 class CustomFieldIndex
 {
@@ -32,7 +31,7 @@ class CustomFieldIndex
     public function addIndexOnColumn(LeadField $leadField): void
     {
         try {
-            /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+            /** @var IndexSchemaHelper $modifySchema */
             $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
             $alias = $leadField->getAlias();
@@ -67,16 +66,14 @@ class CustomFieldIndex
     /**
      * Updates the index for this field.
      *
-     * @param LeadField $leadField
-     *
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function dropIndexOnColumn(LeadField $leadField)
+    public function dropIndexOnColumn(LeadField $leadField): void
     {
         try {
-            /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+            /** @var IndexSchemaHelper $modifySchema */
             $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
             $alias = $leadField->getAlias();
@@ -86,7 +83,7 @@ class CustomFieldIndex
 
             $modifySchema->executeChanges();
         } catch (DriverException $e) {
-            if ($e->getCode() === 1069 /* ER_TOO_MANY_KEYS */) {
+            if (1069 === $e->getCode() /* ER_TOO_MANY_KEYS */) {
                 $this->logger->warning($e->getMessage());
             } else {
                 throw $e;
@@ -95,11 +92,9 @@ class CustomFieldIndex
     }
 
     /**
-     * @param LeadField $leadField
-     * @return bool
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function isUpdatePending(LeadField $leadField)
+    public function isUpdatePending(LeadField $leadField): bool
     {
         $hasIndex = $this->hasIndex($leadField);
 
@@ -111,9 +106,8 @@ class CustomFieldIndex
     }
 
     /**
-     * @param LeadField $leadField
-     *
      * @return bool
+     *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function hasIndex(LeadField $leadField)

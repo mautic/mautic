@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class IndexHelper
 {
-    const MAX_COUNT_ALLOWED = 64;
+    public const MAX_COUNT_ALLOWED = 64;
     /**
      * @var bool|array
      */
@@ -21,10 +21,8 @@ class IndexHelper
 
     /**
      * Can be different from indexed column count when using multiple indexes on same table.
-     *
-     * @var int
      */
-    private $indexCount = 0;
+    private int $indexCount = 0;
 
     public function __construct(private EntityManager $entityManager)
     {
@@ -50,18 +48,12 @@ class IndexHelper
         return $this->indexCount;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxCount()
+    public function getMaxCount(): int
     {
         return self::MAX_COUNT_ALLOWED;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNewIndexAllowed()
+    public function isNewIndexAllowed(): bool
     {
         return $this->getIndexCount() < $this->getMaxCount();
     }
@@ -73,9 +65,9 @@ class IndexHelper
      *
      * @throws DBALException
      */
-    private function getIndexes()
+    private function getIndexes(): void
     {
-        if ($this->indexedColumns !== false) {
+        if (false !== $this->indexedColumns) {
             // Query below performed
             return;
         }
@@ -84,7 +76,7 @@ class IndexHelper
 
         $sql = "SHOW INDEXES FROM `$tableName`";
 
-        $stmt = $this->entityManager->getConnection()->prepare($sql);
+        $stmt    = $this->entityManager->getConnection()->prepare($sql);
         $indexes = $stmt->executeQuery()->fetchAllAssociative();
 
         $this->indexedColumns = array_map(

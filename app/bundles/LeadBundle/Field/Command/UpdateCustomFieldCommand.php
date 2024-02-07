@@ -22,7 +22,7 @@ class UpdateCustomFieldCommand extends Command
         parent::__construct();
     }
 
-    public function configure()
+    public function configure(): void
     {
         parent::configure();
 
@@ -40,9 +40,6 @@ EOT
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -52,7 +49,7 @@ EOT
 
         try {
             $this->backgroundService->updateColumn($leadFieldId, $userId);
-        } catch (LeadFieldWasNotFoundException $e) {
+        } catch (LeadFieldWasNotFoundException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
             return 1;
@@ -60,11 +57,11 @@ EOT
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
             return 1;
-        } catch (AbortColumnUpdateException $e) {
+        } catch (AbortColumnUpdateException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_update_aborted').'</error>');
 
             return 0;
-        } catch (DriverException | SchemaException | DBALException | \Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException|SchemaException|DBALException|\Mautic\CoreBundle\Exception\SchemaException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
             return 1;

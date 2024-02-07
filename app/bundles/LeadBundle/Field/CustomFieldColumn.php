@@ -36,7 +36,7 @@ class CustomFieldColumn
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function createLeadColumn(LeadField $leadField): void
     {
@@ -80,7 +80,7 @@ class CustomFieldColumn
      * @throws CustomFieldLimitException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function processCreateLeadColumn(LeadField $leadField, bool $saveLeadField = true): void
     {
@@ -125,22 +125,18 @@ class CustomFieldColumn
     /**
      * Updates the field column in the leads table.
      *
-     * @param LeadField $leadField
-     *
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
-    public function processUpdateLeadColumn(LeadField $leadField)
+    public function processUpdateLeadColumn(LeadField $leadField): void
     {
         $hasIndex = $this->customFieldIndex->hasIndex($leadField);
 
         if ($leadField->isIsIndex() && !$hasIndex) {
             $this->customFieldIndex->addIndexOnColumn($leadField);
-
         } elseif (!$leadField->isIsIndex() && $hasIndex) {
             $this->customFieldIndex->dropIndexOnColumn($leadField);
-
         }
     }
 }

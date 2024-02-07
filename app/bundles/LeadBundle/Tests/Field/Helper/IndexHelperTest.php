@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
 class IndexHelperTest extends \PHPUnit_Framework_TestCase
 {
-    const COLUMN_NAME_KEY = 'Column_name';
+    public const COLUMN_NAME_KEY = 'Column_name';
 
     public function testGetIndexCountAndColumns()
     {

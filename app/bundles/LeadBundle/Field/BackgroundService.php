@@ -71,15 +71,13 @@ class BackgroundService
     }
 
     /**
-     * @param $leadFieldId
-     * @param $userId
      * @throws AbortColumnUpdateException
      * @throws DriverException
      * @throws LeadFieldWasNotFoundException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function updateColumn($leadFieldId, $userId)
+    public function updateColumn($leadFieldId, $userId): void
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
         if (null === $leadField) {
@@ -88,7 +86,7 @@ class BackgroundService
 
         try {
             $this->fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent($leadField);
-        } catch (NoListenerException $e) {
+        } catch (NoListenerException) {
         }
 
         $this->customFieldColumn->processUpdateLeadColumn($leadField);

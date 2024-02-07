@@ -763,7 +763,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_FIELD_PRE_UPDATE_COLUMN = 'mautic.lead_field_pre_update_column';
+    public const LEAD_FIELD_PRE_UPDATE_COLUMN = 'mautic.lead_field_pre_update_column';
 
     /**
      * The mautic.lead_field_pre_add_column_background_job event is dispatched before updating a column in the lead_fields table.
@@ -774,7 +774,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_update_column_background_job';
+    public const LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_update_column_background_job';
     /**
      * The mautic.post_contact_export_scheduled event is dispatched when a contact export is scheduled.
      *

@@ -18,9 +18,6 @@ class Version20190524124819 extends PreUpAssertionMigration
         }, sprintf('Schema includes this migration'));
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function up(Schema $schema): void
     {
         $this->addSql("

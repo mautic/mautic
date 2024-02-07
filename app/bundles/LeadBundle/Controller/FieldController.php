@@ -6,8 +6,8 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
-use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
+use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -292,7 +292,7 @@ class FieldController extends FormController
                     if ($valid) {
                         $flashMessage = 'mautic.core.notice.updated';
 
-                        //form is valid so process the data
+                        // form is valid so process the data
                         try {
                             $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                         } catch (AbortColumnUpdateException) {
