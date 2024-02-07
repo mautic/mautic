@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
+use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -93,16 +94,16 @@ class ListController extends FormController
 
             $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
-            $tableAlias        = $model->getRepository()->getTableAlias();
-            $filter['where'][] = [
-                'expr' => 'orX',
-                'val'  => [
-                    ['column' => $tableAlias.'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()],
-                    ['column' => $tableAlias.'.isGlobal', 'expr' => 'eq', 'value' => 1],
-                ],
-            ];
-        }
+            if (!$permissions[LeadPermissions::LISTS_VIEW_OTHER]) {
+                $tableAlias        = $model->getRepository()->getTableAlias();
+                $filter['where'][] = [
+                    'expr' => 'orX',
+                    'val'  => [
+                        ['column' => $tableAlias.'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()],
+                        ['column' => $tableAlias.'.isGlobal', 'expr' => 'eq', 'value' => 1],
+                    ],
+                ];
+            }
 
             [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
@@ -541,7 +542,7 @@ class ListController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -692,8 +693,8 @@ class ListController extends FormController
                     'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
-                    LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
-                )) {
+                LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
@@ -719,7 +720,6 @@ class ListController extends FormController
             }
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
-
         } // else don't do anything
 
         return $this->postActionRedirect(
