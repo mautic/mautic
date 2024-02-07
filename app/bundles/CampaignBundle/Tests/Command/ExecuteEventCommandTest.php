@@ -17,7 +17,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
-        // There should be two events scheduled
+        // There should be three events scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
         $this->assertCount(3, $byEvent[2]);
 
@@ -62,6 +62,10 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
                 }
 
                 continue;
+            }
+
+            if (1 === (int) $log['is_scheduled']) {
+                $this->fail('Event is still scheduled for lead ID '.$log['lead_id']);
             }
         }
 
