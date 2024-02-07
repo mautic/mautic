@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Field\Helper;
 
 use Doctrine\DBAL\Exception as DBALException;
@@ -77,9 +79,7 @@ class IndexHelper
         $indexes = $stmt->executeQuery()->fetchAllAssociative();
 
         $this->indexedColumns = array_map(
-            function ($index) {
-                return $index['Column_name'];
-            },
+            fn ($index) => $index['Column_name'],
             $indexes
         );
 

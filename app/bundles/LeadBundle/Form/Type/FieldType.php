@@ -668,10 +668,7 @@ class FieldType extends AbstractType
         return 'leadfield';
     }
 
-    /**
-     * @param string $value
-     */
-    public static function validateDefaultValue($value, ExecutionContextInterface $context): void
+    public static function validateDefaultValue(string $value, ExecutionContextInterface $context): void
     {
         if (!empty($value)) {
             $root  = $context->getRoot();

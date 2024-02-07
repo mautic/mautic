@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Field\Event;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class UpdateColumnEvent extends Event
+final class UpdateColumnEvent extends Event
 {
     public function __construct(
         private LeadField $leadField,

@@ -187,11 +187,9 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function hasUniqueIdentifierIndex(LeadField $leadField)
+    public function hasUniqueIdentifierIndex(LeadField $leadField): bool
     {
         $this->setName($leadField->getCustomFieldObject());
 
