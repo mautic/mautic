@@ -132,8 +132,12 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     public function testAddMethodModifiesOriginalDateTime(): void
 =======
 
+<<<<<<< HEAD
     public function testAddMethodModifiesOriginalDateTime()
 >>>>>>> e5987884d0 (fix: [DPMMA-2401] DateTimeHelper unit tests)
+=======
+    public function testAddMethodModifiesOriginalDateTime(): void
+>>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
     {
         $originalDate   = '2023-01-01 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -152,10 +156,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testAddMethodReturnsClonedDateTime(): void
 =======
     public function testAddMethodReturnsClonedDateTime()
 >>>>>>> e5987884d0 (fix: [DPMMA-2401] DateTimeHelper unit tests)
+=======
+    public function testAddMethodReturnsClonedDateTime(): void
+>>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
     {
         $originalDate   = '2023-01-01 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -177,10 +185,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testSubMethodModifiesOriginalDateTime(): void
 =======
     public function testSubMethodModifiesOriginalDateTime()
 >>>>>>> e5987884d0 (fix: [DPMMA-2401] DateTimeHelper unit tests)
+=======
+    public function testSubMethodModifiesOriginalDateTime(): void
+>>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
     {
         $originalDate   = '2023-01-02 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -199,10 +211,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testSubMethodReturnsClonedDateTime(): void
 =======
     public function testSubMethodReturnsClonedDateTime()
 >>>>>>> e5987884d0 (fix: [DPMMA-2401] DateTimeHelper unit tests)
+=======
+    public function testSubMethodReturnsClonedDateTime(): void
+>>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
     {
         $originalDate   = '2023-01-02 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -224,10 +240,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testModifyMethodModifiesOriginalDateTime(): void
 =======
     public function testModifyMethodModifiesOriginalDateTime()
 >>>>>>> e5987884d0 (fix: [DPMMA-2401] DateTimeHelper unit tests)
+=======
+    public function testModifyMethodModifiesOriginalDateTime(): void
+>>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
     {
         $originalDate       = '2023-01-02 12:00:00';
         $modificationString = '+1 day';
@@ -246,10 +266,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testModifyMethodReturnsClonedDateTime(): void
 =======
     public function testModifyMethodReturnsClonedDateTime()
 >>>>>>> e5987884d0 (fix: [DPMMA-2401] DateTimeHelper unit tests)
+=======
+    public function testModifyMethodReturnsClonedDateTime(): void
+>>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
     {
         $originalDate       = '2023-01-02 12:00:00';
         $modificationString = '+1 day';
