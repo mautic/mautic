@@ -40,10 +40,7 @@ EOT
             );
     }
 
-    /**
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $leadFieldId = (int) $input->getOption('id');
         $userId      = (int) $input->getOption('user');
