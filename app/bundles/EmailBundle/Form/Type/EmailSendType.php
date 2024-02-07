@@ -177,30 +177,13 @@ class EmailSendType extends AbstractType
                     ]
                 );
 
-                $data = $options['data']['send_to_dnc'] ?? false;
                 $builder->add(
                     'send_to_dnc',
                     YesNoButtonGroupType::class,
                     [
                         'label'    => 'mautic.email.send.dnc.label',
-                        'attr'     => [
-                            'onchange'               => 'Mautic.showSendToDncConfirmation(mQuery(this))',
-                            'data-toggle'            => 'confirmation',
-                            'data-message'           => $this->translator->trans('mautic.email.send.dnc.confirmation'),
-                            'data-confirm-text'      => $this->translator->trans(
-                                'mautic.email.send.dnc.confirmation.confirm.text'
-                            ),
-                            'data-confirm-callback'  => 'dismissConfirmation',
-                            'data-cancel-text'       => $this->translator->trans(
-                                'mautic.email.send.dnc.confirmation.cancel.text'
-                            ),
-                            'data-cancel-callback'   => 'setSendToDncToNo',
-                            'data-confirm-btn-class' => 'btn btn-success',
-                            'tooltip'                => 'mautic.email.send.dnc.tooltip',
-                            'data-show-on'           => '{"campaignevent_properties_email_type_1":"checked"}',
-                            'disabled'               => !$this->corePermissions->isGranted('email:campaigns:sendtodnc'),
-                        ],
-                        'data'     => $data,
+                        'attr'     => $this->getSendToDncBtnAttr(),
+                        'data'     => (bool) ($options['data']['send_to_dnc'] ?? false),
                         'required' => false,
                     ]
                 );
@@ -225,5 +208,37 @@ class EmailSendType extends AbstractType
     public function getBlockPrefix()
     {
         return 'emailsend_list';
+    }
+
+    /**
+     * @return array<string, string|bool>
+     */
+    private function getSendToDncBtnAttr(): array
+    {
+        $sendToDncPermission = $this->corePermissions->isGranted('email:campaigns:sendtodnc');
+
+        if ($sendToDncPermission) {
+            $sendToDncAttr = [
+                'onchange'               => 'Mautic.showSendToDncConfirmation(mQuery(this))',
+                'data-toggle'            => 'confirmation',
+                'data-message'           => $this->translator->trans('mautic.email.send.dnc.confirmation'),
+                'data-confirm-text'      => $this->translator->trans('mautic.email.send.dnc.confirmation.confirm.text'),
+                'data-confirm-callback'  => 'dismissConfirmation',
+                'data-cancel-text'       => $this->translator->trans('mautic.email.send.dnc.confirmation.cancel.text'),
+                'data-cancel-callback'   => 'setSendToDncToNo',
+                'data-confirm-btn-class' => 'btn btn-success',
+                'tooltip'                => 'mautic.email.send.dnc.tooltip',
+                'data-show-on'           => '{"campaignevent_properties_email_type_1":"checked"}',
+            ];
+        } else {
+            $sendToDncAttr = [
+                'tooltip'      => 'mautic.email.send.dnc.tooltip',
+                'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
+                'disabled'     => true,
+                'readonly'     => true,
+            ];
+        }
+
+        return $sendToDncAttr;
     }
 }
