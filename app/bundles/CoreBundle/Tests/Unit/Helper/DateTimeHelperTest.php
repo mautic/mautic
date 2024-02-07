@@ -127,7 +127,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
     }
 
-    public function testAddMethodModifiesOriginalDateTime()
+    public function testAddMethodModifiesOriginalDateTime(): void
     {
         $originalDate   = '2023-01-01 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -145,7 +145,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2023-01-02 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
-    public function testAddMethodReturnsClonedDateTime()
+    public function testAddMethodReturnsClonedDateTime(): void
     {
         $originalDate   = '2023-01-01 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -166,7 +166,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
-    public function testSubMethodModifiesOriginalDateTime()
+    public function testSubMethodModifiesOriginalDateTime(): void
     {
         $originalDate   = '2023-01-02 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -184,7 +184,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2023-01-01 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
-    public function testSubMethodReturnsClonedDateTime()
+    public function testSubMethodReturnsClonedDateTime(): void
     {
         $originalDate   = '2023-01-02 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -205,7 +205,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
-    public function testModifyMethodModifiesOriginalDateTime()
+    public function testModifyMethodModifiesOriginalDateTime(): void
     {
         $originalDate       = '2023-01-02 12:00:00';
         $modificationString = '+1 day';
@@ -223,7 +223,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2023-01-03 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
-    public function testModifyMethodReturnsClonedDateTime()
+    public function testModifyMethodReturnsClonedDateTime(): void
     {
         $originalDate       = '2023-01-02 12:00:00';
         $modificationString = '+1 day';
