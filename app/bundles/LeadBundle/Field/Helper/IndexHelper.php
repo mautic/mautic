@@ -15,7 +15,7 @@ class IndexHelper
 {
     public const MAX_COUNT_ALLOWED = 64;
     /**
-     * @var bool|array
+     * @var bool|array<string>
      */
     private $indexedColumns = false;
 
@@ -29,7 +29,7 @@ class IndexHelper
     }
 
     /**
-     * @return array|bool
+     * @return array<string>|bool
      */
     public function getIndexedColumnNames()
     {
@@ -38,10 +38,7 @@ class IndexHelper
         return $this->indexedColumns;
     }
 
-    /**
-     * @return int
-     */
-    public function getIndexCount()
+    public function getIndexCount(): int
     {
         $this->getIndexes();
 

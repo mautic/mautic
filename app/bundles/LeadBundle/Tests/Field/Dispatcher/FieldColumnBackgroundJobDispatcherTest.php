@@ -36,7 +36,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
-    public function testNoListenerUpdate()
+    public function testNoListenerUpdate(): void
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher
@@ -80,7 +80,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
-    public function testNormalProcessUpdate()
+    public function testNormalProcessUpdate(): void
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher
@@ -134,7 +134,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
-    public function testStopPropagationUpdate()
+    public function testStopPropagationUpdate(): void
     {
         $leadField = new LeadField();
 

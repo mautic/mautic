@@ -3,17 +3,18 @@
 namespace Mautic\LeadBundle\Tests\Field\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
-class IndexHelperTest extends \PHPUnit_Framework_TestCase
+class IndexHelperTest extends \PHPUnit\Framework\TestCase
 {
     public const COLUMN_NAME_KEY = 'Column_name';
 
-    public function testGetIndexCountAndColumns()
+    public function testGetIndexCountAndColumns(): void
     {
         $tableName   = 'table_name';
         $sql         = "SHOW INDEXES FROM `$tableName`";
@@ -53,17 +54,18 @@ class IndexHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($connMock);
 
         $stmtMock = $this->createMock(Statement::class);
-
+        $result   = $this->createMock(Result::class);
         $connMock->expects($this->once())
             ->method('prepare')
             ->with($sql)
             ->willReturn($stmtMock);
 
         $stmtMock->expects($this->once())
-            ->method('execute');
+            ->method('executeQuery')
+            ->willReturn($result);
 
-        $stmtMock->expects($this->once())
-            ->method('fetchAll')
+        $result->expects($this->once())
+            ->method('fetchAllAssociative')
             ->willReturn($sqlResult);
 
         $this->assertEquals($expectedColumnNames, $helper->getIndexedColumnNames());

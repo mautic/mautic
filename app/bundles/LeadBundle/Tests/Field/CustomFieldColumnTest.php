@@ -199,7 +199,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $this->customFieldColumn->processCreateLeadColumn($leadField);
     }
 
-    public function testNoErrorWithUpdateAddColumnIndex()
+    public function testNoErrorWithUpdateAddColumnIndex(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -226,7 +226,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->processUpdateLeadColumn($leadField);
     }
 
-    public function testNoErrorWithUpdateRemoveColumnIndex()
+    public function testNoErrorWithUpdateRemoveColumnIndex(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);

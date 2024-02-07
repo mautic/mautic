@@ -53,10 +53,6 @@ EOT
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
             return 1;
-        } catch (CustomFieldLimitException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return 1;
         } catch (AbortColumnUpdateException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_update_aborted').'</error>');
 

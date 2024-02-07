@@ -118,7 +118,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->addColumn(1, $userId);
     }
 
-    public function testAbortColumnUpdate()
+    public function testAbortColumnUpdate(): void
     {
         $leadField = new LeadField();
 
@@ -199,7 +199,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($leadField->getColumnIsNotCreated());
     }
 
-    public function testUpdateColumnWithNoError()
+    public function testUpdateColumnWithNoError(): void
     {
         $leadField = new LeadField();
 

@@ -64,7 +64,7 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
-    public function testStopPropagationUpdate()
+    public function testStopPropagationUpdate(): void
     {
         $leadField = new LeadField();
 

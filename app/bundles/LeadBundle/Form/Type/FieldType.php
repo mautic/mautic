@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
@@ -30,7 +31,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\IsFalse;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<LeadField>
@@ -39,6 +39,7 @@ class FieldType extends AbstractType
 {
     /**
      * For which types will be character limits applicable.
+     * @var array<string>
      */
     private array $indexableFieldsWithLimits = [
         'text',
@@ -50,7 +51,7 @@ class FieldType extends AbstractType
 
     public function __construct(
         private EntityManagerInterface $em,
-        private TranslatorInterface $translator,
+        private Translator $translator,
         private IdentifierFields $identifierFields,
         private IndexHelper $indexHelper,
     ) {

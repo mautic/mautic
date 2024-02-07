@@ -77,7 +77,7 @@ class BackgroundService
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function updateColumn($leadFieldId, $userId): void
+    public function updateColumn(int $leadFieldId, int $userId): void
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
         if (null === $leadField) {
