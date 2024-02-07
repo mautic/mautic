@@ -8,7 +8,6 @@ use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
@@ -48,10 +47,7 @@ class CustomFieldColumn
             $columnExists = $leadsSchema->checkColumnExists($leadField->getAlias(), $leadField->isNew());
 
             if ($columnExists && $this->customFieldIndex->isUpdatePending($leadField)) {
-                try {
-                    $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
-                } catch (NoListenerException) {
-                }
+                $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
                 $this->processUpdateLeadColumn($leadField);
             }
 

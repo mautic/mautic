@@ -71,11 +71,6 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $backgroundSettings = $this->createMock(BackgroundSettings::class);
 
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
-
         $backgroundSettings
             ->expects($this->once())
             ->method('shouldProcessColumnChangeInBackground')
