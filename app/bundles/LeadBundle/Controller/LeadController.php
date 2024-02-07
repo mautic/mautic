@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;

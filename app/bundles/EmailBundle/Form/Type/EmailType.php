@@ -534,18 +534,14 @@ class EmailType extends AbstractType
     /**
      * The owner as mailer value will be taken from the email entity unless the email is new.
      * If so, it will choose the value from the global configuration as default.
-     *
-     * @param Email $email
-     *
-     * @return bool
      */
-    private function getUseOwnerAsMailerOrDefaultValue(Email $email)
+    private function getUseOwnerAsMailerOrDefaultValue(Email $email): bool
     {
-        return $email->getId() ? $email->getUseOwnerAsMailer() : $this->getGlobalMailerIsOwner();
+        return $email->getId() ? ((bool) $email->getUseOwnerAsMailer()) : $this->getGlobalMailerIsOwner();
     }
 
-    private function getGlobalMailerIsOwner()
+    private function getGlobalMailerIsOwner(): bool
     {
-        return (bool) $this->coreParametersHelper->getParameter('mailer_is_owner');
+        return (bool) $this->coreParametersHelper->get('mailer_is_owner');
     }
 }
