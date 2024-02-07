@@ -18,7 +18,7 @@ class Version20191106152509 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql("
             UPDATE {$this->prefix}lead_fields
