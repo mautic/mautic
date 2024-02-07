@@ -75,7 +75,7 @@ class FieldApiController extends CommonApiController
         } catch (AbortColumnCreateException) {
             // Field has been queued
             return Response::HTTP_ACCEPTED;
-        } catch (AbortColumnUpdateException $exception) {
+        } catch (AbortColumnUpdateException) {
             // Field has been queued
             return Response::HTTP_OK;
         }
