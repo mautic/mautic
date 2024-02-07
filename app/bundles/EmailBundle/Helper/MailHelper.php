@@ -6,7 +6,6 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
@@ -611,7 +610,7 @@ class MailHelper
     {
         // Body
         $body         = $message->getHtmlBody();
-        $bodyReplaced = str_ireplace($search, $replace, $body, $updated);
+        $bodyReplaced = str_ireplace($search, $replace, (string) $body, $updated);
         if ($updated) {
             $message->html($bodyReplaced);
         }
@@ -773,7 +772,7 @@ class MailHelper
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (str_contains($content, '</body>')) {
+            if (str_contains((string) $content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;

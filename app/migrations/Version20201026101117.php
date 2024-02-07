@@ -2,17 +2,11 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -22,7 +16,7 @@ use Mautic\EmailBundle\Entity\Email;
 final class Version20201026101117 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      */
     public function preUp(Schema $schema): void
     {
@@ -92,20 +86,22 @@ final class Version20201026101117 extends AbstractMauticMigration
 
     private function iterateOverAllEntities(string $entityClass, callable $entityModifier): void
     {
+        $entityManager  = $this->container->get('doctrine.orm.entity_manager');
+        \assert($entityManager instanceof EntityManagerInterface);
         $batchSize      = 50;
         $i              = 1;
-        $q              = $this->entityManager->createQuery("SELECT t from {$entityClass} t");
-        $iterableResult = $q->iterate();
+        $q              = $entityManager->createQuery("SELECT t from {$entityClass} t");
+        $iterableResult = $q->toIterable();
         foreach ($iterableResult as $row) {
             $entityModifier($row[0]);
-            $this->entityManager->persist($row[0]);
+            $entityManager->persist($row[0]);
 
             if (0 === ($i % $batchSize)) {
-                $this->entityManager->flush();
-                $this->entityManager->clear();
+                $entityManager->flush();
+                $entityManager->clear();
             }
             ++$i;
         }
-        $this->entityManager->flush();
+        $entityManager->flush();
     }
 }

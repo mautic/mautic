@@ -181,6 +181,7 @@ class MailHelperTest extends TestCase
         $email = new Email();
         $email->setFromAddress('override@nowhere.com');
         $email->setFromName('Test');
+        $email->setSubject('Test');
 
         $singleMailHelper->setEmail($email);
 

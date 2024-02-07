@@ -5,8 +5,6 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Mautic 3. Emoji transformation is not necessary anymore due to UTF8MB4 encoding.', EmojiToHtmlTransformer::class), E_USER_DEPRECATED);
-
 /**
  * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
  *
