@@ -1841,7 +1841,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results   = $q->execute()->fetchAllAssociative();
+        $results   = $q->executeQuery()->fetchAllAssociative();
         $countries = array_flip(Countries::getNames('en'));
         $mapData   = [];
 
@@ -1882,7 +1882,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1910,7 +1910,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1941,7 +1941,7 @@ class LeadModel extends FormModel
             $q->andWhere($q->expr()->isNotNull('t.date_identified'));
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ($results) {
             foreach ($results as &$result) {

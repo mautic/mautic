@@ -52,7 +52,7 @@ final class CampaignSubscriberActionEmailToContactFunctionalTest extends MauticM
             }
         }
 
-        $translator = self::$container->get('translator');
+        $translator = static::getContainer()->get('translator');
         $noEmailLog = $translator->trans(
             'mautic.email.contact_has_no_email',
             ['%contact%' => $leadB->getPrimaryIdentifier()]

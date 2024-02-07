@@ -53,11 +53,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private \Mautic\EmailBundle\EventListener\CampaignSubscriber $subscriber;
 
-    /**
-     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $leadModel;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -66,14 +61,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
         $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
-        $this->leadModel           = $this->createMock(LeadModel::class);
+        $leadModel                 = $this->createMock(LeadModel::class);
 
         $this->subscriber = new CampaignSubscriber(
             $this->emailModel,
             $this->realTimeExecutioner,
             $this->sendEmailToUser,
             $this->translator,
-            $this->leadModel
+            $leadModel
         );
     }
 

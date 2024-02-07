@@ -23,10 +23,8 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
             'five'  => false,
         ];
 
-        // Create category
         $categories = $this->createCategories($categoriesFlags);
 
-        // Create lead
         $lead = $this->createLead('John', 'Doe', 'some@test.com');
 
         $this->em->flush();
@@ -47,7 +45,7 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
         ];
 
         /** @var LeadModel $model */
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         $model->setFrequencyRules($lead, $data, [], []);
 
         $subscribedCategories   = $model->getLeadCategories($lead);
