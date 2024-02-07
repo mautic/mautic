@@ -9,6 +9,11 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @runTestsInSeparateProcesses
+ *
+ * @preserveGlobalState disabled
+ */
 class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
@@ -25,7 +30,6 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testCategoriesOnContactPreferences(): void
     {
         $lead       = $this->createLead('John', 'Doe', 'john@doe.com');
-
         $categories = $this->createCategories();
         $this->setLeadCategories($lead, $categories);
 
