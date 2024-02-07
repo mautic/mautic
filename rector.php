@@ -34,6 +34,10 @@ return static function (RectorConfig $rectorConfig): void {
         '*/Test/*',
         '*/Tests/*',
         '*.html.php',
+
+        // Remove in M6 once the class is removed.
+        __DIR__.'/app/bundles/CoreBundle/Helper/UTF8Helper.php',
+
         ReturnTypeFromReturnDirectArrayRector::class => [
             // require bit test update
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
@@ -77,17 +81,17 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
         ],
 
-        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
             '*/Entity/*',
         ],
 
         // handle later with full PHP 8.0 upgrade
-        \Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
-        \Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
-        \Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
+        Rector\Php80\Rector\FunctionLike\MixedTypeRector::class,
+        Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
+        Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
 
         // handle later, case by case as lot of chnaged code
-        \Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
+        Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
             __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
             __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
@@ -106,10 +110,10 @@ return static function (RectorConfig $rectorConfig): void {
 
     // Define what single rules will be applied
     $rectorConfig->rules([
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
-        \Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class,
 
-        \Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
+        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
         NumericReturnTypeFromStrictScalarReturnsRector::class,
         ReturnTypeFromReturnNewRector::class,
         ReturnTypeFromStrictNativeCallRector::class,

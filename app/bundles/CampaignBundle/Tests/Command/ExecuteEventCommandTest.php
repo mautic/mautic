@@ -10,7 +10,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
     {
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=1');
 
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // There should be two events scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -25,7 +25,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
             $logIds[] = $log['id'];
         }
 
-        $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
+        $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
         // There should still be trhee events scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
@@ -43,7 +43,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         // Wait 6 seconds to go past scheduled time
         static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
-        $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
+        $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
         // The events should have executed
         $byEvent = $this->getCampaignEventLogs([2]);
