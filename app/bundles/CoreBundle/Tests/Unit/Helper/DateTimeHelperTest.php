@@ -126,4 +126,121 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         // Assert that the interval has the correct timezone
         $this->assertEquals($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
     }
+
+    public function testAddMethodModifiesOriginalDateTime()
+    {
+        $originalDate   = '2023-01-01 12:00:00';
+        $intervalString = 'P1D'; // Interval of 1 day
+
+        // Initialize DateTimeHelper with a specific date
+        $dateTimeHelper = new DateTimeHelper($originalDate, DateTimeHelper::FORMAT_DB, 'UTC');
+
+        // Add interval to the original DateTime object
+        $dateTimeHelper->add($intervalString);
+
+        // Get the modified DateTime object
+        $modifiedDateTime = $dateTimeHelper->getDateTime();
+
+        // Assert that the date has been modified correctly
+        $this->assertEquals('2023-01-02 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+    }
+
+    public function testAddMethodReturnsClonedDateTime()
+    {
+        $originalDate   = '2023-01-01 12:00:00';
+        $intervalString = 'P1D'; // Interval of 1 day
+
+        // Initialize DateTimeHelper with a specific date
+        $dateTimeHelper = new DateTimeHelper($originalDate, DateTimeHelper::FORMAT_DB, 'UTC');
+
+        // Add interval to a clone of the original DateTime object
+        $clonedDateTime = $dateTimeHelper->add($intervalString, true);
+
+        // Get the original DateTime object
+        $originalDateTime = $dateTimeHelper->getDateTime();
+
+        // Assert that the clone has been modified correctly
+        $this->assertEquals('2023-01-02 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+
+        // Assert that the original DateTime object remains unchanged
+        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+    }
+
+    public function testSubMethodModifiesOriginalDateTime()
+    {
+        $originalDate   = '2023-01-02 12:00:00';
+        $intervalString = 'P1D'; // Interval of 1 day
+
+        // Initialize DateTimeHelper with a specific date
+        $dateTimeHelper = new DateTimeHelper($originalDate, DateTimeHelper::FORMAT_DB, 'UTC');
+
+        // Subtract interval from the original DateTime object
+        $dateTimeHelper->sub($intervalString);
+
+        // Get the modified DateTime object
+        $modifiedDateTime = $dateTimeHelper->getDateTime();
+
+        // Assert that the date has been modified correctly
+        $this->assertEquals('2023-01-01 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+    }
+
+    public function testSubMethodReturnsClonedDateTime()
+    {
+        $originalDate   = '2023-01-02 12:00:00';
+        $intervalString = 'P1D'; // Interval of 1 day
+
+        // Initialize DateTimeHelper with a specific date
+        $dateTimeHelper = new DateTimeHelper($originalDate, DateTimeHelper::FORMAT_DB, 'UTC');
+
+        // Subtract interval from a clone of the original DateTime object
+        $clonedDateTime = $dateTimeHelper->sub($intervalString, true);
+
+        // Get the original DateTime object
+        $originalDateTime = $dateTimeHelper->getDateTime();
+
+        // Assert that the clone has been modified correctly
+        $this->assertEquals('2023-01-01 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+
+        // Assert that the original DateTime object remains unchanged
+        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+    }
+
+    public function testModifyMethodModifiesOriginalDateTime()
+    {
+        $originalDate       = '2023-01-02 12:00:00';
+        $modificationString = '+1 day';
+
+        // Initialize DateTimeHelper with a specific date
+        $dateTimeHelper = new DateTimeHelper($originalDate, DateTimeHelper::FORMAT_DB, 'UTC');
+
+        // Modify the original DateTime object
+        $dateTimeHelper->modify($modificationString);
+
+        // Get the modified DateTime object
+        $modifiedDateTime = $dateTimeHelper->getDateTime();
+
+        // Assert that the date has been modified correctly
+        $this->assertEquals('2023-01-03 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+    }
+
+    public function testModifyMethodReturnsClonedDateTime()
+    {
+        $originalDate       = '2023-01-02 12:00:00';
+        $modificationString = '+1 day';
+
+        // Initialize DateTimeHelper with a specific date
+        $dateTimeHelper = new DateTimeHelper($originalDate, DateTimeHelper::FORMAT_DB, 'UTC');
+
+        // Modify a clone of the original DateTime object
+        $clonedDateTime = $dateTimeHelper->modify($modificationString, true);
+
+        // Get the original DateTime object
+        $originalDateTime = $dateTimeHelper->getDateTime();
+
+        // Assert that the clone has been modified correctly
+        $this->assertEquals('2023-01-03 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+
+        // Assert that the original DateTime object remains unchanged
+        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+    }
 }
