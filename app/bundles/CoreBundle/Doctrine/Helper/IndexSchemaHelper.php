@@ -57,7 +57,7 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return self
+     * @return $this
      *
      * @throws SchemaException
      */
@@ -81,16 +81,16 @@ class IndexSchemaHelper
      * @param string $name
      * @param array  $options
      *
-     * @return self
+     * @return $this
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function addIndex($columns, $name, $options = [])
     {
-        $textColumns = $this->getTextColumns($columns);
+        $columns = $this->getTextColumns($columns);
 
-        if (!empty($textColumns)) {
-            $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
+        if (!empty($columns)) {
+            $index = new Index($this->prefix.$name, $columns, false, false, $options);
 
             if ($this->table->hasIndex($this->prefix.$name)) {
                 $this->changedIndexes[] = $index;
@@ -161,11 +161,9 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function hasIndex(LeadField $leadField)
+    public function hasIndex(LeadField $leadField): bool
     {
         $alias = $leadField->getAlias();
         $this->setName($leadField->getCustomFieldObject());

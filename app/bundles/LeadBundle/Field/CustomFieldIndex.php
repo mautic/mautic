@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Psr\Log\LoggerInterface;
 
-/**
- * Class CustomFieldIndex.
- */
 class CustomFieldIndex
 {
     public function __construct(
@@ -106,11 +103,9 @@ class CustomFieldIndex
     }
 
     /**
-     * @return bool
-     *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function hasIndex(LeadField $leadField)
+    public function hasIndex(LeadField $leadField): bool
     {
         return $this->indexSchemaHelper->hasIndex($leadField);
     }

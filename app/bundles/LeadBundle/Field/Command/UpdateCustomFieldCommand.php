@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
+use Rector\Core\Console\ExitCode;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,20 +52,20 @@ EOT
         } catch (LeadFieldWasNotFoundException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
-            return 1;
+            return Command::FAILURE;
         } catch (AbortColumnUpdateException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_update_aborted').'</error>');
 
-            return 0;
+            return Command::SUCCESS;
         } catch (DriverException|SchemaException|DBALException|\Mautic\CoreBundle\Exception\SchemaException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $output->writeln('');
         $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_updated').'</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

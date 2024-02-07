@@ -37,10 +37,7 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    /**
-     * @param int $userId
-     */
-    public function customFieldWasUpdated(LeadField $leadField, $userId): void
+    public function customFieldWasUpdated(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);

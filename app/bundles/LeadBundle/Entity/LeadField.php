@@ -280,10 +280,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             ->build();
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id = null): void
+    public function setId(?int $id = null): void
     {
         $this->id = $id;
     }
@@ -513,14 +510,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->object;
     }
 
-    /**
-     * Set length limit.
-     *
-     * @param int $charLengthLimit
-     *
-     * @return self
-     */
-    public function setCharLengthLimit($charLengthLimit)
+    public function setCharLengthLimit(int $charLengthLimit): LeadField
     {
         $this->isChanged('charLengthLimit', $charLengthLimit);
         $this->charLengthLimit = $charLengthLimit;
@@ -528,12 +518,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this;
     }
 
-    /**
-     * Get length limit.
-     *
-     * @return int
-     */
-    public function getCharLengthLimit()
+    public function getCharLengthLimit(): int
     {
         return $this->charLengthLimit;
     }
@@ -829,21 +814,13 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return [self::CACHE_NAMESPACE];
     }
 
-    /**
-     * Has simple index? Des not mean that field has unique index.
-     *
-     * @return bool
-     */
-    public function isIsIndex()
+    public function isIsIndex(): bool
     {
         return $this->isIndex;
     }
 
-    /**
-     * @param bool $indexable
-     */
-    public function setIsIndex($indexable): void
+    public function setIsIndex(bool $indexable): void
     {
-        $this->isIndex = (bool) $indexable;
+        $this->isIndex = $indexable;
     }
 }

@@ -685,10 +685,7 @@ class FieldType extends AbstractType
         }
     }
 
-    /**
-     * @param bool $new
-     */
-    private function addLengthValidationField(FormInterface $form, $new = true): void
+    private function addLengthValidationField(FormInterface $form, bool $new = true): void
     {
         $typesWithMaxLength = implode('","', $this->indexableFieldsWithLimits);
 
