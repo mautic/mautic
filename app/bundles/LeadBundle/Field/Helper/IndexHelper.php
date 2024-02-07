@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field\Helper;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -23,12 +14,6 @@ use Mautic\LeadBundle\Entity\Lead;
 class IndexHelper
 {
     const MAX_COUNT_ALLOWED = 64;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     /**
      * @var bool|array
      */
@@ -41,12 +26,8 @@ class IndexHelper
      */
     private $indexCount = 0;
 
-    /**
-     * * @param EntityManager $entityManager
-     */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(private EntityManager $entityManager)
     {
-        $this->entityManager = $entityManager;
     }
 
     /**
@@ -104,8 +85,7 @@ class IndexHelper
         $sql = "SHOW INDEXES FROM `$tableName`";
 
         $stmt = $this->entityManager->getConnection()->prepare($sql);
-        $stmt->execute();
-        $indexes = $stmt->fetchAll(); // Can be empty array, but it's not possible in Mautic
+        $indexes = $stmt->executeQuery()->fetchAllAssociative();
 
         $this->indexedColumns = array_map(
             function ($index) {

@@ -303,7 +303,7 @@ class FieldController extends FormController
                             $valid = false;
                         }
 
-                        $this->addFlash($flashMessage, [
+                        $this->addFlashMessage($flashMessage, [
                             '%name%'      => $field->getLabel(),
                             '%menu_link%' => 'mautic_contactfield_index',
                             '%url%'       => $this->generateUrl('mautic_contactfield_action', [

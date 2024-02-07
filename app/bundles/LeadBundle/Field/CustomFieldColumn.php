@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
@@ -54,10 +55,10 @@ class CustomFieldColumn
             if ($columnExists) {
                 return;
             }
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             // We use slightly different error message if the column already exists in this case.
             throw new SchemaException($this->translator->trans('mautic.lead.field.column.already.exists', ['%field%' => $leadField->getName()], 'validators'));
-        } catch (NoListenerException $e) {
+        } catch (NoListenerException) {
         }
 
         try {
@@ -94,7 +95,7 @@ class CustomFieldColumn
             $leadField->getAlias(),
             $leadField->getType(),
             (bool) $leadField->getIsUniqueIdentifier(),
-            $leadField->getCharLengthLimit()
+            (int) $leadField->getCharLengthLimit()
         );
 
         $leadsSchema->addColumn($schemaDefinition);

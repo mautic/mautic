@@ -2,33 +2,26 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20190524124819 extends AbstractMauticMigration
+class Version20190524124819 extends PreUpAssertionMigration
 {
-    /**
-     * @param Schema $schema
-     *
-     * @throws SkipMigrationException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    public function preUp(Schema $schema)
+    protected function preUpAssertions(): void
     {
-        if ($schema->getTable("{$this->prefix}lead_fields")->hasColumn('is_index')) {
-            throw new SkipMigrationException('Schema includes this migration');
-        }
+        $this->skipAssertion(function (Schema $schema) {
+            return $schema->getTable("{$this->prefix}lead_fields")->hasColumn('is_index');
+        }, sprintf('Schema includes this migration'));
     }
 
     /**
      * @param Schema $schema
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql("
             ALTER TABLE {$this->prefix}lead_fields
@@ -43,7 +36,7 @@ class Version20190524124819 extends AbstractMauticMigration
 	        AND `char_length_limit` IS NULL;
         ");
 
-        $indexHelper    = new IndexHelper($this->factory->getEntityManager());
+        $indexHelper    = $this->container->get(IndexHelper::class);
         $indexedColumns = implode("', '", $indexHelper->getIndexedColumnNames());
 
         $this->addSql("

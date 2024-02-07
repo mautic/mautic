@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
@@ -54,7 +55,7 @@ class FieldColumnDispatcher
 
         $event = new UpdateColumnEvent($leadField, $shouldProcessInBackground);
 
-        $this->dispatcher->dispatch($action, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN);
 
         if ($event->shouldProcessInBackground()) {
             throw new AbortColumnUpdateException('Column change will be processed in background job');
