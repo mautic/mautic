@@ -58,7 +58,7 @@ class FieldColumnBackgroundJobDispatcher
         $this->dispatcher->dispatch($event, $action);
 
         if ($event->isPropagationStopped()) {
-            throw new AbortColumnUpdateException('Column cannot be created now');
+            throw new AbortColumnUpdateException('Column cannot be updated now');
         }
     }
 }

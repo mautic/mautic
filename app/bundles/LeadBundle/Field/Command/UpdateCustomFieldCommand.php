@@ -8,7 +8,6 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
-use Rector\Core\Console\ExitCode;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
