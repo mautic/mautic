@@ -275,7 +275,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testVariantEmailWeightsAreAppropriateForMultipleContacts(): void
     {
-        $this->mailHelper->method('getMailer')->will($this->returnValue($this->mailHelper));
         $this->mailHelper->method('flushQueue')->will($this->returnValue(true));
         $this->mailHelper->method('addTo')->will($this->returnValue(true));
         $this->mailHelper->method('queue')->will($this->returnValue([true, []]));
@@ -420,7 +419,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testVariantEmailWeightsAreAppropriateForMultipleContactsSentOneAtATime(): void
     {
-        $this->mailHelper->method('getMailer')->will($this->returnValue($this->mailHelper));
         $this->mailHelper->method('flushQueue')->will($this->returnValue(true));
         $this->mailHelper->method('addTo')->will($this->returnValue(true));
         $this->mailHelper->method('queue')->will($this->returnValue([true, []]));

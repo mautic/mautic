@@ -44,10 +44,6 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->messageSchedule = $this->createMock(MessageSchedule::class);
         $this->fileHandler     = $this->createMock(FileHandler::class);
 
-        $this->mailHelperMock->expects($this->once())
-            ->method('getMailer')
-            ->willReturnSelf();
-
         $this->sendSchedule = new SendSchedule(
             $this->mailHelperMock,
             $this->messageSchedule,

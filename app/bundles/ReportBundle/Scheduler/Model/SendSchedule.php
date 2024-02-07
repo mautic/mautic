@@ -9,19 +9,17 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class SendSchedule
 {
-    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
-
     public function __construct(
-        MailHelper $mailer,
+        private MailHelper $mailer,
         private MessageSchedule $messageSchedule,
         private FileHandler $fileHandler
     ) {
-        $this->mailer          = $mailer->getMailer();
+        $this->mailer->reset();
     }
 
     public function send(Scheduler $scheduler, $csvFilePath): void
     {
-        $this->mailer->reset(true);
+        $this->mailer->reset();
 
         $transformer = new ArrayStringTransformer();
         $report      = $scheduler->getReport();

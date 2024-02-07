@@ -22,16 +22,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private MailHelper $mailer;
-
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
-        MailHelper $mailer,
+        private MailHelper $mailer,
         private TranslatorInterface $translator,
         private RouterInterface $router
     ) {
-        $this->mailer = $mailer->getMailer();
+        $this->mailer->reset();
     }
 
     public static function getSubscribedEvents(): array

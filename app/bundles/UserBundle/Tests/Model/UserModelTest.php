@@ -95,10 +95,6 @@ class UserModelTest extends TestCase
             ->method('generateSecret')
             ->willReturn($this->userToken);
 
-        $this->mailHelper
-            ->method('getMailer')
-            ->willReturn($this->mailHelper);
-
         $this->mailHelper->expects($this->once())
             ->method('send');
 
@@ -152,10 +148,6 @@ class UserModelTest extends TestCase
             ->willReturn($name);
 
         $this->mailHelper->expects($this->once())
-            ->method('getMailer')
-            ->willReturn($this->mailHelper);
-
-        $this->mailHelper->expects($this->once())
             ->method('setTo')
             ->with($toMail)
             ->willReturn(true);
@@ -172,10 +164,6 @@ class UserModelTest extends TestCase
         $toMails = ['a@test.com', 'b@test.com'];
         $subject = 'subject';
         $content = 'content';
-
-        $this->mailHelper->expects($this->once())
-            ->method('getMailer')
-            ->willReturn($this->mailHelper);
 
         $this->mailHelper->expects($this->once())
             ->method('setTo')
