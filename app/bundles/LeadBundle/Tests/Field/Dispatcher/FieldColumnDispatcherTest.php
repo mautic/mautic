@@ -50,9 +50,7 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(fn ($event) =>
-                    /* @var AddColumnBackgroundEvent $event */
-                    $event instanceof AddColumnEvent),
+                $this->callback(fn (AddColumnEvent $event) => $event instanceof AddColumnEvent),
                 'mautic.lead_field_pre_add_column'
             );
 
@@ -80,7 +78,7 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(fn (AddColumnBackgroundEvent $event) => $event instanceof UpdateColumnEvent),
+                $this->callback(fn (UpdateColumnEvent $event) => $event instanceof UpdateColumnEvent),
                 'mautic.lead_field_pre_update_column',
             );
 
