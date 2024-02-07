@@ -41,11 +41,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private LeadModel $leadModel
     ) {
-        $this->emailModel          = $emailModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->sendEmailToUser     = $sendEmailToUser;
-        $this->translator          = $translator;
-        $this->leadModel           = $leadModel;
     }
 
     public static function getSubscribedEvents(): array
