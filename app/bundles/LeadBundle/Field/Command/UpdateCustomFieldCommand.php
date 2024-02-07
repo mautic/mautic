@@ -7,7 +7,6 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
-use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

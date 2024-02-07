@@ -22,39 +22,39 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|ColumnSchemaHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $columnSchemaHelper;
+    private MockObject $columnSchemaHelper;
 
     /**
      * @var MockObject|SchemaDefinition
      */
-    private \PHPUnit\Framework\MockObject\MockObject $schemaDefinition;
+    private MockObject $schemaDefinition;
 
     /**
      * @var MockObject|Logger
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
     /**
      * @var MockObject|LeadFieldSaver
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldSaver;
+    private MockObject $leadFieldSaver;
 
     /**
      * @var MockObject|CustomFieldIndex
      */
-    private \PHPUnit\Framework\MockObject\MockObject $customFieldIndex;
+    private MockObject $customFieldIndex;
 
     /**
      * @var MockObject|FieldColumnDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldColumnDispatcher;
+    private MockObject $fieldColumnDispatcher;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
-    private \Mautic\LeadBundle\Field\CustomFieldColumn $customFieldColumn;
+    private CustomFieldColumn $customFieldColumn;
 
     protected function setUp(): void
     {
@@ -318,7 +318,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->method('saveLeadFieldEntity')
             ->with($leadField, true);
 
-        $this->customFieldIndex->expects($this->once())
+        $this->customFieldIndex->expects($this->never())
             ->method('addIndexOnColumn')
             ->with($leadField);
 

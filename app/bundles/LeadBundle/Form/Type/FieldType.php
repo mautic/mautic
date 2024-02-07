@@ -39,6 +39,7 @@ class FieldType extends AbstractType
 {
     /**
      * For which types will be character limits applicable.
+     *
      * @var array<string>
      */
     private array $indexableFieldsWithLimits = [

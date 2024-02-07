@@ -654,7 +654,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
     /**
      * Set the unique identifer state of the field.
+     *
      * @param mixed $isUniqueIdentifer
+     *
      * @return LeadField
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
@@ -676,7 +678,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
     /**
      * Wrapper for incorrectly spelled setIsUniqueIdentifer.
+     *
      * @param mixed $isUniqueIdentifier
+     *
      * @return LeadField
      */
     public function setIsUniqueIdentifier($isUniqueIdentifier)

@@ -103,7 +103,7 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param mixed $columns
+     * @param mixed  $columns
      * @param string $name
      * @param array  $options
      *
@@ -175,6 +175,7 @@ class IndexSchemaHelper
 
     /**
      * @param mixed $columns
+     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     private function getTextColumns($columns): array
