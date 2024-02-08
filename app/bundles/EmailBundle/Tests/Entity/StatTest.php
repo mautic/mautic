@@ -67,7 +67,7 @@ class StatTest extends TestCase
         $stat->setRetryCount(3);
         $stat->setSource('campaign');
         $stat->setSourceId(123);
-        $stat->addReply(new EmailReply($stat, 456));
+        $stat->addReply(new EmailReply($stat, '456'));
 
         Assert::assertSame([null, 'john@doe.email'], $stat->getChanges()['emailAddress']);
         Assert::assertSame([false, true], $stat->getChanges()['isFailed']);
@@ -91,7 +91,7 @@ class StatTest extends TestCase
         $stat->setIsRead(true);
         $stat->setSource('campaign');
         $stat->setSourceId(321);
-        $stat->addReply(new EmailReply($stat, 456));
+        $stat->addReply(new EmailReply($stat, '456'));
 
         Assert::assertSame([null, 'john@doe.email'], $stat->getChanges()['emailAddress']);
         Assert::assertSame([false, true], $stat->getChanges()['isFailed']);

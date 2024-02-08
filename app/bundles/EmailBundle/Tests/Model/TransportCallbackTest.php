@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\EmailBundle\Entity\Stat;
@@ -37,6 +28,8 @@ class TransportCallbackTest extends TestCase
             {
                 Assert::assertSame('email', $channel);
                 Assert::assertSame(DNC::BOUNCED, $reason);
+
+                return true;
             }
         };
 
@@ -45,7 +38,7 @@ class TransportCallbackTest extends TestCase
             {
             }
 
-            public function findByHash($hash)
+            public function findByHash($hash): Result
             {
                 Assert::assertSame('some-hash-id', $hash);
 

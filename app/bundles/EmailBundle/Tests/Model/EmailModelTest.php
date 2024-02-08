@@ -64,148 +64,148 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var Connection|LeadDeviceRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepository;
+    private MockObject $leadDeviceRepository;
 
     /**
      * @var Connection|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
-     * @var MockObject|IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
-     * @var MockObject|ThemeHelperInterface
+     * @var MockObject&ThemeHelperInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $themeHelper;
+    private MockObject $themeHelper;
 
     /**
-     * @var MockObject|Mailbox
+     * @var MockObject&Mailbox
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mailboxHelper;
+    private MockObject $mailboxHelper;
 
     /**
-     * @var MockObject|MailHelper
+     * @var MockObject&MailHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mailHelper;
+    private MockObject $mailHelper;
 
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
-     * @var MockObject|TrackableModel
+     * @var MockObject&TrackableModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $trackableModel;
+    private MockObject $trackableModel;
 
     /**
-     * @var MockObject|UserModel
+     * @var MockObject&UserModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userModel;
+    private MockObject $userModel;
 
     /**
-     * @var MockObject|UserHelper
+     * @var MockObject&UserHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
+    private MockObject $userHelper;
 
     /**
-     * @var MockObject|Translator
+     * @var MockObject&Translator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
-     * @var MockObject|Email
+     * @var MockObject&Email
      */
-    private \PHPUnit\Framework\MockObject\MockObject $emailEntity;
+    private MockObject $emailEntity;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&EntityManager
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private MockObject $entityManager;
 
     /**
-     * @var MockObject|StatRepository
+     * @var MockObject&StatRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
+    private MockObject $statRepository;
 
     /**
-     * @var MockObject|EmailRepository
+     * @var MockObject&EmailRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $emailRepository;
+    private MockObject $emailRepository;
 
     /**
-     * @var MockObject|EmailStatModel
+     * @var MockObject&EmailStatModel
      */
     private $emailStatModel;
 
     /**
-     * @var MockObject|FrequencyRuleRepository
+     * @var MockObject&FrequencyRuleRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $frequencyRepository;
+    private MockObject $frequencyRepository;
 
     /**
-     * @var MockObject|MessageQueueModel
+     * @var MockObject&MessageQueueModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $messageModel;
+    private MockObject $messageModel;
 
     /**
-     * @var MockObject|CompanyModel
+     * @var MockObject&CompanyModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyModel;
+    private MockObject $companyModel;
 
     /**
-     * @var MockObject|CompanyRepository
+     * @var MockObject&CompanyRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
+    private MockObject $companyRepository;
 
     /**
-     * @var MockObject|DoNotContact
+     * @var MockObject&DoNotContact
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dncModel;
+    private MockObject $dncModel;
 
-    private \Mautic\EmailBundle\Stat\StatHelper $statHelper;
+    private StatHelper $statHelper;
 
-    private \Mautic\EmailBundle\Model\SendEmailToContact $sendToContactModel;
+    private SendEmailToContact $sendToContactModel;
 
     /**
-     * @var MockObject|DeviceTracker
+     * @var MockObject&DeviceTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackerMock;
+    private MockObject $deviceTrackerMock;
 
     /**
-     * @var MockObject|RedirectRepository
+     * @var MockObject&RedirectRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $redirectRepositoryMock;
+    private MockObject $redirectRepositoryMock;
 
     /**
-     * @var MockObject|CacheStorageHelper
+     * @var MockObject&CacheStorageHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $cacheStorageHelperMock;
+    private MockObject $cacheStorageHelperMock;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
-    private \Mautic\EmailBundle\Model\EmailModel $emailModel;
-
-    /**
-     * @var MockObject|DoNotContact
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $doNotContact;
+    private EmailModel $emailModel;
 
     /**
-     * @var MockObject|CorePermissions
+     * @var MockObject&DoNotContact
      */
-    private \PHPUnit\Framework\MockObject\MockObject $corePermissions;
+    private MockObject $doNotContact;
+
+    /**
+     * @var MockObject&CorePermissions
+     */
+    private MockObject $corePermissions;
 
     /**
      * @var StatsCollectionHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $statsCollectionHelper;
+    private MockObject $statsCollectionHelper;
 
     /**
      * @var MockObject&EventDispatcherInterface
@@ -266,7 +266,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
-            $this->emailStatModel,
             $this->connection,
             $this->entityManager,
             $this->eventDispatcher,
@@ -274,7 +273,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
+            $this->emailStatModel
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -680,7 +680,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
-            $this->emailStatModel,
             $this->connection,
             $this->entityManager,
             $this->eventDispatcher,
@@ -688,7 +687,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
+            $this->emailStatModel
         );
 
         $this->emailEntity->method('getId')
@@ -746,7 +746,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->exactly(2))
             ->method('flush');
 
         $this->entityManager->expects($this->exactly(0))
@@ -787,16 +787,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->with($contactDevice->getId())
             ->willReturn($contactDevice);
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager->expects($this->exactly(1))
             ->method('persist')
             ->withConsecutive(
-                [
-                    $this->callback(function ($statDevice) {
-                        $this->assertInstanceOf(Stat::class, $statDevice);
-
-                        return true;
-                    }),
-                ],
                 [
                     $this->callback(function ($statDevice) use ($stat, $ipAddress) {
                         $this->assertInstanceOf(StatDevice::class, $statDevice);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Stat;
@@ -39,11 +38,6 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $translator;
 
     /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $em;
-
-    /**
      * @var MockObject&MauticMessage
      */
     private MockObject $mockMessage;
@@ -58,14 +52,13 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->auditLogModel    = $this->createMock(AuditLogModel::class);
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
-        $this->em               = $this->createMock(EntityManager::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->em);
+        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator);
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void
     {
-        $event   = new QueueEmailEvent($this->mockMessage);
+        $event = new QueueEmailEvent($this->mockMessage);
 
         $this->emailModel->expects($this->never())
             ->method('getEmailStatus');
@@ -77,8 +70,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoStat(): void
     {
-        $message               = new class() extends MauticMessage {
-            public $leadIdHash = 'some-hash';
+        $message = new class() extends MauticMessage {
+            public ?string $leadIdHash = 'some-hash';
         };
 
         $event = new QueueEmailEvent($message);
@@ -99,8 +92,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoRetry(): void
     {
-        $message               = new class() extends MauticMessage {
-            public $leadIdHash = 'some-hash';
+        $message = new class() extends MauticMessage {
+            public ?string $leadIdHash = 'some-hash';
         };
 
         $event = new QueueEmailEvent($message);
@@ -125,10 +118,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWhenShouldTryAgain(): void
     {
-        $this->mockMessage
-        ->expects($this->once())
-        ->method('getLeadIdHash')
-        ->willReturn('idhash');
+        $this->mockMessage->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $queueEmailEvent = new QueueEmailEvent($this->mockMessage);
 
@@ -146,9 +137,8 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnEmailResendWhenShouldNotTryAgain(): void
     {
         $this->mockMessage
-        ->expects($this->once())
-        ->method('getLeadIdHash')
-        ->willReturn('idhash');
+            ->method('getLeadIdHash')
+            ->willReturn('idhash');
 
         $this->mockMessage->expects($this->once())
             ->method('getSubject')
@@ -169,9 +159,11 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWith4Retry(): void
     {
-        $message               = new class() extends MauticMessage {
-            public $leadIdHash = 'some-hash';
+        $message = new class() extends MauticMessage {
+            public ?string $leadIdHash = 'some-hash';
         };
+
+        $message->subject('Subject');
 
         $event = new QueueEmailEvent($message);
         $stat  = new Stat();

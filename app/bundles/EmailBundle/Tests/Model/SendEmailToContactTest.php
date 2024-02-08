@@ -32,7 +32,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 {
-    protected $contacts = [
+    /**
+     * @var array<array<string,int|string>>
+     */
+    private array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',
@@ -63,32 +66,32 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var MockObject&FromEmailHelper */
+    /**
+     * @var MockObject&FromEmailHelper
+     */
     private $fromEmaiHelper;
 
-    /** @var MockObject&CoreParametersHelper */
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
     private $coreParametersHelper;
 
-    /** @var MockObject&Mailbox */
+    /**
+     * @var MockObject&Mailbox
+     */
     private $mailbox;
 
-    /** @var MockObject&LoggerInterface */
+    /**
+     * @var MockObject&LoggerInterface
+     */
     private MockObject $loggerMock;
 
     private MailHashHelper $mailHashHelper;
 
-    /** @var MockObject&TranslatorInterface */
+    /**
+     * @var MockObject&TranslatorInterface
+     */
     private MockObject $translator;
-
-    protected function setUp(): void
-    {
-        $this->fromEmaiHelper       = $this->createMock(FromEmailHelper::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->mailbox              = $this->createMock(Mailbox::class);
-        $this->loggerMock           = $this->createMock(LoggerInterface::class);
-        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
-    }
 
     /**
      * @var MockObject|MailHelper
@@ -105,24 +108,21 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
      */
     private $emailStatModel;
 
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var StatHelper
-     */
-    private $statHelper;
+    private StatHelper $statHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mailHelper     = $this->createMock(MailHelper::class);
-        $this->dncModel       = $this->createMock(DoNotContact::class);
-        $this->emailStatModel = $this->createMock(EmailStatModel::class);
-        $this->statHelper     = new StatHelper($this->emailStatModel);
-        $this->translator     = $this->createMock(TranslatorInterface::class);
+        $this->dncModel             = $this->createMock(DoNotContact::class);
+        $this->mailHelper           = $this->createMock(MailHelper::class);
+        $this->emailStatModel       = $this->createMock(EmailStatModel::class);
+        $this->statHelper           = new StatHelper($this->emailStatModel);
+        $this->fromEmaiHelper       = $this->createMock(FromEmailHelper::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->mailbox              = $this->createMock(Mailbox::class);
+        $this->loggerMock           = $this->createMock(LoggerInterface::class);
+        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
     }
 
     /**
@@ -647,11 +647,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailer         = new Mailer(new BatchTransport());
         $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper);
-        $statRepository = $this->createMock(StatRepository::class);
         $dncModel       = $this->createMock(DoNotContact::class);
-        $translator     = $this->createMock(Translator::class);
-        $statHelper     = new StatHelper($statRepository);
-        $model          = new SendEmailToContact($mailHelper, $statHelper, $dncModel, $translator);
+        $translator     = $this->createMock(TranslatorInterface::class);
+        $model          = new SendEmailToContact($mailHelper, $this->statHelper, $dncModel, $translator);
         $emailMock      = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getSubject')->willReturn('subject');

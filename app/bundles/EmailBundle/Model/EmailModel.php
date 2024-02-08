@@ -31,6 +31,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -113,7 +114,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        EmailStatModel $emailStatModel
+        private EmailStatModel $emailStatModel
     ) {
         $this->connection = $connection;
 
@@ -128,10 +129,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
     }
 
-    /**
-     * @return \Mautic\EmailBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
         return $this->emailStatModel->getRepository();
     }

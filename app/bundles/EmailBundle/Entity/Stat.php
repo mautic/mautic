@@ -122,6 +122,9 @@ class Stat
      */
     private $replies;
 
+    /**
+     * @var array<string,mixed[]>
+     */
     private $changes = [];
 
     public function __construct()
@@ -643,11 +646,18 @@ class Stat
         $this->replies[] = $reply;
     }
 
+    /**
+     * @return array<string,mixed[]>
+     */
     public function getChanges(): array
     {
         return $this->changes;
     }
 
+    /**
+     * @param mixed $currentValue
+     * @param mixed $newValue
+     */
     private function addChange(string $property, $currentValue, $newValue): void
     {
         if ($currentValue === $newValue) {

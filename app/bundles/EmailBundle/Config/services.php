@@ -33,7 +33,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(\Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
     $services->set(\Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
-    
+
     $services->alias('mautic.email.model.email', \Mautic\EmailBundle\Model\EmailModel::class);
     $services->alias('mautic.email.model.send_email_to_user', \Mautic\EmailBundle\Model\SendEmailToUser::class);
     $services->alias('mautic.email.model.send_email_to_contacts', \Mautic\EmailBundle\Model\SendEmailToContact::class);

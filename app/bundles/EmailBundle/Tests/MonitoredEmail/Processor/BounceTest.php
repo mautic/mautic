@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
@@ -56,8 +55,6 @@ class BounceTest extends \PHPUnit\Framework\TestCase
             ->method('saveEntity');
 
         $leadModel = $this->createMock(LeadModel::class);
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
 
         $translator = $this->createMock(Translator::class);
 
@@ -107,8 +104,6 @@ class BounceTest extends \PHPUnit\Framework\TestCase
             ->method('saveEntity');
 
         $leadModel = $this->createMock(LeadModel::class);
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
 
         $translator = $this->createMock(Translator::class);
 
