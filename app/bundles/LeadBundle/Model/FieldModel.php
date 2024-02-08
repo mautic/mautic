@@ -643,7 +643,7 @@ class FieldModel extends FormModel
     /**
      * Returns list of all segments that use $field.
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
     public function getFieldSegments(LeadField $field)
     {
@@ -769,9 +769,9 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'pre_save':
@@ -939,11 +939,11 @@ class FieldModel extends FormModel
      *
      * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
      *
-     * @param array $filters
+     * @param array<mixed> $filters
      *
-     * @return mixed
+     * @return array<mixed>
      */
-    public function getUniqueIdentifierFields($filters = [])
+    public function getUniqueIdentifierFields(array $filters = []): array
     {
         return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }

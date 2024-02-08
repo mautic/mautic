@@ -110,7 +110,7 @@ class CustomFieldIndex
 
         try {
             return $this->indexSchemaHelper->hasMatchingUniqueIdentifierIndex($leadField, $uniqueIdentifierColumns);
-        } catch (DoctrineSchemaException $exception) {
+        } catch (DoctrineSchemaException) {
             // Return true only if there are no unique identifier fields but otherwise assume the index is missing
             return 0 === count($uniqueIdentifierColumns);
         }
