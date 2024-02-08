@@ -189,6 +189,6 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('ids', $objectIds, ArrayParameterType::INTEGER);
 
-        return $qb2->execute();
+        return $qb2->executeStatement();
     }
 }
