@@ -112,7 +112,7 @@ class LeadType extends AbstractType
         );
 
         $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
-        $companyIds = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId(), null, !$allowMultipleCompanies);
+        $companyIds             = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId());
 
         $builder->add(
             'companies',
