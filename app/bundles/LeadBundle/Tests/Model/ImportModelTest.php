@@ -390,4 +390,33 @@ class ImportModelTest extends StandardImportTestHelper
 
         Assert::assertSame(Import::FAILED, $import->getStatus());
     }
+
+    public function testWhenWarningsAvailableInProcessEventLog(): void
+    {
+        /** @var EventDispatcherInterface|MockObject $dispatcher */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $dispatcher->expects($this->exactly(4))
+            ->method('dispatch')
+            ->with(
+                LeadEvents::IMPORT_ON_PROCESS,
+                $this->callback(function (ImportProcessEvent $event) {
+                    // Emulate a subscriber.
+                    $event->setWasMerged(false);
+                    $event->addWarning('test warning message');
+
+                    return true;
+                })
+            );
+
+        $model = $this->initImportModel();
+        $model->setDispatcher($dispatcher);
+        $entity = $this->initImportEntity();
+        $entity->start();
+        $model->process($entity, new Progress());
+        $entity->end();
+
+        Assert::assertEquals(100, $entity->getProgressPercentage());
+        Assert::assertSame(Import::IMPORTED, $entity->getStatus());
+    }
 }
