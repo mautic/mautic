@@ -388,7 +388,7 @@ class LeadList extends FormEntity
     private function addLegacyParams(array $filters): array
     {
         return array_map(
-            function (array $filter) {
+            function (array $filter): array {
                 if (isset($filter['properties']) && $filter['properties'] && array_key_exists('filter', $filter['properties'])) {
                     $filter['filter'] = $filter['properties']['filter'];
                 } else {
