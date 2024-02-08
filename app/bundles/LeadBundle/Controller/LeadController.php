@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -1431,7 +1430,7 @@ class LeadController extends FormController
                         $mailer->setSubject($email['subject']);
 
                         // Ensure safe emoji for notification
-                        $subject = EmojiHelper::toHtml($email['subject']);
+                        $subject = $email['subject'];
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
                             $this->addFlashMessage(

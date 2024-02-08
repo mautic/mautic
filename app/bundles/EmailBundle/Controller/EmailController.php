@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
@@ -1106,9 +1105,6 @@ class EmailController extends FormController
             // Update the content for processSlots
             $entity->setContent($content);
         }
-
-        // Replace short codes to emoji
-        $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
         $this->processSlots($slotsHelper, $slots, $entity);
 
