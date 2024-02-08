@@ -17,8 +17,8 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
 
     public function testAnalyseWhenNoCustomFieldPresent(): void
     {
-        $output = $this->runCommand('mautic:fields:analyse');
-        $this->assertStringContainsString('No custom field(s) to analyse!!!', $output);
+        $commandTester = $this->testSymfonyCommand('mautic:fields:analyse');
+        $this->assertStringContainsString('No custom field(s) to analyse!!!', $commandTester->getDisplay());
     }
 
     public function testAnalyseCustomField(): void
@@ -61,22 +61,22 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         ];
         $this->createCustomField($extraField);
 
-        $output = $this->runCommand('mautic:fields:analyse');
+        $output = $this->testSymfonyCommand('mautic:fields:analyse');
 
         foreach ($fields as $alias => $field) {
-            $this->assertStringContainsString($alias, $output);
-            $this->assertStringContainsString($field['label'], $output);
-            $this->assertStringContainsString((string) $field['limit'], $output);
+            $this->assertStringContainsString($alias, $output->getDisplay());
+            $this->assertStringContainsString($field['label'], $output->getDisplay());
+            $this->assertStringContainsString((string) $field['limit'], $output->getDisplay());
         }
 
-        $this->assertStringNotContainsString($extraField['label'], $output);
+        $this->assertStringNotContainsString($extraField['label'], $output->getDisplay());
 
-        $output = $this->runCommand('mautic:fields:analyse', ['--display-table' => true]);
+        $output = $this->testSymfonyCommand('mautic:fields:analyse', ['--display-table' => true]);
 
         foreach ($fields as $alias => $field) {
-            $this->assertStringContainsString($alias, $output);
-            $this->assertStringContainsString($field['label'], $output);
-            $this->assertStringContainsString((string) $field['limit'], $output);
+            $this->assertStringContainsString($alias, $output->getDisplay());
+            $this->assertStringContainsString($field['label'], $output->getDisplay());
+            $this->assertStringContainsString((string) $field['limit'], $output->getDisplay());
         }
     }
 
@@ -95,8 +95,8 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         $columnSchemaHelper = $this->getContainer()->get('mautic.schema.helper.column');
         $columnSchemaHelper->setName('leads')->dropColumn($field->getAlias())->executeChanges();
 
-        $output = $this->runCommand('mautic:fields:analyse');
-        $this->assertStringContainsString('No custom field(s) to analyse!!!', $output);
+        $output = $this->testSymfonyCommand('mautic:fields:analyse');
+        $this->assertStringContainsString('No custom field(s) to analyse!!!', $output->getDisplay());
 
         $fieldModel->deleteEntity($field);
     }
@@ -161,6 +161,6 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         array_pop($text);
         $text[count($text) - 1] .= '.';
 
-        return implode($text, '');
+        return implode('', $text);
     }
 }

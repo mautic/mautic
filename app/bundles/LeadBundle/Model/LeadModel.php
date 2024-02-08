@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -585,7 +585,7 @@ class LeadModel extends FormModel
                         $newValue = implode('|', $newValue);
                     }
 
-                    $isEmpty = (null === $newValue || '' === $newValue);
+                    $isEmpty = (null == $newValue || '' == $newValue);
                     if ($curValue !== $newValue && (!$isEmpty || ($isEmpty && $overwriteWithBlank))) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
@@ -648,6 +648,8 @@ class LeadModel extends FormModel
 
     /**
      * Obtain an array of users for api lead edits.
+     *
+     * @return array<mixed>
      */
     public function getOwnerList()
     {
@@ -656,6 +658,8 @@ class LeadModel extends FormModel
 
     /**
      * Obtains a list of leads based off IP.
+     *
+     * @return array<mixed>
      */
     public function getLeadsByIp($ip)
     {
@@ -692,6 +696,8 @@ class LeadModel extends FormModel
 
     /**
      * Gets the details of a lead if not already set.
+     *
+     * @return array<mixed>
      */
     public function getLeadDetails($lead)
     {
@@ -836,6 +842,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of companies this contact belongs to.
+     *
+     * @return array<mixed>
      */
     public function getCompanies(Lead $lead)
     {
@@ -912,6 +920,8 @@ class LeadModel extends FormModel
 
     /**
      * @param string $channel
+     *
+     * @return array<mixed>
      */
     public function getFrequencyRules(Lead $lead, $channel = null)
     {
@@ -1864,7 +1874,7 @@ class LeadModel extends FormModel
         $query->select(implode(', ', $columns))
             ->from(MAUTIC_TABLE_PREFIX.'leads');
 
-        return $query->execute()->fetch();
+        return $query->executeQuery()->fetchAssociative();
     }
 
     /**
