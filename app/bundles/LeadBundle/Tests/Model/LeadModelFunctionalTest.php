@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
@@ -105,7 +105,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
         $leadModel->addToCompany($contact, $company);
         $leadModel->addToCompany($contact, $company2);
 
@@ -118,8 +118,8 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     public function testGetCustomLeadFieldLength(): void
     {
-        $leadModel  = $this->container->get('mautic.lead.model.lead');
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
+        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
 
         // Create a lead field.
         $leadField = new LeadField();
@@ -169,7 +169,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         $this->expectException(DBALException::class);
 
-        $leadModel  = $this->container->get('mautic.lead.model.lead');
+        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
         $leadModel->getCustomLeadFieldLength(['unknown_field']);
     }
 }
