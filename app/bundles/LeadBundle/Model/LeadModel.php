@@ -832,6 +832,8 @@ class LeadModel extends FormModel
      * @param bool $forLists
      * @param bool $arrayHydration
      * @param bool $isPublic
+     *
+     * @return mixed
      */
     public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
