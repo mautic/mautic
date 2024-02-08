@@ -21,7 +21,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 
         $contactId = $lead->getId();
 
-        $this->runcommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
+        $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
         $this->assertNull(static::getContainer()->get('mautic.lead.model.lead')->getEntity($contactId));
 

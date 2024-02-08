@@ -32,6 +32,7 @@ use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -53,14 +54,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * @property LeadDeviceRepository|(LeadDeviceRepository&object&MockObject)|(LeadDeviceRepository&MockObject)|(object&MockObject)|MockObject $leadDeviceRepository
- */
 class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
     public const SEGMENT_A = 'segment A';
 
     public const SEGMENT_B = 'segment B';
+
+    /**
+     * @var Connection|LeadDeviceRepository
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepository;
 
     /**
      * @var Connection|MockObject
@@ -582,6 +585,21 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(1));
 
         $this->assertTrue(0 === count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])));
+    }
+
+    /**
+     * Test that DoNotContact works just with lead.
+     */
+    public function testDoNotContactLead(): void
+    {
+        $lead = new Lead();
+        $lead->setId(42);
+        $this->doNotContact->expects($this->once())
+            ->method('addDncForContact')
+            ->with(42, 'email', DoNotContactEntity::BOUNCED, 'comment', true)
+            ->willReturn(false);
+
+        $this->assertFalse($this->emailModel->setDoNotContactLead($lead, 'comment'));
     }
 
     /**
