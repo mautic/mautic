@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0', '8.1']
+        php-versions: ['8.0', '8.1', '8.2']
         db-types: ['mysql', 'mariadb']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -89,9 +89,9 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          composer test
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
     - name: Upload coverage report

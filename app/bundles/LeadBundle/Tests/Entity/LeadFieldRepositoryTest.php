@@ -238,7 +238,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $query = $this->createQueryMock();
         $this->entityManager->expects($this->once())
             ->method('createQuery')
-            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer FROM  f INDEX BY f.alias WHERE f.object = :object')
+            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit FROM  f INDEX BY f.alias WHERE f.object = :object')
             ->willReturn($query);
 
         $result = [];

@@ -337,6 +337,15 @@ class ReportController extends FormController
                 // Columns have to be reset in order for Symfony to honor the new submitted order
                 $oldColumns = $entity->getColumns();
                 $entity->setColumns([]);
+                $oldSchedule = $entity->isScheduled() ? $entity->getSchedule() : null;
+
+                $newSchedule['schedule_unit']            = $request->request->all()['report']['scheduleUnit'];
+                $newSchedule['schedule_day']             = $request->request->all()['report']['scheduleDay'];
+                $newSchedule['schedule_month_frequency'] = $request->request->all()['report']['scheduleMonthFrequency'];
+
+                if ($oldSchedule != $newSchedule) {
+                    $entity->setHasScheduleChanged(true);
+                }
 
                 $oldGraphs = $entity->getGraphs();
                 $entity->setGraphs([]);

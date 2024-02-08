@@ -127,7 +127,7 @@
               <div class="pr-md pl-md pt-lg pb-lg">
                   <div class="box-layout">
                       <div class="col-xs-10">
-                          <div>{{ emoji_to_html(email.subject, 'short') }}</div>
+                          <div>{{ email.subject }}</div>
                           {% if email.isVariant(true) %}
                             <div class="small">
                               <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}) }}" data-toggle="ajax">
