@@ -103,7 +103,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                                 ],
                             ]
                         );
-                        ?>
+                ?>
                     </td>
                     <td>
                         <div>
