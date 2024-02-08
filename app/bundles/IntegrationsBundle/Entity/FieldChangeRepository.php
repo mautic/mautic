@@ -187,7 +187,7 @@ class FieldChangeRepository extends CommonRepository
             ->where(
                 $qb2->expr()->in('id', ':ids')
             )
-            ->setParameter('ids', $objectIds, ArrayParameterType::INTEGER );
+            ->setParameter('ids', $objectIds, ArrayParameterType::INTEGER);
 
         return $qb2->execute();
     }
