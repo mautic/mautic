@@ -35,7 +35,7 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
      */
     private $customFieldIndex;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->indexSchemaHelperMock          = $this->createMock(IndexSchemaHelper::class);
         $this->loggerMock                     = $this->createMock(Logger::class);
@@ -48,12 +48,8 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getHasMatchingUniqueIdentifierIndexProvider
      *
      * Test getting unique identifier if object is lead or company.
-     *
-     * @param string $object
-     * @param string $field
-     * @param string $fieldKey
      */
-    public function testHasMatchingUniqueIdentifierIndex($object, $field, $fieldKey)
+    public function testHasMatchingUniqueIdentifierIndex(string $object, string $field, string $fieldKey): void
     {
         $this->indexSchemaHelperMock->expects($this->once())
             ->method('hasUniqueIdentifierIndex')
@@ -79,9 +75,9 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
     /**
      * Provides data for testHasMatchingUniqueIdentifierIndex.
      *
-     * @return array
+     * @return array<mixed>>
      */
-    public function getHasMatchingUniqueIdentifierIndexProvider()
+    public function getHasMatchingUniqueIdentifierIndexProvider(): array
     {
         return [
             'Lead object'    => ['lead', 'email', 'email_key'],
