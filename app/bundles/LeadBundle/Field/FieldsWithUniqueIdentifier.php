@@ -6,6 +6,9 @@ namespace Mautic\LeadBundle\Field;
 
 class FieldsWithUniqueIdentifier
 {
+    /**
+     * @var array<mixed>
+     */
     private array $uniqueIdentifierFields = [];
 
     public function __construct(
@@ -16,9 +19,11 @@ class FieldsWithUniqueIdentifier
     /**
      * Retrieves a list of cached published fields that are unique identifiers.
      *
-     * @return mixed
+     * @param array<mixed> $filters
+     *
+     * @return array<mixed>
      */
-    public function getFieldsWithUniqueIdentifier(array $filters = [])
+    public function getFieldsWithUniqueIdentifier(array $filters = []): array
     {
         $filters = $this->prepareFilters($filters);
 
@@ -33,7 +38,9 @@ class FieldsWithUniqueIdentifier
     /**
      * Retrieves a list of published fields that are unique identifiers fresh from the DB each time.
      *
-     * @param array $filters
+     * @param array<mixed> $filters
+     *
+     * @return array<mixed>
      */
     public function getLiveFields(array $filters = []): array
     {
@@ -42,6 +49,11 @@ class FieldsWithUniqueIdentifier
         return $this->fieldList->getFieldList(false, true, $filters);
     }
 
+    /**
+     * @param array<mixed> $filters
+     *
+     * @return array<mixed>
+     */
     private function prepareFilters(array $filters): array
     {
         $filters['isPublished'] ??= true;

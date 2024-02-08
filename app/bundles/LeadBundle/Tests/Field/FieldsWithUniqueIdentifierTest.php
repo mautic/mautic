@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Acquia, Inc.
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Field;
 
 use Mautic\LeadBundle\Field\FieldList;
@@ -29,7 +20,7 @@ class FieldsWithUniqueIdentifierTest extends TestCase
      */
     private $fieldsWithUniqueIdentifier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -37,7 +28,7 @@ class FieldsWithUniqueIdentifierTest extends TestCase
         $this->fieldsWithUniqueIdentifier = new FieldsWithUniqueIdentifier($this->fieldList);
     }
 
-    public function testCacheIsUsed()
+    public function testCacheIsUsed(): void
     {
         $fields = ['cached fields'];
         $this->fieldList->expects($this->once())
@@ -50,7 +41,7 @@ class FieldsWithUniqueIdentifierTest extends TestCase
         Assert::assertSame($fields, $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['isPublished' => false]));
     }
 
-    public function testCacheIsNotUsed()
+    public function testCacheIsNotUsed(): void
     {
         $fields = ['cached fields'];
         $this->fieldList->expects($this->exactly(2))
