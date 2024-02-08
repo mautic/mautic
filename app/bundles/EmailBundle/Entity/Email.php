@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\FormBundle\Entity\Form;
@@ -241,9 +240,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->setDateModified(new \DateTime());
     }
 
-    /**
-     * Clear stats.
-     */
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
@@ -557,9 +553,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setContent($content)
     {
-        // Ensure safe emoji
-        $content = array_map(fn ($text) => EmojiHelper::toShort($text), $content);
-
         $this->isChanged('content', $content);
         $this->content = $content;
 

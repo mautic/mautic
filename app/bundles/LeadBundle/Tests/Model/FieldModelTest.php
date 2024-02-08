@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,6 +19,7 @@ use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Assert;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -139,12 +141,13 @@ class FieldModelTest extends MauticMysqlTestCase
         $this->assertTrue($model->isUsedField($leadField));
     }
 
-    public function testUniqueIdentifierIndexToggleForContacts()
+    public function testUniqueIdentifierIndexToggleForContacts(): void
     {
         // Log queries so we can detect if alter queries were executed
-        $stack                    = new class() implements SQLLogger {
-            /** @var mixed[] */
-            private $indexQueries = [];
+        /**  $stack */
+        $stack                    = new class() implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
+            /** @var array<mixed> */
+            private array $indexQueries = [];
 
             public function startQuery($sql, ?array $params = null, ?array $types = null)
             {
@@ -163,7 +166,7 @@ class FieldModelTest extends MauticMysqlTestCase
             }
 
             /**
-             * @return mixed[]
+             * @return array<mixed>
              */
             public function getIndexQueries(): array
             {
@@ -176,9 +179,8 @@ class FieldModelTest extends MauticMysqlTestCase
             }
         };
 
-        $this->connection->getConfiguration()->setSQLLogger($stack);
-
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $this->connection->getConfiguration()->setSQLLogger($stack); /** @phpstan-ignore-line SQLLogger is deprecated */
+        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
 
         // Ensure the index exists
         $emailField = $fieldModel->getEntityByAlias('email');
@@ -249,13 +251,31 @@ class FieldModelTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
-    private function getColumns($table, $column)
+    private function getColumns(string $table, string $column): array
+    {
+        $stmt = $this->connection->executeQuery(
+            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '"
+            .MAUTIC_TABLE_PREFIX
+            ."$table' AND COLUMN_NAME = '$column'"
+        );
+
+        return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getUniqueIdentifierIndexColumns(string $table): array
     {
         $stmt       = $this->connection->executeQuery(
-            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getParams()['dbname']}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
-            ."$table' AND COLUMN_NAME = '$column'"
+            sprintf(
+                "SELECT * FROM information_schema.statistics where table_schema = '%s' and table_name = '%s' and index_name = '%sunique_identifier_search'",
+                $this->connection->getDatabase(),
+                MAUTIC_TABLE_PREFIX.$table,
+                MAUTIC_TABLE_PREFIX
+            )
         );
 
         return $stmt->fetchAllAssociative();

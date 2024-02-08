@@ -90,6 +90,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
      */
     private $isUniqueIdentifier = false;
 
+    private ?int $charLengthLimit = 64;
+
     /**
      * @var int|null
      */
@@ -104,6 +106,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
      * @var array
      */
     private $properties = [];
+
+    private ?bool $isIndex = false;
 
     /**
      * The column in lead_fields table was not created yet if this property is true.
@@ -187,6 +191,12 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             ->build();
 
         $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
+        $builder->addNullableField('isIndex', 'boolean', 'is_index');
+
+        $builder->createField('charLengthLimit', 'integer')
+            ->columnName('char_length_limit')
+            ->nullable()
+            ->build();
 
         $builder->createField('order', 'integer')
             ->columnName('field_order')
@@ -268,6 +278,11 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
                 ]
             )
             ->build();
+    }
+
+    public function setId(?int $id = null): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -495,6 +510,19 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->object;
     }
 
+    public function setCharLengthLimit(?int $charLengthLimit): LeadField
+    {
+        $this->isChanged('charLengthLimit', $charLengthLimit);
+        $this->charLengthLimit = $charLengthLimit;
+
+        return $this;
+    }
+
+    public function getCharLengthLimit(): ?int
+    {
+        return $this->charLengthLimit;
+    }
+
     public function getCustomFieldObject(): string
     {
         if (!$this->customFieldObject) {
@@ -618,6 +646,10 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
     {
+        if ($isUniqueIdentifer) {
+            $this->isIndex = true;
+        }
+
         $this->isUniqueIdentifer = $this->isUniqueIdentifier = $isUniqueIdentifer;
 
         return $this;
@@ -784,5 +816,15 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
     public function getCacheNamespacesToDelete(): array
     {
         return [self::CACHE_NAMESPACE];
+    }
+
+    public function isIsIndex(): bool
+    {
+        return $this->isIndex;
+    }
+
+    public function setIsIndex(bool $indexable): void
+    {
+        $this->isIndex = $indexable;
     }
 }

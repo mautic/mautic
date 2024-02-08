@@ -4,41 +4,34 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
+use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEntityFormOptions(): void
     {
-        $modelFake = new class() {
-            /**
-             * @var array<string,array<string,string>>
-             */
-            public const FIELD_ARRAY = [
-                'field_1' => [
-                    'label' => 'Field 1',
-                    'type'  => 'text',
-                ],
-                'field_2' => [
-                    'label' => 'Field 2',
-                    'type'  => 'text',
-                ],
-            ];
+        $result = [
+            'field_1' => [
+                'label' => 'Field 1',
+                'type'  => 'text',
+            ],
+            'field_2' => [
+                'label' => 'Field 2',
+                'type'  => 'text',
+            ],
+        ];
 
-            public int $getEntitiesCounter = 0;
+        $paginator = $this->createMock(Paginator::class);
+        $paginator->method('getIterator')
+            ->willReturn($result);
 
-            /**
-             * @return ArrayCollection<string, array{label: string, type: string}>
-             */
-            public function getEntities(): iterable
-            {
-                ++$this->getEntitiesCounter;
-
-                return new ArrayCollection(self::FIELD_ARRAY);
-            }
-        };
+        $modelFake = $this->createMock(FieldModel::class);
+        $modelFake->expects(self::once())
+            ->method('getEntities')
+            ->willReturn($paginator);
 
         $controller = new class($modelFake) {
             use CustomFieldsApiControllerTrait;
@@ -65,8 +58,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             }
         };
 
-        Assert::assertSame($modelFake::FIELD_ARRAY, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
-        Assert::assertSame($modelFake::FIELD_ARRAY, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
-        Assert::assertSame(1, $modelFake->getEntitiesCounter); // Ensure that getEntities is called just once.
+        Assert::assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
+        Assert::assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
     }
 }

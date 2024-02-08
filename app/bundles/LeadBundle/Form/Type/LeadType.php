@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\StageBundle\Entity\Stage;
@@ -31,7 +32,8 @@ class LeadType extends AbstractType
     public function __construct(
         private TranslatorInterface $translator,
         private CompanyModel $companyModel,
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
+        private CoreParametersHelper $coreParametersHelper
     ) {
     }
 
@@ -109,7 +111,8 @@ class LeadType extends AbstractType
             ]
         );
 
-        $companyIds = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId());
+        $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
+        $companyIds             = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId());
 
         $builder->add(
             'companies',
@@ -117,10 +120,10 @@ class LeadType extends AbstractType
             [
                 'label'      => 'mautic.company.selectcompany',
                 'label_attr' => ['class' => 'control-label'],
-                'multiple'   => true,
+                'multiple'   => $allowMultipleCompanies,
                 'required'   => false,
                 'mapped'     => false,
-                'data'       => array_combine($companyIds, $companyIds),
+                'data'       => !$allowMultipleCompanies ? ($companyIds[0] ?? null) : array_combine($companyIds, $companyIds),
             ]
         );
 

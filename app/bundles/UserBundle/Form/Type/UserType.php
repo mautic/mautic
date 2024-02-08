@@ -193,6 +193,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'data' => $defaultSignature,
+                'help' => 'mautic.user.config.signature.helper',
             ]
         );
 

@@ -995,11 +995,12 @@ class LeadModel extends FormModel
             $this->addToCategory($lead, $data['global_categories']);
         }
         $leadCategories = $this->getLeadCategories($lead);
-        // Delete categories that were removed
-        $deletedCategories = array_diff($leadCategories, $data['global_categories']);
 
-        if (!empty($deletedCategories)) {
-            $this->removeFromCategories($deletedCategories);
+        // Update categories relations as removed those are removed.
+        $unsubscribedCategories = array_diff($leadCategories, $data['global_categories']);
+
+        if (!empty($unsubscribedCategories)) {
+            $this->unsubscribeCategories($unsubscribedCategories);
         }
 
         // Delete channels that were removed
@@ -1043,6 +1044,30 @@ class LeadModel extends FormModel
         return $results;
     }
 
+    /**
+     * @param mixed[] $categories
+     */
+    private function unsubscribeCategories(array $categories): void
+    {
+        $unsubscribedCats = [];
+        foreach ($categories as $key => $category) {
+            /** @var LeadCategory $category */
+            $category     = $this->getLeadCategoryRepository()->getEntity($key);
+            $category->setManuallyRemoved(true);
+            $category->setManuallyAdded(false);
+
+            $unsubscribedCats[] = $category;
+
+            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
+                $this->dispatcher->dispatch(new CategoryChangeEvent($category->getLead(), $category->getCategory(), false), LeadEvents::LEAD_CATEGORY_CHANGE);
+            }
+        }
+
+        if (!empty($unsubscribedCats)) {
+            $this->getLeadCategoryRepository()->saveEntities($unsubscribedCats);
+        }
+    }
+
     public function removeFromCategories($categories): void
     {
         $deleteCats = [];
@@ -1072,6 +1097,20 @@ class LeadModel extends FormModel
     public function getLeadCategories(Lead $lead): array
     {
         $leadCategories   = $this->getLeadCategoryRepository()->getLeadCategories($lead);
+        $leadCategoryList = [];
+        foreach ($leadCategories as $category) {
+            $leadCategoryList[$category['id']] = $category['category_id'];
+        }
+
+        return $leadCategoryList;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getUnsubscribedLeadCategoriesIds(Lead $lead): array
+    {
+        $leadCategories   = $this->getLeadCategoryRepository()->getUnsubscribedLeadCategories($lead);
         $leadCategoryList = [];
         foreach ($leadCategories as $category) {
             $leadCategoryList[$category['id']] = $category['category_id'];
@@ -1791,7 +1830,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results   = $q->execute()->fetchAllAssociative();
+        $results   = $q->executeQuery()->fetchAllAssociative();
         $countries = array_flip(Countries::getNames('en'));
         $mapData   = [];
 
@@ -1853,7 +1892,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1881,7 +1920,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1912,7 +1951,7 @@ class LeadModel extends FormModel
             $q->andWhere($q->expr()->isNotNull('t.date_identified'));
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ($results) {
             foreach ($results as &$result) {
