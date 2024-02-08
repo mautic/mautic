@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Field\Helper\IndexHelper;
 use Mautic\LeadBundle\Field\IdentifierFields;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -19,13 +20,16 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\IsFalse;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
@@ -33,10 +37,24 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 class FieldType extends AbstractType
 {
+    /**
+     * For which types will be character limits applicable.
+     *
+     * @var array<string>
+     */
+    private array $indexableFieldsWithLimits = [
+        'text',
+        'select',
+        'phone',
+        'url',
+        'email',
+    ];
+
     public function __construct(
         private EntityManagerInterface $em,
         private Translator $translator,
-        private IdentifierFields $identifierFields
+        private IdentifierFields $identifierFields,
+        private IndexHelper $indexHelper,
     ) {
     }
 
@@ -81,9 +99,11 @@ class FieldType extends AbstractType
 
         $new         = $options['data']->getId() ? false : true;
         $type        = $options['data']->getType();
+        $isIndex     = $options['data']->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
+
         $builder->add(
             'type',
             ChoiceType::class,
@@ -219,21 +239,31 @@ class FieldType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.field.help.defaultvalue',
                 ],
-                'required'   => false,
-                'disabled'   => $disableDefaultValue,
+                'required'    => false,
+                'disabled'    => $disableDefaultValue,
+                'constraints' => [
+                    new Assert\Callback([$this, 'validateDefaultValue']),
+                ],
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue): array {
+        /**
+         * @see FormEvents::PRE_SET_DATA
+         * Used as as form modifier before trying to set data
+         */
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue, $new): array {
             $cleaningRules = [];
             $form          = $event->getForm();
             $data          = $event->getData();
             $type          = (is_array($data)) ? ($data['type'] ?? $type) : $data->getType();
+            $constraints   = [];
 
             switch ($type) {
-                case 'multiselect':
                 case 'select':
                 case 'lookup':
+                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    // no break
+                case 'multiselect':
                     $cleaningRules['defaultValue'] = 'raw';
 
                     if (is_array($data)) {
@@ -261,14 +291,15 @@ class FieldType extends AbstractType
                         'defaultValue',
                         ChoiceType::class,
                         [
-                            'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label is-chosen'],
-                            'attr'       => ['class' => 'form-control'],
-                            'required'   => false,
-                            'choices'    => array_flip($list),
-                            'multiple'   => 'multiselect' === $type,
-                            'data'       => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
-                            'disabled'   => $disableDefaultValue,
+                            'label'       => 'mautic.core.defaultvalue',
+                            'label_attr'  => ['class' => 'control-label is-chosen'],
+                            'attr'        => ['class' => 'form-control'],
+                            'required'    => false,
+                            'choices'     => array_flip($list),
+                            'multiple'    => 'multiselect' === $type,
+                            'data'        => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
+                            'disabled'    => $disableDefaultValue,
+                            'constraints' => $constraints,
                         ]
                     );
                     break;
@@ -388,10 +419,12 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
-                case 'number':
                 case 'tel':
                 case 'url':
                 case 'email':
+                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    // no break
+                case 'number':
                     $form->add(
                         'defaultValue',
                         TextType::class,
@@ -402,12 +435,16 @@ class FieldType extends AbstractType
                                 'class' => 'form-control',
                                 'type'  => $type,
                             ],
-                            'required'   => false,
-                            'disabled'   => $disableDefaultValue,
+                            'required'    => false,
+                            'disabled'    => $disableDefaultValue,
+                            'constraints' => $constraints,
                         ]
                     );
-
                     break;
+            }
+
+            if (in_array($type, $this->indexableFieldsWithLimits)) {
+                $this->addLengthValidationField($form, $new);
             }
 
             return $cleaningRules;
@@ -434,6 +471,10 @@ class FieldType extends AbstractType
                     $data['defaultValue'] = null;
                 }
 
+                if (isset($data['type']) && !in_array($data['type'], $this->indexableFieldsWithLimits)) {
+                    $data['charLengthLimit'] = null;
+                }
+
                 $event->setData($data);
             }
         );
@@ -449,7 +490,7 @@ class FieldType extends AbstractType
                 EntityType::class,
                 [
                     'label'         => 'mautic.core.order',
-                    'class'         => \Mautic\LeadBundle\Entity\LeadField::class,
+                    'class'         => LeadField::class,
                     'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],
@@ -527,6 +568,28 @@ class FieldType extends AbstractType
             ]
         );
 
+        $constraints = [];
+
+        if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
+            $constraints[] = new IsFalse(['message' => 'mautic.lead.field.form.index_count.error']);
+        }
+
+        $builder->add(
+            'isIndex',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.lead.field.indexable',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => $this->translator->trans('mautic.lead.field.form.isIndex.tooltip', ['%indexCount%' => $this->indexHelper->getIndexCount(), '%maxCount%' => $this->indexHelper->getMaxCount()]),
+                    'readonly'=> (false === $isIndex && $this->indexHelper->getIndexCount() >= $this->indexHelper->getMaxCount()),
+                    ],
+                'required'    => false,
+                'constraints' => $constraints,
+            ]
+        );
+
         $data = $options['data']->isUniqueIdentifier();
         $builder->add(
             'isUniqueIdentifer',
@@ -581,7 +644,18 @@ class FieldType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => LeadField::class,
+                'data_class'        => LeadField::class,
+                'validation_groups' => function (FormInterface $form): array {
+                    $data = $form->getData();
+
+                    $groups = ['Default'];
+
+                    if (in_array($data->getType(), $this->indexableFieldsWithLimits)) {
+                        $groups[] = 'indexableFieldWithLimits';
+                    }
+
+                    return $groups;
+                },
             ]
         );
     }
@@ -592,5 +666,47 @@ class FieldType extends AbstractType
     public function getBlockPrefix()
     {
         return 'leadfield';
+    }
+
+    public static function validateDefaultValue(?string $value, ExecutionContextInterface $context): void
+    {
+        if (!empty($value)) {
+            $root  = $context->getRoot();
+            $limit = $root->getViewData()->getCharLengthLimit();
+
+            if (strlen($value) > $limit) {
+                $context->buildViolation('mautic.lead.defaultValue.invalid')->addViolation();
+            }
+        }
+    }
+
+    private function addLengthValidationField(FormInterface $form, bool $new = true): void
+    {
+        $typesWithMaxLength = implode('","', $this->indexableFieldsWithLimits);
+
+        $attr = [
+            'class'        => 'form-control',
+            'data-show-on' => '{
+                "leadfield_type":["'.$typesWithMaxLength.'"]
+             }',
+        ];
+
+        if (false === $new) {
+            $attr['readonly'] = 'readonly';
+        }
+
+        $form->add(
+            'charLengthLimit',
+            NumberType::class,
+            [
+                'label'       => 'mautic.lead.field.form.maximum.character.length',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => $attr,
+                'constraints' => [
+                    new Assert\NotBlank(['groups' => 'indexableFieldWithLimits']),
+                    new Assert\Range(['min' => 1, 'max' => 255, 'groups' => 'indexableFieldWithLimits']),
+                ],
+            ]
+        );
     }
 }

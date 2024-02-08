@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
@@ -570,6 +571,7 @@ class FieldModel extends FormModel
      * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
+     * @throws AbortColumnUpdateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
@@ -681,7 +683,7 @@ class FieldModel extends FormModel
     /**
      * Returns list of all segments that use $field.
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
     public function getFieldSegments(LeadField $field)
     {
@@ -807,9 +809,9 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'pre_save':
@@ -965,9 +967,9 @@ class FieldModel extends FormModel
      *
      * @deprecated to be removed in 3.0
      *
-     * @return array
+     * @return array<mixed>
      */
-    public function getUniqueIdentiferFields($filters = [])
+    public function getUniqueIdentiferFields($filters = []): array
     {
         return $this->getUniqueIdentifierFields($filters);
     }
@@ -977,11 +979,11 @@ class FieldModel extends FormModel
      *
      * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
      *
-     * @param array $filters
+     * @param array<mixed> $filters
      *
-     * @return mixed
+     * @return array<mixed>
      */
-    public function getUniqueIdentifierFields($filters = [])
+    public function getUniqueIdentifierFields(array $filters = []): array
     {
         return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }
