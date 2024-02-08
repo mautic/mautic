@@ -927,9 +927,9 @@ class FieldModel extends FormModel
      *
      * @deprecated to be removed in 3.0
      *
-     * @return array
+     * @return array<mixed>
      */
-    public function getUniqueIdentiferFields($filters = [])
+    public function getUniqueIdentiferFields($filters = []): array
     {
         return $this->getUniqueIdentifierFields($filters);
     }
