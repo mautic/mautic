@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -122,7 +123,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $asset->setStorageLocation('local');
         $asset->setPath('broken-image.jpg');
         $asset->setExtension('jpg');
-        $asset->setCreatedByUser($userCreator->getUsername());
+        $asset->setCreatedByUser($userCreator->getUserIdentifier());
         $asset->setCreatedBy($userCreator->getId());
         $this->em->persist($asset);
         $this->em->flush();
@@ -209,7 +210,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
     }
 
     /**
-     * @param array<string, string[]> $permissions
+     * @param array<string, array<string, array<string>>> $permissions
      */
     private function setPermission(User $user, array $permissions): void
     {
@@ -226,7 +227,8 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
 
         // Set new permissions
         $role->setIsAdmin(false);
-        $roleModel = self::$container->get('mautic.user.model.role');
+        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        \assert($roleModel instanceof RoleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
