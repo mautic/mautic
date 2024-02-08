@@ -4,8 +4,10 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -296,12 +298,20 @@ class FieldModel extends FormModel
             'properties' => [
                 'list' => [
                     [
+                        'label' => 'Aerospace & Defense',
+                        'value' => 'Aerospace & Defense',
+                    ],
+                    [
                         'label' => 'Agriculture',
                         'value' => 'Agriculture',
                     ],
                     [
                         'label' => 'Apparel',
                         'value' => 'Apparel',
+                    ],
+                    [
+                        'label' => 'Automotive & Assembly',
+                        'value' => 'Automotive & Assembly',
                     ],
                     [
                         'label' => 'Banking',
@@ -322,6 +332,10 @@ class FieldModel extends FormModel
                     [
                         'label' => 'Construction',
                         'value' => 'Construction',
+                    ],
+                    [
+                        'label' => 'Consumer Packaged Goods',
+                        'value' => 'Consumer Packaged Goods',
                     ],
                     [
                         'label' => 'Education',
@@ -384,20 +398,48 @@ class FieldModel extends FormModel
                         'value' => 'Media',
                     ],
                     [
+                        'label' => 'Metals & Mining',
+                        'value' => 'Metals & Mining',
+                    ],
+                    [
                         'label' => 'Not for Profit',
                         'value' => 'Not for Profit',
+                    ],
+                    [
+                        'label' => 'Oil & Gas',
+                        'value' => 'Oil & Gas',
+                    ],
+                    [
+                        'label' => 'Packaging & Paper',
+                        'value' => 'Packaging & Paper',
+                    ],
+                    [
+                        'label' => 'Private Equity & Principal Investors',
+                        'value' => 'Private Equity & Principal Investors',
                     ],
                     [
                         'label' => 'Recreation',
                         'value' => 'Recreation',
                     ],
                     [
+                        'label' => 'Real Estate',
+                        'value' => 'Real Estate',
+                    ],
+                    [
                         'label' => 'Retail',
                         'value' => 'Retail',
                     ],
                     [
+                        'label' => 'Semiconductors',
+                        'value' => 'Semiconductors',
+                    ],
+                    [
                         'label' => 'Shipping',
                         'value' => 'Shipping',
+                    ],
+                    [
+                        'label' => 'Social Sector',
+                        'value' => 'Social Sector',
                     ],
                     [
                         'label' => 'Technology',
@@ -477,13 +519,14 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Returns lead custom fields.
-     *
-     * @return array
+     * @return LeadField[]|array<int,mixed>|iterable<LeadField>|\Doctrine\ORM\Internal\Hydration\IterableResult<LeadField>|Paginator<LeadField>|SimplePaginator<LeadField>
      */
     public function getEntities(array $args = [])
     {
-        return $this->em->getRepository(LeadField::class)->getEntities($args);
+        $repository = $this->em->getRepository(LeadField::class);
+        \assert($repository instanceof LeadFieldRepository);
+
+        return $repository->getEntities($args);
     }
 
     /**

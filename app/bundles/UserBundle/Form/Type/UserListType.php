@@ -12,6 +12,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UserListType extends AbstractType
 {
+    /**
+     * @var array<string,int>
+     */
+    private array $choices = [];
+
     public function __construct(
         private UserModel $userModel
     ) {
@@ -38,10 +43,16 @@ class UserListType extends AbstractType
         return ChoiceType::class;
     }
 
+    /**
+     * @return array<string,int>
+     */
     private function getUserChoices(): array
     {
-        $choices = [];
-        $users   = $this->userModel->getRepository()->getEntities(
+        if ($this->choices) {
+            return $this->choices;
+        }
+
+        $users = $this->userModel->getRepository()->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -56,12 +67,12 @@ class UserListType extends AbstractType
         );
 
         foreach ($users as $user) {
-            $choices[$user->getName(true)] = $user->getId();
+            $this->choices[$user->getName(true)] = $user->getId();
         }
 
         // sort by user name
-        ksort($choices);
+        ksort($this->choices);
 
-        return $choices;
+        return $this->choices;
     }
 }

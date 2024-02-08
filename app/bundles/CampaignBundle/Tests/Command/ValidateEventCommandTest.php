@@ -9,11 +9,11 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
         static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // No open email decisions should be recorded yet
         $byEvent = $this->getCampaignEventLogs([3]);
@@ -23,7 +23,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Now they should be inactive
-        $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-id' => 1]);
+        $this->testSymfonyCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-id' => 1]);
 
         $byEvent = $this->getCampaignEventLogs([3, 7, 10]);
         $this->assertCount(1, $byEvent[3]); // decision recorded
@@ -33,11 +33,11 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
 
     public function testEventsAreExecutedForInactiveEventWithMultipleContact(): void
     {
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
         static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // No open email decisions should be recorded yet
         $byEvent = $this->getCampaignEventLogs([3]);
@@ -47,7 +47,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         static::getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
 
         // Now they should be inactive
-        $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);
 
         $byEvent = $this->getCampaignEventLogs([3, 7, 10]);
         $this->assertCount(3, $byEvent[3]); // decision recorded
@@ -57,11 +57,11 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
 
     public function testContactsRemovedFromTheCampaignAreNotExecutedForInactiveEvents(): void
     {
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
         static::getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
-        $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3']);
 
         // No open email decisions should be recorded yet
         $byEvent = $this->getCampaignEventLogs([3]);
@@ -77,7 +77,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
             ->executeStatement();
 
         // Now they should be inactive
-        $this->runCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);
+        $this->testSymfonyCommand('mautic:campaigns:validate', ['--decision-id' => 3, '--contact-ids' => '1,2,3']);
 
         // Only two contacts should have been considered inactive because one was marked as manually removed
         $byEvent = $this->getCampaignEventLogs([3, 7, 10]);
