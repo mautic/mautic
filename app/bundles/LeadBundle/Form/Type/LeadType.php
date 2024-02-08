@@ -47,7 +47,7 @@ class LeadType extends AbstractType
                 'mautic.lead.lead.field.custom_avatar' => 'custom',
             ];
 
-            $cache = $options['data']->getSocialCache();
+            $cache = $options['data']->getSocialCache() ?? [];
             if (count($cache)) {
                 foreach ($cache as $key => $data) {
                     $imageChoices[$key] = $key;
@@ -111,15 +111,8 @@ class LeadType extends AbstractType
             ]
         );
 
-        $leadId                 = $options['data']->getId();
-        $companyLeadRepo        = $this->companyModel->getCompanyLeadRepository();
         $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
-
-        $companies       = $companyLeadRepo->getCompaniesByLeadId($leadId, null, !$allowMultipleCompanies);
-        $leadCompanies   = [];
-        foreach ($companies as $company) {
-            $leadCompanies[(string) $company['company_id']] = (string) $company['company_id'];
-        }
+        $companyIds = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId(), null, !$allowMultipleCompanies);
 
         $builder->add(
             'companies',
@@ -130,7 +123,7 @@ class LeadType extends AbstractType
                 'multiple'   => $allowMultipleCompanies,
                 'required'   => false,
                 'mapped'     => false,
-                'data'       => $allowMultipleCompanies ? $leadCompanies : (array_values($leadCompanies)[0] ?? null),
+                'data'       => !$allowMultipleCompanies ? ($companyIds[0] ?? null) : array_combine($companyIds, $companyIds),
             ]
         );
 

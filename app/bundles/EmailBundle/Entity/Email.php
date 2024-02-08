@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\FormBundle\Entity\Form;
@@ -198,6 +197,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
+    private bool $isCloned = false;
+
     /**
      * In some use cases, we need to get the original email ID after it's been cloned.
      *
@@ -207,19 +208,20 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function __clone()
     {
-        $this->clonedId         = $this->id;
-        $this->id               = null;
-        $this->sentCount        = 0;
-        $this->readCount        = 0;
-        $this->revision         = 0;
-        $this->variantSentCount = 0;
-        $this->variantReadCount = 0;
-        $this->variantStartDate = null;
-        $this->emailType        = null;
-        $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
-        $this->plainText        = null;
-        $this->publishUp        = null;
-        $this->publishDown      = null;
+        $this->isCloned          = true;
+        $this->clonedId          = $this->id;
+        $this->id                = null;
+        $this->sentCount         = 0;
+        $this->readCount         = 0;
+        $this->revision          = 0;
+        $this->variantSentCount  = 0;
+        $this->variantReadCount  = 0;
+        $this->variantStartDate  = null;
+        $this->emailType         = null;
+        $this->sessionId         = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->plainText         = null;
+        $this->publishUp         = null;
+        $this->publishDown       = null;
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
@@ -238,9 +240,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->setDateModified(new \DateTime());
     }
 
-    /**
-     * Clear stats.
-     */
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
@@ -507,6 +506,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function setId(int $id): Email
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     /**
      * @return int|null
      */
@@ -547,9 +553,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setContent($content)
     {
-        // Ensure safe emoji
-        $content = array_map(fn ($text) => EmojiHelper::toShort($text), $content);
-
         $this->isChanged('content', $content);
         $this->content = $content;
 
@@ -591,6 +594,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->readCount = $readCount;
 
         return $this;
+    }
+
+    public function getIsClone(): bool
+    {
+        return $this->isCloned;
     }
 
     /**

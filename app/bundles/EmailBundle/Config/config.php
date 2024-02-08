@@ -60,8 +60,9 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
             ],
             'mautic_email_unsubscribe' => [
-                'path'       => '/email/unsubscribe/{idHash}',
+                'path'       => '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
+                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_resubscribe' => [
                 'path'       => '/email/resubscribe/{idHash}',

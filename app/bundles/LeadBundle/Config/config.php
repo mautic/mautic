@@ -505,6 +505,7 @@ return [
                     'mautic.lead.model.lead_segment_schema_cache',
                     '@service_container',
                     'mautic.lead.model.lead_segment_decorator_factory',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.tracker.contact' => [
