@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -60,10 +59,6 @@ class PublicController extends CommonFormController
             if ($copy = $stat->getStoredCopy()) {
                 $subject = $copy->getSubject();
                 $content = $copy->getBody();
-
-                // Convert emoji
-                $content = EmojiHelper::toEmoji($content, 'short');
-                $subject = EmojiHelper::toEmoji($subject, 'short');
 
                 // Replace tokens
                 $content = str_ireplace(array_keys($tokens), $tokens, $content);
@@ -498,9 +493,6 @@ class PublicController extends CommonFormController
             // replace tokens
             $content = $response->getContent();
         }
-
-        // Convert emojis
-        $content = EmojiHelper::toEmoji($content, 'short');
 
         // Override tracking_pixel
         $tokens = ['{tracking_pixel}' => ''];

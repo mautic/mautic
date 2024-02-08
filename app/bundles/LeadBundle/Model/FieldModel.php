@@ -298,12 +298,20 @@ class FieldModel extends FormModel
             'properties' => [
                 'list' => [
                     [
+                        'label' => 'Aerospace & Defense',
+                        'value' => 'Aerospace & Defense',
+                    ],
+                    [
                         'label' => 'Agriculture',
                         'value' => 'Agriculture',
                     ],
                     [
                         'label' => 'Apparel',
                         'value' => 'Apparel',
+                    ],
+                    [
+                        'label' => 'Automotive & Assembly',
+                        'value' => 'Automotive & Assembly',
                     ],
                     [
                         'label' => 'Banking',
@@ -324,6 +332,10 @@ class FieldModel extends FormModel
                     [
                         'label' => 'Construction',
                         'value' => 'Construction',
+                    ],
+                    [
+                        'label' => 'Consumer Packaged Goods',
+                        'value' => 'Consumer Packaged Goods',
                     ],
                     [
                         'label' => 'Education',
@@ -386,20 +398,48 @@ class FieldModel extends FormModel
                         'value' => 'Media',
                     ],
                     [
+                        'label' => 'Metals & Mining',
+                        'value' => 'Metals & Mining',
+                    ],
+                    [
                         'label' => 'Not for Profit',
                         'value' => 'Not for Profit',
+                    ],
+                    [
+                        'label' => 'Oil & Gas',
+                        'value' => 'Oil & Gas',
+                    ],
+                    [
+                        'label' => 'Packaging & Paper',
+                        'value' => 'Packaging & Paper',
+                    ],
+                    [
+                        'label' => 'Private Equity & Principal Investors',
+                        'value' => 'Private Equity & Principal Investors',
                     ],
                     [
                         'label' => 'Recreation',
                         'value' => 'Recreation',
                     ],
                     [
+                        'label' => 'Real Estate',
+                        'value' => 'Real Estate',
+                    ],
+                    [
                         'label' => 'Retail',
                         'value' => 'Retail',
                     ],
                     [
+                        'label' => 'Semiconductors',
+                        'value' => 'Semiconductors',
+                    ],
+                    [
                         'label' => 'Shipping',
                         'value' => 'Shipping',
+                    ],
+                    [
+                        'label' => 'Social Sector',
+                        'value' => 'Social Sector',
                     ],
                     [
                         'label' => 'Technology',
