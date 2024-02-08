@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Command;
 
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,6 +39,6 @@ class CleanupCommand extends Command
         $io->success("$numberOfRecordsDeleted records deleted.");
         $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
 
-        return ExitCode::SUCCESS;
+        return Command::SUCCESS;
     }
 }
