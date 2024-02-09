@@ -248,7 +248,7 @@
                   </div>
               </div>
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ?: []) }}
+              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
 
               <!-- tabs controls -->
               <ul class="nav nav-tabs pr-md pl-md">
