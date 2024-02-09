@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class SmsPropertiesEvent extends Event
 {
     /**
-     * @return array<mixed>
+     * @var array<mixed>
      */
     private array $fields = [];
 
@@ -34,6 +34,9 @@ class SmsPropertiesEvent extends Event
         return $this->data;
     }
 
+    /**
+     * @param array<int|string|array<int|string>> $options
+     */
     public function addField(string $child, string $type = null, array $options = []): void
     {
         $this->fields[] = [

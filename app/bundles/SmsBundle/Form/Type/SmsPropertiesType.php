@@ -6,20 +6,17 @@ namespace Mautic\SmsBundle\Form\Type;
 
 use Mautic\SmsBundle\Event\SmsPropertiesEvent;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @extends AbstractType<mixed>
  */
 class SmsPropertiesType extends AbstractType
 {
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
