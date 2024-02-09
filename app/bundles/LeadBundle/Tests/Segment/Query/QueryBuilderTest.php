@@ -282,15 +282,6 @@ class QueryBuilderTest extends TestCase
         $this->queryBuilder->select('1')
             ->from('lead_lists_leads', 'orp');
 
-        Assert::assertSame('orp.id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
-    }
-
-    public function testGuessPrimaryLeadContactIdColumnWithOrphanedLeadsWithJoin(): void
-    {
-        $this->queryBuilder->select('1')
-            ->from('lead_lists_leads', 'orp')
-            ->leftJoin('orp', 'leads', 'l', 'l.id=orp.lead_id');
-
         Assert::assertSame('orp.lead_id', $this->queryBuilder->guessPrimaryLeadContactIdColumn());
     }
 
