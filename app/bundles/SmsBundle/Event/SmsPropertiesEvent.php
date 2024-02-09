@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\SmsBundle\Event;
 
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class SmsPropertiesEvent extends Event
@@ -17,7 +18,7 @@ class SmsPropertiesEvent extends Event
     /**
      * @param array<mixed> $data
      */
-    public function __construct(private FormBuilder $formBuilder, private array $data)
+    public function __construct(private FormBuilderInterface $formBuilder, private array $data)
     {
     }
 
