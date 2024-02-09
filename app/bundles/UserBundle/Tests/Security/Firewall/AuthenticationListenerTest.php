@@ -116,7 +116,7 @@ class AuthenticationListenerTest extends TestCase
             ->with($this->callback(function (User $user) use ($adminRole) {
                 $this->assertSame('test-client', $user->getFirstName());
                 $this->assertSame('[123]', $user->getLastName());
-                $this->assertSame('test-client [123]', $user->getUsername());
+                $this->assertSame('test-client [123]', $user->getUserIdentifier());
                 $this->assertSame($adminRole, $user->getRole());
 
                 return true;

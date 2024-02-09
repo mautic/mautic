@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class EmailType extends AbstractType
 {
     public const REPLY_TO_ADDRESS = 'replyToAddress';
@@ -25,7 +28,7 @@ class EmailType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'raw']));
 
         $builder->add(
             'subject',

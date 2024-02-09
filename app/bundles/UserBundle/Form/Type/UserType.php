@@ -24,6 +24,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<User>
+ */
 class UserType extends AbstractType
 {
     public function __construct(
@@ -190,6 +193,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'data' => $defaultSignature,
+                'help' => 'mautic.user.config.signature.helper',
             ]
         );
 

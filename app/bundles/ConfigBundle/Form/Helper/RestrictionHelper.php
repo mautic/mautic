@@ -25,6 +25,10 @@ class RestrictionHelper
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
     }
 
+    /**
+     * @param FormInterface<mixed> $childType
+     * @param FormInterface<mixed> $parentType
+     */
     public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null): void
     {
         if (null === $restrictedFields) {
@@ -46,6 +50,10 @@ class RestrictionHelper
         }
     }
 
+    /**
+     * @param FormInterface<mixed> $childType
+     * @param FormInterface<mixed> $parentType
+     */
     private function restrictField(FormInterface $childType, FormInterface $parentType): void
     {
         switch ($this->displayMode) {

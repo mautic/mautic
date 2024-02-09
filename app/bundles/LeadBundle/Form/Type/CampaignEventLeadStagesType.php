@@ -8,6 +8,9 @@ use Mautic\StageBundle\Form\Type\StageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventLeadStagesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

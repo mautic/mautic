@@ -78,7 +78,7 @@ class TokenHelper
             $value = $lead[$alias];
         } elseif (!empty($lead['companies'])) {
             foreach ($lead['companies'] as $company) {
-                if (1 === (int) $company['is_primary'] && $company[$alias]) {
+                if (isset($company['is_primary'], $company[$alias]) && 1 === (int) $company['is_primary']) {
                     $value = $company[$alias];
                     break;
                 }

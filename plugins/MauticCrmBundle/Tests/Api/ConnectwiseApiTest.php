@@ -13,7 +13,7 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Tests that fetchAllRecords loops until all records are obtained
      *
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi::fetchAllRecords()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi::fetchAllRecords
      *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
      */
@@ -21,7 +21,7 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
     {
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getRecords'])
+            ->onlyMethods(['makeRequest', 'getApiUrl'])
             ->getMock();
 
         $page = 0;

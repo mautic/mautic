@@ -168,18 +168,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.form.repository.form' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\FormBundle\Entity\Form::class,
-            ],
-            'mautic.form.repository.submission' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\FormBundle\Entity\Submission::class,
-            ],
-        ],
         'other' => [
             'mautic.form.collector.object' => [
                 'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,

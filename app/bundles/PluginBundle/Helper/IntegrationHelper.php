@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -79,6 +80,7 @@ class IntegrationHelper
                 [
                     'hydration_mode' => 'hydrate_array',
                     'index'          => 'bundle',
+                    'result_cache'   => new ResultCacheOptions(Plugin::CACHE_NAMESPACE),
                 ]
             );
 

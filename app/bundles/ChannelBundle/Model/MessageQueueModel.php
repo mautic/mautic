@@ -187,7 +187,9 @@ class MessageQueueModel extends FormModel
             $event   = $queue->getEvent();
             $lead    = $queue->getLead();
 
-            $this->em->detach($event);
+            if ($event) {
+                $this->em->detach($event);
+            }
             $this->em->detach($lead);
             $this->em->detach($queue);
         }
@@ -219,9 +221,7 @@ class MessageQueueModel extends FormModel
         }
         if (!empty($contacts)) {
             $contactData = $this->leadModel->getRepository()->getContacts($contacts);
-            $companyData = $this->companyModel->getRepository()->getCompaniesForContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
-                $contactData[$contactId]['companies'] = $companyData[$contactId] ?? null;
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
             }
         }

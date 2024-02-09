@@ -6,6 +6,9 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Service\Campaign;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
+/**
+ * @deprecated to be removed in 6.0
+ */
 class CampaignTest extends \PHPUnit\Framework\TestCase
 {
     public function testHasUnpublishedEmail(): void

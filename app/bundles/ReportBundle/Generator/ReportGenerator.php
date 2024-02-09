@@ -56,7 +56,7 @@ class ReportGenerator
      * @param Report $entity  Report Entity
      * @param array  $options Parameters set by the caller
      *
-     * @return \Symfony\Component\Form\FormInterface
+     * @return \Symfony\Component\Form\FormInterface<Report>
      */
     public function getForm(Report $entity, $options)
     {

@@ -138,7 +138,7 @@ class PageModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', 0, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-', ['_']);
 
             // make sure alias is not already taken
             $repo      = $this->getRepository();

@@ -124,6 +124,7 @@ class PointGroupModel extends CommonFormModel
             Lead::POINTS_SUBTRACT => $newScore -= $points,
             Lead::POINTS_MULTIPLY => $newScore *= $points,
             Lead::POINTS_DIVIDE   => $newScore /= $points,
+            Lead::POINTS_SET      => $newScore = $points,
             default               => throw new \UnexpectedValueException('Invalid operator'),
         };
         $contactScore->setScore($newScore);

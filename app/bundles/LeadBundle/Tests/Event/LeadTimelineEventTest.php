@@ -9,9 +9,9 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets
      *
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::addEvent()
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::getEvents()
-     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::generateEventId()
+     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::addEvent
+     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::getEvents
+     * @covers \Mautic\LeadBundle\Event\LeadTimelineEvent::generateEventId
      */
     public function testEventIdIsGeneratedIfNotSetBySubscriber(): void
     {

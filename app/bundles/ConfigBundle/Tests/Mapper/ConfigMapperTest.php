@@ -136,7 +136,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
      * @testdox Exception should be thrown if parameters key is not found in a form config
      *
      * @covers  \Mautic\ConfigBundle\Exception\BadFormConfigException
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
      */
     public function testExceptionIsThrownOnBadFormConfig(): void
     {
@@ -162,8 +162,8 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Defaults should be bound when local config has no values
      *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
      */
     public function testParametersAreBoundToDefaults(): void
     {
@@ -181,8 +181,8 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Defaults should be merged with local config values
      *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
      */
     public function testParametersAreBoundToDefaultsWithLocalConfig(): void
     {
@@ -248,8 +248,8 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Defaults should be merged with local config values but restricted fields should be removed
      *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
      */
     public function testParametersAreBoundToDefaultsWithLocalConfigAndRestrictionsAppied(): void
     {

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\BuilderSubscriber;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -25,12 +26,14 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
         $trackableModel       = $this->createMock(TrackableModel::class);
         $redirectModel        = $this->createMock(RedirectModel::class);
         $translator           = $this->createMock(TranslatorInterface::class);
+        $mailHashHelper       = new MailHashHelper($coreParametersHelper);
         $builderSubscriber    = new BuilderSubscriber(
             $coreParametersHelper,
             $emailModel,
             $trackableModel,
             $redirectModel,
-            $translator
+            $translator,
+            $mailHashHelper
         );
 
         $emailModel->method('buildUrl')->willReturn('https://some.url');

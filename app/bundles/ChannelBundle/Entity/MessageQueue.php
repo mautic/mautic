@@ -252,7 +252,7 @@ class MessageQueue
     }
 
     /**
-     * @return Event
+     * @return Event|null
      */
     public function getEvent()
     {
