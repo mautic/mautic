@@ -53,6 +53,7 @@ class AvailableStatsDTOTest extends TestCase
         $transport = new class() implements TransportInterface, DeliverySupportInterface, ReadSupportInterface, FailedSupportInterface {
             public function sendSms(Lead $lead, $content)
             {
+                return true;
             }
         };
 

@@ -271,6 +271,9 @@ class Sms extends FormEntity
         }
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
@@ -316,6 +319,9 @@ class Sms extends FormEntity
         return $this->id;
     }
 
+    /**
+     * @return \Mautic\CategoryBundle\Entity\Category|null
+     */
     public function getCategory()
     {
         return $this->category;
@@ -349,6 +355,9 @@ class Sms extends FormEntity
         $this->message = $message;
     }
 
+    /**
+     * @return string
+     */
     public function getLanguage()
     {
         return $this->language;
@@ -365,6 +374,9 @@ class Sms extends FormEntity
         return $this;
     }
 
+    /**
+     * @return \DateTimeInterface
+     */
     public function getPublishDown()
     {
         return $this->publishDown;
@@ -381,6 +393,9 @@ class Sms extends FormEntity
         return $this;
     }
 
+    /**
+     * @return \DateTimeInterface
+     */
     public function getPublishUp()
     {
         return $this->publishUp;
@@ -397,6 +412,9 @@ class Sms extends FormEntity
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getSentCount()
     {
         return $this->sentCount;
@@ -412,6 +430,9 @@ class Sms extends FormEntity
         return $this;
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getLists()
     {
         return $this->lists;
@@ -437,6 +458,9 @@ class Sms extends FormEntity
         $this->lists->removeElement($list);
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getStats()
     {
         return $this->stats;
@@ -579,8 +603,6 @@ class Sms extends FormEntity
 
     /**
      * @param array<int|string|array<int|string>> $properties
-     *
-     * @return Sms
      */
     public function setProperties(array $properties): static
     {
