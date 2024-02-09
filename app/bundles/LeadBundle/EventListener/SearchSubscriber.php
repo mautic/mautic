@@ -394,7 +394,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    private function buildSmsQuery(LeadBuildSearchEvent $event, array $config)
+    private function buildSmsQuery(LeadBuildSearchEvent $event, array $config): void
     {
         $tables = [
             [
@@ -408,7 +408,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    private function buildSmsSentQuery(LeadBuildSearchEvent $event)
+    private function buildSmsSentQuery(LeadBuildSearchEvent $event): void
     {
         $config = [
             'column' => 'ss.sms_id',
@@ -417,7 +417,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildSmsQuery($event, $config);
     }
 
-    private function buildSmsDeliveredQuery(LeadBuildSearchEvent $event)
+    private function buildSmsDeliveredQuery(LeadBuildSearchEvent $event): void
     {
         $config = [
             'column' => 'ss.sms_id',
@@ -429,7 +429,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildSmsQuery($event, $config);
     }
 
-    private function buildSmsReadQuery(LeadBuildSearchEvent $event)
+    private function buildSmsReadQuery(LeadBuildSearchEvent $event): void
     {
         $config = [
             'column' => 'ss.sms_id',
@@ -441,7 +441,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildSmsQuery($event, $config);
     }
 
-    private function buildSmsFailedQuery(LeadBuildSearchEvent $event)
+    private function buildSmsFailedQuery(LeadBuildSearchEvent $event): void
     {
         $config = [
             'column' => 'ss.sms_id',
