@@ -145,7 +145,7 @@ class DoNotContactRepository extends CommonRepository
     public function getChannelList($channel, array $contacts = null): array
     {
         // If no contacts are sent then stop querying for all of the DNC records as it leads to the out of memory error.
-        if (empty($contacts)) {
+        if (is_array($contacts) && empty($contacts)) {
             return [];
         }
 
