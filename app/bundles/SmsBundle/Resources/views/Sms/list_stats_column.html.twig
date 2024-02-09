@@ -21,7 +21,7 @@
           data-toggle="tooltip"
           title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
         <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_read:' ~ item.getId())|trans}) }}">
-            {{ 'mautic.sms.stat.getReadCount()'|trans({'%count%': item.getReadCount(), '%ratio%': item.getReadRatio()}) }}
+            {{ 'mautic.sms.stat.readcount'|trans({'%count%': item.getReadCount(), '%ratio%': item.getReadRatio()}) }}
         </a>
     </span>
 {% endif %}
