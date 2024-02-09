@@ -98,7 +98,7 @@ class Sms extends FormEntity
     private $failedCount = 0;
 
     /**
-     * @var array
+     * @var array<int|string|array<int|string>>
      */
     private $properties = [];
 
@@ -134,7 +134,7 @@ class Sms extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('sms_messages')
-            ->setCustomRepositoryClass(\Mautic\SmsBundle\Entity\SmsRepository::class);
+            ->setCustomRepositoryClass(SmsRepository::class);
 
         $builder->addIdColumns();
 
@@ -172,7 +172,7 @@ class Sms extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('sms_message_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -271,9 +271,6 @@ class Sms extends FormEntity
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getName()
     {
         return $this->name;
@@ -319,9 +316,6 @@ class Sms extends FormEntity
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCategory()
     {
         return $this->category;
@@ -355,9 +349,6 @@ class Sms extends FormEntity
         $this->message = $message;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLanguage()
     {
         return $this->language;
@@ -374,9 +365,6 @@ class Sms extends FormEntity
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPublishDown()
     {
         return $this->publishDown;
@@ -393,9 +381,6 @@ class Sms extends FormEntity
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPublishUp()
     {
         return $this->publishUp;
@@ -412,9 +397,6 @@ class Sms extends FormEntity
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSentCount()
     {
         return $this->sentCount;
@@ -430,9 +412,6 @@ class Sms extends FormEntity
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getLists()
     {
         return $this->lists;
@@ -458,9 +437,6 @@ class Sms extends FormEntity
         $this->lists->removeElement($list);
     }
 
-    /**
-     * @return mixed
-     */
     public function getStats()
     {
         return $this->stats;
@@ -594,19 +570,19 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return array
+     * @return array<int|string|array<int|string>>
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
 
     /**
-     * @param array $properties
+     * @param array<int|string|array<int|string>> $properties
      *
      * @return Sms
      */
-    public function setProperties($properties)
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;

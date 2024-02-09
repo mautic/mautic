@@ -394,6 +394,9 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
+    /**
+     * @param array<int|string|array<int|string>> $config
+     */
     private function buildSmsQuery(LeadBuildSearchEvent $event, array $config): void
     {
         $tables = [
