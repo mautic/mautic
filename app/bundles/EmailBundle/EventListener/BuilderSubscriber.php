@@ -82,7 +82,9 @@ class BuilderSubscriber implements EventSubscriberInterface
             ]
         );
         if (!empty($result) && count($result) > 1) {
-            $event->addError('Error Email already sent to this lead');
+            $emailStatToChange = end($result);
+            $emailStatToChange->setIsFailed(true);
+            $this->emailModel->getStatRepository()->saveEntity($emailStatToChange);
             $event->disableSend();
         }
     }

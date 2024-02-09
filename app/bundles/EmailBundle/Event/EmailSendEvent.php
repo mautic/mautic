@@ -68,6 +68,7 @@ class EmailSendEvent extends CommonEvent
         $this->canSend     = $args['canSend'] ?? true;
         $this->errors      = $args['errors'] ?? [];
         $this->fatal       = $args['fatal'] ?? false;
+        $this->skip        = $args['skip'] ?? false;
 
         if (!$this->subject && $this->email instanceof Email) {
             $this->subject = $args['email']->getSubject();
@@ -336,15 +337,30 @@ class EmailSendEvent extends CommonEvent
 
     public function enableSend()
     {
-        $this->fatal = false;
+        $this->skip = false;
     }
 
     public function disableSend()
     {
-        $this->fatal = true;
+        $this->skip = true;
     }
 
     public function isEnable(): bool
+    {
+        return $this->skip;
+    }
+
+    public function setFatal(): void
+    {
+        $this->fatal = true;
+    }
+
+    public function setNotFatal()
+    {
+        $this->fatal = false;
+    }
+
+    public function isFatal(): bool
     {
         return $this->fatal;
     }
