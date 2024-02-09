@@ -1,0 +1,37 @@
+<span class="mt-xs label label-warning has-click-event clickable-stat"
+      data-toggle="tooltip"
+      title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+    <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_sent:' ~ item.getId())|trans}) }}">
+        {{ 'mautic.sms.stat.sentcount'|trans({'%count%': item.sentCount(true)}) }}
+    </a>
+</span>
+
+{% if availableStats.hasDeliveryStats() %}
+    <span class="mt-xs label label-success has-click-event clickable-stat"
+          data-toggle="tooltip"
+          title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_delivered:' ~ item.getId())|trans}) }}">
+            {{ 'mautic.sms.stat.deliveredcount'|trans({'%count%': item.getDeliveredCount(), '%ratio%': item.getDeliveredRatio()}) }}
+        </a>
+    </span>
+{% endif %}
+
+{% if availableStats.hasReadStats() %}
+    <span class="mt-xs label label-primary has-click-event clickable-stat"
+          data-toggle="tooltip"
+          title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_read:' ~ item.getId())|trans}) }}">
+            {{ 'mautic.sms.stat.getReadCount()'|trans({'%count%': item.getReadCount(), '%ratio%': item.getReadRatio()}) }}
+        </a>
+    </span>
+{% endif %}
+
+{% if availableStats.hasFailedStats() %}
+    <span class="mt-xs label label-danger has-click-event clickable-stat"
+          data-toggle="tooltip"
+          title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_failed:' ~ item.getId())|trans}) }}">
+            {{ 'mautic.sms.stat.failedcount'|trans({'%count%': item.getFailedCount(), '%ratio%': item.getFailedRatio()}) }}
+        </a>
+    </span>
+{% endif %}

@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -81,11 +82,35 @@ class Sms extends FormEntity
      */
     private $pendingCount = 0;
 
+    /**
+     * @var int
+     */
+    private $deliveredCount = 0;
+
+    /**
+     * @var int
+     */
+    private $readCount = 0;
+
+    /**
+     * @var int
+     */
+    private $failedCount = 0;
+
+    /**
+     * @var array
+     */
+    private $properties = [];
+
     public function __clone()
     {
-        $this->id        = null;
-        $this->stats     = new ArrayCollection();
-        $this->sentCount = 0;
+        $this->id             = null;
+        $this->stats          = new ArrayCollection();
+        $this->sentCount      = 0;
+        $this->readCount      = 0;
+        $this->deliveredCount = 0;
+        $this->readCount      = 0;
+        $this->failedCount    = 0;
 
         parent::__clone();
     }
@@ -130,6 +155,20 @@ class Sms extends FormEntity
         $builder->createField('sentCount', 'integer')
             ->columnName('sent_count')
             ->build();
+
+        $builder->createField('deliveredCount', Types::INTEGER)
+            ->columnName('delivered_count')
+            ->build();
+
+        $builder->createField('readCount', Types::INTEGER)
+            ->columnName('read_count')
+            ->build();
+
+        $builder->createField('failedCount', Types::INTEGER)
+            ->columnName('failed_count')
+            ->build();
+
+        $builder->addField('properties', Types::JSON);
 
         $builder->addCategory();
 
@@ -207,6 +246,10 @@ class Sms extends FormEntity
                     'publishUp',
                     'publishDown',
                     'sentCount',
+                    'deliveredCount',
+                    'readCount',
+                    'failedCount',
+                    'properties',
                 ]
             )
             ->build();
@@ -458,5 +501,125 @@ class Sms extends FormEntity
     public function getPendingCount()
     {
         return $this->pendingCount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeliveredCount()
+    {
+        return $this->deliveredCount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getDeliveredRatio()
+    {
+        if (!$this->deliveredCount) {
+            return 0;
+        }
+
+        return round($this->deliveredCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $deliveredCount
+     *
+     * @return Sms
+     */
+    public function setDeliveredCount($deliveredCount)
+    {
+        $this->isChanged('deliveredCount', $deliveredCount);
+        $this->deliveredCount = $deliveredCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReadCount()
+    {
+        return $this->readCount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReadRatio()
+    {
+        if (!$this->readCount) {
+            return 0;
+        }
+
+        return round($this->readCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $readCount
+     *
+     * @return Sms
+     */
+    public function setReadCount($readCount)
+    {
+        $this->isChanged('readCount', $readCount);
+        $this->readCount = $readCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFailedCount()
+    {
+        return $this->failedCount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getFailedRatio()
+    {
+        if (!$this->failedCount) {
+            return 0;
+        }
+
+        return round($this->failedCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $failedCount
+     *
+     * @return Sms
+     */
+    public function setFailedCount($failedCount)
+    {
+        $this->isChanged('failedCount', $failedCount);
+        $this->failedCount = $failedCount;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @param array $properties
+     *
+     * @return Sms
+     */
+    public function setProperties($properties)
+    {
+        $this->isChanged('properties', $properties);
+        $this->properties = $properties;
+
+        return $this;
     }
 }

@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Stat\DTO\AvailableStatsDTO;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -111,16 +112,17 @@ class SmsController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $smss,
-                'totalItems'  => $count,
-                'page'        => $page,
-                'limit'       => $limit,
-                'tmpl'        => $request->get('tmpl', 'index'),
-                'permissions' => $permissions,
-                'model'       => $model,
-                'security'    => $this->security,
-                'configured'  => count($transportChain->getEnabledTransports()) > 0,
+                'searchValue'    => $search,
+                'items'          => $smss,
+                'totalItems'     => $count,
+                'page'           => $page,
+                'limit'          => $limit,
+                'tmpl'           => $request->get('tmpl', 'index'),
+                'permissions'    => $permissions,
+                'model'          => $model,
+                'security'       => $this->security,
+                'configured'     => count($transportChain->getEnabledTransports()) > 0,
+                'availableStats' => new AvailableStatsDTO($transportChain->getPrimaryTransport()),
             ],
             'contentTemplate' => '@MauticSms/Sms/list.html.twig',
             'passthroughVars' => [

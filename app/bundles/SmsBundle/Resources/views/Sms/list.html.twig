@@ -152,7 +152,7 @@
                             <span>{{ catName }}</span>
                         </span>
                     </td>
-                        {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item }) -}}
+                        {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item, 'availableStats' : availableStats }) -}}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>
             {% endfor %}
