@@ -6,11 +6,16 @@ namespace Mautic\SmsBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\SmsBundle\Entity\Sms;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SmsControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testSmsListView(): void
     {
+        $this->setupTwilio();
+
         $sms = $this->createSms('ABC', 'content of sms', 'list');
 
         $this->em->persist($sms);
@@ -64,5 +69,27 @@ class SmsControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($sms);
 
         return $sms;
+    }
+
+    private function setupTwilio(): void
+    {
+        $integration = static::getContainer()->get('mautic.integration.twilio');
+        $crawler     = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
+        $response    = $this->client->getResponse();
+
+        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+
+        $saveButton = $crawler->selectButton('integration_details[buttons][save]');
+        $form       = $saveButton->form();
+
+        $form['integration_details[apiKeys][username]']->setValue('test_username');
+        $form['integration_details[apiKeys][password]']->setValue('test_password');
+        $form['integration_details[isPublished]']->setValue('1');
+        $form['integration_details[featureSettings][messaging_service_sid]']->setValue('messaging_sid');
+
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
     }
 }
