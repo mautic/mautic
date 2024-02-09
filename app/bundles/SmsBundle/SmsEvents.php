@@ -102,4 +102,13 @@ final class SmsEvents
      * Mautic\SmsBundle\Event\TokensBuildEvent
      */
     public const ON_SMS_TOKENS_BUILD = 'mautic.sms.on_tokens_build';
+
+    /**
+     * The mautic.sms_properties event is dispatched during the configuration in send text message dialog.
+     *
+     * The event listener receives a Mautic\SmsBundle\Event\SmsPropertiesEvent instance.
+     *
+     * @var string
+     */
+    public const SMS_PROPERTIES = 'mautic.sms_properties';
 }

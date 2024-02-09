@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -81,6 +82,11 @@ class Sms extends FormEntity
      */
     private $pendingCount = 0;
 
+    /**
+     * @var array
+     */
+    private $properties = [];
+
     public function __clone()
     {
         $this->id        = null;
@@ -130,6 +136,8 @@ class Sms extends FormEntity
         $builder->createField('sentCount', 'integer')
             ->columnName('sent_count')
             ->build();
+
+        $builder->addField('properties', Types::JSON);
 
         $builder->addCategory();
 
@@ -207,6 +215,7 @@ class Sms extends FormEntity
                     'publishUp',
                     'publishDown',
                     'sentCount',
+                    'properties',
                 ]
             )
             ->build();
@@ -458,5 +467,24 @@ class Sms extends FormEntity
     public function getPendingCount()
     {
         return $this->pendingCount;
+    }
+
+    /**
+     * @return array<int|string|array<int|string>>
+     */
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @param array<int|string|array<int|string>> $properties
+     */
+    public function setProperties(array $properties): static
+    {
+        $this->isChanged('properties', $properties);
+        $this->properties = $properties;
+
+        return $this;
     }
 }

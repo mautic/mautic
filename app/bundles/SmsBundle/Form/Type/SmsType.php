@@ -105,6 +105,15 @@ class SmsType extends AbstractType
         );
 
         $builder->add(
+            'properties',
+            SmsPropertiesType::class,
+            [
+                'label'=> false,
+                'data' => $options['data']->getProperties(),
+            ]
+        );
+
+        $builder->add(
             'language',
             LocaleType::class,
             [
