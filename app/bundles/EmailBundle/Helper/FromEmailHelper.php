@@ -54,7 +54,7 @@ class FromEmailHelper
         try {
             return $this->getFromEmailAsOwner($contact, $email);
         } catch (OwnerNotFoundException) {
-            return $address;
+            return $this->getFrom($email);
         }
     }
 
@@ -130,6 +130,15 @@ class FromEmailHelper
         return $signature;
     }
 
+    private function getFrom(?Email $email): AddressDTO
+    {
+        if ($email && $email->getFromAddress()) {
+            return new AddressDTO($email->getFromAddress(), $email->getFromName());
+        }
+
+        return $this->getDefaultFrom();
+    }
+
     private function getDefaultFrom(): AddressDTO
     {
         if ($this->defaultFrom) {
@@ -167,9 +176,9 @@ class FromEmailHelper
                 throw new TokenNotFoundOrEmptyException();
             }
 
-            $email = $address->isEmailTokenized() ? $address->getEmailTokenValue($contact) : $address->getEmail();
+            $emailAddress = $address->isEmailTokenized() ? $address->getEmailTokenValue($contact) : $address->getEmail();
 
-            return new AddressDTO($email, $name);
+            return new AddressDTO($emailAddress, $name);
         } catch (TokenNotFoundOrEmptyException) {
             if ($contact && $asOwner) {
                 try {
