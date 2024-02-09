@@ -62,7 +62,7 @@ class ListController extends FormController
             LeadPermissions::LISTS_FULL,
         ]);
 
-        $permissions = $this->get('mautic.security')->isGranted($permissionsToCheck, 'RETURN_ARRAY');
+        $permissions = $this->security->isGranted($permissionsToCheck, 'RETURN_ARRAY');
 
         // If no permission set to the current user.
         if (!in_array(1, $permissions)) {
@@ -165,6 +165,8 @@ class ListController extends FormController
                 )
             );
         }
+
+        return $this->accessDenied();
     }
 
     /**
@@ -174,7 +176,7 @@ class ListController extends FormController
      */
     public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare)
     {
-        if (!$this->security->isGranted('lead:leads:viewown')) {
+        if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
             return $this->accessDenied();
         }
 
@@ -249,7 +251,7 @@ class ListController extends FormController
      */
     public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId, $ignorePost = false)
     {
-        if (!$this->get('mautic.security')->isGranted(LeadPermissions::LISTS_CREATE)) {
+        if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
             return $this->accessDenied();
         }
 
@@ -259,7 +261,10 @@ class ListController extends FormController
             $segment = $this->getSegment($objectId, LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER);
 
             return $this->createSegmentModifyResponse(
+                $request,
                 clone $segment,
+                $segmentDependencies,
+                $segmentCampaignShare,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 $ignorePost
@@ -300,14 +305,17 @@ class ListController extends FormController
                 $segment->setNew();
             }
 
-            if (!$this->get('mautic.security')->hasEntityAccess(
+            if (!$this->security->hasEntityAccess(
                 LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
             )) {
                 return $this->accessDenied();
             }
 
             return $this->createSegmentModifyResponse(
+                $request,
                 $segment,
+                $segmentDependencies,
+                $segmentCampaignShare,
                 $postActionVars,
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
@@ -341,11 +349,11 @@ class ListController extends FormController
         $segment = $this->getModel('lead.list')->getEntity($segmentId);
 
         // Check if exists
-        if (!$segment instanceof LeadList) {
+        if (is_null($segment)) {
             throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
         }
 
-        if (!$this->get('mautic.security')->hasEntityAccess(
+        if (!$this->security->hasEntityAccess(
             $ownPermission, $otherPermission, $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
