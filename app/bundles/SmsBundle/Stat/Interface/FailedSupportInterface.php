@@ -6,5 +6,4 @@ namespace Mautic\SmsBundle\Stat\Interface;
 
 interface FailedSupportInterface
 {
-    public const COLUMN  = 'failed';
 }

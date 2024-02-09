@@ -6,5 +6,4 @@ namespace Mautic\SmsBundle\Stat\Interface;
 
 interface DeliverySupportInterface
 {
-    public const COLUMN  = 'delivered';
 }
