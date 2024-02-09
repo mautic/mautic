@@ -182,7 +182,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         $prefix = 'company';
 
-        if (substr($prop, 0, strlen($prefix)) === $prefix) {
+        if (str_starts_with($prop, $prefix)) {
             $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
             $current = $this->$getter();
             if ($current !== $val) {
