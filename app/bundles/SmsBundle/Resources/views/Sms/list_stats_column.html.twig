@@ -1,7 +1,7 @@
 <span class="mt-xs label label-warning has-click-event clickable-stat"
       data-toggle="tooltip"
       title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
-    <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_sent:' ~ item.getId())|trans}) }}">
+    <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_sent')|trans ~ ':' ~ item.getId()}) }}">
         {{ 'mautic.sms.stat.sentcount'|trans({'%count%': item.sentCount(true)}) }}
     </a>
 </span>
@@ -10,7 +10,7 @@
     <span class="mt-xs label label-success has-click-event clickable-stat"
           data-toggle="tooltip"
           title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
-        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_delivered:' ~ item.getId())|trans}) }}">
+        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_delivered')|trans ~ ':' ~ item.getId()}) }}">
             {{ 'mautic.sms.stat.deliveredcount'|trans({'%count%': item.getDeliveredCount(), '%ratio%': item.getDeliveredRatio()}) }}
         </a>
     </span>
@@ -20,7 +20,7 @@
     <span class="mt-xs label label-primary has-click-event clickable-stat"
           data-toggle="tooltip"
           title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
-        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_read:' ~ item.getId())|trans}) }}">
+        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_read')|trans ~ ':' ~ item.getId()}) }}">
             {{ 'mautic.sms.stat.readcount'|trans({'%count%': item.getReadCount(), '%ratio%': item.getReadRatio()}) }}
         </a>
     </span>
@@ -30,7 +30,7 @@
     <span class="mt-xs label label-danger has-click-event clickable-stat"
           data-toggle="tooltip"
           title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
-        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_failed:' ~ item.getId())|trans}) }}">
+        <a href="{{ path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.sms_failed')|trans ~ ':' ~ item.getId()}) }}">
             {{ 'mautic.sms.stat.failedcount'|trans({'%count%': item.getFailedCount(), '%ratio%': item.getFailedRatio()}) }}
         </a>
     </span>
