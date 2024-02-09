@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class CompanyLeadRepository extends CommonRepository
 {
+    public const DELETE_BATCH_SIZE = 1000;
+
     /**
      * @param CompanyLead[] $entities
      */
@@ -46,7 +48,7 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Get companies by leadId.
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null): array
+    public function getCompaniesByLeadId($leadId, $companyId = null, ?bool $onlyPrimary = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -60,6 +62,12 @@ class CompanyLeadRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('cl.company_id', ':companyId')
             )->setParameter('companyId', $companyId);
+        }
+
+        if ($onlyPrimary) {
+            $q->andWhere(
+                $q->expr()->eq('cl.is_primary', true)
+            );
         }
 
         return $q->executeQuery()->fetchAllAssociative();
@@ -183,6 +191,26 @@ class CompanyLeadRepository extends CommonRepository
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
             $qb->expr()->eq('is_primary', 1)
+        )->executeStatement();
+    }
+
+   public function removeAllSecondaryCompanies(): void
+   {
+       $conn = $this->getEntityManager()->getConnection();
+       do {
+           $sql = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'companies_leads WHERE is_primary = 0 LIMIT '.self::DELETE_BATCH_SIZE;
+           $row = $conn->executeQuery($sql)->rowCount();
+       } while ($row);
+   }
+
+    public function removeContactSecondaryCompanies(int $leadId): void
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
+        $qb->where(
+            $qb->expr()->eq('lead_id', $leadId)
+        )->andWhere(
+            $qb->expr()->eq('is_primary', 0)
         )->executeStatement();
     }
 }
