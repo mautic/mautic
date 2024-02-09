@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Helper\DateTime;
+namespace Mautic\CoreBundle\Tests\Unit\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeLocalization;

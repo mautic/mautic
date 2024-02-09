@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -74,6 +75,9 @@ class FieldApiController extends CommonApiController
         } catch (AbortColumnCreateException) {
             // Field has been queued
             return Response::HTTP_ACCEPTED;
+        } catch (AbortColumnUpdateException) {
+            // Field has been queued
+            return Response::HTTP_OK;
         }
     }
 

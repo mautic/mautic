@@ -6,9 +6,9 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -227,6 +227,7 @@ class MailHelper
         private CoreParametersHelper $coreParametersHelper,
         private Mailbox $mailbox,
         private LoggerInterface $logger,
+        private MailHashHelper $mailHashHelper
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -611,7 +612,7 @@ class MailHelper
     {
         // Body
         $body         = $message->getHtmlBody();
-        $bodyReplaced = str_ireplace($search, $replace, $body, $updated);
+        $bodyReplaced = str_ireplace($search, $replace, (string) $body, $updated);
         if ($updated) {
             $message->html($bodyReplaced);
         }
@@ -773,7 +774,7 @@ class MailHelper
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (str_contains($content, '</body>')) {
+            if (str_contains((string) $content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -1215,9 +1216,6 @@ class MailHelper
 
         $subject = $email->getSubject();
 
-        // Convert short codes to emoji
-        $subject = EmojiHelper::toEmoji($subject ?? '', 'short');
-
         // Set message settings from the email
         $this->setSubject($subject);
 
@@ -1258,9 +1256,6 @@ class MailHelper
                 'template' => $template,
             ], true);
         }
-
-        // Convert short codes to emoji
-        $customHtml = EmojiHelper::toEmoji($customHtml ?? '', 'short');
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
 
@@ -1344,7 +1339,26 @@ class MailHelper
     private function getUnsubscribeHeader()
     {
         if ($this->idHash) {
-            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], UrlGeneratorInterface::ABSOLUTE_URL);
+            $lead    = $this->getLead();
+            $toEmail = null;
+            if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
+                $toEmail = $lead['email'];
+            } elseif ($lead instanceof Lead && is_string($lead->getEmail())) {
+                $toEmail = $lead->getEmail();
+            }
+
+            if ($toEmail) {
+                $unsubscribeHash = $this->mailHashHelper->getEmailHash($toEmail);
+                $url             = $this->factory->getRouter()->generate('mautic_email_unsubscribe',
+                    ['idHash' => $this->idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+            } else {
+                $url             = $this->factory->getRouter()->generate('mautic_email_unsubscribe',
+                    ['idHash' => $this->idHash],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+            }
 
             return "<$url>";
         }
@@ -1717,14 +1731,14 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(Copy::class, $this->copies[$id]));
             } catch (ORMException) {
                 // keep IDE happy
             }
         }
 
         if ($persist) {
-            $emailModel->getStatRepository()->saveEntity($stat);
+            $emailModel->saveEmailStat($stat);
         }
 
         return $stat;

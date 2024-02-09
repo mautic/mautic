@@ -223,7 +223,6 @@ return [
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.removed_contact_tracker',
-                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.kickoff'     => [
@@ -235,19 +234,6 @@ return [
                     'mautic.campaign.event_executioner',
                     'mautic.campaign.scheduler',
                 ],
-            ],
-            'mautic.campaign.executioner.scheduled'     => [
-                'class'     => \Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class,
-                'arguments' => [
-                    'mautic.campaign.repository.lead_event_log',
-                    'monolog.logger.mautic',
-                    'translator',
-                    'mautic.campaign.event_executioner',
-                    'mautic.campaign.scheduler',
-                    'mautic.campaign.contact_finder.scheduled',
-                ],
-                'tag'          => 'kernel.reset',
-                'tagArguments' => ['method' => 'reset'],
             ],
             'mautic.campaign.executioner.realtime'     => [
                 'class'     => \Mautic\CampaignBundle\Executioner\RealTimeExecutioner::class,
@@ -261,17 +247,6 @@ return [
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
                     'mautic.campaign.helper.decision',
-                ],
-            ],
-            'mautic.campaign.executioner.inactive'     => [
-                'class'     => \Mautic\CampaignBundle\Executioner\InactiveExecutioner::class,
-                'arguments' => [
-                    'mautic.campaign.contact_finder.inactive',
-                    'monolog.logger.mautic',
-                    'translator',
-                    'mautic.campaign.scheduler',
-                    'mautic.campaign.helper.inactivity',
-                    'mautic.campaign.event_executioner',
                 ],
             ],
             'mautic.campaign.helper.decision' => [
@@ -379,8 +354,9 @@ return [
         ],
     ],
     'parameters' => [
-        'campaign_time_wait_on_event_false' => 'PT1H',
-        'campaign_use_summary'              => 0,
-        'campaign_by_range'                 => 0,
+        'campaign_time_wait_on_event_false'       => 'PT1H',
+        'campaign_use_summary'                    => 0,
+        'campaign_by_range'                       => 0,
+        'delete_campaign_event_log_in_background' => false,
     ],
 ];
