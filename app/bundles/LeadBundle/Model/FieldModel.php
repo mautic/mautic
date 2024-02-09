@@ -549,6 +549,49 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @return LeadField[]
+     */
+    public function getLeadFieldCustomFields(): array
+    {
+        $forceFilter = [
+            [
+                'column' => $this->getRepository()->getTableAlias().'.object',
+                'expr'   => 'like',
+                'value'  => 'lead',
+            ],
+            [
+                'column' => $this->getRepository()->getTableAlias().'.dateAdded',
+                'expr'   => 'isNotNull',
+            ],
+        ];
+
+        return $this->getEntities([
+            'filter' => [
+                'force' => $forceFilter,
+            ],
+            'ignore_paginator' => true,
+        ]);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getLeadFieldCustomFieldSchemaDetails(): array
+    {
+        $fields     = $this->getLeadFieldCustomFields();
+        $columns    = $this->columnSchemaHelper->setName('leads')->getColumns();
+
+        $schemaDetails = [];
+        foreach ($fields as $value) {
+            if (!empty($columns[$value->getAlias()])) {
+                $schemaDetails[$value->getAlias()] = $columns[$value->getAlias()];
+            }
+        }
+
+        return $schemaDetails;
+    }
+
+    /**
      * @return array
      */
     public function getCompanyFields()

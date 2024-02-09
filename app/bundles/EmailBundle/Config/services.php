@@ -31,6 +31,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(\Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
         ->decorate('mailer.transport_factory');
 
+    $services->set(\Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
+    $services->set(\Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
+
     $services->alias('mautic.email.model.email', \Mautic\EmailBundle\Model\EmailModel::class);
     $services->alias('mautic.email.model.send_email_to_user', \Mautic\EmailBundle\Model\SendEmailToUser::class);
     $services->alias('mautic.email.model.send_email_to_contacts', \Mautic\EmailBundle\Model\SendEmailToContact::class);
@@ -41,4 +44,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.email.repository.stat', \Mautic\EmailBundle\Entity\StatRepository::class);
     $services->alias('mautic.helper.mailbox', \Mautic\EmailBundle\MonitoredEmail\Mailbox::class);
     $services->alias('mautic.helper.mailer', \Mautic\EmailBundle\Helper\MailHelper::class);
+    $services->alias('mautic.message.processor.bounce', \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
+    $services->alias('mautic.message.processor.replier', \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
+    $services->alias('mautic.email.helper.stat', \Mautic\EmailBundle\Stat\StatHelper::class);
 };
