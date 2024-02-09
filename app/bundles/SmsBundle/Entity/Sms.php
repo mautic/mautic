@@ -83,9 +83,9 @@ class Sms extends FormEntity
     private $pendingCount = 0;
 
     /**
-     * @var array
+     * @var array<int|string|array<int|string>>
      */
-    private $properties = [];
+    private array $properties = [];
 
     public function __clone()
     {

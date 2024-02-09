@@ -10,6 +10,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class SmsPropertiesType extends AbstractType
 {
     private EventDispatcherInterface $dispatcher;
@@ -19,7 +22,7 @@ class SmsPropertiesType extends AbstractType
         $this->dispatcher = $dispatcher;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $event = new SmsPropertiesEvent($builder, $options['data'] ?? []);
         $this->dispatcher->dispatch($event, SmsEvents::SMS_PROPERTIES);
