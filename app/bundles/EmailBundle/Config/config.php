@@ -107,18 +107,6 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.message.processor.bounce' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
-                'arguments' => [
-                    'mailer.default_transport',
-                    'mautic.message.search.contact',
-                    'mautic.email.repository.stat',
-                    'mautic.lead.model.lead',
-                    'translator',
-                    'monolog.logger.mautic',
-                    'mautic.lead.model.dnc',
-                ],
-            ],
             'mautic.message.processor.unsubscribe' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
                 'arguments' => [
@@ -138,18 +126,6 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
-            'mautic.message.processor.replier' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class,
-                'arguments' => [
-                    'mautic.email.repository.stat',
-                    'mautic.message.search.contact',
-                    'mautic.lead.model.lead',
-                    'event_dispatcher',
-                    'monolog.logger.mautic',
-                    'mautic.tracker.contact',
-                    'mautic.helper.email.address',
-                ],
-            ],
             'mautic.validator.email' => [
                 'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
                 'arguments' => [
@@ -163,12 +139,6 @@ return [
                     'mautic.helper.mailbox',
                     'event_dispatcher',
                     'translator',
-                ],
-            ],
-            'mautic.email.helper.stat' => [
-                'class'     => \Mautic\EmailBundle\Stat\StatHelper::class,
-                'arguments' => [
-                    'mautic.email.repository.stat',
                 ],
             ],
             'mautic.email.helper.stats_collection' => [

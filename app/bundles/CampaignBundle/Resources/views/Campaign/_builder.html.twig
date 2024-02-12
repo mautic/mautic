@@ -33,11 +33,13 @@
             {% endfor %}
 
             {% for event in campaignEvents %}
-              {% set settings = eventSettings[event.eventType][event.type]|default(null) %}
-              {{- include(settings['template']|default('@MauticCampaign/Event/_generic.html.twig'), {
-                    'event': event,
-                    'campaignId': campaignId,
-              }) -}}
+                {% if event.deleted is empty %}
+                  {% set settings = eventSettings[event.eventType][event.type]|default(null) %}
+                  {{- include(settings['template']|default('@MauticCampaign/Event/_generic.html.twig'), {
+                        'event': event,
+                        'campaignId': campaignId,
+                  }) -}}
+                {% endif %}
             {% endfor %}
 
             {{- include('@MauticCampaign/Campaign/Builder/_index.html.twig', {

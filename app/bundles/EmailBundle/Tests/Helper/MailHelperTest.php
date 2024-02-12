@@ -181,6 +181,7 @@ class MailHelperTest extends TestCase
         $email = new Email();
         $email->setFromAddress('override@nowhere.com');
         $email->setFromName('Test');
+        $email->setSubject('Test');
 
         $singleMailHelper->setEmail($email);
 
@@ -722,7 +723,7 @@ class MailHelperTest extends TestCase
     public function testEmailHeadersAreSet(): void
     {
         $params = [
-            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test', 'custom-mautic-header' => '{contactfield=email}', 'Reply-to' => '{contactfield=email}']],
             ['mailer_from_email', null, 'nobody@nowhere.com'],
         ];
         $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
@@ -731,7 +732,9 @@ class MailHelperTest extends TestCase
         $symfonyMailer = new Mailer($transport);
         $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper);
         $mailer->addTo($this->contacts[0]['email']);
-
+        $mailer->setTokens([
+            '{contactfield=email}' => $this->contacts[0]['email'],
+        ]);
         $email = new Email();
         $email->setSubject('Test');
         $email->setCustomHtml('{signature}');
@@ -743,6 +746,7 @@ class MailHelperTest extends TestCase
 
         /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
+
         foreach ($headers as $header) {
             if ('X-Mautic-Test' === $header->getName() || 'X-Mautic-Test2' === $header->getName()) {
                 $customHeadersFounds[] = $header->getName();
@@ -752,9 +756,18 @@ class MailHelperTest extends TestCase
                 $customHeadersFounds[] = $header->getName();
                 $this->assertEquals('test2', $header->getBody());
             }
+            if ('custom-mautic-header' === $header->getName()) {
+                $customHeadersFounds[] = $header->getName();
+                $this->assertEquals($this->contacts[0]['email'], $header->getBody());
+            }
+
+            if ('Reply-To' === $header->getName()) {
+                $customHeadersFounds[] = $header->getName();
+                $this->assertCount(1, $header->getBody());
+            }
         }
 
-        $this->assertCount(4, $customHeadersFounds);
+        $this->assertCount(6, $customHeadersFounds);
     }
 
     public function testUnsubscribeHeader(): void

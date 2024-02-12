@@ -6,9 +6,9 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -27,6 +27,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -611,7 +612,7 @@ class MailHelper
     {
         // Body
         $body         = $message->getHtmlBody();
-        $bodyReplaced = str_ireplace($search, $replace, $body, $updated);
+        $bodyReplaced = str_ireplace($search, $replace, (string) $body, $updated);
         if ($updated) {
             $message->html($bodyReplaced);
         }
@@ -773,7 +774,7 @@ class MailHelper
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (str_contains($content, '</body>')) {
+            if (str_contains((string) $content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -1215,9 +1216,6 @@ class MailHelper
 
         $subject = $email->getSubject();
 
-        // Convert short codes to emoji
-        $subject = EmojiHelper::toEmoji($subject ?? '', 'short');
-
         // Set message settings from the email
         $this->setSubject($subject);
 
@@ -1258,9 +1256,6 @@ class MailHelper
                 'template' => $template,
             ], true);
         }
-
-        // Convert short codes to emoji
-        $customHtml = EmojiHelper::toEmoji($customHtml ?? '', 'short');
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
 
@@ -1736,14 +1731,14 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(Copy::class, $this->copies[$id]));
             } catch (ORMException) {
                 // keep IDE happy
             }
         }
 
         if ($persist) {
-            $emailModel->getStatRepository()->saveEntity($stat);
+            $emailModel->saveEmailStat($stat);
         }
 
         return $stat;
@@ -1880,13 +1875,31 @@ class MailHelper
 
         // Set custom headers
         if (!empty($headers)) {
+            $tokens = $this->getTokens();
+            // Replace tokens
             $messageHeaders = $this->message->getHeaders();
             foreach ($headers as $headerKey => $headerValue) {
-                if ($messageHeaders->has($headerKey)) {
-                    $header = $messageHeaders->get($headerKey);
-                    $header->setBody($headerValue);
-                } else {
-                    $messageHeaders->addTextHeader($headerKey, $headerValue);
+                $headerValue = str_ireplace(array_keys($tokens), $tokens, $headerValue);
+
+                if (!$headerValue) {
+                    $messageHeaders->remove($headerKey);
+                    continue;
+                }
+
+                try {
+                    if (in_array(strtolower($headerKey), ['from', 'to', 'cc', 'bcc', 'reply-to'])) {
+                        // Handling headers that require MailboxListHeader
+                        $headerValue = array_map(fn ($address): Address => new Address($address),
+                            explode(',', $headerValue));
+                    }
+                    if ($messageHeaders->has($headerKey)) {
+                        $header = $messageHeaders->get($headerKey);
+                        $header->setBody($headerValue);
+                    } else {
+                        $messageHeaders->addHeader($headerKey, $headerValue);
+                    }
+                } catch (RfcComplianceException) {
+                    $messageHeaders->remove($headerKey);
                 }
             }
         }

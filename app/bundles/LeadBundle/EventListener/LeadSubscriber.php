@@ -2,11 +2,14 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -17,6 +20,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event as Events;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
@@ -47,6 +51,8 @@ class LeadSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory,
+        private CoreParametersHelper $coreParametersHelper,
+        private CompanyLeadRepository $companyLeadRepository,
         private $isTest = false
     ) {
         $this->router              = $router;
@@ -66,6 +72,7 @@ class LeadSubscriber implements EventSubscriberInterface
             LeadEvents::NOTE_POST_SAVE       => ['onNotePostSave', 0],
             LeadEvents::NOTE_POST_DELETE     => ['onNoteDelete', 0],
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_COMPANY_CHANGE  => ['onLeadCompanyChange', 0],
         ];
     }
 
@@ -397,6 +404,19 @@ class LeadSubscriber implements EventSubscriberInterface
             }
         } else {
             // Purposively not including this in engagements graph as it's info only
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
+    {
+        $leadId                 = $event->getLead()->getId();
+        $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
+
+        if ($leadId && !$allowMultipleCompanies) {
+            $this->companyLeadRepository->removeContactSecondaryCompanies($leadId);
         }
     }
 
