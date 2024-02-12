@@ -46,7 +46,7 @@ class Hit
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
@@ -635,7 +635,7 @@ class Hit
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {

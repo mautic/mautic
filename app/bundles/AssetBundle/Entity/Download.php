@@ -28,7 +28,7 @@ class Download
     private $asset;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 

@@ -24,7 +24,7 @@ class Submission
     private $form;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
