@@ -67,10 +67,7 @@ class ListController extends FormController
         // If no permission set to the current user.
         if (!in_array(1, $permissions)) {
             $this->accessDenied();
-            // Lists can be managed by anyone who has access to leads
-            if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-                return $this->accessDenied();
-            }
+        }
 
             $this->setListFilters();
 
@@ -166,9 +163,6 @@ class ListController extends FormController
             );
         }
 
-        return $this->accessDenied();
-    }
-
     /**
      * Generate's new form and processes post data.
      *
@@ -251,10 +245,6 @@ class ListController extends FormController
      */
     public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, $objectId, $ignorePost = false)
     {
-        if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
-            return $this->accessDenied();
-        }
-
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
@@ -303,12 +293,6 @@ class ListController extends FormController
 
             if ($isNew) {
                 $segment->setNew();
-            }
-
-            if (!$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $segment->getCreatedBy()
-            )) {
-                return $this->accessDenied();
             }
 
             return $this->createSegmentModifyResponse(
@@ -539,6 +523,7 @@ class ListController extends FormController
                 return $this->isLocked($postActionVars, $list, 'lead.list');
             } else {
                 $model->deleteEntity($list);
+                }
 
                 $flashes[] = [
                     'type'    => 'notice',
@@ -548,8 +533,7 @@ class ListController extends FormController
                         '%id%'   => $objectId,
                     ],
                 ];
-            }
-        } // else don't do anything
+            } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -725,8 +709,6 @@ class ListController extends FormController
                     ],
                 ];
             }
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
         } // else don't do anything
 
         return $this->postActionRedirect(
