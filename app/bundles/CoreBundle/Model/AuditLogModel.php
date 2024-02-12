@@ -30,7 +30,7 @@ class AuditLogModel extends AbstractCommonModel
         $objectId  = $args['objectId'] ?? '';
         $action    = $args['action'] ?? '';
         $details   = $args['details'] ?? '';
-        $ipAddress = $args['ipAddress'] && !$this->coreParametersHelper->get('anonymize_ip') ? $args['ipAddress'] : '*.*.*.*';
+        $ipAddress = isset($args['ipAddress']) ? ($this->coreParametersHelper->get('anonymize_ip') ? '*.*.*.*' : $args['ipAddress']) : '';
         $log       = new AuditLog();
         $log->setBundle($bundle);
         $log->setObject($object);
