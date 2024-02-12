@@ -171,7 +171,7 @@ $view['slots']->set(
                 'mautic_segment_contacts',
                 ['objectId' => $list->getId(), 'page' => $app->getSession()->get('mautic.segment.contact.page', 1)]
             );
-            ?>">
+?>">
 
             <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>

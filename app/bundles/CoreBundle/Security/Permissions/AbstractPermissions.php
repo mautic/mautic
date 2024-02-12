@@ -217,7 +217,6 @@ abstract class AbstractPermissions
     }
 
     /**
-     * @param      $allPermissions
      * @param bool $isSecondRound
      *
      * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
