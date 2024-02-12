@@ -58,14 +58,14 @@ trait MatchFilterForLeadTrait
                 $groups[$groupNum] = false;
             }
 
-            $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
-            $filterVal = $data['filter'];
-
             if (!array_key_exists($data['field'], $lead)) {
                 $groups[$groupNum] = $extendedFiltersPassed;
                 continue;
             }
-
+            
+            $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
+            $filterVal = $data['filter'];
+            
             switch ($data['type']) {
                 case 'boolean':
                     if (null !== $leadVal) {
