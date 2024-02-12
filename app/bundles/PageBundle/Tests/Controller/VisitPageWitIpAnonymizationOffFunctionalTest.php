@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -23,10 +22,10 @@ class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
 
     public function testPageWithIpAnonymizationOff(): void
     {
-        //create landing page
+        // create landing page
         $pageObject = new Page();
         $pageObject->setIsPublished(true);
-        $pageObject->setDateAdded(new DateTime());
+        $pageObject->setDateAdded(new \DateTime());
         $pageObject->setTitle('Page:Page:Anonymization:Off');
         $pageObject->setAlias('page-page-anonymizaiton-off');
         $pageObject->setTemplate('Blank');
