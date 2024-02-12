@@ -346,7 +346,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    public function testRemoveTagFromLeadAction()
+    public function testRemoveTagFromLeadAction(): void
     {
         // Create a lead
         $lead = $this->createContact('test@email.com');
