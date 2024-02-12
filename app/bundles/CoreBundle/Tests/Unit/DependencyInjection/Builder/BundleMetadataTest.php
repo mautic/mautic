@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class BundleMetadataTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $metadataArray = [
             'isPlugin'          => true,

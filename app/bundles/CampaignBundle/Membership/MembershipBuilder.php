@@ -8,75 +8,33 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\Exception\RunLimitReachedException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MembershipBuilder
 {
-    /**
-     * @var MembershipManager
-     */
-    private $manager;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    /**
-     * @var CampaignLeadRepository
-     */
-    private $campaignLeadRepository;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $contactLimiter = null;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private ?int $runLimit = null;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
-
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
-
-    /**
-     * @var int
-     */
-    private $runLimit;
-
-    /**
-     * @var OutputInterface|null
-     */
-    private $output;
-
-    /**
-     * @var ProgressBar|null
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     public function __construct(
-        MembershipManager $manager,
-        CampaignLeadRepository $campaignMemberRepository,
-        LeadRepository $leadRepository,
-        TranslatorInterface $translator
+        private MembershipManager $manager,
+        private CampaignLeadRepository $campaignLeadRepository,
+        private LeadRepository $leadRepository,
+        private TranslatorInterface $translator
     ) {
-        $this->manager                = $manager;
-        $this->campaignLeadRepository = $campaignMemberRepository;
-        $this->leadRepository         = $leadRepository;
-        $this->translator             = $translator;
     }
 
     /**
      * @param int $runLimit
-     *
-     * @return int
      */
-    public function build(Campaign $campaign, ContactLimiter $contactLimiter, $runLimit, OutputInterface $output = null)
+    public function build(Campaign $campaign, ContactLimiter $contactLimiter, $runLimit, OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_CAMPAIGNS') or define('MAUTIC_REBUILDING_CAMPAIGNS', 1);
 

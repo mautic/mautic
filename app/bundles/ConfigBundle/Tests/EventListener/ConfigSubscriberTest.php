@@ -16,12 +16,9 @@ class ConfigSubscriberTest extends TestCase
     /**
      * @var ConfigChangeLogger|MockObject
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var ConfigSubscriber
-     */
-    private $subscriber;
+    private \Mautic\ConfigBundle\EventListener\ConfigSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -29,7 +26,7 @@ class ConfigSubscriberTest extends TestCase
         $this->subscriber = new ConfigSubscriber($this->logger);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -39,7 +36,7 @@ class ConfigSubscriberTest extends TestCase
         );
     }
 
-    public function testNothingToLogOnConfigPostSave()
+    public function testNothingToLogOnConfigPostSave(): void
     {
         // Test nothing to log
         $this->logger->expects($this->never())
@@ -52,7 +49,7 @@ class ConfigSubscriberTest extends TestCase
         $this->subscriber->onConfigPostSave($event);
     }
 
-    public function testSomethingToLogOnConfigPostSave()
+    public function testSomethingToLogOnConfigPostSave(): void
     {
         // Test something to log
         $originalNormData = ['orig'];

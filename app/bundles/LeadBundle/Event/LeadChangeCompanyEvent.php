@@ -6,25 +6,28 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class LeadCompanyChangeEvent.
- */
 class LeadChangeCompanyEvent extends Event
 {
-    private $lead;
-    private $leads;
-    private $company;
-    private $added;
+    private ?Lead $lead = null;
 
-    public function __construct($leads, Company $company, $added = true)
-    {
+    /**
+     * @var Lead[]|null
+     */
+    private ?array $leads = null;
+
+    /**
+     * @param Lead|Lead[] $leads
+     */
+    public function __construct(
+        Lead|array $leads,
+        private Company $company,
+        private bool $added = true
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
             $this->lead = $leads;
         }
-        $this->company = $company;
-        $this->added   = $added;
     }
 
     /**
@@ -55,18 +58,12 @@ class LeadChangeCompanyEvent extends Event
         return $this->company;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return $this->added;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
         return !$this->added;
     }

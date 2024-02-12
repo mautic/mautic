@@ -3,7 +3,6 @@
 namespace Mautic\DashboardBundle;
 
 /**
- * Class LeadEvents
  * Events available for DashboardBundle.
  */
 final class DashboardEvents

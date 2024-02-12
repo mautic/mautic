@@ -83,7 +83,7 @@ class LeadList extends FormEntity
         $this->leads = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -128,7 +128,7 @@ class LeadList extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -145,7 +145,7 @@ class LeadList extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadList')
             ->addListProperties(
@@ -218,9 +218,6 @@ class LeadList extends FormEntity
         return $this->description;
     }
 
-    /**
-     * Set category.
-     */
     public function setCategory(Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
@@ -229,9 +226,6 @@ class LeadList extends FormEntity
         return $this;
     }
 
-    /**
-     * Get category.
-     */
     public function getCategory(): ?Category
     {
         return $this->category;
@@ -379,7 +373,7 @@ class LeadList extends FormEntity
     /**
      * @param bool $isPreferenceCenter
      */
-    public function setIsPreferenceCenter($isPreferenceCenter)
+    public function setIsPreferenceCenter($isPreferenceCenter): void
     {
         $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
         $this->isPreferenceCenter = (bool) $isPreferenceCenter;
@@ -394,9 +388,18 @@ class LeadList extends FormEntity
     private function addLegacyParams(array $filters): array
     {
         return array_map(
-            function (array $filter) {
-                $filter['filter']  = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
-                $filter['display'] = $filter['properties']['display'] ?? $filter['display'] ?? null;
+            function (array $filter): array {
+                if (isset($filter['properties']) && $filter['properties'] && array_key_exists('filter', $filter['properties'])) {
+                    $filter['filter'] = $filter['properties']['filter'];
+                } else {
+                    $filter['filter'] = $filter['filter'] ?? null;
+                }
+
+                if (isset($filter['properties']) && $filter['properties'] && array_key_exists('display', $filter['properties'])) {
+                    $filter['display'] = $filter['properties']['display'];
+                } else {
+                    $filter['display'] = $filter['display'] ?? null;
+                }
 
                 return $filter;
             },

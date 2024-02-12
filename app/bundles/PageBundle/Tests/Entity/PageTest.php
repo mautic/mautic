@@ -21,7 +21,7 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    public function setIsPreferenceCenterDataProvider(): iterable
+    public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, null, []];
         yield [true, true, ['isPreferenceCenter' => [null, true]]];
@@ -43,7 +43,7 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    public function setNoIndexDataProvider(): iterable
+    public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, []];
         yield [true, true, ['noIndex' => [null, true]]];
@@ -55,10 +55,8 @@ class PageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test setHeadScript and getHeadScript.
-     *
-     * @return void
      */
-    public function testSetHeadScript()
+    public function testSetHeadScript(): void
     {
         $script = '<script>console.log("test")';
         $page   = new Page();
@@ -69,10 +67,8 @@ class PageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test setFooterScript and getFooterScript.
-     *
-     * @return void
      */
-    public function testSetFooterScript()
+    public function testSetFooterScript(): void
     {
         $script = '<script>console.log("test")';
         $page   = new Page();

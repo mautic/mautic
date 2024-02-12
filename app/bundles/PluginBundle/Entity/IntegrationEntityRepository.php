@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -12,15 +12,13 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class IntegrationEntityRepository extends CommonRepository
 {
     /**
-     * @param array<int>|int|null $internalEntityIds
-     * @param null                $startDate
-     * @param null                $endDate
-     * @param bool                $push
-     * @param int                 $start
-     * @param int                 $limit
-     * @param null                $integrationEntityIds
-     *
-     * @return array
+     * @param array<int>|int|null               $internalEntityIds
+     * @param mixed                             $startDate
+     * @param mixed                             $endDate
+     * @param bool                              $push
+     * @param int                               $start
+     * @param int                               $limit
+     * @param int|string|array<int|string>|null $integrationEntityIds
      */
     public function getIntegrationsEntityId(
         $integration,
@@ -33,7 +31,7 @@ class IntegrationEntityRepository extends CommonRepository
         $start = 0,
         $limit = 0,
         $integrationEntityIds = null
-    ) {
+    ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity, i.internal_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
@@ -66,7 +64,7 @@ class IntegrationEntityRepository extends CommonRepository
         if ($internalEntityIds) {
             if (is_array($internalEntityIds)) {
                 $q->andWhere('i.internal_entity_id in (:internalEntityIds)')
-                    ->setParameter('internalEntityIds', $internalEntityIds, Connection::PARAM_STR_ARRAY);
+                    ->setParameter('internalEntityIds', $internalEntityIds, ArrayParameterType::STRING);
             } else {
                 $q->andWhere('i.internal_entity_id = :internalEntityId')
                     ->setParameter('internalEntityId', $internalEntityIds);
@@ -86,7 +84,7 @@ class IntegrationEntityRepository extends CommonRepository
         if ($integrationEntityIds) {
             if (is_array($integrationEntityIds)) {
                 $q->andWhere('i.integration_entity_id in (:integrationEntityIds)')
-                    ->setParameter('integrationEntityIds', $integrationEntityIds, Connection::PARAM_STR_ARRAY);
+                    ->setParameter('integrationEntityIds', $integrationEntityIds, ArrayParameterType::STRING);
             } else {
                 $q->andWhere('i.integration_entity_id = :integrationEntityId')
                     ->setParameter('integrationEntityId', $integrationEntityIds);
@@ -101,12 +99,10 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
-     * @param null $leadFields
-     *
      * @return array
      */
     public function getIntegrationEntity($integration, $integrationEntity, $internalEntity, $internalEntityId, $leadFields = null)
@@ -132,7 +128,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setMaxResults(1);
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -162,10 +158,10 @@ class IntegrationEntityRepository extends CommonRepository
 
     /**
      * @param int          $limit
-     * @param null         $fromDate
-     * @param null         $toDate
      * @param array|string $integrationEntity
      * @param array        $excludeIntegrationIds
+     *
+     * @return mixed[]
      */
     public function findLeadsToUpdate(
         $integration,
@@ -176,7 +172,7 @@ class IntegrationEntityRepository extends CommonRepository
         $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
         $excludeIntegrationIds = []
-    ) {
+    ): array {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
         } else {
@@ -225,9 +221,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $q->expr()->notIn(
                     'i.integration_entity_id',
                     array_map(
-                        function ($x) {
-                            return "'".$x."'";
-                        },
+                        fn ($x): string => "'".$x."'",
                         $excludeIntegrationIds
                     )
                 )
@@ -288,7 +282,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $leads   = [];
 
@@ -314,9 +308,7 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param int  $limit
-     * @param null $fromDate
-     * @param null $toDate
+     * @param int $limit
      *
      * @return array|int
      */
@@ -404,7 +396,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('dateTo', $toDate);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if (false === $limit) {
             return (int) $results[0]['total'];
@@ -451,10 +443,8 @@ class IntegrationEntityRepository extends CommonRepository
                 ->select('p.name')
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
-            $rows    = $pq->execute()->fetchAllAssociative();
-            $plugins = array_map(function ($i) {
-                return "'${i['name']}'";
-            }, $rows);
+            $rows    = $pq->executeQuery()->fetchAllAssociative();
+            $plugins = array_map(static fn ($i): string => "'{$i['name']}'", $rows);
             if (count($plugins) > 0) {
                 $q->andWhere($q->expr()->in('i.integration', $plugins));
             } else {
@@ -484,7 +474,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setParameter('integrationEntity', $integrationEntity);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if (false === $limit && count($results) > 0) {
             return (int) $results[0]['total'];
@@ -493,7 +483,7 @@ class IntegrationEntityRepository extends CommonRepository
         return $results;
     }
 
-    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType)
+    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -506,13 +496,10 @@ class IntegrationEntityRepository extends CommonRepository
             )
             ->setParameter('integration', $integration)
             ->setParameter('entity', $internalEntityType.'-deleted')
-            ->execute();
+            ->executeStatement();
     }
 
-    /**
-     * @return array
-     */
-    public function findLeadsToDelete($internalEntity, $leadId)
+    public function findLeadsToDelete($internalEntity, $leadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -522,10 +509,10 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-            ->execute();
+            ->executeStatement();
     }
 
-    public function updateErrorLeads($internalEntity, $leadId)
+    public function updateErrorLeads($internalEntity, $leadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -536,7 +523,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->eq('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-            ->execute();
+            ->executeStatement();
 
         $z = $this->_em->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -547,6 +534,6 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-            ->execute();
+            ->executeStatement();
     }
 }

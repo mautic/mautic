@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class ComplexRelationValueFilterQueryBuilder is used to connect foreign tables using third table.
+ * Used to connect foreign tables using third table.
  *
  * Currently only company decorator uses this functionality but it may be used by plugins in the future
  *
@@ -19,8 +19,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
  */
 class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /** {@inheritdoc} */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.complex_relation.value';
     }
@@ -28,7 +27,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @throws \Exception
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator  = $filter->getOperator();

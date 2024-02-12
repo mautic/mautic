@@ -15,26 +15,13 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var PrimaryCompanyHelper
-     */
-    private $primaryCompanyHelper;
-
-    public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
-    {
-        $this->dispatcher           = $dispatcher;
-        $this->primaryCompanyHelper = $primaryCompanyHelper;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private PrimaryCompanyHelper $primaryCompanyHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 254],
@@ -43,7 +30,7 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function decodeTokens(EmailSendEvent $event)
+    public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
             // prevent a loop
@@ -52,11 +39,11 @@ class TokenSubscriber implements EventSubscriberInterface
 
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();
-        $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content, -1, $count);
+        $content = $this->urlDecodeTokens($content);
         $event->setContent($content);
 
         if ($plainText = $event->getPlainText()) {
-            $plainText = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $plainText);
+            $plainText = $this->urlDecodeTokens($plainText);
             $event->setPlainText($plainText);
         }
 
@@ -81,7 +68,7 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
 
@@ -129,5 +116,10 @@ class TokenSubscriber implements EventSubscriberInterface
 
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
+    }
+
+    private function urlDecodeTokens(string $content): string
+    {
+        return preg_replace('/(%7B)(.*?)(%3D|=)(.*?)(%7D)/i', '{$2=$4}', $content);
     }
 }

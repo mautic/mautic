@@ -15,7 +15,7 @@ class PublicController extends FormController
     /**
      * Generates a new password for the user and emails it to them.
      */
-    public function passwordResetAction(Request $request)
+    public function passwordResetAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         /** @var UserModel $model */
         $model = $this->getModel('user');
@@ -36,7 +36,7 @@ class PublicController extends FormController
                         $model->sendResetEmail($user);
                     }
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset');
-                } catch (\Exception $exception) {
+                } catch (\Exception) {
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
                 }
 

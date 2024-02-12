@@ -20,4 +20,12 @@ final class MobileNotificationControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
+
+    public function testCreateRouteSuccessfullyLoads(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/mobile_notifications/new');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
 }

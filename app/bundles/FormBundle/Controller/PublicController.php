@@ -14,15 +14,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PublicController.
- */
 class PublicController extends CommonFormController
 {
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
@@ -37,17 +31,17 @@ class PublicController extends CommonFormController
         $post          = $request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $request->server->all();
-        $return        = (isset($post['return'])) ? $post['return'] : false;
+        $return        = $post['return'] ?? false;
 
         if (empty($return)) {
             // try to get it from the HTTP_REFERER
-            $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
+            $return = $server['HTTP_REFERER'] ?? false;
         }
 
         if (!empty($return)) {
             // remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (false === strpos($return, '?')) ? '?' : '&';
+            $query  = (!str_contains($return, '?')) ? '?' : '&';
         }
 
         $translator = $this->translator;
@@ -239,10 +233,8 @@ class PublicController extends CommonFormController
 
     /**
      * Displays a message.
-     *
-     * @return Response
      */
-    public function messageAction(Request $request)
+    public function messageAction(Request $request): Response
     {
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);
@@ -324,10 +316,8 @@ class PublicController extends CommonFormController
             $assetsHelper = $this->factory->getHelper('template.assets');
             $analytics    = $this->factory->getHelper('twig.analytics')->getCode();
 
-            if (!empty($customStylesheets)) {
-                foreach ($customStylesheets as $css) {
-                    $assetsHelper->addStylesheet($css);
-                }
+            foreach ($customStylesheets as $css) {
+                $assetsHelper->addStylesheet($css);
             }
 
             $this->factory->getHelper('template.slots')->set('pageTitle', $form->getName());
@@ -347,10 +337,8 @@ class PublicController extends CommonFormController
 
     /**
      * Generates JS file for automatic form generation.
-     *
-     * @return Response
      */
-    public function generateAction(Request $request)
+    public function generateAction(Request $request): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
@@ -406,7 +394,10 @@ class PublicController extends CommonFormController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
-    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent)
+    /**
+     * @return string|string[]
+     */
+    private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent): string|array
     {
         if (empty($this->tokens)) {
             if ($lead = $submissionEvent->getLead()) {

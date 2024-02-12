@@ -35,21 +35,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
-    /**
-     * @var AlreadyMappedFieldCollectorInterface
-     */
-    private $alreadyMappedFieldCollector;
-
-    /**
-     * @var MappedObjectCollector
-     */
-    private $mappedObjectCollector;
-
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, MappedObjectCollector $mappedObjectCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
-        $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
-        $this->mappedObjectCollector       = $mappedObjectCollector;
-
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private MappedObjectCollector $mappedObjectCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -453,7 +454,7 @@ class FormController extends CommonFormController
         }
 
         // fire the form builder event
-        $customComponents = $model->getCustomComponents($sessionId);
+        $customComponents = $model->getCustomComponents();
 
         return $this->delegateView(
             [
@@ -502,7 +503,7 @@ class FormController extends CommonFormController
         /** @var \Mautic\FormBundle\Model\FormModel $model */
         $model            = $this->getModel('form');
         $formData         = $request->request->get('mauticform');
-        $sessionId        = isset($formData['sessionId']) ? $formData['sessionId'] : null;
+        $sessionId        = $formData['sessionId'] ?? null;
         $customComponents = $model->getCustomComponents();
         $modifiedFields   = [];
         $deletedFields    = [];
@@ -789,13 +790,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
-                    function ($a, $b) {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
-                    }
+                    fn ($a, $b): int => $a['order'] <=> $b['order']
                 );
             }
 
@@ -827,13 +822,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedActions,
-                    function ($a, $b) {
-                        if ($a['order'] == $b['order']) {
-                            return 0;
-                        }
-
-                        return $a['order'] < $b['order'] ? -1 : 1;
-                    }
+                    fn ($a, $b): int => $a['order'] <=> $b['order']
                 );
             }
 
@@ -931,10 +920,8 @@ class FormController extends CommonFormController
      * Gives a preview of the form.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, AnalyticsHelper $analyticsHelper)
+    public function previewAction($objectId, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, AnalyticsHelper $analyticsHelper): Response
     {
         /** @var FormModel $model */
         $model = $this->getModel('form.form');
@@ -1151,7 +1138,7 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session.
      */
-    public function clearSessionComponents(Request $request, $sessionId)
+    public function clearSessionComponents(Request $request, $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');

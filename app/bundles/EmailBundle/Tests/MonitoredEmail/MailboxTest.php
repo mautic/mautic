@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 
 class MailboxTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructWithDefaultConfig()
+    public function testConstructWithDefaultConfig(): void
     {
         $expected = [
             'host'            => '',
@@ -31,7 +31,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $mailbox->getMailboxSettings());
     }
 
-    public function testSettingsForMonitoredEmailWithoutOverride()
+    public function testSettingsForMonitoredEmailWithoutOverride(): void
     {
         $config = [
             'general' => [
@@ -78,7 +78,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('foo@bar.com', $settings['address']);
     }
 
-    public function testSettingsForMonitoredEmailWithOverride()
+    public function testSettingsForMonitoredEmailWithOverride(): void
     {
         $config = [
             'general' => [
@@ -125,7 +125,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('bar@foo.com', $settings['address']);
     }
 
-    public function testUseAttachments()
+    public function testUseAttachments(): void
     {
         // Test undefined $this->settings['use_attachments']
         // will not invoke undefined index error or mkdir error
