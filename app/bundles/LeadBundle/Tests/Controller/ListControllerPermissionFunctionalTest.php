@@ -131,7 +131,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[name]']->setValue('Segment Test');
         $form['leadlist[alias]']->setValue('segment_test');
-        $form['leadlist[isPublished]']->setValue(false);
+        $form['leadlist[isPublished]']->setValue('false');
         $crawler = $this->client->submit($form);
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -226,7 +226,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         // Save the Segment.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
-        $form['leadlist[isPublished]']->setValue(false);
+        $form['leadlist[isPublished]']->setValue('false');
         $crawler = $this->client->submit($form);
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
