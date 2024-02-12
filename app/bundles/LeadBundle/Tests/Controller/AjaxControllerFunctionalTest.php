@@ -366,7 +366,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Call the removeTagFromLeadAction
-        $this->client->request(Request::METHOD_POST, '/s/ajax', [
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=lead:removeTagFromLead', [
             'leadId' => $lead->getId(),
             'tagId'  => $tag->getId(),
         ]);
