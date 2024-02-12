@@ -5,6 +5,7 @@ namespace Mautic\ConfigBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,7 +15,8 @@ class ConfigSubscriber implements EventSubscriberInterface
     public function __construct(
         private ConfigChangeLogger $configChangeLogger,
         private IpAddressRepository $ipAddressRepository,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
+        private AuditLogRepository $auditLogRepository
     ) {
     }
 
@@ -43,6 +45,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
             if ($oldAnonymizeIp !== $newAnonymizeIp && $newAnonymizeIp && !$this->coreParametersHelper->get('anonymize_ip_address_in_background', false)) {
                 $this->ipAddressRepository->anonymizeAllIpAddress();
+                $this->auditLogRepository->anonymizeAllIpAddress();
             }
         }
     }

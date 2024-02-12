@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Console\Command\Command;
@@ -18,7 +19,7 @@ class AnonymizeIpCommand extends Command
      */
     public const COMMAND_NAME = 'mautic:anonymize:ip';
 
-    public function __construct(private IpAddressRepository $ipAddressRepository, private CoreParametersHelper $coreParametersHelper)
+    public function __construct(private IpAddressRepository $ipAddressRepository, private CoreParametersHelper $coreParametersHelper, private AuditLogRepository $auditLogRepository)
     {
         parent::__construct();
     }
@@ -35,8 +36,9 @@ class AnonymizeIpCommand extends Command
             return $this->exitWithError('Anonymization could not be done because anonymize Ip feature is disabled for this instance.', $output);
         }
         try {
-            $deletedRows = $this->ipAddressRepository->anonymizeAllIpAddress();
-            $output->writeln(sprintf('<info>%s IP addresses have been anonymized</info>', $deletedRows));
+            $anonymizedRows = $this->ipAddressRepository->anonymizeAllIpAddress();
+            $anonymizedRows += $this->auditLogRepository->anonymizeAllIpAddress();
+            $output->writeln(sprintf('<info>%s IP addresses have been anonymized</info>', $anonymizedRows));
         } catch (DBALException $e) {
             return $this->exitWithError(sprintf('Anonymization of IP addresses failed because of database error: %s', $e->getMessage()), $output);
         }
