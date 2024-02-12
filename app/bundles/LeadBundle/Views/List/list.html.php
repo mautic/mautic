@@ -43,9 +43,9 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
         'MauticCoreBundle:Helper:tableheader.html.php',
         [
                         'sessionVar' => 'lead.list',
-            'orderBy'    => 'l.name',
-            'text'       => 'mautic.core.name',
-            'class'      => 'col-leadlist-name',
+            'orderBy'                => 'l.name',
+            'text'                   => 'mautic.core.name',
+            'class'                  => 'col-leadlist-name',
         ]
     );
 
@@ -53,8 +53,8 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
         'MauticCoreBundle:Helper:tableheader.html.php',
         [
                         'sessionVar' => 'lead.list',
-            'text'       => 'mautic.lead.list.thead.leadcount',
-            'class'      => 'visible-md visible-lg col-leadlist-leadcount',
+            'text'                   => 'mautic.lead.list.thead.leadcount',
+            'class'                  => 'visible-md visible-lg col-leadlist-leadcount',
         ]
     );
 
@@ -66,33 +66,33 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                         'text'       => 'mautic.lead.import.label.dateAdded',
                         'class'      => 'visible-md visible-lg col-leadlist-dateAdded',
                     ]
-                );
+    );
 
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'lead.list',
-                        'orderBy'    => 'l.dateModified',
-                        'text'       => 'mautic.lead.import.label.dateModified',
-                        'class'      => 'visible-md visible-lg col-leadlist-dateModified',
-                        'default'    => true,
-                    ]
-                );
+    echo $view->render(
+        'MauticCoreBundle:Helper:tableheader.html.php',
+        [
+            'sessionVar' => 'lead.list',
+            'orderBy'    => 'l.dateModified',
+            'text'       => 'mautic.lead.import.label.dateModified',
+            'class'      => 'visible-md visible-lg col-leadlist-dateModified',
+            'default'    => true,
+        ]
+    );
 
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'lead.list',
-                        'orderBy'    => 'l.createdByUser',
-                        'text'       => 'mautic.core.createdby',
-                        'class'      => 'visible-md visible-lg col-leadlist-createdByUser',
-                    ]
-                );
+    echo $view->render(
+        'MauticCoreBundle:Helper:tableheader.html.php',
+        [
+            'sessionVar' => 'lead.list',
+            'orderBy'    => 'l.createdByUser',
+            'text'       => 'mautic.core.createdby',
+            'class'      => 'visible-md visible-lg col-leadlist-createdByUser',
+        ]
+    );
 
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'lead.list',
+    echo $view->render(
+        'MauticCoreBundle:Helper:tableheader.html.php',
+        [
+            'sessionVar' => 'lead.list',
             'orderBy'    => 'l.id',
             'text'       => 'mautic.core.id',
             'class'      => 'visible-md visible-lg col-leadlist-id',
@@ -106,11 +106,11 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
             <?php foreach ($items as $item): ?>
                 <?php
                     $lastBuiltDateDifference = null;
-                    if ($item->getLastBuiltDate() instanceof \DateTime) {
-                        $lastBuiltDateDifferenceInterval = $now->diff($item->getLastBuiltDate());
-                        // Calculate difference between now and last_built_date in hours
-                        $lastBuiltDateDifference = (int) abs((new \DateTime())->setTimestamp(0)->add($lastBuiltDateDifferenceInterval)->getTimestamp() / 3600);
-                    }
+                if ($item->getLastBuiltDate() instanceof \DateTime) {
+                    $lastBuiltDateDifferenceInterval = $now->diff($item->getLastBuiltDate());
+                    // Calculate difference between now and last_built_date in hours
+                    $lastBuiltDateDifference = (int) abs((new \DateTime())->setTimestamp(0)->add($lastBuiltDateDifferenceInterval)->getTimestamp() / 3600);
+                }
                 ?>
                 <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
@@ -173,8 +173,8 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                                 <label class="control-label" data-toggle="tooltip"
                                        data-container="body" data-placement="top" title=""
                                        data-original-title="<?php echo $view['translator']->trans(
-                                               'mautic.lead.list.form.config.segment_rebuild_time.message',
-                                               ['%count%' => $lastBuiltDateDifference]
+                                           'mautic.lead.list.form.config.segment_rebuild_time.message',
+                                           ['%count%' => $lastBuiltDateDifference]
                                        ); ?>">
                                     <i class="fa text-danger fa-exclamation-circle"></i></label>
                             <?php endif; ?>
