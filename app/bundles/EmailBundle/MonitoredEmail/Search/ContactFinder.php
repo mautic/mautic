@@ -38,6 +38,9 @@ class ContactFinder
         return $this->findByAddress($contactEmail);
     }
 
+    /**
+     * @param string $hash
+     */
     public function findByHash($hash): Result
     {
         $result = new Result();

@@ -2,12 +2,14 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -103,7 +105,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
         $leadModel->addToCompany($contact, $company);
         $leadModel->addToCompany($contact, $company2);
 
@@ -112,5 +114,62 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
 
         return $contactCompanies;
+    }
+
+    public function testGetCustomLeadFieldLength(): void
+    {
+        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
+        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+
+        // Create a lead field.
+        $leadField = new LeadField();
+        $leadField->setName('Test Field')
+            ->setAlias('custom_field_len_test')
+            ->setType('string')
+            ->setObject('lead')
+            ->setCharLengthLimit(150);
+        $fieldModel->saveEntity($leadField);
+
+        // Create leads without adding value to the 'Test field'.
+        $bob = new Lead();
+        $bob->setFirstname('Bob')
+            ->setLastname('Smith')
+            ->setEmail('bob.smith@test.com');
+        $leadModel->saveEntity($bob);
+
+        $jane = new Lead();
+        $jane->setFirstname('Jane')
+            ->setLastname('Smith')
+            ->setEmail('jane.smith@test.com');
+        $leadModel->saveEntity($jane);
+
+        $this->em->clear();
+
+        // Custom field is empty, and will return null.
+        $length = $leadModel->getCustomLeadFieldLength([$leadField->getAlias()]);
+        $this->assertNull($length[$leadField->getAlias()]);
+
+        // Update lead Bob with 'Test field' value.
+        $hashStringBob = hash('sha256', __METHOD__);
+        $bob->addUpdatedField($leadField->getAlias(), $hashStringBob);
+        $leadModel->saveEntity($bob);
+
+        // Update lead Jane with 'Test field' value.
+        $hashStringJane = hash('sha1', __METHOD__);
+        $jane->addUpdatedField($leadField->getAlias(), $hashStringJane);
+        $leadModel->saveEntity($jane);
+
+        $this->em->clear();
+
+        $length = $leadModel->getCustomLeadFieldLength([$leadField->getAlias()]);
+        $this->assertEquals(strlen($hashStringBob), $length[$leadField->getAlias()]);
+    }
+
+    public function testGettingUnknownCustomFieldLength(): void
+    {
+        $this->expectException(DBALException::class);
+
+        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
+        $leadModel->getCustomLeadFieldLength(['unknown_field']);
     }
 }
