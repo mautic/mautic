@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -19,24 +10,16 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class TrackingPixelSendType.
+ * @extends AbstractType<array<mixed>>
  */
 class TrackingPixelSendType extends AbstractType
 {
-    /**
-     * @var TrackingHelper
-     */
-    protected $trackingHelper;
-
-    /**
-     * TrackingPixelSendType constructor.
-     */
-    public function __construct(TrackingHelper $trackingHelper)
-    {
-        $this->trackingHelper = $trackingHelper;
+    public function __construct(
+        protected TrackingHelper $trackingHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $trackingServices = $this->trackingHelper->getEnabledServices();
 

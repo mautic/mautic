@@ -1,0 +1,82 @@
+{#
+  Variables
+    - items
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}lead{% endblock %}
+{% block headerTitle %}{{ 'mautic.lead.leads'|trans }}{% endblock %}
+
+{% block actions %}
+  {% set pageButtons = [] %}
+  {% if permissions['lead:leads:create'] %}
+      {% set pageButtons = pageButtons|merge([{
+          'attr': {
+              'class': 'btn btn-default btn-nospin quickadd',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
+              'data-header': 'mautic.lead.lead.menu.quickadd'|trans,
+          },
+          'iconClass': 'fa fa-bolt',
+          'btnText': 'mautic.lead.lead.menu.quickadd',
+          'primary': true,
+      }]) %}
+
+      {% if permissions['lead:imports:create'] %}
+          {% set pageButtons = pageButtons|merge([{
+              'attr': {
+                  'href': path('mautic_import_action', {'object': 'contacts', 'objectAction': 'new'}),
+              },
+              'iconClass': 'fa fa-upload',
+              'btnText': 'mautic.lead.lead.import',
+          }]) %}
+      {% endif %}
+
+      {% if permissions['lead:imports:view'] %}
+          {% set pageButtons = pageButtons|merge([{
+              'attr': {
+                  'href': path('mautic_import_index', {'object': 'contacts'}),
+              },
+              'iconClass': 'fa fa-history',
+              'btnText': 'mautic.lead.lead.import.index',
+          }]) %}
+      {% endif %}
+  {% endif %}
+
+  {# Only show toggle buttons for accessibility #}
+  {% set extraHtml %}
+  <div class="btn-group ml-5 sr-only ">
+      <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
+        <a id="table-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'list'}) }}" data-toggle="ajax" class="btn btn-default">
+            <i class="fa fa-fw fa-table"></i>
+        </a>
+      </span>
+      <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.grid'|trans }}" data-placement="left">
+        <a id="card-view" href="{{ path('mautic_contact_index', {'page': page, 'view': 'grid'}) }}" data-toggle="ajax" class="btn btn-default">
+          <i class="fa fa-fw fa-th-large"></i>
+        </a>
+      </span>
+  </div>
+  {% endset %}
+
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+        'templateButtons': {'new': permissions['lead:leads:create']},
+        'routeBase': 'contact',
+        'langVar': 'lead.lead',
+        'customButtons': pageButtons,
+        'extraHtml': extraHtml,
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {{ include('@MauticLead/Lead/_filter.html.twig') }}
+  {{ include('@MauticLead/Lead/_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

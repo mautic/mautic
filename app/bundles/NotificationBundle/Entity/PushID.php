@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -23,7 +14,7 @@ class PushID
     private $id;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -42,15 +33,15 @@ class PushID
      */
     private $mobile;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('push_ids')
-            ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\PushIDRepository');
+            ->setCustomRepositoryClass(\Mautic\NotificationBundle\Entity\PushIDRepository::class);
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -59,7 +50,7 @@ class PushID
             ->nullable(false)
             ->build();
 
-        $builder->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead')
+        $builder->createManyToOne('lead', \Mautic\LeadBundle\Entity\Lead::class)
             ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
             ->inversedBy('pushIds')
             ->build();
@@ -135,8 +126,6 @@ class PushID
     }
 
     /**
-     * @param $enabled
-     *
      * @return $this
      */
     public function setEnabled($enabled)

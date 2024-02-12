@@ -1,96 +1,55 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class TweetController.
- */
 class TweetController extends FormController
 {
-    /**
-     * @return mixed
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'social.tweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getJsLoadMethodPrefix()
+    protected function getJsLoadMethodPrefix(): string
     {
         return 'socialTweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getRouteBase()
+    protected function getRouteBase(): string
     {
         return 'mautic_tweet';
     }
 
-    /**
-     * @param null $objectId
-     *
-     * @return mixed
-     */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         return 'mautic_tweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getTemplateBase()
+    protected function getTemplateBase(): string
     {
-        return 'MauticSocialBundle:Tweet';
+        return '@MauticSocial/Tweet';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getControllerBase()
-    {
-        return 'MauticSocialBundle:Tweet';
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getTranslationBase()
+    protected function getTranslationBase(): string
     {
         return 'mautic.integration.Twitter';
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getPermissionBase()
+    protected function getPermissionBase(): string
     {
         return 'mauticSocial:tweets';
     }
 
     /**
      * Define options to pass to the form when it's being created.
-     *
-     * @return array
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return [
             'update_select'      => $this->getUpdateSelect(),
@@ -105,31 +64,29 @@ class TweetController extends FormController
      */
     public function getUpdateSelect()
     {
-        return ('POST' == $this->request->getMethod())
-            ? $this->request->request->get('twitter_tweet[updateSelect]', false, true)
-            : $this->request->get('updateSelect', false);
+        $request = $this->getCurrentRequest();
+
+        return ('POST' === $request->getMethod())
+            ? $request->request->get('twitter_tweet[updateSelect]', false)
+            : $request->get('updateSelect', false);
     }
 
     /**
      * Set custom form themes, etc.
      *
      * @param string $action
-     *
-     * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $action)
+    protected function getFormView(FormInterface $form, $action): FormView
     {
-        return $this->setFormTheme($form, 'MauticSocialBundle:Tweet:form.html.php', ['MauticSocialBundle:FormTheme']);
+        return $form->createView();
     }
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
-        return parent::indexStandard($page);
+        return parent::indexStandard($request, $page);
     }
 
     /**
@@ -137,25 +94,21 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
-        return parent::newStandard();
+        return parent::newStandard($request);
     }
 
     /**
      * Get the template file.
-     *
-     * @param $file
-     *
-     * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName($file): string
     {
-        if ('form.html.php' === $file && 1 == $this->request->get('modal')) {
-            return parent::getTemplateName('form.modal.html.php');
+        if (('form.html.twig' === $file) && 1 == $this->getCurrentRequest()->get('modal')) {
+            return '@MauticSocial/Tweet/form_modal.html.twig';
         }
 
-        return parent::getTemplateName($file);
+        return '@MauticSocial/'.$file;
     }
 
     /**
@@ -166,33 +119,26 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($request, $objectId, $ignorePost);
+    }
+
+    public function viewAction($objectId): Response
+    {
+        return $this->forward('MauticPlugin\MauticSocialBundle\Controller\TweetController::editAction', [
+            'objectId' => $objectId,
+        ]);
     }
 
     /**
-     * Displays details.
-     *
-     * @param $objectId
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function viewAction($objectId)
-    {
-        return parent::indexStandard(1);
-    }
-
-    /**
-     * Clone an entity.
-     *
      * @param int $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
-        return parent::cloneStandard($objectId);
+        return parent::cloneStandard($request, $objectId);
     }
 
     /**
@@ -202,9 +148,9 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        return parent::deleteStandard($objectId);
+        return parent::deleteStandard($request, $objectId);
     }
 
     /**
@@ -212,8 +158,8 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        return parent::batchDeleteStandard();
+        return parent::batchDeleteStandard($request);
     }
 }

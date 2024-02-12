@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
@@ -21,15 +12,16 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Tests that fetchAllRecords loops until all records are obtained
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi::fetchAllRecords()
+     *
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi::fetchAllRecords
      *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
      */
-    public function testResultPagination()
+    public function testResultPagination(): void
     {
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getRecords'])
+            ->onlyMethods(['makeRequest', 'getApiUrl'])
             ->getMock();
 
         $page = 0;

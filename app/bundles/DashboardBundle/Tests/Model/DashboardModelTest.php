@@ -2,77 +2,86 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class DashboardModelTest extends TestCase
+final class DashboardModelTest extends TestCase
 {
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var PathsHelper|MockObject
      */
-    private $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var MockObject|Filesystem
      */
-    private $filesystem;
+    private MockObject $filesystem;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private MockObject $session;
 
-    /**
-     * @var DashboardModel
-     */
-    private $model;
+    private DashboardModel $model;
+
+    private WidgetDetailEventFactory $widgetDetailEventFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
-        $this->filesystem           = $this->createMock(Filesystem::class);
+        $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $this->pathsHelper              = $this->createMock(PathsHelper::class);
+        $this->widgetDetailEventFactory = $this->createMock(WidgetDetailEventFactory::class);
+        $this->filesystem               = $this->createMock(Filesystem::class);
+        $this->session                  = $this->createMock(Session::class);
+        $requestStack                   = $this->createMock(RequestStack::class);
+        $requestStack->method('getSession')
+            ->willReturn($this->session);
 
         $this->model = new DashboardModel(
             $this->coreParametersHelper,
             $this->pathsHelper,
-            $this->filesystem
+            $this->widgetDetailEventFactory,
+            $this->filesystem,
+            $requestStack,
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class)
         );
-
-        $this->session = $this->createMock(Session::class);
-
-        $this->model->setSession($this->session);
     }
 
     public function testGetDefaultFilterFromSession(): void
     {
         $dateFromStr = '-1 month';
         $dateFrom    = new \DateTime($dateFromStr);
-        $dateTo      = new \DateTime();
+        $dateTo      = new \DateTime('23:59:59'); // till end of the 'to' date selected
 
         $this->coreParametersHelper->expects(self::once())
             ->method('get')
@@ -81,10 +90,6 @@ class DashboardModelTest extends TestCase
 
         $this->session->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(
-                ['mautic.daterange.form.from'],
-                ['mautic.daterange.form.to']
-            )
             ->willReturnOnConsecutiveCalls(
                 $dateFrom->format(\DateTimeInterface::ATOM),
                 $dateTo->format(\DateTimeInterface::ATOM)

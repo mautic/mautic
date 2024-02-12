@@ -1,31 +1,20 @@
 <?php
-/*
- * @copyright   2020 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
 
 use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IframeAvailabilityCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var IframeAvailabilityChecker|MockObject
      */
-    private $helper;
+    private \MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker $helper;
 
     public function setUp(): void
     {
@@ -46,11 +35,11 @@ class IframeAvailabilityCheckerTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->once())
             ->method('trans')
             ->with(
-                    'mautic.focus.protocol.mismatch',
-                    [
-                        '%url%' => str_replace('http://', 'https://', $url),
-                    ]
-                )
+                'mautic.focus.protocol.mismatch',
+                [
+                    '%url%' => str_replace('http://', 'https://', $url),
+                ]
+            )
             ->willReturn($translatedErrorMessage);
 
         /** @var JsonResponse $response */

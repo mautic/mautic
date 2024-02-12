@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
@@ -21,12 +12,12 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CompanyRepository
      */
-    private $companyRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $companyRepository;
 
     protected function setUp(): void
     {
@@ -39,7 +30,7 @@ class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testUniqueFieldNotFoundException()
+    public function testUniqueFieldNotFoundException(): void
     {
         $this->expectException(UniqueFieldNotFoundException::class);
         $this->fieldModel->method('getFieldList')->willReturn([]);

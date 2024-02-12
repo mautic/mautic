@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\FeedbackLoopNotFound;
@@ -18,54 +9,21 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FeedbackLoop implements ProcessorInterface
 {
-    /**
-     * @var ContactFinder
-     */
-    private $contactFinder;
+    private ?\Mautic\EmailBundle\MonitoredEmail\Message $message = null;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var Message
-     */
-    private $message;
-
-    /**
-     * @var DoNotContactModel
-     */
-    private $doNotContact;
-
-    /**
-     * FeedbackLoop constructor.
-     */
     public function __construct(
-        ContactFinder $contactFinder,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        DoNotContactModel $doNotContact
+        private ContactFinder $contactFinder,
+        private TranslatorInterface $translator,
+        private LoggerInterface $logger,
+        private DoNotContactModel $doNotContact
     ) {
-        $this->contactFinder = $contactFinder;
-        $this->translator    = $translator;
-        $this->logger        = $logger;
-        $this->doNotContact  = $doNotContact;
     }
 
-    /**
-     * @return bool
-     */
-    public function process(Message $message)
+    public function process(Message $message): bool
     {
         $this->message = $message;
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a feedback loop report');
@@ -80,7 +38,7 @@ class FeedbackLoop implements ProcessorInterface
                 // A contact email was not found in the FBL report
                 return false;
             }
-        } catch (FeedbackLoopNotFound $exception) {
+        } catch (FeedbackLoopNotFound) {
             return false;
         }
 
@@ -99,10 +57,7 @@ class FeedbackLoop implements ProcessorInterface
         return true;
     }
 
-    /**
-     * @return int
-     */
-    protected function isApplicable()
+    protected function isApplicable(): int|bool
     {
         return preg_match('/.*feedback-type: abuse.*/is', $this->message->fblReport);
     }

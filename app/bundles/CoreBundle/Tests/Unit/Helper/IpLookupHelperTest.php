@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Doctrine\ORM\EntityManager;
@@ -35,7 +26,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testLocalIpIsReturnedWhenNotInRequestScope()
+    public function testLocalIpIsReturnedWhenNotInRequestScope(): void
     {
         $ip = $this->getIpHelper()->getIpAddress();
 
@@ -47,7 +38,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testClientIpIsReturnedFromProxy()
+    public function testClientIpIsReturnedFromProxy(): void
     {
         $request = new Request([], [], [], [], [], ['HTTP_X_FORWARDED_FOR' => '73.77.245.52,10.8.0.2,192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
@@ -60,7 +51,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testClientIpIsReturnedFromRequest()
+    public function testClientIpIsReturnedFromRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
@@ -73,7 +64,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testLocalIpIsReturnedForInternalNetworkIp()
+    public function testLocalIpIsReturnedForInternalNetworkIp(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
@@ -86,7 +77,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @covers  \Mautic\CoreBundle\Helper\IpLookupHelper::getIpAddress
      */
-    public function testInternalNetworkIpIsReturnedIfSetToTrack()
+    public function testInternalNetworkIpIsReturnedIfSetToTrack(): void
     {
         $request                  = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $mockCoreParametersHelper = $this
@@ -96,9 +87,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $mockCoreParametersHelper->expects($this->any())
             ->method('get')
             ->willReturnCallback(
-                function ($param, $defaultValue) {
-                    return 'track_private_ip_ranges' === $param ? true : $defaultValue;
-                }
+                fn ($param, $defaultValue) => 'track_private_ip_ranges' === $param ? true : $defaultValue
             );
         $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 
@@ -106,9 +95,6 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param null $request
-     * @param null $mockCoreParametersHelper
-     *
      * @return IpLookupHelper
      */
     private function getIpHelper($request = null, $mockCoreParametersHelper = null)

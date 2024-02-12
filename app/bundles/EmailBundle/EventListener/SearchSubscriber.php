@@ -1,62 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var TemplatingHelper
-     */
-    private $templating;
-
     public function __construct(
-        UserHelper $userHelper,
-        EmailModel $emailModel,
-        CorePermissions $security,
-        TemplatingHelper $templating
+        private UserHelper $userHelper,
+        private EmailModel $emailModel,
+        private CorePermissions $security,
+        private Environment $twig
     ) {
-        $this->userHelper = $userHelper;
-        $this->emailModel = $emailModel;
-        $this->security   = $security;
-        $this->templating = $templating;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -64,7 +28,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
         if (empty($str)) {
@@ -95,20 +59,20 @@ class SearchSubscriber implements EventSubscriberInterface
                 $emailResults = [];
 
                 foreach ($emails as $email) {
-                    $emailResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
+                    $emailResults[] = $this->twig->render(
+                        '@MauticEmail/SubscribedEvents/Search/global.html.twig',
                         ['email' => $email]
-                    )->getContent();
+                    );
                 }
                 if (count($emails) > 5) {
-                    $emailResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
+                    $emailResults[] = $this->twig->render(
+                        '@MauticEmail/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($emails) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $emailResults['count'] = count($emails);
                 $event->addResults('mautic.email.emails', $emailResults);
@@ -116,7 +80,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted(['email:emails:viewown', 'email:emails:viewother'], 'MATCH_ONE')) {
             $event->addCommands(

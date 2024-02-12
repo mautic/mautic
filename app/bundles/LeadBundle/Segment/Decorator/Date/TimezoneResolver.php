@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,23 +7,15 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class TimezoneResolver
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
      * @param bool $hasTimePart
-     *
-     * @return DateTimeHelper
      */
-    public function getDefaultDate($hasTimePart)
+    public function getDefaultDate($hasTimePart): DateTimeHelper
     {
         /**
          * $hasTimePart tells us if field in a database is date or datetime

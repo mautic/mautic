@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
@@ -18,21 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
     public function __construct(
-        AuditLogModel $auditLogModel
+        private AuditLogModel $auditLogModel
     ) {
-        $this->auditLogModel = $auditLogModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::MESSAGE_POST_SAVE   => ['onPostSave', 0],
@@ -43,7 +25,7 @@ class MessageSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onPostSave(MessageEvent $event)
+    public function onPostSave(MessageEvent $event): void
     {
         $entity = $event->getMessage();
         if ($details = $event->getChanges()) {
@@ -61,7 +43,7 @@ class MessageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onDelete(MessageEvent $event)
+    public function onDelete(MessageEvent $event): void
     {
         $entity = $event->getMessage();
         $log    = [

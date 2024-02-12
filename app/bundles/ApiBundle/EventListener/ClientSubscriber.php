@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\ApiEvents;
@@ -19,22 +10,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ClientSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->auditLogModel        = $auditLogModel;
     }
 
     public static function getSubscribedEvents(): array

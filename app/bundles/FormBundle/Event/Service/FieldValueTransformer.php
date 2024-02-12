@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Event\Service;
 
 use Mautic\FormBundle\Entity\Field;
@@ -18,39 +9,23 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private array $contactFieldsToUpdate = [];
 
-    /**
-     * @var array
-     */
-    private $contactFieldsToUpdate = [];
+    private array $tokensToUpdate = [];
 
-    /**
-     * @var array
-     */
-    private $tokensToUpdate = [];
+    private bool $isTransformed = false;
 
-    /**
-     * @var bool
-     */
-    private $isTransformed = false;
-
-    /**
-     * FieldValueTransformer constructor.
-     */
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        private RouterInterface $router
+    ) {
     }
 
-    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
+    public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void
     {
-        if ($this->isIsTransformed()) {
+        if (true === $this->isTransformed) {
             return;
         }
+
         $fields              = $submissionEvent->getForm()->getFields();
         $contactFieldMatches = $submissionEvent->getContactFieldMatches();
         $tokens              = $submissionEvent->getTokens();
@@ -74,8 +49,8 @@ class FieldValueTransformer
                         $this->tokensToUpdate[$tokenAlias] = $tokens[$tokenAlias] = $newValue;
                     }
 
-                    $contactFieldAlias = $field->getLeadField();
-                    if (!empty($contactFieldMatches[$contactFieldAlias])) {
+                    $contactFieldAlias = $field->getMappedField();
+                    if ('contact' === $field->getMappedObject() && !empty($contactFieldMatches[$contactFieldAlias])) {
                         $this->contactFieldsToUpdate[$contactFieldAlias] = $contactFieldMatches[$contactFieldAlias] = $newValue;
                     }
 
@@ -105,9 +80,9 @@ class FieldValueTransformer
     }
 
     /**
-     * @return bool
+     * @deprecated will be removed in Mautic 4. This should have been a private method. Not actually needed.
      */
-    public function isIsTransformed()
+    public function isIsTransformed(): bool
     {
         return $this->isTransformed;
     }

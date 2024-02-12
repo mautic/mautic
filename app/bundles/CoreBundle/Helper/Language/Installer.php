@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\Language;
 
 use Symfony\Component\Filesystem\Filesystem;
@@ -16,34 +7,18 @@ use Symfony\Component\Finder\Finder;
 
 class Installer
 {
-    /**
-     * @var string
-     */
-    private $translationsDirectory;
+    private ?string $sourceDirectory = null;
+
+    private ?string $installDirectory = null;
+
+    private \Symfony\Component\Filesystem\Filesystem $filesystem;
 
     /**
-     * @var string
-     */
-    private $sourceDirectory;
-
-    /**
-     * @var string
-     */
-    private $installDirectory;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    /**
-     * Installer constructor.
-     *
      * @param string $translationsDirectory
      */
-    public function __construct($translationsDirectory)
-    {
-        $this->translationsDirectory = $translationsDirectory;
+    public function __construct(
+        private $translationsDirectory
+    ) {
         $this->filesystem            = new Filesystem();
     }
 
@@ -65,7 +40,7 @@ class Installer
         return $this;
     }
 
-    public function cleanup()
+    public function cleanup(): void
     {
         if (!$this->sourceDirectory) {
             return;
@@ -78,7 +53,7 @@ class Installer
         $this->installDirectory = null;
     }
 
-    private function createLanguageDirectory()
+    private function createLanguageDirectory(): void
     {
         if (is_dir($this->installDirectory)) {
             return;
@@ -87,12 +62,12 @@ class Installer
         $this->filesystem->mkdir($this->installDirectory, 0755);
     }
 
-    private function copyConfig()
+    private function copyConfig(): void
     {
         $this->filesystem->copy($this->sourceDirectory.'/config.json', $this->installDirectory.'/config.json', true);
     }
 
-    private function copyBundles()
+    private function copyBundles(): void
     {
         $bundles = new Finder();
         $bundles->directories()->name('*Bundle')->in($this->sourceDirectory);
@@ -103,7 +78,7 @@ class Installer
         }
     }
 
-    private function copyBundle(\SplFileInfo $bundle)
+    private function copyBundle(\SplFileInfo $bundle): void
     {
         $name            = $bundle->getFilename();
         $targetDirectory = $this->installDirectory.'/'.$name;

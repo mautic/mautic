@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -22,35 +13,26 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Report
-     */
-    private $report;
+    private \Mautic\ReportBundle\Entity\Report $report;
 
-    /**
-     * @var Scheduler
-     */
-    private $scheduler;
+    private \Mautic\ReportBundle\Entity\Scheduler $scheduler;
 
-    /**
-     * @var SendSchedule
-     */
-    private $sendSchedule;
+    private \Mautic\ReportBundle\Scheduler\Model\SendSchedule $sendSchedule;
 
     /**
      * @var MockObject|MailHelper
      */
-    private $mailHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $mailHelperMock;
 
     /**
      * @var MockObject|MessageSchedule
      */
-    private $messageSchedule;
+    private \PHPUnit\Framework\MockObject\MockObject $messageSchedule;
 
     /**
      * @var MockObject|FileHandler
      */
-    private $fileHandler;
+    private \PHPUnit\Framework\MockObject\MockObject $fileHandler;
 
     protected function setUp(): void
     {
@@ -73,7 +55,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendScheduleWithCsvFile()
+    public function testSendScheduleWithCsvFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 
@@ -118,7 +100,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
 
-    public function testSendScheduleWithZipFile()
+    public function testSendScheduleWithZipFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 
@@ -175,7 +157,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule->send($this->scheduler, '/path/to/report.csv');
     }
 
-    public function testSendScheduleWithoutFile()
+    public function testSendScheduleWithoutFile(): void
     {
         $this->report->setToAddress('john@doe.com, doe@john.com');
 

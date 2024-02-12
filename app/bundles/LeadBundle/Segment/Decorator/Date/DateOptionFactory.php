@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -33,29 +24,11 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 
 class DateOptionFactory
 {
-    /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
-
-    /**
-     * @var RelativeDate
-     */
-    private $relativeDate;
-
-    /**
-     * @var TimezoneResolver
-     */
-    private $timezoneResolver;
-
     public function __construct(
-        DateDecorator $dateDecorator,
-        RelativeDate $relativeDate,
-        TimezoneResolver $timezoneResolver
+        private DateDecorator $dateDecorator,
+        private RelativeDate $relativeDate,
+        private TimezoneResolver $timezoneResolver
     ) {
-        $this->dateDecorator    = $dateDecorator;
-        $this->relativeDate     = $relativeDate;
-        $this->timezoneResolver = $timezoneResolver;
     }
 
     /**
@@ -78,9 +51,9 @@ class DateOptionFactory
             case 'birthday':
             case 'anniversary':
             case $timeframe && (
-                    false !== strpos($timeframe, 'anniversary') ||
-                    false !== strpos($timeframe, 'birthday')
-                ):
+                str_contains($timeframe, 'anniversary') ||
+                str_contains($timeframe, 'birthday')
+            ):
                 return new DateAnniversary($this->dateDecorator, $dateOptionParameters);
             case 'today':
                 return new DateDayToday($this->dateDecorator, $dateOptionParameters);
@@ -107,13 +80,30 @@ class DateOptionFactory
             case 'year_this':
                 return new DateYearThis($this->dateDecorator, $dateOptionParameters);
             case $timeframe && (
-                    false !== strpos($timeframe[0], '-') || // -5 days
-                    false !== strpos($timeframe[0], '+') || // +5 days
-                    false !== strpos($timeframe, ' ago')    // 5 days ago
-                ):
+                str_contains($timeframe[0], '-') || // -5 days
+                str_contains($timeframe[0], '+') || // +5 days
+                false !== $this->isRelativeFormatsPresent($timeframe)
+            ):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
         }
+    }
+
+    protected function isRelativeFormatsPresent(string $timeframe): bool
+    {
+        $notations = [
+            'first day of ', // first day of January 2021
+            'last day of ', // last day of January 2021
+            ' ago', // 5 days ago
+        ];
+
+        foreach ($notations as $notation) {
+            if (str_contains($timeframe, $notation)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

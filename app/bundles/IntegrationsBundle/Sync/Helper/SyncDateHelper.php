@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -18,34 +9,20 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class SyncDateHelper
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private ?\DateTimeInterface $syncFromDateTime = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncFromDateTime;
+    private ?\DateTimeInterface $syncToDateTime = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncToDateTime;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncDateTime;
+    private ?\DateTimeImmutable $syncDateTime = null;
 
     /**
      * @var \DateTimeInterface[]
      */
-    private $lastObjectSyncDates = [];
+    private array $lastObjectSyncDates = [];
 
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection
+    ) {
     }
 
     public function setSyncDateTimes(?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null): void
@@ -112,8 +89,8 @@ class SyncDateHelper
             )
             ->setParameter('integration', $integration)
             ->setParameter('object', $object)
-            ->execute()
-            ->fetchColumn();
+            ->executeQuery()
+            ->fetchOne();
 
         if (!$result) {
             return null;

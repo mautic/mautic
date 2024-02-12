@@ -1,0 +1,100 @@
+{% if event.extra is defined %}
+  {% set timeOnPage = 'mautic.core.unknown'|trans %}
+
+  {% if event.extra.hit.dateLeft %}
+      {% set timeOnPage = (event.extra.hit.dateLeft.timestamp - event.extra.hit.dateHit.timestamp) %}
+
+      {# format the time #}
+      {% if timeOnPage > 60 %}
+          {% set sec = timeOnPage % 60 %}
+          {% set min = (timeOnPage / 60)|round(0, 'floor') %}
+          {% set timeOnPage = min ~ 'm ' ~ sec ~ 's' %}
+      {% else %}
+          {% set timeOnPage = timeOnPage ~ 's' %}
+      {% endif %}
+  {% endif %}
+
+  <dl class="dl-horizontal">
+      <dt>{{ 'mautic.page.time.on.page'|trans }}:</dt>
+      <dd>{{ timeOnPage }}</dd>
+      <dt>{{ 'mautic.page.referrer'|trans }}:</dt>
+      <dd>{% if event['extra']['hit']['referer'] %}{{ assetMakeLinks(event['extra']['hit']['referer']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
+      <dt>{{ 'mautic.page.url'|trans }}:</dt>
+      <dd>{% if event['extra']['hit']['url'] %}{{ assetMakeLinks(event['extra']['hit']['url']) }}{% else %}{{ 'mautic.core.unknown'|trans }}{% endif %}</dd>
+
+      {% if event.extra.hit.device is defined and event.extra.hit.device is not empty %}
+          <dt>{{ 'mautic.core.timeline.device.name'|trans }}</dt>
+          <dd class="ellipsis">{{ inputClean(event.extra.hit.device) }}</dd>
+      {% endif %}
+
+      {% if event.extra.hit.deviceOsName is defined and event.extra.hit.deviceOsName is not empty %}
+          <dt>{{ 'mautic.core.timeline.device.os'|trans }}</dt>
+          <dd class="ellipsis">{{ inputClean(event.extra.hit.deviceOsName) }}</dd>
+      {% endif %}
+
+      {% if event.extra.hit.deviceBrand is defined and event.extra.hit.deviceBrand is not empty %}
+          <dt>{{ 'mautic.core.timeline.device.brand'|trans }}</dt>
+          <dd class="ellipsis">{{ inputClean(event.extra.hit.deviceBrand) }}</dd>
+      {% endif %}
+
+      {% if event.extra.hit.deviceModel is defined and event.extra.hit.deviceModel is not empty %}
+          <dt>{{ 'mautic.core.timeline.device.model'|trans }}</dt>
+          <dd class="ellipsis">{{ inputClean(event.extra.hit.deviceModel) }}</dd>
+      {% endif %}
+
+      {% if event.extra.hit.sourceName is defined and event.extra.hit.sourceName is not empty %}
+          <dt>{{ 'mautic.core.source'|trans }}:</dt>
+          <dd>
+              {% if event.extra.hit.sourceRate is defined %}
+                  <a href="{{ inputClean(event.extra.hit.sourceRoute) }}" data-toggle="ajax">{{ inputClean(event.extra.hit.sourceName) }}</a>
+              {% else %}
+                  {{ inputClean(event.extra.hit.sourceName) }}
+              {% endif %}
+          </dd>
+
+          {% if event.extra.hit.clientInfo is defined and event.extra.hit.clientInfo is not empty and event.extra.hit.clientInfo is iterable %}
+              <dt>{{ 'mautic.core.timeline.device.client.info'|trans }}</dt>
+              <dd class="ellipsis">
+                  {% for clientInfo in event.extra.hit.clientInfo %}
+                      {{ inputClean(clientInfo) }}
+                  {% endfor %}
+              </dd>
+          {% endif %}
+      {% endif %}
+
+      {% if event.extra.hit.query is defined and event.extra.hit.query is not empty and event.extra.hit.query is iterable %}
+          {% set counter = 0 %}
+          {% for k, v in event.extra.hit.query %}
+              {% if v is not empty and k not in ['ct', 'page_title', 'page_referrer', 'page_url'] %}
+                {% if v is iterable %}
+                    {% for k2, v2 in v %}
+                        {% set counter = counter + 1 %}
+                        {% set k2 = k|replace({'_': ' '})|title %}
+                        <dt>{{ k2 }}:</dt>
+                        <dd class="ellipsis">{{ v2 }}</dd>
+                    {% endfor %}
+                {% else %}
+                    {% set counter = counter + 1 %}
+                    {% set k = k|replace({'_': ' '})|title %}
+                    <dt>{{ k }}</dt>
+                    <dd class="ellipsis">{{ v }}</dd>
+                {% endif %}
+
+                {% if showMore is not defined and counter > 5 %}
+                    {% set showMore = true %}
+                    <div style="display:none">
+                {% endif %}
+
+              {% endif %}
+          {% endfor %}
+
+          {% if showMore is defined and true == showMore %}
+              </div>
+              <a href="javascript:void(0);" class="text-center small center-block mt-xs" onclick="Mautic.toggleTimelineMoreVisiblity(mQuery(this).prev());">{{ 'mautic.core.more.show'|trans }}</a>
+          {% endif %}
+      {% endif %}
+  </dl>
+  <div class="small">
+      {{ inputClean(event.extra.hit.userAgent) }}
+  </div>
+{% endif %}

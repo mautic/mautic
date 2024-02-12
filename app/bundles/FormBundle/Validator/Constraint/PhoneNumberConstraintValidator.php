@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Validator\Constraint;
 
 use libphonenumber\NumberParseException;
@@ -23,10 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class PhoneNumberConstraintValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (null === $value || '' === $value) {
             return;
@@ -42,7 +30,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
             $value = (string) $value;
             try {
                 $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException $e) {
+            } catch (NumberParseException) {
                 $this->addViolation($value, $constraint);
 
                 return;
@@ -62,7 +50,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
      * @param mixed      $value      the value that should be validated
      * @param Constraint $constraint the constraint for the validation
      */
-    private function addViolation($value, Constraint $constraint)
+    private function addViolation($value, Constraint $constraint): void
     {
         $this->context->addViolation(
             $constraint->getMessage(),

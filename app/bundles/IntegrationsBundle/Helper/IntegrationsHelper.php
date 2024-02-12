@@ -19,39 +19,15 @@ class IntegrationsHelper
     /**
      * @var IntegrationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
-    /**
-     * @var IntegrationRepository
-     */
-    private $integrationRepository;
+    private array $decryptedIntegrationConfigurations = [];
 
-    /**
-     * @var EncryptionService
-     */
-    private $encryptionService;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var array
-     */
-    private $decryptedIntegrationConfigurations = [];
-
-    /**
-     * IntegrationsHelper constructor.
-     */
     public function __construct(
-        IntegrationRepository $integrationRepository,
-        EncryptionService $encryptionService,
-        EventDispatcherInterface $eventDispatcher
+        private IntegrationRepository $integrationRepository,
+        private EncryptionService $encryptionService,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->integrationRepository = $integrationRepository;
-        $this->encryptionService     = $encryptionService;
-        $this->eventDispatcher       = $eventDispatcher;
     }
 
     public function addIntegration(IntegrationInterface $integration): void
@@ -83,7 +59,7 @@ class IntegrationsHelper
 
         // Dispatch event before encryption
         $encryptionEvent = new KeysEncryptionEvent($configuration, $decryptedApiKeys);
-        $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_KEYS_BEFORE_ENCRYPTION, $encryptionEvent);
+        $this->eventDispatcher->dispatch($encryptionEvent, IntegrationEvents::INTEGRATION_KEYS_BEFORE_ENCRYPTION);
 
         // Encrypt and store the keys
         $encryptedApiKeys = $this->encryptionService->encrypt($encryptionEvent->getKeys());
@@ -97,15 +73,13 @@ class IntegrationsHelper
     }
 
     /**
-     * @return Integration
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegrationConfiguration(IntegrationInterface $integration)
+    public function getIntegrationConfiguration(IntegrationInterface $integration): Integration
     {
         if (!$integration->hasIntegrationConfiguration()) {
             /** @var Integration $configuration */
-            $configuration = $this->integrationRepository->findOneBy(['name' => $integration->getName()]);
+            $configuration = $this->integrationRepository->findOneByName($integration->getName());
 
             if (!$configuration) {
                 throw new IntegrationNotFoundException("{$integration->getName()} doesn't exist in the database");
@@ -122,7 +96,7 @@ class IntegrationsHelper
 
             // Dispatch event after decryption
             $decryptionEvent = new KeysDecryptionEvent($configuration, $decryptedApiKeys);
-            $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_KEYS_AFTER_DECRYPTION, $decryptionEvent);
+            $this->eventDispatcher->dispatch($decryptionEvent, IntegrationEvents::INTEGRATION_KEYS_AFTER_DECRYPTION);
 
             $configuration->setApiKeys($decryptionEvent->getKeys());
 

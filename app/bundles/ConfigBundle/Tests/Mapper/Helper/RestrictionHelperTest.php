@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
@@ -32,9 +23,9 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Ensure a mixed numeric/string keyed array is formatted to all string based keys
      *
-     * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::prepareRestrictions()
+     * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::prepareRestrictions
      */
-    public function testRestrictedConfigArrayIsFormattedCorrectly()
+    public function testRestrictedConfigArrayIsFormattedCorrectly(): void
     {
         $expected = [
             'db_host'         => 'db_host',
@@ -52,10 +43,11 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Ensure a restrictions are recursively applied
-     * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::prepareRestrictions()
-     * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::applyRestrictions()
+     *
+     * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::prepareRestrictions
+     * @covers  \Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper::applyRestrictions
      */
-    public function testApplyingRestrictionsToConfigArray()
+    public function testApplyingRestrictionsToConfigArray(): void
     {
         $config = [
             'db_host'         => 'dbhost',

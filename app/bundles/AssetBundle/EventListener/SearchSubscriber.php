@@ -1,58 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var TemplatingHelper
-     */
-    private $templating;
-
-    public function __construct(AssetModel $assetModel, CorePermissions $security, UserHelper $userHelper, TemplatingHelper $templating)
-    {
-        $this->assetModel = $assetModel;
-        $this->security   = $security;
-        $this->userHelper = $userHelper;
-        $this->templating = $templating;
+    public function __construct(
+        private AssetModel $assetModel,
+        private CorePermissions $security,
+        private UserHelper $userHelper,
+        private Environment $twig
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -60,7 +28,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
         if (empty($str)) {
@@ -92,20 +60,20 @@ class SearchSubscriber implements EventSubscriberInterface
                 $assetResults = [];
 
                 foreach ($assets as $asset) {
-                    $assetResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                    $assetResults[] = $this->twig->render(
+                        '@MauticAsset/SubscribedEvents/Search/global.html.twig',
                         ['asset' => $asset]
-                    )->getContent();
+                    );
                 }
                 if (count($assets) > 5) {
-                    $assetResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                    $assetResults[] = $this->twig->render(
+                        '@MauticAsset/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($assets) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $assetResults['count'] = count($assets);
                 $event->addResults('mautic.asset.assets', $assetResults);
@@ -113,7 +81,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted(['asset:assets:viewown', 'asset:assets:viewother'], 'MATCH_ONE')) {
             $event->addCommands(

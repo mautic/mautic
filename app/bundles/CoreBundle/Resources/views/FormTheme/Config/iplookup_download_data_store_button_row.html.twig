@@ -1,0 +1,14 @@
+{% block iplookup_download_data_store_button_row %}
+<div class="row">
+    <div class="col-sm-6">
+        <div id="iplookup_fetch_button_container">
+            {{ form_widget(form.fetch_button) }}
+            <span class="fa fa-spinner fa-spin hide"></span>
+            {% if ipDataStoreLastDownloaded is defined %}
+              <div class="small text-muted">{{ ipDataStoreLastDownloaded }}</div>
+            {% endif %}
+        </div>
+        <div class="col-md-9 help-block"></div>
+    </div>
+</div>
+{% endblock %}

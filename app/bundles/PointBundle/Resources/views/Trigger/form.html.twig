@@ -1,0 +1,114 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'pointTrigger' %}
+
+{%- block headerTitle -%}
+  {%- if entity.id -%}
+    {{ 'mautic.point.trigger.header.edit'|trans({'%name%': entity.name|trans}) }}
+  {%- else -%}
+    {{ 'mautic.point.trigger.header.new'|trans }}
+  {%- endif -%}
+{%- endblock -%}
+
+{% block modal include('@MauticCore/Helper/modal.html.twig', {
+  'id': 'triggerEventModal',
+  'header': 'mautic.point.trigger.form.modalheader'|trans,
+  'footerButtons': true
+}) %}
+
+{% block content %}
+{{ form_start(form) }}
+<div class="box-layout">
+    <div class="col-md-9 bg-white height-auto">
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- tabs controls -->
+                <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                    <li class="active"><a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
+                    <li class=""><a href="#events-container" role="tab" data-toggle="tab">{{ 'mautic.point.trigger.tab.events'|trans }}</a></li>
+                </ul>
+                <!--/ tabs controls -->
+
+                <div class="tab-content pa-md">
+                    <div class="tab-pane fade in active bdr-w-0 height-auto" id="details-container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    {{ form_row(form.name) }}
+                                    {{ form_row(form.description, {'attr': {'class': 'form-control editor'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    {{ form_row(form.points) }}
+                                    {{ form_row(form.color) }}
+                                    {{ form_row(form.group) }}
+                                    {{ form_row(form.triggerExistingLeads) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade bdr-w-0" id="events-container">
+                        <div id="triggerEvents">
+                            <div class="mb-md">
+                                <p>{{ 'mautic.point.trigger.addevent'|trans }}</p>
+                                <div class="dropdown">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                        {{ 'mautic.point.trigger.event.add'|trans }}
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        {% for group, event in events %}
+                                            <li role="presentation" class="dropdown-header">
+                                                {{ group }}
+                                            </li>
+                                            {% for k, e in event %}
+                                                <li id="event_{{ k }}">
+                                                    <a data-toggle="ajaxmodal"
+                                                       data-target="#triggerEventModal"
+                                                       class="list-group-item"
+                                                       href="{{ path('mautic_pointtriggerevent_action', {'objectAction': 'new', 'type': k, 'tmpl': 'event', 'triggerId': sessionId}) }}">
+                                                        <div data-toggle="tooltip" title="{{ e.description }}">
+                                                            <span>{{ e.label }}</span>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {% for event in triggerEvents %}
+                                {% set template = event.settings.template|default('@MauticPoint/Event/generic.html.twig') %}
+                                <!-- start: "{{ template }}" -->
+                                {{ include(template, {
+                                    'event': event,
+                                    'id': event.id,
+                                    'deleted': (event.id in deletedEvents),
+                                    'sessionId': sessionId,
+                                }, with_context=false) }}
+                                <!--/ start: "{{ template }}" -->
+                            {% else %}
+                                <div class="alert alert-info" id="triggerEventPlaceholder">
+                                    <p>{{ 'mautic.point.trigger.addevent'|trans }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 bg-white height-auto bdr-l">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {{ form_row(form.category) }}
+            {{ form_row(form.isPublished) }}
+            {{ form_row(form.publishUp) }}
+            {{ form_row(form.publishDown) }}
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+
+{% endblock %}

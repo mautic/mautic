@@ -1,34 +1,37 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait CustomFieldsApiControllerTrait
 {
+    private ?RequestStack $requestStack = null;
+
+    /**
+     * @var mixed[]
+     */
+    private $fieldCache = [];
+
     /**
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
-     * @param $parameters
-     * @param Lead $entity
-     * @param $action
+     * @param mixed[]      $parameters
+     * @param Lead|Company $entity
+     * @param string       $action
      *
      * @return mixed|void
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         if ('company' === $this->entityNameOne) {
             $object = 'company';
@@ -37,7 +40,7 @@ trait CustomFieldsApiControllerTrait
             unset($parameters['lastActive'], $parameters['tags'], $parameters['ipAddress']);
         }
 
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+        if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
             // is not defined in the request
 
@@ -59,10 +62,8 @@ trait CustomFieldsApiControllerTrait
 
     /**
      * Flatten fields into an 'all' key for dev convenience.
-     *
-     * @param string $action
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
         if ($entity instanceof CustomFieldEntityInterface) {
             $fields        = $entity->getFields();
@@ -77,6 +78,11 @@ trait CustomFieldsApiControllerTrait
         }
     }
 
+    /**
+     * @param mixed[] $fields
+     *
+     * @return mixed[]
+     */
     private function fixNumbers(array $fields): array
     {
         $numberFields = [];
@@ -117,12 +123,20 @@ trait CustomFieldsApiControllerTrait
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         $object = ('company' === $this->entityNameOne) ? 'company' : 'lead';
-        $fields = $this->getModel('lead.field')->getEntities(
+
+        if (isset($this->fieldCache[$object])) {
+            return $this->fieldCache[$object];
+        }
+
+        $model = $this->getModel('lead.field');
+        \assert($model instanceof FieldModel);
+
+        $fields = $model->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -139,22 +153,28 @@ trait CustomFieldsApiControllerTrait
                     ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
+                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
+        \assert($fields instanceof Paginator);
 
-        return ['fields' => $fields];
+        $this->fieldCache[$object] = ['fields' => $fields->getIterator()];
+
+        return $this->fieldCache[$object];
     }
 
     /**
      * @param Lead|Company $entity
      * @param Form         $form
-     * @param array        $parameters
+     * @param mixed[]      $parameters
      * @param bool         $isPostOrPatch
+     *
+     * @return bool|void
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
-        //set the custom field values
-        //pull the data from the form in order to apply the form's formatting
+        // set the custom field values
+        // pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
             $parameters[$f->getName()] = $f->getData();
         }
@@ -169,7 +189,7 @@ trait CustomFieldsApiControllerTrait
             // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
             $parameters = array_filter(
                 $parameters,
-                function ($value) {
+                function ($value): bool {
                     if (is_numeric($value)) {
                         return 0 !== (int) $value;
                     }
@@ -190,14 +210,24 @@ trait CustomFieldsApiControllerTrait
 
     /**
      * @param string $object
+     *
+     * @return void
      */
     protected function setCleaningRules($object = 'lead')
     {
-        $fields = $this->getModel('lead.field')->getFieldListWithProperties($object);
+        $leadFieldModel = $this->getModel('lead.field');
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getFieldListWithProperties($object);
         foreach ($fields as $field) {
             if (!empty($field['properties']['allowHtml'])) {
-                $this->dataInputMasks[$field['alias']]  = 'html';
+                $this->dataInputMasks[$field['alias']]  = 'html'; /** @phpstan-ignore-line this is accessing a property from the parent class. Terrible. Refactor for M6. */
             }
         }
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setRequestStack(RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
     }
 }

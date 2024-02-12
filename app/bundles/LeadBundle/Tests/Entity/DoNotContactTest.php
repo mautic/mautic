@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 
 class DoNotContactTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDoNotContactComments()
+    public function testDoNotContactComments(): void
     {
         $doNotContact = new DoNotContact();
         $doNotContact->setComments(null);

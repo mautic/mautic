@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -19,23 +10,24 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DynamicContentFilterType extends AbstractType
 {
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
-
-    public function __construct(BuilderIntegrationsHelper $builderIntegrationsHelper)
-    {
-        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+    public function __construct(
+        private BuilderIntegrationsHelper $builderIntegrationsHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $extraClasses = '';
 
         try {
             $mauticBuilder = $this->builderIntegrationsHelper->getBuilder('email');
             $mauticBuilder->getName();
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             // Assume legacy builder
             $extraClasses = ' legacy-builder';
         }
@@ -82,7 +74,7 @@ class DynamicContentFilterType extends AbstractType
         );
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -90,13 +82,5 @@ class DynamicContentFilterType extends AbstractType
                 'error_bubbling' => false,
             ]
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'dynamic_content_filter';
     }
 }

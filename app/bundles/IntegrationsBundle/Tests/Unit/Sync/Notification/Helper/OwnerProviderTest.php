@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
@@ -28,17 +19,14 @@ class OwnerProviderTest extends TestCase
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var OwnerProvider
-     */
-    private $ownerProvider;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider $ownerProvider;
 
     protected function setUp(): void
     {
@@ -78,7 +66,6 @@ class OwnerProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_OWNER_IDS,
                 $this->callback(function (InternalObjectOwnerEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame([123], $event->getObjectIds());
@@ -87,7 +74,8 @@ class OwnerProviderTest extends TestCase
                     $event->setOwners([$event->getObjectIds()[0] => 456]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_OWNER_IDS
             );
 
         $this->assertSame([123 => 456], $this->ownerProvider->getOwnersForObjectIds(Contact::NAME, [123]));

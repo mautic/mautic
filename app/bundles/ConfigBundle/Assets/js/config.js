@@ -67,6 +67,38 @@ Mautic.observeConfigTabs = function() {
     });
 }
 
+Mautic.resetEmailsToNotification = function(obj) {
+    const send_to_owner = obj.value;
+    if (parseInt(send_to_owner, 10) === 1)
+    {
+        mQuery(obj).closest('.panel-body').find('.notification_email_addresses').val('');
+    }
+};
+
+Mautic.configDsnTestExecute = function(element, action, key) {
+    const $button = mQuery(element),
+        $container = $button.closest('.config-dsn-container');
+
+    $container.find('.fa-spinner').removeClass('hide');
+
+    Mautic.ajaxActionRequest(action, {key: key}, function(response) {
+        const theClass = (response.success) ? 'has-success' : 'has-error',
+            theMessage = response.message;
+        $container.find('.config-dsn-test-container').removeClass('has-success has-error').addClass(theClass);
+        $container.find('.help-block .status-msg').html(theMessage);
+        $container.find('.fa-spinner').addClass('hide');
+    });
+};
+
+Mautic.configDsnTestDisable = function(element) {
+    const $container = mQuery(element).closest('.config-dsn-container');
+
+    $container.find('.help-block .status-msg').html('');
+    $container.find('.help-block .save-config-msg').removeClass('hide');
+    $container.find('.config-dsn-test-button').prop('disabled', true).addClass('disabled');
+};
+
+
 Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
     if (parseInt(anonymize_ip, 10) === 1)
     {

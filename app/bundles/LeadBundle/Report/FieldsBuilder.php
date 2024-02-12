@@ -1,51 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Report;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel)
-    {
-        $this->fieldModel = $fieldModel;
-        $this->listModel  = $listModel;
-        $this->userModel  = $userModel;
+    public function __construct(
+        private FieldModel $fieldModel,
+        private ListModel $listModel,
+        private UserModel $userModel,
+        private LeadModel $leadModel
+    ) {
     }
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getLeadFieldsColumns($prefix)
+    public function getLeadFieldsColumns($prefix): array
     {
         $baseColumns  = $this->getBaseLeadColumns();
         $leadFields   = $this->fieldModel->getLeadFields();
@@ -57,10 +33,8 @@ class FieldsBuilder
     /**
      * @param string $prefix
      * @param string $segmentPrefix
-     *
-     * @return array
      */
-    public function getLeadFilter($prefix, $segmentPrefix)
+    public function getLeadFilter($prefix, $segmentPrefix): array
     {
         $filters = $this->getLeadFieldsColumns($prefix);
 
@@ -86,6 +60,24 @@ class FieldsBuilder
             ],
         ];
 
+        $aTags     = [];
+        $aTagsList = $this->leadModel->getTagList();
+        foreach ($aTagsList as $aTemp) {
+            $aTags[$aTemp['value']] = $aTemp['label'];
+        }
+
+        $filters['tag'] = [
+            'label'     => 'mautic.core.filter.tags',
+            'type'      => 'multiselect',
+            'list'      => $aTags,
+            'operators' => [
+                'in'       => 'mautic.core.operator.in',
+                'notIn'    => 'mautic.core.operator.notin',
+                'empty'    => 'mautic.core.operator.isempty',
+                'notEmpty' => 'mautic.core.operator.isnotempty',
+            ],
+        ];
+
         $ownerPrefix           = $prefix.'owner_id';
         $ownersList            = [];
         $owners                = $this->userModel->getUserList('', 0);
@@ -103,10 +95,8 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return array
      */
-    public function getCompanyFieldsColumns($prefix)
+    public function getCompanyFieldsColumns($prefix): array
     {
         $baseColumns   = $this->getBaseCompanyColumns();
         $companyFields = $this->fieldModel->getCompanyFields();
@@ -115,10 +105,7 @@ class FieldsBuilder
         return array_merge($baseColumns, $fieldColumns);
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseLeadColumns()
+    private function getBaseLeadColumns(): array
     {
         return [
             'l.id' => [
@@ -142,7 +129,6 @@ class FieldsBuilder
             'l.owner_id' => [
                 'label' => 'mautic.lead.report.owner_id',
                 'type'  => 'int',
-                'link'  => 'mautic_user_action',
             ],
             'u.first_name' => [
                 'label' => 'mautic.lead.report.owner_firstname',
@@ -155,10 +141,7 @@ class FieldsBuilder
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getBaseCompanyColumns()
+    private function getBaseCompanyColumns(): array
     {
         return [
             'comp.id' => [
@@ -197,41 +180,23 @@ class FieldsBuilder
     /**
      * @param LeadField[] $fields
      * @param string      $prefix
-     *
-     * @return array
      */
-    private function getFieldColumns($fields, $prefix)
+    private function getFieldColumns($fields, $prefix): array
     {
         $prefix = $this->sanitizePrefix($prefix);
 
         $columns = [];
         foreach ($fields as $field) {
-            switch ($field->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
+            $type = match ($field->getType()) {
+                'boolean'  => 'bool',
+                'date'     => 'date',
+                'datetime' => 'datetime',
+                'time'     => 'time',
+                'url'      => 'url',
+                'email'    => 'email',
+                'number'   => 'float',
+                default    => 'string',
+            };
             $columns[$prefix.$field->getAlias()] = [
                 'label' => $field->getLabel(),
                 'type'  => $type,
@@ -243,12 +208,10 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
-     *
-     * @return string
      */
-    private function sanitizePrefix($prefix)
+    private function sanitizePrefix($prefix): string
     {
-        if (false === strpos($prefix, '.')) {
+        if (!str_contains($prefix, '.')) {
             $prefix .= '.';
         }
 

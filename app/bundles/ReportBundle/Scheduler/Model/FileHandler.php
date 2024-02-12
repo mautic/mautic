@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Model;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -22,29 +13,11 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class FileHandler
 {
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
-
-    /**
-     * @var FileProperties
-     */
-    private $fileProperties;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        FilePathResolver $filePathResolver,
-        FileProperties $fileProperties,
-        CoreParametersHelper $coreParametersHelper
+        private FilePathResolver $filePathResolver,
+        private FileProperties $fileProperties,
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->filePathResolver     = $filePathResolver;
-        $this->fileProperties       = $fileProperties;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -21,89 +12,63 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 class OrderDAO
 {
     /**
-     * @var \DateTimeInterface
+     * @var ObjectChangeDAO[][]
      */
-    private $syncDateTime;
+    private array $identifiedObjects = [];
 
     /**
-     * @var bool
+     * @var ObjectChangeDAO[][]
      */
-    private $isFirstTimeSync;
-
-    /**
-     * @var string
-     */
-    private $integration;
-
-    /**
-     * @var array
-     */
-    private $identifiedObjects = [];
-
-    /**
-     * @var array
-     */
-    private $unidentifiedObjects = [];
+    private array $unidentifiedObjects = [];
 
     /**
      * Array of all changed objects.
      *
-     * @var ObjectChangeDAO[]
+     * @var ObjectChangeDAO[][]
      */
-    private $changedObjects = [];
+    private array $changedObjects = [];
 
     /**
-     * @var array|ObjectMapping
+     * @var ObjectMapping[]
      */
-    private $objectMappings = [];
+    private array $objectMappings = [];
 
     /**
      * @var UpdatedObjectMappingDAO[]
      */
-    private $updatedObjectMappings = [];
+    private array $updatedObjectMappings = [];
 
     /**
      * @var RemappedObjectDAO[]
      */
-    private $remappedObjects = [];
+    private array $remappedObjects = [];
 
     /**
      * @var ObjectChangeDAO[]
      */
-    private $deleteTheseObjects = [];
+    private array $deleteTheseObjects = [];
 
-    /**
-     * @var array
-     */
-    private $retryTheseLater = [];
+    private array $retryTheseLater = [];
 
-    /**
-     * @var int
-     */
-    private $objectCounter = 0;
+    private int $objectCounter = 0;
 
     /**
      * @var NotificationDAO[]
      */
-    private $notifications = [];
-
-    private array $options;
+    private array $notifications = [];
 
     /**
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
-    {
-        $this->syncDateTime    = $syncDateTime;
-        $this->isFirstTimeSync = $isFirstTimeSync;
-        $this->integration     = $integration;
-        $this->options         = $options;
+    public function __construct(
+        private \DateTimeInterface $syncDateTime,
+        private $isFirstTimeSync,
+        private $integration,
+        private array $options = []
+    ) {
     }
 
-    /**
-     * @return OrderDAO
-     */
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
@@ -139,11 +104,17 @@ class OrderDAO
         throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
     }
 
+    /**
+     * @return ObjectChangeDAO[][]
+     */
     public function getIdentifiedObjects(): array
     {
         return $this->identifiedObjects;
     }
 
+    /**
+     * @return ObjectChangeDAO[][]
+     */
     public function getUnidentifiedObjects(): array
     {
         return $this->unidentifiedObjects;
@@ -279,16 +250,11 @@ class OrderDAO
     /**
      * @return ObjectChangeDAO[]
      */
-    public function getSuccessfullySyncedObjects()
+    public function getSuccessfullySyncedObjects(): array
     {
         $synced = [];
         foreach ($this->changedObjects as $objectChanges) {
-            /** @var ObjectChangeDAO $objectChange */
             foreach ($objectChanges as $objectChange) {
-                if (isset($this->retryTheseLater[$objectChange->getMappedObject()])) {
-                    continue;
-                }
-
                 if (isset($this->retryTheseLater[$objectChange->getMappedObject()][$objectChange->getMappedObjectId()])) {
                     continue;
                 }

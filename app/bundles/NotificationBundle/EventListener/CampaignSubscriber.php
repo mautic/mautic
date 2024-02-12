@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -29,30 +20,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private NotificationModel $notificationModel;
-    private AbstractNotificationApi $notificationApi;
-    private IntegrationHelper $integrationHelper;
-    private EventDispatcherInterface $dispatcher;
-    private DoNotContactModel $doNotContact;
-
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        NotificationModel $notificationModel,
-        AbstractNotificationApi $notificationApi,
-        EventDispatcherInterface $dispatcher,
-        DoNotContactModel $doNotContact
+        private IntegrationHelper $integrationHelper,
+        private NotificationModel $notificationModel,
+        private AbstractNotificationApi $notificationApi,
+        private EventDispatcherInterface $dispatcher,
+        private DoNotContactModel $doNotContact
     ) {
-        $this->integrationHelper = $integrationHelper;
-        $this->notificationModel = $notificationModel;
-        $this->notificationApi   = $notificationApi;
-        $this->dispatcher        = $dispatcher;
-        $this->doNotContact      = $doNotContact;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD              => ['onCampaignBuild', 0],
@@ -60,7 +37,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
@@ -79,8 +56,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                     'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                     'formType'         => MobileNotificationSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                    'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                    'formTheme'        => '@MauticNotification/FormTheme/NotificationSendList/_notificationsend_list_row.html.twig',
+                    'timelineTemplate' => '@MauticNotification/SubscribedEvents/Timeline/index.html.twig',
                     'channel'          => 'mobile_notification',
                     'channelIdField'   => 'mobile_notification',
                 ]
@@ -95,8 +72,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'         => NotificationSendType::class,
                 'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                'formTheme'        => '@MauticNotification/FormTheme/NotificationSendList/_notificationsend_list_row.html.twig',
+                'timelineTemplate' => '@MauticNotification/SubscribedEvents/Timeline/index.html.twig',
                 'channel'          => 'notification',
                 'channelIdField'   => 'notification',
             ]
@@ -164,18 +141,18 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         /** @var TokenReplacementEvent $tokenEvent */
         $tokenEvent = $this->dispatcher->dispatch(
-            NotificationEvents::TOKEN_REPLACEMENT,
             new TokenReplacementEvent(
                 $notification->getMessage(),
                 $lead,
                 ['channel' => ['notification', $notification->getId()]]
-            )
+            ),
+            NotificationEvents::TOKEN_REPLACEMENT
         );
 
         /** @var NotificationSendEvent $sendEvent */
         $sendEvent = $this->dispatcher->dispatch(
-            NotificationEvents::NOTIFICATION_ON_SEND,
-            new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
+            new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead),
+            NotificationEvents::NOTIFICATION_ON_SEND
         );
 
         // prevent rewrite notification entity

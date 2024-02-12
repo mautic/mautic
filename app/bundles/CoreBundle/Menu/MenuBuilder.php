@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
@@ -18,46 +9,23 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class MenuBuilder.
- */
 class MenuBuilder
 {
-    /**
-     * @var FactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var MatcherInterface
-     */
-    private $matcher;
-
     /**
      * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
     private $dispatcher;
 
-    /**
-     * @var \Mautic\CoreBundle\Menu\MenuHelper
-     */
-    private $menuHelper;
-
-    /**
-     * MenuBuilder constructor.
-     */
-    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
-    {
-        $this->factory    = $knpFactory;
-        $this->matcher    = $matcher;
+    public function __construct(
+        private FactoryInterface $factory,
+        private MatcherInterface $matcher,
+        EventDispatcherInterface $dispatcher,
+        private MenuHelper $menuHelper
+    ) {
         $this->dispatcher = $dispatcher;
-        $this->menuHelper = $menuHelper;
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     *
      * @return mixed
      */
     public function __call($name, $arguments)
@@ -82,13 +50,13 @@ class MenuBuilder
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
                 if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
-                    //current match
+                    // current match
                     return $item;
                 } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
-                    //route uri match
+                    // route uri match
                     return $item;
                 } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
-                    //route name match
+                    // route name match
                     return $item;
                 }
 
@@ -96,16 +64,14 @@ class MenuBuilder
                     return $current_child;
                 }
             }
-        } catch (\Exception $e) {
-            //do nothing
+        } catch (\Exception) {
+            // do nothing
         }
 
         return null;
     }
 
     /**
-     * @param $name
-     *
      * @return mixed
      */
     private function buildMenu($name)
@@ -115,9 +81,9 @@ class MenuBuilder
         if (!isset($menus[$name])) {
             $loader = new ArrayLoader($this->factory);
 
-            //dispatch the MENU_BUILD event to retrieve bundle menu items
+            // dispatch the MENU_BUILD event to retrieve bundle menu items
             $event = new MenuEvent($this->menuHelper, $name);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 
             $menuItems    = $event->getMenuItems();
 

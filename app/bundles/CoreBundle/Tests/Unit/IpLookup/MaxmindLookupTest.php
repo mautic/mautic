@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
@@ -163,34 +154,34 @@ RESPONSE);
             ->willReturn($mockResponse);
     }
 
-    public function testCountryIpLookupSuccessful()
+    public function testCountryIpLookupSuccessful(): void
     {
-        $ipService = new MaxmindCountryLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindCountryLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
         $this->checkDetails($details);
     }
 
-    public function testOmniIpLookupSuccessful()
+    public function testOmniIpLookupSuccessful(): void
     {
-        $ipService = new MaxmindOmniLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindOmniLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
         $this->checkDetails($details);
     }
 
-    public function testPrecisionIpLookupSuccessful()
+    public function testPrecisionIpLookupSuccessful(): void
     {
-        $ipService = new MaxmindPrecisionLookup(null, null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = new MaxmindPrecisionLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
         $this->checkDetails($details);
     }
 
-    private function checkDetails($details)
+    private function checkDetails($details): void
     {
         $this->assertEquals('Los Angeles', $details['city']);
         $this->assertEquals('California', $details['region']);

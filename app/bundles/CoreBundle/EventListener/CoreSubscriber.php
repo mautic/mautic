@@ -1,28 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
@@ -31,120 +19,34 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    /**
-     * @var MenuHelper
-     */
-    private $menuHelper;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var AuthorizationChecker
-     */
-    private $securityContext;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FormRepository
-     */
-    private $formRepository;
-
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
     public function __construct(
-        BundleHelper $bundleHelper,
-        MenuHelper $menuHelper,
-        UserHelper $userHelper,
-        AssetsHelper $assetsHelper,
-        CoreParametersHelper $coreParametersHelper,
-        AuthorizationChecker $securityContext,
-        UserModel $userModel,
-        EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
-        RequestStack $requestStack,
-        FormRepository $formRepository,
-        MauticFactory $factory,
-        FlashBag $flashBag
+        private BundleHelper $bundleHelper,
+        private MenuHelper $menuHelper,
+        private UserHelper $userHelper,
+        private AssetsHelper $assetsHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private AuthorizationCheckerInterface $securityContext,
+        private UserModel $userModel,
+        private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
+        private FormRepository $formRepository
     ) {
-        $this->bundleHelper         = $bundleHelper;
-        $this->menuHelper           = $menuHelper;
-        $this->userHelper           = $userHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->securityContext      = $securityContext;
-        $this->userModel            = $userModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->requestStack         = $requestStack;
-        $this->formRepository       = $formRepository;
-        $this->factory              = $factory;
-        $this->flashBag             = $flashBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => [
-                ['onKernelController', 0],
                 ['onKernelRequestAddGlobalJS', 0],
             ],
             CoreEvents::BUILD_MENU            => ['onBuildMenu', 9999],
@@ -157,9 +59,9 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Add mauticForms in js script tag for Froala.
      */
-    public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
+    public function onKernelRequestAddGlobalJS(ControllerEvent $event): void
     {
-        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMasterRequest()) {
+        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMainRequest()) {
             return;
         }
 
@@ -172,7 +74,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Set vars on login.
      */
-    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
+    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         if (defined('MAUTIC_INSTALLER')) {
             return;
@@ -180,12 +82,13 @@ class CoreSubscriber implements EventSubscriberInterface
 
         $session = $event->getRequest()->getSession();
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            /** @var User $user */
             $user = $event->getAuthenticationToken()->getUser();
 
-            //set a session var for filemanager to know someone is logged in
+            // set a session var for filemanager to know someone is logged in
             $session->set('mautic.user', $user->getId());
 
-            //mark the user as last logged in
+            // mark the user as last logged in
             $user = $this->userHelper->getUser();
             if ($user instanceof User) {
                 $this->userModel->getRepository()->setLastLogin($user);
@@ -205,59 +108,17 @@ class CoreSubscriber implements EventSubscriberInterface
                 $session->set('_locale', $locale);
             }
 
-            //dispatch on login events
+            // dispatch on login events
             if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
                 $loginEvent = new LoginEvent($this->userHelper->getUser());
-                $this->dispatcher->dispatch(UserEvents::USER_LOGIN, $loginEvent);
+                $this->dispatcher->dispatch($loginEvent, UserEvents::USER_LOGIN);
             }
         } else {
             $session->remove('mautic.user');
         }
     }
 
-    /**
-     * Populates namespace, bundle, controller, and action into request to be used throughout application.
-     */
-    public function onKernelController(FilterControllerEvent $event)
-    {
-        $controller = $event->getController();
-
-        if (!is_array($controller)) {
-            return;
-        }
-
-        //only affect Mautic controllers
-        if ($controller[0] instanceof MauticController) {
-            $request = $event->getRequest();
-
-            //also set the request for easy access throughout controllers
-            $controller[0]->setRequest($request);
-
-            // set the factory for easy use access throughout the controllers
-            // @deprecated To be removed in 3.0
-            $controller[0]->setFactory($this->factory);
-
-            // set the user as well
-            $controller[0]->setUser($this->userHelper->getUser());
-
-            // and the core parameters helper
-            $controller[0]->setCoreParametersHelper($this->coreParametersHelper);
-
-            // and the dispatcher
-            $controller[0]->setDispatcher($this->dispatcher);
-
-            // and the translator
-            $controller[0]->setTranslator($this->translator);
-
-            // and the flash bag
-            $controller[0]->setFlashBag($this->flashBag);
-
-            //run any initialize functions
-            $controller[0]->initialize($event);
-        }
-    }
-
-    public function onBuildMenu(MenuEvent $event)
+    public function onBuildMenu(MenuEvent $event): void
     {
         $name    = $event->getType();
         $bundles = $this->bundleHelper->getMauticBundles(true);
@@ -274,7 +135,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildRoute(RouteEvent $event)
+    public function onBuildRoute(RouteEvent $event): void
     {
         $type       = $event->getType();
         $bundles    = $this->bundleHelper->getMauticBundles(true);
@@ -356,7 +217,7 @@ class CoreSubscriber implements EventSubscriberInterface
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
-                                    'controller' => $controller.':'.$standardDetails['action'],
+                                    'controller' => $controller.':'.$standardDetails['action'].'Action',
                                     'method'     => $standardDetails['method'],
                                 ]
                             );
@@ -370,7 +231,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFetchIcons(IconEvent $event)
+    public function onFetchIcons(IconEvent $event): void
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
         $icons   = $session->get('mautic.menu.icons', []);
@@ -390,7 +251,7 @@ class CoreSubscriber implements EventSubscriberInterface
                             $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
-                                if ('s' == substr($id[1], -1)) {
+                                if (str_ends_with($id[1], 's')) {
                                     $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
                                 $event->addIcon($id[1], $item['iconClass']);
@@ -408,12 +269,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $type
-     * @param $name
-     * @param $details
-     */
-    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
+    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details): void
     {
         // Set defaults and controller
         $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];
@@ -435,7 +291,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (false !== strpos($details['path'], '{page}')) {
+        if (str_contains($details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -443,7 +299,7 @@ class CoreSubscriber implements EventSubscriberInterface
                 $requirements['page'] = '\d+';
             }
         }
-        if (false !== strpos($details['path'], '{objectId}')) {
+        if (str_contains($details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -454,7 +310,7 @@ class CoreSubscriber implements EventSubscriberInterface
             }
         }
         if ('api' == $type) {
-            if (false !== strpos($details['path'], '{id}')) {
+            if (str_contains($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }

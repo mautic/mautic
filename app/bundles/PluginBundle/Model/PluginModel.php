@@ -1,89 +1,82 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Entity\Plugin;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class PluginModel.
+ * @extends FormModel<Plugin>
  */
 class PluginModel extends FormModel
 {
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper)
-    {
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->bundleHelper         = $bundleHelper;
+    public function __construct(
+        protected FieldModel $leadFieldModel,
+        private FieldList $fieldList,
+        CoreParametersHelper $coreParametersHelper,
+        private BundleHelper $bundleHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
+    ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PluginBundle\Entity\PluginRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:Plugin');
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Plugin::class);
     }
 
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'plugin:plugins';
     }
 
     /**
      * Get lead fields used in selects/matching.
+     *
+     * @return mixed[]
      */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
-        return $this->leadFieldModel->getFieldList();
+        return $this->fieldList->getFieldList();
     }
 
     /**
      * Get Company fields.
+     *
+     * @return mixed[]
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
-        return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+        return $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 
-    public function saveFeatureSettings($entity)
+    public function saveFeatureSettings($entity): void
     {
         $this->em->persist($entity);
         $this->em->flush();
@@ -115,10 +108,8 @@ class PluginModel extends FormModel
 
     /**
      * Returns metadata for all plugins.
-     *
-     * @return array
      */
-    public function getPluginsMetadata()
+    public function getPluginsMetadata(): array
     {
         $allMetadata     = $this->em->getMetadataFactory()->getAllMetadata();
         $pluginsMetadata = [];
@@ -126,7 +117,7 @@ class PluginModel extends FormModel
         foreach ($allMetadata as $meta) {
             $namespace = $meta->namespace;
 
-            if (false !== strpos($namespace, 'MauticPlugin')) {
+            if (str_contains($namespace, 'MauticPlugin')) {
                 $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginsMetadata[$bundleName])) {
                     $pluginsMetadata[$bundleName] = [];
@@ -140,12 +131,10 @@ class PluginModel extends FormModel
 
     /**
      * Returns all tables of installed plugins.
-     *
-     * @return array
      */
-    public function getInstalledPluginTables(array $pluginsMetadata)
+    public function getInstalledPluginTables(array $pluginsMetadata): array
     {
-        $currentSchema          = $this->em->getConnection()->getSchemaManager()->createSchema();
+        $currentSchema          = $this->em->getConnection()->createSchemaManager()->introspectSchema();
         $installedPluginsTables = [];
 
         foreach ($pluginsMetadata as $bundleName => $pluginMetadata) {
@@ -167,10 +156,8 @@ class PluginModel extends FormModel
 
     /**
      * Generates new Schema objects for all installed plugins.
-     *
-     * @return array
      */
-    public function createPluginSchemas(array $installedPluginsTables)
+    public function createPluginSchemas(array $installedPluginsTables): array
     {
         $installedPluginsSchemas = [];
         foreach ($installedPluginsTables as $bundleName => $tables) {

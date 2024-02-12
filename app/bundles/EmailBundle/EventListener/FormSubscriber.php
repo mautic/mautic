@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\ORMException;
@@ -24,28 +15,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
     public function __construct(
-        EmailModel $emailModel,
-        ContactTracker $contactTracker
+        private EmailModel $emailModel,
+        private ContactTracker $contactTracker
     ) {
-        $this->emailModel     = $emailModel;
-        $this->contactTracker = $contactTracker;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
@@ -58,14 +34,14 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a send email actions to available form submit actions.
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('email.send.user', [
             'group'             => 'mautic.email.actions',
             'label'             => 'mautic.email.form.action.sendemail.admin',
             'description'       => 'mautic.email.form.action.sendemail.admin.descr',
             'formType'          => FormSubmitActionUserEmailType::class,
-            'formTheme'         => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'formTheme'         => '@MauticEmail/FormTheme/FormAction/_formaction_properties_useremail_row.html.twig',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
@@ -76,7 +52,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description'     => 'mautic.email.form.action.sendemail.lead.descr',
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
-            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',
             'eventName'       => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }

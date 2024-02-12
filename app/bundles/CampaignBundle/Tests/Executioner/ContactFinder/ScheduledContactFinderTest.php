@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,12 +16,12 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
      */
-    private $campaignRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
 
     protected function setUp(): void
     {
@@ -43,7 +34,7 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testHydratedLeadsFromRepositoryAreFoundAndPushedIntoLogs()
+    public function testHydratedLeadsFromRepositoryAreFoundAndPushedIntoLogs(): void
     {
         $lead1 = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -94,7 +85,7 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->hydrateContacts($logs);
     }
 
-    public function testHydratedLeadsFromRepositoryWithMissingLeadResultsLogBeingRemoved()
+    public function testHydratedLeadsFromRepositoryWithMissingLeadResultsLogBeingRemoved(): void
     {
         $lead1 = $this->getMockBuilder(Lead::class)
             ->getMock();
@@ -146,7 +137,7 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $logs);
     }
 
-    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound()
+    public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound(): void
     {
         $this->leadRepository->expects($this->never())
             ->method('getContactCollection');

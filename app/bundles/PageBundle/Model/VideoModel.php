@@ -1,71 +1,56 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
+use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class PageModel.
+ * @extends FormModel<VideoHit>
  */
 class VideoModel extends FormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    /**
-     * VideoModel constructor.
-     */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ContactTracker $contactTracker
+        protected IpLookupHelper $ipLookupHelper,
+        protected ContactTracker $contactTracker,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->contactTracker = $contactTracker;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\VideoHitRepository
-     */
-    public function getHitRepository()
+    public function getHitRepository(): VideoHitRepository
     {
-        return $this->em->getRepository('MauticPageBundle:VideoHit');
+        return $this->em->getRepository(VideoHit::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'page:pages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
@@ -87,11 +72,11 @@ class VideoModel extends FormModel
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function hitVideo($request, $code = '200')
+    public function hitVideo($request, $code = '200'): void
     {
-        //don't skew results with in-house hits
+        // don't skew results with in-house hits
         if (!$this->security->isAnonymous()) {
-            //return;
+            // return;
         }
 
         $lead = $this->contactTracker->getContact();
@@ -100,13 +85,13 @@ class VideoModel extends FormModel
         $hit = ($lead) ? $this->getHitForLeadByGuid($lead, $guid) : new VideoHit();
 
         $hit->setGuid($guid);
-        $hit->setDateHit(new \Datetime());
+        $hit->setDateHit(new \DateTime());
 
         $hit->setDuration($request->get('duration'));
         $hit->setUrl($request->get('url'));
         $hit->setTimeWatched($request->get('total_watched'));
 
-        //check for existing IP
+        // check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
         $hit->setIpAddress($ipAddress);
 
@@ -119,7 +104,7 @@ class VideoModel extends FormModel
             $hit->setLead($lead);
         }
 
-        //glean info from the IP address
+        // glean info from the IP address
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
             $hit->setRegion($details['region']);
@@ -136,13 +121,13 @@ class VideoModel extends FormModel
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
 
-        //get a list of the languages the user prefers
+        // get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
-                    //remove weights
+                if (($pos = strpos(';q=', $l)) !== false) {
+                    // remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
             }
@@ -152,12 +137,12 @@ class VideoModel extends FormModel
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($hit);
-            $this->em->flush($hit);
+            $this->em->flush();
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -166,7 +151,7 @@ class VideoModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::VIDEO_ON_HIT)) {
             $event = new VideoHitEvent($hit, $request, $code);
-            $this->dispatcher->dispatch(PageEvents::VIDEO_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::VIDEO_ON_HIT);
         }
     }
 }

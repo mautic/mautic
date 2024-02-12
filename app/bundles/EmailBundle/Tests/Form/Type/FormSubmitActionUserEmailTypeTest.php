@@ -2,28 +2,17 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
-use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\UserBundle\Form\Type\UserListType;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -45,24 +34,15 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var EmailType
-     */
-    private $form;
-
-    /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private $coreParametersHelper;
+    private \Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType $form;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->form                 = new FormSubmitActionUserEmailType();
         $this->formBuilder->method('create')->willReturnSelf();
     }

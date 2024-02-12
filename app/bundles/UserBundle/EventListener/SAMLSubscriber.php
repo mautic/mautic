@@ -1,42 +1,23 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class SAMLSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, Router $router)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->router               = $router;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private RouterInterface $router
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 256],
@@ -46,16 +27,16 @@ class SAMLSubscriber implements EventSubscriberInterface
     /**
      * Block access to SAML URLs if SAML is disabled.
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
         $request = $event->getRequest();
-        $route   = $request->attributes->get('_route');
-        $url     = $request->getRequestUri();
-        if (false === strpos($route, 'lightsaml') && false === strpos($url, '/saml/')) {
+        $route   = (string) $request->attributes->get('_route');
+        $url     = (string) $request->getRequestUri();
+        if (!str_contains($route, 'lightsaml') && !str_contains($url, '/saml/')) {
             return;
         }
 

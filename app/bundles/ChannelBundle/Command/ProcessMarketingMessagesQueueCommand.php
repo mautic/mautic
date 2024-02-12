@@ -1,29 +1,27 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Command;
 
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ProcessMarketingMessagesQueueCommand.
- */
 class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    public function __construct(
+        private TranslatorInterface $translator,
+        private MessageQueueModel $messageQueueModel,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        parent::__construct($pathsHelper, $coreParametersHelper);
+    }
+
     protected function configure()
     {
         $this
@@ -34,7 +32,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                     'mautic:campaigns:messages',
                 ]
             )
-            ->setDescription('Process sending of messages queue.')
             ->addOption(
                 '--channel',
                 '-c',
@@ -48,40 +45,34 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processed  = 0;
-        $container  = $this->getContainer();
-        $translator = $container->get('translator');
         $channel    = $input->getOption('channel');
         $channelId  = $input->getOption('channel-id');
         $messageId  = $input->getOption('message-id');
         $key        = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
-        /** @var \Mautic\ChannelBundle\Model\MessageQueueModel $model */
-        $model = $container->get('mautic.channel.model.queue');
-
-        $output->writeln('<info>'.$translator->trans('mautic.campaign.command.process.messages').'</info>');
+        $output->writeln('<info>'.$this->translator->trans('mautic.campaign.command.process.messages').'</info>');
 
         if ($messageId) {
-            if ($message = $model->getEntity($messageId)) {
-                $processed = intval($model->processMessageQueue($message));
+            if ($message = $this->messageQueueModel->getEntity($messageId)) {
+                $processed = intval($this->messageQueueModel->processMessageQueue($message));
             }
         } else {
-            $processed = intval($model->sendMessages($channel, $channelId));
+            $processed = intval($this->messageQueueModel->sendMessages($channel, $channelId));
         }
 
-        $output->writeln('<comment>'.$translator->trans('mautic.campaign.command.messages.sent', ['%events%' => $processed]).'</comment>'."\n");
+        $output->writeln('<comment>'.$this->translator->trans('mautic.campaign.command.messages.sent', ['%events%' => $processed]).'</comment>'."\n");
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Process sending of messages queue.';
 }

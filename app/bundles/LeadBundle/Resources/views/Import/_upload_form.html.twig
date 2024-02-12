@@ -1,0 +1,44 @@
+{#
+  Variables
+    - form
+#}
+{% set uploadMaxFilesize = ini_get('upload_max_filesize')|replace({'M': ''}) %}
+<div class="row">
+    <div class="col-sm-offset-3 col-sm-6">
+        <div class="ml-lg mr-lg mt-md pa-lg">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">{{ 'mautic.lead.import.start.instructions'|trans({'%size%': uploadMaxFilesize}) }}</div>
+                </div>
+                <div class="panel-body">
+                    {{ form_start(form) }}
+                    <div class="input-group well mt-lg">
+                        {{ form_widget(form.file) }}
+                        <span class="input-group-btn">
+                            {{ form_widget(form.start) }}
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-3">
+                            {{ form_row(form.batchlimit) }}
+                        </div>
+
+                        <div class="col-xs-3">
+                            {{ form_row(form.delimiter) }}
+                        </div>
+
+                        <div class="col-xs-3">
+                            {{ form_row(form.enclosure) }}
+                        </div>
+
+                        <div class="col-xs-3">
+                            {{ form_row(form.escape) }}
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

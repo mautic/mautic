@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
@@ -19,39 +10,30 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \DateTime
-     */
-    private $dateFrom;
+    private \DateTime $dateFrom;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateTo;
+    private DateTimeHelper $dateTimeHelper;
+
+    private \DateTime $dateTo;
 
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    /**
-     * @var string
-     */
-    private $dateColumn;
+    private string $dateColumn;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private string $unit;
 
     /**
      * @var ChartQuery
@@ -62,33 +44,32 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
-        $this->dateFrom     = new \DateTime('2018-01-01 12:00:00');
-        $this->dateTo       = new \DateTime('2018-02-01 12:00:00');
-        $this->unit         = 'd';
-        $this->dateColumn   = 'date_sent';
-        $this->connection   = $this->createMock(Connection::class);
-        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->dateFrom       = new \DateTime('2018-01-01 12:00:00');
+        $this->dateTo         = new \DateTime('2018-02-01 12:00:00');
+        $this->unit           = 'd';
+        $this->dateColumn     = 'date_sent';
+        $this->connection     = $this->createMock(Connection::class);
+        $this->queryBuilder   = $this->createMock(QueryBuilder::class);
+        $this->dateTimeHelper = new DateTimeHelper();
 
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
-    public function testClassicDateColumn()
+    public function testClassicDateColumn(): void
     {
         $this->createChartQuery();
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with('DATE_FORMAT(t.date_sent, \'%Y-%m-%d\') AS date, COUNT(*) AS count');
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\') AS date, COUNT(*) AS count');
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with('DATE_FORMAT(t.date_sent, \'%Y-%m-%d\')');
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
 
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
-            ->with('DATE_FORMAT(t.date_sent, \'%Y-%m-%d\')');
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
 
         $this->queryBuilder->expects($this->once())
             ->method('setMaxResults')
@@ -97,7 +78,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
 
-    public function testGeneratedDateColumn()
+    public function testGeneratedDateColumn(): void
     {
         $this->createChartQuery();
 
@@ -315,12 +296,52 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery = new ChartQuery($this->connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 
+    /**
+     * @param array<mixed> $expectedResult
+     * @param array<mixed> $data
+     */
     private function assertTimeDataWithoutSqlOrder($expectedResult, $data): void
     {
         $this->createChartQuery();
         self::assertSame(
             $expectedResult,
-            $this->chartQuery->completeTimeData($data, false, false)
+            $this->chartQuery->completeTimeData($data, false)
         );
+    }
+
+    public function testPrepareTimeDataQueryWithLeadEventLog(): void
+    {
+        $table   = 'lead_event_log';
+        $column  = 'date_added';
+        $filters = [
+            'object'    => 'segment',
+            'bundle'    => 'lead',
+            'action'    => 'added',
+            'object_id' => '1',
+        ];
+
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\') AS date, COUNT(*) AS count');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(MAUTIC_TABLE_PREFIX.'lead_event_log', 't');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('groupBy')
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setMaxResults')
+            ->with(32);
+
+        $this->createChartQuery();
+        $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
+        $this->assertInstanceOf(QueryBuilder::class, $query);
     }
 }

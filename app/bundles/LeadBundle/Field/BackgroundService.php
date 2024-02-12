@@ -2,23 +2,14 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
@@ -27,43 +18,13 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class BackgroundService
 {
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
-     * @var CustomFieldColumn
-     */
-    private $customFieldColumn;
-
-    /**
-     * @var LeadFieldSaver
-     */
-    private $leadFieldSaver;
-
-    /**
-     * @var FieldColumnBackgroundJobDispatcher
-     */
-    private $fieldColumnBackgroundJobDispatcher;
-
-    /**
-     * @var CustomFieldNotification
-     */
-    private $customFieldNotification;
-
     public function __construct(
-        FieldModel $fieldModel,
-        CustomFieldColumn $customFieldColumn,
-        LeadFieldSaver $leadFieldSaver,
-        FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
-        CustomFieldNotification $customFieldNotification
+        private FieldModel $fieldModel,
+        private CustomFieldColumn $customFieldColumn,
+        private LeadFieldSaver $leadFieldSaver,
+        private FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher,
+        private CustomFieldNotification $customFieldNotification
     ) {
-        $this->fieldModel                         = $fieldModel;
-        $this->customFieldColumn                  = $customFieldColumn;
-        $this->leadFieldSaver                     = $leadFieldSaver;
-        $this->fieldColumnBackgroundJobDispatcher = $fieldColumnBackgroundJobDispatcher;
-        $this->customFieldNotification            = $customFieldNotification;
     }
 
     /**
@@ -71,12 +32,12 @@ class BackgroundService
      * @throws ColumnAlreadyCreatedException
      * @throws CustomFieldLimitException
      * @throws LeadFieldWasNotFoundException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function addColumn(int $leadFieldId, int $userId): void
+    public function addColumn(int $leadFieldId, ?int $userId): void
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
         if (null === $leadField) {
@@ -95,7 +56,7 @@ class BackgroundService
 
         try {
             $this->customFieldColumn->processCreateLeadColumn($leadField, false);
-        } catch (DriverException | SchemaException | \Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException|SchemaException|\Mautic\CoreBundle\Exception\SchemaException $e) {
             $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
             throw $e;
         } catch (CustomFieldLimitException $e) {
@@ -107,5 +68,28 @@ class BackgroundService
         $this->leadFieldSaver->saveLeadFieldEntity($leadField, false);
 
         $this->customFieldNotification->customFieldWasCreated($leadField, $userId);
+    }
+
+    /**
+     * @throws AbortColumnUpdateException
+     * @throws DriverException
+     * @throws LeadFieldWasNotFoundException
+     * @throws SchemaException
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     */
+    public function updateColumn(int $leadFieldId, int $userId): void
+    {
+        $leadField = $this->fieldModel->getEntity($leadFieldId);
+        if (null === $leadField) {
+            throw new LeadFieldWasNotFoundException('LeadField entity was not found');
+        }
+
+        try {
+            $this->fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent($leadField);
+        } catch (NoListenerException) {
+        }
+
+        $this->customFieldColumn->processUpdateLeadColumn($leadField);
+        $this->customFieldNotification->customFieldWasUpdated($leadField, $userId);
     }
 }

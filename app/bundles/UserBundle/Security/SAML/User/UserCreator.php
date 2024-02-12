@@ -1,17 +1,7 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\SAML\User;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\SpBundle\Security\User\UserCreatorInterface;
@@ -19,41 +9,15 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCreator implements UserCreatorInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private int $defaultRole;
 
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var UserPasswordEncoder
-     */
-    private $encoder;
-
-    /**
-     * @var int
-     */
-    private $defaultRole;
-
-    /**
-     * @var array
-     */
-    private $requiredFields = [
+    private array $requiredFields = [
         'username',
         'firstname',
         'lastname',
@@ -61,16 +25,12 @@ class UserCreator implements UserCreatorInterface
     ];
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        UserMapper $userMapper,
-        UserModel $userModel,
-        UserPasswordEncoder $encoder,
+        private EntityManagerInterface $entityManager,
+        private UserMapper $userMapper,
+        private UserModel $userModel,
+        private UserPasswordHasher $hasher,
         $defaultRole
     ) {
-        $this->entityManager = $entityManager;
-        $this->userMapper    = $userMapper;
-        $this->userModel     = $userModel;
-        $this->encoder       = $encoder;
         $this->defaultRole   = (int) $defaultRole;
     }
 
@@ -84,10 +44,10 @@ class UserCreator implements UserCreatorInterface
         }
 
         /** @var Role $defaultRole */
-        $defaultRole = $this->entityManager->getReference('MauticUserBundle:Role', $this->defaultRole);
+        $defaultRole = $this->entityManager->getReference(\Mautic\UserBundle\Entity\Role::class, $this->defaultRole);
 
         $user = $this->userMapper->getUser($response);
-        $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder, EncryptionHelper::generateKey()));
+        $user->setPassword($this->userModel->checkNewPassword($user, $this->hasher, EncryptionHelper::generateKey()));
         $user->setRole($defaultRole);
 
         $this->validateUser($user);

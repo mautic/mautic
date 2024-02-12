@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle;
 
 final class StatEvents
@@ -20,5 +11,5 @@ final class StatEvents
      *
      * @var string
      */
-    const AGGREGATE_STAT_REQUEST = 'mautic.aggregate_stat_request';
+    public const AGGREGATE_STAT_REQUEST = 'mautic.aggregate_stat_request';
 }

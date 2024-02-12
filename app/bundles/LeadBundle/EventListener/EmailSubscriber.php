@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -20,34 +12,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private static $contactFieldRegex = '{contactfield=(.*?)}';
+    private static string $contactFieldRegex = '{contactfield=(.*?)}';
 
-    /**
-     * @var string
-     */
-    private $builderTokenHelperFactory;
-
-    public function __construct(BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
-        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+    public function __construct(
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailDisplay', 0],
+            EmailEvents::EMAIL_ON_BUILD                     => ['onEmailBuild', 0],
+            EmailEvents::EMAIL_ON_SEND                      => ['onEmailGenerate', 0],
+            EmailEvents::EMAIL_ON_DISPLAY                   => ['onEmailDisplay', 0],
+            EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT => ['onEmailAddressReplacement', 0],
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
         // the permissions are for viewing contact data, not for managing contact fields
@@ -58,12 +40,12 @@ class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         // Combine all possible content to find tokens across them
         $content = $event->getSubject();
@@ -78,5 +60,10 @@ class EmailSubscriber implements EventSubscriberInterface
             $event->addTokens($tokenList);
             unset($tokenList);
         }
+    }
+
+    public function onEmailAddressReplacement(TokenReplacementEvent $event): void
+    {
+        $event->setContent(TokenHelper::findLeadTokens($event->getContent(), $event->getLead()->getProfileFields(), true));
     }
 }

@@ -66,16 +66,15 @@ class CodeEditor {
   }
 
   // Load content and show popup
-  showCodePopup() {
+  showCodePopup(editor) {
     this.updateEditorContents();
     // this.codeEditor.editor.refresh();
-    // this.editor.Modal.setContent('');
-    this.editor.Modal.setContent(this.codePopup);
-    this.editor.Modal.setTitle(Mautic.translate('grapesjsbuilder.sourceEditModalTitle'));
-    this.editor.Modal.open();
-    this.editor.Modal.onceClose(() => {
-      this.editor.stopCommand('preset-mautic:code-edit');
-    });
+    // editor.Modal.setContent('');
+    editor.Modal.setContent(this.codePopup);
+    editor.Modal.setTitle(Mautic.translate('grapesjsbuilder.sourceEditModalTitle'));
+    editor.Modal.open();
+
+    editor.Modal.onceClose(() => editor.stopCommand('preset-mautic:code-edit'));
   }
 
   /**
@@ -113,7 +112,6 @@ class CodeEditor {
     let content;
     if (ContentService.isMjmlMode(this.editor)) {
       content = MjmlService.getEditorMjmlContent(this.editor);
-      console.log('loading modal');
     } else {
       content = ContentService.getEditorHtmlContent(this.editor);
     }

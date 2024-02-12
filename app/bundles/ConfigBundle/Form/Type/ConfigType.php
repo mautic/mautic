@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
@@ -19,28 +10,18 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
-    /**
-     * @var RestrictionHelper
-     */
-    private $restrictionHelper;
-
-    /**
-     * @var EscapeTransformer
-     */
-    private $escapeTransformer;
-
-    public function __construct(RestrictionHelper $restrictionHelper, EscapeTransformer $escapeTransformer)
-    {
-        $this->restrictionHelper = $restrictionHelper;
-        $this->escapeTransformer = $escapeTransformer;
+    public function __construct(
+        private RestrictionHelper $restrictionHelper,
+        private EscapeTransformer $escapeTransformer
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // TODO very dirty quick fix for https://github.com/mautic/mautic/issues/8854
         if (isset($options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'])
@@ -50,7 +31,7 @@ class ConfigType extends AbstractType
         }
 
         if (isset($options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'])
-            && 1209600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
+            && 1_209_600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
         ) {
             $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'] = 14;
         }
@@ -76,7 +57,7 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $form = $event->getForm();
 
                 foreach ($form as $configForm) {
@@ -101,15 +82,7 @@ class ConfigType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'config';
-    }
-
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

@@ -1,57 +1,26 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StatsBundle\Aggregate;
 
-use DateTime;
-use Exception;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
 class Calculator
 {
-    /**
-     * @var StatsDAO
-     */
-    private $statsDAO;
-
-    /**
-     * @var DateTime|null
-     */
-    private $fromDateTime;
-
-    /**
-     * @var DateTime|null
-     */
-    private $toDateTime;
-
-    /**
-     * Calculator constructor.
-     */
-    public function __construct(StatsDAO $statsDAO, DateTime $fromDateTime = null, DateTime $toDateTime = null)
-    {
-        $this->statsDAO     = $statsDAO;
-        $this->fromDateTime = $fromDateTime;
-        $this->toDateTime   = $toDateTime;
+    public function __construct(
+        private StatsDAO $statsDAO,
+        private ?\DateTimeInterface $fromDateTime = null,
+        private ?\DateTimeInterface $toDateTime = null
+    ) {
     }
 
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getSumsByYear($labelFormat = 'Y')
+    public function getSumsByYear($labelFormat = 'Y'): StatDAO
     {
         $statDAO  = new StatDAO();
         $lastYear = $this->fromDateTime ? $this->fromDateTime->format('Y') : null;
@@ -77,11 +46,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getSumsByMonth($labelFormat = 'Y-m')
+    public function getSumsByMonth($labelFormat = 'Y-m'): StatDAO
     {
         $statDAO   = new StatDAO();
         $lastMonth = $this->fromDateTime ? $this->fromDateTime->format('Y-m') : null;
@@ -107,11 +74,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getSumsByDay($labelFormat = 'Y-m-d')
+    public function getSumsByDay($labelFormat = 'Y-m-d'): StatDAO
     {
         $statDAO   = new StatDAO();
         $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-m-d') : null;
@@ -137,11 +102,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getSumsByWeek($labelFormat = 'Y-W')
+    public function getSumsByWeek($labelFormat = 'Y-W'): StatDAO
     {
         $statDAO   = new StatDAO();
         $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-W') : null;
@@ -157,10 +120,11 @@ class Calculator
             $yesterday = $today;
         }
 
-        $yesterday = (new DateTime(CalculatorHelper::getWeekDateString($yesterday)))->modify('+1 week')->format('Y-W');
+        $yesterday = (new \DateTime(CalculatorHelper::getWeekDateString($yesterday)))->modify('+1 week')->format('Y-W');
 
         if ($this->toDateTime) {
-            $tomorrow = $this->toDateTime;
+            /** @var \DateTime $tomorrow */
+            $tomorrow = clone $this->toDateTime;
             CalculatorHelper::fillInMissingWeeks($statDAO, $yesterday, $tomorrow->modify('+1 week')->format('Y-W'), $labelFormat);
         }
 
@@ -170,11 +134,9 @@ class Calculator
     /**
      * @param string $labelFormat
      *
-     * @return StatDAO
-     *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getCountsByHour($labelFormat = 'Y-m-d H')
+    public function getCountsByHour($labelFormat = 'Y-m-d H'): StatDAO
     {
         $statDAO  = new StatDAO();
         $lastHour = $this->fromDateTime ? $this->fromDateTime->format('Y-m-d H') : null;
@@ -197,7 +159,7 @@ class Calculator
         return $statDAO;
     }
 
-    public function getSum()
+    public function getSum(): StatDAO
     {
         $statDAO = new StatDAO();
         $sum     = 0;

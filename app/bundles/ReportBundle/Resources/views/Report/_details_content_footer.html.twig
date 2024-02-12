@@ -1,0 +1,11 @@
+</div>
+{% if debug is defined and debug.count_query is defined %}
+  <div class="well">
+      <h4>Debug: {{ debug.query_time }}</h4>
+      <div>{{ debug.count_query }}</div>
+      <br />
+      <div>{{ debug.query }}</div>
+  </div>
+{% endif %}
+<!--/ end: box layout -->
+<input type="hidden" name="entityId" id="entityId" value="{{ report.id|e }}"/>

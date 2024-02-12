@@ -1,21 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
- * DoNotContactRepository.
+ * @extends CommonRepository<DoNotContact>
  */
 class DoNotContactRepository extends CommonRepository
 {
@@ -34,11 +26,11 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $channel
-     * @param null $ids
-     * @param null $reason
-     * @param null $listId
-     * @param bool $combined
+     * @param string|null                         $channel
+     * @param array<int,int|string>|int|null      $ids
+     * @param int|null                            $reason
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -77,13 +69,13 @@ class DoNotContactRepository extends CommonRepository
                         ->groupBy('cs.leadlist_id');
                 } elseif (is_array($listId)) {
                     $q->andWhere(
-                        $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
+                        $q->expr()->in('cs.leadlist_id', ':segmentIds')
                     );
 
-                    if (!$combined) {
-                        $q->addSelect('cs.leadlist_id')
-                            ->groupBy('cs.leadlist_id');
-                    }
+                    $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
+
+                    $q->addSelect('cs.leadlist_id')
+                        ->groupBy('cs.leadlist_id');
                 } else {
                     $q->andWhere('cs.leadlist_id = :list_id')
                         ->setParameter('list_id', $listId);
@@ -93,8 +85,10 @@ class DoNotContactRepository extends CommonRepository
                 $subQ->select('distinct(list.lead_id)')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
                     ->andWhere(
-                        $q->expr()->in('list.leadlist_id', array_map('intval', $listId))
+                        $q->expr()->in('list.leadlist_id', ':segmentIds')
                     );
+
+                $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
 
                 $q->innerJoin('dnc', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = dnc.lead_id');
             }
@@ -104,7 +98,7 @@ class DoNotContactRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_added', 'dnc');
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -120,8 +114,6 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null $leadId
-     *
      * @return array
      */
     public function getTimelineStats($leadId = null, array $options = [])
@@ -145,13 +137,18 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param       $channel
-     * @param array $contacts Array of contacts to filter by
+     * @param string|null    $channel
+     * @param string[]|int[] $contacts Array of contact IDs to filter by
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getChannelList($channel, array $contacts = null)
+    public function getChannelList($channel, array $contacts = null): array
     {
+        // If no contacts are sent then stop querying for all of the DNC records as it leads to the out of memory error.
+        if (is_array($contacts) && empty($contacts)) {
+            return [];
+        }
+
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id');
@@ -160,8 +157,8 @@ class DoNotContactRepository extends CommonRepository
             $q->select('dnc.channel, dnc.reason, l.id as lead_id');
         } else {
             $q->select('l.id, dnc.reason')
-              ->where('dnc.channel = :channel')
-              ->setParameter('channel', $channel);
+                ->where('dnc.channel = :channel')
+                ->setParameter('channel', $channel);
         }
 
         if ($contacts) {
@@ -170,7 +167,7 @@ class DoNotContactRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {

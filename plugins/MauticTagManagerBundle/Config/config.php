@@ -1,12 +1,4 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 return [
     'name'        => 'Mautic tag manager bundle',
@@ -17,11 +9,11 @@ return [
         'main' => [
             'mautic_tagmanager_index' => [
                 'path'       => '/tags/{page}',
-                'controller' => 'MauticTagManagerBundle:Tag:index',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
             ],
             'mautic_tagmanager_action' => [
                 'path'       => '/tags/{objectAction}/{objectId}',
-                'controller' => 'MauticTagManagerBundle:Tag:execute',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::executeAction',
             ],
         ],
     ],
@@ -46,23 +38,6 @@ return [
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
-                ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.tagmanager.repository.tag' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \MauticPlugin\MauticTagManagerBundle\Entity\Tag::class,
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.tagmanager.model.tag' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Model\TagModel::class,
-                'arguments' => [
-                    'service_container',
                 ],
             ],
         ],

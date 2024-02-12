@@ -1,0 +1,50 @@
+{#
+  Variables
+    - searchValue
+    - items
+    - totalItems
+    - page
+    - limit
+    - permissions
+    - security
+    - tmpl
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}form{% endblock %}
+
+{% block headerTitle %}
+  {{ 'mautic.form.forms'|trans }}
+{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+            'templateButtons': {
+                'new': permissions['form:forms:create'],
+            },
+            'routeBase': 'form',
+            'langVar': 'form.form',
+        }
+    ) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': 'mautic.form.form.help.searchcommands',
+                'searchId': 'form-search',
+                'action': currentRoute,
+            }
+        ) }}
+        <div class="page-list">
+          {{ include('@MauticForm/Form/_list.html.twig') }}
+        </div>
+    </div>
+  {% else %}
+    {{ include('@MauticForm/Form/_list.html.twig') }}
+  {% endif %}
+{% endblock %}

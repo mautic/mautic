@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -22,36 +13,17 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignReplySubscriber.
- */
 class CampaignReplySubscriber implements EventSubscriberInterface
 {
-    const TYPE = 'sms.reply';
+    public const TYPE = 'sms.reply';
 
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
-    /**
-     * CampaignReplySubscriber constructor.
-     */
-    public function __construct(TransportChain $transportChain, RealTimeExecutioner $realTimeExecutioner)
-    {
-        $this->transportChain      = $transportChain;
-        $this->realTimeExecutioner = $realTimeExecutioner;
+    public function __construct(
+        private TransportChain $transportChain,
+        private RealTimeExecutioner $realTimeExecutioner
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
@@ -60,7 +32,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (0 === count($this->transportChain->getEnabledTransports())) {
             return;
@@ -77,7 +49,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onCampaignReply(DecisionEvent $decisionEvent)
+    public function onCampaignReply(DecisionEvent $decisionEvent): void
     {
         /** @var ReplyEvent $replyEvent */
         $replyEvent = $decisionEvent->getPassthrough();
@@ -106,7 +78,7 @@ class CampaignReplySubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function onReply(ReplyEvent $event)
+    public function onReply(ReplyEvent $event): void
     {
         $this->realTimeExecutioner->execute(self::TYPE, $event, 'sms');
     }

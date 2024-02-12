@@ -1,37 +1,23 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class LeadAccessTrait.
- */
 trait LeadAccessTrait
 {
     /**
      * Determines if the user has access to the lead the note is for.
      *
-     * @param $lead
-     * @param $action
-     * @param bool   $isPlugin
-     * @param string $intgegration
+     * @param bool $isPlugin
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Lead
+     * @return Response|Lead
      */
     protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
     {
         if (!$leadId instanceof Lead) {
-            //make sure the user has view access to this lead
+            // make sure the user has view access to this lead
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity((int) $leadId);
         } else {
@@ -41,15 +27,15 @@ trait LeadAccessTrait
 
         if (null === $lead || !$lead->getId()) {
             if (method_exists($this, 'postActionRedirect')) {
-                //set the return URL
-                $page      = $this->get('session')->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);
+                // set the return URL
+                $page      = $this->getCurrentRequest()->getSession()->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);
                 $returnUrl = $this->generateUrl($isPlugin ? 'mautic_plugin_timeline_index' : 'mautic_contact_index', ['page' => $page]);
 
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $page],
-                        'contentTemplate' => $isPlugin ? 'MauticLeadBundle:Lead:pluginIndex' : 'MauticLeadBundle:Lead:index',
+                        'contentTemplate' => $isPlugin ? 'Mautic\LeadBundle\Controller\LeadController::pluginIndexAction' : 'Mautic\LeadBundle\Controller\LeadController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => $isPlugin ? '#mautic_plugin_timeline_index' : '#mautic_contact_index',
                             'mauticContent' => 'leadTimeline',
@@ -66,7 +52,7 @@ trait LeadAccessTrait
             } else {
                 return $this->notFound('mautic.contact.error.notfound');
             }
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->security->hasEntityAccess(
             'lead:leads:'.$action.'own',
             'lead:leads:'.$action.'other',
             $lead->getPermissionUser()
@@ -81,8 +67,6 @@ trait LeadAccessTrait
     /**
      * Returns leads the user has access to.
      *
-     * @param $action
-     *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function checkAllAccess($action, $limit)
@@ -90,7 +74,7 @@ trait LeadAccessTrait
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
-        //make sure the user has view access to leads
+        // make sure the user has view access to leads
         $repo = $model->getRepository();
 
         // order by lastactive, filter
@@ -115,7 +99,7 @@ trait LeadAccessTrait
         }
 
         foreach ($leads as $lead) {
-            if (!$this->get('mautic.security')->hasEntityAccess(
+            if (!$this->security->hasEntityAccess(
                 'lead:leads:'.$action.'own',
                 'lead:leads:'.$action.'other',
                 $lead->getOwner()

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -27,13 +18,11 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that the message is processed appropriately
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::process
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts
      */
-    public function testContactIsFoundFromMessage()
+    public function testContactIsFoundFromMessage(): void
     {
         $contactFinder = $this->getMockBuilder(ContactFinder::class)
             ->disableOriginalConstructor()

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -56,5 +47,6 @@ class DetailsTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         Assert::assertSame(200, $response->getStatusCode());
         Assert::assertStringContainsString($campaign->getName(), $response->getContent());
+        Assert::assertStringContainsString(sprintf('data-target-url="/s/campaigns/view/%s/contact/1"', $campaign->getId()), $response->getContent());
     }
 }

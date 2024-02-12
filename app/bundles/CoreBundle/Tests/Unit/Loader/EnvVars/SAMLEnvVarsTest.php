@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\SAMLEnvVars;
@@ -39,7 +30,7 @@ class SAMLEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testEntityIdIsSetToConfigIfNotEmpty()
+    public function testEntityIdIsSetToConfigIfNotEmpty(): void
     {
         $this->config->set('saml_idp_entity_id', 'foobar');
         SAMLEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
@@ -47,7 +38,7 @@ class SAMLEnvVarsTest extends TestCase
         $this->assertEquals('foobar', $this->envVars->get('MAUTIC_SAML_ENTITY_ID'));
     }
 
-    public function testEntityIdIsSetToSiteUrlIfNotEmpty()
+    public function testEntityIdIsSetToSiteUrlIfNotEmpty(): void
     {
         $this->config->set('saml_idp_entity_id', '');
         $this->config->set('site_url', 'https://foobar.com/happydays');
@@ -57,7 +48,7 @@ class SAMLEnvVarsTest extends TestCase
         $this->assertEquals('https://foobar.com', $this->envVars->get('MAUTIC_SAML_ENTITY_ID'));
     }
 
-    public function testEntityIdIsSetToMauticByDefault()
+    public function testEntityIdIsSetToMauticByDefault(): void
     {
         $this->config->set('saml_idp_entity_id', '');
         $this->config->set('site_url', '');
@@ -67,7 +58,7 @@ class SAMLEnvVarsTest extends TestCase
         $this->assertEquals('mautic', $this->envVars->get('MAUTIC_SAML_ENTITY_ID'));
     }
 
-    public function testLoginPathIsDefaultIfSamlIsDisabled()
+    public function testLoginPathIsDefaultIfSamlIsDisabled(): void
     {
         $this->config->set('saml_idp_metadata', 'enabled');
 
@@ -77,7 +68,7 @@ class SAMLEnvVarsTest extends TestCase
         $this->assertEquals('/s/saml/login_check', $this->envVars->get('MAUTIC_SAML_LOGIN_CHECK_PATH'));
     }
 
-    public function testCorrectLoginPathIfSamlIsEnabled()
+    public function testCorrectLoginPathIfSamlIsEnabled(): void
     {
         $this->config->set('saml_idp_metadata', '');
 

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,6 +15,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
+use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -36,13 +28,13 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $event    = new Event();
         $campaign = new Campaign();
         $leadLog  = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): int
             {
                 return 456;
             }
         };
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 789;
             }
@@ -50,11 +42,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private $campaign;
-
-            public function __construct(Campaign $campaign)
-            {
-                $this->campaign = $campaign;
+            public function __construct(
+                private Campaign $campaign
+            ) {
             }
 
             public function getEntities(array $args = [])
@@ -94,6 +84,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
+            /**
+             * @param mixed[] $parameters
+             */
             public function trans($id, array $parameters = [], $domain = null, $locale = null)
             {
                 Assert::assertSame('mautic.campaign.campaign.jump_to_event.target_not_exist', $id);
@@ -106,11 +99,19 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
         };
+
+        $eventScheduler = new class() extends EventScheduler {
+            public function __construct()
+            {
+            }
+        };
+
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $eventRepository,
             $eventExecutioner,
             $translator,
-            $leadRepository
+            $leadRepository,
+            $eventScheduler
         );
 
         $event->setProperties(['jumpToEvent' => 123]);
@@ -136,19 +137,19 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
     {
         $event    = new Event();
         $campaign = new class() extends Campaign {
-            public function getId()
+            public function getId(): int
             {
                 return 111;
             }
         };
         $leadLog = new class() extends LeadEventLog {
-            public function getId()
+            public function getId(): int
             {
                 return 456;
             }
         };
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 789;
             }
@@ -156,11 +157,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private $campaign;
-
-            public function __construct(Campaign $campaign)
-            {
-                $this->campaign = $campaign;
+            public function __construct(
+                private Campaign $campaign
+            ) {
             }
 
             public function getEntities(array $args = [])
@@ -202,7 +201,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, $isInactiveEvent = false)
+            public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, $isInactiveEvent = false): void
             {
                 Assert::assertSame(222, $event->getId());
                 Assert::assertCount(1, $contacts);
@@ -219,17 +218,38 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
-            public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+            public function incrementCampaignRotationForContacts(array $contactIds, $campaignId): void
             {
                 Assert::assertSame([789], $contactIds);
                 Assert::assertSame(111, $campaignId);
             }
         };
+
+        $eventScheduler = new class() extends EventScheduler {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @return \DateTime
+             */
+            public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null): \DateTimeInterface
+            {
+                return new \DateTime();
+            }
+
+            public function shouldScheduleEvent(Event $event, \DateTimeInterface $executionDate, \DateTimeInterface $now): bool
+            {
+                return false;
+            }
+        };
+
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $eventRepository,
             $eventExecutioner,
             $translator,
-            $leadRepository
+            $leadRepository,
+            $eventScheduler
         );
 
         $event->setProperties(['jumpToEvent' => 123]);

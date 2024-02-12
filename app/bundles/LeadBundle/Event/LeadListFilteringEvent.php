@@ -1,61 +1,22 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class LeadListFilteringEvent.
- *
- * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples
+ * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples.
  */
 class LeadListFilteringEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    protected $details;
+    protected bool $isFilteringDone;
 
-    /**
-     * @var int
-     */
-    protected $leadId;
+    protected string $subQuery;
 
-    /**
-     * @var QueryBuilder
-     */
-    protected $queryBuilder;
-
-    /**
-     * @var bool
-     */
-    protected $isFilteringDone;
-
-    /**
-     * @var string
-     */
-    protected $alias;
-
-    /**
-     * @var string
-     */
-    protected $subQuery;
-
-    /**
-     * @var string
-     */
-    protected $func;
+    private string $leadsTableAlias;
 
     /**
      * @param array        $details
@@ -64,16 +25,18 @@ class LeadListFilteringEvent extends CommonEvent
      * @param string       $func
      * @param QueryBuilder $queryBuilder
      */
-    public function __construct($details, $leadId, $alias, $func, $queryBuilder, EntityManager $entityManager)
-    {
-        $this->details         = $details;
-        $this->leadId          = $leadId;
-        $this->alias           = $alias;
-        $this->func            = $func;
-        $this->queryBuilder    = $queryBuilder;
+    public function __construct(
+        protected $details,
+        protected $leadId,
+        protected $alias,
+        protected $func,
+        protected $queryBuilder,
+        EntityManager $entityManager
+    ) {
         $this->em              = $entityManager;
         $this->isFilteringDone = false;
         $this->subQuery        = '';
+        $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
     /**
@@ -109,7 +72,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
     public function getEntityManager()
     {
@@ -127,7 +90,7 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param bool $status
      */
-    public function setFilteringStatus($status)
+    public function setFilteringStatus($status): void
     {
         $this->isFilteringDone = $status;
     }
@@ -135,25 +98,19 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param string $query
      */
-    public function setSubQuery($query)
+    public function setSubQuery($query): void
     {
         $this->subQuery = $query;
 
         $this->setFilteringStatus(true);
     }
 
-    /**
-     * @return bool
-     */
-    public function isFilteringDone()
+    public function isFilteringDone(): bool
     {
         return $this->isFilteringDone;
     }
 
-    /**
-     * @return string
-     */
-    public function getSubQuery()
+    public function getSubQuery(): string
     {
         return $this->subQuery;
     }
@@ -161,8 +118,13 @@ class LeadListFilteringEvent extends CommonEvent
     /**
      * @param array $details
      */
-    public function setDetails($details)
+    public function setDetails($details): void
     {
         $this->details = $details;
+    }
+
+    public function getLeadsTableAlias(): string
+    {
+        return $this->leadsTableAlias;
     }
 }

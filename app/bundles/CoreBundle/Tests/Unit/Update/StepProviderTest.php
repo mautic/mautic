@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;
@@ -18,10 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class StepProviderTest extends TestCase
 {
-    /**
-     * @var StepProvider
-     */
-    private $provider;
+    private \Mautic\CoreBundle\Update\StepProvider $provider;
 
     protected function setUp(): void
     {
@@ -60,7 +48,7 @@ class StepProviderTest extends TestCase
         $this->provider->addStep($step4);
     }
 
-    public function testInitialStepsAreOrdered()
+    public function testInitialStepsAreOrdered(): void
     {
         $steps = $this->provider->getInitialSteps();
         $this->assertCount(2, $steps);
@@ -68,7 +56,7 @@ class StepProviderTest extends TestCase
         $this->assertEquals(10, $steps[1]->getOrder());
     }
 
-    public function testsFinalStepsAreOrdered()
+    public function testsFinalStepsAreOrdered(): void
     {
         $steps = $this->provider->getFinalSteps();
         $this->assertCount(2, $steps);

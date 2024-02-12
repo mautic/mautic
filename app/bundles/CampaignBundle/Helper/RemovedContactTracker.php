@@ -1,28 +1,16 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Helper;
 
 class RemovedContactTracker
 {
-    /**
-     * @var array
-     */
-    private $removedContacts = [];
+    private array $removedContacts = [];
 
     /**
      * @param int $campaignId
      * @param int $contactId
      */
-    public function addRemovedContact($campaignId, $contactId)
+    public function addRemovedContact($campaignId, $contactId): void
     {
         if (!isset($this->removedContacts[$campaignId])) {
             $this->removedContacts[$campaignId] = [];
@@ -32,10 +20,9 @@ class RemovedContactTracker
     }
 
     /**
-     * @param int   $campaignId
-     * @param array $contacts
+     * @param int $campaignId
      */
-    public function addRemovedContacts($campaignId, array $contactIds)
+    public function addRemovedContacts($campaignId, array $contactIds): void
     {
         foreach ($contactIds as $contactId) {
             $this->addRemovedContact($campaignId, $contactId);
@@ -45,7 +32,7 @@ class RemovedContactTracker
     /**
      * @param int $campaignId
      */
-    public function clearRemovedContact($campaignId, $contactId)
+    public function clearRemovedContact($campaignId, $contactId): void
     {
         unset($this->removedContacts[$campaignId][$contactId]);
     }
@@ -53,7 +40,7 @@ class RemovedContactTracker
     /**
      * @param int $campaignId
      */
-    public function wasContactRemoved($campaignId, $contactId)
+    public function wasContactRemoved($campaignId, $contactId): bool
     {
         return !empty($this->removedContacts[$campaignId][$contactId]);
     }

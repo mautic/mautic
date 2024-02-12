@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
@@ -21,26 +12,11 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class CompanyNotificationHandler implements HandlerInterface
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
-
-    /**
-     * @var UserNotificationHelper
-     */
-    private $userNotificationHelper;
-
-    /**
-     * @var CompanyHelper
-     */
-    private $companyHelper;
-
-    public function __construct(Writer $writer, UserNotificationHelper $userNotificationHelper, CompanyHelper $companyHelper)
-    {
-        $this->writer                 = $writer;
-        $this->userNotificationHelper = $userNotificationHelper;
-        $this->companyHelper          = $companyHelper;
+    public function __construct(
+        private Writer $writer,
+        private UserNotificationHelper $userNotificationHelper,
+        private CompanyHelper $companyHelper
+    ) {
     }
 
     public function getIntegration(): string

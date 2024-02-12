@@ -1,0 +1,39 @@
+{% extends '@MauticCore/Default/' ~ (useSlim is defined and useSlim is not empty ? 'slim' : 'content') ~ '.html.twig' %}
+
+{% if entity is not defined %}
+    {% set entity = form.vars.data %}
+{% endif %}
+
+{% block mauticContent %}
+    {% if mauticContent is defined %}
+        {{ mauticContent }}
+    {% endif %}
+{% endblock %}
+
+{% if headerTitle is not defined %}
+    {% if entity.getId() %}
+        {% set headerTitle = translatorHasId(translationBase ~ '.header.edit') ? (translationBase ~ '.header.edit')|trans({'%name%' : entity.getName()}) : 'mautic.core.header.edit'|trans({'%name%' : entity.getName()}) %}
+    {% else %}
+        {% set headerTitle = translatorHasId(translationBase ~ '.header.new') ? (translationBase ~ '.header.new')|trans : 'mautic.core.header.new'|trans %}
+    {% endif %}
+{% endif %}
+
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
+
+{% if entity is not defined %}
+    {% set entity = form.vars.data %}
+{% endif %}
+
+{% set attr = form.vars.attr %}
+
+{% if block('formAttr') is defined and block('formAttr') is not empty %}
+    {% set attr = attr|merge(block('formAttr')) %}
+{% endif %}
+
+{% block content %}
+    {{ form_start(form, {'attr': attr}) }}
+    {% block mainFormContent %}{% endblock %}
+    {{ form_end(form) }}
+    {% block postFormContent %}{% endblock %}
+{% endblock %}
+

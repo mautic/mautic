@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
@@ -16,20 +7,20 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Remover;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RemoverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $leadEventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {
@@ -37,7 +28,7 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
     }
 
-    public function testMemberHasDateExitedSetWithForcedExit()
+    public function testMemberHasDateExitedSetWithForcedExit(): void
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(false);
@@ -50,7 +41,7 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(\DateTime::class, $campaignMember->getDateLastExited());
     }
 
-    public function testMemberHasDateExistedSetToNullWhenRemovedByFilter()
+    public function testMemberHasDateExistedSetToNullWhenRemovedByFilter(): void
     {
         $campaignMember = new CampaignMember();
         $campaignMember->setManuallyRemoved(false);
@@ -63,7 +54,7 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($campaignMember->getDateLastExited());
     }
 
-    public function testExceptionThrownWhenMemberIsAlreadyRemoved()
+    public function testExceptionThrownWhenMemberIsAlreadyRemoved(): void
     {
         $this->expectException(ContactAlreadyRemovedFromCampaignException::class);
 
@@ -79,7 +70,14 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
     private function getRemover()
     {
         $translator     = $this->createMock(TranslatorInterface::class);
-        $dateTimeHelper = $this->createMock(DateHelper::class);
+        $dateTimeHelper = new DateHelper(
+            'Y-m-d H:i:s',
+            'Y-m-d H:i',
+            'Y-m-d',
+            'H:i',
+            $translator,
+            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
+        );
 
         return new Remover($this->leadRepository, $this->leadEventLogRepository, $translator, $dateTimeHelper);
     }

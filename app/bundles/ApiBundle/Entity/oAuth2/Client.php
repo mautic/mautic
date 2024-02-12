@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,7 +25,7 @@ class Client extends BaseClient
     protected $name;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\UserBundle\Entity\User>
      */
     protected $users;
 
@@ -64,7 +55,7 @@ class Client extends BaseClient
     protected $allowedGrantTypes;
 
     /**
-     * @var Role
+     * @var Role|null
      */
     protected $role;
 
@@ -81,7 +72,7 @@ class Client extends BaseClient
         $this->authCodes = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -112,13 +103,13 @@ class Client extends BaseClient
             ->columnName('allowed_grant_types')
             ->build();
 
-        $builder->createManyToOne('role', 'Mautic\UserBundle\Entity\Role')
+        $builder->createManyToOne('role', \Mautic\UserBundle\Entity\Role::class)
             ->addJoinColumn('role_id', 'id', true, false)
             ->cascadePersist()
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -134,10 +125,6 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -185,10 +172,7 @@ class Client extends BaseClient
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setRedirectUris(array $redirectUris)
+    public function setRedirectUris(array $redirectUris): void
     {
         $this->isChanged('redirectUris', $redirectUris);
 
@@ -205,7 +189,7 @@ class Client extends BaseClient
         return $this;
     }
 
-    public function removeAuthCode(AuthCode $authCodes)
+    public function removeAuthCode(AuthCode $authCodes): void
     {
         $this->authCodes->removeElement($authCodes);
     }
@@ -240,7 +224,7 @@ class Client extends BaseClient
         return $this;
     }
 
-    public function removeUser(User $users)
+    public function removeUser(User $users): void
     {
         $this->users->removeElement($users);
     }

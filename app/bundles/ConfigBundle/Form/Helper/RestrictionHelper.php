@@ -1,51 +1,35 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Form\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper as FieldHelper;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RestrictionHelper
 {
-    const MODE_REMOVE = 'remove';
-    const MODE_MASK   = 'mask';
+    public const MODE_REMOVE = 'remove';
+
+    public const MODE_MASK   = 'mask';
 
     /**
-     * @var TranslatorInterface
+     * @var string[]
      */
-    private $translator;
+    private array $restrictedFields;
 
-    /**
-     * @var array
-     */
-    private $restrictedFields;
-
-    /**
-     * @var string
-     */
-    private $displayMode;
-
-    /**
-     * RestrictionHelper constructor.
-     */
-    public function __construct(TranslatorInterface $translator, array $restrictedFields, $mode)
-    {
-        $this->translator       = $translator;
+    public function __construct(
+        private TranslatorInterface $translator,
+        array $restrictedFields,
+        private string $displayMode
+    ) {
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);
-        $this->displayMode      = $mode;
     }
 
-    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null)
+    /**
+     * @param FormInterface<mixed> $childType
+     * @param FormInterface<mixed> $parentType
+     */
+    public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null): void
     {
         if (null === $restrictedFields) {
             $restrictedFields = $this->restrictedFields;
@@ -66,13 +50,17 @@ class RestrictionHelper
         }
     }
 
-    private function restrictField(FormInterface $childType, FormInterface $parentType)
+    /**
+     * @param FormInterface<mixed> $childType
+     * @param FormInterface<mixed> $parentType
+     */
+    private function restrictField(FormInterface $childType, FormInterface $parentType): void
     {
         switch ($this->displayMode) {
             case self::MODE_MASK:
                 $parentType->add(
                     $childType->getName(),
-                    get_class($childType->getConfig()->getType()->getInnerType()),
+                    $childType->getConfig()->getType()->getInnerType()::class,
                     array_merge(
                         $childType->getConfig()->getOptions(),
                         [

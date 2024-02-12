@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -16,21 +7,22 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class MessageQueue.
- */
 class MessageQueue
 {
-    const STATUS_RESCHEDULED = 'rescheduled';
-    const STATUS_PENDING     = 'pending';
-    const STATUS_SENT        = 'sent';
-    const STATUS_CANCELLED   = 'cancelled';
+    public const STATUS_RESCHEDULED = 'rescheduled';
 
-    const PRIORITY_NORMAL = 2;
-    const PRIORITY_HIGH   = 1;
+    public const STATUS_PENDING     = 'pending';
+
+    public const STATUS_SENT        = 'sent';
+
+    public const STATUS_CANCELLED   = 'cancelled';
+
+    public const PRIORITY_NORMAL = 2;
+
+    public const PRIORITY_HIGH   = 1;
 
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -42,7 +34,7 @@ class MessageQueue
     private $channelId;
 
     /**
-     * @var Event
+     * @var Event|null
      */
     private $event;
 
@@ -77,22 +69,22 @@ class MessageQueue
     private $status = self::STATUS_PENDING;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $datePublished;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $scheduledDate;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastAttempt;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -117,12 +109,12 @@ class MessageQueue
      */
     private $metadataUpdated = false;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('message_queue')
-            ->setCustomRepositoryClass('Mautic\ChannelBundle\Entity\MessageQueueRepository')
+            ->setCustomRepositoryClass(\Mautic\ChannelBundle\Entity\MessageQueueRepository::class)
             ->addIndex(['status'], 'message_status_search')
             ->addIndex(['date_sent'], 'message_date_sent')
             ->addIndex(['scheduled_date'], 'message_scheduled_date')
@@ -135,7 +127,7 @@ class MessageQueue
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
 
-        $builder->createManyToOne('event', 'Mautic\CampaignBundle\Entity\Event')
+        $builder->createManyToOne('event', \Mautic\CampaignBundle\Entity\Event::class)
             ->addJoinColumn('event_id', 'id', true, false, 'CASCADE')
             ->build();
 
@@ -186,12 +178,9 @@ class MessageQueue
             ->build();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -205,7 +194,7 @@ class MessageQueue
     /**
      * @param int $attempts
      */
-    public function setAttempts($attempts)
+    public function setAttempts($attempts): void
     {
         $this->attempts = $attempts;
     }
@@ -221,7 +210,7 @@ class MessageQueue
     /**
      * @param array $options
      */
-    public function setOptions($options)
+    public function setOptions($options): void
     {
         $this->options[] = $options;
     }
@@ -237,7 +226,7 @@ class MessageQueue
     /**
      * @param string $channel
      */
-    public function setChannel($channel)
+    public function setChannel($channel): void
     {
         $this->channel = $channel;
     }
@@ -263,7 +252,7 @@ class MessageQueue
     }
 
     /**
-     * @return Event
+     * @return Event|null
      */
     public function getEvent()
     {
@@ -281,7 +270,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDatePublished()
     {
@@ -291,13 +280,13 @@ class MessageQueue
     /**
      * @param \DateTime $datePublished
      */
-    public function setDatePublished($datePublished)
+    public function setDatePublished($datePublished): void
     {
         $this->datePublished = $datePublished;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {
@@ -307,13 +296,13 @@ class MessageQueue
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastAttempt()
     {
@@ -323,7 +312,7 @@ class MessageQueue
     /**
      * @param \DateTime $lastAttempt
      */
-    public function setLastAttempt($lastAttempt)
+    public function setLastAttempt($lastAttempt): void
     {
         $this->lastAttempt = $lastAttempt;
     }
@@ -336,7 +325,7 @@ class MessageQueue
         return $this->lead;
     }
 
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -352,7 +341,7 @@ class MessageQueue
     /**
      * @param int $maxAttempts
      */
-    public function setMaxAttempts($maxAttempts)
+    public function setMaxAttempts($maxAttempts): void
     {
         $this->maxAttempts = $maxAttempts;
     }
@@ -368,13 +357,13 @@ class MessageQueue
     /**
      * @param int $priority
      */
-    public function setPriority($priority)
+    public function setPriority($priority): void
     {
         $this->priority = $priority;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getScheduledDate()
     {
@@ -384,7 +373,7 @@ class MessageQueue
     /**
      * @param mixed $scheduledDate
      */
-    public function setScheduledDate($scheduledDate)
+    public function setScheduledDate($scheduledDate): void
     {
         $this->scheduledDate = $scheduledDate;
     }
@@ -400,7 +389,7 @@ class MessageQueue
     /**
      * @param string $status
      */
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         $this->status = $status;
     }
@@ -424,7 +413,7 @@ class MessageQueue
     /**
      * @param bool $success
      */
-    public function setSuccess($success = true)
+    public function setSuccess($success = true): void
     {
         $this->success = $success;
     }
@@ -474,10 +463,10 @@ class MessageQueue
      */
     public function getMetadata()
     {
-        return (isset($this->options['metadata'])) ? $this->options['metadata'] : [];
+        return $this->options['metadata'] ?? [];
     }
 
-    public function setMetadata(array $metadata = [])
+    public function setMetadata(array $metadata = []): void
     {
         $this->metadataUpdated     = true;
         $this->options['metadata'] = $metadata;

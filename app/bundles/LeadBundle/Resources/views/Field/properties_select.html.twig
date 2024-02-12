@@ -1,0 +1,11 @@
+{% set type = type|default('select') %}
+<div class="{{ type }}">
+    {% if form is not defined or form is null or form.vars.value is empty %}
+      {{ selectTemplate|replace({
+          ('properties_'~type~'_template'): 'properties',
+          'properties': 'properties_template'
+      })|raw }}
+    {% else %}
+      {{ form_row(form) }}
+    {% endif %}
+</div>

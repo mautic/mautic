@@ -1,46 +1,30 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
 class IpAddressModel
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    private const DELETE_SIZE = 10000;
 
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    public function __construct(EntityManager $entityManager, LoggerInterface $logger)
-    {
-        $this->entityManager = $entityManager;
-        $this->logger        = $logger;
+    public function __construct(
+        protected EntityManager $entityManager,
+        protected LoggerInterface $logger
+    ) {
     }
 
     /**
      * Saving IP Address references sometimes throws UniqueConstraintViolationException exception on Lead entity save.
      * Rather pre-save the IP references here and catch the exception.
      */
-    public function saveIpAddressesReferencesForContact(Lead $contact)
+    public function saveIpAddressesReferencesForContact(Lead $contact): void
     {
         foreach ($contact->getIpAddresses() as $ipAddress) {
             $this->insertIpAddressReference($contact, $ipAddress);
@@ -60,7 +44,7 @@ class IpAddressModel
     /**
      * Tries to insert the Lead/IP relation and continues even if UniqueConstraintViolationException is thrown.
      */
-    private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress)
+    private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress): void
     {
         $ipAddressAdded = isset($contact->getChanges()['ipAddressList'][$ipAddress->getIpAddress()]);
         if (!$ipAddressAdded || !$ipAddress->getId() || !$contact->getId()) {
@@ -79,13 +63,35 @@ class IpAddressModel
         $qb->setParameter('ipId', $ipAddress->getId());
 
         try {
-            $qb->execute();
-        } catch (UniqueConstraintViolationException $e) {
+            $qb->executeStatement();
+        } catch (UniqueConstraintViolationException) {
             $this->logger->warning("The reference for contact {$contact->getId()} and IP address {$ipAddress->getId()} is already there. (Unique constraint)");
-        } catch (ForeignKeyConstraintViolationException $e) {
+        } catch (ForeignKeyConstraintViolationException) {
             $this->logger->warning("The reference for contact {$contact->getId()} and IP address {$ipAddress->getId()} is already there. (Foreign key constraint)");
         }
 
         $this->entityManager->detach($ipAddress);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function deleteUnusedIpAddresses(int $limit): int
+    {
+        /** @var IpAddressRepository $ipAddressRepo */
+        $ipAddressRepo = $this->entityManager->getRepository(IpAddress::class);
+        $ipIds         = $ipAddressRepo->getUnusedIpAddressesIds($limit);
+
+        $chunkedIds = array_chunk($ipIds, self::DELETE_SIZE);
+        $count      = 0;
+
+        foreach ($chunkedIds as $ids) {
+            $count += $ipAddressRepo->deleteUnusedIpAddresses($ids);
+
+            // Use sleep to recover from any potential table locks.
+            usleep(50000);
+        }
+
+        return $count;
     }
 }

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,22 +25,22 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|KickoffContactFinder
      */
-    private $kickoffContactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $kickoffContactFinder;
 
     /**
      * @var MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|EventExecutioner
      */
-    private $executioner;
+    private \PHPUnit\Framework\MockObject\MockObject $executioner;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     protected function setUp(): void
     {
@@ -74,7 +65,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
-    public function testEventsAreScheduledAndExecuted()
+    public function testEventsAreScheduledAndExecuted(): void
     {
         $this->kickoffContactFinder->expects($this->once())
             ->method('getContactCount')
@@ -91,9 +82,15 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $event    = new Event();
         $event2   = new Event();
         $campaign = new class() extends Campaign {
-            public $rootEvents;
+            /**
+             * @var ArrayCollection<int,Event>
+             */
+            public ArrayCollection $rootEvents;
 
-            public function getRootEvents()
+            /**
+             * @return ArrayCollection<int,Event>
+             */
+            public function getRootEvents(): ArrayCollection
             {
                 return $this->rootEvents;
             }
@@ -112,7 +109,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->scheduler->expects($this->exactly(4))
             ->method('validateAndScheduleEventForContacts')
             ->willReturnCallback(
-                function () use (&$callbackCounter) {
+                function () use (&$callbackCounter): void {
                     ++$callbackCounter;
                     if (in_array($callbackCounter, [3, 4])) {
                         throw new NotSchedulableException();

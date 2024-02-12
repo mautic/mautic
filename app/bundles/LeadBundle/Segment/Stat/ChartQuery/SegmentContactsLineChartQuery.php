@@ -1,70 +1,41 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Stat\ChartQuery;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 
 class SegmentContactsLineChartQuery extends ChartQuery
 {
     /**
-     * @var array
-     */
-    private $filters;
-
-    /**
      * @var int
      */
     private $segmentId;
 
-    /**
-     * @var bool|string
-     */
-    private $firstEventLog;
+    private ?array $addedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $addedEventLogStats;
-
-    /**
-     * @var array
-     */
-    private $removedEventLogStats;
-
-    /**
-     * @var array
-     */
-    private $addedLeadListStats;
-
-    /**
-     * @var bool
-     */
-    private $statsFromEventLog;
+    private ?array $removedEventLogStats = null;
 
     /**
      * @param string|null $unit
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, array $filters = [], $unit = null)
-    {
+    public function __construct(
+        Connection $connection,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        private array $filters = [],
+        $unit = null
+    ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;
         $this->unit       = $unit;
-        $this->filters    = $filters;
 
         if (!isset($this->filters['leadlist_id']['value'])) {
             throw new SegmentNotFoundException('Segment ID required');
@@ -73,16 +44,13 @@ class SegmentContactsLineChartQuery extends ChartQuery
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
     }
 
-    public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
+    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): void
     {
         parent::setDateRange($dateFrom, $dateTo);
         $this->init();
     }
 
-    /**
-     * @return array
-     */
-    public function getTotalStats(int $total)
+    public function getTotalStats(int $total): array
     {
         $totalCountDateTo = $this->getTotalToDateRange($total);
         // count array SUM and then reverse
@@ -118,57 +86,22 @@ class SegmentContactsLineChartQuery extends ChartQuery
      * Get data about add/remove from segment based on LeadEventLog.
      *
      * @param string $action
-     *
-     * @return array
      */
-    public function getDataFromLeadEventLog($action)
+    public function getDataFromLeadEventLog($action): array
     {
-        return $this->loadAndBuildTimeData(
-            $this->prepareTimeDataQuery(
-                'lead_event_log',
-                'date_added',
-                [
-                    'object'    => 'segment',
-                    'bundle'    => 'lead',
-                    'action'    => $action,
-                    'object_id' => $this->segmentId,
-                ]
-            )
+        $qb = $this->prepareTimeDataQuery(
+            'lead_event_log',
+            'date_added',
+            [
+                'object'    => 'segment',
+                'bundle'    => 'lead',
+                'action'    => $action,
+                'object_id' => $this->segmentId,
+            ]
         );
-    }
+        $qb = $this->optimizeSearchInLeadEventLog($qb);
 
-    /**
-     * Get data about add from segment based on LeadListLead before upgrade to 2.15.
-     *
-     * @return array
-     */
-    public function getDataFromLeadListLeads()
-    {
-        $q = $this->prepareTimeDataQuery('lead_lists_leads', 'date_added', $this->filters);
-        if ($this->firstEventLog) {
-            $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($this->firstEventLog)));
-        }
-
-        return $this->loadAndBuildTimeData($q);
-    }
-
-    /**
-     * @return bool|string
-     */
-    private function getFirstDateAddedSegmentEventLog()
-    {
-        $subQuery = $this->connection->createQueryBuilder();
-        $subQuery->select('MIN(el.date_added) - INTERVAL 10 SECOND')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
-            ->where(
-                $subQuery->expr()->andX(
-                    $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
-                    $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
-                    $subQuery->expr()->eq('el.object_id', $this->segmentId)
-                )
-            );
-
-        return $subQuery->execute()->fetchColumn();
+        return $this->loadAndBuildTimeData($qb);
     }
 
     /**
@@ -177,14 +110,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
     public function getSegmentId()
     {
         return $this->segmentId;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatsFromEventLog()
-    {
-        return $this->statsFromEventLog;
     }
 
     /**
@@ -208,14 +133,17 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private function init(): void
     {
-        $this->firstEventLog        = $this->getFirstDateAddedSegmentEventLog();
-        $this->addedLeadListStats   = $this->getDataFromLeadListLeads();
         $this->addedEventLogStats   = $this->getDataFromLeadEventLog('added');
         $this->removedEventLogStats = $this->getDataFromLeadEventLog('removed');
-        $this->statsFromEventLog    = (
-            empty(array_filter($this->addedLeadListStats))
-            && (!empty(array_filter($this->addedEventLogStats))
-            || !empty(array_filter($this->removedEventLogStats)))
-        );
+    }
+
+    private function optimizeSearchInLeadEventLog(QueryBuilder $qb): QueryBuilder
+    {
+        $fromPart             = $qb->getQueryPart('from');
+        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH);
+        $qb->resetQueryPart('from');
+        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+
+        return $qb;
     }
 }

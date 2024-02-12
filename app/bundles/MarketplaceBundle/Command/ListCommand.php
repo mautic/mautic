@@ -16,25 +16,22 @@ class ListCommand extends Command
 {
     public const NAME = 'mautic:marketplace:list';
 
-    private PluginCollector $pluginCollector;
-
-    public function __construct(PluginCollector $pluginCollector)
-    {
+    public function __construct(
+        private PluginCollector $pluginCollector
+    ) {
         parent::__construct();
-        $this->pluginCollector = $pluginCollector;
     }
 
     protected function configure(): void
     {
         $this->setName(self::NAME);
-        $this->setDescription('Lists plugins that are available at Packagist.org');
         $this->addOption('page', 'p', InputOption::VALUE_OPTIONAL, 'Page number', 1);
         $this->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Packages per page', 15);
         $this->addOption('filter', 'f', InputOption::VALUE_OPTIONAL, 'Filter the packages', '');
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io        = new SymfonyStyle($input, $output);
         $stopwatch = new Stopwatch();
@@ -64,6 +61,8 @@ class ListCommand extends Command
         $io->writeln("<fg=green>Total packages: {$this->pluginCollector->getTotal()}</>");
         $io->writeln("<fg=green>Execution time: {$event->getDuration()} ms</>");
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Lists plugins that are available at Packagist.org';
 }

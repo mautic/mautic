@@ -1,20 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\FieldCollectorInterface;
+use Mautic\FormBundle\Collector\ObjectCollectorInterface;
+use Mautic\FormBundle\Exception\FieldNotFoundException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -22,33 +16,25 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class FieldType.
+ * @extends AbstractType<mixed>
  */
 class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * FieldType constructor.
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ObjectCollectorInterface $objectCollector,
+        private FieldCollectorInterface $fieldCollector,
+        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Populate settings
         $cleanMasks = [
@@ -56,6 +42,7 @@ class FieldType extends AbstractType
             'inputAttributes'     => 'string',
             'containerAttributes' => 'string',
             'label'               => 'strict_html',
+            'helpMessage'         => 'strict_html',
         ];
 
         $addHelpMessage         =
@@ -65,7 +52,7 @@ class FieldType extends AbstractType
         $addLabelAttributes     =
         $addInputAttributes     =
         $addContainerAttributes =
-        $addLeadFieldList       =
+        $addMappedFieldList     =
         $addSaveResult          =
         $addBehaviorFields      =
         $addIsRequired          = true;
@@ -94,22 +81,23 @@ class FieldType extends AbstractType
                 'inputAttributesText',
                 'addContainerAttributes',
                 'containerAttributesText',
-                'addLeadFieldList',
+                'addMappedFieldList',
                 'addSaveResult',
                 'addBehaviorFields',
                 'addIsRequired',
                 'addHtml',
             ];
+
             foreach ($addFields as $f) {
                 if (isset($customParams['builderOptions'][$f])) {
-                    $$f = (bool) $customParams['builderOptions'][$f];
+                    ${$f} = (bool) $customParams['builderOptions'][$f];
                 }
             }
         } else {
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addLeadFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -119,7 +107,7 @@ class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'freehtml':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addLeadFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freehtml_attributes';
@@ -128,16 +116,16 @@ class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'button':
-                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'hidden':
                     $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
                     break;
                 case 'captcha':
-                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addShowLabel = $addIsRequired = $addDefaultValue = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'pagebreak':
-                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'select':
                     $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
@@ -151,6 +139,29 @@ class FieldType extends AbstractType
                     break;
             }
         }
+
+        // disable progressing profiling  for conditional fields
+        if (!empty($options['data']['parent'])) {
+            $addBehaviorFields = false;
+            $builder->add(
+                'conditions',
+                FormFieldConditionType::class,
+                [
+                    'label'      => false,
+                    'data'       => $options['data']['conditions'] ?? [],
+                    'formId'     => $options['data']['formId'],
+                    'parent'     => $options['data']['parent'] ?? null,
+                ]
+            );
+        }
+
+        $builder->add(
+            'parent',
+            HiddenType::class,
+            [
+                'label'=> false,
+            ]
+        );
 
         // Build form fields
         $builder->add(
@@ -179,7 +190,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && false === strpos($options['data']['id'], 'new')) ? true : false,
+                    'disabled' => (!empty($options['data']['id']) && !str_contains($options['data']['id'], 'new')) ? true : false,
                     'required' => false,
                 ]
             );
@@ -321,7 +332,7 @@ class FieldType extends AbstractType
         }
 
         if ($addBehaviorFields) {
-            $alwaysDisplay = isset($options['data']['alwaysDisplay']) ? $options['data']['alwaysDisplay'] : false;
+            $alwaysDisplay = $options['data']['alwaysDisplay'] ?? false;
             $builder->add(
                 'alwaysDisplay',
                 YesNoButtonGroupType::class,
@@ -379,51 +390,64 @@ class FieldType extends AbstractType
             );
         }
 
-        if ($addLeadFieldList) {
-            if (!isset($options['data']['leadField'])) {
-                switch ($type) {
-                    case 'email':
-                        $data = 'email';
-                        break;
-                    case 'country':
-                        $data = 'country';
-                        break;
-                    case 'tel':
-                        $data = 'phone';
-                        break;
-                    default:
-                        $data = '';
-                        break;
-                }
-            } elseif (isset($options['data']['leadField'])) {
-                $data = $options['data']['leadField'];
-            } else {
-                $data = '';
-            }
-
+        if ($addMappedFieldList) {
+            $mappedObject = $options['data']['mappedObject'] ?? 'contact';
+            $mappedField  = $options['data']['mappedField'] ?? null;
             $builder->add(
-                'leadField',
+                'mappedObject',
                 ChoiceType::class,
                 [
-                    'choices'           => $options['leadFields'],
-                    'choice_attr'       => function ($val, $key, $index) use ($options) {
-                        $objects = ['lead', 'company'];
-                        foreach ($objects as $object) {
-                            if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
+                    'choices'    => $this->objectCollector->getObjects()->toChoices(),
+                    'label'      => 'mautic.form.field.form.mapped.object',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.form.field.help.mapped.object',
+                        'onchange' => 'Mautic.fetchFieldsOnObjectChange();',
+                    ],
+                    'required' => false,
+                    'data'     => $mappedObject,
+                ]
+            );
+
+            $fields       = $this->fieldCollector->getFields($mappedObject);
+            $mappedFields = $this->mappedFieldCollector->getFields((string) $options['data']['formId'], $mappedObject);
+            $fields       = $fields->removeFieldsWithKeys($mappedFields, (string) $mappedField);
+
+            $builder->add(
+                'mappedField',
+                ChoiceType::class,
+                [
+                    'choices'     => $fields->toChoices(),
+                    'choice_attr' => function ($val) use ($fields): array {
+                        try {
+                            $field = $fields->getFieldByKey($val);
+                            if ($field->isListType()) {
                                 return ['data-list-type' => 1];
                             }
+                        } catch (FieldNotFoundException) {
                         }
 
                         return [];
                     },
-                    'label'      => 'mautic.form.field.form.lead_field',
+                    'label'      => 'mautic.form.field.form.mapped.field',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.lead_field',
+                        'tooltip' => 'mautic.form.field.help.mapped.field',
                     ],
                     'required' => false,
-                    'data'     => $data,
+                    'data'     => $mappedField ?? $this->getDefaultMappedField((string) $type),
+                ]
+            );
+
+            $builder->add(
+                'originalMappedField',
+                HiddenType::class,
+                [
+                    'label'    => false,
+                    'required' => false,
+                    'data'     => $mappedField,
                 ]
             );
         }
@@ -459,7 +483,7 @@ class FieldType extends AbstractType
         );
 
         // Put properties last so that the other values are available to form events
-        $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
+        $propertiesData = $options['data']['properties'] ?? [];
         if (!empty($options['customParameters'])) {
             $formTypeOptions = array_merge($formTypeOptions, ['data' => $propertiesData]);
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
@@ -571,10 +595,7 @@ class FieldType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -582,16 +603,21 @@ class FieldType extends AbstractType
             ]
         );
 
-        $resolver->setDefined(['customParameters', 'leadFieldProperties']);
-
-        $resolver->setRequired(['leadFields']);
+        $resolver->setDefined(['customParameters']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'formfield';
+    }
+
+    private function getDefaultMappedField(string $type): string
+    {
+        return match ($type) {
+            'email'   => 'email',
+            'country' => 'country',
+            'tel'     => 'phone',
+            default   => '',
+        };
     }
 }

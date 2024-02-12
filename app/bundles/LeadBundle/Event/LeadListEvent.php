@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -38,7 +29,7 @@ class LeadListEvent extends CommonEvent
     /**
      * Sets the List entity.
      */
-    public function setList(LeadList $list)
+    public function setList(LeadList $list): void
     {
         $this->entity = $list;
     }

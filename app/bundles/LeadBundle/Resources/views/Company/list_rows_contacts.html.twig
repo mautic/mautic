@@ -1,0 +1,246 @@
+{#
+  Variables:
+    - contacts
+    - company
+    - tmpl
+    - permissions
+    - security
+    - page
+    - limit
+    - totalItems
+#}
+{% set baseUrl = path('mautic_company_contacts_list', {'objectId': company.id}) %}
+{% set customButtons = [] %}
+
+{% if permissions['lead:leads:editown'] or permissions['load:leads:editother'] %}
+    {% set customButtons = [
+        {
+            'attr': {
+                'class': 'btn btn-default btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_segment_batch_contact_view'),
+                'data-header': 'mautic.lead.batch.lists'|trans,
+            },
+            'btnText': 'mautic.lead.batch.lists'|trans,
+            'iconClass': 'fa fa-pie-chart',
+        },
+        {
+            'attr': {
+                'class': 'btn btn-default btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_contact_action', {'objectAction': 'batchStages'}),
+                'data-header': 'mautic.lead.batch.stages'|trans,
+            },
+            'btnText': 'mautic.lead.batch.stages'|trans,
+            'iconClass': 'fa fa-tachometer',
+        },
+        {
+            'attr': {
+                'class': 'btn btn-default btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_contact_action', {'objectAction': 'batchCampaigns'}),
+                'data-header': 'mautic.lead.batch.campaigns'|trans,
+            },
+            'btnText': 'mautic.lead.batch.campaigns'|trans,
+            'iconClass': 'fa fa-clock-o',
+        },
+        {
+            'attr': {
+                'class': 'btn btn-default btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_contact_action', {'objectAction': 'batchOwners'}),
+                'data-header': 'mautic.lead.batch.owner'|trans,
+            },
+            'btnText': 'mautic.lead.batch.owner'|trans,
+            'iconClass': 'fa fa-user',
+        },
+        {
+            'attr': {
+                'class': 'btn btn-default btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_contact_action', {'objectAction': 'batchDnc'}),
+                'data-header': 'mautic.lead.batch.dnc'|trans,
+            },
+            'btnText': 'mautic.lead.batch.dnc'|trans,
+            'iconClass': 'fa fa-ban text-danger',
+        },
+    ] %}
+{% endif %}
+
+{% if contacts|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered" id="leadTable">
+            <thead>
+                <tr>
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#contacts-table',
+                        'templateButtons': {
+                            'delete': permissions['lead:leads:deleteown'] or permissions['lead:leads:deleteother'],
+                        },
+                        'customButtons': customButtons,
+                        'langVar': 'lead.lead',
+                        'routeBase': 'contact',
+                        'tooltip': 'mautic.lead.list.checkall.help'|trans,
+                    }) }}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'orderBy': 'l.lastname, l.firstname, l.company, l.email',
+                        'text': 'mautic.core.name',
+                        'class': 'col-lead-name',
+                        'target': '#contacts-table',
+                        'baseUrl': baseUrl,
+                    }) }}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'orderBy': 'l.email',
+                        'text': 'mautic.core.type.email',
+                        'class': 'col-lead-email visible-md visible-lg',
+                        'target': '#contacts-table',
+                        'baseUrl': baseUrl,
+                    }) }}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'orderBy': 'l.city, l.state',
+                        'text': 'mautic.lead.lead.thead.location',
+                        'class': 'col-lead-location visible-md visible-lg',
+                        'target': '#contacts-table',
+                        'baseUrl': baseUrl,
+                    }) }}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'orderBy': 'l.stage_id',
+                        'text': 'mautic.lead.stage.label',
+                        'class': 'col-lead-stage',
+                        'target': '#contacts-table',
+                        'baseUrl': baseUrl,
+                    }) }}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'orderBy': 'l.points',
+                        'text': 'mautic.lead.points',
+                        'class': 'visible-md visible-lg col-lead-points',
+                        'target': '#contacts-table',
+                        'baseUrl': baseUrl,
+                    }) }}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'orderBy': 'l.last_active',
+                        'text': 'mautic.lead.lastactive',
+                        'class': 'col-lead-lastactive visible-md visible-lg',
+                        'default': true,
+                        'target': '#contacts-table',
+                        'baseUrl': baseUrl,
+                    }) }}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'orderBy': 'l.id',
+                        'text': 'mautic.core.id',
+                        'class': 'col-lead-id visible-md visible-lg',
+                        'target': '#contacts-table',
+                        'baseUrl': baseUrl,
+                    }) }}
+                </tr>
+            </thead>
+            <tbody>
+            {% for contact in contacts %}
+                {% set fields = contact.fields %}
+                <tr>
+                    <td>
+                        {% set hasEditAccess = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], contact.permissionUser()) %}
+                        {% set custom = [] %}
+                        {% if hasEditAccess and currentList is defined %}
+                            {# this lead was manually added to a list so give an option to remove them #}
+                            {% set custom = custom|merge([{
+                                'attr': {
+                                    'href': path('mautic_segment_action', {'objectAction': 'removeLead', 'objectId': currentList.id, 'leadId': contact.id}),
+                                    'data-toggle': 'ajax',
+                                    'data-method': 'POST',
+                                },
+                                'btnText': 'mautic.lead.lead.remove.fromlist',
+                                'iconClass': 'fa fa-remove',
+                            }]) %}
+                        {% endif %}
+
+                        {% if fields.core.email is defined %}
+                            {% set custom = custom|merge([{
+                                'attr': {
+                                    'data-toggle': 'ajaxmodal',
+                                    'data-target': '#MauticSharedModal',
+                                    'data-header': 'mautic.lead.email.send_email.header'|trans({'%email%': fields.core.email.value}),
+                                    'href': path('mautic_contact_action', {'objectId': contact.id, 'objectAction': 'email', 'list': 1}),
+                                },
+                                'btnText': 'mautic.lead.email.send_email',
+                                'iconClass': 'fa fa-send',
+                            }]) %}
+                        {% endif %}
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                            'item': contact,
+                            'templateButtons': {
+                                'edit': hasEditAccess,
+                                'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], contact.permissionUser),
+                            },
+                            'routeBase': 'contact',
+                            'langVar': 'lead.lead',
+                            'customButtons': custom,
+                        }) }}
+                    </td>
+                    <td>
+                        <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
+                            <div>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ contact.primaryIdentifier|purify }}{% endif %}</div>
+                            <div class="small">{{ contact.secondaryIdentifier|purify }}</div>
+                        </a>
+                    </td>
+                    <td class="visible-md visible-lg">{{ fields.core.email.value|purify }}</td>
+                    <td class="visible-md visible-lg">
+                        {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+                        {% if flag is not empty %}
+                          <img src="{{ flag }}" style="max-height: 24px;" class="mr-sm" />
+                        {% endif %}
+                        {% set location = [] %}
+                        {% if fields.core.city is defined %}
+                            {% set location = location|merge([fields.core.city.value]) %}
+                        {% endif %}
+                        {% if fields.core.state is defined %}
+                            {% set location = location|merge([fields.core.state.value]) %}
+                        {% elseif fields.core.country is defined %}
+                            {% set location = location|merge([fields.core.country.value]) %}
+                        {% endif %}
+                        {{ location|join(', ') }}
+                        <div class="clearfix"></div>
+                    </td>
+                    <td class="text-center">
+                        {% if contact.stage %}
+                          <span class="label label-default" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.stage.name|purify }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="visible-md visible-lg text-center">
+                        <span class="label label-default" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.points }}</span>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        <abbr title="{{ dateToFull(contact.lastActive)|e }}">
+                            {{ dateToFull(contact.lastActive) }}
+                        </abbr>
+                    </td>
+                    <td class="visible-md visible-lg">{{ contact.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {{ include('@MauticCore/Helper/pagination.html.twig', {
+            'page': page,
+            'limit': limit,
+            'baseUrl': baseUrl,
+            'target': '#contacts-table',
+            'totalItems': totalItems,
+            'sessionVar': 'company.'~company.id~'.contacts',
+    }) }}
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

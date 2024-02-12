@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Tests\Model;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
@@ -24,32 +15,29 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Lead
      */
-    private $contactMock5;
+    private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
 
     /**
      * @var MockObject|LeadModel
      */
-    private $contactModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
     /**
      * @var MockObject|FrequencyRuleRepository
      */
-    private $frequencyRepoMock;
+    private \PHPUnit\Framework\MockObject\MockObject $frequencyRepoMock;
 
     /**
      * @var MockObject|FrequencyRule
      */
-    private $frequencyRuleEmailMock;
+    private \PHPUnit\Framework\MockObject\MockObject $frequencyRuleEmailMock;
 
     /**
      * @var MockObject|FrequencyRule
      */
-    private $frequencyRuleSmsMock;
+    private \PHPUnit\Framework\MockObject\MockObject $frequencyRuleSmsMock;
 
-    /**
-     * @var FrequencyActionModel
-     */
-    private $actionModel;
+    private \Mautic\ChannelBundle\Model\FrequencyActionModel $actionModel;
 
     protected function setUp(): void
     {

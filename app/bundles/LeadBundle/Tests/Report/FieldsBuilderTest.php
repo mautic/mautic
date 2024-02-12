@@ -1,25 +1,17 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Report;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetLeadColumns()
+    public function testGetLeadColumns(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -33,12 +25,14 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fieldModel->expects($this->exactly(2)) //We have 2 asserts
+        $leadModel = $this->createMock(LeadModel::class);
+
+        $fieldModel->expects($this->exactly(2)) // We have 2 asserts
             ->method('getLeadFields')
             ->with()
             ->willReturn($this->getFields());
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel);
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
 
         $expected = [
             'l.id' => [
@@ -62,7 +56,6 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             'l.owner_id' => [
                 'label' => 'mautic.lead.report.owner_id',
                 'type'  => 'int',
-                'link'  => 'mautic_user_action',
             ],
             'u.first_name' => [
                 'label' => 'mautic.lead.report.owner_firstname',
@@ -105,7 +98,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    public function testGetLeadFilter()
+    public function testGetLeadFilter(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -157,7 +150,26 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($users);
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel);
+        $tagList = [
+            [
+                'value' => '1',
+                'label' => 'A',
+            ],
+            [
+                'value' => '2',
+                'label' => 'B',
+            ],
+            [
+                'value' => '3',
+                'label' => 'C',
+            ],
+        ];
+        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel->method('getTagList')
+            ->with()
+            ->willReturn($tagList);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
 
         $expected = [
             'l.id' => [
@@ -181,7 +193,6 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             'l.owner_id' => [
                 'label' => 'mautic.lead.report.owner_id',
                 'type'  => 'int',
-                'link'  => 'mautic_user_action',
             ],
             'u.first_name' => [
                 'label' => 'mautic.lead.report.owner_firstname',
@@ -228,6 +239,21 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                     'eq' => 'mautic.core.operator.equals',
                 ],
             ],
+            'tag' => [
+                'label' => 'mautic.core.filter.tags',
+                'type'  => 'multiselect',
+                'list'  => [
+                    1 => 'A',
+                    2 => 'B',
+                    3 => 'C',
+                ],
+                'operators' => [
+                    'in'       => 'mautic.core.operator.in',
+                    'notIn'    => 'mautic.core.operator.notin',
+                    'empty'    => 'mautic.core.operator.isempty',
+                    'notEmpty' => 'mautic.core.operator.isnotempty',
+                ],
+            ],
             'x.owner_id' => [
                 'label' => 'mautic.lead.list.filter.owner',
                 'type'  => 'select',
@@ -242,7 +268,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    public function testGetCompanyColumns()
+    public function testGetCompanyColumns(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -256,12 +282,14 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fieldModel->expects($this->exactly(2)) //We have 2 asserts
+        $fieldModel->expects($this->exactly(2)) // We have 2 asserts
         ->method('getCompanyFields')
             ->with()
             ->willReturn($this->getFields());
 
-        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel);
+        $leadModel = $this->createMock(LeadModel::class);
+
+        $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel);
 
         $expected = [
             'comp.id' => [

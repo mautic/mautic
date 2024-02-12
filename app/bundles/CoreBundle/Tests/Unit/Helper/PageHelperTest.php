@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,9 +10,11 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $session;
-    private $coreParametersHelper;
-    private $pageHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
+
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+
+    private \Mautic\CoreBundle\Helper\PageHelper $pageHelper;
 
     protected function setUp(): void
     {
@@ -34,7 +27,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider PageProvider
      */
-    public function testCountPage(int $count, int $limit, int $page)
+    public function testCountPage(int $count, int $limit, int $page): void
     {
         $this->session->expects($this->once())
             ->method('get')
@@ -44,7 +37,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($page, $this->pageHelper->countPage($count));
     }
 
-    public function pageProvider()
+    public static function pageProvider()
     {
         return [
             [0, 10, 1],
@@ -62,7 +55,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider startProvider
      */
-    public function testCountStart(int $page, int $limit, int $start)
+    public function testCountStart(int $page, int $limit, int $start): void
     {
         $this->session->expects($this->once())
             ->method('get')
@@ -72,7 +65,7 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($start, $this->pageHelper->countPage($page));
     }
 
-    public function startProvider()
+    public static function startProvider()
     {
         return [
             [0, 10, 1],

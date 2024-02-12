@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -19,23 +10,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailToUserSubscriber implements EventSubscriberInterface
 {
-    /** @var SendEmailToUser */
-    private $sendEmailToUser;
-
-    public function __construct(SendEmailToUser $sendEmailToUser)
-    {
-        $this->sendEmailToUser = $sendEmailToUser;
+    public function __construct(
+        private SendEmailToUser $sendEmailToUser
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [EmailEvents::ON_SENT_EMAIL_TO_USER => ['onEmailToUser', 0]];
     }
 
-    public function onEmailToUser(TriggerExecutedEvent $event)
+    public function onEmailToUser(TriggerExecutedEvent $event): TriggerExecutedEvent
     {
         $triggerEvent = $event->getTriggerEvent();
         $config       = $triggerEvent->getProperties();
@@ -44,7 +29,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
         try {
             $this->sendEmailToUser->sendEmailToUsers($config, $lead);
             $event->setSucceded();
-        } catch (EmailCouldNotBeSentException $e) {
+        } catch (EmailCouldNotBeSentException) {
             $event->setFailed();
         }
 

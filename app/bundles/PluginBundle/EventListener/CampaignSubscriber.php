@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -22,10 +13,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -33,20 +21,20 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
             'formType'    => IntegrationsListType::class,
-            'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
+            'formTheme'   => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
             'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
 
         $event->addAction('plugin.leadpush', $action);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $config                  = $event->getConfig();
         $config['campaignEvent'] = $event->getEvent();

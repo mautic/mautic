@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
@@ -17,10 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class EntityMetadataTest extends TestCase
 {
-    /**
-     * @var BundleMetadata
-     */
-    private $metadata;
+    private \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata $metadata;
 
     protected function setUp(): void
     {
@@ -38,7 +26,7 @@ class EntityMetadataTest extends TestCase
         $this->metadata = new BundleMetadata($metadataArray);
     }
 
-    public function testOrmAndSerializerConfigsFound()
+    public function testOrmAndSerializerConfigsFound(): void
     {
         $entityMetadata = new EntityMetadata($this->metadata);
         $entityMetadata->build();

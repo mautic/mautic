@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class EmailReplyRepository.
+ * @extends CommonRepository<EmailReply>
  */
 final class EmailReplyRepository extends CommonRepository implements EmailReplyRepositoryInterface
 {

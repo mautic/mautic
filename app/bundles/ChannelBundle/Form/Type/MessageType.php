@@ -1,44 +1,27 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Form\Type\AbstractFormStandardType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
-/**
- * Class MessageType.
- */
 class MessageType extends AbstractFormStandardType
 {
-    /**
-     * @var MessageModel
-     */
-    protected $model;
-
-    /**
-     * MessageType constructor.
-     */
-    public function __construct(MessageModel $messageModel)
-    {
-        $this->model = $messageModel;
+    public function __construct(
+        protected MessageModel $model,
+        CorePermissions $security
+    ) {
+        $this->security = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Add standard fields
         $options = array_merge($options, ['model_name' => 'channel.message', 'permission_base' => 'channel:messages']);
@@ -80,10 +63,7 @@ class MessageType extends AbstractFormStandardType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

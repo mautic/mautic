@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,13 +12,15 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 class Stat
 {
-    /** @var int Limit number of stored 'openDetails' */
-    const MAX_OPEN_DETAILS = 1000;
+    /**
+     * @var int Limit number of stored 'openDetails'
+     */
+    public const MAX_OPEN_DETAILS = 1000;
 
     public const TABLE_NAME = 'email_stats';
 
     /**
-     * @var int|null
+     * @var string|null
      */
     private $id;
 
@@ -42,7 +35,7 @@ class Stat
     private $lead;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $emailAddress;
 
@@ -57,7 +50,7 @@ class Stat
     private $ipAddress;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -77,7 +70,7 @@ class Stat
     private $viewedInBrowser = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateRead;
 
@@ -87,7 +80,7 @@ class Stat
     private $trackingHash;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
@@ -112,12 +105,12 @@ class Stat
     private $storedCopy;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $openCount = 0;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastOpened;
 
@@ -131,17 +124,22 @@ class Stat
      */
     private $replies;
 
+    /**
+     * @var array<string,mixed[]>
+     */
+    private $changes = [];
+
     public function __construct()
     {
         $this->replies = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatRepository')
+            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatRepository::class)
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
@@ -149,7 +147,9 @@ class Stat
             ->addIndex(['tracking_hash'], 'stat_email_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_email_source_search')
             ->addIndex(['date_sent'], 'email_date_sent')
-            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead');
+            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead')
+            ->addIndex(['lead_id', 'date_sent'], 'stat_email_lead_id_date_sent')
+            ->addIndex(['email_id', 'is_read'], 'stat_email_email_id_is_read');
 
         $builder->addBigIntIdField();
 
@@ -164,7 +164,7 @@ class Stat
             ->columnName('email_address')
             ->build();
 
-        $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -214,7 +214,7 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('storedCopy', 'Mautic\EmailBundle\Entity\Copy')
+        $builder->createManyToOne('storedCopy', \Mautic\EmailBundle\Entity\Copy::class)
             ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -234,7 +234,7 @@ class Stat
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -261,7 +261,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateRead()
     {
@@ -271,13 +271,14 @@ class Stat
     /**
      * @param \DateTime|null $dateRead
      */
-    public function setDateRead($dateRead)
+    public function setDateRead($dateRead): void
     {
+        $this->addChange('dateRead', $this->dateRead, $dateRead);
         $this->dateRead = $dateRead;
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -287,8 +288,9 @@ class Stat
     /**
      * @param \DateTime|null $dateSent
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): void
     {
+        $this->addChange('dateSent', $this->dateSent, $dateSent);
         $this->dateSent = $dateSent;
     }
 
@@ -300,17 +302,14 @@ class Stat
         return $this->email;
     }
 
-    public function setEmail(Email $email = null)
+    public function setEmail(Email $email = null): void
     {
         $this->email = $email;
     }
 
-    /**
-     * @return id|null
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -321,7 +320,10 @@ class Stat
         return $this->ipAddress;
     }
 
-    public function setIpAddress(IpAddress $ip)
+    /**
+     * @param IpAddress|null $ip
+     */
+    public function setIpAddress(IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -345,8 +347,9 @@ class Stat
     /**
      * @param bool $isRead
      */
-    public function setIsRead($isRead)
+    public function setIsRead($isRead): void
     {
+        $this->addChange('isRead', $this->isRead, $isRead);
         $this->isRead = $isRead;
     }
 
@@ -358,7 +361,7 @@ class Stat
         return $this->lead;
     }
 
-    public function setLead(Lead $lead = null)
+    public function setLead(Lead $lead = null): void
     {
         $this->lead = $lead;
     }
@@ -374,7 +377,7 @@ class Stat
     /**
      * @param string|null $trackingHash
      */
-    public function setTrackingHash($trackingHash)
+    public function setTrackingHash($trackingHash): void
     {
         $this->trackingHash = $trackingHash;
     }
@@ -390,7 +393,7 @@ class Stat
     /**
      * @param LeadList|null $list
      */
-    public function setList($list)
+    public function setList($list): void
     {
         $this->list = $list;
     }
@@ -406,16 +409,18 @@ class Stat
     /**
      * @param int $retryCount
      */
-    public function setRetryCount($retryCount)
+    public function setRetryCount($retryCount): void
     {
+        $this->addChange('retryCount', $this->retryCount, $retryCount);
         $this->retryCount = $retryCount;
     }
 
     /**
      * Increase the retry count.
      */
-    public function upRetryCount()
+    public function upRetryCount(): void
     {
+        $this->addChange('retryCount', $this->retryCount, $this->retryCount + 1);
         ++$this->retryCount;
     }
 
@@ -430,8 +435,9 @@ class Stat
     /**
      * @param bool $isFailed
      */
-    public function setIsFailed($isFailed)
+    public function setIsFailed($isFailed): void
     {
+        $this->addChange('isFailed', $this->isFailed, $isFailed);
         $this->isFailed = $isFailed;
     }
 
@@ -454,8 +460,9 @@ class Stat
     /**
      * @param string|null $emailAddress
      */
-    public function setEmailAddress($emailAddress)
+    public function setEmailAddress($emailAddress): void
     {
+        $this->addChange('emailAddress', $this->emailAddress, $emailAddress);
         $this->emailAddress = $emailAddress;
     }
 
@@ -470,8 +477,9 @@ class Stat
     /**
      * @param bool $viewedInBrowser
      */
-    public function setViewedInBrowser($viewedInBrowser)
+    public function setViewedInBrowser($viewedInBrowser): void
     {
+        $this->addChange('viewedInBrowser', $this->viewedInBrowser, $viewedInBrowser);
         $this->viewedInBrowser = $viewedInBrowser;
     }
 
@@ -486,8 +494,9 @@ class Stat
     /**
      * @param string|null $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
+        $this->addChange('source', $this->source, $source);
         $this->source = $source;
     }
 
@@ -502,8 +511,9 @@ class Stat
     /**
      * @param int|null $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): void
     {
+        $this->addChange('sourceId', $this->sourceId, (int) $sourceId);
         $this->sourceId = (int) $sourceId;
     }
 
@@ -515,7 +525,7 @@ class Stat
         return $this->tokens;
     }
 
-    public function setTokens(array $tokens)
+    public function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }
@@ -535,6 +545,7 @@ class Stat
      */
     public function setOpenCount($openCount)
     {
+        $this->addChange('openCount', $this->openCount, $openCount);
         $this->openCount = $openCount;
 
         return $this;
@@ -543,7 +554,7 @@ class Stat
     /**
      * @param string $details
      */
-    public function addOpenDetails($details)
+    public function addOpenDetails($details): void
     {
         if (self::MAX_OPEN_DETAILS > $this->getOpenCount()) {
             $this->openDetails[] = $details;
@@ -559,14 +570,15 @@ class Stat
      */
     public function upOpenCount()
     {
-        $count           = (int) $this->openCount + 1;
+        $count = (int) $this->openCount + 1;
+        $this->addChange('openCount', $this->openCount, $count);
         $this->openCount = $count;
 
         return $this;
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getLastOpened()
     {
@@ -580,6 +592,7 @@ class Stat
      */
     public function setLastOpened($lastOpened)
     {
+        $this->addChange('lastOpened', $this->lastOpened, $lastOpened);
         $this->lastOpened = $lastOpened;
 
         return $this;
@@ -629,8 +642,30 @@ class Stat
         return $this->replies;
     }
 
-    public function addReply(EmailReply $reply)
+    public function addReply(EmailReply $reply): void
     {
+        $this->addChange('replyAdded', false, true);
         $this->replies[] = $reply;
+    }
+
+    /**
+     * @return array<string,mixed[]>
+     */
+    public function getChanges(): array
+    {
+        return $this->changes;
+    }
+
+    /**
+     * @param mixed $currentValue
+     * @param mixed $newValue
+     */
+    private function addChange(string $property, $currentValue, $newValue): void
+    {
+        if ($currentValue === $newValue) {
+            return;
+        }
+
+        $this->changes[$property] = [$currentValue, $newValue];
     }
 }

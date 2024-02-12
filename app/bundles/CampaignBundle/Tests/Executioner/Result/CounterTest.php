@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 
 class CounterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCounterIncrements()
+    public function testCounterIncrements(): void
     {
         $counter = new Counter(1, 1, 1, 1, 1, 1);
 

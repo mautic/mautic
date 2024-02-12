@@ -2,35 +2,30 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 
 final class ImportInitEvent extends CommonEvent
 {
-    public string $routeObjectName;
-    public bool $objectSupported = false;
-    public ?string $objectSingular;
-    public ?string $objectName; // Object name for humans. Will go through translator.
-    public ?string $activeLink;
-    public ?string $indexRoute;
+    public bool $objectSupported   = false;
+
+    public ?string $objectSingular = null;
+
+    public ?string $objectName     = null; // Object name for humans. Will go through translator.
+
+    public ?string $activeLink     = null;
+
+    public ?string $indexRoute     = null;
+
     public array $indexRouteParams = [];
 
-    public function __construct(string $routeObjectName)
-    {
-        $this->routeObjectName = $routeObjectName;
+    public function __construct(
+        public string $routeObjectName
+    ) {
     }
 
-    public function setIndexRoute(?string $indexRoute, array $routeParams = [])
+    public function setIndexRoute(?string $indexRoute, array $routeParams = []): void
     {
         $this->indexRoute       = $indexRoute;
         $this->indexRouteParams = $routeParams;

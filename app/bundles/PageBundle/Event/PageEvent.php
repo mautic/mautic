@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class PageEvent.
- */
 class PageEvent extends CommonEvent
 {
     /**
@@ -41,7 +29,7 @@ class PageEvent extends CommonEvent
     /**
      * Sets the Page entity.
      */
-    public function setPage(Page $page)
+    public function setPage(Page $page): void
     {
         $this->entity = $page;
     }

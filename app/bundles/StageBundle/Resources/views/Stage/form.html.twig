@@ -1,0 +1,42 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}stage{% endblock %}
+{% block headerTitle %}
+    {% if entity.getId() %}
+        {{ 'mautic.stage.menu.edit'|trans({'%name%' : entity.getName()|trans}) }}
+    {% else %}
+        {% trans %}mautic.stage.menu.new{% endtrans %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+        <!-- container -->
+        <div class="col-md-9 bg-auto height-auto bdr-r">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="pa-md">
+                        {{ form_row(form.name) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="pa-md">
+                        {{ form_row(form.description) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 bg-white height-auto">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {{ form_row(form.weight) }}
+                {{ form_row(form.category) }}
+                {{ form_row(form.isPublished) }}
+                {{ form_row(form.publishUp) }}
+                {{ form_row(form.publishDown) }}
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

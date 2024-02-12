@@ -1,48 +1,20 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 
 class TransportCallback
 {
-    /**
-     * @var DoNotContact
-     */
-    private $dncModel;
-
-    /**
-     * @var ContactFinder
-     */
-    private $finder;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * TransportCallback constructor.
-     */
-    public function __construct(DoNotContact $dncModel, ContactFinder $finder, StatRepository $statRepository)
-    {
-        $this->dncModel       = $dncModel;
-        $this->finder         = $finder;
-        $this->statRepository = $statRepository;
+    public function __construct(
+        private DoNotContact $dncModel,
+        private ContactFinder $finder,
+        private EmailStatModel $emailStatModel
+    ) {
     }
 
     /**
@@ -50,7 +22,7 @@ class TransportCallback
      * @param string $comments
      * @param int    $dncReason
      */
-    public function addFailureByHashId($hashId, $comments, $dncReason = DNC::BOUNCED)
+    public function addFailureByHashId($hashId, $comments, $dncReason = DNC::BOUNCED): void
     {
         $result = $this->finder->findByHash($hashId);
 
@@ -72,7 +44,7 @@ class TransportCallback
      * @param int      $dncReason
      * @param int|null $channelId
      */
-    public function addFailureByAddress($address, $comments, $dncReason = DNC::BOUNCED, $channelId = null)
+    public function addFailureByAddress($address, $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
     {
         $result = $this->finder->findByAddress($address);
 
@@ -85,21 +57,16 @@ class TransportCallback
     }
 
     /**
-     * @param          $id
-     * @param          $comments
      * @param int      $dncReason
      * @param int|null $channelId
      */
-    public function addFailureByContactId($id, $comments, $dncReason = DNC::BOUNCED, $channelId = null)
+    public function addFailureByContactId($id, $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
     {
         $channel = ($channelId) ? ['email' => $channelId] : 'email';
         $this->dncModel->addDncForContact($id, $channel, $dncReason, $comments);
     }
 
-    /**
-     * @param $comments
-     */
-    private function updateStatDetails(Stat $stat, $comments, $dncReason)
+    private function updateStatDetails(Stat $stat, $comments, $dncReason): void
     {
         if (DNC::BOUNCED === $dncReason) {
             $stat->setIsFailed(true);
@@ -115,6 +82,6 @@ class TransportCallback
             'reason'   => $comments,
         ];
         $stat->setOpenDetails($openDetails);
-        $this->statRepository->saveEntity($stat);
+        $this->emailStatModel->saveEntity($stat);
     }
 }

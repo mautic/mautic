@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\SiteUrlEnvVars;
@@ -39,7 +30,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->envVars       = new ParameterBag();
     }
 
-    public function testContextIsNullIfHostNotFound()
+    public function testContextIsNullIfHostNotFound(): void
     {
         $this->config->set('site_url', '');
 
@@ -52,7 +43,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals(443, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
-    public function testContextIsCorrectForRootDomain()
+    public function testContextIsCorrectForRootDomain(): void
     {
         $this->config->set('site_url', 'https://foobar.com');
 
@@ -65,7 +56,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals(443, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
-    public function testContextIsCorrectForCustomHttpPort()
+    public function testContextIsCorrectForCustomHttpPort(): void
     {
         $this->config->set('site_url', 'http://foobar.com:8080');
 
@@ -78,7 +69,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals(443, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
-    public function testContextIsCorrectForCustomHttpsPort()
+    public function testContextIsCorrectForCustomHttpsPort(): void
     {
         $this->config->set('site_url', 'https://foobar.com:8080');
 
@@ -91,7 +82,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals(8080, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
-    public function testContextIsCorrectForUrlWithPath()
+    public function testContextIsCorrectForUrlWithPath(): void
     {
         $this->config->set('site_url', 'https://foobar.com/hello/there/');
 

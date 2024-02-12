@@ -2,24 +2,25 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\AjaxController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class AjaxControllerTest extends \PHPUnit\Framework\TestCase
@@ -27,53 +28,87 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Session
      */
-    private $sessionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
 
     /**
-     * @var MockObject|ModelFactory
+     * @var MockObject|ModelFactory<EmailModel>
      */
-    private $modelFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|Container
      */
-    private $containerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
 
     /**
      * @var MockObject|EmailModel
      */
-    private $modelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelMock;
 
     /**
      * @var MockObject|Email
      */
-    private $emailMock;
+    private \PHPUnit\Framework\MockObject\MockObject $emailMock;
+
+    private \Mautic\EmailBundle\Controller\AjaxController $controller;
 
     /**
-     * @var AjaxController
+     * @var MockObject&ManagerRegistry
      */
-    private $controller;
+    private \PHPUnit\Framework\MockObject\MockObject $managerRegistry;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->sessionMock      = $this->createMock(Session::class);
-        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $this->containerMock    = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
-        $this->controller       = new AjaxController();
+
+        $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
+        $doctrine               = $this->createMock(ManagerRegistry::class);
+        $factory                = $this->createMock(MauticFactory::class);
+        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
+        $userHelper             = $this->createMock(UserHelper::class);
+        $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
+        $dispatcher             = $this->createMock(EventDispatcherInterface::class);
+        $translator             = $this->createMock(Translator::class);
+        $flashBag               = $this->createMock(FlashBag::class);
+        $requestStack           = new RequestStack();
+        $security               = $this->createMock(CorePermissions::class);
+
+        $this->controller = new AjaxController(
+            $this->managerRegistry,
+            $factory,
+            $this->modelFactoryMock,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
+            $requestStack,
+            $security
+        );
         $this->controller->setContainer($this->containerMock);
+
+        $parameterBag = $this->createMock(ContainerBagInterface::class);
+        $parameterBag->expects(self::once())
+            ->method('get')
+            ->with('kernel.environment')
+            ->willReturn('test');
+        $this->containerMock->expects(self::once())
+            ->method('has')
+            ->with('parameter_bag')
+            ->willReturn(true);
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with('parameter_bag')
+            ->willReturn($parameterBag);
     }
 
     public function testSendBatchActionWhenNoIdProvided(): void
     {
-        $this->containerMock->expects($this->once())
-            ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($this->modelFactoryMock);
-
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
@@ -86,11 +121,6 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBatchActionWhenIdProvidedButEmailNotPublished(): void
     {
-        $this->containerMock->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(['mautic.model.factory'], ['session'])
-            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock);
-
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
@@ -121,18 +151,15 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isPublished')
             ->willReturn(false);
 
-        $response = $this->controller->sendBatchAction(new Request([], ['id' => 5, 'pending' => 100]));
+        $request = new Request([], ['id' => 5, 'pending' => 100]);
+        $request->setSession($this->sessionMock);
+        $response = $this->controller->sendBatchAction($request);
         $expected = '{"success":1,"percent":0,"progress":[0,100],"stats":{"sent":0,"failed":0,"failedRecipients":[]}}';
         $this->assertEquals($expected, $response->getContent());
     }
 
     public function testSendBatchActionWhenIdProvidedAndEmailIsPublished(): void
     {
-        $this->containerMock->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(['mautic.model.factory'], ['session'])
-            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock);
-
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')
@@ -165,7 +192,9 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isPublished')
             ->willReturn(true);
 
-        $response = $this->controller->sendBatchAction(new Request([], ['id' => 5, 'pending' => 100, 'batchlimit' => 50]));
+        $request = new Request([], ['id' => 5, 'pending' => 100, 'batchlimit' => 50]);
+        $request->setSession($this->sessionMock);
+        $response = $this->controller->sendBatchAction($request);
         $expected = '{"success":1,"percent":50,"progress":[50,100],"stats":{"sent":50,"failed":0,"failedRecipients":[]}}';
         $this->assertEquals($expected, $response->getContent());
     }

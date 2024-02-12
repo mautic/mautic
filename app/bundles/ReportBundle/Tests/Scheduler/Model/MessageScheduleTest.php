@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,39 +9,33 @@ use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|Router
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var MockObject|FileProperties
      */
-    private $fileProperties;
+    private \PHPUnit\Framework\MockObject\MockObject $fileProperties;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
-    /**
-     * @var Report
-     */
-    private $report;
+    private \Mautic\ReportBundle\Entity\Report $report;
 
-    /**
-     * @var MessageSchedule
-     */
-    private $messageSchedule;
+    private \Mautic\ReportBundle\Scheduler\Model\MessageSchedule $messageSchedule;
 
     protected function setUp(): void
     {
@@ -73,7 +58,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
      * @param int $fileSize
      * @param int $limit
      */
-    public function testSendFile($fileSize, $limit)
+    public function testSendFile($fileSize, $limit): void
     {
         $this->translatorMock->expects($this->once())
             ->method('trans')
@@ -98,7 +83,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->messageSchedule->getMessage($this->report, 'path-to-a-file');
     }
 
-    public function sendFileProvider()
+    public static function sendFileProvider()
     {
         return [
             [10, 100],
@@ -114,7 +99,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
      * @param int $fileSize
      * @param int $limit
      */
-    public function testDoSendFile($fileSize, $limit)
+    public function testDoSendFile($fileSize, $limit): void
     {
         $this->translatorMock->expects($this->once())
             ->method('trans')
@@ -138,7 +123,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->messageSchedule->getMessage($this->report, 'path-to-a-file');
     }
 
-    public function doSendFileProvider()
+    public static function doSendFileProvider()
     {
         return [
             [100, 10],
@@ -152,7 +137,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
      * @param int $fileSize
      * @param int $limit
      */
-    public function testFileCouldBeSend($fileSize, $limit)
+    public function testFileCouldBeSend($fileSize, $limit): void
     {
         $this->fileProperties->expects($this->once())
             ->method('getFileSize')
@@ -173,7 +158,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
      * @param int $fileSize
      * @param int $limit
      */
-    public function testFileCouldNotBeSend($fileSize, $limit)
+    public function testFileCouldNotBeSend($fileSize, $limit): void
     {
         $this->fileProperties->expects($this->once())
             ->method('getFileSize')
@@ -188,7 +173,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->messageSchedule->fileCouldBeSend('path-to-a-file'));
     }
 
-    public function testGetMessageForAttachedFile()
+    public function testGetMessageForAttachedFile(): void
     {
         $report = $this->createMock(Report::class);
 
@@ -209,7 +194,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('The message', $this->messageSchedule->getMessageForAttachedFile($report));
     }
 
-    public function testGetMessageForLinkedFile()
+    public function testGetMessageForLinkedFile(): void
     {
         $report = $this->createMock(Report::class);
 
@@ -234,7 +219,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('The message', $this->messageSchedule->getMessageForLinkedFile($report));
     }
 
-    public function testGetSubject()
+    public function testGetSubject(): void
     {
         $report = $this->createMock(Report::class);
 

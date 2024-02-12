@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
@@ -24,22 +15,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OwnerProvider
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        ObjectProvider $objectProvider
+        private EventDispatcherInterface $dispatcher,
+        private ObjectProvider $objectProvider
     ) {
-        $this->dispatcher     = $dispatcher;
-        $this->objectProvider = $objectProvider;
     }
 
     /**
@@ -57,14 +36,14 @@ class OwnerProvider
 
         try {
             $object = $this->objectProvider->getObjectByName($objectName);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception for BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }
 
         $event = new InternalObjectOwnerEvent($object, $objectIds);
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_OWNER_IDS, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_FIND_OWNER_IDS);
 
         return $event->getOwners();
     }

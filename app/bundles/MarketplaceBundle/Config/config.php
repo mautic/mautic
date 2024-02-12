@@ -10,64 +10,33 @@ return [
         'main' => [
             RouteProvider::ROUTE_LIST => [
                 'path'       => '/marketplace/{page}',
-                'controller' => 'MarketplaceBundle:Package\List:list',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\ListController::listAction',
                 'method'     => 'GET|POST',
                 'defaults'   => ['page' => 1],
             ],
             RouteProvider::ROUTE_DETAIL => [
                 'path'       => '/marketplace/detail/{vendor}/{package}',
-                'controller' => 'MarketplaceBundle:Package\Detail:view',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\DetailController::viewAction',
+                'method'     => 'GET',
+            ],
+            RouteProvider::ROUTE_INSTALL => [
+                'path'       => '/marketplace/install/{vendor}/{package}',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\InstallController::viewAction',
+                'method'     => 'GET|POST',
+            ],
+            RouteProvider::ROUTE_REMOVE => [
+                'path'       => '/marketplace/remove/{vendor}/{package}',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\Package\RemoveController::viewAction',
+                'method'     => 'GET|POST',
+            ],
+            RouteProvider::ROUTE_CLEAR_CACHE => [
+                'path'       => '/marketplace/clear/cache',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
                 'method'     => 'GET',
             ],
         ],
     ],
     'services' => [
-        'controllers' => [
-            'marketplace.controller.package.list' => [
-                'class'     => \Mautic\MarketplaceBundle\Controller\Package\ListController::class,
-                'arguments' => [
-                    'marketplace.service.plugin_collector',
-                    'request_stack',
-                    'marketplace.service.route_provider',
-                    'mautic.security',
-                    'marketplace.service.config',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'marketplace.controller.package.detail' => [
-                'class'     => \Mautic\MarketplaceBundle\Controller\Package\DetailController::class,
-                'arguments' => [
-                    'marketplace.model.package',
-                    'marketplace.service.route_provider',
-                    'mautic.security',
-                    'marketplace.service.config',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-        ],
-        'commands' => [
-            'marketplace.command.list' => [
-                'class'     => \Mautic\MarketplaceBundle\Command\ListCommand::class,
-                'tag'       => 'console.command',
-                'arguments' => ['marketplace.service.plugin_collector'],
-            ],
-        ],
-        'events' => [
-            'marketplace.menu.subscriber' => [
-                'class'     => \Mautic\MarketplaceBundle\EventListener\MenuSubscriber::class,
-                'arguments' => [
-                    'marketplace.service.config',
-                ],
-            ],
-        ],
         'permissions' => [
             'marketplace.permissions' => [
                 'class'     => \Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class,
@@ -86,16 +55,13 @@ return [
                 ],
             ],
         ],
-        'models' => [
-            'marketplace.model.package' => [
-                'class'     => \Mautic\MarketplaceBundle\Model\PackageModel::class,
-                'arguments' => ['marketplace.api.connection'],
-            ],
-        ],
         'other' => [
             'marketplace.service.plugin_collector' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\PluginCollector::class,
-                'arguments' => ['marketplace.api.connection'],
+                'arguments' => [
+                    'marketplace.api.connection',
+                    'marketplace.service.allowlist',
+                ],
             ],
             'marketplace.service.route_provider' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\RouteProvider::class,
@@ -103,11 +69,24 @@ return [
             ],
             'marketplace.service.config' => [
                 'class'     => \Mautic\MarketplaceBundle\Service\Config::class,
-                'arguments' => ['mautic.helper.core_parameters'],
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'marketplace.service.allowlist' => [
+                'class'     => \Mautic\MarketplaceBundle\Service\Allowlist::class,
+                'arguments' => [
+                    'marketplace.service.config',
+                    'mautic.cache.provider',
+                    'mautic.http.client',
+                ],
             ],
         ],
     ],
+    // NOTE: when adding new parameters here, please add them to the developer documentation as well:
     'parameters' => [
-        Config::MARKETPLACE_ENABLED => true,
+        Config::MARKETPLACE_ENABLED                     => true,
+        Config::MARKETPLACE_ALLOWLIST_URL               => 'https://raw.githubusercontent.com/mautic/marketplace-allowlist/main/allowlist.json',
+        Config::MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS => 3600,
     ],
 ];

@@ -1,0 +1,53 @@
+{#
+  Variables
+    - form
+    - fields
+    - first
+#}
+{% block _leadlist_filters_entry_widget %}
+  {% set isPrototype = ('__name__' == form.vars.name) %}
+  {% set filterType = form.field.vars.value %}
+  {% set inGroup = form.vars.data is defined and form.vars.data.glue is defined and 'and' == form.vars.data.glue %}
+  {% set isBehavior = fields.behaviors[filterType].label is defined %}
+  {% set class = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'fa-building' : 'fa-user' %}
+
+  {% if isBehavior %}
+      {% set object = 'behaviors' %}
+  {% else %}
+      {% set object = (form.vars.data.object is defined) ? form.vars.data.object : 'lead' %}
+  {% endif %}
+
+  {% if isPrototype or fields[object][filterType].label is defined %}
+    <div class="panel {% if inGroup and false == first %}in-group{% endif %}" id="{{ id }}">
+        <div class="panel-heading {% if not isPrototype and '0' == form.vars.name %}hide{% endif %}">
+            <div class="panel-glue col-sm-2 pl-0 ">
+                {{ form_widget(form.glue) }}
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-xs-6 col-sm-3 field-name">
+                <i class="object-icon fa {{ class }}" aria-hidden="true"></i> <span>{% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+            </div>
+
+            <div class="col-xs-6 col-sm-3 padding-none">
+                {{ form_widget(form.operator) }}
+            </div>
+
+            {% set hasErrors = (form.properties.vars.errors|length > 0) %}
+            <div class="col-xs-10 col-sm-5 padding-none {% if hasErrors %}has-error{% endif %}">
+                <div class="properties-form">
+                    {{ form_widget(form.properties) }}
+                </div>
+                {{ form_errors(form.properties) }}
+            </div>
+
+            <div class="col-xs-2 col-sm-1">
+                <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>
+            </div>
+            {{ form_widget(form.field) }}
+            {{ form_widget(form.type) }}
+            {{ form_widget(form.object) }}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

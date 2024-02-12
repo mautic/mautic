@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Broadcast;
 
 use Doctrine\ORM\EntityManager;
@@ -23,39 +14,23 @@ class BroadcastQuery
     use ContactLimiterTrait;
 
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
-
-    /**
      * @var \Doctrine\DBAL\Query\QueryBuilder
      */
     private $query;
 
-    /**
-     * BroadcastQuery constructor.
-     */
-    public function __construct(EntityManager $entityManager, SmsModel $smsModel)
-    {
-        $this->entityManager = $entityManager;
-        $this->smsModel      = $smsModel;
+    public function __construct(
+        private EntityManager $entityManager,
+        private SmsModel $smsModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter)
+    public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter): array
     {
         $query = $this->getBasicQuery($sms);
         $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
 
-        return $query->execute()->fetchAll();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -66,7 +41,7 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->execute()->fetchColumn();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
@@ -76,12 +51,12 @@ class BroadcastQuery
     {
         $this->query = $this->smsModel->getRepository()->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(
-            $this->query->expr()->orX(
-                $this->query->expr()->orX(
+            $this->query->expr()->or(
+                $this->query->expr()->or(
                     $this->query->expr()->isNotNull('l.mobile'),
                     $this->query->expr()->neq('l.mobile', $this->query->expr()->literal(''))
                 ),
-                $this->query->expr()->orX(
+                $this->query->expr()->or(
                     $this->query->expr()->isNotNull('l.phone'),
                     $this->query->expr()->neq('l.phone', $this->query->expr()->literal(''))
                 )
@@ -94,30 +69,30 @@ class BroadcastQuery
         return $this->query;
     }
 
-    private function excludeStatsRecords(int $smsId)
+    private function excludeStatsRecords(int $smsId): void
     {
         // Do not include leads that have already received text message
         $statQb = $this->entityManager->getConnection()->createQueryBuilder();
         $statQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 'stat')
             ->where(
-                $statQb->expr()->andX(
-                $statQb->expr()->eq('stat.lead_id', 'l.id'),
-                $statQb->expr()->eq('stat.sms_id', $smsId)
-                    )
+                $statQb->expr()->and(
+                    $statQb->expr()->eq('stat.lead_id', 'l.id'),
+                    $statQb->expr()->eq('stat.sms_id', $smsId)
+                )
             );
 
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()));
     }
 
-    private function excludeDnc()
+    private function excludeDnc(): void
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->entityManager->getConnection()->createQueryBuilder();
         $dncQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $dncQb->expr()->andX(
+                $dncQb->expr()->and(
                     $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
                     $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('sms'))
                 )
@@ -125,14 +100,14 @@ class BroadcastQuery
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()));
     }
 
-    private function excludeQueue()
+    private function excludeQueue(): void
     {
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->entityManager->getConnection()->createQueryBuilder();
         $mqQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
             ->where(
-                $mqQb->expr()->andX(
+                $mqQb->expr()->and(
                     $mqQb->expr()->eq('mq.lead_id', 'l.id'),
                     $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT)),
                     $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('sms'))

@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-vibrant",
+            "directory": "themes/vibrant",
+            "target": "git@github.com:mautic/theme-vibrant.git"
+        }
+    ]
+}

@@ -1,38 +1,29 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RemoveDeletedFilesStepTest extends AbstractStepTest
 {
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     protected function setUp(): void
     {
@@ -43,7 +34,7 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
         $this->pathsHelper = $this->createMock(PathsHelper::class);
     }
 
-    public function testNothingDoneIfDeletedFileListDoesNotExist()
+    public function testNothingDoneIfDeletedFileListDoesNotExist(): void
     {
         $this->pathsHelper->method('getRootPath')
             ->willReturn(__DIR__);
@@ -54,7 +45,7 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
         $this->assertEquals(0, $this->progressBar->getProgress());
     }
 
-    public function testFileIsDeleted()
+    public function testFileIsDeleted(): void
     {
         $resourcePath = __DIR__.'/resources';
 
@@ -78,7 +69,7 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
         $this->assertFileDoesNotExist($resourcePath.'/deleted_files.txt');
     }
 
-    public function testNonExistentFileIsIgnored()
+    public function testNonExistentFileIsIgnored(): void
     {
         $resourcePath = __DIR__.'/resources';
         file_put_contents($resourcePath.'/deleted_files.txt', '["delete_me.txt"]');

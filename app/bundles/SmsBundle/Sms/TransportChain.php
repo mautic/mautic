@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\SmsBundle\Sms;
 
@@ -20,26 +12,16 @@ class TransportChain
     /**
      * @var TransportInterface[]
      */
-    private $transports;
-
-    /**
-     * @var string
-     */
-    private $primaryTransport;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
+    private array $transports;
 
     /**
      * @param string $primaryTransport
      */
-    public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
-    {
-        $this->primaryTransport  = $primaryTransport;
+    public function __construct(
+        private $primaryTransport,
+        private IntegrationHelper $integrationHelper
+    ) {
         $this->transports        = [];
-        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -130,7 +112,7 @@ class TransportChain
      *
      * @return TransportInterface[]
      */
-    public function getEnabledTransports()
+    public function getEnabledTransports(): array
     {
         $enabled = [];
         foreach ($this->transports as $alias => $transport) {

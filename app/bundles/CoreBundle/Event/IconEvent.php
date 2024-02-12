@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class IconEvent.
- */
 class IconEvent extends Event
 {
     /**
@@ -24,14 +12,9 @@ class IconEvent extends Event
      */
     protected $icons = [];
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(CorePermissions $security)
-    {
-        $this->security = $security;
+    public function __construct(
+        protected CorePermissions $security
+    ) {
     }
 
     /**
@@ -46,7 +29,7 @@ class IconEvent extends Event
      * @param string $type
      * @param string $icon
      */
-    public function addIcon($type, $icon)
+    public function addIcon($type, $icon): void
     {
         $this->icons[$type] = $icon;
     }
@@ -61,7 +44,7 @@ class IconEvent extends Event
         return $this->icons;
     }
 
-    public function setIcons(array $icons)
+    public function setIcons(array $icons): void
     {
         $this->icons = $icons;
     }

@@ -16,9 +16,6 @@
 .focus-builder .website-preview .website-placeholder {
   z-index: 1020;
 }
-.focus-builder .website-preview .website-placeholder.has-error input, .focus-builder .website-preview .website-placeholder.has-error button {
-  border-color: #a94442;
-}
 .focus-builder #websiteScreenshot {
   position: absolute;
   top: 0;
@@ -26,6 +23,10 @@
   right: 0;
   left: 0;
   margin: auto;
+  z-index: 0;
+}
+.focus-builder #websiteScreenshot .screenshot-container {
+  overflow: hidden;
 }
 .focus-builder #websiteScreenshot.css-device .screenshot-container {
   height: 392px;
@@ -209,16 +210,19 @@
     content: "";
   }
 }
-
-#websiteScreenshot.mobile .screenshot-container{
+.focus-builder .website-preview .website-placeholder.has-error input,
+.focus-builder .website-preview .website-placeholder.has-error button {
+  border-color: #a94442;
+}
+#websiteScreenshot.mobile .screenshot-container {
   position: absolute;
-  left : 50%;
+  left: 50%;
   width: 320px;
   margin: 0px;
   margin-top: 20px;
 }
-
-#websiteScreenshot.mobile .preview-body, #websiteScreenshot.mobile  #websiteCanvas {
+#websiteScreenshot.mobile .preview-body,
+#websiteScreenshot.mobile #websiteCanvas {
   margin: 0;
   padding: 0;
   border: none;
@@ -226,17 +230,15 @@
   pointer-events: none;
   position: absolute;
   z-index: 2;
-  left : -50%;
+  left: -50%;
   width: 320px;
   height: 568px;
 }
-
-#websiteScreenshot.mobile  #websiteCanvas {
+#websiteScreenshot.mobile #websiteCanvas {
   z-index: 0;
   border: 1px solid #000;
 }
-
-#websiteScreenshot.mobile  #websiteCanvas iframe {
+#websiteScreenshot.mobile #websiteCanvas iframe {
   height: 100%;
   width: 320px;
   border: 0;

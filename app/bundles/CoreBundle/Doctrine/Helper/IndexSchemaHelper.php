@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -16,23 +7,14 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Exception\SchemaException;
+use Mautic\LeadBundle\Entity\LeadField;
 
 class IndexSchemaHelper
 {
     /**
-     * @var Connection
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $db;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    protected $sm;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema
@@ -67,16 +49,14 @@ class IndexSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
-    {
-        $this->db     = $db;
-        $this->prefix = $prefix;
-        $this->sm     = $this->db->getSchemaManager();
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
+        $this->sm = $this->db->createSchemaManager();
     }
 
     /**
-     * @param $name
-     *
      * @return $this
      *
      * @throws SchemaException
@@ -87,23 +67,19 @@ class IndexSchemaHelper
             throw new SchemaException("Table $name does not exist!");
         }
 
-        $this->table = $this->sm->listTableDetails($this->prefix.$name);
+        $this->table = $this->sm->introspectTable($this->prefix.$name);
 
         return $this;
     }
 
-    /**
-     * @param $name
-     */
-    public function allowColumn($name)
+    public function allowColumn($name): void
     {
         $this->allowedColumns[] = $name;
     }
 
     /**
-     * @param       $columns
-     * @param       $name
-     * @param array $options
+     * @param string $name
+     * @param array  $options
      *
      * @return $this
      *
@@ -111,17 +87,21 @@ class IndexSchemaHelper
      */
     public function addIndex($columns, $name, $options = [])
     {
-        $columns = $this->getTextColumns($columns);
+        $textColumns = $this->getTextColumns($columns);
 
-        if (!empty($columns)) {
-            $index = new Index($this->prefix.$name, $columns, false, false, $options);
-
-            if ($this->table->hasIndex($this->prefix.$name)) {
-                $this->changedIndexes[] = $index;
-            } else {
-                $this->addedIndexes[] = $index;
-            }
+        if (empty($textColumns)) {
+            return $this;
         }
+
+        $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
+
+        if ($this->table->hasIndex($this->prefix.$name)) {
+            $this->changedIndexes[] = $index;
+
+            return $this;
+        }
+
+        $this->addedIndexes[] = $index;
 
         return $this;
     }
@@ -139,8 +119,8 @@ class IndexSchemaHelper
     {
         $textColumns = $this->getTextColumns($columns);
 
-        $index = new Index($name, $textColumns, false, false, $options);
-        if ($this->table->hasIndex($name)) {
+        $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
+        if ($this->table->hasIndex($this->prefix.$name)) {
             $this->dropIndexes[] = $index;
         }
 
@@ -150,33 +130,27 @@ class IndexSchemaHelper
     /**
      * Execute changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
-        $platform = $this->sm->getDatabasePlatform();
+        $platform = $this->db->getDatabasePlatform();
 
         $sql = [];
-        if (count($this->changedIndexes)) {
-            foreach ($this->changedIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index, $this->table);
-                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
-            }
+        foreach ($this->changedIndexes as $index) {
+            $sql[] = $platform->getDropIndexSQL($index, $this->table);
+            $sql[] = $platform->getCreateIndexSQL($index, $this->table);
         }
 
-        if (count($this->dropIndexes)) {
-            foreach ($this->dropIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index, $this->table);
-            }
+        foreach ($this->dropIndexes as $index) {
+            $sql[] = $platform->getDropIndexSQL($index, $this->table);
         }
 
-        if (count($this->addedIndexes)) {
-            foreach ($this->addedIndexes as $index) {
-                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
-            }
+        foreach ($this->addedIndexes as $index) {
+            $sql[] = $platform->getCreateIndexSQL($index, $this->table);
         }
 
         if (count($sql)) {
             foreach ($sql as $query) {
-                $this->db->executeUpdate($query);
+                $this->db->executeStatement($query);
             }
             $this->changedIndexes = [];
             $this->dropIndexes    = [];
@@ -185,13 +159,49 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param $columns
-     *
-     * @return array
+     * @throws SchemaException
+     */
+    public function hasIndex(LeadField $leadField): bool
+    {
+        $alias = $leadField->getAlias();
+        $this->setName($leadField->getCustomFieldObject());
+
+        return $this->table->hasIndex($this->prefix."{$alias}_search");
+    }
+
+    /**
+     * @param array<mixed> $uniqueIdentifierColumns
+     */
+    public function hasMatchingUniqueIdentifierIndex(LeadField $leadField, array $uniqueIdentifierColumns): bool
+    {
+        $this->setName($leadField->getCustomFieldObject());
+
+        $index = $this->table->getIndex($this->prefix.'unique_identifier_search');
+
+        $columns = $index->getColumns();
+
+        asort($columns);
+        asort($uniqueIdentifierColumns);
+
+        return $columns === $uniqueIdentifierColumns;
+    }
+
+    /**
+     * @throws SchemaException
+     */
+    public function hasUniqueIdentifierIndex(LeadField $leadField): bool
+    {
+        $this->setName($leadField->getCustomFieldObject());
+
+        return $this->table->hasIndex($this->prefix.'unique_identifier_search');
+    }
+
+    /**
+     * @param mixed $columns
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns)
+    private function getTextColumns($columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];

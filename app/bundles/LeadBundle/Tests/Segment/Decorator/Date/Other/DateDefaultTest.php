@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -20,7 +11,7 @@ class DateDefaultTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault::getParameterValue
      */
-    public function testGetParameterValue()
+    public function testGetParameterValue(): void
     {
         $dateDecorator             = $this->createMock(DateDecorator::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);

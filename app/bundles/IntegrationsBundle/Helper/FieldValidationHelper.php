@@ -2,50 +2,31 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Helper;
 
-use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldValidationHelper
 {
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private ?ConfigFormSyncInterface $integrationObject = null;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ConfigFormSyncInterface|BasicInterface
-     */
-    private $integrationObject;
-
-    public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
-    {
-        $this->fieldHelper = $fieldHelper;
-        $this->translator  = $translator;
+    public function __construct(
+        private FieldHelper $fieldHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    public function validateRequiredFields(Form $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
+    /**
+     * @param FormInterface<mixed> $form
+     */
+    public function validateRequiredFields(FormInterface $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
     {
         $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
         if (!$integrationConfiguration->getIsPublished()) {

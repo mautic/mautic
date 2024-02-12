@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle;
 
 use Mautic\IntegrationsBundle\Bundle\AbstractPluginBundle;
@@ -25,10 +16,10 @@ class IntegrationsBundle extends AbstractPluginBundle
 {
     public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new IntegrationsPass());
-        $container->addCompilerPass(new AuthenticationIntegrationPass());
-        $container->addCompilerPass(new SyncIntegrationsPass());
-        $container->addCompilerPass(new ConfigIntegrationPass());
-        $container->addCompilerPass(new BuilderIntegrationPass());
+        $container->addCompilerPass(new IntegrationsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new AuthenticationIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new SyncIntegrationsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new ConfigIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new BuilderIntegrationPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

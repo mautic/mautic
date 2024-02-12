@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 
-/**
- * Class LeadNoteEvent.
- */
 class LeadNoteEvent extends CommonEvent
 {
     /**
@@ -42,7 +30,7 @@ class LeadNoteEvent extends CommonEvent
     /**
      * Sets the LeadNote entity.
      */
-    public function setLeadNote(LeadNote $note)
+    public function setLeadNote(LeadNote $note): void
     {
         $this->entity = $note;
     }

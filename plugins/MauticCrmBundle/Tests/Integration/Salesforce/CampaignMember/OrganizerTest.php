@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
@@ -17,7 +8,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class OrganizerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testRecordsAreOrganizedIntoLeadsAndContacts()
+    public function testRecordsAreOrganizedIntoLeadsAndContacts(): void
     {
         $records = [
             [

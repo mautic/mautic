@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -20,26 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ConfigChangeLogger
-     */
-    private $configChangeLogger;
-
-    /**
-     * @var IpAddressRepository
-     */
-    private $ipAddressRepository;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    public function __construct(ConfigChangeLogger $configChangeLogger, IpAddressRepository $ipAddressRepository, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->configChangeLogger   = $configChangeLogger;
-        $this->ipAddressRepository  = $ipAddressRepository;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private ConfigChangeLogger $configChangeLogger,
+        private IpAddressRepository $ipAddressRepository,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public static function getSubscribedEvents(): array

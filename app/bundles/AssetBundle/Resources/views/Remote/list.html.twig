@@ -1,0 +1,36 @@
+{% if items|length %}
+    <div class="panel panel-primary mb-0">
+        <div class="panel-body">
+            <input type='text' class='remote-file-search form-control mb-lg' autocomplete='off' placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" />
+
+            <div class="list-group remote-file-list">
+                {% if items.dirs is defined %}
+                    {% for item in items.dirs %}
+                        <a class="list-group-item" href="#" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}', '/{{ item|trim('/','right') }}');">
+                            {{ item }}
+                        </a>
+                    {% endfor %}
+                    {% for item in items.keys %}
+                        <a class="list-group-item" href="#" onclick="Mautic.selectRemoteFile('{{ integration.getPublicUrl(item) }}');">
+                            {{ item }}
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    {% for item in items %}
+                        {% if connector.getAdapter().isDirectory(item) %}
+                            <a class="list-group-item" href="#" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}', '/{{ item|trim('/', 'right') }}');">
+                                {{ item }}
+                            </a>
+                        {% else %}
+                            <a class="list-group-item" href="#" onclick="Mautic.selectRemoteFile('{{ integration.getPublicUrl(item) }}');">
+                                {{ item }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'mautic.asset.remote.no_results'}) -}}
+{% endif %}

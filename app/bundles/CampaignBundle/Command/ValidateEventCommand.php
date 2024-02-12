@@ -1,67 +1,32 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class TriggerCampaignCommand.
- */
 class ValidateEventCommand extends Command
 {
     use WriteCountTrait;
 
-    /**
-     * @var InactiveExecutioner
-     */
-    private $inactiveExecution;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
-    /**
-     * ValidateEventCommand constructor.
-     */
-    public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
-    {
+    public function __construct(
+        private InactiveExecutioner $inactiveExecution,
+        private TranslatorInterface $translator,
+        private FormatterHelper $formatterHelper
+    ) {
         parent::__construct();
-
-        $this->inactiveExecution = $inactiveExecutioner;
-        $this->translator        = $translator;
-        $this->formatterHelper   = $formatterHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
             ->setName('mautic:campaigns:validate')
-            ->setDescription('Validate if a contact has been inactive for a decision and execute events if so.')
             ->addOption(
                 '--decision-id',
                 null,
@@ -85,11 +50,9 @@ class ValidateEventCommand extends Command
     }
 
     /**
-     * @return int|null
-     *
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
@@ -100,11 +63,11 @@ class ValidateEventCommand extends Command
         if (!$contactIds && !$contactId) {
             $output->writeln(
                 "\n".
-                '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%events%' => 0])
+                '<comment>'.$this->translator->trans('mautic.campaign.trigger.events_executed', ['%count%' => 0])
                 .'</comment>'
             );
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $limiter = new ContactLimiter(null, $contactId, null, null, $contactIds);
@@ -112,6 +75,8 @@ class ValidateEventCommand extends Command
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Validate if a contact has been inactive for a decision and execute events if so.';
 }

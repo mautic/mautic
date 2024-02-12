@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\PluginRepository;
@@ -23,6 +13,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Twig\Environment;
 
 class ConfigFormTest extends KernelTestCase
 {
@@ -31,7 +22,7 @@ class ConfigFormTest extends KernelTestCase
         self::bootKernel();
     }
 
-    public function testConfigForm()
+    public function testConfigForm(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
@@ -46,7 +37,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testOauth()
+    public function testOauth(): void
     {
         $plugins    = $this->getIntegrationObject()->getIntegrationObjects();
         $url        = 'https://test.com';
@@ -70,7 +61,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testAmendLeadDataBeforeMauticPopulate()
+    public function testAmendLeadDataBeforeMauticPopulate(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
         $object  = 'company';
@@ -90,12 +81,12 @@ class ConfigFormTest extends KernelTestCase
 
     public function getIntegrationObject()
     {
-        //create an integration object
+        // create an integration object
         $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
         $bundleHelper         = $this->getMockBuilder(BundleHelper::class)->disableOriginalConstructor()->getMock();
         $pluginModel          = $this->getMockBuilder(PluginModel::class)->disableOriginalConstructor()->getMock();
         $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
-        $templatingHelper     = $this->getMockBuilder(TemplatingHelper::class)->disableOriginalConstructor()->getMock();
+        $twig                 = $this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock();
         $entityManager        = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
@@ -106,8 +97,8 @@ class ConfigFormTest extends KernelTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registeredPluginBundles = self::$container->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = self::$container->getParameter('mautic.bundles');
+        $registeredPluginBundles = static::getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = static::getContainer()->getParameter('mautic.bundles');
         $bundleHelper->expects($this->any())->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
 
         $bundleHelper->expects($this->any())->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
@@ -126,11 +117,11 @@ class ConfigFormTest extends KernelTestCase
                 ->method('getRepository')
                 ->will(
                     $this->returnValueMap(
-                            [
-                                ['MauticPluginBundle:Plugin', $pluginRepository],
-                                ['MauticPluginBundle:Integration', $integrationRepository],
-                                ['MauticPluginBundle:IntegrationEntity', $integrationEntityRepository],
-                            ]
+                        [
+                            [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
+                            [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
+                            [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                        ]
                     )
                 );
 
@@ -140,16 +131,13 @@ class ConfigFormTest extends KernelTestCase
             $pathsHelper,
             $bundleHelper,
             $coreParametersHelper,
-            $templatingHelper,
+            $twig,
             $pluginModel
-            );
+        );
 
         return $integrationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();

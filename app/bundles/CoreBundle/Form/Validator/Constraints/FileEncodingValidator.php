@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
@@ -23,7 +14,7 @@ class FileEncodingValidator extends ConstraintValidator
     /**
      * @param LeadField $field
      */
-    public function validate($field, Constraint $constraint)
+    public function validate($field, Constraint $constraint): void
     {
         /*
             If the file uploaded exceeds the max size, it will not be considered,

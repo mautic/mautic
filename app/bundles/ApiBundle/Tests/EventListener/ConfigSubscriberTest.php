@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ConfigSubscriber;
@@ -18,7 +9,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ConfigSubscriberTest extends CommonMocks
 {
-    public function testWithUnsetApiBasicAuthSetting()
+    public function testWithUnsetApiBasicAuthSetting(): void
     {
         /**
          * We need a config array where api_enable_basic_auth is not set
@@ -36,7 +27,7 @@ class ConfigSubscriberTest extends CommonMocks
         $this->assertEquals($config, $configEvent->getConfig());
     }
 
-    public function testWithIntegerApiBasicAuthSetting()
+    public function testWithIntegerApiBasicAuthSetting(): void
     {
         // Make sure the subscriber converts an integer value to boolean.
         $config = [

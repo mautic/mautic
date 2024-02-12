@@ -1,31 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Company.
- */
-class Company extends FormEntity implements CustomFieldEntityInterface
+class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS = 'company';
+    public const FIELD_ALIAS = 'company';
 
     /**
      * @var int
@@ -33,17 +23,14 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $score = 0;
 
-    /**
-     * @var \Mautic\UserBundle\Entity\User
-     */
-    private $owner;
+    private ?User $owner = null;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $socialCache = [];
 
@@ -79,9 +66,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get social cache.
-     *
-     * @return mixed
+     * @return mixed[]
      */
     public function getSocialCache()
     {
@@ -89,23 +74,21 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set social cache.
-     *
-     * @param $cache
+     * @param mixed[] $cache
      */
-    public function setSocialCache($cache)
+    public function setSocialCache($cache): void
     {
         $this->socialCache = $cache;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('companies')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyRepository');
+            ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -114,8 +97,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
-            ->cascadeDetach()
+        $builder->createManyToOne('owner', \Mautic\UserBundle\Entity\User::class)
             ->cascadeMerge()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -146,10 +128,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('companyBasic')
             ->addListProperties(
@@ -181,20 +161,40 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->build();
     }
 
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
+    }
+
+    public static function getDefaultIdentifierFields(): array
+    {
+        return [
+            'companyname',
+            'companyemail',
+            'companywebsite',
+            'city',
+            'state',
+            'country',
+        ];
+    }
+
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ('owner' == $prop) {
+        $prefix = 'company';
+
+        if (str_starts_with($prop, $prefix)) {
+            $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
+            $current = $this->$getter();
+            if ($current !== $val) {
+                $this->addChange($prop, [$current, $val]);
+            }
+        } elseif ('owner' === $prop) {
+            $current = $this->getOwner();
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {
                 $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
+            } elseif ($current && $current->getId() != $val->getId()) {
                 $this->changes['owner'] = [
                     $current->getName().'('.$current->getId().')',
                     $val->getName().'('.$val->getId().')',
@@ -206,8 +206,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -230,10 +228,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set owner.
-     *
-     * @param User $owner
-     *
      * @return Company
      */
     public function setOwner(User $owner = null)
@@ -244,12 +238,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         return $this;
     }
 
-    /**
-     * Get owner.
-     *
-     * @return User
-     */
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
@@ -261,13 +250,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     public function getPermissionUser()
     {
-        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
+        return $this->getOwner() ?? $this->getCreatedBy();
     }
 
     /**
-     * Set score.
-     *
-     * @param User $score
+     * @param int $score
      *
      * @return Company
      */
@@ -282,8 +269,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get score.
-     *
      * @return int
      */
     public function getScore()
@@ -292,7 +277,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getName()
     {
@@ -300,19 +285,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $name
+     * @param string|null $name
      *
      * @return Company
      */
     public function setName($name)
     {
+        $this->isChanged('companyname', $name);
         $this->name = $name;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getEmail()
     {
@@ -320,19 +306,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $email
+     * @param string|null $email
      *
      * @return Company
      */
     public function setEmail($email)
     {
+        $this->isChanged('companyemail', $email);
         $this->email = $email;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getAddress1()
     {
@@ -340,19 +327,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $address1
+     * @param string|null $address1
      *
      * @return Company
      */
     public function setAddress1($address1)
     {
+        $this->isChanged('companyaddress1', $address1);
         $this->address1 = $address1;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getAddress2()
     {
@@ -360,19 +348,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $address2
+     * @param string|null $address2
      *
      * @return Company
      */
     public function setAddress2($address2)
     {
+        $this->isChanged('companyaddress2', $address2);
         $this->address2 = $address2;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getPhone()
     {
@@ -380,19 +369,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $phone
+     * @param string|null $phone
      *
      * @return Company
      */
     public function setPhone($phone)
     {
+        $this->isChanged('companyphone', $phone);
         $this->phone = $phone;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getCity()
     {
@@ -400,19 +390,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $city
+     * @param string|null $city
      *
      * @return Company
      */
     public function setCity($city)
     {
+        $this->isChanged('companycity', $city);
         $this->city = $city;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getState()
     {
@@ -420,19 +411,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $state
+     * @param string|null $state
      *
      * @return Company
      */
     public function setState($state)
     {
+        $this->isChanged('companystate', $state);
         $this->state = $state;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getZipcode()
     {
@@ -440,19 +432,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $zipcode
+     * @param string|null $zipcode
      *
      * @return Company
      */
     public function setZipcode($zipcode)
     {
+        $this->isChanged('companyzipcode', $zipcode);
         $this->zipcode = $zipcode;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getCountry()
     {
@@ -460,19 +453,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $country
+     * @param string|null $country
      *
      * @return Company
      */
     public function setCountry($country)
     {
+        $this->isChanged('companycountry', $country);
         $this->country = $country;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getWebsite()
     {
@@ -480,19 +474,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $website
+     * @param string|null $website
      *
      * @return Company
      */
     public function setWebsite($website)
     {
+        $this->isChanged('companywebsite', $website);
         $this->website = $website;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getIndustry()
     {
@@ -500,19 +495,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $industry
+     * @param string|null $industry
      *
      * @return Company
      */
     public function setIndustry($industry)
     {
+        $this->isChanged('companyindustry', $industry);
         $this->industry = $industry;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDescription()
     {
@@ -520,12 +516,13 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param mixed $description
+     * @param string|null $description
      *
      * @return Company
      */
     public function setDescription($description)
     {
+        $this->isChanged('companydescription', $description);
         $this->description = $description;
 
         return $this;

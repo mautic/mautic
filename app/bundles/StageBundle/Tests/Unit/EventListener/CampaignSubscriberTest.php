@@ -17,14 +17,14 @@ use Mautic\StageBundle\EventListener\CampaignSubscriber;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriberTest extends TestCase
 {
     public function testOnCampaignTriggerStageChangeWhenStageNotFound(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -49,7 +49,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -76,7 +76,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenStageUnpublished(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -101,7 +101,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -137,7 +137,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasNoStage(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -160,7 +160,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function saveEntity($entity, $unlock = true)
+            public function saveEntity($entity, $unlock = true): void
             {
             }
         };
@@ -170,7 +170,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -202,7 +202,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasTheSameStage(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -243,7 +243,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -281,7 +281,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithGreaterWeight(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -324,7 +324,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -363,7 +363,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithLowerWeight(): void
     {
         $contact = new class() extends Lead {
-            public function getId()
+            public function getId(): int
             {
                 return 333;
             }
@@ -400,7 +400,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function saveEntity($entity, $unlock = true)
+            public function saveEntity($entity, $unlock = true): void
             {
             }
         };
@@ -410,7 +410,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -443,22 +443,9 @@ final class CampaignSubscriberTest extends TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
-            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
-            }
-
-            public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
-            {
-                return '[trans]'.$id.'[/trans]';
-            }
-
-            public function setLocale($locale)
-            {
-            }
-
-            public function getLocale()
-            {
             }
         };
     }

@@ -2,52 +2,29 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class ObjectMappingDAO
 {
-    const SYNC_TO_MAUTIC       = 'mautic';
-    const SYNC_TO_INTEGRATION  = 'integration';
-    const SYNC_BIDIRECTIONALLY = 'bidirectional';
+    public const SYNC_TO_MAUTIC       = 'mautic';
 
-    /**
-     * @var string
-     */
-    private $internalObjectName;
+    public const SYNC_TO_INTEGRATION  = 'integration';
 
-    /**
-     * @var string
-     */
-    private $integrationObjectName;
+    public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
-    /**
-     * @var array
-     */
-    private $internalIdMapping = [];
+    private array $internalIdMapping = [];
 
-    /**
-     * @var array
-     */
-    private $integrationIdMapping = [];
+    private array $integrationIdMapping = [];
 
     /**
      * @var FieldMappingDAO[]
      */
-    private $fieldMappings = [];
+    private array $fieldMappings = [];
 
-    public function __construct(string $internalObjectName, string $integrationObjectName)
-    {
-        $this->internalObjectName    = $internalObjectName;
-        $this->integrationObjectName = $integrationObjectName;
+    public function __construct(
+        private string $internalObjectName,
+        private string $integrationObjectName
+    ) {
     }
 
     /**
@@ -55,8 +32,6 @@ class ObjectMappingDAO
      * @param string $integrationField
      * @param string $direction
      * @param bool   $isRequired
-     *
-     * @return ObjectMappingDAO
      */
     public function addFieldMapping($internalField, $integrationField, $direction = self::SYNC_BIDIRECTIONALLY, $isRequired = false): self
     {

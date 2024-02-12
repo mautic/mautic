@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -20,7 +11,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class FetcherTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEntitiesAreFetchedFromOrganizerResults()
+    public function testEntitiesAreFetchedFromOrganizerResults(): void
     {
         $organizer = $this->getOrgnanizer();
         $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)
@@ -38,7 +29,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         new Fetcher($repo, $organizer, '701f10000021UnkAAE');
     }
 
-    public function testThatCampaignMembersAreFetched()
+    public function testThatCampaignMembersAreFetched(): void
     {
         $organizer = $this->getOrgnanizer();
         $repo      = $this->getMockBuilder(IntegrationEntityRepository::class)

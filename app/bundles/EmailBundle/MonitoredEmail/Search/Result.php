@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail\Search;
 
 use Mautic\EmailBundle\Entity\Stat;
@@ -16,15 +7,12 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Result
 {
-    /**
-     * @var Stat
-     */
-    private $stat;
+    private ?\Mautic\EmailBundle\Entity\Stat $stat = null;
 
     /**
      * @var Lead[]
      */
-    private $contacts = [];
+    private array $contacts = [];
 
     /**
      * @var string
@@ -72,9 +60,9 @@ class Result
     }
 
     /**
-     * @return Lead[]
+     * @param Lead[] $contacts
      */
-    public function setContacts(array $contacts)
+    public function setContacts(array $contacts): void
     {
         $this->contacts = $contacts;
     }

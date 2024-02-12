@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -38,27 +29,27 @@ class Asset extends FormEntity
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $storageLocation = 'local';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $path;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remotePath;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $originalFileName;
 
@@ -107,12 +98,12 @@ class Asset extends FormEntity
     private $language = 'en';
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishUp;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishDown;
 
@@ -132,22 +123,22 @@ class Asset extends FormEntity
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $extension;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $mime;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $size;
 
@@ -157,16 +148,16 @@ class Asset extends FormEntity
     private $downloadUrl;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $disallow = false;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository')
+            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -229,10 +220,8 @@ class Asset extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('asset')
             ->addListProperties(
@@ -285,10 +274,8 @@ class Asset extends FormEntity
 
     /**
      * Sets file.
-     *
-     * @param File $file
      */
-    public function setFile(File $file = null)
+    public function setFile(File $file = null): void
     {
         $this->file = $file;
 
@@ -355,7 +342,7 @@ class Asset extends FormEntity
     /**
      * @param mixed $extension
      */
-    public function setExtension($extension)
+    public function setExtension($extension): void
     {
         $this->extension = $extension;
     }
@@ -371,7 +358,7 @@ class Asset extends FormEntity
     /**
      * @param mixed $mime
      */
-    public function setMime($mime)
+    public function setMime($mime): void
     {
         $this->mime = $mime;
     }
@@ -523,7 +510,7 @@ class Asset extends FormEntity
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -533,7 +520,7 @@ class Asset extends FormEntity
     /**
      * Set publishDown.
      *
-     * @param \DateTime $publishDown
+     * @param \DateTimeInterface $publishDown
      *
      * @return Asset
      */
@@ -548,7 +535,7 @@ class Asset extends FormEntity
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -631,8 +618,6 @@ class Asset extends FormEntity
     /**
      * Set category.
      *
-     * @param \Mautic\CategoryBundle\Entity\Category $category
-     *
      * @return Asset
      */
     public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
@@ -677,7 +662,7 @@ class Asset extends FormEntity
         return $this->uniqueDownloadCount;
     }
 
-    public function setFileNameFromRemote()
+    public function setFileNameFromRemote(): void
     {
         $fileName = basename($this->getRemotePath());
 
@@ -689,7 +674,7 @@ class Asset extends FormEntity
         }
     }
 
-    public function preUpload()
+    public function preUpload(): void
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
@@ -701,7 +686,7 @@ class Asset extends FormEntity
             $extension = $this->getFile()->guessExtension();
 
             if (empty($extension)) {
-                //get it from the original name
+                // get it from the original name
                 $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
             }
             $this->path = $filename.'.'.$extension;
@@ -710,7 +695,7 @@ class Asset extends FormEntity
         }
     }
 
-    public function upload()
+    public function upload(): void
     {
         // the file property can be empty if the field is not required
         if (null === $this->getFile()) {
@@ -748,7 +733,7 @@ class Asset extends FormEntity
     /**
      * Remove a file.
      */
-    public function setFileInfoFromFile()
+    public function setFileInfoFromFile(): void
     {
         // get some basic information about the file type
         $fileInfo = $this->getFileInfo();
@@ -768,7 +753,7 @@ class Asset extends FormEntity
      *
      * @param bool $temp >> regular uploaded file or temporary
      */
-    public function removeUpload($temp = false)
+    public function removeUpload($temp = false): void
     {
         if ($temp) {
             $file = $this->getAbsoluteTempPath();
@@ -857,7 +842,7 @@ class Asset extends FormEntity
             return $this->maxSize;
         }
 
-        return 6000000;
+        return 6_000_000;
     }
 
     /**
@@ -961,10 +946,8 @@ class Asset extends FormEntity
 
     /**
      * Returns Font Awesome icon class based on file type.
-     *
-     * @return string
      */
-    public function getIconClass()
+    public function getIconClass(): string
     {
         $fileType = $this->getFileType();
 
@@ -988,10 +971,8 @@ class Asset extends FormEntity
 
     /**
      * Decides if an asset is image displayable by browser.
-     *
-     * @return bool
      */
-    public function isImage()
+    public function isImage(): bool
     {
         $fileType = strtolower($this->getFileType());
 
@@ -1011,9 +992,9 @@ class Asset extends FormEntity
     /**
      * Returns array of common extensions.
      *
-     * @return string
+     * @return array<string, string[]>
      */
-    public function getFileExtensions()
+    public function getFileExtensions(): array
     {
         return [
             'excel' => [
@@ -1108,7 +1089,7 @@ class Asset extends FormEntity
 
         try {
             $file = new File($path);
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException) {
             $file = null;
         }
 
@@ -1117,10 +1098,8 @@ class Asset extends FormEntity
 
     /**
      * Load content of the file from it's path.
-     *
-     * @return string
      */
-    public function getFileContents()
+    public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
 
@@ -1148,15 +1127,15 @@ class Asset extends FormEntity
     /**
      * @param mixed $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback([__CLASS__, 'validateFile']));
+        $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
     }
 
     /**
@@ -1165,7 +1144,7 @@ class Asset extends FormEntity
      * @param Asset                     $object  Entity object to validate
      * @param ExecutionContextInterface $context Context object
      */
-    public static function validateFile($object, ExecutionContextInterface $context)
+    public static function validateFile($object, ExecutionContextInterface $context): void
     {
         if ($object->isLocal()) {
             $tempName = $object->getTempName();
@@ -1301,10 +1280,8 @@ class Asset extends FormEntity
      *
      * @param string    $setting
      * @param bool|true $convertToBytes
-     *
-     * @return int
      */
-    public static function getIniValue($setting, $convertToBytes = true)
+    public static function getIniValue($setting, $convertToBytes = true): int
     {
         $value = ini_get($setting);
 
@@ -1320,31 +1297,25 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param        $size
      * @param string $unit
-     *
-     * @return string
      */
-    public static function convertBytesToHumanReadable($size, $unit = '')
+    public static function convertBytesToHumanReadable($size, $unit = ''): string
     {
-        list($number, $unit) = self::convertBytesToUnit($size, $unit);
+        [$number, $unit] = self::convertBytesToUnit($size, $unit);
 
         // Format number
         $number = number_format($number, 2);
 
         // Remove trailing .00
-        $number = false !== strpos($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
+        $number = str_contains($number, '.') ? rtrim(rtrim($number, '0'), '.') : $number;
 
         return $number.' '.$unit;
     }
 
     /**
-     * @param        $size
      * @param string $unit
-     *
-     * @return array
      */
-    public static function convertBytesToUnit($size, $unit = '')
+    public static function convertBytesToUnit($size, $unit = ''): array
     {
         $unit = strtoupper($unit);
 
@@ -1382,18 +1353,12 @@ class Asset extends FormEntity
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isLocal()
+    public function isLocal(): bool
     {
         return 'local' === $this->storageLocation;
     }
 
-    /**
-     * @return bool
-     */
-    public function isRemote()
+    public function isRemote(): bool
     {
         return 'remote' === $this->storageLocation;
     }
@@ -1409,7 +1374,7 @@ class Asset extends FormEntity
     /**
      * @param mixed $disallow
      */
-    public function setDisallow($disallow)
+    public function setDisallow($disallow): void
     {
         $this->disallow = $disallow;
     }

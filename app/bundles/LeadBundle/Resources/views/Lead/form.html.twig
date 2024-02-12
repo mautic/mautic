@@ -1,0 +1,234 @@
+{#
+  Variables
+    - lead
+    - fields
+    - form
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}lead{% endblock %}
+
+{% block headerTitle %}
+  {% if lead.id %}
+    {{ 'mautic.lead.lead.header.edit'|trans({
+          '%name%': lead.primaryIdentifier|trans,
+    }) }}
+  {% else %}
+    {{ 'mautic.lead.lead.header.new'|trans }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% set groups = fields|keys|sort %}
+  {% set img = leadGetAvatar(lead) %}
+  {{ form_start(form) }}
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <!-- step container -->
+      <div class="col-md-3 bg-white height-auto">
+          <div class="pr-lg pl-lg pt-md pb-md">
+              <div class="media">
+                  <div class="media-body">
+                      <img class="img-rounded img-bordered img-responsive media-object" src="{{ img }}" alt="">
+                  </div>
+              </div>
+
+              <div class="row mt-xs">
+                  <div class="col-sm-12">
+                      {{ form_label(form.preferred_profile_image) }}
+                      {{ form_widget(form.preferred_profile_image) }}
+                  </div>
+                  <div class="col-sm-12 {% if false == form.custom_avatar.vars.valid %}has-error{% endif %}"
+                       id="customAvatarContainer"
+                       style="{% if 'custom' != form.preferred_profile_image.vars.data %}display: none;{% endif %}">
+                      {{ form_widget(form.custom_avatar) }}
+                      {{ form_errors(form.custom_avatar) }}
+                  </div>
+              </div>
+
+              <hr/>
+
+              <ul class="list-group list-group-tabs">
+                  {% for g in groups %}
+                      {% if fields[g] is not empty %}
+                          <li class="list-group-item {% if loop.first %}active{% endif %}">
+                              <a href="#{{ g }}" class="steps" data-toggle="tab">
+                                  {{ ('mautic.lead.field.group.'~g)|trans }}
+                              </a>
+                          </li>
+                      {% endif %}
+                  {% endfor %}
+              </ul>
+          </div>
+      </div>
+      <!--/ step container -->
+
+      <!-- container -->
+      <div class="col-md-9 bg-auto height-auto bdr-l">
+          <div class="tab-content">
+              <!-- pane -->
+              {% for group in groups %}
+                  {% if fields[group] is defined %}
+                      {% set groupFields = fields[group] %}
+                      {% if groupFields is not empty %}
+                          <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">
+                              <div class="pa-md bg-auto bg-light-xs bdr-b">
+                                  <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
+                              </div>
+                              <div class="pa-md">
+                                  {% if 'core' == group %}
+                                      {% if form.title is defined or form.firstname is defined or form.lastname is defined %}
+                                          <div class="form-group mb-0">
+                                              <label class="control-label mb-xs">{{ 'mautic.core.name'|trans }}</label>
+                                              <div class="row">
+                                                  {% if form.title is defined %}
+                                                      <div class="col-sm-2">
+                                                          {{ form_widget(form.title, {'attr': {'placeholder': form.title.vars.label}}) }}
+                                                      </div>
+                                                  {% endif %}
+                                                  {% if form.firstname is defined %}
+                                                      <div class="col-sm-3">
+                                                          {{ form_widget(form.firstname, {'attr': {'placeholder': form.firstname.vars.label}}) }}
+                                                      </div>
+                                                  {% endif %}
+                                                  {% if form.lastname is defined %}
+                                                      <div class="col-sm-3">
+                                                          {{ form_widget(form.lastname, {'attr': {'placeholder': form.lastname.vars.label}}) }}
+                                                      </div>
+                                                  {% endif %}
+                                              </div>
+                                              <hr class="mnr-md mnl-md">
+                                          </div>
+                                      {% endif %}
+                                      <div class="form-group mb-0">
+                                          <label class="control-label mb-xs">{{ form.email.vars.label }}</label>
+                                          <div class="row">
+                                              <div class="col-sm-8">
+                                                  {{ form_widget(form.email, {'attr': {'placeholder': form.email.vars.label}}) }}
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <hr class="mnr-md mnl-md">
+                                      <div class="form-group mb-0">
+                                          <label>{{ 'mautic.company.company'|trans }}</label>
+                                          <div class="row">
+                                              {% if form.companies is defined %}
+                                                  <div class="col-sm-4">
+                                                      {{ form_widget(form.companies) }}
+                                                  </div>
+                                              {% endif %}
+                                              {% if form.position is defined %}
+                                                  <div class="col-sm-4">
+                                                      {{ form_widget(form.position, {'attr': {'placeholder': form.position.vars.label}}) }}
+                                                  </div>
+                                              {% endif %}
+                                          </div>
+                                      </div>
+                                      <hr class="mnr-md mnl-md">
+                                      {% if form.address1 is defined or form.address2 is defined or form.city is defined or form.state is defined or form.zipcode is defined or form.country is defined %}
+                                          <div class="form-group mb-0">
+                                              <label class="control-label mb-xs">{{ 'mautic.lead.field.address'|trans }}</label>
+                                              {% if form.address1 is defined %}
+                                                  <div class="row mb-xs">
+                                                      <div class="col-sm-8">
+                                                          {{ form_widget(form.address1, {'attr': {'placeholder': form.address1.vars.label}}) }}
+                                                      </div>
+                                                  </div>
+                                              {% endif %}
+                                              {% if form.address2 is defined %}
+                                                  <div class="row mb-xs">
+                                                      <div class="col-sm-8">
+                                                          {{ form_widget(form.address2, {'attr': {'placeholder': form.address2.vars.label}}) }}
+                                                      </div>
+                                                  </div>
+                                              {% endif %}
+                                              <div class="row mb-xs">
+                                                  {% if form.city is defined %}
+                                                      <div class="col-sm-4">
+                                                          {{ form_widget(form.city, {'attr': {'placeholder': form.city.vars.label}}) }}
+                                                      </div>
+                                                  {% endif %}
+                                                  {% if form.state is defined %}
+                                                      <div class="col-sm-4">
+                                                          {{ form_widget(form.state, {'attr': {'placeholder': form.state.vars.label}}) }}
+                                                      </div>
+                                                  {% endif %}
+                                              </div>
+                                              <div class="row">
+                                                  {% if form.zipcode is defined %}
+                                                      <div class="col-sm-4">
+                                                          {{ form_widget(form.zipcode, {'attr': {'placeholder': form.zipcode.vars.label}}) }}
+                                                      </div>
+                                                  {% endif %}
+                                                  {% if form.country is defined %}
+                                                      <div class="col-sm-4">
+                                                          {{ form_widget(form.country, {'attr': {'placeholder': form.country.vars.label}}) }}
+                                                      </div>
+                                                  {% endif %}
+                                              </div>
+                                          </div>
+                                          <hr class="mnr-md mnl-md">
+                                      {% endif %}
+                                      {% if form.attribution is defined and form.attribution_date is defined %}
+                                          <div class="form-group mb-0">
+                                              <label class="control-label mb-xs">{{ 'mautic.lead.attribution'|trans }}</label>
+                                              <div class="row">
+                                                  <div class="col-sm-4">
+                                                      {{ form_widget(form.attribution, {'attr': {'placeholder': form.attribution.vars.label, 'preaddon': 'fa fa-money'}}) }}
+                                                  </div>
+                                                  <div class="col-sm-4">
+                                                      {{ form_widget(form.attribution_date, {'attr': {'placeholder': form.attribution_date.vars.label}}) }}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <hr class="mnr-md mnl-md">
+                                      {% endif %}
+                                  {% endif %}
+                                  <div class="form-group mb-0">
+                                      <div class="row">
+                                          {% for alias, field in groupFields %}
+                                              {% if 'company' != alias and form[alias] is defined and not form[alias].isRendered %}
+                                                  <div class="col-sm-8">
+                                                      {{ form_row(form[alias]) }}
+                                                  </div>
+                                              {% else %}
+                                                  {% do form[alias].setRendered %}
+                                              {% endif %}
+                                          {% endfor %}
+                                      </div>
+                                  </div>
+                                  {% if 'core' == group %}
+                                      <hr class="mnr-md mnl-md">
+                                      <div class="row">
+                                          <div class="col-sm-8">
+                                              {{ form_label(form.stage) }}
+                                              {{ form_widget(form.stage) }}
+                                          </div>
+                                      </div>
+                                      <hr class="mnr-md mnl-md">
+                                      <div class="form-group mb-0">
+                                          <div class="row">
+                                              <div class="col-sm-4">
+                                                  {{ form_label(form.owner) }}
+                                                  {{ form_widget(form.owner) }}
+                                              </div>
+                                              <div class="col-sm-4">
+                                                  {{ form_label(form.tags) }}
+                                                  {{ form_widget(form.tags) }}
+                                              </div>
+                                          </div>
+                                      </div>
+                                  {% endif %}
+                              </div>
+                          </div>
+                      {% endif %}
+                  {% endif %}
+              {% endfor %}
+              <!--/ #pane -->
+          </div>
+      </div>
+      <!--/ end: container -->
+  </div>
+  {{ form_end(form) }}
+  <!--/ end: box layout -->
+{% endblock %}

@@ -1,30 +1,16 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\FileHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FileUploadValidator
 {
-    /**
-     * @param TranslatorInterface $translator
-     */
-    protected $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        protected TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -36,7 +22,7 @@ class FileUploadValidator
      *
      * @throws FileInvalidException
      */
-    public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, $extensionErrorMsg, $sizeErrorMsg)
+    public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, $extensionErrorMsg, $sizeErrorMsg): void
     {
         $errors = [];
 
@@ -64,7 +50,7 @@ class FileUploadValidator
      *
      * @throws FileInvalidException
      */
-    public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg)
+    public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg): void
     {
         if (!in_array(strtolower($extension), array_map('strtolower', $allowedExtensions), true)) {
             $error = $this->translator->trans($extensionErrorMsg, [
@@ -83,7 +69,7 @@ class FileUploadValidator
      *
      * @throws FileInvalidException
      */
-    public function checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg)
+    public function checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg): void
     {
         if (!$maxUploadSizeMB) {
             return;

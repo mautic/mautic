@@ -3,13 +3,16 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
 
+/**
+ * @property SugarcrmIntegration $integration
+ */
 class SugarcrmApi extends CrmApi
 {
     protected $object = 'Leads';
 
     /**
-     * @param        $sMethod
      * @param array  $data
      * @param string $method
      *
@@ -32,7 +35,7 @@ class SugarcrmApi extends CrmApi
             ];
             if (!isset($data['module_names'])) {
                 $sessionParams['module_name'] = $object;
-            } //Making sure that module_name is the second value of the array
+            } // Making sure that module_name is the second value of the array
             else {
                 $sessionParams['module_names'] = $data['module_names'];
             }
@@ -61,7 +64,7 @@ class SugarcrmApi extends CrmApi
             $response = $this->integration->makeRequest($request_url, $data, $method, $settings);
 
             if (isset($response['error'])) {
-                throw new ApiErrorException(isset($response['error_message']) ? $response['error_message'] : $response['error']['message'], ('invalid_grant' == $response['error']) ? 1 : 500);
+                throw new ApiErrorException($response['error_message'] ?? $response['error']['message'], ('invalid_grant' == $response['error']) ? 1 : 500);
             }
 
             return $response;
@@ -79,7 +82,7 @@ class SugarcrmApi extends CrmApi
             $object = $this->object;
         }
         if ('company' == $object) {
-            $object = 'Accounts'; //sugarCRM object name
+            $object = 'Accounts'; // sugarCRM object name
         } elseif ('lead' == $object || 'Lead' == $object) {
             $object = 'Leads';
         } elseif ('contact' == $object || 'Contact' == $object) {
@@ -111,15 +114,15 @@ class SugarcrmApi extends CrmApi
     {
         $tokenData       = $this->integration->getKeys();
         $createdLeadData = [];
-        //search for Sugar id in mautic records first to avoid making an API call
+        // search for Sugar id in mautic records first to avoid making an API call
         if (is_object($lead)) {
             $sugarLeadRecords = $this->integration->getSugarLeadId($lead);
         }
         if ('6' == $tokenData['version']) {
-            //if not found then go ahead and make an API call to find all the records with that email
+            // if not found then go ahead and make an API call to find all the records with that email
             if (isset($fields['email1']) && empty($sugarLeadRecords)) {
                 $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
-                $sugarLeadRecords = isset($sLeads['entry_list']) ? $sLeads['entry_list'] : [];
+                $sugarLeadRecords = $sLeads['entry_list'] ?? [];
             }
             $leadFields = [];
             foreach ($fields as $name => $value) {
@@ -137,11 +140,11 @@ class SugarcrmApi extends CrmApi
             if (!empty($sugarLeadRecords)) {
                 foreach ($sugarLeadRecords as $sLeadRecord) {
                     $localParam  = $parameters;
-                    $sugarLeadId = (isset($sLeadRecord['integration_entity_id']) ? $sLeadRecord['integration_entity_id'] : $sLeadRecord['id']);
-                    $sugarObject = (isset($sLeadRecord['integration_entity']) ? $sLeadRecord['integration_entity'] : 'Leads');
-                    //update the converted contact if found and not the Lead
+                    $sugarLeadId = ($sLeadRecord['integration_entity_id'] ?? $sLeadRecord['id']);
+                    $sugarObject = ($sLeadRecord['integration_entity'] ?? 'Leads');
+                    // update the converted contact if found and not the Lead
                     if (isset($sLeadRecord['contact_id']) && null != $sLeadRecord['contact_id'] && '' != $sLeadRecord['contact_id']) {
-                        unset($fields['Company']); //because this record is not in the Contact object.
+                        unset($fields['Company']); // because this record is not in the Contact object.
                         $localParams['name_value_list'][] = ['name' => 'id', 'value' => $sLeadRecord['contact_id']];
                         $createdLeadData[]                = $this->request('set_entry', $localParams, 'POST', 'Contacts');
                     } else {
@@ -153,9 +156,9 @@ class SugarcrmApi extends CrmApi
                 $createdLeadData = $this->request('set_entry', $parameters, 'POST', 'Leads');
             }
 
-            //$createdLeadData[] = $this->request('set_entry', $parameters, 'POST');
+        // $createdLeadData[] = $this->request('set_entry', $parameters, 'POST');
         } else {
-            //if not found then go ahead and make an API call to find all the records with that email
+            // if not found then go ahead and make an API call to find all the records with that email
             if (isset($fields['email1']) && empty($sugarLeadRecords)) {
                 $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
                 $sugarLeadRecords = $sLeads['records'];
@@ -164,14 +167,14 @@ class SugarcrmApi extends CrmApi
 
             if (!empty($sugarLeadRecords)) {
                 foreach ($sugarLeadRecords as $sLeadRecord) {
-                    $sugarLeadId = (isset($sLeadRecord['integration_entity_id']) ? $sLeadRecord['integration_entity_id'] : $sLeadRecord['id']);
-                    $sugarObject = (isset($sLeadRecord['integration_entity']) ? $sLeadRecord['integration_entity'] : 'Leads');
-                    //update the converted contact if found and not the Lead
+                    $sugarLeadId = ($sLeadRecord['integration_entity_id'] ?? $sLeadRecord['id']);
+                    $sugarObject = ($sLeadRecord['integration_entity'] ?? 'Leads');
+                    // update the converted contact if found and not the Lead
                     $config                = $this->integration->mergeConfigToFeatureSettings();
                     $fieldsToUpdateInSugar = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
 
                     if (isset($sLeadRecord['contact_id']) && null != $sLeadRecord['contact_id'] && '' != $sLeadRecord['contact_id']) {
-                        unset($fields['Company']); //because this record is not in the Contact object
+                        unset($fields['Company']); // because this record is not in the Contact object
                         $fieldsToUpdateInContactsSugar = $this->integration->cleanSugarData($config, $fieldsToUpdateInSugar, 'Contacts');
                         $contactSugarFields            = array_diff_key($fields, $fieldsToUpdateInContactsSugar);
                         $createdLeadData[]             = $this->request("Contacts/$sugarLeadId", $contactSugarFields, 'PUT', 'Contacts');
@@ -184,7 +187,7 @@ class SugarcrmApi extends CrmApi
             } else {
                 $createdLeadData = $this->request('Leads', $fields, 'POST', 'Leads');
             }
-            //$createdLeadData[] = $this->request('set_entry', $fields, 'POST', 'Leads');
+            // $createdLeadData[] = $this->request('set_entry', $fields, 'POST', 'Leads');
         }
 
         return $createdLeadData;
@@ -239,7 +242,7 @@ class SugarcrmApi extends CrmApi
         } else {
             $leadFieldsList = [];
             $response       = [];
-            //body is prepared for Sugar6. Translate it to sugar 7
+            // body is prepared for Sugar6. Translate it to sugar 7
             $reference_ids = [];
             foreach ($data as $object => $leadFieldsList) {
                 $requests = [];
@@ -253,14 +256,14 @@ class SugarcrmApi extends CrmApi
                     $request = [];
                     if (isset($fields['id'])) {
                         $ids['id'] = $fields['id'];
-                        //Update record
+                        // Update record
                         $sugarLeadId = $fields['id'];
                         unset($fields['id']);
                         $request['method'] = 'PUT';
                         $request['url']    = "/v10/$object/$sugarLeadId";
                         $request['data']   = $fields;
                     } else {
-                        //Create record
+                        // Create record
                         $request['data']   = $fields;
                         $request['url']    = '/v10/'.$object;
                         $request['method'] = 'POST';
@@ -307,22 +310,20 @@ class SugarcrmApi extends CrmApi
      */
     public function createLeadActivity(array $activity, $object)
     {
-        $config    = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $tokenData = $this->integration->getKeys();
 
-        //1st : set_entries to return ids module_name : "Leads" or "Contacts" and name_value_lists (array of arrays of name/value)
-        $module_name          = $object;
+        // 1st : set_entries to return name_value_lists (array of arrays of name/value)
         $set_name_value_lists = [];
         // set relationship
-        $module_names     = []; //Contacts or Leads
-        $module_ids       = []; //Contacts or leads ids
-        $link_field_names = []; //Array of mtc_webactivities_contacts or mtc_webactivities_leads
-        $related_ids      = []; //Array of arrays of web activity array
-        $name_value_lists = []; //array of empty arrays
-        $delete_array     = []; //Array of 0
-        //set_relationships
+        $module_names     = []; // Contacts or Leads
+        $module_ids       = []; // Contacts or leads ids
+        $link_field_names = []; // Array of mtc_webactivities_contacts or mtc_webactivities_leads
+        $related_ids      = []; // Array of arrays of web activity array
+        $name_value_lists = []; // array of empty arrays
+        $delete_array     = []; // Array of 0
+        // set_relationships
         $s7_records = [];
-        //Send activities and get back sugar activities id
+        // Send activities and get back sugar activities id
 
         if (!empty($activity)) {
             foreach ($activity as $sugarId => $records) {
@@ -338,7 +339,7 @@ class SugarcrmApi extends CrmApi
                     } else {
                         $rec[] = ['name' => 'lead_id_c', 'value' => $sugarId];
                     }
-                    $set_name_value_lists[] = $rec; //Sugar 6
+                    $set_name_value_lists[] = $rec; // Sugar 6
                     $s7_record              = [];
                     foreach ($rec as $r) {
                         $s7_record[$r['name']] = $r['value'];
@@ -355,9 +356,9 @@ class SugarcrmApi extends CrmApi
             } else {
                 $requests = [];
                 foreach ($s7_records as $fields) {
-                    //Create record
+                    // Create record
                     $request['data']   = $fields;
-                    $request['url']    = '/v10/'.'mtc_WebActivities';
+                    $request['url']    = '/v10/mtc_WebActivities';
                     $request['method'] = 'POST';
                     $requests[]        = $request;
                 }
@@ -368,7 +369,7 @@ class SugarcrmApi extends CrmApi
             }
 
             if ('6' == $tokenData['version']) {
-                //Send sugar relationsips
+                // Send sugar relationsips
                 if (!empty($resp)) {
                     $nbLeads = 0;
                     $nbAct   = 0;
@@ -395,17 +396,17 @@ class SugarcrmApi extends CrmApi
                         $related_ids[] = $related_ids_row;
                     }
                     $parameters = [
-                        'module_names'     => $module_names, //Contacts or Leads
-                        'module_ids'       => $module_ids, //Contacts or leads ids
-                        'link_field_names' => $link_field_names, //Array of mtc_webactivities_contacts or mtc_webactivities_leads
-                        'related_ids'      => $related_ids, //Array of arrays of web activity array
-                        'name_value_lists' => $name_value_lists, //array of empty arrays
-                        'delete_array'     => $delete_array, //Array of 0
+                        'module_names'     => $module_names, // Contacts or Leads
+                        'module_ids'       => $module_ids, // Contacts or leads ids
+                        'link_field_names' => $link_field_names, // Array of mtc_webactivities_contacts or mtc_webactivities_leads
+                        'related_ids'      => $related_ids, // Array of arrays of web activity array
+                        'name_value_lists' => $name_value_lists, // array of empty arrays
+                        'delete_array'     => $delete_array, // Array of 0
                     ];
                     $resp2 = $this->request('set_relationships', $parameters, 'POST', $object);
                 }
             } else {
-                //Sugar 7 set relationship
+                // Sugar 7 set relationship
                 if (!empty($resp)) {
                     $nbAct = 0;
                     foreach ($activity as $sugarId => $records) {
@@ -417,7 +418,7 @@ class SugarcrmApi extends CrmApi
                         foreach ($records['records'] as $record) {
                             if (!isset($resp[$nbAct]['contents']['id'])) {
                                 continue;
-                            } //current Web activity was not created
+                            } // current Web activity was not created
                             $wa_id = $resp[$nbAct]['contents']['id'];
                             $resp2 = $this->request("mtc_WebActivities/$wa_id/link/$link_field_name/$sugarId", [], 'POST');
                             ++$nbAct;
@@ -483,7 +484,7 @@ class SugarcrmApi extends CrmApi
 
             return $res;
         } else {
-            //TODO
+            // TODO
 
             if (isset($query['emails'])) {
                 $filter[] = ['email_addresses.email_address' => ['$in' => $query['emails']]];
@@ -501,10 +502,10 @@ class SugarcrmApi extends CrmApi
                     'offset' => 0,
                 'fields'     => implode(',', $fields),
                 'max_num'    => 1000,
-                //'deleted'     => 0,
-                //'favorites'   => false,
+                // 'deleted'     => 0,
+                // 'favorites'   => false,
             ];
-            $data = $this->request('Users/filter', $parameters, 'POST', 'Users');
+            $data = $this->request('Users/filter', $parameters, 'GET', 'Users');
 
             if (isset($query['type']) && 'BYEMAIL' == $query['type']) {
                 $type = 'BYEMAIL';
@@ -559,7 +560,6 @@ class SugarcrmApi extends CrmApi
     public function getLeads($query, $object)
     {
         $tokenData       = $this->integration->getKeys();
-        $data            = ['filter' => 'all'];
         $availableFields = $this->integration->getIntegrationSettings()->getFeatureSettings();
 
         switch ($object) {
@@ -573,10 +573,10 @@ class SugarcrmApi extends CrmApi
                 $fields      = [];
                 $object      = ('Contacts' == $object) ? 'Contacts' : 'Leads';
                 foreach ($mixedFields as $sugarField => $mField) {
-                    if (false !== strpos($sugarField, '__'.$object)) {
+                    if (str_contains($sugarField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sugarField);
                     }
-                    if (false !== strpos($sugarField, '-'.$object)) {
+                    if (str_contains($sugarField, '-'.$object)) {
                         $fields[] = str_replace('-'.$object, '', $sugarField);
                     }
                 }
@@ -648,28 +648,28 @@ class SugarcrmApi extends CrmApi
                 $filter = [];
                 if (isset($query['start'])) {
                     $filter[] = ['date_modified' => ['$gte' => $query['start']]];
-                    //$qry[] = ' '.strtolower($object).".date_modified >= '".$query['start']."' ";
+                    // $qry[] = ' '.strtolower($object).".date_modified >= '".$query['start']."' ";
                 }
                 if (isset($query['end'])) {
                     $filter[] = ['date_modified' => ['$lte' => $query['end']]];
-                    //$qry[] = ' '.strtolower($object).".date_modified <= '".$query['end']."' ";
+                    // $qry[] = ' '.strtolower($object).".date_modified <= '".$query['end']."' ";
                 }
                 if (isset($query['email'])) {
                     $filter[] = ['email' => ['$equals' => $query['email']]];
-                    //$qry[]    = " leads.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Leads' AND ea.email_address = '".$query['email']."' AND eabr.deleted=0) ";
+                    // $qry[]    = " leads.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Leads' AND ea.email_address = '".$query['email']."' AND eabr.deleted=0) ";
                     $fields[] = 'contact_id';
                 }
                 if (isset($query['checkemail'])) {
                     $filter[] = ['email' => ['$in' => $query['checkemail']]];
                     $filter[] = ['deleted' => '0'];
-                    $fields   = []; //Do not need previous fields
+                    $fields   = []; // Do not need previous fields
                     $fields[] = 'contact_id';
                     $fields[] = 'deleted';
                 }
                 if (isset($query['checkemail_contacts'])) {
                     $filter[] = ['email' => ['$in' => $query['checkemail_contacts']]];
                     $filter[] = ['deleted' => '0'];
-                    $fields   = []; //Do not need previous fields
+                    $fields   = []; // Do not need previous fields
                     $fields[] = 'deleted';
                 }
                 $fields[] = 'id';
@@ -680,19 +680,19 @@ class SugarcrmApi extends CrmApi
                 if ('Accounts' != $object) {
                     $fields[] = 'account_id';
                 }
-                //$filter_args = ['filter' => [['$and' => $filter]]];
-                //$fields_arg  = implode(',', $fields);
+                // $filter_args = ['filter' => [['$and' => $filter]]];
+                // $fields_arg  = implode(',', $fields);
                 $parameters = [
 //                     'order_by'                 => '',
                      'filter' => [['$and' => $filter]],
                      'offset' => $query['offset'],
                     'fields'  => implode(',', $fields),
                     'max_num' => $query['max_results'],
-                    //'deleted'     => 0,
-                    //'favorites'   => false,
+                    // 'deleted'     => 0,
+                    // 'favorites'   => false,
                 ];
 
-                return $this->request("$object/filter", $parameters, 'POST', $object);
+                return $this->request("$object/filter", $parameters, 'GET', $object);
             }
         }
     }

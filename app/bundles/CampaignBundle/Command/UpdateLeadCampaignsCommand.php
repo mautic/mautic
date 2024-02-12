@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -16,73 +7,34 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
+    private int $runLimit = 0;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private ContactLimiter $contactLimiter;
 
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
+    private bool $quiet = false;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
-    /**
-     * @var int
-     */
-    private $runLimit;
-
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
-
-    /**
-     * @var bool
-     */
-    private $quiet;
-
-    /**
-     * UpdateLeadCampaignsCommand constructor.
-     */
     public function __construct(
-        CampaignRepository $campaignRepository,
-        TranslatorInterface $translator,
-        MembershipBuilder $membershipBuilder,
-        LoggerInterface $logger,
-        FormatterHelper $formatterHelper
+        private CampaignRepository $campaignRepository,
+        private TranslatorInterface $translator,
+        private MembershipBuilder $membershipBuilder,
+        private LoggerInterface $logger,
+        private FormatterHelper $formatterHelper,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->campaignRepository = $campaignRepository;
-        $this->translator         = $translator;
-        $this->membershipBuilder  = $membershipBuilder;
-        $this->logger             = $logger;
-        $this->formatterHelper    = $formatterHelper;
-
-        parent::__construct();
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
@@ -90,7 +42,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $this
             ->setName('mautic:campaigns:rebuild')
             ->setAliases(['mautic:campaigns:update'])
-            ->setDescription('Rebuild campaigns based on contact segments.')
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
                 '--max-contacts',
@@ -149,7 +100,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $id             = $input->getOption('campaign-id');
         $batchLimit     = $input->getOption('batch-limit');
@@ -160,17 +111,17 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         $threadId       = $input->getOption('thread-id');
         $maxThreads     = $input->getOption('max-threads');
         $this->runLimit = $input->getOption('max-contacts');
-        $this->quiet    = $input->getOption('quiet');
+        $this->quiet    = (bool) $input->getOption('quiet');
         $this->output   = ($this->quiet) ? new NullOutput() : $output;
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $this->contactLimiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
@@ -180,36 +131,33 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
             if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return 0;
+                return \Symfony\Component\Console\Command\Command::FAILURE;
             }
 
             $this->updateCampaign($campaign);
         } else {
             $campaigns = $this->campaignRepository->getEntities(
                 [
-                    'iterator_mode' => true,
+                    'iterable_mode' => true,
                 ]
             );
 
-            while (false !== ($results = $campaigns->next())) {
-                // Get first item; using reset as the key will be the ID and not 0
-                $campaign = reset($results);
-
+            foreach ($campaigns as $campaign) {
                 $this->updateCampaign($campaign);
 
-                unset($results, $campaign);
+                unset($campaign);
             }
         }
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**
      * @throws \Exception
      */
-    private function updateCampaign(Campaign $campaign)
+    private function updateCampaign(Campaign $campaign): void
     {
         if (!$campaign->isPublished()) {
             return;
@@ -240,4 +188,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->output->writeln('');
     }
+
+    protected static $defaultDescription = 'Rebuild campaigns based on contact segments.';
 }

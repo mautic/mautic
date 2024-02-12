@@ -1,0 +1,243 @@
+{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
+{% set ignoreStandardColumns = ignoreStandardColumns is defined ? ignoreStandardColumns : [] %}
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}
+    {% if not slot('mauticContent') %}
+        {% if mauticContent is defined %}
+            {{ mauticContent }}
+        {% endif %}
+    {% else %}
+        {{ slot('mauticContent') }}
+    {% endif %}
+{% endblock %}
+
+{% if not slot('headerTitle') %}
+    {% if headerTitle is not defined %}
+        {% set headerTitle = 'Mautic' %}
+    {% endif %}
+    {% set headerTitle = headerTitle|trans %}
+{% else %}
+    {% set headerTitle = slot('headerTitle') %}
+{% endif %}
+
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig',
+    {
+        'templateButtons' : {
+            'new' : permissions[permissionBase ~ ':create'],
+        },
+        'actionRoute'     : actionRoute,
+        'indexRoute'      : indexRoute,
+        'translationBase' : translationBase,
+    }) -}}
+{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig',
+                {
+                    'searchValue'      : searchValue,
+                    'searchHelp'       : searchHelp is defined ? searchHelp : '',
+                    'action'           : currentRoute,
+                    'actionRoute'      : actionRoute,
+                    'indexRoute'       : indexRoute,
+                    'translationBase'  : translationBase,
+                    'preCustomButtons' : toolBarButtons is defined ? toolBarButtons : null,
+                    'templateButtons'  : {
+                        'delete' : permissions[permissionBase ~ ':delete'],
+                    },
+                    'filters' : filters is defined ? filters : [],
+            }) -}}
+
+            <div class="page-list">
+                {{ customContent('content.above', mauticTemplateVars) }}
+                {{ block('mainContent') }}
+                {{ customContent('content.below', mauticTemplateVars) }}
+            </div>
+        </div>
+    {% else %}
+        {{ block('mainContent') }}
+    {% endif %}
+{% endblock %}
+
+{% block mainContent %}
+    {% if templateVariables is not defined %}
+        {% set templateVariables = [] %}
+    {% endif %}
+
+    {% if sessionVar is not defined %}
+        {% set sessionVar = 'entity' %}
+    {% endif %}
+
+    {% if nameAction is not defined %}
+        {% set nameAction = 'view' %}
+    {% endif %}
+
+    {% if items|length %}
+        {% if items is instanceof('\Doctrine\ORM\Tools\Pagination\Paginator') %}
+            {% set item = items.getIterator().getArrayCopy() %}
+        {% endif %}
+
+        {% set firstItem = items|first %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped table-bordered {{ sessionVar }}-list">
+                <thead>
+                <tr>
+                    {% if ignoreStandardColumns is empty %}
+                        {{- include('@MauticCore/Helper/tableheader.html.twig',
+                            {
+                                'checkall'        : 'true',
+                                'actionRoute'     : actionRoute,
+                                'indexRoute'      : indexRoute,
+                                'templateButtons' : {
+                                    'delete' : permissions[permissionBase ~ ':deleteown'] is not empty or permissions[permissionBase ~ ':deleteown'] is not empty or permissions[permissionBase ~ ':delete'] is not empty,
+                                },
+                        }) -}}
+                        {{- include(
+                            '@MauticCore/Helper/tableheader.html.twig',
+                            {
+                                'sessionVar' : sessionVar,
+                                'orderBy'    : tablePrefix ~ '.name',
+                                'text'       : 'mautic.core.name',
+                                'class'      : 'col-name',
+                                'default'    : true,
+                            }
+                        ) -}}
+
+                        {% if attribute(firstItem, 'getCategory') is defined %}
+                            {{ include('@MauticCore/Helper/tableheader.html.twig',
+                                {
+                                    'sessionVar' : sessionVar,
+                                    'orderBy'    : (categoryTablePrefix is defined ? categoryTablePrefix : 'cat') ~ '.title',
+                                    'text'       : 'mautic.core.category',
+                                    'class'      : 'visible-md visible-lg col-focus-category',
+                            }) }}
+                        {% endif %}
+                    {% endif %}
+
+                        {% if listHeaders is defined %}
+                            {% for header in listHeaders %}
+                                {% if header.sessionVar is not defined %}
+                                    {% set header = header|merge({'sessionVar': sessionVar}) %}
+                                {% endif %}
+                            {{- include('@MauticCore/Helper/tableheader.html.twig', header) -}}
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if ignoreStandardColumns is empty %}
+                        {{- include('@MauticCore/Helper/tableheader.html.twig',
+                            {
+                                'sessionVar' : sessionVar,
+                                'orderBy'    : tablePrefix ~ '.id',
+                                'text'       : 'mautic.core.id',
+                                'class'      : 'visible-md visible-lg col-id',
+                        }) -}}
+                        {% endif %}
+
+                        {{ customContent('list.headers', mauticTemplateVars) }}
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in items %}
+                    <tr>
+                        {% if ignoreStandardColumns is empty %}
+                            <td>
+                            {{- include('@MauticCore/Helper/list_actions.html.twig',
+                                    {
+                                        'item'            : item,
+                                        'templateButtons' : {
+                                            'edit' : attribute(item, 'getCreatedBy') is defined
+                                                ?
+                                                securityHasEntityAccess(
+                                                    permissions[permissionBase ~ ':editown'],
+                                                    permissions[permissionBase ~ ':editother'],
+                                                    item.getCreatedBy()
+                                                )
+                                                :
+                                                permissions[permissionBase ~ ':edit'],
+                                            'clone'  : enableCloneButton is defined ? permissions[permissionBase ~ ':create'] : false,
+                                            'delete' : attribute(item, 'getCreatedBy') is defined
+                                                ?
+                                                securityHasEntityAccess(
+                                                    permissions[permissionBase ~ ':deleteown'],
+                                                    permissions[permissionBase ~ ':deleteother'],
+                                                    item.getCreatedBy()
+                                                )
+                                                :
+                                                permissions[permissionBase ~ ':delete'],
+                                            'abtest' : enableAbTestButton is defined ? permissions[permissionBase ~ ':create'] : false,
+                                        },
+                                        'actionRoute'     : actionRoute,
+                                        'indexRoute'      : indexRoute,
+                                        'translationBase' : translationBase,
+                                        'customButtons'   : customButtons is defined ? customButtons : [],
+                            }) -}}
+                            </td>
+                            <td>
+                                <div>
+                                    {% if attribute(item, 'isPublished') is defined %}
+                                    {{ include(
+                                            '@MauticCore/Helper/publishstatus_icon.html.twig',
+                                            {'item' : item, 'model' : modelName}
+                                        ) }}
+                                    {% endif %}
+                                    <a data-toggle="ajax" href="{{ path(
+                                        actionRoute,
+                                        {'objectId' : item.getId(), 'objectAction' : nameAction}
+                                    ) }}">
+                                        {{ item.getName() }}
+                                        {{ customContent('list.name', mauticTemplateVars) }}
+                                    </a>
+                                </div>
+                                {% if attribute(item, 'getDescription') is defined and item.getDescription() %}
+                                    <div class="text-muted mt-4">
+                                        <small>{{ item.getDescription()|purify }}</small>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            {% if attribute(item, 'getCategory') is defined %}
+                                <td class="visible-md visible-lg">
+                                    {% set category = item.getCategory() %}
+                                    {% set catName, color = category
+                                        ? category.getTitle()
+                                        : 'mautic.core.form.uncategorized'|trans, category ? '#' ~ category.getColor() : 'inherit' %}
+                                    <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> <span>{{ catName }}</span></span>
+                                </td>
+                            {% endif %}
+                        {% endif %}
+                        {% if listItemTemplate is defined %}
+                            {% set templateVariables = templateVariables|merge({'item': item}) %}
+                            {{- include(listItemTemplate, templateVariables) -}}
+                        {% endif %}
+                        {% if ignoreStandardColumns is empty %}
+                            <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                        {% endif %}
+
+                        {{ customContent('list.columns', mauticTemplateVars) }}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+            {{- include('@MauticCore/Helper/pagination.html.twig',
+                {
+                    'totalItems' : totalItems,
+                    'page'       : page,
+                    'limit'      : limit,
+                    'baseUrl'    : path(indexRoute),
+                    'sessionVar' : sessionVar,
+            }) -}}
+        </div>
+    {% else %}
+        {{- include('@MauticCore/Helper/noresults.html.twig') -}}
+    {% endif %}
+
+{% endblock %}

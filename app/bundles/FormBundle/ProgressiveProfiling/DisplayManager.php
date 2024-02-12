@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\ProgressiveProfiling;
 
 use Mautic\FormBundle\Entity\Field;
@@ -16,28 +7,12 @@ use Mautic\FormBundle\Entity\Form;
 
 class DisplayManager
 {
-    /**
-     * @var Form
-     */
-    private $form;
+    private \Mautic\FormBundle\ProgressiveProfiling\DisplayCounter $displayCounter;
 
-    /**
-     * @var array
-     */
-    private $viewOnlyFields;
-
-    /**
-     * @var DisplayCounter
-     */
-    private $displayCounter;
-
-    /**
-     * DisplayManager constructor.
-     */
-    public function __construct(Form $form, array $viewOnlyFields = [])
-    {
-        $this->form           = $form;
-        $this->viewOnlyFields = $viewOnlyFields;
+    public function __construct(
+        private Form $form,
+        private array $viewOnlyFields = []
+    ) {
         $this->displayCounter = new DisplayCounter($form);
     }
 
@@ -68,18 +43,15 @@ class DisplayManager
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function shouldDisplayNotAlwaysDisplayField(Field $field)
+    private function shouldDisplayNotAlwaysDisplayField(Field $field): bool
     {
-        /** @var Field $fieldFromArray */
         $fields = $this->form->getFields()->toArray();
         foreach ($fields as $fieldFromArray) {
             if (in_array($field->getType(), $this->viewOnlyFields)) {
                 continue;
             }
 
+            /** @var Field $fieldFromArray */
             if ($field->getId() === $fieldFromArray->getId()) {
                 if (($this->displayCounter->getDisplayFields() + ($this->displayCounter->getAlwaysDisplayFields() - $this->displayCounter->getAlreadyAlwaysDisplayed())) >= $this->form->getProgressiveProfilingLimit()) {
                     return false;
@@ -90,10 +62,7 @@ class DisplayManager
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public function useProgressiveProfilingLimit()
+    public function useProgressiveProfilingLimit(): bool
     {
         return '' != $this->form->getProgressiveProfilingLimit();
     }
@@ -106,7 +75,7 @@ class DisplayManager
         return $this->displayCounter;
     }
 
-    public function increaseDisplayedFields(Field $field)
+    public function increaseDisplayedFields(Field $field): void
     {
         if (!in_array($field->getType(), $this->viewOnlyFields)) {
             $this->displayCounter->increaseDisplayedFields();

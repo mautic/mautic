@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
@@ -22,14 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UploadFieldValidator
 {
-    /**
-     * @var FileUploadValidator
-     */
-    private $fileUploadValidator;
-
-    public function __construct(FileUploadValidator $fileUploadValidator)
-    {
-        $this->fileUploadValidator = $fileUploadValidator;
+    public function __construct(
+        private FileUploadValidator $fileUploadValidator
+    ) {
     }
 
     /**
@@ -42,16 +28,11 @@ class UploadFieldValidator
     {
         $files = $request->files->get('mauticform');
 
-        if (!$files || !array_key_exists($field->getAlias(), $files)) {
+        if (!$files || !array_key_exists($field->getAlias(), $files) || !$files[$field->getAlias()] instanceof UploadedFile) {
             throw new NoFileGivenException();
         }
 
-        /** @var UploadedFile $file */
         $file = $files[$field->getAlias()];
-
-        if (!$file instanceof UploadedFile) {
-            throw new NoFileGivenException();
-        }
 
         $properties = $field->getProperties();
 

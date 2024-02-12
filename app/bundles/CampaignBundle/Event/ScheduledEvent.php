@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -19,42 +10,24 @@ class ScheduledEvent extends CampaignScheduledEvent
     use ContextTrait;
 
     /**
-     * @var AbstractEventAccessor
-     */
-    private $eventConfig;
-
-    /**
-     * @var LeadEventLog
-     */
-    private $eventLog;
-
-    /**
-     * @var bool
-     */
-    private $isReschedule;
-
-    /**
-     * ScheduledEvent constructor.
-     *
      * @param bool $isReschedule
      */
-    public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
-    {
-        $this->eventConfig  = $config;
-        $this->eventLog     = $log;
-        $this->isReschedule = $isReschedule;
-
+    public function __construct(
+        private AbstractEventAccessor $eventConfig,
+        private LeadEventLog $eventLog,
+        private $isReschedule = false
+    ) {
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
-                'eventSettings'   => $config->getConfig(),
+                'eventSettings'   => $eventConfig->getConfig(),
                 'eventDetails'    => null,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
+                'event'           => $eventLog->getEvent(),
+                'lead'            => $eventLog->getLead(),
                 'systemTriggered' => true,
-                'dateScheduled'   => $log->getTriggerDate(),
+                'dateScheduled'   => $eventLog->getTriggerDate(),
             ],
-            $log
+            $eventLog
         );
     }
 

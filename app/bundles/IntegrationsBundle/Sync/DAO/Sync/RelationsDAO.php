@@ -2,32 +2,18 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
-use Countable;
-use Iterator;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
-class RelationsDAO implements Iterator, Countable
+class RelationsDAO implements \Iterator, \Countable
 {
     /**
      * @var RelationDAO[]
      */
-    private $relations = [];
+    private array $relations = [];
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * @param RelationDAO[] $relations
@@ -44,49 +30,31 @@ class RelationsDAO implements Iterator, Countable
         $this->relations[] = $relation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function current(): RelationDAO
     {
         return $this->relations[$this->position];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function next(): void
     {
         ++$this->position;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function valid(): bool
     {
         return isset($this->relations[$this->position]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rewind(): void
     {
         $this->position = 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return count($this->relations);

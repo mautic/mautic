@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -22,19 +13,9 @@ use Mautic\CoreBundle\Exception\SchemaException;
 class ColumnSchemaHelper
 {
     /**
-     * @var Connection
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $db;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    protected $sm;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var string
@@ -56,17 +37,16 @@ class ColumnSchemaHelper
     /**
      * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix)
-    {
-        $this->db     = $db;
-        $this->sm     = $db->getSchemaManager();
-        $this->prefix = $prefix;
+    public function __construct(
+        protected Connection $db,
+        protected $prefix
+    ) {
+        $this->sm = $db->createSchemaManager();
     }
 
     /**
      * Set the table to be manipulated.
      *
-     * @param      $table
      * @param bool $addPrefix
      *
      * @return $this
@@ -77,11 +57,11 @@ class ColumnSchemaHelper
     {
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 
-        //make sure the table exists
+        // make sure the table exists
         $this->checkTableExists($this->tableName, true);
 
-        //use the to schema to get table details so that changes will be calculated
-        $this->fromTable = $this->sm->listTableDetails($this->tableName);
+        // use the to schema to get table details so that changes will be calculated
+        $this->fromTable = $this->sm->introspectTable($this->tableName);
         $this->toTable   = clone $this->fromTable;
 
         return $this;
@@ -90,7 +70,7 @@ class ColumnSchemaHelper
     /**
      * Get the SchemaManager.
      *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager()
     {
@@ -126,9 +106,9 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addColumns(array $columns)
+    public function addColumns(array $columns): void
     {
-        //ensure none of the columns exist before manipulating the schema
+        // ensure none of the columns exist before manipulating the schema
         foreach ($columns as $column) {
             if (empty($column['name'])) {
                 throw new SchemaException('Column is missing required name key.');
@@ -137,7 +117,7 @@ class ColumnSchemaHelper
             $this->checkColumnExists($column['name'], true);
         }
 
-        //now add the columns
+        // now add the columns
         foreach ($columns as $column) {
             $this->addColumn($column, false);
         }
@@ -146,11 +126,11 @@ class ColumnSchemaHelper
     /**
      * Add a column to the table.
      *
-     * @param array $column
      *                           ['name']    string (required) unique name of column; cannot already exist
      *                           ['type']    string (optional) Doctrine type for column; defaults to text
      *                           ['options'] array  (optional) Defining options for column
-     * @param bool  $checkExists Check if table exists; pass false if this has already been done
+     *
+     * @param bool $checkExists Check if table exists; pass false if this has already been done
      *
      * @return $this
      *
@@ -166,8 +146,8 @@ class ColumnSchemaHelper
             $this->checkColumnExists($column['name'], true);
         }
 
-        $type    = (isset($column['type'])) ? $column['type'] : 'text';
-        $options = (isset($column['options'])) ? $column['options'] : [];
+        $type    = $column['type'] ?? 'text';
+        $options = $column['options'] ?? [];
 
         $this->toTable->addColumn($column['name'], $type, $options);
 
@@ -176,8 +156,6 @@ class ColumnSchemaHelper
 
     /**
      * Drops a column from table.
-     *
-     * @param $columnName
      *
      * @return $this
      */
@@ -193,13 +171,13 @@ class ColumnSchemaHelper
     /**
      * Computes and executes the changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
-        //create a table diff
+        // create a table diff
         $comparator = new Comparator();
-        $diff       = $comparator->diffTable($this->fromTable, $this->toTable);
+        $diff       = $comparator->compareTables($this->fromTable, $this->toTable);
 
-        if ($diff) {
+        if (!$diff->isEmpty()) {
             $this->sm->alterTable($diff);
         }
     }
@@ -210,13 +188,11 @@ class ColumnSchemaHelper
      * @param string $column
      * @param bool   $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function checkColumnExists($column, $throwException = false)
+    public function checkColumnExists($column, $throwException = false): bool
     {
-        //check to ensure column doesn't exist
+        // check to ensure column doesn't exist
         if ($this->toTable->hasColumn($column)) {
             if ($throwException) {
                 throw new SchemaException("The column {$column} already exists in {$this->tableName}");
@@ -231,7 +207,6 @@ class ColumnSchemaHelper
     /**
      * Determine if a table exists.
      *
-     * @param            $table
      * @param bool|false $throwException
      *
      * @return bool

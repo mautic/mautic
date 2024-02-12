@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -16,6 +7,7 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\StageBundle\Entity\Stage;
@@ -27,36 +19,25 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<Lead>
+ */
 class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager)
-    {
-        $this->translator    = $translator;
-        $this->companyModel  = $companyModel;
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private CompanyModel $companyModel,
+        private EntityManager $entityManager,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
@@ -66,7 +47,7 @@ class LeadType extends AbstractType
                 'mautic.lead.lead.field.custom_avatar' => 'custom',
             ];
 
-            $cache = $options['data']->getSocialCache();
+            $cache = $options['data']->getSocialCache() ?? [];
             if (count($cache)) {
                 foreach ($cache as $key => $data) {
                     $imageChoices[$key] = $key;
@@ -130,12 +111,8 @@ class LeadType extends AbstractType
             ]
         );
 
-        $companyLeadRepo = $this->companyModel->getCompanyLeadRepository();
-        $companies       = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
-        $leadCompanies   = [];
-        foreach ($companies as $company) {
-            $leadCompanies[(string) $company['company_id']] = (string) $company['company_id'];
-        }
+        $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
+        $companyIds             = $this->companyModel->getCompanyLeadRepository()->getCompanyIdsByLeadId((string) $options['data']->getId());
 
         $builder->add(
             'companies',
@@ -143,10 +120,10 @@ class LeadType extends AbstractType
             [
                 'label'      => 'mautic.company.selectcompany',
                 'label_attr' => ['class' => 'control-label'],
-                'multiple'   => true,
+                'multiple'   => $allowMultipleCompanies,
                 'required'   => false,
                 'mapped'     => false,
-                'data'       => $leadCompanies,
+                'data'       => !$allowMultipleCompanies ? ($companyIds[0] ?? null) : array_combine($companyIds, $companyIds),
             ]
         );
 
@@ -208,7 +185,7 @@ class LeadType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -218,13 +195,5 @@ class LeadType extends AbstractType
         );
 
         $resolver->setRequired(['fields', 'isShortForm']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'lead';
     }
 }

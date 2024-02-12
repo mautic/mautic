@@ -1,0 +1,16 @@
+{% use '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig' %}
+
+{% block email_to_user_row %}
+  <div class="row">
+      <div class="col-md-6">
+          {{ form_row(form.user_id) }}
+      </div>
+      <div class="col-md-6">
+          {{ form_row(form.to_owner) }}
+      </div>
+  </div>
+  {{ form_row(form.to) }}
+  {{ form_row(form.cc) }}
+  {{ form_row(form.bcc) }}
+  {{ form_rest(form) }}
+{% endblock %}

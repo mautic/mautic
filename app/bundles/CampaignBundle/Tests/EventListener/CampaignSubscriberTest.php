@@ -2,53 +2,39 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\EventListener\CampaignSubscriber;
-use Mautic\CampaignBundle\Service\Campaign as CampaignService;
+use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Service\FlashBag;
 use PHPUnit\Framework\TestCase;
 
 class CampaignSubscriberTest extends TestCase
 {
-    private $ipLookupHelper;
-    private $auditLogModel;
-    private $campaignService;
-    private $flashBag;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+
+    private \PHPUnit\Framework\MockObject\MockObject $campaignAuditService;
+
+    private \Mautic\CampaignBundle\EventListener\CampaignSubscriber $subscriber;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->ipLookupHelper  = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel   = $this->createMock(AuditLogModel::class);
-        $this->campaignService = $this->createMock(CampaignService::class);
-        $this->flashBag        = $this->createMock(FlashBag::class);
+        $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
+        $this->auditLogModel        = $this->createMock(AuditLogModel::class);
+        $this->campaignAuditService = $this->createMock(CampaignAuditService::class);
 
         $this->subscriber = new CampaignSubscriber(
             $this->ipLookupHelper,
             $this->auditLogModel,
-            $this->campaignService,
-            $this->flashBag
+            $this->campaignAuditService
         );
     }
 
@@ -79,7 +65,7 @@ class CampaignSubscriberTest extends TestCase
         $ipAddress    = 'someIp';
 
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp(1597752193);
+        $dateTime->setTimestamp(1_597_752_193);
 
         $campaign = new Campaign();
         $campaign->setPublishDown($dateTime);
@@ -117,7 +103,7 @@ class CampaignSubscriberTest extends TestCase
         $campaignName = 'campaignName';
 
         $dateTime = new \DateTime();
-        $dateTime->setTimestamp(1597752193);
+        $dateTime->setTimestamp(1_597_752_193);
 
         $campaign = new Campaign();
         $campaign->setPublishUp($dateTime);
@@ -125,19 +111,9 @@ class CampaignSubscriberTest extends TestCase
 
         $event = new CampaignEvent($campaign);
 
-        $this->campaignService->expects($this->once())
-            ->method('hasUnpublishedEmail')
-            ->with(null)
-            ->willReturn(true);
-
-        $this->flashBag->expects($this->once())
-            ->method('add')
-            ->with(
-                'mautic.core.notice.campaign.unpublished.email',
-                [
-                    '%name%' => $campaign->getName(),
-                ]
-            );
+        $this->campaignAuditService->expects($this->once())
+            ->method('addWarningForUnpublishedEmails')
+            ->with($campaign);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')

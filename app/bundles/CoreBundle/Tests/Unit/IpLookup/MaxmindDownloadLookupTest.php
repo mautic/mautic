@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
 
 class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDownloadDataStore()
+    public function testDownloadDataStore(): void
     {
         if (empty($_ENV['MAXMIND_LICENSE_KEY'])) {
             // The env variable MAXMIND_LICENSE_KEY. can be set in phpunit.xml
@@ -32,7 +23,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function testIpLookupSuccessful()
+    public function testIpLookupSuccessful(): void
     {
         if (empty($_ENV['MAXMIND_LICENSE_KEY'])) {
             $this->markTestSkipped('It can be tested just with testDownloadDataStore. It needs env variable MAXMIND_LICENSE_KEY.');

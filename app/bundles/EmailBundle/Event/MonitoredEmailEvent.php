@@ -1,46 +1,24 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MonitoredEmailEvent extends Event
 {
-    /**
-     * @var FormBuilder
-     */
-    private $formBuilder;
+    private array $folders = [];
 
-    /**
-     * @var array
-     */
-    private $data;
-
-    /**
-     * @var array
-     */
-    private $folders = [];
-
-    public function __construct(FormBuilder $builder, array $data)
-    {
-        $this->formBuilder = $builder;
-        $this->data        = $data;
+    public function __construct(
+        private FormBuilderInterface $formBuilder,
+        private array $data
+    ) {
     }
 
     /**
      * Get the FormBuilder for monitored_mailboxes FormType.
      *
-     * @return FormBuilder
+     * @return FormBuilderInterface
      */
     public function getFormBuilder()
     {
@@ -50,12 +28,9 @@ class MonitoredEmailEvent extends Event
     /**
      * Insert a folder to configure.
      *
-     * @param        $bundleKey
-     * @param        $folderKey
-     * @param        $label
      * @param string $default
      */
-    public function addFolder($bundleKey, $folderKey, $label, $default = '')
+    public function addFolder($bundleKey, $folderKey, $label, $default = ''): void
     {
         $keyName = ($folderKey) ? $bundleKey.'_'.$folderKey : $bundleKey;
 
@@ -68,17 +43,13 @@ class MonitoredEmailEvent extends Event
     /**
      * Get the value set for a specific bundle/folder.
      *
-     * @param $bundleKey
-     * @param $folderKey
-     * @param $default
-     *
      * @return string
      */
     public function getData($bundleKey, $folderKey, $default = '')
     {
         $keyName = $bundleKey.'_'.$folderKey;
 
-        return (isset($this->data[$keyName])) ? $this->data[$keyName] : $default;
+        return $this->data[$keyName] ?? $default;
     }
 
     /**

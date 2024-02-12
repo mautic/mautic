@@ -12,11 +12,15 @@ class RouteProvider
 
     public const ROUTE_DETAIL = 'mautic_marketplace_detail';
 
-    private RouterInterface $router;
+    public const ROUTE_INSTALL = 'mautic_marketplace_install';
 
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public const ROUTE_REMOVE = 'mautic_marketplace_remove';
+
+    public const ROUTE_CLEAR_CACHE = 'mautic_marketplace_clear_cache';
+
+    public function __construct(
+        private RouterInterface $router
+    ) {
     }
 
     public function buildListRoute(int $page = 1): string
@@ -29,6 +33,29 @@ class RouteProvider
         return $this->router->generate(
             static::ROUTE_DETAIL,
             ['vendor' => $vendor, 'package' => $package]
+        );
+    }
+
+    public function buildInstallRoute(string $vendor, string $package): string
+    {
+        return $this->router->generate(
+            static::ROUTE_DETAIL,
+            ['vendor' => $vendor, 'package' => $package]
+        );
+    }
+
+    public function buildRemoveRoute(string $vendor, string $package): string
+    {
+        return $this->router->generate(
+            static::ROUTE_REMOVE,
+            ['vendor' => $vendor, 'package' => $package]
+        );
+    }
+
+    public function buildClearCacheRoute(): string
+    {
+        return $this->router->generate(
+            static::ROUTE_CLEAR_CACHE
         );
     }
 }

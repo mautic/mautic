@@ -1,32 +1,19 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationAuthRedirectEvent.
- */
 class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
 {
     /**
-     * @var string
+     * @param string $authUrl
      */
-    private $authUrl;
-
-    public function __construct(UnifiedIntegrationInterface $integration, $authUrl)
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private $authUrl
+    ) {
         $this->integration = $integration;
-        $this->authUrl     = $authUrl;
     }
 
     /**
@@ -40,7 +27,7 @@ class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
     /**
      * @param string $authUrl
      */
-    public function setAuthUrl($authUrl)
+    public function setAuthUrl($authUrl): void
     {
         $this->authUrl = $authUrl;
 

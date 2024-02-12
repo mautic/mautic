@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\SAML\Store;
 
 use Doctrine\Persistence\ObjectManager;
@@ -18,20 +9,10 @@ use Mautic\UserBundle\Entity\IdEntry;
 
 class IdStore implements IdStoreInterface
 {
-    /**
-     * @var ObjectManager
-     */
-    private $manager;
-
-    /**
-     * @var TimeProviderInterface
-     */
-    private $timeProvider;
-
-    public function __construct(ObjectManager $manager, TimeProviderInterface $timeProvider)
-    {
-        $this->manager      = $manager;
-        $this->timeProvider = $timeProvider;
+    public function __construct(
+        private ObjectManager $manager,
+        private TimeProviderInterface $timeProvider
+    ) {
     }
 
     /**

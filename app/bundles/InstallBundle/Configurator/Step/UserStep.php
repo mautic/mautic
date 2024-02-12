@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
@@ -41,42 +32,27 @@ class UserStep implements StepInterface
      */
     public $password;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return UserStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
-        return 'MauticInstallBundle:Install:user.html.php';
+        return '@MauticInstall/Install/user.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         return [];
     }

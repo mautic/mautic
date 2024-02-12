@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Helper;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -26,27 +17,17 @@ class SyncIntegrationsHelper
     /**
      * @var SyncInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     /**
-     * @var array|null
+     * @var array<int,string>|null
      */
-    private $enabled;
+    private ?array $enabled = null;
 
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
-    public function __construct(IntegrationsHelper $integrationsHelper, ObjectProvider $objectProvider)
-    {
-        $this->integrationsHelper = $integrationsHelper;
-        $this->objectProvider     = $objectProvider;
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper,
+        private ObjectProvider $objectProvider
+    ) {
     }
 
     public function addIntegration(SyncInterface $integration): void
@@ -69,7 +50,7 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @return array|null
+     * @return array<int,string>|null
      *
      * @throws IntegrationNotFoundException
      */
@@ -87,7 +68,7 @@ class SyncIntegrationsHelper
                 if ($integrationConfiguration->getIsPublished()) {
                     $this->enabled[] = $name;
                 }
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Just ignore as the plugin hasn't been installed yet
             }
         }
@@ -131,7 +112,7 @@ class SyncIntegrationsHelper
                         return true;
                     }
                 }
-            } catch (ObjectNotFoundException $exception) {
+            } catch (ObjectNotFoundException) {
                 // Object is not supported so just continue
             }
         }

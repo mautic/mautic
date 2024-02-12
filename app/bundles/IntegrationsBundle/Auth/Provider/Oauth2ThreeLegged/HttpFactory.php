@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
 use GuzzleHttp\Client;
@@ -42,27 +33,18 @@ class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth2_three_legged';
 
-    /**
-     * @var CredentialsInterface
-     */
-    private $credentials;
+    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface $credentials = null;
 
-    /**
-     * @var ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|ConfigTokenFactoryInterface
-     */
-    private $config;
+    private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|null $config = null;
 
-    /**
-     * @var Client
-     */
-    private $reAuthClient;
+    private ?\GuzzleHttp\Client $reAuthClient = null;
 
     /**
      * Cache of initialized clients.
      *
      * @var Client[]
      */
-    private $initializedClients = [];
+    private array $initializedClients = [];
 
     public function getAuthType(): string
     {
@@ -82,7 +64,7 @@ class HttpFactory implements AuthProviderInterface
         }
 
         // Return cached initialized client if there is one.
-        if (!empty($this->initializedClients[$credentials->getClientId()])) {
+        if (isset($this->initializedClients[$credentials->getClientId()])) {
             return $this->initializedClients[$credentials->getClientId()];
         }
 
@@ -141,11 +123,9 @@ class HttpFactory implements AuthProviderInterface
             return $this->reAuthClient;
         }
 
-        $this->reAuthClient = new Client(
-            [
-                'base_uri' => $this->credentials->getTokenUrl(),
-            ]
-        );
+        $this->reAuthClient = new Client([
+            'base_uri' => $this->credentials->getTokenUrl(),
+        ]);
 
         return $this->reAuthClient;
     }

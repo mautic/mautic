@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Loader\EnvVars;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -25,7 +16,7 @@ class ConfigEnvVars implements EnvVarsInterface
             // JSON encode arrays
             $defaultValue = $defaultConfig->get($key);
             if (is_array($value) || is_array($defaultValue)) {
-                $jsonValue = $value ? $value : $defaultValue;
+                $jsonValue = $value ?: $defaultValue;
                 $value     = json_encode($jsonValue);
             }
 

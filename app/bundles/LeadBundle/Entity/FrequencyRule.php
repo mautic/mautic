@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -16,14 +7,13 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class FrequencyRule.
- */
 class FrequencyRule extends CommonEntity
 {
-    const TIME_DAY   = 'DAY';
-    const TIME_WEEK  = 'WEEK';
-    const TIME_MONTH = 'MONTH';
+    public const TIME_DAY   = 'DAY';
+
+    public const TIME_WEEK  = 'WEEK';
+
+    public const TIME_MONTH = 'MONTH';
 
     /**
      * @var int
@@ -36,17 +26,17 @@ class FrequencyRule extends CommonEntity
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $frequencyNumber;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $frequencyTime;
 
@@ -61,22 +51,23 @@ class FrequencyRule extends CommonEntity
     private $preferredChannel = 0;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $pauseFromDate;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $pauseToDate;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_frequencyrules')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\FrequencyRuleRepository')
-            ->addIndex(['channel'], 'channel_frequency');
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class)
+            ->addIndex(['channel'], 'channel_frequency')
+            ->addIndex(['lead_id', 'date_added'], 'idx_frequency_date_added');
 
         $builder->addId();
 
@@ -112,10 +103,8 @@ class FrequencyRule extends CommonEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('frequencyRules')
                  ->addListProperties(
@@ -166,7 +155,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -174,7 +163,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $dateAdded
+     * @param \DateTimeInterface $dateAdded
      *
      * @return FrequencyRule
      */
@@ -196,7 +185,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param int $frequencyNumber
+     * @param int|null $frequencyNumber
      *
      * @return FrequencyRule
      */
@@ -218,7 +207,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param string $frequencyTime
+     * @param string|null $frequencyTime
      *
      * @return FrequencyRule
      */
@@ -284,7 +273,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPauseFromDate()
     {
@@ -292,8 +281,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseFromDate
-     *
      * @return FrequencyRule
      */
     public function setPauseFromDate(\DateTime $pauseFromDate = null)
@@ -306,7 +293,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPauseToDate()
     {
@@ -314,8 +301,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseToDate
-     *
      * @return FrequencyRule
      */
     public function setPauseToDate(\DateTime $pauseToDate = null)

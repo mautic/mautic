@@ -1,64 +1,32 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Event;
 
 use Gaufrette\Adapter;
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class RemoteAssetBrowseEvent.
- */
 class RemoteAssetBrowseEvent extends CommonEvent
 {
-    /**
-     * @var Adapter
-     */
-    private $adapter;
+    private ?Adapter $adapter = null;
 
-    /**
-     * @var AbstractIntegration
-     */
-    private $integration;
-
-    public function __construct(UnifiedIntegrationInterface $integration)
-    {
-        $this->integration = $integration;
+    public function __construct(
+        private UnifiedIntegrationInterface $integration
+    ) {
     }
 
-    /**
-     * @return Adapter
-     */
-    public function getAdapter()
+    public function getAdapter(): ?Adapter
     {
         return $this->adapter;
     }
 
-    /**
-     * @return AbstractIntegration
-     */
-    public function getIntegration()
+    public function getIntegration(): UnifiedIntegrationInterface
     {
         return $this->integration;
     }
 
-    /**
-     * @return $this
-     */
-    public function setAdapter(Adapter $adapter)
+    public function setAdapter(Adapter $adapter): void
     {
         $this->adapter = $adapter;
-
-        return $this;
     }
 }

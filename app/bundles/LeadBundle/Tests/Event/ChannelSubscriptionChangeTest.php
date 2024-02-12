@@ -1,29 +1,17 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 
-/**
- * Class ChannelSubscriptionChangeTest.
- */
 class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Tests that getters returns same values as the contstruct
      */
-    public function testGetterReturnConstruct()
+    public function testGetterReturnConstruct(): void
     {
         $lead      = new Lead();
         $channel   = 'email';
@@ -43,13 +31,13 @@ class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that the default verb is unsubscribed if not recongized
      */
-    public function testGetStatusVerbReturnsUnsubscribedForUnrecognized()
+    public function testGetStatusVerbReturnsUnsubscribedForUnrecognized(): void
     {
         $lead      = new Lead();
         $channel   = 'email';
         $oldStatus = DoNotContact::IS_CONTACTABLE;
 
-        $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, 'foobar');
+        $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, 456);
 
         $this->assertEquals('unsubscribed', $event->getNewStatusVerb());
     }

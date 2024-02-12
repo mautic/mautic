@@ -1,23 +1,17 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Service;
 
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Service\Campaign;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
+/**
+ * @deprecated to be removed in 6.0
+ */
 class CampaignTest extends \PHPUnit\Framework\TestCase
 {
-    public function testHasUnpublishedEmail()
+    public function testHasUnpublishedEmail(): void
     {
         $campaignId         = 1;
         $campaignRepository = $this->createMock(CampaignRepository::class);

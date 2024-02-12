@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
@@ -26,8 +17,6 @@ trait FieldsTypeTrait
 {
     /**
      * @param string $fieldObject
-     * @param $limit
-     * @param $start
      */
     protected function buildFormFields(
         FormBuilderInterface $builder,
@@ -40,17 +29,17 @@ trait FieldsTypeTrait
     ) {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
-                $form = $event->getForm();
-                $index = 0;
-                $choices = [];
+            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start): void {
+                $form           = $event->getForm();
+                $index          = 0;
+                $choices        = [];
                 $requiredFields = [];
                 $optionalFields = [];
-                $group = [];
-                $fieldData = $event->getData();
+                $group          = [];
+                $fieldData      = $event->getData();
 
                 foreach ($mauticFields as $key => $value) {
-                    if (is_array($mauticFields)) {
+                    if (is_array($value)) {
                         $mauticFields[$key] = array_flip($value);
                     }
                 }
@@ -63,8 +52,8 @@ trait FieldsTypeTrait
                             if (!isset($choices[$details['group']])) {
                                 $choices[$details['group']] = [];
                             }
-                            $label = (isset($details['optionLabel'])) ? $details['optionLabel'] : $details['label'];
-                            $group[$field] = $groupName = $details['group'];
+                            $label           = $details['optionLabel'] ?? $details['label'];
+                            $group[$field]   = $groupName = $details['group'];
                             $choices[$field] = $label;
                         } else {
                             $choices[$field] = $details['label'];
@@ -89,15 +78,15 @@ trait FieldsTypeTrait
                 ksort($requiredFields, SORT_NATURAL);
                 ksort($optionalFields, SORT_NATURAL);
 
-                $sortFieldsFunction = function ($a, $b) {
+                $sortFieldsFunction = function ($a, $b): int {
                     if (is_array($a)) {
-                        $aLabel = (isset($a['optionLabel'])) ? $a['optionLabel'] : $a['label'];
+                        $aLabel = $a['optionLabel'] ?? $a['label'];
                     } else {
                         $aLabel = $a;
                     }
 
                     if (is_array($b)) {
-                        $bLabel = (isset($b['optionLabel'])) ? $b['optionLabel'] : $b['label'];
+                        $bLabel = $b['optionLabel'] ?? $b['label'];
                     } else {
                         $bLabel = $b;
                     }
@@ -123,7 +112,7 @@ trait FieldsTypeTrait
                 }
 
                 $paginatedFields = array_slice($fields, $start, $limit);
-                $fieldsName = 'leadFields';
+                $fieldsName      = 'leadFields';
                 if ($fieldObject) {
                     $fieldsName = $fieldObject.'Fields';
                 }
@@ -132,7 +121,7 @@ trait FieldsTypeTrait
                 }
 
                 foreach ($paginatedFields as $field => $details) {
-                    $matched = isset($fieldData[$fieldsName][$field]);
+                    $matched  = isset($fieldData[$fieldsName][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || 'Email' == $choices[$field]);
                     ++$index;
                     $form->add(
@@ -145,7 +134,7 @@ trait FieldsTypeTrait
                                 'class'         => 'form-control integration-fields',
                                 'data-required' => $required,
                                 'data-label'    => $choices[$field],
-                                'placeholder'   => isset($group[$field]) ? $group[$field] : '',
+                                'placeholder'   => $group[$field] ?? '',
                                 'readonly'      => true,
                             ],
                             'by_reference' => true,
@@ -160,13 +149,13 @@ trait FieldsTypeTrait
                         }
 
                         $forceDirection = false;
-                        $disabled = (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
-                        $data = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
+                        $disabled       = (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
+                        $data           = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
 
                         // Force to use just one way for certainly fields
                         if (isset($fields[$field]['update_mautic'])) {
-                            $data = (bool) $fields[$field]['update_mautic'];
-                            $disabled = true;
+                            $data           = (bool) $fields[$field]['update_mautic'];
+                            $disabled       = true;
                             $forceDirection = true;
                         }
 
@@ -192,8 +181,8 @@ trait FieldsTypeTrait
                     }
 
                     if (!$fieldObject) {
-                        $mauticFields['mautic.lead.report.contact_id'] = 'mauticContactId';
-                        $mauticFields['mautic.plugin.integration.contact.timeline.link'] = 'mauticContactTimelineLink';
+                        $mauticFields['mautic.lead.report.contact_id']                        = 'mauticContactId';
+                        $mauticFields['mautic.plugin.integration.contact.timeline.link']      = 'mauticContactTimelineLink';
                         $mauticFields['mautic.plugin.integration.contact.donotcontact.email'] = 'mauticContactIsContactableByEmail';
                     }
 
@@ -248,27 +237,21 @@ trait FieldsTypeTrait
         $resolver->setDefaults(
             [
                 'special_instructions' => function (Options $options) {
-                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $specialInstructions;
                 },
                 'alert_type' => function (Options $options) {
-                    list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
+                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $alertType;
                 },
                 'allow_extra_fields'   => true,
                 'enable_data_priority' => false,
-                'totalFields'          => function (Options $options) {
-                    return count($options['integration_fields']);
-                },
-                'fixedPageNum' => function (Options $options) {
-                    return ceil($options['totalFields'] / $options['limit']);
-                },
-                'limit' => 10,
-                'start' => function (Options $options) {
-                    return (1 === (int) $options['page']) ? 0 : ((int) $options['page'] - 1) * (int) $options['limit'];
-                },
+                'totalFields'          => fn (Options $options): int => count($options['integration_fields']),
+                'fixedPageNum'         => fn (Options $options): float => ceil($options['totalFields'] / $options['limit']),
+                'limit'                => 10,
+                'start'                => fn (Options $options): int => (1 === (int) $options['page']) ? 0 : ((int) $options['page'] - 1) * (int) $options['limit'],
             ]
         );
     }

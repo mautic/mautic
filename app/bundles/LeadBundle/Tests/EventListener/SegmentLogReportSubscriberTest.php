@@ -1,16 +1,9 @@
 <?php
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -23,17 +16,13 @@ class SegmentLogReportSubscriberTest extends TestCase
     /**
      * @var FieldsBuilder
      */
-    private $fieldsBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilder;
 
-    /**
-     * @var SegmentLogReportSubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber $subscriber;
 
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->fieldsBuilder = $this->createMock(FieldsBuilder::class);
 
@@ -42,7 +31,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         );
     }
 
-    public function testOnReportBuilder()
+    public function testOnReportBuilder(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -69,7 +58,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         $setTables = [];
         $mockEvent->expects($this->exactly(1))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
+            ->willReturnCallback(function () use (&$setTables): void {
                 $args = func_get_args();
 
                 $setTables[] = $args;
@@ -79,14 +68,21 @@ class SegmentLogReportSubscriberTest extends TestCase
         $this->assertCount(1, $setTables);
     }
 
-    public function testOnReportGenerate()
+    public function testOnReportGenerate(): void
     {
         // Mock query builder
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['from', 'andWhere', 'leftJoin', 'expr', 'setParameter', 'groupBy'])
-            ->addMethods(['orX', 'isNotNull'])
             ->getMock();
+
+        $expressionBuilder = $this->createMock(ExpressionBuilder::class);
+        $expressionBuilder->expects($this->exactly(1))
+            ->method('or')
+            ->willReturn($this->createMock(CompositeExpression::class));
+        $expressionBuilder->expects($this->exactly(2))
+            ->method('isNotNull')
+            ->willReturn('');
 
         $mockQueryBuilder->expects($this->once())
             ->method('from')
@@ -102,19 +98,11 @@ class SegmentLogReportSubscriberTest extends TestCase
 
         $mockQueryBuilder->expects($this->exactly(3))
             ->method('expr')
-            ->willReturn($mockQueryBuilder);
+            ->willReturn($expressionBuilder);
 
         $mockQueryBuilder->expects($this->exactly(2))
             ->method('setParameter')
             ->willReturn($mockQueryBuilder);
-
-        $mockQueryBuilder->expects($this->exactly(1))
-            ->method('orX')
-            ->willReturn($mockQueryBuilder);
-
-        $mockQueryBuilder->expects($this->exactly(2))
-            ->method('isNotNull')
-            ->willReturn('');
 
         $mockQueryBuilder->expects($this->exactly(1))
             ->method('groupBy')

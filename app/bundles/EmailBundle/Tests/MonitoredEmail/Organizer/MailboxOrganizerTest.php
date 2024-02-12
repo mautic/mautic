@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\Event\ParseEmailEvent;
@@ -58,11 +49,11 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Multiple mailboxes with the same imap path should be converted to a single container
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers
      */
-    public function testMailboxesAreConvertedIntoASingleContainer()
+    public function testMailboxesAreConvertedIntoASingleContainer(): void
     {
         $configs   = $this->getConfigs($this->mailboxes);
         $event     = new ParseEmailEvent();
@@ -81,11 +72,11 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Multiple mailboxes with multiple imap paths are converted to a multiple container
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers
      */
-    public function testMailboxesWithDifferentPathsAreConvertedIntoMultipleContainers()
+    public function testMailboxesWithDifferentPathsAreConvertedIntoMultipleContainers(): void
     {
         $mailboxes = [
             'EmailBundle_bounces' => [
@@ -140,13 +131,13 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Different criteria should be handled by the single container
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers()
-     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::setCriteriaRequest()
-     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getCriteriaRequests()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers
+     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::setCriteriaRequest
+     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getCriteriaRequests
      */
-    public function testMailboxesWithDifferentCriteriaAreAddedToContainer()
+    public function testMailboxesWithDifferentCriteriaAreAddedToContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);
         $event   = new ParseEmailEvent();
@@ -175,14 +166,14 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox All getters return appropriate values
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers()
-     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::setCriteriaRequest()
-     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getCriteriaRequests()
-     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getMarkAsSeenInstructions()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::organize
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainer
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer::getContainers
+     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::setCriteriaRequest
+     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getCriteriaRequests
+     * @covers  \Mautic\EmailBundle\Event\ParseEmailEvent::getMarkAsSeenInstructions
      */
-    public function testMailboxesWithDifferentCriteriaWithUnseenFlagMarksContainer()
+    public function testMailboxesWithDifferentCriteriaWithUnseenFlagMarksContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);
         $event   = new ParseEmailEvent();
@@ -198,8 +189,6 @@ class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $mailboxes
-     *
      * @return array
      */
     protected function getConfigs($mailboxes)

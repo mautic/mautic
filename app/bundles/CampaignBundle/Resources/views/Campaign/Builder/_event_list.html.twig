@@ -1,0 +1,34 @@
+{#
+  Variables
+    - campaignSettings
+    - campaignId
+#}
+{% for eventGroup, color in {'action': 'primary', 'decision': 'success', 'condition': 'danger'} %}
+    <div id="{{ eventGroup|title }}GroupList" class="hide">
+        <h4 class="mb-xs">
+            <span>{{ ('mautic.campaign.event.'~eventGroup~'s.header')|trans }}</span>
+            <button class="pull-right btn btn-xs btn-nospin btn-{{ color }}">
+                <i class="fa fa-fw fa-level-up"></i>
+            </button>
+        </h4>
+        <select id="{{ eventGroup|title }}List" class="campaign-event-selector">
+            <option value=""></option>
+            {% for k, e in eventSettings[eventGroup] %}
+                <option id="campaignEvent_{{ k|replace({'.': ''}) }}"
+                        class="option_campaignEvent_{{ k|replace({'.': ''}) }}"
+                        data-href="{{ path('mautic_campaignevent_action', {
+                                    'objectAction': 'new',
+                                    'type': k,
+                                    'eventType': eventGroup,
+                                    'campaignId': campaignId,
+                                    'anchor': '',
+                            }) }}"
+                        data-target="#CampaignEventModal"
+                        title="{{ e['description']|e }}"
+                        value="{{ k|e }}">
+                    <span>{{ e['label'] }}</span>
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+{% endfor %}

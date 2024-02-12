@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use LightSaml\Meta\TrustOptions\TrustOptions;
@@ -18,15 +9,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TrustOptionsStoreTest extends TestCase
-{  /**
- * @var CoreParametersHelper|MockObject
- */
-    private $coreParametersHelper;
-
+{
     /**
-     * @var TrustOptionsStore
+     * @var CoreParametersHelper|MockObject
      */
-    private $store;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+
+    private \Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore $store;
 
     protected function setUp(): void
     {
@@ -34,13 +23,13 @@ class TrustOptionsStoreTest extends TestCase
         $this->store                = new TrustOptionsStore($this->coreParametersHelper, 'foobar');
     }
 
-    public function testTrustOptionsConfiguredIfSamlEnabledAndEntityIdMatches()
+    public function testTrustOptionsConfiguredIfSamlEnabledAndEntityIdMatches(): void
     {
         $store = $this->store->get('foobar');
         $this->assertInstanceOf(TrustOptions::class, $store);
     }
 
-    public function testHasTrustOptionsIfSamlConfiguredAndEntityIdMatches()
+    public function testHasTrustOptionsIfSamlConfiguredAndEntityIdMatches(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -50,7 +39,7 @@ class TrustOptionsStoreTest extends TestCase
         $this->assertTrue($this->store->has('foobar'));
     }
 
-    public function testNotHaveTrustOptionsIfSamlDisabled()
+    public function testNotHaveTrustOptionsIfSamlDisabled(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -60,7 +49,7 @@ class TrustOptionsStoreTest extends TestCase
         $this->assertFalse($this->store->has('foobar'));
     }
 
-    public function testNotHaveTrustOptionsIfEntityIdDoesNotMatch()
+    public function testNotHaveTrustOptionsIfEntityIdDoesNotMatch(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -70,7 +59,7 @@ class TrustOptionsStoreTest extends TestCase
         $this->assertFalse($this->store->has('barfoo'));
     }
 
-    public function testTrustOptionsDoNotSignRequestForDefault()
+    public function testTrustOptionsDoNotSignRequestForDefault(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -81,7 +70,7 @@ class TrustOptionsStoreTest extends TestCase
         $this->assertFalse($store->getSignAuthnRequest());
     }
 
-    public function testTrustOptionsSignRequestForCustom()
+    public function testTrustOptionsSignRequestForCustom(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')

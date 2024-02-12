@@ -1,0 +1,98 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}user{% endblock %}
+{% set userId = form.vars.data.getId() %}
+{% if userId is not empty %}
+    {% set user = form.vars.data.getName() %}
+    {% set header = 'mautic.user.user.header.edit'|trans({'%name%': user}) %}
+{% else %}
+    {% set header = 'mautic.user.user.header.new'|trans %}
+{% endif %}
+
+{% block headerTitle %}{{ header }}{% endblock %}
+
+
+{% block content %}
+
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+	{{ form_start(form) }}
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+		<div class="pa-md">
+			<div class="form-group mb-0">
+			    <div class="row">
+                    <div class="col-sm-6{{ form.firstName.vars.errors|length ? ' has-error' : '' }}">
+                    	<label class="control-label mb-xs">{{ form_label(form.firstName) }}</label>
+                        {{ form_widget(form.firstName, {'attr' : {'placeholder' : form.firstName.vars.label }}) }}
+                        {{ form_errors(form.firstName) }}
+			        </div>
+                    <div class="col-sm-6{{ form.lastName.vars.errors|length ? ' has-error' : '' }}">
+                        <label class="control-label mb-xs">{{ form_label(form.lastName) }}</label>
+                        {{ form_widget(form.lastName, {'attr' : {'placeholder' : form.lastName.vars.label }}) }}
+                        {{ form_errors(form.lastName) }}
+				</div>
+			</div>
+			</div>
+			<hr class="mnr-md mnl-md">
+
+			<div class="form-group mb-0">
+			<div class="row">
+				<div class="col-sm-6{{ form.role.vars.errors|length ? ' has-error' : '' }}">
+					<label class="control-label mb-xs">{{ form_label(form.role) }}</label>
+                        {{ form_widget(form.role, {'attr' : {'placeholder' : form.role.vars.label }}) }}
+                        {{ form_errors(form.role) }}
+				</div>
+				<div class="col-sm-6{{ form.position.vars.errors|length ? ' has-error' : '' }}">
+					<label class="control-label mb-xs">{{ form_label(form.position) }}</label>
+                        {{ form_widget(form.position, {'attr' : {'placeholder' : form.position.vars.label }}) }}
+                        {{ form_errors(form.position) }}
+				</div>
+			</div>
+			</div>
+			<hr class="mnr-md mnl-md">
+
+            <div class="form-group mb-0">
+                <div class="row">
+                    <div class="col-sm-6{{ form.signature.vars.errors|length ? ' has-error' : '' }}">
+                        <label class="control-label mb-xs">{{ form_label(form.signature) }}</label>
+                        {{ form_widget(form.signature, {'attr' : {'placeholder' : form.signature.vars.label }}) }}
+                        {{ form_errors(form.signature) }}
+                    </div>
+                </div>
+            </div>
+            <hr class="mnr-md mnl-md">
+
+			<div class="panel panel-default form-group mb-0">
+				<div class="panel-body">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group{{ form.username.vars.errors|length ? ' has-error' : '' }}">
+							{{ form_label(form.username) }}
+						{{ form_widget(form.username, {'attr' : {'placeholder' : form.username.vars.label }}) }}
+						{{ form_errors(form.username) }}
+						</div>
+							<div class="form-group{{ form.email.vars.errors|length ? ' has-error' : '' }}">
+							{{ form_label(form.email) }}
+                        {{ form_widget(form.email, {'attr' : {'placeholder' : form.email.vars.label }}) }}
+                        {{ form_errors(form.email) }}
+						</div>
+					</div>
+					<div class="col-sm-6">
+						{{ form_widget(form.plainPassword, {'attr' : {'placeholder' : form.plainPassword.vars.label }}) }}
+					</div>
+				</div>
+				</div>
+			</div>
+			<hr class="mnr-md mnl-md">
+
+		</div>
+	</div>
+<div class="col-md-3 bg-white height-auto">
+		<div class="pr-lg pl-lg pt-md pb-md">
+            {{ form_rest(form) }}
+		</div>
+	</div>
+    {{ form_end(form) }}
+</div>
+
+{% endblock %}

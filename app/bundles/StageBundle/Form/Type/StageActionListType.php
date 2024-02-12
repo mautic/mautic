@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\StageBundle\Model\StageModel;
@@ -18,21 +9,19 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class StageActionType.
+ * @extends AbstractType<array<mixed>>
  */
 class StageActionListType extends AbstractType
 {
-    private $model;
-
-    public function __construct(StageModel $model)
-    {
-        $this->model = $model;
+    public function __construct(
+        private StageModel $model
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $stages = $this->model->getUserStages();
 
                 $choices = [];
@@ -47,16 +36,13 @@ class StageActionListType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string
      */
     public function getParent()
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'stageaction_list';
