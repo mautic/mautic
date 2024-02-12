@@ -23,20 +23,11 @@ class LeadPermissions extends AbstractPermissions
         parent::__construct($params);
 
         $this->permissions = [
-            'lists' => [
-                'viewother'   => 2,
-                'viewown'     => 4,
-                'editother'   => 8,
-                'deleteother' => 64,
-                'full'        => 1024,
-            ],
             'fields' => [
                 'full' => 1024,
-                'view' => 1,
             ],
         ];
 
-        $this->addExtendedPermissions('lists', false);
         $this->addExtendedPermissions('leads', false);
         $this->addExtendedPermissions('lists', false);
         $this->addStandardPermissions('imports');
@@ -100,15 +91,6 @@ class LeadPermissions extends AbstractPermissions
                 case 'publishown':
                 case 'publishother':
                     $level = 'full';
-                    break;
-            }
-        }
-
-        if ('lists' === $name) {
-            switch ($level) {
-                case 'view':
-                case 'viewown':
-                    $name = 'leads';
                     break;
             }
         }
