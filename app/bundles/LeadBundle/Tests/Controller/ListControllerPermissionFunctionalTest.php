@@ -83,7 +83,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testIndexPageWithCreatePermission(): void
     {
-        $this->loginOtherUser($this->userOne->getUsername());
+        $this->loginOtherUser($this->userOne->getUserIdentifier());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -93,7 +93,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testIndexPageNonAdmin(): void
     {
-        $this->loginOtherUser($this->nonAdminUser->getUsername());
+        $this->loginOtherUser($this->nonAdminUser->getUserIdentifier());
 
         $this->client->request(Request::METHOD_GET, '/s/segments');
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
@@ -107,7 +107,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testCreateSegmentForUserWithoutPermission(): void
     {
-        $this->loginOtherUser($this->nonAdminUser->getUsername());
+        $this->loginOtherUser($this->nonAdminUser->getUserIdentifier());
 
         $this->client->request(Request::METHOD_GET, '/s/segments/new');
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
@@ -115,7 +115,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testCreateSegmentForUserWithPermission(): void
     {
-        $this->loginOtherUser($this->userOne->getUsername());
+        $this->loginOtherUser($this->userOne->getUserIdentifier());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/new');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -156,7 +156,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 ],
             ]
         );
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $segment = $this->createSegment('Test Segment for clone test', $user);
 
@@ -189,7 +189,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 ],
             ]
         );
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -197,7 +197,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentCloningUsingUserWithoutPermissions(): void
     {
-        $this->loginOtherUser($this->userTwo->getUsername());
+        $this->loginOtherUser($this->userTwo->getUserIdentifier());
 
         $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
@@ -244,7 +244,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testEditOwnSegment(): void
     {
-        $this->loginOtherUser($this->userOne->getUsername());
+        $this->loginOtherUser($this->userOne->getUserIdentifier());
 
         $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -252,7 +252,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testEditOthersSegment(): void
     {
-        $this->loginOtherUser($this->userTwo->getUsername());
+        $this->loginOtherUser($this->userTwo->getUserIdentifier());
 
         $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -272,7 +272,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
@@ -295,7 +295,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testDeleteSegmentWithoutPermission(): void
     {
-        $this->loginOtherUser($this->nonAdminUser->getUsername());
+        $this->loginOtherUser($this->nonAdminUser->getUserIdentifier());
         $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
@@ -313,7 +313,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
                 'bitwise'   => 128,
             ],
         ]);
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
         $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
@@ -376,7 +376,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $segmentIds = [
             $this->segmentA->getId(),
@@ -403,7 +403,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $segmentIds = [
             101,
@@ -433,7 +433,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segmentA  = $this->createSegment('Segment List A', $user);
         $this->em->flush();
 
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $segmentIds = [
             $segmentA->getId(),
@@ -466,7 +466,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segmentC);
         $this->em->flush();
 
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $segmentIds = [
             $segmentC->getId(),
@@ -511,7 +511,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segmentB = $this->createSegment('Segment List with filter', $user, $filter);
         $this->assertSame($filter, $segmentB->getFilters(), 'Filters');
 
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
 
         $segmentIds = [
             $segmentA->getId(),
@@ -539,11 +539,11 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         ]);
         $segment = $this->createSegment('Segment News View', $user);
 
-        $this->loginOtherUser($user->getUsername());
+        $this->loginOtherUser($user->getUserIdentifier());
         $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        $this->loginOtherUser($this->userOne->getUsername());
+        $this->loginOtherUser($this->userOne->getUserIdentifier());
         $this->client->request(Request::METHOD_GET, '/s/segments/view/'.$segment->getId());
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
@@ -563,7 +563,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     public function testRemoveLeadFromSegmentWhereUserIsNotOwnerOfSegment(): void
     {
         $leadId = $this->createLead($this->userOne)->getId();
-        $this->loginOtherUser($this->userTwo->getUsername());
+        $this->loginOtherUser($this->userTwo->getUserIdentifier());
         $this->client->request(Request::METHOD_POST, '/s/segments/removeLead/'.$this->segmentA->getId().'?leadId='.$leadId);
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
@@ -571,7 +571,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     public function testRemoveLeadFromSegmentWhereUserIsOwnerOfSegment(): void
     {
         $leadId = $this->createLead($this->userOne)->getId();
-        $this->loginOtherUser($this->userOne->getUsername());
+        $this->loginOtherUser($this->userOne->getUserIdentifier());
         $this->client->request(Request::METHOD_POST, '/s/segments/removeLead/'.$this->segmentA->getId().'?leadId='.$leadId);
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
