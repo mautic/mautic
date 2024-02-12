@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use function PHPUnit\Framework\isInstanceOf;
 
 class ListController extends FormController
 {
@@ -345,7 +346,6 @@ class ListController extends FormController
      */
     private function getSegment(int $segmentId, string $ownPermission, string $otherPermission): LeadList
     {
-        /** @var LeadList $segment */
         $segment = $this->getModel('lead.list')->getEntity($segmentId);
 
         // Check if exists
