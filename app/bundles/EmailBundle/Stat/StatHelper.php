@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Stat;
 
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 
 class StatHelper
@@ -21,25 +21,25 @@ class StatHelper
     private $deleteUs = [];
 
     public function __construct(
-        private StatRepository $repo
+        private EmailStatModel $emailStatModel
     ) {
     }
 
     public function storeStat(Stat $stat, $emailAddress): void
     {
-        $this->repo->saveEntity($stat);
+        $this->emailStatModel->saveEntity($stat);
 
         // to avoid Doctrine RAM issues, we're just going to hold onto ID references
         $this->stats[$emailAddress] = new Reference($stat);
 
         // clear stat from doctrine memory
-        $this->repo->detachEntity($stat);
+        $this->emailStatModel->getRepository()->detachEntity($stat);
     }
 
     public function deletePending(): void
     {
         if (count($this->deleteUs)) {
-            $this->repo->deleteStats($this->deleteUs);
+            $this->emailStatModel->getRepository()->deleteStats($this->deleteUs);
         }
     }
 

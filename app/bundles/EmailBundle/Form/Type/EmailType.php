@@ -68,18 +68,16 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'subject',
-                TextType::class,
-                [
-                    'label'      => 'mautic.email.subject',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'   => 'form-control',
-                        'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
-                    ],
-                ]
-            )
+            'subject',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.subject',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
+                ],
+            ]
         );
 
         $builder->add(
@@ -226,22 +224,20 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'customHtml',
-                TextareaType::class,
-                [
-                    'label'      => 'mautic.email.form.body',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => false,
-                    'attr'       => [
-                        'tooltip'              => 'mautic.email.form.body.help',
-                        'class'                => 'form-control editor-builder-tokens builder-html editor-email',
-                        'data-token-callback'  => 'email:getBuilderTokens',
-                        'data-token-activator' => '{',
-                        'rows'                 => '15',
-                    ],
-                ]
-            )
+            'customHtml',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.email.form.body',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'tooltip'              => 'mautic.email.form.body.help',
+                    'class'                => 'form-control editor-builder-tokens builder-html editor-email',
+                    'data-token-callback'  => 'email:getBuilderTokens',
+                    'data-token-activator' => '{',
+                    'rows'                 => '15',
+                ],
+            ]
         );
 
         $transformer = new IdToEntityModelTransformer($this->em, \Mautic\FormBundle\Entity\Form::class, 'id');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -310,10 +311,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldModelMock->expects($this->once())
             ->method('getEntities')
-            ->willReturn([
-                4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
-                5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
-            ]);
+            ->willReturn($this->getFieldPaginatorFake());
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
@@ -353,10 +351,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldModelMock->expects($this->once())
             ->method('getEntities')
-            ->willReturn([
-                4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
-                5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
-            ]);
+            ->willReturn($this->getFieldPaginatorFake());
 
         /** @var LeadModel&MockObject $mockLeadModel */
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
@@ -739,6 +734,29 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             public function getId(): int
             {
                 return $this->id;
+            }
+        };
+    }
+
+    /**
+     * @return Paginator<mixed[]>
+     */
+    private function getFieldPaginatorFake(): Paginator
+    {
+        return new class() extends Paginator {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @return \ArrayIterator<int,array{label: string, alias: string, isPublished: bool, id: int, object: string, group: string, type: string}>
+             */
+            public function getIterator()
+            {
+                return new \ArrayIterator([
+                    4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
+                    5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
+                ]);
             }
         };
     }

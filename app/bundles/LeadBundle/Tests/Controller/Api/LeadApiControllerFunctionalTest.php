@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -14,6 +20,18 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Disable API just for specific test.
         $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->getName();
+
+        static::getContainer()->set(
+            'session',
+            new Session(
+                new class() extends FixedMockFileSessionStorage {
+                    public function start()
+                    {
+                        Assert::fail('Session cannot be started during API call. It must be stateless.');
+                    }
+                }
+            )
+        );
 
         parent::setUp();
     }
@@ -45,7 +63,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
-        $payload = [
+        $companyA = $this->createCompany('CompanyA corp');
+        $companyB = $this->createCompany('CompanyB corp');
+        $payload  = [
             [
                 'email'            => 'batchemail1@email.com',
                 'firstname'        => 'BatchUpdate',
@@ -57,6 +77,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'preferred_locale' => 'es_SV',
                 'timezone'         => 'America/Chicago',
                 'owner'            => 1,
+                'company'          => $companyA->getId(),
             ],
             [
                 'email'            => 'batchemail2@email.com',
@@ -74,7 +95,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
         Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -141,6 +162,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][1]['owner']);
         $this->assertEquals(null, $response['contacts'][2]['owner']);
 
+        // Assert company
+        $this->assertEquals($companyA->getId(), (int) $response['contacts'][0]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
+
         // Emulate an unsanitized email to ensure that doesn't cause duplicates
         $payload[0]['email'] = 'batchemail1@email.com,';
 
@@ -155,6 +181,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[0]['state']            = 'California';
         $payload[0]['timezone']         = 'America/Los_Angeles';
         $payload[0]['preferred_locale'] = 'en_US';
+        $payload[0]['company']          = $companyB->getId();
 
         // Update owner
         $payload[0]['owner'] = null;
@@ -167,7 +194,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[1]['points'] = 3;
 
         // Update the 3 contacts
-        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
         Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -233,6 +260,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][0]['owner']);
         $this->assertEquals($payload[1]['owner'], $response['contacts'][1]['owner']['id']);
         $this->assertEquals(null, $response['contacts'][2]['owner']);
+
+        // Assert company
+        $this->assertEquals($companyB->getId(), (int) $response['contacts'][0]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
     }
 
     /**
@@ -307,10 +339,13 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'owner'            => 1,
         ];
 
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $contactId      = $response['contact']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response  = json_decode($clientResponse->getContent(), true);
+        $contactId = $response['contact']['id'];
 
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
@@ -328,7 +363,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload['lastname'] = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -344,7 +379,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload['lastname']           = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -371,7 +406,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'owner'    => 2,
         ];
 
-        $this->client->request('POST', '/api/contacts/new', $updatedValues);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $updatedValues);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -408,8 +443,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $updatedValues['owner'] = 2;
 
         // Test getting a contact
-        $this->client->request(
-            'GET', '/api/contacts/'.$contactId);
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contactId);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -427,8 +461,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
 
         // Test fetching the batch of contacts
-        $this->client->request(
-            'GET', '/api/contacts');
+        $this->client->request(Request::METHOD_GET, '/api/contacts');
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -503,7 +536,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ];
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
@@ -513,7 +546,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['doNotContact'][0]['reason'], $response['contact']['doNotContact'][0]['reason']);
 
         // Remove contact
-        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -748,7 +781,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'email' => $emailAddress,
         ];
 
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
@@ -769,7 +802,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertSame(3, $response['contacts'][0]['doNotContact'][0]['reason']);
@@ -790,14 +823,14 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertEmpty($response['contacts'][0]['doNotContact']);
 
         // Remove contact
-        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -805,11 +838,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testAddAndRemoveDncToExistingContact(): void
     {
         // Create contact
-        $payload = [
-            'email' => 'addDncDemo@mautic.org',
-        ];
+        $payload = ['email' => 'addDncDemo@mautic.org'];
 
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
@@ -818,12 +849,10 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $response['contact']['doNotContact']);
 
         // Check with a DNC payload that has an empty reasoncode in it, this should throw a 400 Bad Request error
-        $dncPayload = [
-            'reason' => 0,
-        ];
+        $dncPayload = ['reason' => 0];
         $dncChannel = 'email';
 
-        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
 
@@ -831,7 +860,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $dncPayload = [];
 
         // Add DNC to the contact.
-        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
         $clientResponse = $this->client->getResponse();
         $dncResponse    = json_decode($clientResponse->getContent(), true);
 
@@ -851,7 +880,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Contact was manually set as do not contact for this channel.', $dncEvents[0]['details']['dnc']['reason']);
 
         // Remove DNC from the contact.
-        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/remove");
+        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/remove");
         $clientResponse    = $this->client->getResponse();
         self::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $dncRemoveResponse = json_decode($clientResponse->getContent(), true);
@@ -860,8 +889,19 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $dncRemoveResponse['contact']['doNotContact']);
 
         // Remove the contact.
-        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    private function createCompany(string $name): Company
+    {
+        $company = new Company();
+        $company->setName($name);
+
+        $this->em->persist($company);
+        $this->em->flush();
+
+        return $company;
     }
 }
