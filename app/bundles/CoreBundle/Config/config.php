@@ -403,14 +403,6 @@ return [
                     'template' => '@MauticCore/Menu/profile_inline.html.twig',
                 ],
             ],
-            'mautic.core.command.anonymize_ip' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\CoreBundle\Command\AnonymizeIpCommand::class,
-                'arguments' => [
-                    'mautic.core.repository.ip_address',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [

@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic. All rights reserved
- * @author      Mautic
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\DBALException;
@@ -25,20 +18,8 @@ class AnonymizeIpCommand extends Command
      */
     public const COMMAND_NAME = 'mautic:anonymize:ip';
 
-    /**
-     * @var IpAddressRepository
-     */
-    private $ipAddressRepository;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(IpAddressRepository $ipAddressRepository, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private IpAddressRepository $ipAddressRepository, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->ipAddressRepository  = $ipAddressRepository;
-        $this->coreParametersHelper = $coreParametersHelper;
         parent::__construct();
     }
 
