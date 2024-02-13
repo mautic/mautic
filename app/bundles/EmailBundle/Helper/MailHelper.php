@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -26,6 +27,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -1729,14 +1731,14 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(Copy::class, $this->copies[$id]));
             } catch (ORMException) {
                 // keep IDE happy
             }
         }
 
         if ($persist) {
-            $emailModel->getStatRepository()->saveEntity($stat);
+            $emailModel->saveEmailStat($stat);
         }
 
         return $stat;
@@ -1873,13 +1875,31 @@ class MailHelper
 
         // Set custom headers
         if (!empty($headers)) {
+            $tokens = $this->getTokens();
+            // Replace tokens
             $messageHeaders = $this->message->getHeaders();
             foreach ($headers as $headerKey => $headerValue) {
-                if ($messageHeaders->has($headerKey)) {
-                    $header = $messageHeaders->get($headerKey);
-                    $header->setBody($headerValue);
-                } else {
-                    $messageHeaders->addTextHeader($headerKey, $headerValue);
+                $headerValue = str_ireplace(array_keys($tokens), $tokens, $headerValue);
+
+                if (!$headerValue) {
+                    $messageHeaders->remove($headerKey);
+                    continue;
+                }
+
+                try {
+                    if (in_array(strtolower($headerKey), ['from', 'to', 'cc', 'bcc', 'reply-to'])) {
+                        // Handling headers that require MailboxListHeader
+                        $headerValue = array_map(fn ($address): Address => new Address($address),
+                            explode(',', $headerValue));
+                    }
+                    if ($messageHeaders->has($headerKey)) {
+                        $header = $messageHeaders->get($headerKey);
+                        $header->setBody($headerValue);
+                    } else {
+                        $messageHeaders->addHeader($headerKey, $headerValue);
+                    }
+                } catch (RfcComplianceException) {
+                    $messageHeaders->remove($headerKey);
                 }
             }
         }
@@ -1977,7 +1997,7 @@ class MailHelper
             }
         }
 
-        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $email);
 
         $this->setMessageFrom($from);
     }

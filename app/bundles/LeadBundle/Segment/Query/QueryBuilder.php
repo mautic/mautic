@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
-    private ?\Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder $_expr = null;
+    private ?ExpressionBuilder $_expr = null;
 
     /**
      * Unprocessed logic for segment processing.
@@ -24,19 +24,6 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * Gets an ExpressionBuilder used for object-oriented construction of query expressions.
-     * This producer method is intended for convenient inline usage. Example:.
-     *
-     * <code>
-     *     $qb = $conn->createQueryBuilder()
-     *         ->select('u')
-     *         ->from('users', 'u')
-     *         ->where($qb->expr()->eq('u.id', 1));
-     * </code>
-     *
-     * For more complex expression construction, consider storing the expression
-     * builder object in a local variable.
-     *
      * @return ExpressionBuilder
      */
     public function expr()
@@ -50,23 +37,6 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->_expr;
     }
 
-    /**
-     * Sets a query parameter for the query being constructed.
-     *
-     * <code>
-     *     $qb = $conn->createQueryBuilder()
-     *         ->select('u')
-     *         ->from('users', 'u')
-     *         ->where('u.id = :user_id')
-     *         ->setParameter(':user_id', 1);
-     * </code>
-     *
-     * @param string|int  $key   the parameter position or name
-     * @param mixed       $value the parameter value
-     * @param string|null $type  one of the PDO::PARAM_* constants
-     *
-     * @return $this this QueryBuilder instance
-     */
     public function setParameter($key, $value, $type = null)
     {
         if (str_starts_with($key, ':')) {
@@ -75,11 +45,112 @@ class QueryBuilder extends BaseQueryBuilder
             @\trigger_error('Using query key with ":" is deprecated. Use key without ":" instead.', \E_USER_DEPRECATED);
         }
 
+        if (is_bool($value)) {
+            $value = (int) $value;
+        }
+
         return parent::setParameter($key, $value, $type);
     }
 
     /**
-     * @return bool
+     * @param string $queryPartName
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function setQueryPart($queryPartName, $value)
+    {
+        $this->resetQueryPart($queryPartName);
+        $this->add($queryPartName, $value);
+
+        return $this;
+    }
+
+    public function getSQL()
+    {
+        $sql   = &$this->parentProperty('sql');
+        $state = &$this->parentProperty('state');
+
+        if (null !== $sql && 1 /* self::STATE_CLEAN */ === $state) {
+            return $sql;
+        }
+
+        $sql = match ($this->getType()) { /** @phpstan-ignore-line this method is deprecated. We'll have to find a way how to refactor this method. */
+            3 /* self::INSERT */ => $this->parentMethod('getSQLForInsert'),
+            1 /* self::DELETE */ => $this->parentMethod('getSQLForDelete'),
+            2 /* self::UPDATE */ => $this->parentMethod('getSQLForUpdate'),
+            default              => $this->getSQLForSelect(),
+        };
+
+        $state = 1 /* self::STATE_CLEAN */;
+
+        return $sql;
+    }
+
+    private function getSQLForSelect(): string
+    {
+        $sqlParts = $this->getQueryParts();
+
+        $query = 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').
+            implode(', ', $sqlParts['select']);
+
+        $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
+            .(null !== $sqlParts['where'] ? ' WHERE '.($sqlParts['where']) : '')
+            .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $sqlParts['groupBy']) : '')
+            .(null !== $sqlParts['having'] ? ' HAVING '.($sqlParts['having']) : '')
+            .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $sqlParts['orderBy']) : '');
+
+        if ($this->parentMethod('isLimitQuery')) {
+            return $this->connection->getDatabasePlatform()->modifyLimitQuery(
+                $query,
+                $this->getMaxResults(),
+                $this->getFirstResult()
+            );
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getFromClauses(): array
+    {
+        $fromClauses  = [];
+        $knownAliases = [];
+
+        // Loop through all FROM clauses
+        foreach ($this->getQueryParts()['from'] as $from) {
+            if (null === $from['alias']) {
+                $tableSql       = $from['table'];
+                $tableReference = $from['table'];
+            } else {
+                $tableSql       = $from['table'].' '.$from['alias'];
+                $tableReference = $from['alias'];
+            }
+
+            if (isset($from['hint'])) {
+                $tableSql .= ' '.$from['hint'];
+            }
+
+            $knownAliases[$tableReference] = true;
+
+            $fromClauses[$tableReference] = $tableSql.\Closure::bind(
+                fn ($tableReference, &$knownAliases) => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
+                $this,
+                parent::class
+            )($tableReference, $knownAliases);
+        }
+
+        $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
+
+        return $fromClauses;
+    }
+
+    /**
+     * @param string $alias
+     *
+     * @return string|false
      */
     public function getJoinCondition($alias)
     {
@@ -102,32 +173,22 @@ class QueryBuilder extends BaseQueryBuilder
      */
     public function addJoinCondition($alias, $expr)
     {
-        $parts = $this->getQueryPart('join');
+        $result = $parts = $this->getQueryPart('join');
+
         foreach ($parts as $tbl => $joins) {
             foreach ($joins as $key => $join) {
-                if ($join['joinAlias'] !== $alias) {
-                    continue;
+                if ($join['joinAlias'] == $alias) {
+                    $result[$tbl][$key]['joinCondition'] = $join['joinCondition'].' and ('.$expr.')';
+                    $inserted                            = true;
                 }
-
-                $parts[$tbl][$key] = array_merge(
-                    $join,
-                    [
-                        'joinType'      => $join['joinType'],
-                        'joinTable'     => $join['joinTable'],
-                        'joinAlias'     => $join['joinAlias'],
-                        'joinCondition' => $join['joinCondition'].' and ('.$expr.')',
-                    ]
-                );
-                $this->add('join', $parts);
-                $inserted = true;
-
-                break;
             }
         }
 
         if (!isset($inserted)) {
             throw new QueryException('Inserting condition to nonexistent join '.$alias);
         }
+
+        $this->setQueryPart('join', $result);
 
         return $this;
     }
@@ -138,13 +199,13 @@ class QueryBuilder extends BaseQueryBuilder
     public function replaceJoinCondition($alias, $expr)
     {
         $parts = $this->getQueryPart('join');
-        $this->resetQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
             if ($part['joinAlias'] == $alias) {
                 $parts['l'][$key]['joinCondition'] = $expr;
             }
-            $this->join($part['joinType'], $part['joinTable'], $part['joinAlias'], $parts['l'][$key]['joinCondition']);
         }
+
+        $this->setQueryPart('join', $parts);
 
         return $this;
     }
@@ -260,6 +321,9 @@ class QueryBuilder extends BaseQueryBuilder
         return $tables;
     }
 
+    /**
+     * @param string $table
+     */
     public function isJoinTable($table): bool
     {
         $queryParts = $this->getQueryParts();
@@ -380,10 +444,30 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function createQueryBuilder(Connection $connection = null): QueryBuilder
     {
-        if (null === $connection) {
-            $connection = $this->connection;
-        }
+        return new self($connection ?: $this->connection);
+    }
 
-        return new self($connection);
+    /**
+     * @return mixed
+     *
+     * @noinspection PhpPassByRefInspection
+     */
+    private function &parentProperty(string $property)
+    {
+        return \Closure::bind(function &() use ($property) {
+            return $this->$property;
+        }, $this, parent::class)();
+    }
+
+    /**
+     * @param mixed ...$arguments
+     *
+     * @return mixed
+     */
+    private function parentMethod(string $method, ...$arguments)
+    {
+        return \Closure::bind(function () use ($method, $arguments) {
+            return $this->$method(...$arguments);
+        }, $this, parent::class)();
     }
 }

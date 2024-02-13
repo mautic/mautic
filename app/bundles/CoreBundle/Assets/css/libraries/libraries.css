@@ -14316,7 +14316,7 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   cursor: not-allowed;
   background-color: #ebedf0 !important;
 }
-.tt-dropdown-menu {
+.tt-menu {
   position: absolute;
   top: 100%;
   left: 0;
@@ -14337,7 +14337,7 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   *border-right-width: 2px;
   *border-bottom-width: 2px;
 }
-.tt-dropdown-menu .tt-suggestion {
+.tt-menu .tt-suggestion {
   display: block;
   padding: 3px 20px;
   clear: both;
@@ -14346,16 +14346,16 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   color: #47535f;
   white-space: nowrap;
 }
-.tt-dropdown-menu .tt-suggestion.tt-cursor {
+.tt-menu .tt-suggestion.tt-cursor {
   text-decoration: none;
   outline: 0;
   background-color: #f5f5f5;
   color: #3c4650;
 }
-.tt-dropdown-menu .tt-suggestion.tt-cursor a {
+.tt-menu .tt-suggestion.tt-cursor a {
   color: #3c4650;
 }
-.tt-dropdown-menu .tt-suggestion p {
+.tt-menu .tt-suggestion p {
   margin: 0;
 }
 .xdsoft_datetimepicker {
