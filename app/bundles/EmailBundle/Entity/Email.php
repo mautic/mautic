@@ -657,7 +657,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return bool
+     * @return ?bool
      */
     public function getUseOwnerAsMailer()
     {
