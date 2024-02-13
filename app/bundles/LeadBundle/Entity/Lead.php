@@ -134,7 +134,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $pushIds;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadEventLog>
+     * @var ArrayCollection<int, LeadEventLog>
      */
     private $eventLog;
 

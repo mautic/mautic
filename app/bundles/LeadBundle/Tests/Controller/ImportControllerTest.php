@@ -82,7 +82,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertSame($fields, $importEntity->getProperties()['fields']);
         Assert::assertSame(array_values($fields), $importEntity->getProperties()['headers']);
 
-        $this->runCommand(ImportCommand::COMMAND_NAME);
+        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
 
         $this->em->clear();
 

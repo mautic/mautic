@@ -235,19 +235,6 @@ return [
                     'mautic.campaign.scheduler',
                 ],
             ],
-            'mautic.campaign.executioner.scheduled'     => [
-                'class'     => \Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class,
-                'arguments' => [
-                    'mautic.campaign.repository.lead_event_log',
-                    'monolog.logger.mautic',
-                    'translator',
-                    'mautic.campaign.event_executioner',
-                    'mautic.campaign.scheduler',
-                    'mautic.campaign.contact_finder.scheduled',
-                ],
-                'tag'          => 'kernel.reset',
-                'tagArguments' => ['method' => 'reset'],
-            ],
             'mautic.campaign.executioner.realtime'     => [
                 'class'     => \Mautic\CampaignBundle\Executioner\RealTimeExecutioner::class,
                 'arguments' => [
@@ -260,17 +247,6 @@ return [
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
                     'mautic.campaign.helper.decision',
-                ],
-            ],
-            'mautic.campaign.executioner.inactive'     => [
-                'class'     => \Mautic\CampaignBundle\Executioner\InactiveExecutioner::class,
-                'arguments' => [
-                    'mautic.campaign.contact_finder.inactive',
-                    'monolog.logger.mautic',
-                    'translator',
-                    'mautic.campaign.scheduler',
-                    'mautic.campaign.helper.inactivity',
-                    'mautic.campaign.event_executioner',
                 ],
             ],
             'mautic.campaign.helper.decision' => [
