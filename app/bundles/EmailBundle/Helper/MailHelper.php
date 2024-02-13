@@ -2127,7 +2127,7 @@ class MailHelper
             $this->dispatcher = $this->factory->getDispatcher();
         }
 
-        if (null === $this->dispatcher) {
+        if (empty($this->dispatcher)) {
             return;
         }
 

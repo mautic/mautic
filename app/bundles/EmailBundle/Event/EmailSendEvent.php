@@ -48,7 +48,9 @@ class EmailSendEvent extends CommonEvent
     private bool $fatal = false;
 
     private bool $skip = false;
-
+    /**
+     * @var array<string>
+     */
     private array $errors = [];
 
     /**
@@ -338,12 +340,12 @@ class EmailSendEvent extends CommonEvent
         return $content.implode(' ', $this->getTextHeaders());
     }
 
-    public function disableSkip()
+    public function disableSkip(): void
     {
         $this->skip = false;
     }
 
-    public function enableSkip()
+    public function enableSkip(): void
     {
         $this->skip = true;
     }
@@ -358,7 +360,7 @@ class EmailSendEvent extends CommonEvent
         $this->fatal = true;
     }
 
-    public function disableFatal()
+    public function disableFatal(): void
     {
         $this->fatal = false;
     }
@@ -368,11 +370,14 @@ class EmailSendEvent extends CommonEvent
         return $this->fatal;
     }
 
-    public function addError($error): void
+    public function addError(string $error): void
     {
         $this->errors[] = $error;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getErrors(): array
     {
         return $this->errors;
