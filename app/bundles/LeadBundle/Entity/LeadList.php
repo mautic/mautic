@@ -89,7 +89,8 @@ class LeadList extends FormEntity
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist');
+            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist')
+            ->addIndex(['alias'], 'lead_list_alias');
 
         $builder->addIdColumns();
 
