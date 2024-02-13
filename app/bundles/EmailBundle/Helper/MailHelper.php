@@ -211,6 +211,8 @@ class MailHelper
      */
     protected $fatal = false;
 
+    protected bool $skip = false;
+
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
      */
@@ -311,6 +313,7 @@ class MailHelper
             $this->message->returnPath($this->returnPath);
         }
 
+        $this->dispatchPreSendEvent();
         if (empty($this->fatal)) {
             if (!$isQueueFlush) {
                 // Search/replace tokens if this is not a queue flush
@@ -372,7 +375,10 @@ class MailHelper
             }
 
             try {
-                $this->mailer->send($this->message);
+                if (!$this->skip) {
+                    $this->mailer->send($this->message);
+                }
+                $this->skip = false;
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
@@ -2113,5 +2119,32 @@ class MailHelper
         }
 
         return $this->systemFrom;
+    }
+
+    public function dispatchPreSendEvent(): void
+    {
+        if (null === $this->dispatcher) {
+            $this->dispatcher = $this->factory->getDispatcher();
+        }
+
+        if (null === $this->dispatcher) {
+            return;
+        }
+
+        $event = new EmailSendEvent($this);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
+
+        $this->skip               = $event->isSkip();
+        $this->fatal              = $event->isFatal();
+        $errors                   = $event->getErrors();
+        if (!empty($errors)) {
+            $currentErrors = [];
+            if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
+                $currentErrors = $this->errors['failures'];
+            }
+            $this->errors['failures'] = array_merge($errors, $currentErrors);
+        }
+
+        unset($event);
     }
 }
