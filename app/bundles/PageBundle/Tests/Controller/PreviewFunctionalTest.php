@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\Lead;
@@ -51,7 +50,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         $page = new Page();
         $page->setIsPublished(true);
-        $page->setDateAdded(new DateTime());
+        $page->setDateAdded(new \DateTime());
         $page->setTitle('Preview settings test - main page');
         $page->setAlias('page-main');
         $page->setTemplate('Blank');

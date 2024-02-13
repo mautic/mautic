@@ -430,15 +430,15 @@ class EmailController extends FormController
                     )->getContent(),
                     'dateRangeForm'       => $dateRangeForm->createView(),
                     'previewSettingsForm' => $this->createForm(
-                            ContentPreviewSettingsType::class,
-                            null,
-                            [
-                                'type'         => ContentPreviewSettingsType::TYPE_EMAIL,
-                                'objectId'     => $email->getId(),
-                                'variants'     => $variants,
-                                'translations' => $translations,
-                            ]
-                        )->createView(),
+                        ContentPreviewSettingsType::class,
+                        null,
+                        [
+                            'type'         => ContentPreviewSettingsType::TYPE_EMAIL,
+                            'objectId'     => $email->getId(),
+                            'variants'     => $variants,
+                            'translations' => $translations,
+                        ]
+                    )->createView(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/details.html.twig',
                 'passthroughVars' => [

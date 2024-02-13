@@ -2,15 +2,15 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -31,8 +31,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
-class PublicController extends CommonFormController
+class PublicController extends AbstractFormController
 {
     /**
      * @return Response
@@ -47,6 +48,7 @@ class PublicController extends CommonFormController
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         Tracking404Model $tracking404Model,
+        Router $router,
         $slug)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
@@ -275,8 +277,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $assetsHelper->addScript(
-                $this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $assetsHelper->addScript($router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'
@@ -304,7 +305,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, int $id)
+    public function previewAction(Request $request, CorePermissions $security, int $id)
     {
         $contactId = (int) $request->query->get('contactId');
 
@@ -329,8 +330,6 @@ class PublicController extends CommonFormController
         $BCcontent = $page->getContent();
         $content   = $page->getCustomHtml();
 
-        /** @var CorePermissions $security */
-        $security   = $this->get('mautic.security');
         if (!$security->isAdmin()
             && (
                 (!$page->isPublished())
@@ -344,16 +343,16 @@ class PublicController extends CommonFormController
         }
 
         if ($contactId && (
-                !$security->isAdmin()
-                || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-            )
+            !$security->isAdmin()
+            || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+        )
         ) {
             return $this->accessDenied();
         }
 
         if (empty($content) && !empty($BCcontent)) {
             $template = $page->getTemplate();
-            //all the checks pass so display the content
+            // all the checks pass so display the content
             $slots   = $this->factory->getTheme($template)->getSlots('page');
             $content = $page->getContent();
 

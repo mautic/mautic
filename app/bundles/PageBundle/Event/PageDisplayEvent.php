@@ -9,16 +9,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 class PageDisplayEvent extends Event
 {
     /**
-     * @param string $content
-     */
-
-    /**
      * Preferred lead to be used in listeners.
      */
     private ?Lead $lead;
 
     public function __construct(
-        private $content,
+        private string $content,
         private Page $page,
         private array $params = []
     ) {

@@ -10,7 +10,7 @@ use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -25,14 +25,8 @@ class ContentPreviewSettingsType extends AbstractType
     private const CHOICE_TYPE_TRANSLATION = 'translation';
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
-    private TranslatorInterface $translator;
-
-    private CorePermissions $security;
-
-    public function __construct(TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(private TranslatorInterface $translator, private CorePermissions $security)
     {
-        $this->translator = $translator;
-        $this->security   = $security;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -45,7 +39,7 @@ class ContentPreviewSettingsType extends AbstractType
         $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $objectId);
 
         if ($this->security->isAdmin()
-            || (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother'))
+            || $this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
         ) {
             $builder->add(
                 'contact',
@@ -135,7 +129,7 @@ class ContentPreviewSettingsType extends AbstractType
 
         if (self::CHOICE_TYPE_TRANSLATION === $type) {
             // Add localised translation name
-            $identifier .= ' - '.Intl::getLocaleBundle()->getLocaleName($email->getLanguage());
+            $identifier .= ' - '.Locales::getName($email->getLanguage());
         }
 
         $identifier .= " - ID {$email->getId()}";

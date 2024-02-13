@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -45,7 +44,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     private function createEmail(bool $publicPreview = true): Email
     {
         $email = new Email();
-        $email->setDateAdded(new DateTime());
+        $email->setDateAdded(new \DateTime());
         $email->setName('Email name');
         $email->setSubject('Email subject');
         $email->setTemplate('Blank');

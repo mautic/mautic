@@ -59,7 +59,6 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

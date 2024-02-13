@@ -349,9 +349,11 @@ class ContentPreviewSettingsTypeTest extends TestCase
                 return $this->id;
             }
 
-            public function setId(int $id): void
+            public function setId(int $id): Email
             {
                 $this->id = $id;
+
+                return $this;
             }
         };
     }

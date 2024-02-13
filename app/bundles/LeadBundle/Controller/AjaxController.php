@@ -11,8 +11,10 @@ use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -27,6 +29,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class AjaxController extends CommonAjaxController
 {
@@ -63,9 +66,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($results);
     }
 
-    /**
-     * @return JsonResponse
-     */
     protected function getLeadIdsByFieldValueAction(Request $request): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
@@ -320,25 +320,21 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Updates the timeline events and gets returns updated HTML.
-     *
-     * @return JsonResponse
      */
-    protected function updateTimelineAction(Request $request)
+    protected function updateTimelineAction(Request $request, Session $session): JsonResponse
     {
         $dataArray     = ['success' => 0];
-        $includeEvents = InputHelper::clean($request->request->get('includeEvents', []));
-        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents', []));
+        $includeEvents = InputHelper::clean($request->request->get('includeEvents') ?? []);
+        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents') ?? []);
         $search        = InputHelper::clean($request->request->get('search'));
         $leadId        = (int) $request->request->get('leadId');
 
         if (!empty($leadId)) {
-            //find the lead
+            // find the lead
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
             if (null !== $lead) {
-                $session = $this->get('session');
-
                 $filter = [
                     'search'        => $search,
                     'includeEvents' => $includeEvents,

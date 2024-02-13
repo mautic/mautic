@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -28,7 +27,6 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -466,15 +464,15 @@ class PublicController extends CommonFormController
 
         // bogus ID
         if ($contactId && (
-                !$this->security->isAdmin()
-                || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-            )
+            !$this->security->isAdmin()
+            || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+        )
         ) {
             // disallow displaying contact information
             $contactId = null;
         }
 
-        //bogus ID
+        // bogus ID
         $idHash = 'xxxxxxxxxxxxxx';
 
         $BCcontent = $emailEntity->getContent();
@@ -526,7 +524,7 @@ class PublicController extends CommonFormController
 
             array_walk(
                 $contact,
-                function (&$field) {
+                function (&$field): void {
                     $field = "[$field]";
                 }
             );
