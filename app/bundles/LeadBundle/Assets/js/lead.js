@@ -1158,7 +1158,6 @@ Mautic.removeTagFromLead = function (el, leadId, tagId) {
 
 };
 
-
 Mautic.toggleLiveLeadListUpdate = function () {
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
         Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
