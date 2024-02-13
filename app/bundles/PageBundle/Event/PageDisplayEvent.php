@@ -32,10 +32,8 @@ class PageDisplayEvent extends Event
 
     /**
      * Get page content.
-     *
-     * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
