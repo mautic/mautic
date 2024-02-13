@@ -2,6 +2,11 @@
 
 namespace Mautic\PageBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
@@ -9,6 +14,9 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class TrackableModelTest extends TestCase
 {
@@ -21,13 +29,24 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
-    public function testHtmlIsDetectedInContent()
+    public function testHtmlIsDetectedInContent(): void
     {
         $mockRedirectModel       = $this->createMock(RedirectModel::class);
         $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
-            ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
+            ->setConstructorArgs([
+                $mockRedirectModel,
+                $mockLeadFieldRepository,
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(CoreParametersHelper::class),
+            ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
 
@@ -52,7 +71,7 @@ class TrackableModelTest extends TestCase
             ->method('createTrackingTokens')
             ->willReturn([]);
 
-        list($content, $trackables) = $mockModel->parseContentForTrackables(
+        [$content, $trackables] = $mockModel->parseContentForTrackables(
             $this->generateContent('https://foo-bar.com', 'html'),
             [],
             'email',
@@ -69,13 +88,24 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
-    public function testPlainTextIsDetectedInContent()
+    public function testPlainTextIsDetectedInContent(): void
     {
         $mockRedirectModel       = $this->createMock(RedirectModel::class);
         $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
-            ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
+            ->setConstructorArgs([
+                $mockRedirectModel,
+                $mockLeadFieldRepository,
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(CoreParametersHelper::class),
+            ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
 
@@ -100,7 +130,7 @@ class TrackableModelTest extends TestCase
             ->method('createTrackingTokens')
             ->willReturn([]);
 
-        list($content, $trackables) = $mockModel->parseContentForTrackables(
+        [$content, $trackables] = $mockModel->parseContentForTrackables(
             $this->generateContent('https://foo-bar.com', 'text'),
             [],
             'email',
@@ -117,6 +147,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testStandardLinkWithStandardQuery(?bool $useMap): void
@@ -163,6 +194,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testStandardLinkWithoutQuery(?bool $useMap): void
@@ -209,6 +241,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testStandardLinkWithTokenizedQuery(?bool $useMap): void
@@ -251,7 +284,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testTokenizedDomain()
+    public function testTokenizedDomain(): void
     {
         $url   = 'http://{contactfield=foo}.org';
         $model = $this->getModel();
@@ -279,12 +312,12 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testTokenizedHostWithScheme()
+    public function testTokenizedHostWithScheme(): void
     {
         $url   = '{contactfield=foo}';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{contactfield=foo}' => 'https://mautic.org',
@@ -309,12 +342,12 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testTokenizedHostWithQuery()
+    public function testTokenizedHostWithQuery(): void
     {
         $url   = 'http://{contactfield=foo}.com?foo=bar';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{contactfield=foo}' => '',
@@ -337,12 +370,12 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testTokenizedHostWithTokenizedQuery()
+    public function testTokenizedHostWithTokenizedQuery(): void
     {
         $url   = 'http://{contactfield=foo}.com?foo={contactfield=bar}';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{contactfield=foo}' => '',
@@ -368,12 +401,12 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testIgnoredTokensAreNotConverted()
+    public function testIgnoredTokensAreNotConverted(): void
     {
         $url   = 'https://{unsubscribe_url}';
         $model = $this->getModel(['{unsubscribe_url}']);
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [
                 '{unsubscribe_url}' => 'https://domain.com/email/unsubscribe/xxxxxxx',
@@ -393,12 +426,12 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testUnsupportedTokensAreNotConverted()
+    public function testUnsupportedTokensAreNotConverted(): void
     {
         $url   = '{random_token}';
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'text'),
             [
                 '{unsubscribe_url}' => 'https://domain.com/email/unsubscribe/xxxxxxx',
@@ -415,13 +448,13 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testTokenWithDefaultValueInPlaintextWillCountAsOne()
+    public function testTokenWithDefaultValueInPlaintextWillCountAsOne(): void
     {
         $url          = '{contactfield=website|https://mautic.org}';
         $model        = $this->getModel();
         $inputContent = $this->generateContent($url, 'text');
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $inputContent,
             [
                 '{contactfield=website}' => 'https://mautic.org/about-us',
@@ -450,19 +483,19 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
-    public function testIgnoredUrlDoesNotCrash()
+    public function testIgnoredUrlDoesNotCrash(): void
     {
         $url   = 'https://domain.com';
         $model = $this->getModel([$url]);
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             $this->generateContent($url, 'html'),
             [],
             'email',
             1
         );
 
-        $this->assertTrue((false !== strpos($content, $url)), $content);
+        $this->assertTrue(str_contains($content, $url), $content);
     }
 
     /**
@@ -475,6 +508,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     *
      * @dataProvider trackMapProvider
      */
     public function testTokenAsHostIsConvertedToTrackableToken(?bool $useMap): void
@@ -497,9 +531,7 @@ class TrackableModelTest extends TestCase
             'email',
             1
         );
-
-        reset($trackables);
-        $token = key($trackables);
+        $token = array_key_first($trackables);
         Assert::assertNotEmpty($trackables, $content);
         Assert::assertStringContainsString($token, $content);
 
@@ -516,6 +548,7 @@ class TrackableModelTest extends TestCase
      * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackables
      * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
      * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     *
      * @dataProvider trackMapProvider
      */
     public function testUrlsWithSameBaseAreReplacedCorrectly(?bool $useMap): void
@@ -523,6 +556,7 @@ class TrackableModelTest extends TestCase
         $urls = [
             'https://foo-bar.com',
             'https://foo-bar.com?foo=bar',
+            'https://FOO-bar.com/bar',
         ];
 
         $model = $this->getModel();
@@ -542,22 +576,22 @@ class TrackableModelTest extends TestCase
         );
 
         // Assert that both trackables found
-        Assert::assertCount(2, $trackables);
+        Assert::assertCount(3, $trackables);
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
-            Assert::assertNotFalse(strpos($content, $redirectId), $content);
+            Assert::assertNotFalse(strpos($content, (string) $redirectId), $content);
         }
     }
 
     /**
      * @testdox Test that css images are not converted if there are no links
      */
-    public function testCssUrlsAreNotConvertedIfThereAreNoLinks()
+    public function testCssUrlsAreNotConvertedIfThereAreNoLinks(): void
     {
         $model = $this->getModel();
 
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables] = $model->parseContentForTrackables(
             '<style> .mf-modal { background-image: url(\'https://www.mautic.org/wp-content/uploads/2014/08/iTunesArtwork.png\'); } </style>',
             [],
             'email',
@@ -570,7 +604,7 @@ class TrackableModelTest extends TestCase
     /**
      * @testdox Tests that URLs in the plaintext does not contaminate HTML
      */
-    public function testPlainTextDoesNotContaminateHtml()
+    public function testPlainTextDoesNotContaminateHtml(): void
     {
         $model = $this->getModel();
 
@@ -587,7 +621,7 @@ TEXT;
         $plainText = strip_tags($html);
 
         $combined                   = [$html, $plainText];
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables]     = $model->parseContentForTrackables(
             $combined,
             [],
             'email',
@@ -598,10 +632,8 @@ TEXT;
 
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
-
-        // Has a URL so has one trackable
-        reset($trackables);
-        $token = key($trackables);
+        $token = array_key_first($trackables);
+        self::assertNotNull($token);
 
         $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
@@ -609,7 +641,7 @@ TEXT;
     /**
      * @testdox Tests that URL based contact fields are found in plain text
      */
-    public function testPlainTextFindsUrlContactFields()
+    public function testPlainTextFindsUrlContactFields(): void
     {
         $model = $this->getModel([], ['website']);
 
@@ -626,7 +658,7 @@ TEXT;
         $plainText = strip_tags($html);
 
         $combined                   = [$html, $plainText];
-        list($content, $trackables) = $model->parseContentForTrackables(
+        [$content, $trackables]     = $model->parseContentForTrackables(
             $combined,
             [],
             'email',
@@ -637,10 +669,8 @@ TEXT;
 
         // No links so no trackables
         $this->assertEquals($html, $content[0]);
-
-        // Has a URL so has one trackable
-        reset($trackables);
-        $token = key($trackables);
+        $token = array_key_first($trackables);
+        self::assertNotNull($token);
 
         $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
@@ -667,7 +697,18 @@ TEXT;
         $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
-            ->setConstructorArgs([$mockRedirectModel, $mockLeadFieldRepository])
+            ->setConstructorArgs([
+                $mockRedirectModel,
+                $mockLeadFieldRepository,
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(CorePermissions::class),
+                $this->createMock(EventDispatcherInterface::class),
+                $this->createMock(UrlGeneratorInterface::class),
+                $this->createMock(Translator::class),
+                $this->createMock(UserHelper::class),
+                $this->createMock(LoggerInterface::class),
+                $this->createMock(CoreParametersHelper::class),
+            ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
 
@@ -696,8 +737,6 @@ TEXT;
     }
 
     /**
-     * @param $url
-     *
      * @return Trackable
      */
     protected function getTrackableEntity($url)
@@ -710,8 +749,8 @@ TEXT;
         $trackable->setChannel('email')
             ->setChannelId(1)
             ->setRedirect($redirect)
-            ->setHits(rand(1, 10))
-            ->setUniqueHits(rand(1, 10));
+            ->setHits(random_int(1, 10))
+            ->setUniqueHits(random_int(1, 10));
 
         return $trackable;
     }
@@ -755,7 +794,7 @@ CONTENT;
     /**
      * @return array<array<bool|null>> Use null to include both <a> and <map> tags
      */
-    public function trackMapProvider(): array
+    public static function trackMapProvider(): array
     {
         return [
             [true],

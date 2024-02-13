@@ -14,10 +14,10 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 {
     public function testMergedContactFound(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         \assert($model instanceof LeadModel);
 
-        $merger = self::$container->get('mautic.lead.merger');
+        $merger = static::getContainer()->get('mautic.lead.merger');
         \assert($merger instanceof ContactMerger);
 
         $bob = new Lead();
@@ -68,13 +68,13 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
     public function testMergedContactsPointsAreAccurate(): void
     {
-        $model = self::$container->get('mautic.lead.model.lead');
+        $model = static::getContainer()->get('mautic.lead.model.lead');
         \assert($model instanceof LeadModel);
 
-        $em = self::$container->get('doctrine.orm.entity_manager');
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
         \assert($em instanceof EntityManager);
 
-        $merger = self::$container->get('mautic.lead.merger');
+        $merger = static::getContainer()->get('mautic.lead.merger');
         \assert($merger instanceof ContactMerger);
 
         // Startout Jane with 50 points
@@ -86,7 +86,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         $model->saveEntity($jane);
 
-        $em->clear(Lead::class);
+        $em->detach($jane);
         $jane = $model->getEntity($jane->getId());
         $this->assertEquals(50, $jane->getPoints());
         $janeId = $jane->getId();
@@ -95,7 +95,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $visitor = new Lead();
         $visitor->setPoints(3);
         $model->saveEntity($visitor);
-        $em->clear(Lead::class);
+        $em->detach($visitor);
         $visitor = $model->getEntity($visitor->getId());
         $this->assertEquals(3, $visitor->getPoints());
 
@@ -108,7 +108,8 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($janeId, $jane->getId());
         // Jane should now have 53 points
         $this->assertEquals(53, $jane->getPoints());
-        $em->clear(Lead::class);
+        $em->detach($jane);
+        $em->detach($visitor);
         // Jane should still have 53 points
         $jane = $model->getEntity($janeId);
         $this->assertEquals(53, $jane->getPoints());
@@ -117,7 +118,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $visitor2 = new Lead();
         $visitor2->setPoints(3);
         $model->saveEntity($visitor2);
-        $em->clear(Lead::class);
+        $em->detach($visitor2);
         $visitor2 = $model->getEntity($visitor2->getId());
         $this->assertEquals(3, $visitor2->getPoints());
 
@@ -125,7 +126,8 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $jane = $model->getEntity($janeId);
         $jane = $merger->merge($jane, $visitor2);
         $this->assertEquals($janeId, $jane->getId());
-        $em->clear(Lead::class);
+        $em->detach($jane);
+        $em->detach($visitor2);
         $jane = $model->getEntity($jane->getId());
 
         $this->assertEquals(56, $jane->getPoints());

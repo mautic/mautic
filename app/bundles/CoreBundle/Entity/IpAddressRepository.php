@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Exception;
-use PDO;
 
 /**
  * @extends CommonRepository<IpAddress>
@@ -12,10 +11,8 @@ class IpAddressRepository extends CommonRepository
 {
     /**
      * Count how many unique IP addresses is there.
-     *
-     * @return int
      */
-    public function countIpAddresses()
+    public function countIpAddresses(): int
     {
         $q = $this->createQueryBuilder('i');
         $q->select('COUNT(DISTINCT i.id) as unique');
@@ -86,10 +83,10 @@ class IpAddressRepository extends CommonRepository
             LIMIT :limit
 SQL;
 
-        $params = [':limit' => $limit];
-        $types  = [':limit' => PDO::PARAM_INT];
+        $params = ['limit' => $limit];
+        $types  = ['limit' => \PDO::PARAM_INT];
 
-        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchAll(PDO::FETCH_COLUMN, 0);
+        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
     }
 
     /**
@@ -105,6 +102,6 @@ SQL;
                 DELETE FROM {$prefix}ip_addresses WHERE {$prefix}ip_addresses.id IN ({$ids});
 SQL;
 
-        return $this->_em->getConnection()->executeUpdate($deleteSql);
+        return $this->_em->getConnection()->executeStatement($deleteSql);
     }
 }

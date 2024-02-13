@@ -17,7 +17,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'stages',
                 'path'            => '/stages',
-                'controller'      => 'Mautic\StageBundle\Controller\Api\StageApiController',
+                'controller'      => \Mautic\StageBundle\Controller\Api\StageApiController::class,
             ],
             'mautic_api_stageddcontact' => [
                 'path'       => '/stages/{id}/contact/{contactId}/add',
@@ -45,27 +45,5 @@ return [
 
     'categories' => [
         'stage' => null,
-    ],
-
-    'services' => [
-        'models' => [
-            'mautic.stage.model.stage' => [
-                'class'     => 'Mautic\StageBundle\Model\StageModel',
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'session',
-                    'mautic.helper.user',
-                ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.stage.repository.lead_stage_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\StageBundle\Entity\LeadStageLog::class,
-                ],
-            ],
-        ],
     ],
 ];

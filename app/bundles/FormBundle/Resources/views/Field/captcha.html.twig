@@ -1,0 +1,34 @@
+{% set required = true %}
+{% set type = 'text' %}
+
+{% if field.properties.captcha is not defined or field.properties.captcha is empty %}
+    {% set required = false %}
+    {% if inForm is not defined or inForm is empty or false == inForm %}
+        {# Use as a honeypot #}
+        {% set field = field|merge({
+                'containerAttributes': field.containerAttributes ~ ' style="display:none;"',
+        }) %}
+    {% else %}
+        {# Hide the input #}
+        {% set type = 'hidden' %}
+    {% endif %}
+{% endif %}
+
+{#
+    This field relies on the `text.html.twig` implementation.
+
+    Mautic tries to render `@themes/{{theme}}/html/MauticFormBundle/Field/text.html.twig`
+    and falls back to the standard template '@MauticForm/Field/text.html.twig'.
+
+    This eliminates the need to copy twig templates into themes that just rely on one base template file.
+#}
+{{- include([theme|default('') ~ 'text.html.twig', '@MauticForm/Field/text.html.twig'], {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'type': type,
+        'id': id,
+        'required': required,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+}) -}}

@@ -13,16 +13,11 @@ import './grapesjs-custom.css';
  * Launch builder
  *
  * @param formName
- * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
   if (useBuilderForCodeMode() === false) {
     return;
   }
-
-  const assets = AssetService.getAssets();
-
-  const builder = new BuilderService(assets);
 
   Mautic.showChangeThemeWarning = true;
 
@@ -33,8 +28,15 @@ function launchBuilderGrapesjs(formName) {
   mQuery('.builder-panel').css('display', 'block');
   mQuery('.builder').addClass('builder-active').removeClass('hide');
 
+  const assetsConfig = AssetService.getAssetsConfig();
+  const builder = new BuilderService(assetsConfig);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+
+  // Load and add assets
+  AssetService.getAssetsXhr(function (result) {
+    builder.editor.AssetManager.add(result.data);
+  });
 }
 
 /**
@@ -96,7 +98,7 @@ function setThemeHtml(theme) {
  * @param theme
  */
 function switchBuilderButton(theme) {
-  const builderButton  = mQuery('.btn-builder');
+  const builderButton = mQuery('.btn-builder');
   const mEmailBuilderButton = mQuery('#emailform_buttons_builder_toolbar_mobile');
   const mPageBuilderButton = mQuery('#page_buttons_builder_toolbar_mobile');
   const isCodeMode = theme === 'mautic_code_mode';

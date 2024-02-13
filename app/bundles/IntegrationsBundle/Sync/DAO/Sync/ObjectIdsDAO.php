@@ -20,7 +20,7 @@ class ObjectIdsDAO
      *
      * @var array[]
      */
-    private $objects = [];
+    private array $objects = [];
 
     /**
      * Expected $cliOptions structure:
@@ -33,15 +33,13 @@ class ObjectIdsDAO
      * Simply put, an array of object types and IDs separated by colon.
      *
      * @param string[] $cliOptions
-     *
-     * @return ObjectIdsDAO
      */
     public static function createFromCliOptions(array $cliOptions): self
     {
         $objectsIdDAO = new self();
 
         foreach ($cliOptions as $cliOption) {
-            if (is_string($cliOption) && false !== strpos($cliOption, ':')) {
+            if (is_string($cliOption) && str_contains($cliOption, ':')) {
                 $objectsIdDAO->addObjectId(...explode(':', $cliOption));
             }
         }

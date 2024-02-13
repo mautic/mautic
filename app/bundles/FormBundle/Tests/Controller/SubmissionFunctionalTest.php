@@ -43,14 +43,16 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
 
         // Add conditional state field dependent on the country field:
         $patchPayload = [
@@ -145,6 +147,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -239,6 +242,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction' => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -342,6 +346,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'                => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -377,6 +382,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -389,7 +395,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $campaignSources = ['forms' => [$formId => $formId]];
 
         /** @var CampaignModel $campaignModel */
-        $campaignModel = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
 
         $publishedCampaign = new Campaign();
         $publishedCampaign->setName('Published');
@@ -419,13 +425,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(1, $submissions);
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        parent::tearDown();
-
-        if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
+        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
         }
     }
@@ -450,6 +454,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -492,7 +497,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Fetch form submissions as non-admin-user who don't have the permission to view submissions
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}/submissions", [], [], [
-            'PHP_AUTH_USER' => $user->getUsername(),
+            'PHP_AUTH_USER' => $user->getUserIdentifier(),
             'PHP_AUTH_PW'   => $this->getUserPlainPassword(),
         ]);
         $clientResponse = $this->client->getResponse();
@@ -520,7 +525,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordEncoderInterface $encoder */
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword($this->getUserPlainPassword(), $user->getSalt()));
 
         /** @var UserRepository $userRepo */
@@ -528,6 +533,76 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $userRepo->saveEntities([$user]);
 
         return $user;
+    }
+
+    public function testSendSubmissionWhenFieldHaveMysqlReservedWords(): void
+    {
+        // Create the test form.
+        $payload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'     => 'All',
+                    'type'      => 'text',
+                    'alias'     => 'all',
+                    'leadField' => 'firstname',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+            'postAction'  => 'return',
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[f_all]' => 'test',
+        ]);
+        $this->client->submit($form);
+
+        // Ensure the submission was created properly.
+        $submissions = $this->em->getRepository(Submission::class)->findAll();
+        Assert::assertCount(1, $submissions);
+
+        /** @var Submission $submission */
+        $submission = $submissions[0];
+        Assert::assertSame([
+            'f_all' => 'test',
+        ], $submission->getResults());
+
+        // A contact should be created by the submission.
+        $contact = $submission->getLead();
+
+        Assert::assertSame('test', $contact->getFirstname());
+
+        // The previous request changes user to anonymous. We have to configure API again.
+        $this->setUpSymfony($this->configParams);
+
+        $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString('Results for Submission test form', $clientResponse->getContent());
+
+        // Cleanup:
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
     private function getUserPlainPassword(): string

@@ -10,18 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractNotificationApi
 {
-    protected Client $http;
-    protected TrackableModel $trackableModel;
-    protected IntegrationHelper $integrationHelper;
-
-    /**
-     * AbstractNotificationApi constructor.
-     */
-    public function __construct(Client $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
-    {
-        $this->http              = $http;
-        $this->trackableModel    = $trackableModel;
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        protected Client $http,
+        protected TrackableModel $trackableModel,
+        protected IntegrationHelper $integrationHelper
+    ) {
     }
 
     /**
@@ -31,8 +24,6 @@ abstract class AbstractNotificationApi
     abstract public function send(string $endpoint, array $data): ResponseInterface;
 
     /**
-     * @param $id
-     *
      * @return mixed
      */
     abstract public function sendNotification($id, Notification $notification);

@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
 
 interface ThemeHelperInterface
 {
@@ -18,15 +18,13 @@ interface ThemeHelperInterface
 
     /**
      * @param string $defaultTheme
-     *
-     * @return void
      */
-    public function setDefaultTheme($defaultTheme);
+    public function setDefaultTheme($defaultTheme): void;
 
     /**
      * @param string $themeName
      *
-     * @return TemplatingThemeHelper
+     * @return twigThemeHelper
      *
      * @throws BadConfigurationException
      * @throws FileNotFoundException
@@ -47,10 +45,8 @@ interface ThemeHelperInterface
      *
      * @throws FileExistsException
      * @throws FileNotFoundException
-     *
-     * @return void
      */
-    public function copy($theme, $newName, $newDirName = null);
+    public function copy($theme, $newName, $newDirName = null): void;
 
     /**
      * @param string $theme
@@ -58,19 +54,15 @@ interface ThemeHelperInterface
      *
      * @throws FileNotFoundException
      * @throws FileExistsException
-     *
-     * @return void
      */
-    public function rename($theme, $newName);
+    public function rename($theme, $newName): void;
 
     /**
      * @param string $theme
      *
      * @throws FileNotFoundException
-     *
-     * @return void
      */
-    public function delete($theme);
+    public function delete($theme): void;
 
     /**
      * Fetches the optional settings from the defined steps.
@@ -100,7 +92,7 @@ interface ThemeHelperInterface
      * @param string $theme
      * @param bool   $throwException
      *
-     * @return TemplatingThemeHelper
+     * @return twigThemeHelper
      *
      * @throws FileNotFoundException
      * @throws BadConfigurationException
@@ -122,11 +114,11 @@ interface ThemeHelperInterface
     /**
      * Get the error message from the zip archive.
      *
-     * @param \ZipArchive $archive
+     * @param \ZipArchive::ER_* $archive
      *
      * @return string
      */
-    public function getExtractError($archive);
+    public function getExtractError(int $archive);
 
     /**
      * Creates a zip file from a theme and returns the path where it's stored.

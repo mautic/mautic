@@ -13,20 +13,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
-
-    public function __construct(ObjectMappingRepository $objectMappingRepository)
-    {
-        $this->objectMappingRepository = $objectMappingRepository;
+    public function __construct(
+        private ObjectMappingRepository $objectMappingRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE => ['onTemplateRender', 0],
@@ -35,7 +27,7 @@ class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
-        if ('MauticLeadBundle:Lead:lead.html.php' === $event->getTemplate()) {
+        if ('@MauticLead/Lead/lead.html.twig' === $event->getTemplate()) {
             $vars         = $event->getVars();
             $integrations = $vars['integrations'];
 

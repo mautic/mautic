@@ -71,7 +71,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'users',
                 'path'            => '/users',
-                'controller'      => 'Mautic\UserBundle\Controller\Api\UserApiController',
+                'controller'      => \Mautic\UserBundle\Controller\Api\UserApiController::class,
             ],
             'mautic_api_getself' => [
                 'path'       => '/users/self',
@@ -90,7 +90,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'roles',
                 'path'            => '/roles',
-                'controller'      => 'Mautic\UserBundle\Controller\Api\RoleApiController',
+                'controller'      => \Mautic\UserBundle\Controller\Api\RoleApiController::class,
             ],
         ],
         'public' => [
@@ -114,28 +114,23 @@ return [
     ],
 
     'services' => [
-        'controllers' => [
-            \Mautic\UserBundle\Controller\SecurityController::class => [
-                'class' => \Mautic\UserBundle\Controller\SecurityController::class,
-            ],
-        ],
         'other' => [
             // Authentication
             'mautic.user.manager' => [
-                'class'     => 'Doctrine\ORM\EntityManager',
-                'arguments' => 'Mautic\UserBundle\Entity\User',
+                'class'     => \Doctrine\ORM\EntityManager::class,
+                'arguments' => \Mautic\UserBundle\Entity\User::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
             'mautic.permission.manager' => [
-                'class'     => 'Doctrine\ORM\EntityManager',
-                'arguments' => 'Mautic\UserBundle\Entity\Permission',
+                'class'     => \Doctrine\ORM\EntityManager::class,
+                'arguments' => \Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
             'mautic.user.form_guard_authenticator' => [
-                'class'     => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
+                'class'     => \Mautic\UserBundle\Security\Authenticator\FormAuthenticator::class,
                 'arguments' => [
                     'mautic.helper.integration',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     'event_dispatcher',
                     'request_stack',
                     'security.csrf.token_manager',
@@ -143,7 +138,7 @@ return [
                 ],
             ],
             'mautic.user.preauth_authenticator' => [
-                'class'     => 'Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator',
+                'class'     => \Mautic\UserBundle\Security\Authenticator\PreAuthAuthenticator::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'event_dispatcher',
@@ -154,13 +149,13 @@ return [
                 'public' => false,
             ],
             'mautic.user.provider' => [
-                'class'     => 'Mautic\UserBundle\Security\Provider\UserProvider',
+                'class'     => \Mautic\UserBundle\Security\Provider\UserProvider::class,
                 'arguments' => [
                     'mautic.user.repository',
                     'mautic.permission.repository',
                     'session',
                     'event_dispatcher',
-                    'security.password_encoder',
+                    'security.password_hasher',
                 ],
             ],
             'mautic.security.authentication_listener' => [
@@ -184,8 +179,12 @@ return [
                 ],
             ],
             'mautic.security.logout_handler' => [
-                'class'     => 'Mautic\UserBundle\Security\Authentication\LogoutHandler',
-                'arguments' => [
+                'class'        => \Mautic\UserBundle\EventListener\LogoutListener::class,
+                'tagArguments' => [
+                    'event'      => \Symfony\Component\Security\Http\Event\LogoutEvent::class,
+                ],
+                'tag'          => 'kernel.event_listener',
+                'arguments'    => [
                     'mautic.user.model.user',
                     'event_dispatcher',
                     'mautic.helper.user',
@@ -245,20 +244,8 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.security.saml.username_mapper',
                     'mautic.user.model.user',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     '%mautic.saml_idp_default_role%',
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.user.model.role' => [
-                'class' => 'Mautic\UserBundle\Model\RoleModel',
-            ],
-            'mautic.user.model.user' => [
-                'class'     => 'Mautic\UserBundle\Model\UserModel',
-                'arguments' => [
-                    'mautic.helper.mailer',
-                    'mautic.user.model.user_token_service',
                 ],
             ],
             'mautic.user.model.user_token_service' => [
@@ -267,23 +254,6 @@ return [
                     'mautic.helper.random',
                     'mautic.user.repository.user_token',
                 ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.user.repository.user_token' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'arguments' => [\Mautic\UserBundle\Entity\UserToken::class],
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-            ],
-            'mautic.user.repository' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'arguments' => \Mautic\UserBundle\Entity\User::class,
-                'factory'   => ['@mautic.user.manager', 'getRepository'],
-            ],
-            'mautic.permission.repository' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'arguments' => \Mautic\UserBundle\Entity\Permission::class,
-                'factory'   => ['@mautic.permission.manager', 'getRepository'],
             ],
         ],
         'fixtures' => [
@@ -295,7 +265,7 @@ return [
             'mautic.user.fixture.user' => [
                 'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['security.password_encoder'],
+                'arguments' => ['security.password_hasher'],
             ],
         ],
     ],

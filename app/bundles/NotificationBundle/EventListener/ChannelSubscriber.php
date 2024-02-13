@@ -12,27 +12,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        private IntegrationHelper $integrationHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 70],
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
@@ -48,7 +40,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                             'form.submit',
                         ],
                         'lookupFormType' => NotificationListType::class,
-                        'repository'     => 'MauticNotificationBundle:Notification',
+                        'repository'     => \Mautic\NotificationBundle\Entity\Notification::class,
                         'lookupOptions'  => [
                             'mobile'  => false,
                             'desktop' => true,
@@ -74,7 +66,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                                 'form.submit',
                             ],
                             'lookupFormType'             => NotificationListType::class,
-                            'repository'                 => 'MauticNotificationBundle:Notification',
+                            'repository'                 => \Mautic\NotificationBundle\Entity\Notification::class,
                             'lookupOptions'              => [
                                 'mobile'  => true,
                                 'desktop' => false,

@@ -20,22 +20,22 @@ class VideoHit
     private $guid;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateHit;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLeft;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $timeWatched;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $duration;
 
@@ -45,7 +45,7 @@ class VideoHit
     private $redirect;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -55,27 +55,27 @@ class VideoHit
     private $ipAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $country;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $region;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $city;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $isp;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $organization;
 
@@ -89,17 +89,17 @@ class VideoHit
     private $url;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $userAgent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remoteHost;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $pageLanguage;
 
@@ -109,12 +109,12 @@ class VideoHit
     private $browserLanguages = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $channel;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $channelId;
 
@@ -123,12 +123,12 @@ class VideoHit
      */
     private $query = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('video_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\VideoHitRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\VideoHitRepository::class)
             ->addIndex(['date_hit'], 'video_date_hit')
             ->addIndex(['channel', 'channel_id'], 'video_channel_search')
             ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');
@@ -226,10 +226,8 @@ class VideoHit
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(
@@ -287,7 +285,7 @@ class VideoHit
     /**
      * Get dateHit.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateHit()
     {
@@ -295,7 +293,7 @@ class VideoHit
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateLeft()
     {
@@ -729,8 +727,6 @@ class VideoHit
     }
 
     /**
-     * @param $timeWatched
-     *
      * @return VideoHit
      */
     public function setTimeWatched($timeWatched)

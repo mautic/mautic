@@ -4,12 +4,7 @@ namespace Mautic\EmailBundle\Helper;
 
 class UrlMatcher
 {
-    /**
-     * @param $urlToFind
-     *
-     * @return bool
-     */
-    public static function hasMatch(array $urlsToCheckAgainst, $urlToFind)
+    public static function hasMatch(array $urlsToCheckAgainst, $urlToFind): bool
     {
         $urlToFind = self::sanitizeUrl($urlToFind);
 
@@ -25,8 +20,6 @@ class UrlMatcher
     }
 
     /**
-     * @param $url
-     *
      * @return mixed|string
      */
     private static function sanitizeUrl($url)
@@ -41,7 +34,7 @@ class UrlMatcher
         $url = str_replace(['http://', 'https://'], '', $url);
 
         // Remove preceding //
-        if (0 === strpos($url, '//')) {
+        if (str_starts_with($url, '//')) {
             $url = str_replace('//', '', $url);
         }
 

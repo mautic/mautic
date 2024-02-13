@@ -1,0 +1,190 @@
+{% set defaultInputClass = 'freetext' %}
+{% set containerType = defaultInputClass %}
+
+{# start: field_helper #}
+{% set defaultInputFormClass = defaultInputFormClass|default('') %}
+{% set defaultLabelClass = defaultLabelClass|default('label') %}
+{% set formName = formName|default('') %}
+{% set defaultInputClass = 'mauticform-' ~ defaultInputClass %}
+{% set defaultLabelClass = 'mauticform-' ~ defaultLabelClass %}
+{% set containerClass = containerClass|default(containerType) %}
+{% set order = field.order|default(0) %}
+{% set validationMessage = '' %}
+{% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
+{% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
+{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+{% if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) %}
+  {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
+  {% if field.properties.multiple is defined %}
+    {% set inputName = inputName ~ '[]' %}
+  {% endif %}
+  {% set inputAttributes = inputAttributes|merge({
+          'name': inputName,
+  }) %}
+{% endif %}
+
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] %}
+  {% set inputAttributes = inputAttributes|merge({
+          'value': field.defaultValue|default(''),
+  }) %}
+{% endif %}
+
+{% if ignoreId is not defined or (ignoreId is defined and ignoreId is empty) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'id': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+  }) %}
+  {% set labelAttributes = labelAttributes|merge({
+          'id': 'mauticform_label' ~ formName ~ '_' ~ field.alias,
+          'for': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+  }) %}
+{% endif %}
+
+{% if field.properties.placeholder is defined and field.properties.placeholder is not empty %}
+  {% set inputAttributes = inputAttributes|merge({
+          'placeholder': field.properties.placeholder,
+  }) %}
+{% endif %}
+{% if inForm is defined and (true == inForm or inForm is not empty) %}
+  {% if field.type in ['button', 'pagebreak'] %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
+  {% endif %}
+
+  {% set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
+  }) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'disabled': 'disabled',
+          'class': inputAttributes.class|default([])|merge([defaultInputClass, defaultInputFormClass]),
+  }) %}
+{% else %}
+  {% set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
+  }) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'class': inputAttributes.class|default([])|merge([defaultInputClass]),
+  }) %}
+{% endif %}
+{% set containerAttributes = containerAttributes|merge({
+        'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
+        'class': containerAttributes.class|default([])|merge([
+          'mauticform-row',
+          'mauticform-' ~ containerClass,
+          'mauticform-field-' ~ order,
+        ]),
+}) %}
+{% if field.parent and fields[field.parent] is defined %}
+  {% set values = field.conditions.values|join('|') %}
+
+  {%- if field.conditions.any != false and 'notIn' != field.conditions.expr -%}
+    {% set values = '*' %}
+  {% endif %}
+
+  {% set containerAttributes = containerAttributes|merge({
+          'data-mautic-form-show-on': fields[field.parent].alias ~ ':' ~ values,
+          'data-mautic-form-expr': field.conditions.expr,
+          'class': containerAttributes.class|merge([
+            'mauticform-field-hidden',
+          ]),
+  }) %}
+{% endif %}
+{% if field.isRequired is defined and field.isRequired %}
+  {% set required = true %}
+  {% set validationMessage = field.validationMessage %}
+  {% if validationMessage is empty %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %}
+  {% endif %}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+          'data-validate': field.alias,
+          'data-validation-type': field.type,
+  }) %}
+  {% if field.properties.multiple is not empty %}
+    {% set containerAttributes = containerAttributes|merge({
+            'data-validate-multiple': 'true',
+    }) %}
+  {% endif %}
+{% elseif required is defined and true == required %}
+  {# Forced to be required #}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+  }) %}
+{% endif %}
+{% if list is defined or field.properties.syncList is defined or field.properties.list is defined or field.properties.optionList is defined %}
+  {% set parseList = [] %}
+  {% set isBooleanList = false %}
+  {% set contactFields = contactFields|default([]) %}
+  {% set companyFields = companyFields|default([]) %}
+  {% set formFields = contactFields|merge(companyFields) %}
+
+  {% if
+        field.properties.syncList is defined and field.properties.syncList is not empty and
+        field.leadField is defined and field.leadField is not empty and
+        formFields[field.leadField] is defined
+  %}
+    {% set leadFieldType = formFields[field.leadField].type %}
+    {% if formFields[field.leadField].properties.list is not empty %}
+      {% set parseList = formFields[field.leadField].properties.list %}
+    {% elseif 'boolean' == leadFieldType %}
+      {% set parseList = {
+              '0': formFields[field.leadField].properties.no,
+              '1': formFields[field.leadField].properties.yes,
+      }%}
+    {% elseif 'country' == leadFieldType %}
+      {% set list = leadFieldCountryChoices() %}
+    {% elseif 'region' == leadFieldType %}
+      {% set list = leadFieldRegionChoices() %}
+    {% elseif 'timezone' == leadFieldType %}
+      {% set list = leadFieldTimezonesChoices() %}
+    {% elseif 'locale' == leadFieldType %}
+      {% set list = leadFieldLocaleChoices() %}
+    {% endif %}
+  {% endif %}
+
+  {% if parseList is empty %}
+    {% if list is defined %}
+      {% set parseList = list %}
+    {% elseif field.properties.optionlist is not empty %}
+      {% set parseList = field.properties.optionlist %}
+    {% elseif field.properties.list is not empty %}
+      {% set parseList = field.properties.list %}
+    {% endif %}
+
+    {% if parseList.list is defined %}
+      {% set parseList = parseList.list %}
+    {% endif %}
+  {% endif %}
+
+  {% if field.leadField and formFields[field.leadField].type is not empty and formFields[field.leadField].type in ['datetime', 'date'] %}
+    {% set tempLeadFieldType = formFields[field.leadField].type %}
+    {% for key, aTemp in parseList %}
+      {% set date = 'datetime' == tempLeadFieldType ? dateToFull(aTemp.label) : dateToDate(aTemp.label) %}
+      {% if date %}
+          {% set parseList = parseList|merge({
+                  (key): parseList[key]|merge({
+                          'label': date,
+                  }),
+          }) %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if isBooleanList %}
+    {% set list = formFieldParseBooleanList(parseList) %}
+  {% else %}
+    {% set list = formFieldParseList(parseList) %}
+  {% endif %}
+
+  {% set firstListValue = list|first %}
+{% endif %}
+{# end: field_helper #}
+
+<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+  {% if field.showLabel %}<h3 {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</h3>{% endif %}
+  <div {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+    {{ field.properties.text|raw }}
+  </div>
+</div>

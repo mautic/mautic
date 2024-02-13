@@ -1,0 +1,46 @@
+{#
+  Variables
+    - items
+    - leadCounts
+    - page
+    - limit
+#}
+{# Check to see if the entire page should be displayed or just main content #}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}leadlist{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.lead.list.header.index'|trans }}{% endblock %}
+
+{% block actions %}
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+        'templateButtons': {'new': true},
+        'routeBase': 'segment',
+        'langVar': 'lead.list',
+        'tooltip': 'mautic.lead.lead.segment.add.help',
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% set listCommand = 'mautic.lead.lead.searchcommand.list'|trans %}
+
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0">
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': 'mautic.lead.list.help.searchcommands',
+                'action': currentRoute,
+                'filters': filters|default([]),
+        }) }}
+        <div class="page-list">
+  {% endif %}
+
+  {{ include('@MauticLead/List/_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

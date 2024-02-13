@@ -2,19 +2,9 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-/**
- * Class PointEventHelper.
- */
 class PointEventHelper
 {
-    /**
-     * @param $event
-     * @param $factory
-     * @param $lead
-     *
-     * @return bool
-     */
-    public static function changeLists($event, $factory, $lead)
+    public static function changeLists($event, $factory, $lead): bool
     {
         $properties = $event['properties'];
 

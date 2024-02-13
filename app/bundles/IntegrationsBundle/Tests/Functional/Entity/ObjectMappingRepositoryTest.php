@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Functional\Entity;
 
-use DateTimeImmutable;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -14,9 +13,13 @@ use PHPUnit\Framework\Assert;
 final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
 {
     private const INTEGRATION             = 'integration';
+
     private const INTEGRATION_OBJECT_NAME = 'integrationObjectName';
+
     private const INTEGRATION_OBJECT_ID   = '123';
+
     private const INTERNAL_OBJECT_NAME    = 'internalObjectName';
+
     private const INTERNAL_OBJECT_ID      = 569;
 
     private ObjectMappingRepository $repository;
@@ -25,7 +28,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->repository = self::$container->get('mautic.integrations.repository.object_mapping');
+        $this->repository = static::getContainer()->get('mautic.integrations.repository.object_mapping');
     }
 
     public function testGetInternalObject(): void
@@ -76,7 +79,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
             self::INTEGRATION_OBJECT_ID,
             self::INTERNAL_OBJECT_NAME,
             self::INTERNAL_OBJECT_ID,
-            $now = new DateTimeImmutable()
+            $now = new \DateTimeImmutable()
         );
 
         Assert::assertSame(1, $affectedRows);
@@ -89,7 +92,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
         Assert::assertSame(self::INTEGRATION_OBJECT_NAME, $objectMapping->getIntegrationObjectName());
         Assert::assertSame(self::INTEGRATION_OBJECT_ID, $objectMapping->getIntegrationObjectId());
         Assert::assertSame(self::INTERNAL_OBJECT_NAME, $objectMapping->getInternalObjectName());
-        Assert::assertSame((string) self::INTERNAL_OBJECT_ID, $objectMapping->getInternalObjectId());
+        Assert::assertSame(self::INTERNAL_OBJECT_ID, $objectMapping->getInternalObjectId());
         Assert::assertSame($now->getTimestamp(), $objectMapping->getDateCreated()->getTimestamp());
         Assert::assertSame($now->getTimestamp(), $objectMapping->getLastSyncDate()->getTimestamp());
         Assert::assertNull($objectMapping->getIntegrationReferenceId());

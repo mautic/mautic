@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,37 +12,36 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class ExceptionController extends CommonController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function showAction(Request $request, \Throwable $exception, DebugLoggerInterface $logger = null)
+    public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, DebugLoggerInterface $logger = null)
     {
-        $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $this->request->headers->all());
+        $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
         $class          = $exception->getClass();
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();
 
-        if (0 === $code) {
-            //thrown exception that didn't set a code
+        // All valid status codes are within the range of 100 to 599, inclusive
+        // @see https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes
+        if ($code < 100 || $code > 599) {
+            // thrown exception that didn't set a code
             $code = 500;
         }
 
         // Special handling for oauth and api urls
         if (
-            (false !== strpos($request->getUri(), '/oauth') && false === strpos($request->getUri(), 'authorize'))
+            (str_contains($request->getUri(), '/oauth') && !str_contains($request->getUri(), 'authorize'))
             || RequestHelper::isApiRequest($request)
-            || (!defined('MAUTIC_AJAX_VIEW') && false !== strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
+            || (!defined('MAUTIC_AJAX_VIEW') && str_contains($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
         ) {
             $allowRealMessage =
                 'dev' === MAUTIC_ENV ||
-                false !== strpos($class, 'UnexpectedValueException') ||
-                false !== strpos($class, 'NotFoundHttpException') ||
-                false !== strpos($class, 'AccessDeniedHttpException');
+                str_contains($class, 'UnexpectedValueException') ||
+                str_contains($class, 'NotFoundHttpException') ||
+                str_contains($class, 'AccessDeniedHttpException');
 
             $message   = $allowRealMessage
                 ? $exception->getMessage()
-                : $this->get('translator')->trans(
+                : $this->translator->trans(
                     'mautic.core.error.generic',
                     ['%code%' => $code]
                 );
@@ -68,21 +68,20 @@ class ExceptionController extends CommonController
             $layout = 'Error';
         }
 
-        $anonymous    = $this->get('mautic.security')->isAnonymous();
-        $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
+        $anonymous    = $this->security->isAnonymous();
+        $baseTemplate = '@MauticCore/Default/slim.html.twig';
         if ($anonymous) {
-            if ($templatePage = $this->get('mautic.helper.theme')->getTheme()->getErrorPageTemplate($code)) {
+            if ($templatePage = $themeHelper->getTheme()->getErrorPageTemplate((string) $code)) {
                 $baseTemplate = $templatePage;
             }
         }
 
-        $template   = "MauticCoreBundle:{$layout}:{$code}.html.php";
-        $templating = $this->get('mautic.helper.templating')->getTemplating();
-        if (!$templating->exists($template)) {
-            $template = "MauticCoreBundle:{$layout}:base.html.php";
+        $template   = "@MauticCore/{$layout}/{$code}.html.twig";
+        if (!$this->get('twig')->getLoader()->exists($template)) {
+            $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
-        $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
+        $statusText = Response::$statusTexts[$code] ?? '';
 
         $url      = $request->getRequestUri();
         $urlParts = parse_url($url);
@@ -115,10 +114,8 @@ class ExceptionController extends CommonController
 
     /**
      * @param int $startObLevel
-     *
-     * @return string
      */
-    protected function getAndCleanOutputBuffering($startObLevel)
+    protected function getAndCleanOutputBuffering($startObLevel): string|false
     {
         if (ob_get_level() <= $startObLevel) {
             return '';

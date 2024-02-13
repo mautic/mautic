@@ -17,35 +17,18 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReplyHelper
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var ContactTracker
-     */
-    private $contactTracker;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->logger          = $logger;
-        $this->contactTracker  = $contactTracker;
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher,
+        private LoggerInterface $logger,
+        private ContactTracker $contactTracker
+    ) {
     }
 
     /**
      * @param string $pattern
      * @param string $replyBody
-     *
-     * @return bool
      */
-    public static function matches($pattern, $replyBody)
+    public static function matches($pattern, $replyBody): bool
     {
         return fnmatch($pattern, $replyBody, FNM_CASEFOLD);
     }
@@ -78,9 +61,9 @@ class ReplyHelper
                     $response = $eventResponse;
                 }
             }
-        } catch (BadRequestHttpException $exception) {
+        } catch (BadRequestHttpException) {
             return new Response('invalid request', 400);
-        } catch (NotFoundHttpException $exception) {
+        } catch (NotFoundHttpException) {
             return new Response('', 404);
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(
@@ -96,12 +79,7 @@ class ReplyHelper
         return $response;
     }
 
-    /**
-     * @param string $message
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|null
-     */
-    private function dispatchReplyEvent(Lead $contact, $message)
+    private function dispatchReplyEvent(Lead $contact, string $message): ?Response
     {
         $replyEvent = new ReplyEvent($contact, trim($message));
 

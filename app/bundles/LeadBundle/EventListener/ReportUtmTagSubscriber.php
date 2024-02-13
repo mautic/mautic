@@ -13,28 +13,13 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     public const UTM_TAG = 'lead.utmTag';
 
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
     public function __construct(
-        FieldsBuilder $fieldsBuilder,
-        CompanyReportData $companyReportData
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData
     ) {
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
@@ -45,15 +30,15 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::UTM_TAG])) {
             return;
         }
 
-        $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-        $companyColumns = $this->companyReportData->getCompanyData();
-        $filters        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+        $columns           = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+        $companyColumns    = $this->companyReportData->getCompanyData();
+        $leadFilter        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
         $utmTagColumns = [
             'utm.utm_campaign' => [
@@ -81,7 +66,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
         $data = [
             'display_name' => 'mautic.lead.report.utm.utm_tag',
             'columns'      => array_merge($columns, $companyColumns, $utmTagColumns),
-            'filters'      => $filters,
+            'filters'      => array_merge($columns, $companyColumns, $utmTagColumns, $leadFilter),
         ];
         $event->addTable(self::UTM_TAG, $data, ReportSubscriber::GROUP_CONTACTS);
     }
@@ -89,7 +74,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::UTM_TAG])) {
             return;

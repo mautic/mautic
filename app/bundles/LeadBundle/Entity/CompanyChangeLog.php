@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class PointsChangeLog.
- */
 class CompanyChangeLog
 {
     /**
@@ -36,21 +33,21 @@ class CompanyChangeLog
     private $actionName;
 
     /**
-     * @var Company
+     * @var int
      */
     private $company;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_companies_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyChangeLogRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\CompanyChangeLogRepository::class)
             ->addIndex(['date_added'], 'company_date_added');
 
         $builder->addId();
@@ -161,7 +158,7 @@ class CompanyChangeLog
     /**
      * Set delta.
      *
-     * @param Company $company
+     * @param int $company
      *
      * @return CompanyChangeLog
      */
@@ -175,7 +172,7 @@ class CompanyChangeLog
     /**
      * Get company.
      *
-     * @return \Mautic\LeadBundle\Entity\Company
+     * @return int
      */
     public function getCompany()
     {
@@ -199,7 +196,7 @@ class CompanyChangeLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

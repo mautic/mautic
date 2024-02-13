@@ -2,10 +2,9 @@
 
 namespace Mautic\EmailBundle\Stats\Helper;
 
-use DateTime;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Exception;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
@@ -19,62 +18,32 @@ abstract class AbstractHelper implements StatHelperInterface
     use FilterTrait;
     use DateRangeUnitTrait;
 
-    /**
-     * @var Collector
-     */
-    private $collector;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    protected $generatedColumnsProvider;
-
     public function __construct(
-        Collector $collector,
+        private Collector $collector,
         Connection $connection,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        UserHelper $userHelper
+        protected GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private UserHelper $userHelper
     ) {
-        $this->collector                = $collector;
         $this->connection               = $connection;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->userHelper               = $userHelper;
     }
 
     /**
      * @return array
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function fetchStats(DateTime $fromDateTime, DateTime $toDateTime, EmailStatOptions $options)
+    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
 
-        // Format into what is required for the graphs
-        switch ($this->getTimeUnitFromDateRange($fromDateTime, $toDateTime)) {
-            case 'Y': // year
-                $stats = $calculator->getSumsByYear();
-                break;
-            case 'm': // month
-                $stats = $calculator->getSumsByMonth();
-                break;
-            case 'W':
-                $stats = $calculator->getSumsByWeek();
-                break;
-            case 'd': // day
-                $stats = $calculator->getSumsByDay();
-                break;
-            case 'H': // hour
-            default:
-                $stats = $calculator->getCountsByHour();
-                break;
-        }
+        $stats = match ($this->getTimeUnitFromDateRange($fromDateTime, $toDateTime)) {
+            'Y'     => $calculator->getSumsByYear(),
+            'm'     => $calculator->getSumsByMonth(),
+            'W'     => $calculator->getSumsByWeek(),
+            'd'     => $calculator->getSumsByDay(),
+            default => $calculator->getCountsByHour(),
+        };
 
         // Chart.js only care about the values
         return array_values($stats->getStats());
@@ -83,7 +52,7 @@ abstract class AbstractHelper implements StatHelperInterface
     /**
      * @return ChartQuery
      */
-    protected function getQuery(DateTime $fromDateTime, DateTime $toDateTime)
+    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime)
     {
         $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
 
@@ -127,15 +96,15 @@ abstract class AbstractHelper implements StatHelperInterface
         }
 
         $q->andWhere("$prefix.$column IN (:email_ids)");
-        $q->setParameter('email_ids', $ids, Connection::PARAM_INT_ARRAY);
+        $q->setParameter('email_ids', $ids, ArrayParameterType::INTEGER);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function fetchAndBindToCollection(QueryBuilder $q, StatCollection $statCollection)
     {
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
         foreach ($results as $result) {
             $statCollection->addStatByDateTimeStringInUTC($result['date'], $result['count']);
         }

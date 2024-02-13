@@ -10,22 +10,20 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class MauticCoreExtension extends Extension
 {
     public const DEFAULT_EXCLUDES = [
-        'DependencyInjection',
-        'Entity',
         'Config',
+        'Crate',
+        'DataObject',
+        'DependencyInjection',
+        'DTO',
+        'Entity',
+        'Event',
+        'Exception',
+        'Migration',
+        'Migrations',
+        'Security',
         'Test',
         'Tests',
         'Views',
-        'Event',
-        'Exception',
-        'Crate',
-        'DataObject',
-        'DTO',
-        'Migrations',
-        'Migration',
-        'Form/DataTransformer',
-        'Security',
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
     ];
 
     /**

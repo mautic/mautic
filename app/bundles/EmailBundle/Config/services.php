@@ -3,12 +3,9 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
-use Mautic\EmailBundle\Controller\PublicController;
-use Mautic\LeadBundle\Model\DoNotContact;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
-return function (ContainerConfigurator $configurator) {
+return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
@@ -21,24 +18,33 @@ return function (ContainerConfigurator $configurator) {
         'MonitoredEmail/Organizer',
         'MonitoredEmail/Processor',
         'Stat/Reference.php',
-        // Will be removed in M5:
-        'Swiftmailer/Exception',
-        'Swiftmailer/Momentum/Callback/ResponseItem.php',
-        'Swiftmailer/Momentum/Callback/ResponseItems.php',
-        'Swiftmailer/Momentum/DTO',
-        'Swiftmailer/Momentum/Exception',
-        'Swiftmailer/Momentum/Metadata',
-        'Swiftmailer/SendGrid/Callback/ResponseItem.php',
-        'Swiftmailer/SendGrid/Callback/ResponseItems.php',
+        'Helper/DTO',
     ];
 
     $services->load('Mautic\\EmailBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set(PublicController::class)
-        ->arg('$doNotContactModel', ref(DoNotContact::class))
-        ->call('setContainer', [ref('service_container')]);
+    $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php')
+        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+    $services->set(\Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
+        ->decorate('mailer.transport_factory');
+
+    $services->set(\Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
+    $services->set(\Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
+
+    $services->alias('mautic.email.model.email', \Mautic\EmailBundle\Model\EmailModel::class);
+    $services->alias('mautic.email.model.send_email_to_user', \Mautic\EmailBundle\Model\SendEmailToUser::class);
+    $services->alias('mautic.email.model.send_email_to_contacts', \Mautic\EmailBundle\Model\SendEmailToContact::class);
+    $services->alias('mautic.email.model.transport_callback', \Mautic\EmailBundle\Model\TransportCallback::class);
+    $services->alias('mautic.email.helper.request.storage', \Mautic\EmailBundle\Helper\RequestStorageHelper::class);  /** @phpstan-ignore-line as the service is deprecated */
+    $services->alias('mautic.email.repository.email', \Mautic\EmailBundle\Entity\EmailRepository::class);
+    $services->alias('mautic.email.repository.emailReply', \Mautic\EmailBundle\Entity\EmailReplyRepository::class);
+    $services->alias('mautic.email.repository.stat', \Mautic\EmailBundle\Entity\StatRepository::class);
+    $services->alias('mautic.helper.mailbox', \Mautic\EmailBundle\MonitoredEmail\Mailbox::class);
+    $services->alias('mautic.helper.mailer', \Mautic\EmailBundle\Helper\MailHelper::class);
+    $services->alias('mautic.message.processor.bounce', \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class);
+    $services->alias('mautic.message.processor.replier', \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class);
+    $services->alias('mautic.email.helper.stat', \Mautic\EmailBundle\Stat\StatHelper::class);
 };

@@ -10,39 +10,30 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \DateTime
-     */
-    private $dateFrom;
+    private \DateTime $dateFrom;
 
-    /**
-     * @var \DateTime
-     */
-    private $dateTo;
+    private DateTimeHelper $dateTimeHelper;
+
+    private \DateTime $dateTo;
 
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    /**
-     * @var string
-     */
-    private $dateColumn;
+    private string $dateColumn;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private string $unit;
 
     /**
      * @var ChartQuery
@@ -53,12 +44,13 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->dateFrom     = new \DateTime('2018-01-01 12:00:00');
-        $this->dateTo       = new \DateTime('2018-02-01 12:00:00');
-        $this->unit         = 'd';
-        $this->dateColumn   = 'date_sent';
-        $this->connection   = $this->createMock(Connection::class);
-        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->dateFrom       = new \DateTime('2018-01-01 12:00:00');
+        $this->dateTo         = new \DateTime('2018-02-01 12:00:00');
+        $this->unit           = 'd';
+        $this->dateColumn     = 'date_sent';
+        $this->connection     = $this->createMock(Connection::class);
+        $this->queryBuilder   = $this->createMock(QueryBuilder::class);
+        $this->dateTimeHelper = new DateTimeHelper();
 
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
@@ -69,15 +61,15 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with('DATE_FORMAT(t.date_sent, \'%Y-%m-%d\') AS date, COUNT(*) AS count');
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\') AS date, COUNT(*) AS count');
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with('DATE_FORMAT(t.date_sent, \'%Y-%m-%d\')');
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
 
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
-            ->with('DATE_FORMAT(t.date_sent, \'%Y-%m-%d\')');
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_sent, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
 
         $this->queryBuilder->expects($this->once())
             ->method('setMaxResults')
@@ -313,7 +305,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->createChartQuery();
         self::assertSame(
             $expectedResult,
-            $this->chartQuery->completeTimeData($data, false, false)
+            $this->chartQuery->completeTimeData($data, false)
         );
     }
 
@@ -330,7 +322,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d') AS date, COUNT(*) AS count");
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\') AS date, COUNT(*) AS count');
 
         $this->queryBuilder->expects($this->once())
             ->method('from')
@@ -338,11 +330,11 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('groupBy')
-            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d')");
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
 
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
-            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d')");
+            ->with('DATE_FORMAT(CONVERT_TZ(t.date_added, \'+00:00\', \''.$this->dateTimeHelper->getLocalTimezoneOffset().'\'), \'%Y-%m-%d\')');
 
         $this->queryBuilder->expects($this->once())
             ->method('setMaxResults')

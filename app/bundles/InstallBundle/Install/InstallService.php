@@ -14,20 +14,19 @@ use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
-use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
-use Mautic\MessengerBundle\Helper\MessengerDsnConvertor;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -40,48 +39,19 @@ class InstallService
 
     public const USER_STEP = 2;
 
-    public const EMAIL_STEP = 3;
-
-    public const FINAL_STEP = 4;
-
-    private Configurator $configurator;
-
-    private CacheHelper $cacheHelper;
-
-    protected PathsHelper $pathsHelper;
-
-    private EntityManager $entityManager;
-
-    private TranslatorInterface $translator;
-
-    private KernelInterface $kernel;
-
-    private ValidatorInterface $validator;
-
-    private UserPasswordEncoder $encoder;
-
-    private FixturesLoaderInterface $fixturesLoader;
+    public const FINAL_STEP = 3;
 
     public function __construct(
-        Configurator $configurator,
-        CacheHelper $cacheHelper,
-        PathsHelper $pathsHelper,
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
-        KernelInterface $kernel,
-        ValidatorInterface $validator,
-        UserPasswordEncoder $encoder,
-        FixturesLoaderInterface $fixturesLoader
+        private Configurator $configurator,
+        private CacheHelper $cacheHelper,
+        protected PathsHelper $pathsHelper,
+        private EntityManager $entityManager,
+        private TranslatorInterface $translator,
+        private KernelInterface $kernel,
+        private ValidatorInterface $validator,
+        private UserPasswordHasher $hasher,
+        private FixturesLoaderInterface $fixturesLoader
     ) {
-        $this->configurator   = $configurator;
-        $this->cacheHelper    = $cacheHelper;
-        $this->pathsHelper    = $pathsHelper;
-        $this->entityManager  = $entityManager;
-        $this->translator     = $translator;
-        $this->kernel         = $kernel;
-        $this->validator      = $validator;
-        $this->encoder        = $encoder;
-        $this->fixturesLoader = $fixturesLoader;
     }
 
     /**
@@ -107,7 +77,7 @@ class InstallService
         if ((empty($params)
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
-            return $this->configurator->getStep(self::DOCTRINE_STEP);
+            return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
         }
 
         return $this->configurator->getStep($index)[0];
@@ -118,7 +88,7 @@ class InstallService
      */
     private function localConfig(): string
     {
-        return (string) $this->pathsHelper->getSystemPath('local_config', false);
+        return ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app');
     }
 
     /**
@@ -153,13 +123,12 @@ class InstallService
             return false;
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $params = $this->configurator->getParameters();
 
-        // if db_driver and mailer_from_name are present then it is assumed all the steps of the installation have been
+        // if db_driver and site_url are present then it is assumed all the steps of the installation have been
         // performed; manually deleting these values or deleting the config file will be required to re-enter
         // installation.
-        if (empty($params['db_driver']) || empty($params['mailer_from_name'])) {
+        if (empty($params['db_driver']) || empty($params['site_url'])) {
             return false;
         }
 
@@ -213,7 +182,7 @@ class InstallService
         $messages = [];
         try {
             $this->configurator->write();
-        } catch (\RuntimeException $exception) {
+        } catch (\RuntimeException) {
             $messages = [
                 'error' => $this->translator->trans(
                     'mautic.installer.error.writing.configuration',
@@ -405,11 +374,11 @@ class InstallService
     {
         $entityManager = $this->entityManager;
 
-        //ensure the username and email are unique
+        // ensure the username and email are unique
         try {
             /** @var User $existingUser */
             $existingUser = $entityManager->getRepository(User::class)->find(1);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $existingUser = null;
         }
 
@@ -464,13 +433,13 @@ class InstallService
             return $messages;
         }
 
-        $encoder = $this->encoder;
+        $hasher = $this->hasher;
 
         $user->setFirstName(InputHelper::clean($data['firstname']));
         $user->setLastName(InputHelper::clean($data['lastname']));
         $user->setUsername(InputHelper::clean($data['username']));
         $user->setEmail(InputHelper::email($data['email']));
-        $user->setPassword($encoder->encodePassword($user, $data['password']));
+        $user->setPassword($hasher->hashPassword($user, $data['password']));
 
         $adminRole = null;
         try {
@@ -499,61 +468,6 @@ class InstallService
         }
 
         return $messages;
-    }
-
-    /**
-     * Setup the email configuration.
-     */
-    public function setupEmailStep(StepInterface $step, array $data): array
-    {
-        $required = [
-            'mailer_from_name',
-            'mailer_from_email',
-            'messenger_type',
-        ];
-
-        $messages = [];
-        foreach ($required as $r) {
-            if (!isset($data[$r]) || empty($data[$r])) {
-                $messages[$r] = $this->translator->trans(
-                    'mautic.core.value.required',
-                    [],
-                    'validators'
-                );
-            }
-        }
-
-        if (!empty($messages)) {
-            return $messages;
-        }
-
-        $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $this->translator->trans(
-            'mautic.core.email.required',
-            [],
-            'validators'
-        );
-
-        $errors = $this->validator->validate(
-            $data['mailer_from_email'],
-            $emailConstraint
-        );
-
-        if (0 !== count($errors)) {
-            foreach ($errors as $error) {
-                $messages[] = $error->getMessage();
-            }
-
-            return $messages;
-        }
-        if ($step instanceof EmailStep) {
-            if ('sync' === $data['messenger_type']) {
-                $data['messenger_transport'] = 'sync';
-            }
-            $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
-        }
-
-        return $this->saveConfiguration($data, $step, true);
     }
 
     /**

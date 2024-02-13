@@ -4,11 +4,18 @@ namespace Mautic\InstallBundle\Tests\Install;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
+use Mautic\CoreBundle\Test\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class InstallSchemaTest extends \PHPUnit\Framework\TestCase
+/**
+ * @template T of AbstractPlatform
+ */
+class InstallSchemaTest extends TestCase
 {
     private Connection $connection;
 
@@ -19,17 +26,23 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
 
     private string $indexTableName;
 
+    /**
+     * @var AbstractSchemaManager<T>
+     */
+    private AbstractSchemaManager $schemaManager;
+
     public function setUp(): void
     {
         parent::setUp();
+        EnvLoader::load();
 
         $this->dbParams = [
-            'driver'        => getenv('DB_DRIVER') ?: 'pdo_mysql',
-            'host'          => getenv('DB_HOST'),
-            'port'          => getenv('DB_PORT'),
-            'dbname'        => getenv('DB_NAME'), // Doctrine needs 'dbname', not 'name'
-            'user'          => getenv('DB_USER'),
-            'password'      => getenv('DB_PASSWD'),
+            'driver'        => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
+            'host'          => $_ENV['DB_HOST'],
+            'port'          => $_ENV['DB_PORT'],
+            'dbname'        => $_ENV['DB_NAME'], // Doctrine needs 'dbname', not 'name'
+            'user'          => $_ENV['DB_USER'],
+            'password'      => $_ENV['DB_PASSWD'],
             'table_prefix'  => MAUTIC_TABLE_PREFIX,
             'backup_prefix' => 'bak_',
         ];
@@ -48,18 +61,19 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $t->addIndex(['a_column'], 'index_with_options', [], $indexOptions);
-        $this->connection->getSchemaManager()->createTable($t);
+        $this->schemaManager = $this->connection->createSchemaManager();
+        $this->schemaManager->createTable($t);
     }
 
     public function tearDown(): void
     {
         parent::tearDown();
 
-        if ($this->connection->getSchemaManager()->tablesExist([$this->indexTableName])) {
-            $this->connection->getSchemaManager()->dropTable($this->indexTableName);
+        if ($this->schemaManager->tablesExist([$this->indexTableName])) {
+            $this->schemaManager->dropTable($this->indexTableName);
         }
-        if ($this->connection->getSchemaManager()->tablesExist([$this->dbParams['backup_prefix'].$this->indexTableName])) {
-            $this->connection->getSchemaManager()->dropTable($this->dbParams['backup_prefix'].$this->indexTableName);
+        if ($this->schemaManager->tablesExist([$this->dbParams['backup_prefix'].$this->indexTableName])) {
+            $this->schemaManager->dropTable($this->dbParams['backup_prefix'].$this->indexTableName);
         }
     }
 
@@ -75,7 +89,8 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         // Set the platform property, as that one is only set in the installSchema method, which we want to avoid.
         $property = $controllerReflection->getProperty('platform');
         $property->setAccessible(true);
-        $property->setValue($schemaHelper, DriverManager::getConnection($this->dbParams)->getSchemaManager()->getDatabasePlatform());
+        $connection = DriverManager::getConnection($this->dbParams);
+        $property->setValue($schemaHelper, $connection->getDatabasePlatform());
 
         $tables       = [$this->indexTableName];
         $mauticTables = [$this->indexTableName => $this->dbParams['backup_prefix'].$this->indexTableName];
@@ -86,7 +101,7 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->connection->query($q);
+                    $this->connection->executeQuery($q);
                 } catch (\Exception $exception) {
                     $exceptions[] = $exception->getMessage();
                 }

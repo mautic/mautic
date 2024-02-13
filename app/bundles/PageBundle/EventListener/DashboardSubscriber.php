@@ -43,26 +43,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page:pages:viewother',
     ];
 
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(PageModel $pageModel, RouterInterface $router)
-    {
-        $this->pageModel = $pageModel;
-        $this->router    = $router;
+    public function __construct(
+        protected PageModel $pageModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');
@@ -90,7 +80,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
@@ -104,7 +94,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
@@ -118,7 +108,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
@@ -137,21 +127,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($pages) {
-                    foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
-                        $row     = [
-                            [
-                                'value' => $page['title'],
-                                'type'  => 'link',
-                                'link'  => $pageUrl,
-                            ],
-                            [
-                                'value' => $page['hits'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($pages as &$page) {
+                    $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                    $row     = [
+                        [
+                            'value' => $page['title'],
+                            'type'  => 'link',
+                            'link'  => $pageUrl,
+                        ],
+                        [
+                            'value' => $page['hits'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -164,7 +152,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
@@ -183,18 +171,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($pages) {
-                    foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
-                        $row     = [
-                            [
-                                'value' => $page['name'],
-                                'type'  => 'link',
-                                'link'  => $pageUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($pages as &$page) {
+                    $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                    $row     = [
+                        [
+                            'value' => $page['name'],
+                            'type'  => 'link',
+                            'link'  => $pageUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
@@ -206,7 +192,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
@@ -227,7 +213,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
     }

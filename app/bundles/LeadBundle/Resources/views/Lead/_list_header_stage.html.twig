@@ -1,0 +1,6 @@
+{{ include('@MauticCore/Helper/tableheader.html.twig', {
+    'sessionVar': 'lead',
+    'orderBy': 'l.stage_id',
+    'text': 'mautic.lead.stage.label',
+    'class': 'col-lead-stage '~class|default(''),
+}) }}

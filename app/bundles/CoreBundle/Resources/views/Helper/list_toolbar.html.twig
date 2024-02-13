@@ -1,0 +1,47 @@
+{% set wrap = true %}
+
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_TOOLBAR_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_GROUP'),
+) }}
+
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+{# Workaround to get variables from action_button_helper here #}
+{{ restore('action_button_helper') }}
+
+<div class="panel-body">
+    <div class="box-layout">
+        <div class="col-xs-6 col-lg-8 va-m form-inline">
+            {% if searchValue is defined %}
+            {{- include('@MauticCore/Helper/search.html.twig', {
+                searchId: searchId|default(null),
+                searchValue: searchValue,
+                action: action|default(''),
+                searchHelp: searchHelp|default(''),
+                target: target|default(null),
+                tmpl: tmpl|default(null),
+                overlayDisabled: overlayDisabled is defined ? overlayDisabled : null
+            }) -}}
+            {% endif %}
+
+            {% if filters is defined and filters is not empty %}
+            {{- include('@MauticCore/Helper/list_filters.html.twig', {
+                filters: filters,
+                target: target|default(null),
+                tmpl: tmpl|default(null)
+            }) -}}
+            {% endif %}
+        </div>
+
+        <div class="col-xs-6 col-lg-4 va-m text-right">
+            {% if buttonHelp is defined and buttonHelp is not empty %}
+                <div class="input-group-btn">
+                    <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help">
+                        <i class="fa fa-question-circle"></i>
+                    </button>
+                </div>
+            {% endif %}
+            {{ buttonsRender() }}
+        </div>
+    </div>
+</div>

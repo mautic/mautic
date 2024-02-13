@@ -3,32 +3,25 @@
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\RequestSubscriber;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RequestSubscriber
-     */
-    private $subscriber;
+    private \Mautic\CoreBundle\EventListener\RequestSubscriber $subscriber;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private \Symfony\Component\HttpFoundation\Request $request;
 
     /**
      * @var MockObject&RequestEvent
      */
-    private $event;
+    private \PHPUnit\Framework\MockObject\MockObject $event;
 
     protected function setUp(): void
     {
@@ -40,6 +33,10 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
         $csrfTokenManagerMock
             ->method('getToken')
             ->willReturn(new CsrfToken($aCsrfTokenId, $aCsrfTokenValue));
+
+        $csrfTokenManagerMock
+          ->method('isTokenValid')
+          ->will($this->returnCallback(fn (CsrfToken $token) => $token->getValue() === $aCsrfTokenValue));
 
         $this->request = new Request();
 
@@ -56,16 +53,12 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRequest')
             ->willReturn($this->request);
 
-        $templatingHelper = $this->createMock(TemplatingHelper::class);
-
-        $templatingHelper
-            ->method('getTemplating')
-            ->willReturn($this->createMock(DelegatingEngine::class));
+        $twig = $this->createMock(Environment::class);
 
         $this->subscriber = new RequestSubscriber(
             $csrfTokenManagerMock,
             $this->createMock(TranslatorInterface::class),
-            $templatingHelper
+            $twig
         );
     }
 

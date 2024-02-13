@@ -13,9 +13,10 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
-     * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords()
+     *
+     * @covers \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getRecords
      */
-    public function testMultiplePagesOfRecordsAreFetched()
+    public function testMultiplePagesOfRecordsAreFetched(): void
     {
         $this->reset();
 
@@ -26,14 +27,12 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $apiHelper->expects($this->exactly(2))
             ->method('getContacts')
             ->willReturnCallback(
-                function () {
-                    return $this->generateData(2);
-                }
+                fn () => $this->generateData(2)
             );
 
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getRecords'])
+            ->onlyMethods(['isAuthorized', 'getApiHelper', 'getMauticLead'])
             ->getMock();
 
         $integration->expects($this->once())
@@ -49,9 +48,10 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 
     /**
      * @testdox Test that all records are fetched till last page of results are consumed
-     * @covers  \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers()
+     *
+     * @covers \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::getCampaignMembers
      */
-    public function testMultiplePagesOfCampaignMemberRecordsAreFetched()
+    public function testMultiplePagesOfCampaignMemberRecordsAreFetched(): void
     {
         $this->reset();
 
@@ -62,9 +62,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $apiHelper->expects($this->exactly(2))
             ->method('getCampaignMembers')
             ->willReturnCallback(
-                function () {
-                    return $this->generateData(2);
-                }
+                fn () => $this->generateData(2)
             );
 
         $integrationEntityModel = $this->getMockBuilder(IntegrationEntityModel::class)
@@ -90,7 +88,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 $integrationEntityModel,
                 $this->doNotContact,
             ])
-            ->setMethodsExcept(['getCampaignMembers', 'getRecordList', 'setIntegrationEntityModel'])
+            ->onlyMethods(['isAuthorized', 'getApiHelper', 'getRecords', 'saveCampaignMembers'])
             ->getMock();
 
         $integration->expects($this->once())

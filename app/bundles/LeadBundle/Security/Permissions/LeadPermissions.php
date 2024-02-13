@@ -15,6 +15,7 @@ class LeadPermissions extends AbstractPermissions
         $this->permissions = [
             'lists' => [
                 'viewother'   => 2,
+                'viewown'     => 4,
                 'editother'   => 8,
                 'deleteother' => 64,
                 'full'        => 1024,
@@ -28,15 +29,12 @@ class LeadPermissions extends AbstractPermissions
         $this->addStandardPermissions('imports');
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'lead';
     }
 
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
 
@@ -75,11 +73,11 @@ class LeadPermissions extends AbstractPermissions
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }
 
-    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false)
+    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false): bool
     {
         parent::analyzePermissions($permissions, $allPermissions, $isSecondRound);
 
-        //make sure the user has access to own leads as well if they have access to lists, notes or fields
+        // make sure the user has access to own leads as well if they have access to lists, notes or fields
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
             (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
@@ -97,7 +95,7 @@ class LeadPermissions extends AbstractPermissions
     protected function getSynonym($name, $level)
     {
         if ('fields' === $name) {
-            //set some synonyms
+            // set some synonyms
             switch ($level) {
                 case 'publishown':
                 case 'publishother':

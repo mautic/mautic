@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -15,7 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
     public const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
+
     public const PERMISSION_DELETE_OTHER = 'dynamiccontent:dynamiccontents:deleteother';
+
     public const PERMISSION_DELETE_OWN   = 'dynamiccontent:dynamiccontents:deleteown';
 
     public const BITWISE_BY_PERM = [
@@ -68,10 +71,10 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user = $this->createUser($role);
 
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($role);
 
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         return $user;
@@ -107,12 +110,54 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', null));
         $user->setRole($role);
 
         $this->em->persist($user);
 
         return $user;
+    }
+
+    public function testIndexActionIsSuccessful(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/dwc');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testNewActionIsSuccessful(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/dwc/new');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testEditActionIsSuccessful(): void
+    {
+        $entity = new DynamicContent();
+        $entity->setName('Test Dynamic Content');
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$entity->getId());
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testViewActionIsSuccessful(): void
+    {
+        $entity = new DynamicContent();
+        $entity->setName('Test Dynamic Content');
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/dwc/view/'.$entity->getId());
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 }

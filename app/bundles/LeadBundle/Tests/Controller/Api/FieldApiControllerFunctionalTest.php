@@ -6,10 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,7 +24,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testCreatingMultiselectField()
+    public function testCreatingMultiselectField(): void
     {
         $payload = [
             'label'               => 'Shops (TB)',
@@ -43,7 +40,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $payload);
+        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $fieldResponse  = json_decode($clientResponse->getContent(), true);
 
@@ -76,8 +74,10 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload = $this->getCreatePayload($alias);
         $id      = $this->assertCreateResponse($payload, Response::HTTP_ACCEPTED);
 
-        // Exeucte the command to create the field
-        $this->executeCommand($id);
+        // Test that the command will create the field
+        $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $id]);
+
+        $this->assertEquals(0, $commandTester->getStatusCode());
 
         // Test fetching
         $this->assertGetResponse($payload, $id);
@@ -116,7 +116,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int
     {
         // Test creating a new field
-        $this->client->request('POST', '/api/fields/contact/new', $payload);
+
+        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $this->client->request('POST', '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -156,7 +158,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function assertPatchResponse(array $payload, int $id, string $alias): void
     {
-        $this->client->request('PATCH', sprintf('/api/fields/contact/%s/edit', $id), $payload);
+        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $this->client->request('PATCH', sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);
@@ -165,22 +168,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         foreach ($payload as $key => $value) {
             $this->assertTrue(isset($response['field'][$key]));
 
-            switch ($key) {
-                case 'alias':
-                    $this->assertEquals($alias, $response['field'][$key]);
-                    break;
-
-                case 'object':
-                    $this->assertEquals('lead', $response['field'][$key]);
-                    break;
-
-                case 'type':
-                    $this->assertEquals('text', $response['field'][$key]);
-                    break;
-
-                default:
-                    $this->assertEquals($value, $response['field'][$key]);
-            }
+            match ($key) {
+                'alias'  => $this->assertEquals($alias, $response['field'][$key]),
+                'object' => $this->assertEquals('lead', $response['field'][$key]),
+                'type'   => $this->assertEquals('text', $response['field'][$key]),
+                default  => $this->assertEquals($value, $response['field'][$key]),
+            };
         }
     }
 
@@ -197,40 +190,14 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             // use array has key because ID will now be null
             $this->assertArrayHasKey($key, $response['field']);
 
-            switch ($key) {
-                case 'id':
-                    // ID is expected to now be null
-                    $this->assertNull($response['field'][$key]);
-                    break;
-
-                case 'alias':
-                    $this->assertEquals($alias, $response['field'][$key]);
-                    break;
-
-                case 'object':
-                    $this->assertEquals('lead', $response['field'][$key]);
-                    break;
-
-                case 'type':
-                    $this->assertEquals('text', $response['field'][$key]);
-                    break;
-
-                default:
-                    $this->assertEquals($value, $response['field'][$key]);
-            }
+            match ($key) {
+                'id'     => $this->assertNull($response['field'][$key]),
+                'alias'  => $this->assertEquals($alias, $response['field'][$key]),
+                'object' => $this->assertEquals('lead', $response['field'][$key]),
+                'type'   => $this->assertEquals('text', $response['field'][$key]),
+                default  => $this->assertEquals($value, $response['field'][$key]),
+            };
         }
-    }
-
-    private function executeCommand(int $id): void
-    {
-        // Test that the command will create the field
-        $input  = new ArrayInput(['--id' => $id]);
-        $output = new BufferedOutput();
-
-        /** @var CreateCustomFieldCommand $command */
-        $command    = $this->client->getKernel()->getContainer()->get('mautic.lead.command.create_custom_field');
-        $returnCode = $command->run($input, $output);
-        $this->assertEquals(0, $returnCode);
     }
 
     private function getCreatePayload(string $alias): array

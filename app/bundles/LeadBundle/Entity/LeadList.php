@@ -24,27 +24,27 @@ class LeadList extends FormEntity
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $name;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $publicName;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $alias;
 
@@ -64,21 +64,26 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
      */
     private $leads;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastBuiltDate;
+
+    /**
+     * @var float|null
+     */
+    private $lastBuiltTime;
 
     public function __construct()
     {
         $this->leads = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -116,9 +121,14 @@ class LeadList extends FormEntity
             ->columnName('last_built_date')
             ->nullable()
             ->build();
+
+        $builder->createField('lastBuiltTime', 'float')
+            ->columnName('last_built_time')
+            ->nullable()
+            ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             ['message' => 'mautic.core.name.required']
@@ -135,7 +145,7 @@ class LeadList extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadList')
             ->addListProperties(
@@ -208,9 +218,6 @@ class LeadList extends FormEntity
         return $this->description;
     }
 
-    /**
-     * Set category.
-     */
     public function setCategory(Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
@@ -219,9 +226,6 @@ class LeadList extends FormEntity
         return $this;
     }
 
-    /**
-     * Get category.
-     */
     public function getCategory(): ?Category
     {
         return $this->category;
@@ -267,7 +271,7 @@ class LeadList extends FormEntity
     public function getFilters()
     {
         if (is_array($this->filters)) {
-            return $this->addLegacyParams($this->filters);
+            return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters));
         }
 
         return $this->filters;
@@ -369,7 +373,7 @@ class LeadList extends FormEntity
     /**
      * @param bool $isPreferenceCenter
      */
-    public function setIsPreferenceCenter($isPreferenceCenter)
+    public function setIsPreferenceCenter($isPreferenceCenter): void
     {
         $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
         $this->isPreferenceCenter = (bool) $isPreferenceCenter;
@@ -384,9 +388,18 @@ class LeadList extends FormEntity
     private function addLegacyParams(array $filters): array
     {
         return array_map(
-            function (array $filter) {
-                $filter['filter'] = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
-                $filter['display'] = $filter['properties']['display'] ?? $filter['display'] ?? null;
+            function (array $filter): array {
+                if (isset($filter['properties']) && $filter['properties'] && array_key_exists('filter', $filter['properties'])) {
+                    $filter['filter'] = $filter['properties']['filter'];
+                } else {
+                    $filter['filter'] = $filter['filter'] ?? null;
+                }
+
+                if (isset($filter['properties']) && $filter['properties'] && array_key_exists('display', $filter['properties'])) {
+                    $filter['display'] = $filter['properties']['display'];
+                } else {
+                    $filter['display'] = $filter['display'] ?? null;
+                }
 
                 return $filter;
             },
@@ -394,7 +407,7 @@ class LeadList extends FormEntity
         );
     }
 
-    public function getLastBuiltDate(): ?\DateTime
+    public function getLastBuiltDate(): ?\DateTimeInterface
     {
         return $this->lastBuiltDate;
     }
@@ -417,5 +430,30 @@ class LeadList extends FormEntity
         }
 
         $this->setLastBuiltDateToCurrentDatetime();
+    }
+
+    public function getLastBuiltTime(): ?float
+    {
+        return $this->lastBuiltTime;
+    }
+
+    public function setLastBuiltTime(?float $lastBuiltTime): void
+    {
+        $this->lastBuiltTime = $lastBuiltTime;
+    }
+
+    /**
+     * @param mixed[] $filters
+     *
+     * @return mixed[]
+     */
+    private function setFirstFilterGlueToAnd(array $filters): array
+    {
+        foreach ($filters as &$filter) {
+            $filter['glue'] = 'and';
+            break;
+        }
+
+        return $filters;
     }
 }

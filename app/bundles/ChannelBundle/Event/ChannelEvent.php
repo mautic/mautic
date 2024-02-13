@@ -71,8 +71,10 @@ class ChannelEvent extends CommonEvent
 
         // if not defined, try the classic naming convention
         $channel = ucfirst($channel);
+        $class   = "\Mautic\\{$channel}Bundle\Entity\\{$channel}";
+        \assert(class_exists($class));
 
-        return "Mautic{$channel}Bundle:{$channel}";
+        return $class;
     }
 
     /**
@@ -84,16 +86,10 @@ class ChannelEvent extends CommonEvent
      */
     public function getNameColumn($channel)
     {
-        if (isset($this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'])) {
-            return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'];
-        }
-
-        return 'name';
+        return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'] ?? 'name';
     }
 
     /**
-     * @param $feature
-     *
      * @return array
      */
     public function getFeatureChannels()

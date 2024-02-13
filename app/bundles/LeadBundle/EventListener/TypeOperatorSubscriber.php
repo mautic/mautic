@@ -31,39 +31,18 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 
-    private LeadModel $leadModel;
-
-    private ListModel $listModel;
-
-    private CampaignModel $campaignModel;
-
-    private EmailModel $emailModel;
-
-    private StageModel $stageModel;
-
-    private CategoryModel $categoryModel;
-
-    private AssetModel $assetModel;
-
     private TranslatorInterface $translator;
 
     public function __construct(
-        LeadModel $leadModel,
-        ListModel $listModel,
-        CampaignModel $campaignModel,
-        EmailModel $emailModel,
-        StageModel $stageModel,
-        CategoryModel $categoryModel,
-        AssetModel $assetModel,
+        private LeadModel $leadModel,
+        private ListModel $listModel,
+        private CampaignModel $campaignModel,
+        private EmailModel $emailModel,
+        private StageModel $stageModel,
+        private CategoryModel $categoryModel,
+        private AssetModel $assetModel,
         TranslatorInterface $translator
     ) {
-        $this->leadModel     = $leadModel;
-        $this->listModel     = $listModel;
-        $this->campaignModel = $campaignModel;
-        $this->emailModel    = $emailModel;
-        $this->stageModel    = $stageModel;
-        $this->categoryModel = $categoryModel;
-        $this->assetModel    = $assetModel;
         $this->translator    = $translator;
     }
 
@@ -122,9 +101,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldAlias('globalcategory', $this->getCategoryChoices());
         $event->setChoicesForFieldAlias('lead_email_received', $emails);
         $event->setChoicesForFieldAlias('lead_email_sent', $emails);
-        $event->setChoicesForFieldAlias('device_type', array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())));
+        $event->setChoicesForFieldAlias('device_type', array_combine(DeviceParser::getAvailableDeviceTypeNames(), DeviceParser::getAvailableDeviceTypeNames()));
         $event->setChoicesForFieldAlias('device_brand', array_flip(DeviceParser::$deviceBrands));
-        $event->setChoicesForFieldAlias('device_os', array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())));
+        $event->setChoicesForFieldAlias('device_os', array_combine(array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())));
         $event->setChoicesForFieldType('country', FormFieldHelper::getCountryChoices());
         $event->setChoicesForFieldType('locale', FormFieldHelper::getLocaleChoices());
         $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());
@@ -149,6 +128,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 'multiple'                  => true,
                 'choice_translation_domain' => false,
                 'disabled'                  => $event->filterShouldBeDisabled(),
+                'constraints'               => $event->filterShouldBeDisabled() ? [] : [new NotBlank(['message' => 'mautic.core.value.required'])],
                 'attr'                      => [
                     'class'                => 'form-control',
                     'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
@@ -175,7 +155,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $properties  = $event->getFieldDetails()['properties'] ?? [];
         $displayAttr = [
             'class'               => 'form-control',
-            'data-field-callback' => isset($properties['callback']) ? $properties['callback'] : 'activateSegmentFilterTypeahead',
+            'data-field-callback' => $properties['callback'] ?? 'activateSegmentFilterTypeahead',
             'data-target'         => $event->getFieldAlias(),
             'placeholder'         => $this->translator->trans(
                 'mautic.lead.list.form.startTyping'
@@ -287,6 +267,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                     'multiple'                  => $multiple,
                     'choice_translation_domain' => false,
                     'disabled'                  => $event->filterShouldBeDisabled(),
+                    'constraints'               => $event->filterShouldBeDisabled() ? [] : [new NotBlank(['message' => 'mautic.core.value.required'])],
                 ]
             );
 

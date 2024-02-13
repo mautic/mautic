@@ -1,0 +1,45 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'emailSend' %}
+
+{% block headerTitle 'mautic.email.send.list'|trans({'%name%': email.name})|purify %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6">
+            <div class="ml-lg mr-lg mt-md pa-lg">
+                <div class="panel panel-info">
+                    <div class="panel-body">
+                        {{ form_start(form) }}
+                        <div class="col-xs-offset-1 col-xs-10 col-lg-offset-2 col-lg-8">
+                            <div class="well mt-lg">
+                                <div class="input-group">
+                                <span class="input-group-btn text-center">
+                                    {{- include('@MauticCore/Helper/confirm.html.twig', {
+                                        'message'         : 'mautic.email.form.confirmsend'|trans({'%name%' : email.getName()}),
+                                        'confirmText'     : 'mautic.email.send'|trans,
+                                        'confirmCallback' : 'submitSendForm',
+                                        'iconClass'       : 'fa fa-send-o',
+                                        'btnText'         : 'mautic.email.send'|trans,
+                                        'btnClass'        : 'btn btn-primary btn-send' ~ ((pending) ? '' : ' disabled')
+                                    }) -}}
+                                </span>
+                                </div>
+                                <div class="text-center">
+                                <span class="label label-primary mt-lg">
+                                    {{ 'mautic.email.send.pending'|trans ({'%count%' : pending}) }}
+                                </span>
+                                    <div class="mt-sm">
+                                        <a class="text-danger mt-md" href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : email.getId()}) }}" data-toggle="ajax">{{ 'mautic.core.form.cancel'|trans }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

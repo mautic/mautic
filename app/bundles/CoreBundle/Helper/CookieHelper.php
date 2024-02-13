@@ -13,11 +13,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class CookieHelper implements EventSubscriberInterface
 {
-    private ?string $path;
-    private ?string $domain;
-    private bool $secure;
-    private bool $httponly;
-    private RequestStack $requestStack;
     private ?Request $request = null;
 
     /**
@@ -25,13 +20,13 @@ class CookieHelper implements EventSubscriberInterface
      */
     private array $cookies = [];
 
-    public function __construct(string $cookiePath, ?string $cookieDomain, bool $cookieSecure, bool $cookieHttp, RequestStack $requestStack)
-    {
-        $this->path         = $cookiePath;
-        $this->domain       = $cookieDomain;
-        $this->secure       = $cookieSecure;
-        $this->httponly     = $cookieHttp;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private ?string $path,
+        private ?string $domain,
+        private bool $secure,
+        private bool $httponly,
+        private RequestStack $requestStack
+    ) {
     }
 
     /**
@@ -51,7 +46,7 @@ class CookieHelper implements EventSubscriberInterface
     /**
      * @param int|string|float|bool|object|null $value
      */
-    public function setCookie(string $name, $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): void
+    public function setCookie(string $name, $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
     {
         if (null !== $value) {
             $value = (string) $value;
@@ -66,7 +61,7 @@ class CookieHelper implements EventSubscriberInterface
             $secure ?? $this->secure,
             $httponly ?? $this->httponly,
             false,
-            ($secure ?? $this->secure) ? Cookie::SAMESITE_LAX : null
+            $sameSite
         );
 
         $this->cookies[$name] = $cookie;
@@ -75,9 +70,9 @@ class CookieHelper implements EventSubscriberInterface
     /**
      * Deletes a cookie by expiring it.
      */
-    public function deleteCookie(string $name, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): void
+    public function deleteCookie(string $name, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null, ?string $sameSite = Cookie::SAMESITE_LAX): void
     {
-        $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly);
+        $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly, $sameSite);
     }
 
     public function onResponse(ResponseEvent $event): void
@@ -100,6 +95,6 @@ class CookieHelper implements EventSubscriberInterface
             return $this->request;
         }
 
-        return $this->request = $this->requestStack->getMasterRequest();
+        return $this->request = $this->requestStack->getMainRequest();
     }
 }

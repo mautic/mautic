@@ -100,14 +100,51 @@ Mautic.formOnLoad = function (container) {
 };
 
 Mautic.formBuilderNewComponentInit = function () {
-    mQuery('select.form-builder-new-component').change(function (e) {
-        mQuery(this).find('option:selected');
-        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+    mQuery('select.form-builder-new-component:not(.initialized)').change(function (e) {
+        const select = mQuery(this);
+        select.addClass('initialized');
+        select.find('option:selected');
+        Mautic.ajaxifyModal(select.find('option:selected'));
         // Reset the dropdown
-        mQuery(this).val('');
-        mQuery(this).trigger('chosen:updated');
+        select.val('');
+        select.chosen('destroy').chosen();
     });
-}
+};
+
+Mautic.changeSelectOptions = function(selectEl, options) {
+    selectEl.empty();
+    mQuery.each(options, function(key, field) {
+        selectEl.append(
+            mQuery('<option></option>')
+                .attr('value', field.value)
+                .attr('data-list-type', field.isListType ? 1 : 0)
+                .text(field.label)
+        );
+    });
+    selectEl.trigger('chosen:updated');
+};
+
+Mautic.fetchFieldsOnObjectChange = function() {
+    var fieldSelect = mQuery('select#formfield_mappedField');
+    fieldSelect.attr('disable', true);
+    mQuery.ajax({
+        url: mauticAjaxUrl + "?action=form:getFieldsForObject",
+        data: {
+            mappedObject: mQuery('select#formfield_mappedObject').val(),
+            mappedField: mQuery('input#formfield_originalMappedField').val(),
+            formId: mQuery('input#mauticform_sessionId').val()
+        },
+        success: function (response) {
+            Mautic.changeSelectOptions(fieldSelect, response.fields);
+        },
+        error: function (response, textStatus, errorThrown) {
+            Mautic.processAjaxError(response, textStatus, errorThrown);
+        },
+        complete: function () {
+            fieldSelect.removeAttr('disable');
+        }
+    });
+};
 
 Mautic.updateFormFields = function () {
     Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');

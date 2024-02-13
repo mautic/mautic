@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\BuilderSubscriber;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -26,15 +26,18 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
         $trackableModel       = $this->createMock(TrackableModel::class);
         $redirectModel        = $this->createMock(RedirectModel::class);
         $translator           = $this->createMock(TranslatorInterface::class);
-        $entityManager        = $this->createMock(EntityManager::class);
+        $mailHashHelper       = new MailHashHelper($coreParametersHelper);
         $builderSubscriber    = new BuilderSubscriber(
             $coreParametersHelper,
             $emailModel,
             $trackableModel,
             $redirectModel,
             $translator,
-            $entityManager
+            $mailHashHelper
         );
+
+        $emailModel->method('buildUrl')->willReturn('https://some.url');
+        $translator->method('trans')->willReturn('some translation');
 
         $coreParametersHelper->method('get')->willReturnCallback(function ($key) {
             if ('locale' === $key) {

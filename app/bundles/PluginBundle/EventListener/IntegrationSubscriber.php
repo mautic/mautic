@@ -2,7 +2,6 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use DOMDocument;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
@@ -15,20 +14,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class IntegrationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
@@ -39,7 +30,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
     /*
      * Request event
      */
-    public function onRequest(PluginIntegrationRequestEvent $event)
+    public function onRequest(PluginIntegrationRequestEvent $event): void
     {
         $name     = strtoupper($event->getIntegrationName());
         $headers  = var_export($event->getHeaders(), true);
@@ -73,7 +64,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
     /*
      * Response event
      */
-    public function onResponse(PluginIntegrationRequestEvent $event)
+    public function onResponse(PluginIntegrationRequestEvent $event): void
     {
         $response = $event->getResponse();
         $headers  = var_export($response->getHeaders(), true);
@@ -83,7 +74,7 @@ class IntegrationSubscriber implements EventSubscriberInterface
         $xml      = '';
         $isXml    = isset($response->getHeaders()['Content-Type']) && preg_grep('/text\/xml/', $response->getHeaders()['Content-Type']);
         if ($isXml) {
-            $doc                     = new DomDocument('1.0');
+            $doc                     = new \DOMDocument('1.0');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput       = true;
             $doc->loadXML($response->getBody());

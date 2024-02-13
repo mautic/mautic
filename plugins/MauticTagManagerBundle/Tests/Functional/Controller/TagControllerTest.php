@@ -30,7 +30,7 @@ class TagControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var TagModel $tagModel */
-        $tagModel            = self::$container->get('mautic.lead.model.tag');
+        $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
         $this->tagRepository = $tagModel->getRepository();
 
         foreach ($tags as $tagName) {
@@ -157,15 +157,13 @@ class TagControllerTest extends MauticMysqlTestCase
         $form['tag_entity[tag]']->setValue($TagName);
         $crawler = $this->client->submit($form);
 
-        $this->assertStringContainsString($TagName.' has been updated!', strip_tags($crawler->text()), 'Must contain already exist.');
+        $this->assertStringContainsString($TagName.' has been updated!', strip_tags($crawler->text(null, false)), 'Must contain already exist.');
     }
 
     public function testBatchDeleteAction(): void
     {
         $tags   = $this->tagRepository->findAll();
-        $tagsId = array_map(function (Tag $tag) {
-            return $tag->getId();
-        }, $tags);
+        $tagsId = array_map(fn (Tag $tag) => $tag->getId(), $tags);
         $this->client->request('POST', '/s/tags/batchDelete?ids='.json_encode($tagsId));
         $this->assertTrue($this->client->getResponse()->isOk(), 'Return code must be 200.');
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');

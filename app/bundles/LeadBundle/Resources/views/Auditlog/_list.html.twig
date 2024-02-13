@@ -1,0 +1,136 @@
+{#
+  Variables
+    - lead
+    - events
+#}
+<!-- filter form -->
+<form method="post" action="{{ path('mautic_contact_auditlog_action', {'leadId': lead.id}) }}" class="panel" id="auditlog-filters">
+    <div class="form-control-icon pa-xs">
+        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events['filters']['search']|e }}">
+        <span class="the-icon fa fa-search text-muted mt-xs"></span>
+    </div>
+    {% if events.types is defined and events.types is iterable %}
+        <div class="history-search panel-footer text-muted">
+            <div class="col-sm-5">
+                <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}">
+                    {% for typeKey, typeName in events.types %}
+                        <option value="{{ typeKey }}" {% if typeKey in events.filters.includeEvents %}selected{% endif %}>
+                            {{- typeName -}}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-5">
+                <select name="excludeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.exclude.placeholder'|trans }}">
+                    {% for typeKey, typeName in events.types %}
+                        <option value="{{ typeKey }}" {% if typeKey in events.filters.excludeEvents %}selected{% endif %}>
+                            {{- typeName -}}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <a class="btn btn-default btn-block" href="{{ url('mautic_contact_auditlog_export_action', {'leadId': lead.id}) }}" data-toggle="download">
+                    <span>
+                        <i class="fa fa-download"></i> <span class="hidden-xs hidden-sm">{{ 'mautic.core.export'|trans }}</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}" />
+</form>
+<script>
+    mauticLang['showMore'] = '{{ 'mautic.core.more.show'|trans }}';
+    mauticLang['hideMore'] = '{{ 'mautic.core.more.hide'|trans }}';
+</script>
+<div id="auditlog-table">
+  <!-- auditlog -->
+  <div class="table-responsive">
+      <table class="table table-hover table-bordered" id="contact-auditlog">
+          <thead>
+          <tr>
+              <th class="timeline-icon">
+                  <a class="btn btn-sm btn-nospin btn-default" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
+                      <span class="fa fa-fw fa-level-down"></span>
+                  </a>
+              </th>
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                  'orderBy': 'userName',
+                  'text': 'mautic.lead.timeline.user_name',
+                  'class': 'timeline-name',
+                  'sessionVar': 'lead.'~lead.id~'.auditlog',
+                  'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+                  'target': '#auditlog-table',
+              }) }}
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                  'orderBy': 'action',
+                  'text': 'mautic.lead.timeline.event_type',
+                  'class': 'visible-md visible-lg timeline-type',
+                  'sessionVar': 'lead.'~lead.id~'.auditlog',
+                  'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+                  'target': '#auditlog-table',
+              }) }}
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                  'orderBy': 'dateAdded',
+                  'text': 'mautic.lead.timeline.event_timestamp',
+                  'class': 'visible-md visible-lg timeline-timestamp',
+                  'sessionVar': 'lead.'~lead.id~'.auditlog',
+                  'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+                  'target': '#auditlog-table',
+              }) }}
+          </tr>
+          <tbody>
+          {% for event in events.events %}
+              {% set counter = loop.index0 + 1 %}
+              {% set icon = event.icon|default('fa-history') %}
+              {% set eventLabel = event.eventLabel|default(event.eventType) %}
+              {% if eventLabel is iterable %}
+                  {% set linkType = eventLabel.isExternal is defined ? 'data-toggle="ajax"' : 'target="_new"' %}
+                  {% set eventLabel = '<a href="'~eventLabel.href~'" '~linkType~'>'~eventLabel.label~'</a>' %}
+              {% endif %}
+
+              {% set rowStripe = cycle(['', 'timeline-row-highlighted'], loop.index0) %}
+              {% set hasDetails = false %}
+              {% for key, value in event.details %}
+                  {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key %}
+                      {% set hasDetails = true %}
+                  {% endif %}
+              {% endfor %}
+              <tr class="timeline-row {{ rowStripe }} {% if event.featured is defined %}timeline-featured{% endif %}">
+                  <td class="timeline-icon">
+                      <a href="javascript:void(0);"
+                         data-activate-details="{{ counter }}"
+                         class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined or hasDetails == false %}disabled{% endif %}"
+                         data-toggle="tooltip"
+                         title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
+                          <span class="fa fa-fw {{ icon }}"></span>
+                      </a>
+                  </td>
+                  <td class="timeline-name">{{ eventLabel }}</td>
+                  <td class="timeline-type">{% if event.eventType is defined %}{{ ('mautic.lead.event.'~event.eventType)|trans }}{% endif %}
+              </td>
+                  <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
+              </tr>
+              {% if event.contentTemplate and hasDetails == true %}
+                  <!-- contentTemplate: "{{ event.contentTemplate }}" -->
+                  <tr class="timeline-row {{ rowStripe }} timeline-details hide" id="auditlog-details-{{ counter }}">
+                      <td colspan="4">
+                        {{ include([event.contentTemplate, event.contentTemplate], {'event': event, 'lead': lead}) }}
+                      </td>
+                  </tr>
+              {% endif %}
+          {% endfor %}
+          </tbody>
+      </table>
+  </div>
+  {{ include('@MauticCore/Helper/pagination.html.twig', {
+          'page': events.page,
+          'fixedPages': events.maxPages,
+          'fixedLimit': true,
+          'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+          'target': '#auditlog-table',
+          'totalItems': events.total,
+  }) }}
+  <!--/ auditlog -->
+</div>

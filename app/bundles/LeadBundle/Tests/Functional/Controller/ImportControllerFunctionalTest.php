@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,6 +19,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
     protected $useCleanupRollback = false;
 
     private string $csvFile;
+
     /**
      * @var array|string[][]
      */
@@ -64,7 +64,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $html = $this->client->submit($form);
         Assert::assertStringContainsString(
             'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text()
+            $html->text(null, false)
         );
 
         $importButton = $html->selectButton('Import');
@@ -105,14 +105,14 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $html = $this->client->submit($form);
         Assert::assertStringContainsString(
             'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text()
+            $html->text(null, false)
         );
 
         // Run command to import CSV.
-        $output = $this->runCommand('mautic:import', ['-e' => 'dev', '--id' => $import->getId(), '--limit' => 10000]);
+        $output = $this->testSymfonyCommand('mautic:import', ['-e' => 'dev', '--id' => $import->getId(), '--limit' => 10000]);
         Assert::assertStringContainsString(
             '4 lines were processed, 3 items created, 0 items updated, 1 items ignored',
-            $output
+            $output->getDisplay()
         );
         $leadCount = $this->em->getRepository(Lead::class)->count(['firstname' => 'John']);
         Assert::assertSame(3, $leadCount);
@@ -127,13 +127,13 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setName($alias);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::$container->get('mautic.lead.model.field');
+        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $fieldModel->saveEntity($field);
     }
 
     private function createCsvContactImport(): Import
     {
-        $now    = new DateTime();
+        $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
         $import->setDateAdded($now);
@@ -175,7 +175,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $import->setProperties($properties);
 
         /** @var ImportModel $importModel */
-        $importModel = self::$container->get('mautic.lead.model.import');
+        $importModel = static::getContainer()->get('mautic.lead.model.import');
         $importModel->saveEntity($import);
 
         return $import;
@@ -199,7 +199,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $tag = new Tag();
         $tag->setTag($tagName);
 
-        $tagModel = self::$container->get('mautic.lead.model.tag');
+        $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->saveEntity($tag);
 
         return $tag;

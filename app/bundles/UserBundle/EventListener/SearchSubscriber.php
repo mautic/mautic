@@ -4,50 +4,23 @@ namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var RoleModel
-     */
-    private $userRoleModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var TemplatingHelper
-     */
-    private $templating;
-
     public function __construct(
-        UserModel $userModel,
-        RoleModel $roleModel,
-        CorePermissions $security,
-        TemplatingHelper $templating
+        private UserModel $userModel,
+        private RoleModel $userRoleModel,
+        private CorePermissions $security,
+        private Environment $twig
     ) {
-        $this->userModel     = $userModel;
-        $this->userRoleModel = $roleModel;
-        $this->security      = $security;
-        $this->templating    = $templating;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -55,7 +28,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
         if (empty($str)) {
@@ -73,23 +46,23 @@ class SearchSubscriber implements EventSubscriberInterface
                 $userResults = [];
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
-                    $userResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
+                    $userResults[] = $this->twig->render(
+                        '@MauticUser/SubscribedEvents/Search/global_user.html.twig',
                         [
                             'user'    => $user,
                             'canEdit' => $canEdit,
                         ]
-                    )->getContent();
+                    );
                 }
                 if (count($users) > 5) {
-                    $userResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
+                    $userResults[] = $this->twig->render(
+                        'MauticUser/SubscribedEvents/Search/global_user.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($users) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $userResults['count'] = count($users);
                 $event->addResults('mautic.user.users', $userResults);
@@ -107,23 +80,23 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit     = $this->security->isGranted('user:roles:edit');
 
                 foreach ($roles as $role) {
-                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
+                    $roleResults[] = $this->twig->render(
+                        '@MauticUser/SubscribedEvents/Search/global_role.html.twig',
                         [
                             'role'    => $role,
                             'canEdit' => $canEdit,
                         ]
-                    )->getContent();
+                    );
                 }
                 if (count($roles) > 5) {
-                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
+                    $roleResults[] = $this->twig->render(
+                        '@MauticUser/SubscribedEvents/Search/global_role.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($roles) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $roleResults['count'] = count($roles);
                 $event->addResults('mautic.user.roles', $roleResults);
@@ -131,7 +104,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('user:users:view')) {
             $event->addCommands(

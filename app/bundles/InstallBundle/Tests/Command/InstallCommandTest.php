@@ -22,12 +22,12 @@ class InstallCommandTest extends TestCase
     /**
      * @var MockObject&InstallService
      */
-    private $installer;
+    private \PHPUnit\Framework\MockObject\MockObject $installer;
 
     /**
      * @var MockObject&Registry
      */
-    private $doctrineRegistry;
+    private \PHPUnit\Framework\MockObject\MockObject $doctrineRegistry;
 
     private InstallCommand $command;
 
@@ -41,6 +41,7 @@ class InstallCommandTest extends TestCase
         $command                = $this->createMock(Command::class);
 
         $inputDefinition->method('getOptions')->willReturn([]);
+        $inputDefinition->method('getArguments')->willReturn([]);
 
         $application->method('getHelperSet')->willReturn($this->createMock(HelperSet::class));
         $application->method('getDefinition')->willReturn($inputDefinition);

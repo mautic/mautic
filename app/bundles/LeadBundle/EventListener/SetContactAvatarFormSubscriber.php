@@ -8,44 +8,26 @@ use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
+use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AvatarHelper
-     */
-    private $avatarHelper;
-
-    /**
-     * @var FormUploader
-     */
-    private $uploader;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    public function __construct(AvatarHelper $avatarHelper, FormUploader $uploader, LeadModel $leadModel)
-    {
-        $this->avatarHelper = $avatarHelper;
-        $this->uploader     = $uploader;
-        $this->leadModel    = $leadModel;
+    public function __construct(
+        private AvatarHelper $avatarHelper,
+        private FormUploader $uploader,
+        private LeadModel $leadModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
         ];
     }
 
-    public function onFormSubmit(SubmissionEvent $submissionEvent)
+    public function onFormSubmit(SubmissionEvent $submissionEvent): void
     {
         $fields  = $submissionEvent->getForm()->getFields();
         $contact = $submissionEvent->getLead();
@@ -73,7 +55,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
                         $this->leadModel->saveEntity($contact);
 
                         return;
-                    } catch (\Exception $exception) {
+                    } catch (\Exception) {
                     }
 
                     break;

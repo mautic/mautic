@@ -14,8 +14,6 @@ class UtmTagRepository extends CommonRepository
     /**
      * Get tag entities by lead.
      *
-     * @param $utmTags
-     *
      * @return array
      */
     public function getUtmTagsByLead(Lead $lead = null, $options = [])
@@ -29,7 +27,7 @@ class UtmTagRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $qb->andWhere($qb->expr()->orX(
+            $qb->andWhere($qb->expr()->or(
                 $qb->expr()->like('ut.utm_campaign', $qb->expr()->literal('%'.$options['search'].'%')),
                 $qb->expr()->like('ut.utm_content', $qb->expr()->literal('%'.$options['search'].'%')),
                 $qb->expr()->like('ut.utm_medium', $qb->expr()->literal('%'.$options['search'].'%')),

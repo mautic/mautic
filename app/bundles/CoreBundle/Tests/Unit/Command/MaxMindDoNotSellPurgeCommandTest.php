@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand;
@@ -67,7 +68,9 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
     private function buildMockEntityManager(array $dataToReturn): EntityManager
     {
         $mockStatement = $this->createMock(Statement::class);
-        $mockStatement->method('fetchAll')->withAnyParameters()->willReturn($dataToReturn);
+        $resultMock    = $this->createMock(Result::class);
+        $mockStatement->method('executeQuery')->withAnyParameters()->willReturn($resultMock);
+        $resultMock->method('fetchAllAssociative')->withAnyParameters()->willReturn($dataToReturn);
 
         $mockConnection = $this->createMock(Connection::class);
         $mockConnection->method('prepare')->withAnyParameters()->willReturn($mockStatement);

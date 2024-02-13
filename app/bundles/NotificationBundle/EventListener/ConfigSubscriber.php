@@ -11,10 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array<string,array<int,string|int>>
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
@@ -27,7 +24,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'NotificationBundle',
             'formAlias'  => 'notification_config',
             'formType'   => NotificationConfigType::class,
-            'formTheme'  => 'MauticNotificationBundle:FormTheme\Config',
+            'formTheme'  => '@MauticNotification/FormTheme/Config/_config_notification_config_widget.html.twig',
             'parameters' => $event->getParametersFromConfig('MauticNotificationBundle'),
         ]);
     }

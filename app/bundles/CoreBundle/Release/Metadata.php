@@ -1,16 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Release;
 
-class Metadata implements \JsonSerializable
+final class Metadata implements \JsonSerializable
 {
     private string $version;
+
     private int $majorVersion;
+
     private int $minorVersion;
+
     private int $patchVersion;
+
     private string $extraVersion;
+
     private string $stability;
+
     private string $minSupportedPHPVersion;
+
     private string $maxSupportedPHPVersion;
 
     /**
@@ -22,8 +31,11 @@ class Metadata implements \JsonSerializable
     private string $showPHPVersionWarningIfUnder;
 
     private string $minSupportedMauticVersion;
+
     private string $announcementUrl;
+
     private string $minSupportedMySqlVersion;
+
     private string $minSupportedMariaDbVersion;
 
     public function __construct(array $metadata)
@@ -39,9 +51,9 @@ class Metadata implements \JsonSerializable
         $this->minSupportedMariaDbVersion   = $metadata['minimum_mariadb_version'] ?? '';
 
         preg_match('#^(\d+)\.(\d+)\.(\d+)[\. \-]?(.*+)?$#', $this->version, $match);
-        $this->majorVersion = $match[1];
-        $this->minorVersion = $match[2];
-        $this->patchVersion = $match[3];
+        $this->majorVersion = (int) $match[1];
+        $this->minorVersion = (int) $match[2];
+        $this->patchVersion = (int) $match[3];
         $this->extraVersion = $match[4] ?? '';
     }
 
@@ -116,7 +128,10 @@ class Metadata implements \JsonSerializable
         return $this->minSupportedMariaDbVersion;
     }
 
-    public function jsonSerialize()
+    /**
+     * @return array<string, int|string>
+     */
+    public function jsonSerialize(): array
     {
         return [
             'version'                           => $this->version,

@@ -3,29 +3,20 @@
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var array
-     */
-    private $options;
-
-    /**
-     * @var FormBuilder
-     */
-    private $builder;
-
-    public function __construct(UnifiedIntegrationInterface $integration, FormBuilder $builder, array $options)
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private FormBuilderInterface $builder,
+        private array $options
+    ) {
         $this->integration = $integration;
-        $this->builder     = $builder;
-        $this->options     = $options;
     }
 
     /**
-     * @return FormBuilder
+     * @return FormBuilderInterface
      */
     public function getFormBuilder()
     {

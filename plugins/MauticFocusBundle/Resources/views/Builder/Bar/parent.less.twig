@@ -1,0 +1,64 @@
+{{ include('@MauticFocus/Builder/Bar/animations.less.twig', with_context=false) }}
+
+.mf-bar-iframe {
+    width: 100%;
+    position: static;
+    z-index: 20000;
+    left: 0;
+    right: 0;
+
+    &.mf-animate {
+        .barAnimate();
+    }
+
+    &.mf-bar-iframe-top {
+        top: 0;
+        margin-top: -100px;
+    }
+
+    &.mf-bar-iframe-bottom {
+        bottom: 0;
+        margin-bottom: -100px;
+    }
+
+    &.mf-bar-iframe-regular {
+        body, html {
+            min-height: 30px;
+        }
+
+        &.mf-bar-iframe-top {
+            margin-top: -30px;
+        }
+
+        &.mf-bar-iframe-bottom {
+            margin-bottom: -30px;
+        }
+    }
+
+    &.mf-bar-iframe-large {
+        body, html {
+            min-height: 50px;
+        }
+
+        &.mf-bar-iframe-top {
+            margin-top: -50px;
+        }
+
+        &.mf-bar-iframe-bottom {
+            margin-bottom: -50px;
+        }
+    }
+
+    &.mf-bar-iframe-sticky {
+        position: fixed;
+    }
+}
+
+{{ include('@MauticFocus/Builder/Bar/shared.less.twig', with_context=false) }}
+{{ include('@MauticFocus/Builder/Bar/collapser.less.twig', with_context=false) }}
+
+@media only screen and (max-width: 667px) {
+    .mf-bar-collapser {
+        display: none !important;
+    }
+}

@@ -1,3 +1,4 @@
+// Mautic note: This does not seem to be a library and perhaps should be moved to an app folder.
 jQuery.fn.extend({
     jQuery2Offset: function (options) {
         if (arguments.length) {

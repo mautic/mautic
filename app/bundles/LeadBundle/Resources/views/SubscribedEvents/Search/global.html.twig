@@ -1,0 +1,15 @@
+{% if showMore is defined %}
+    <a href="{{ url('mautic_contact_index', {'search': searchString}) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+    </a>
+{% else %}
+    {% set fields = lead.fields %}
+    <span class="pull-left pr-xs pt-xs" style="width:36px">
+        <span class="img-wrapper img-rounded"><img src="{{ gravatarGetImage(fields.core.email.value|default(''), '100') }}" /></span>
+    </span>
+    <a href="{{ url('mautic_contact_action', {'objectAction': 'view', 'objectId': lead.id}) }}" data-toggle="ajax">
+        <span>{{ lead.primaryIdentifier(true) }}</span>
+        <span class="label label-default pull-right" {% if lead.color is not empty %}style="background-color:{{ lead.color }};"{% endif %} data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.lead.pointscount'|trans }}">{{ lead.points }}</span>
+    </a>
+    <div class="clearfix"></div>
+{% endif %}

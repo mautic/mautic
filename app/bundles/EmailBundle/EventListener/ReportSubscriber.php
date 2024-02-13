@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -21,12 +22,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_EMAILS       = 'emails';
+
     public const CONTEXT_EMAIL_STATS  = 'email.stats';
+
     public const EMAILS_PREFIX        = 'e';
+
     public const EMAIL_STATS_PREFIX   = 'es';
+
     public const EMAIL_VARIANT_PREFIX = 'vp';
+
     public const DNC_PREFIX           = 'dnc';
+
     public const CLICK_PREFIX         = 'cut';
+
+    public const TRACKABLE_PREFIX     = 'tr';
+
+    public const REDIRECT_PREFIX      = 'pr';
+
+    public const CLICK_THROUGH_PREFIX = 'ct';
 
     public const DNC_COLUMNS = [
         'unsubscribed' => [
@@ -138,49 +151,16 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
-    /**
-     * @var StatRepository
-     */
-    private $statRepository;
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
     public function __construct(
-        Connection $db,
-        CompanyReportData $companyReportData,
-        StatRepository $statRepository,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        FieldsBuilder $fieldsBuilder
+        private Connection $db,
+        private CompanyReportData $companyReportData,
+        private StatRepository $statRepository,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private FieldsBuilder $fieldsBuilder
     ) {
-        $this->db                       = $db;
-        $this->companyReportData        = $companyReportData;
-        $this->statRepository           = $statRepository;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
-        $this->fieldsBuilder            = $fieldsBuilder;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -192,7 +172,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
             return;
@@ -240,6 +220,26 @@ class ReportSubscriber implements EventSubscriberInterface
                 'label' => 'mautic.email.report.variant_read_count',
                 'type'  => 'int',
             ],
+            'click_through_count' => [
+                'alias'   => 'click_through_count',
+                'label'   => 'mautic.email.report.click_through_count',
+                'type'    => 'string',
+                'formula' => 'IFNULL('.self::CLICK_THROUGH_PREFIX.'.click_through_count, 0)',
+            ],
+            'click_through_rate' => [
+                'alias'   => 'click_through_rate',
+                'label'   => 'mautic.email.report.click_through_rate',
+                'type'    => 'string',
+                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'sent_count * 100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
+            'click_to_open_rate' => [
+                'alias'   => 'click_to_open_rate',
+                'label'   => 'mautic.email.report.click_to_open_rate',
+                'type'    => 'string',
+                'formula' => 'IFNULL(ROUND('.self::CLICK_THROUGH_PREFIX.'.click_through_count/'.$prefix.'read_count * 100, 1), \'0.0\')',
+                'suffix'  => '%',
+            ],
         ];
 
         $columns = array_merge(
@@ -257,10 +257,14 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_EMAILS, $data);
         $context = self::CONTEXT_EMAILS;
         $event->addGraph($context, 'pie', 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced');
+        $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
 
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
             // Ratios are not applicable for individual stats
             unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['bounced_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
+
+            // Click through value are not applicable for individual stats
+            unset($columns['click_through_count'], $columns['click_through_rate'], $columns['click_to_open_rate']);
 
             // Email counts are not applicable for individual stats
             unset($columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
@@ -288,18 +292,23 @@ class ReportSubscriber implements EventSubscriberInterface
                 'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
             ];
 
-            $filters = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+            $columns = array_merge(
+                $columns,
+                self::EMAIL_STATS_COLUMNS,
+                $event->getCampaignByChannelColumns(),
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $this->companyReportData->getCompanyData()
+            );
+
+            $filters = array_merge(
+                $columns,
+                $this->fieldsBuilder->getLeadFilter('l.', 's.')
+            );
 
             $data = [
                 'display_name' => 'mautic.email.stats.report.table',
-                'columns'      => array_merge(
-                    $columns,
-                    self::EMAIL_STATS_COLUMNS,
-                    $event->getCampaignByChannelColumns(),
-                    $event->getLeadColumns(),
-                    $event->getIpColumn(),
-                    $this->companyReportData->getCompanyData()
-                ),
+                'columns'      => $columns,
                 'filters'      => $filters,
             ];
             $event->addTable(self::CONTEXT_EMAIL_STATS, $data, self::CONTEXT_EMAILS);
@@ -314,23 +323,25 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.unsubscribed');
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.bounced');
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.failed');
+            $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
         }
     }
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
         $qb         = $event->getQueryBuilder();
         $hasGroupBy = $event->hasGroupBy();
 
-        // channel_url_trackables subquery
-        $qbcut             = $this->db->createQueryBuilder();
-        $useDncColumns     = $event->usesColumn(array_keys(self::DNC_COLUMNS));
-        $useVariantColumns = $event->usesColumn(array_keys(self::EMAIL_VARIANT_COLUMNS));
-        $useClickColumns   = $event->usesColumn(array_keys(self::CLICK_COLUMNS)) || $event->usesColumn('is_hit');
+        $qbcut                  = $this->db->createQueryBuilder(); // channel_url_trackables subquery
+        $qbct                   = $this->db->createQueryBuilder(); // click-though subquery
+        $useDncColumns          = $event->usesColumn(array_keys(self::DNC_COLUMNS));
+        $useVariantColumns      = $event->usesColumn(array_keys(self::EMAIL_VARIANT_COLUMNS));
+        $useClickColumns        = $event->usesColumn(array_keys(self::CLICK_COLUMNS)) || $event->usesColumn('is_hit');
+        $useClickThroughColumns = $event->usesColumn(['click_through_count', 'click_through_rate', 'click_to_open_rate']);
 
         switch ($context) {
             case self::CONTEXT_EMAILS:
@@ -358,6 +369,17 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($useDncColumns) {
                     $this->addDNCTableForEmails($qb);
+                }
+
+                if ($useClickThroughColumns) {
+                    $qbct->select(
+                        'COUNT(DISTINCT ph.lead_id) AS click_through_count',
+                        'cut.channel_id',
+                    )
+                        ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+                        ->innerJoin('ph', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 'cut.redirect_id = ph.redirect_id AND cut.channel_id = ph.source_id')
+                        ->groupBy('cut.channel_id');
+                    $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbct->getSQL()), self::CLICK_THROUGH_PREFIX, 'e.id = ct.channel_id');
                 }
 
                 break;
@@ -407,7 +429,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     if ($event->hasFilter('e.id')) {
                         $filterParam = $event->createParameterName();
                         $qbcut->andWhere($qb->expr()->in('cut2.channel_id', ":{$filterParam}"));
-                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), Connection::PARAM_INT_ARRAY);
+                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), ArrayParameterType::INTEGER);
                     }
 
                     $qb->leftJoin(
@@ -443,7 +465,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
 
@@ -451,7 +473,9 @@ class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($event->checkContext(self::CONTEXT_EMAILS) && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)) {
+        if ($event->checkContext(self::CONTEXT_EMAILS)
+            && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)
+            && !in_array('mautic.email.table.most.emails.clicks', $graphs)) {
             return;
         }
 
@@ -520,7 +544,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
-                    $counts = $queryBuilder->execute()->fetch();
+                    $counts = $queryBuilder->execute()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.stat.read'),
@@ -528,7 +552,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
-                        (($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0))
+                        ($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0)
                     );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.unsubscribed'),
@@ -660,6 +684,23 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
+
+                case 'mautic.email.table.most.emails.clicks':
+                    $this->addTrackableTablesForEmailStats($queryBuilder);
+                    $queryBuilder->select('e.id, e.subject as `title`, tr.hits as `clicks`, tr.unique_hits as `unique clicks`, pr.url as `URL`')
+                        ->andWhere('pr.url IS NOT NULL')
+                        ->groupBy('e.id, tr.redirect_id, tr.hits')
+                        ->orderBy('tr.hits', 'DESC')
+                        ->setMaxResults(10);
+
+                    $items                  = $queryBuilder->execute()->fetchAllAssociative();
+                    $graphData              = [];
+                    $graphData['data']      = $items;
+                    $graphData['name']      = $g;
+                    $graphData['iconClass'] = 'fa-external-link-square';
+                    $graphData['link']      = 'mautic_email_action';
+                    $event->setGraph($g, $graphData);
+                    break;
             }
             unset($queryBuilder);
         }
@@ -689,10 +730,33 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
+    {
+        $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
+        $prTable = MAUTIC_TABLE_PREFIX.'page_redirects';
+
+        if (!$this->isJoined($qb, $trTable, self::EMAILS_PREFIX, self::TRACKABLE_PREFIX)) {
+            $qb->leftJoin(
+                self::EMAILS_PREFIX,
+                $trTable,
+                self::TRACKABLE_PREFIX,
+                'e.id = tr.channel_id AND tr.channel = \'email\''
+            );
+        }
+        if (!$this->isJoined($qb, $prTable, self::TRACKABLE_PREFIX, self::REDIRECT_PREFIX)) {
+            $qb->leftJoin(
+                self::TRACKABLE_PREFIX,
+                $prTable,
+                self::REDIRECT_PREFIX,
+                'tr.redirect_id = pr.id'
+            );
+        }
+    }
+
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmailStats(QueryBuilder $qb)
+    private function addDNCTableForEmailStats(QueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -706,7 +770,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isJoined($query, $table, $fromAlias, $alias)
+    private function isJoined($query, $table, $fromAlias, $alias): bool
     {
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {

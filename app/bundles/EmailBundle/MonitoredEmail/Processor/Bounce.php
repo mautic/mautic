@@ -5,44 +5,22 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Mailer\Transport\BounceProcessorInterface;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Bounce implements ProcessorInterface
 {
-    /**
-     * @var \Swift_Transport
-     */
-    protected $transport;
-
-    /**
-     * @var ContactFinder
-     */
-    protected $contactFinder;
-
-    /**
-     * @var StatRepository
-     */
-    protected $statRepository;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    private const RETRY_COUNT = 5;
 
     /**
      * @var string
@@ -50,45 +28,22 @@ class Bounce implements ProcessorInterface
     protected $bouncerAddress;
 
     /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * @var Message
      */
     protected $message;
 
-    /**
-     * @var DoNotContact
-     */
-    protected $doNotContact;
-
-    /**
-     * Bounce constructor.
-     */
     public function __construct(
-        \Swift_Transport $transport,
-        ContactFinder $contactFinder,
-        StatRepository $statRepository,
-        LeadModel $leadModel,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        DoNotContact $doNotContact
+        protected TransportInterface $transport,
+        protected ContactFinder $contactFinder,
+        protected EmailStatModel $emailStatModel,
+        protected LeadModel $leadModel,
+        protected TranslatorInterface $translator,
+        protected LoggerInterface $logger,
+        protected DoNotContact $doNotContact
     ) {
-        $this->transport      = $transport;
-        $this->contactFinder  = $contactFinder;
-        $this->statRepository = $statRepository;
-        $this->leadModel      = $leadModel;
-        $this->translator     = $translator;
-        $this->logger         = $logger;
-        $this->doNotContact   = $doNotContact;
     }
 
-    /**
-     * @return bool
-     */
-    public function process(Message $message)
+    public function process(Message $message): bool
     {
         $this->message = $message;
         $bounce        = false;
@@ -99,7 +54,7 @@ class Bounce implements ProcessorInterface
         if ($this->transport instanceof BounceProcessorInterface) {
             try {
                 $bounce = $this->transport->processBounce($this->message);
-            } catch (BounceNotFound $exception) {
+            } catch (BounceNotFound) {
                 // Attempt to parse a bounce the standard way
             }
         }
@@ -107,7 +62,7 @@ class Bounce implements ProcessorInterface
         if (!$bounce) {
             try {
                 $bounce = (new Parser($this->message))->parse();
-            } catch (BounceNotFound $exception) {
+            } catch (BounceNotFound) {
                 return false;
             }
         }
@@ -160,10 +115,10 @@ class Bounce implements ProcessorInterface
         ++$retryCount;
         $stat->setRetryCount($retryCount);
 
-        if ($fail = $bouncedEmail->isFinal() || $retryCount >= 5) {
+        if ($bouncedEmail->isFinal() || $retryCount >= self::RETRY_COUNT) {
             $stat->setIsFailed(true);
         }
 
-        $this->statRepository->saveEntity($stat);
+        $this->emailStatModel->saveEntity($stat);
     }
 }

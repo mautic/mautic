@@ -6,28 +6,33 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 
 class IteratorExportDataModel implements \Iterator
 {
-    private $position;
-    private $model;
-    private $args;
+    private int $position;
+
     private $callback;
-    private $total;
+
+    private int $total;
+
     private $data;
+
     private $totalResult;
 
     /**
      * @param AbstractCommonModel<T> $model
      * @param array<mixed>           $args
+     *
      * @template T of object
      */
-    public function __construct(AbstractCommonModel $model, array $args, callable $callback)
-    {
-        $this->model       = $model;
-        $this->args        = $args;
-        $this->callback    = $callback;
-        $this->position    = 0;
-        $this->total       = 0;
-        $this->totalResult = 0;
-        $this->data        = 0;
+    public function __construct(
+        private AbstractCommonModel $model,
+        private array $args,
+        callable $callback,
+        private bool $skipOrdering = false
+    ) {
+        $this->callback     = $callback;
+        $this->position     = 0;
+        $this->total        = 0;
+        $this->totalResult  = 0;
+        $this->data         = 0;
     }
 
     /**
@@ -39,7 +44,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->data[$this->position];
     }
@@ -50,15 +55,12 @@ class IteratorExportDataModel implements \Iterator
      * @see http://php.net/manual/en/iterator.next.php
      * @since 5.0.0
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
+
         if ($this->position === $this->totalResult) {
-            $data              = new DataExporterHelper();
-            $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
-            $this->totalResult = $this->data ? count($this->data) : 0;
-            $this->total       = $this->total + $this->totalResult;
-            $this->position    = 0;
+            $this->getDataForExport();
         }
     }
 
@@ -71,7 +73,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
@@ -86,7 +88,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function valid()
+    public function valid(): bool
     {
         if ($this->position <= $this->totalResult && !is_null($this->data)) {
             return true;
@@ -101,12 +103,23 @@ class IteratorExportDataModel implements \Iterator
      * @see http://php.net/manual/en/iterator.rewind.php
      * @since 5.0.0
      */
-    public function rewind()
+    public function rewind(): void
     {
-        $data              = new DataExporterHelper();
-        $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
+        $this->getDataForExport();
+    }
+
+    private function getDataForExport(): void
+    {
+        $data       = new DataExporterHelper();
+        $this->data = $data->getDataForExport(
+            $this->total,
+            $this->model,
+            $this->args,
+            $this->callback,
+            $this->skipOrdering
+        );
         $this->totalResult = $this->data ? count($this->data) : 0;
-        $this->total       = $this->total + $this->totalResult;
-        $this->position    = 0;
+        $this->total += $this->totalResult;
+        $this->position = 0;
     }
 }

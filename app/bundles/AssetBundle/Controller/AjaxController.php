@@ -10,15 +10,9 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function categoryListAction(Request $request)
+    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $assetModel = $this->getModel('asset');
         \assert($assetModel instanceof AssetModel);
@@ -36,11 +30,9 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     *
      * @throws \Exception
      */
-    protected function fetchRemoteFilesAction(Request $request)
+    public function fetchRemoteFilesAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
@@ -68,7 +60,7 @@ class AjaxController extends CommonAjaxController
         $connector = new Filesystem($adapter);
 
         $output = $this->renderView(
-            'MauticAssetBundle:Remote:list.html.php',
+            '@MauticAsset/Remote/list.html.twig',
             [
                 'connector'   => $connector,
                 'integration' => $integration,

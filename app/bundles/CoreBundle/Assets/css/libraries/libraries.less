@@ -14,15 +14,19 @@
 @import "multiselect/multi-select";
 
 //Colorpicker
-@import "minicolors/minicolors.less";
+@import (less) "../../../../../../node_modules/@claviska/jquery-minicolors/jquery.minicolors.css";
+// Adding the minicolor background image as base64 to avoid issues with path to node_modules which does not exist in prod.
+.minicolors-sprite {
+    background-image: data-uri('../../../../../../node_modules/@claviska/jquery-minicolors/jquery.minicolors.png');
+}
 
 //Emoji
 @import "emoji/emoji";
 
 //Other
 @import "other/typeahead";
-@import "other/datetimepicker";
-@import "other/jqvmap";
+@import (less) "../../../../../../node_modules/jquery-datetimepicker/jquery.datetimepicker.css";
+@import (less) "../../../../../../node_modules/jvectormap-next/jquery-jvectormap.css";
 @import "other/at";
 @import "other/codemirror";
 

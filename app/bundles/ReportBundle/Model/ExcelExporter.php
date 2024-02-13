@@ -2,25 +2,20 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CsvExporter.
- */
 class ExcelExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
-
-    public function __construct(FormatterHelper $formatterHelper)
-    {
-        $this->formatterHelper = $formatterHelper;
+    public function __construct(
+        protected FormatterHelper $formatterHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -28,24 +23,29 @@ class ExcelExporter
      *
      * @throws \Exception
      */
-    public function export(array $reportData, $name, string $output = 'php://output')
+    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output'): void
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
-        }
-
-        if (!array_key_exists('data', $reportData) || !array_key_exists('columns', $reportData)) {
-            throw new \InvalidArgumentException("Keys 'data' and 'columns' have to be provided");
         }
 
         try {
             $objPHPExcel = new Spreadsheet();
             $objPHPExcel->getProperties()->setTitle($name);
             $objPHPExcel->createSheet();
-            $reportDataResult = new ReportDataResult($reportData);
+            $objPHPExcelSheet = $objPHPExcel->getActiveSheet();
+            $reportData       = $reportDataResult->getData();
+            $rowCount         = 1;
 
-            //build the data rows
-            foreach ($reportDataResult->getData() as $count=>$data) {
+            if (empty($reportData)) {
+                throw new \Exception('No report data to be exported');
+            }
+
+            $headersRow = $reportDataResult->getHeaders();
+            $this->putHeader($headersRow, $objPHPExcelSheet);
+
+            // build the data rows
+            foreach ($reportData as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
                     $type      = $reportDataResult->getType($k);
@@ -53,15 +53,17 @@ class ExcelExporter
                     $row[]     = $formatted;
                 }
 
-                if (0 === $count) {
-                    //write the column names row
-                    $objPHPExcel->getActiveSheet()->fromArray($reportDataResult->getHeaders());
-                }
-                //write the row
+                // write the row
                 $rowCount = $count + 2;
                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-                //free memory
+                // free memory
                 unset($row, $reportData['data'][$count]);
+            }
+
+            // Add totals to export
+            $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
+            if (!empty($totalsRow)) {
+                $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);
             }
 
             $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
@@ -71,5 +73,28 @@ class ExcelExporter
         } catch (Exception $e) {
             throw new \Exception('PHPSpreadsheet Error', 0, $e);
         }
+    }
+
+    /**
+     * @param array<string> $headers
+     */
+    public function putHeader(array $headers, Worksheet $activeSheet): void
+    {
+        $activeSheet->fromArray($headers);
+    }
+
+    /**
+     * @param array<string> $totals
+     */
+    public function putTotals(array $totals, Worksheet $activeSheet, string $startCell): void
+    {
+        // Put label if the first item is empty
+        $key = array_key_first($totals);
+
+        if (empty($totals[$key])) {
+            $totals[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+        }
+
+        $activeSheet->fromArray($totals, null, $startCell);
     }
 }

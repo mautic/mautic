@@ -7,22 +7,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class RoleListType extends AbstractType
 {
-    /**
-     * @var RoleModel
-     */
-    private $roleModel;
-
-    public function __construct(RoleModel $roleModel)
-    {
-        $this->roleModel = $roleModel;
+    public function __construct(
+        private RoleModel $roleModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -43,10 +38,7 @@ class RoleListType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getRoleChoices()
+    private function getRoleChoices(): array
     {
         $choices = [];
         $roles   = $this->roleModel->getRepository()->getEntities(
@@ -67,7 +59,7 @@ class RoleListType extends AbstractType
             $choices[$role->getName(true)] = $role->getId();
         }
 
-        //sort by name
+        // sort by name
         ksort($choices);
 
         return $choices;

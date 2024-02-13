@@ -1,0 +1,53 @@
+{#
+  Variables
+    - page
+    - items
+    - totalItems
+    - tmpl
+    - indexMode
+    - route
+    - routeParameters
+    - sessionVar
+    - limit
+    - objectId
+    - noContactList
+    - target
+    - currentRoute
+    - mauticContent
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% extends isIndex ? '@MauticLead/Lead/list.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block content %}
+    {{ include('@MauticLead/Lead/_filter.html.twig') }}
+<div class="pa-md bg-auto">
+    {% if items|length > 0 %}
+        <div class="row shuffle-grid">
+            {% for item in items %}
+                {{ include('@MauticLead/Lead/grid_card.html.twig', {'contact': item, 'noContactList': noContactList|default([])}) }}
+            {% endfor %}
+        </div>
+    {% else %}
+        {{ include('@MauticCore/Helper/noresults.html.twig', {'header': 'mautic.lead.grid.noresults.header', 'message': 'mautic.lead.grid.noresults.message'}) }}
+        <div class="clearfix"></div>
+    {% endif %}
+</div>
+{% if items|length > 0 %}
+    <div class="panel-footer">
+        {% set route = route is defined ? route : (link|default('mautic_contact_index')) %}
+        {% set routeParameters = routeParameters|default([]) %}
+        {% if objectId is defined %}
+          {% set routeParameters = routeParameters|merge({'objectId': objectId}) %}
+        {% endif %}
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': totalItems,
+                'page': page,
+                'limit': limit,
+                'baseUrl': path(route, routeParameters),
+                'tmpl': tmpl not in ['grid', 'index'] ? tmpl : indexMode,
+                'sessionVar': sessionVar|default('lead'),
+                'target': target|default('.page-list'),
+        }) }}
+    </div>
+{% endif %}
+{% endblock %}

@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 
 class Copy
 {
@@ -16,23 +15,23 @@ class Copy
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateCreated;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $body;
 
-    private ?string $bodyText;
+    private ?string $bodyText = null;
 
     /**
      * @var string|null
      */
     private $subject;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -40,7 +39,7 @@ class Copy
             ->setCustomRepositoryClass(CopyRepository::class);
 
         $builder->createField('id', 'string')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->length(32)
             ->build();
 
@@ -55,8 +54,6 @@ class Copy
     }
 
     /**
-     * @param $id
-     *
      * @return $this
      */
     public function setId($id)
@@ -75,7 +72,7 @@ class Copy
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateCreated()
     {
@@ -109,9 +106,6 @@ class Copy
      */
     public function setBody($body)
     {
-        // Ensure it's clean of emoji
-        $body = EmojiHelper::toShort($body);
-
         $this->body = $body;
 
         return $this;
@@ -132,9 +126,6 @@ class Copy
      */
     public function setSubject($subject)
     {
-        // Ensure it's clean of emoji
-        $subject = EmojiHelper::toShort($subject);
-
         $this->subject = $subject;
 
         return $this;
@@ -147,7 +138,6 @@ class Copy
 
     public function setBodyText(?string $bodyText): self
     {
-        $bodyText       = EmojiHelper::toShort($bodyText);
         $this->bodyText = $bodyText;
 
         return $this;

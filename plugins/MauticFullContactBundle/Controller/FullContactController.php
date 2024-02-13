@@ -7,7 +7,9 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticFullContactBundle\Form\Type\BatchLookupType;
 use MauticPlugin\MauticFullContactBundle\Form\Type\LookupType;
+use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class FullContactController extends FormController
@@ -19,23 +21,23 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupPersonAction($objectId = '')
+    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
     {
-        if ('POST' === $this->request->getMethod()) {
-            $data     = $this->request->request->get('fullcontact_lookup', [], true);
+        if ('POST' === $request->getMethod()) {
+            $data     = $request->request->all()['fullcontact_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
-        if (!$this->get('mautic.security')->hasEntityAccess(
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
         )
         ) {
-            $this->addFlash(
+            $this->addFlashMessage(
                 $this->translator->trans('mautic.plugin.fullcontact.forbidden'),
                 [],
                 'error'
@@ -49,7 +51,7 @@ class FullContactController extends FormController
             );
         }
 
-        if ('GET' === $this->request->getMethod()) {
+        if ('GET' === $request->getMethod()) {
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -71,7 +73,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $lead->getEmail(),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
+                    'contentTemplate' => '@MauticFullContact/FullContact/lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -80,17 +82,17 @@ class FullContactController extends FormController
                 ]
             );
         } else {
-            if ('POST' === $this->request->getMethod()) {
+            if ('POST' === $request->getMethod()) {
                 try {
-                    $this->get('mautic.plugin.fullcontact.lookup_helper')->lookupContact($lead, array_key_exists('notify', $data));
-                    $this->addFlash(
+                    $lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
+                    $this->addFlashMessage(
                         'mautic.lead.batch_leads_affected',
                         [
                             '%count%'     => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $ex->getMessage(),
                         [],
                         'error'
@@ -114,14 +116,14 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupPersonAction()
+    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
-        if ('GET' === $this->request->getMethod()) {
-            $data = $this->request->query->get('fullcontact_batch_lookup', [], true);
+        if ('GET' === $request->getMethod()) {
+            $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
         } else {
-            $data = $this->request->request->get('fullcontact_batch_lookup', [], true);
+            $data = $request->request->all()['fullcontact_batch_lookup'] ?? [];
         }
 
         $entities = [];
@@ -154,11 +156,11 @@ class FullContactController extends FormController
         if ($count = count($entities)) {
             /** @var Lead $lead */
             foreach ($entities as $lead) {
-                if ($this->get('mautic.security')->hasEntityAccess(
-                        'lead:leads:editown',
-                        'lead:leads:editother',
-                        $lead->getPermissionUser()
-                    )
+                if ($this->security->hasEntityAccess(
+                    'lead:leads:editown',
+                    'lead:leads:editother',
+                    $lead->getPermissionUser()
+                )
                     && $lead->getEmail()
                 ) {
                     $lookupEmails[$lead->getId()] = $lead->getEmail();
@@ -169,7 +171,7 @@ class FullContactController extends FormController
         }
 
         if (0 === $count) {
-            $this->addFlash(
+            $this->addFlashMessage(
                 $this->translator->trans('mautic.plugin.fullcontact.empty'),
                 [],
                 'error'
@@ -183,7 +185,7 @@ class FullContactController extends FormController
             );
         } else {
             if ($count > 20) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $this->translator->trans('mautic.plugin.fullcontact.toomany'),
                     [],
                     'error'
@@ -197,7 +199,7 @@ class FullContactController extends FormController
                 );
             }
         }
-        if ('GET' === $this->request->getMethod()) {
+        if ('GET' === $request->getMethod()) {
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -217,7 +219,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupEmails),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
+                    'contentTemplate' => '@MauticFullContact/FullContact/batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -226,14 +228,14 @@ class FullContactController extends FormController
                 ]
             );
         } else {
-            if ('POST' === $this->request->getMethod()) {
+            if ('POST' === $request->getMethod()) {
                 $notify = array_key_exists('notify', $data);
                 foreach ($lookupEmails as $id => $lookupEmail) {
                     if ($lead = $model->getEntity($id)) {
                         try {
-                            $this->get('mautic.plugin.fullcontact.lookup_helper')->lookupContact($lead, $notify);
+                            $lookupHelper->lookupContact($lead, $notify);
                         } catch (\Exception $ex) {
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 $ex->getMessage(),
                                 [],
                                 'error'
@@ -244,7 +246,7 @@ class FullContactController extends FormController
                 }
 
                 if ($count) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.lead.batch_leads_affected',
                         [
                             '%count%'     => $count,
@@ -273,10 +275,10 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupCompanyAction($objectId = '')
+    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
     {
-        if ('POST' === $this->request->getMethod()) {
-            $data     = $this->request->request->get('fullcontact_lookup', [], true);
+        if ('POST' === $request->getMethod()) {
+            $data     = $request->request->all()['fullcontact_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -284,7 +286,7 @@ class FullContactController extends FormController
         /** @var Company $company */
         $company = $model->getEntity($objectId);
 
-        if ('GET' === $this->request->getMethod()) {
+        if ('GET' === $request->getMethod()) {
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -295,7 +297,7 @@ class FullContactController extends FormController
             $website = $company->getFieldValue('companywebsite');
 
             if (!$website) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $this->translator->trans('mautic.plugin.fullcontact.compempty'),
                     [],
                     'error'
@@ -324,7 +326,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $parse['host'],
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
+                    'contentTemplate' => '@MauticFullContact/FullContact/lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
@@ -333,17 +335,17 @@ class FullContactController extends FormController
                 ]
             );
         } else {
-            if ('POST' === $this->request->getMethod()) {
+            if ('POST' === $request->getMethod()) {
                 try {
-                    $this->get('mautic.plugin.fullcontact.lookup_helper')->lookupCompany($company, array_key_exists('notify', $data));
-                    $this->addFlash(
+                    $lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
+                    $this->addFlashMessage(
                         'mautic.company.batch_companies_affected',
                         [
                             '%count%'     => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $ex->getMessage(),
                         [],
                         'error'
@@ -367,14 +369,14 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupCompanyAction()
+    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper)
     {
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model = $this->getModel('lead.company');
-        if ('GET' === $this->request->getMethod()) {
-            $data = $this->request->query->get('fullcontact_batch_lookup', [], true);
+        if ('GET' === $request->getMethod()) {
+            $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
         } else {
-            $data = $this->request->request->get('fullcontact_batch_lookup', [], true);
+            $data = $request->request->all()['fullcontact_batch_lookup'] ?? [];
         }
 
         $entities = [];
@@ -421,7 +423,7 @@ class FullContactController extends FormController
         }
 
         if (0 === $count) {
-            $this->addFlash(
+            $this->addFlashMessage(
                 $this->translator->trans('mautic.plugin.fullcontact.compempty'),
                 [],
                 'error'
@@ -435,7 +437,7 @@ class FullContactController extends FormController
             );
         } else {
             if ($count > 20) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $this->translator->trans('mautic.plugin.fullcontact.comptoomany'),
                     [],
                     'error'
@@ -449,7 +451,7 @@ class FullContactController extends FormController
                 );
             }
         }
-        if ('GET' === $this->request->getMethod()) {
+        if ('GET' === $request->getMethod()) {
             $route = $this->generateUrl(
                 'mautic_plugin_fullcontact_action',
                 [
@@ -469,7 +471,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupWebsites),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
+                    'contentTemplate' => '@MauticFullContact/FullContact/batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'companyBatch',
@@ -478,14 +480,14 @@ class FullContactController extends FormController
                 ]
             );
         } else {
-            if ('POST' === $this->request->getMethod()) {
+            if ('POST' === $request->getMethod()) {
                 $notify = array_key_exists('notify', $data);
                 foreach ($lookupWebsites as $id => $lookupWebsite) {
                     if ($company = $model->getEntity($id)) {
                         try {
-                            $this->get('mautic.plugin.fullcontact.lookup_helper')->lookupCompany($company, $notify);
+                            $lookupHelper->lookupCompany($company, $notify);
                         } catch (\Exception $ex) {
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 $ex->getMessage(),
                                 [],
                                 'error'
@@ -496,7 +498,7 @@ class FullContactController extends FormController
                 }
 
                 if ($count) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.company.batch_companies_affected',
                         [
                             '%count%'     => $count,

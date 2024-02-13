@@ -12,7 +12,7 @@ use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 
 class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testComputeSchedule()
+    public function testComputeSchedule(): void
     {
         $dateBuilder = $this->getMockBuilder(DateBuilder::class)
             ->disableOriginalConstructor()
@@ -59,17 +59,14 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
         $entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($scheduler) use ($report, $dateOfNextSchedule) {
-                return
-                    $scheduler instanceof Scheduler &&
-                    $scheduler->getReport() === $report &&
-                    $scheduler->getScheduleDate() === $dateOfNextSchedule;
-            }));
+            ->with($this->callback(fn ($scheduler) => $scheduler instanceof Scheduler &&
+            $scheduler->getReport() === $report &&
+            $scheduler->getScheduleDate() === $dateOfNextSchedule));
 
         $schedulerPlanner->computeScheduler($report);
     }
 
-    public function testNoSchedule()
+    public function testNoSchedule(): void
     {
         $dateBuilder = $this->getMockBuilder(DateBuilder::class)
             ->disableOriginalConstructor()
@@ -115,7 +112,7 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $schedulerPlanner->computeScheduler($report);
     }
 
-    public function testNoRemoveNoSchedule()
+    public function testNoRemoveNoSchedule(): void
     {
         $dateBuilder = $this->getMockBuilder(DateBuilder::class)
             ->disableOriginalConstructor()

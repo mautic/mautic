@@ -11,10 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => [
@@ -25,13 +22,13 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
             'formType'   => ConfigType::class,
-            'formTheme'  => 'MauticPageBundle:FormTheme\Config',
+            'formTheme'  => '@MauticPage/FormTheme/Config/_config_pageconfig_widget.html.twig',
             // parameters must be defined directly in case there are 2 config forms per bundle.
             // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
             // and trackingconfig form would overwrote values in the pageconfig form. See #5559.
@@ -42,13 +39,13 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigGenerateTracking(ConfigBuilderEvent $event)
+    public function onConfigGenerateTracking(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'trackingconfig',
             'formType'   => ConfigTrackingPageType::class,
-            'formTheme'  => 'MauticPageBundle:FormTheme\Config',
+            'formTheme'  => '@MauticPage/FormTheme/Config/_config_trackingconfig_widget.html.twig',
             // parameters defined this way because of the reason as above.
             'parameters' => [
                 'anonymize_ip'                          => false,
@@ -66,7 +63,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();
 

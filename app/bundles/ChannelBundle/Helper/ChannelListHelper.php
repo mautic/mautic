@@ -6,42 +6,29 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Templating\Helper\Helper;
 
-class ChannelListHelper extends Helper
+class ChannelListHelper
 {
     /**
-     * @var Translator
+     * @var array<string,string>
      */
-    protected $translator;
+    private array $channels = [];
 
     /**
-     * @var array
+     * @var array<string,string[]>
      */
-    protected $channels = [];
+    private array $featureChannels = [];
 
-    /**
-     * @var array
-     */
-    protected $featureChannels = [];
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
-    {
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private Translator $translator
+    ) {
     }
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getChannelList()
+    public function getChannelList(): array
     {
         $channels = [];
         foreach ($this->getChannels() as $channel => $details) {
@@ -53,22 +40,18 @@ class ChannelListHelper extends Helper
     }
 
     /**
-     * @param      $features
      * @param bool $listOnly
-     *
-     * @return array
      */
-    public function getFeatureChannels($features, $listOnly = false)
+    public function getFeatureChannels($features, $listOnly = false): array
     {
         $this->setupChannels();
 
         if (!is_array($features)) {
             $features = [$features];
         }
-
         $channels = [];
         foreach ($features as $feature) {
-            $featureChannels = (isset($this->featureChannels[$feature])) ? $this->featureChannels[$feature] : [];
+            $featureChannels = $this->featureChannels[$feature] ?? [];
             $returnChannels  = [];
             foreach ($featureChannels as $channel => $details) {
                 if (!isset($details['label'])) {
@@ -102,27 +85,16 @@ class ChannelListHelper extends Helper
         return $this->channels;
     }
 
-    /**
-     * @param $channel
-     *
-     * @return string
-     */
-    public function getChannelLabel($channel)
+    public function getChannelLabel($channel): string
     {
-        switch (true) {
-            case $this->translator->hasId('mautic.channel.'.$channel):
-                return $this->translator->trans('mautic.channel.'.$channel);
-            case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
-                return $this->translator->trans('mautic.'.$channel.'.'.$channel);
-            default:
-                return ucfirst($channel);
-        }
+        return match (true) {
+            $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
+            $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
+            default                                                   => ucfirst($channel),
+        };
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'chanel';
     }
@@ -132,7 +104,7 @@ class ChannelListHelper extends Helper
      *
      * Done this way to avoid a circular dependency error with LeadModel
      */
-    protected function setupChannels()
+    private function setupChannels(): void
     {
         if (!empty($this->channels)) {
             return;

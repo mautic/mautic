@@ -8,14 +8,9 @@ use Mautic\FormBundle\Model\FormModel;
 
 class PropertiesAccessor
 {
-    /**
-     * @var FormModel
-     */
-    private $formModel;
-
-    public function __construct(FormModel $formModel)
-    {
-        $this->formModel = $formModel;
+    public function __construct(
+        private FormModel $formModel
+    ) {
     }
 
     /**
@@ -25,8 +20,9 @@ class PropertiesAccessor
      */
     public function getProperties(array $field)
     {
-        if ('country' === $field['type'] || (!empty($field['leadField']) && !empty($field['properties']['syncList']))) {
-            return $this->formModel->getContactFieldPropertiesList($field['leadField']);
+        $hasContactFieldMapped = !empty($field['mappedField']) && !empty($field['mappedObject']) && 'contact' === $field['mappedObject'];
+        if ('country' === $field['type'] || ($hasContactFieldMapped && !empty($field['properties']['syncList']))) {
+            return $this->formModel->getContactFieldPropertiesList((string) $field['mappedField']);
         } elseif (!empty($field['properties'])) {
             return $this->getOptionsListFromProperties($field['properties']);
         }
@@ -39,7 +35,7 @@ class PropertiesAccessor
      *
      * @return string[]
      */
-    public function getChoices($options)
+    public function getChoices($options): array
     {
         $choices = [];
 
@@ -48,7 +44,7 @@ class PropertiesAccessor
         }
 
         if (!is_array($options)) {
-            $options = explode('|', $options);
+            $options = explode('|', (string) $options);
         }
 
         foreach ($options as $option) {

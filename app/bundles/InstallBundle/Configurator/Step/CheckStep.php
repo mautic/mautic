@@ -13,22 +13,8 @@ class CheckStep implements StepInterface
 {
     /**
      * Flag if the configuration file is writable.
-     *
-     * @var bool
      */
-    private $configIsWritable;
-
-    /**
-     * Path to the kernel root.
-     *
-     * @var string
-     */
-    private $kernelRoot;
-
-    /**
-     * @var OpenSSLCipher
-     */
-    private $openSSLCipher;
+    private bool $configIsWritable;
 
     /**
      * Absolute path to cache directory.
@@ -51,14 +37,14 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $site_url;
+    public $site_url = '';
 
     /**
      * Recommended minimum memory limit for Mautic.
      *
      * @var string
      */
-    public static $memory_limit = '512M';
+    public const RECOMMENDED_MEMORY_LIMIT = '512M';
 
     /**
      * @param Configurator $configurator Configurator service
@@ -67,42 +53,28 @@ class CheckStep implements StepInterface
      */
     public function __construct(
         Configurator $configurator,
-        string $projectDir,
+        private string $projectDir,
         RequestStack $requestStack,
-        OpenSSLCipher $openSSLCipher
+        private OpenSSLCipher $openSSLCipher
     ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        $this->kernelRoot       = $projectDir.'/app';
         if (!empty($request)) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
-        $this->openSSLCipher    = $openSSLCipher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return CheckStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         $messages = [];
 
-        if (version_compare(PHP_VERSION, '7.2.21', '<')) {
-            $messages[] = 'mautic.install.php.version.not.supported';
-        }
-
-        // Allow for the vendor folder to live
-        // above the application folder.
-        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer') && !is_dir(dirname($this->kernelRoot).'/../vendor/composer')) {
+        if (!is_dir($this->projectDir.'/vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
         }
 
@@ -110,11 +82,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->cache_path))) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->projectDir, $this->cache_path))) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->log_path))) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->projectDir, $this->log_path))) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
@@ -179,10 +151,7 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         $messages = [];
 
@@ -211,7 +180,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.iconv';
         }
 
-        if (!function_exists('utf8_decode')) {
+        if (!extension_loaded('xml')) {
             $messages[] = 'mautic.install.function.xml';
         }
 
@@ -219,7 +188,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if ('https' !== substr($this->site_url, 0, 5)) {
+        if (!$this->site_url || !str_starts_with($this->site_url, 'https')) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
@@ -230,7 +199,7 @@ class CheckStep implements StepInterface
         }
 
         $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));
-        $suggestedLimit = FileHelper::convertPHPSizeToBytes(self::$memory_limit);
+        $suggestedLimit = FileHelper::convertPHPSizeToBytes(self::RECOMMENDED_MEMORY_LIMIT);
         if ($memoryLimit > -1 && $memoryLimit < $suggestedLimit) {
             $messages[] = 'mautic.install.memory.limit';
         }
@@ -244,7 +213,7 @@ class CheckStep implements StepInterface
                 if (is_null(new \Collator('fr_FR'))) {
                     $messages[] = 'mautic.install.intl.config';
                 }
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
         }
@@ -256,24 +225,21 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
-        return 'MauticInstallBundle:Install:check.html.php';
+        return '@MauticInstall/Install/check.html.twig';
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed[]
      */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         $parameters = [];
 
         foreach ($data as $key => $value) {
             // Exclude keys from the config
-            if (!in_array($key, ['configIsWritable', 'kernelRoot'])) {
+            if (!in_array($key, ['configIsWritable', 'projectDir'])) {
                 $parameters[$key] = $value;
             }
         }

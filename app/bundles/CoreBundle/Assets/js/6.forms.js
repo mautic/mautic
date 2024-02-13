@@ -593,6 +593,17 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                     .attr('name', valueFieldAttrs['name'])
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
                     .attr('value', valueFieldAttrs['value']);
+
+                var multiple = (fieldOperator === 'in' || fieldOperator === '!in');
+                if (multiple) {
+                    newValueField.attr('multiple', 'multiple');
+
+                    // Update the name
+                    var newName =  newValueField.attr('name') + '[]';
+                    newValueField.attr('name', newName);
+                    newValueField.attr('data-placeholder', mauticLang['chosenChooseMore']);
+                }
+
                 mQuery.each(response.options, function(value, optgroup) {
                     if (typeof optgroup === 'object') {
                         var optgroupEl = mQuery('<optgroup/>').attr('label', value);

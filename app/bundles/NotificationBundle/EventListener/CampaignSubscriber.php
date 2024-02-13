@@ -20,30 +20,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    private NotificationModel $notificationModel;
-    private AbstractNotificationApi $notificationApi;
-    private IntegrationHelper $integrationHelper;
-    private EventDispatcherInterface $dispatcher;
-    private DoNotContactModel $doNotContact;
-
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        NotificationModel $notificationModel,
-        AbstractNotificationApi $notificationApi,
-        EventDispatcherInterface $dispatcher,
-        DoNotContactModel $doNotContact
+        private IntegrationHelper $integrationHelper,
+        private NotificationModel $notificationModel,
+        private AbstractNotificationApi $notificationApi,
+        private EventDispatcherInterface $dispatcher,
+        private DoNotContactModel $doNotContact
     ) {
-        $this->integrationHelper = $integrationHelper;
-        $this->notificationModel = $notificationModel;
-        $this->notificationApi   = $notificationApi;
-        $this->dispatcher        = $dispatcher;
-        $this->doNotContact      = $doNotContact;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD              => ['onCampaignBuild', 0],
@@ -51,7 +37,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
@@ -70,8 +56,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                     'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                     'formType'         => MobileNotificationSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                    'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                    'formTheme'        => '@MauticNotification/FormTheme/NotificationSendList/_notificationsend_list_row.html.twig',
+                    'timelineTemplate' => '@MauticNotification/SubscribedEvents/Timeline/index.html.twig',
                     'channel'          => 'mobile_notification',
                     'channelIdField'   => 'mobile_notification',
                 ]
@@ -86,8 +72,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'         => NotificationSendType::class,
                 'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                'formTheme'        => '@MauticNotification/FormTheme/NotificationSendList/_notificationsend_list_row.html.twig',
+                'timelineTemplate' => '@MauticNotification/SubscribedEvents/Timeline/index.html.twig',
                 'channel'          => 'notification',
                 'channelIdField'   => 'notification',
             ]

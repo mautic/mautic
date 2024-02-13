@@ -1,0 +1,6 @@
+{#
+    This file serves as a placeholder for files that need to conditionally render a main template or output raw content (e.g. on AJAX calls)
+    Example usage:
+    {% extends tmpl == 'index' ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+#}
+{{ block('content') }}

@@ -36,12 +36,12 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->listModel = self::$container->get('mautic.lead.model.list');
+        $this->listModel = static::getContainer()->get('mautic.lead.model.list');
         \assert($this->listModel instanceof ListModel);
         $this->listRepo = $this->listModel->getRepository();
         \assert($this->listRepo instanceof LeadListRepository);
         /** @var LeadModel $leadModel */
-        $leadModel = self::$container->get('mautic.lead.model.lead');
+        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         /* @var LeadRepository $leadRepo */
         $this->leadRepo = $leadModel->getRepository();
     }
@@ -140,7 +140,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
-        $segment = $segment ?? new LeadList();
+        $segment ??= new LeadList();
         $segment->setName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
@@ -177,7 +177,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $contact1Id = $contacts[0]->getId();
 
         // Rebuild segment - set current count to the cache.
-        $this->runCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
+        $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
 
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
@@ -287,6 +287,140 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         return [
             'content'    => json_decode($clientResponse->getContent(), true),
             'statusCode' => $this->client->getResponse()->getStatusCode(),
+        ];
+    }
+
+    public function testCloneSegment(): void
+    {
+        $segment = $this->saveSegment(
+            'Clone Segment',
+            'clonesegment',
+        );
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/clone/'.$segment->getId());
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[alias]']->setValue('clonesegment2');
+        $this->client->submit($form);
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->client->submit($form);
+
+        $rows = $this->listRepo->findAll();
+        $this->assertCount(2, $rows);
+
+        $this->assertSame('clonesegment', $rows[0]->getAlias());
+        $this->assertSame('clonesegment2', $rows[1]->getAlias());
+    }
+
+    public function testSegmentFilterIcon(): void
+    {
+        // Save segment.
+        $filters   = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+        $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        $this->saveSegment('Lead List 2', 'lead-list-2');
+
+        // Check segment count UI for no contacts.
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(2, $leadListsTableRows->count());
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $this->assertEquals(1, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa fa-fw fa-filter"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+    }
+
+    public function testSegmentWarningIcon(): void
+    {
+        $segmentWithOldLastRebuildDate            = $this->saveSegment('Lead List 1', 'lead-list-1');
+        $segmentWithFreshLastRebuildDate          = $this->saveSegment('Lead List 2', 'lead-list-2');
+        $segmentWithOldLastRebuildDateUnpublished = $this->saveSegment('Lead List 3', 'lead-list-3');
+
+        $segmentWithOldLastRebuildDate->setLastBuiltDate(new \DateTime('-1 year'));
+        $segmentWithFreshLastRebuildDate->setLastBuiltDate(new \DateTime('now'));
+        $segmentWithOldLastRebuildDateUnpublished->isPublished(false);
+
+        $this->em->persist($segmentWithOldLastRebuildDate);
+        $this->em->persist($segmentWithFreshLastRebuildDate);
+        $this->em->persist($segmentWithOldLastRebuildDateUnpublished);
+
+        $this->em->flush();
+
+        // Check segment count UI for no contacts.
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(3, $leadListsTableRows->count());
+        $secondColumnOfLine    = $leadListsTableRows->first()->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(1, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(1)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+        $secondColumnOfLine    = $leadListsTableRows->eq(2)->filterXPath('//td[2]//div//i[@class="fa text-danger fa-exclamation-circle"]')->count();
+        $this->assertEquals(0, $secondColumnOfLine);
+    }
+
+    /**
+     * @dataProvider dateFieldProvider
+     */
+    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
+    {
+        $segment = $this->saveSegment(
+            'Date Segment',
+            'ds',
+            [
+                [
+                    'glue'     => 'and',
+                    'field'    => 'date_added',
+                    'object'   => 'lead',
+                    'type'     => 'date',
+                    'filter'   => $filter,
+                    'display'  => null,
+                    'operator' => $operator,
+                ],
+            ]
+        );
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        if ($shouldContainError) {
+            $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', $this->client->getResponse()->getContent());
+        } else {
+            $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+        }
+    }
+
+    /**
+     * @return array<int, array<int, bool|string|null>>
+     */
+    public static function dateFieldProvider(): array
+    {
+        return [
+            ['Today', true],
+            ['birthday', false],
+            ['2023-01-01 11:00', false],
+            ['2023-01-01 11:00:00', false],
+            ['2023-01-01', false],
+            ['next week', false],
+            [null, false],
+            ['\b\d{4}-(10|11|12)-\d{2}\b', false, 'regexp'],
         ];
     }
 }

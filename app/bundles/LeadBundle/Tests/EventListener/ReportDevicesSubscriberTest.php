@@ -6,12 +6,14 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\EventListener\ReportDevicesSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -55,8 +57,8 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testReportBuilder(): void
     {
         $translatorMock        = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock = $this->createMock(ChannelListHelper::class);
-        $reportHelperMock      = $this->createMock(ReportHelper::class);
+        $channelListHelperMock = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $reportHelperMock      = new ReportHelper($this->createMock(EventDispatcher::class));
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock = $this->createMock(CompanyReportData::class);
 

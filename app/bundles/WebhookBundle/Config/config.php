@@ -17,7 +17,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'hooks',
                 'path'            => '/hooks',
-                'controller'      => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController',
+                'controller'      => \Mautic\WebhookBundle\Controller\Api\WebhookApiController::class,
             ],
             'mautic_api_webhookevents' => [
                 'path'       => '/hooks/triggers',
@@ -40,17 +40,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.webhook.model.webhook' => [
-                'class'     => \Mautic\WebhookBundle\Model\WebhookModel::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'jms_serializer',
-                    'mautic.webhook.http.client',
-                    'event_dispatcher',
-                ],
-            ],
-        ],
         'others' => [
             'mautic.webhook.notificator.webhookkillnotificator' => [
                 'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
@@ -75,16 +64,7 @@ return [
                 'class'     => \Mautic\WebhookBundle\Http\Client::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.guzzle.client',
-                ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.webhook.repository.queue' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\WebhookBundle\Entity\WebhookQueue::class,
+                    'mautic.http.client',
                 ],
             ],
         ],

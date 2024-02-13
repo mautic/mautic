@@ -75,9 +75,11 @@ class ListControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertStringContainsString('MySeg', $response->getContent());
-        //Make sure that contact grid is not loaded synchronously
+        // Make sure that contact grid is not loaded synchronously
         self::assertStringNotContainsString('Kane', $response->getContent());
         self::assertStringNotContainsString('Jacques', $response->getContent());
+        // Make sure the data-target-url is not an absolute URL
+        self::assertStringContainsString(sprintf('data-target-url="/s/segment/view/%s/contact/1"', $segment->getId()), $response->getContent());
     }
 
     public function testSegmentContactGrid(): void
@@ -171,5 +173,23 @@ class ListControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $segment;
+    }
+
+    public function testCloneSegmentPage(): void
+    {
+        $list = $this->createList('clone');
+        $list->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
+        $list->setDateModified(new \DateTime('2020-03-21 20:29:02'));
+        $list->setCreatedByUser('Test User');
+
+        $this->em->persist($list);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->request('GET', sprintf('/s/segments/clone/%d', $list->getId()));
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        self::assertStringContainsString('Segment clone', $clientResponse->getContent());
     }
 }

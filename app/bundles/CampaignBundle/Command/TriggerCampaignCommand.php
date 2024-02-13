@@ -12,8 +12,9 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
@@ -28,16 +29,10 @@ class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
-    private CampaignRepository $campaignRepository;
-    private EventDispatcherInterface $dispatcher;
-    private TranslatorInterface $translator;
-    private KickoffExecutioner $kickoffExecutioner;
-    private ScheduledExecutioner $scheduledExecutioner;
-    private InactiveExecutioner $inactiveExecutioner;
-    private LoggerInterface $logger;
-    private FormatterHelper $formatterHelper;
     private bool $kickoffOnly  = false;
+
     private bool $inactiveOnly = false;
+
     private bool $scheduleOnly = false;
 
     /**
@@ -45,58 +40,31 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected $output;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    /**
-     * @var SegmentCountCacheHelper
-     */
-    private $segmentCountCacheHelper;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
     public function __construct(
-        CampaignRepository $campaignRepository,
-        EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
-        KickoffExecutioner $kickoffExecutioner,
-        ScheduledExecutioner $scheduledExecutioner,
-        InactiveExecutioner $inactiveExecutioner,
-        LoggerInterface $logger,
-        FormatterHelper $formatterHelper,
-        ListModel $listModel,
-        SegmentCountCacheHelper $segmentCountCacheHelper,
-        PathsHelper $pathsHelper
+        private CampaignRepository $campaignRepository,
+        private EventDispatcherInterface $dispatcher,
+        private TranslatorInterface $translator,
+        private KickoffExecutioner $kickoffExecutioner,
+        private ScheduledExecutioner $scheduledExecutioner,
+        private InactiveExecutioner $inactiveExecutioner,
+        private LoggerInterface $logger,
+        private FormatterHelper $formatterHelper,
+        private ListModel $listModel,
+        private SegmentCountCacheHelper $segmentCountCacheHelper,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        parent::__construct($pathsHelper);
-
-        $this->campaignRepository        = $campaignRepository;
-        $this->dispatcher                = $dispatcher;
-        $this->translator                = $translator;
-        $this->kickoffExecutioner        = $kickoffExecutioner;
-        $this->scheduledExecutioner      = $scheduledExecutioner;
-        $this->inactiveExecutioner       = $inactiveExecutioner;
-        $this->logger                    = $logger;
-        $this->formatterHelper           = $formatterHelper;
-        $this->listModel                 = $listModel;
-        $this->segmentCountCacheHelper   = $segmentCountCacheHelper;
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
     {
         $this
             ->setName('mautic:campaigns:trigger')
-            ->setDescription('Trigger timed events for published campaigns.')
             ->addOption(
                 '--campaign-id',
                 '-i',
@@ -180,7 +148,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -202,7 +170,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
@@ -212,30 +180,34 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         // Specific campaign;
         if ($id) {
+            $statusCode = 0;
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
             if ($campaign = $this->campaignRepository->getEntity($id)) {
                 $this->triggerCampaign($campaign);
             } else {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+                $statusCode = 1;
             }
 
             $this->completeRun();
 
-            return 0;
+            return (int) $statusCode;
         }
 
         // All published campaigns
         /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
-        $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
+        $campaigns = $this->campaignRepository->getEntities([
+            'iterable_mode' => true,
+            'orderBy'       => 'c.dateAdded',
+            'orderByDir'    => 'DESC',
+        ]);
 
-        while (false !== ($next = $campaigns->next())) {
-            // Key is ID and not 0
-            $campaign = reset($next);
+        foreach ($campaigns as $campaign) {
             $this->triggerCampaign($campaign);
             if ($this->limiter->hasCampaignLimit()) {
                 $this->limiter->resetCampaignLimitRemaining();
@@ -244,7 +216,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**
@@ -266,9 +238,9 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
-    private function triggerCampaign(Campaign $campaign)
+    private function triggerCampaign(Campaign $campaign): void
     {
         if (!$campaign->isPublished()) {
             return;
@@ -305,7 +277,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
                 throw $exception;
@@ -329,9 +301,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeKickoff()
+    private function executeKickoff(): void
     {
-        //trigger starting action events for newly added contacts
+        // trigger starting action events for newly added contacts
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.starting').'</comment>');
 
         $counter = $this->kickoffExecutioner->execute($this->campaign, $this->limiter, $this->output);
@@ -346,7 +318,7 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeScheduled()
+    private function executeScheduled(): void
     {
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.scheduled').'</comment>');
 
@@ -361,9 +333,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    private function executeInactive()
+    private function executeInactive(): void
     {
-        //find and trigger "no" path events
+        // find and trigger "no" path events
         $this->output->writeln('<comment>'.$this->translator->trans('mautic.campaign.trigger.negative').'</comment>');
 
         $counter = $this->inactiveExecutioner->execute($this->campaign, $this->limiter, $this->output);
@@ -372,7 +344,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function updateCampaignSegmentContactCount(Campaign $campaign): void
     {
@@ -383,4 +355,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+
+    protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

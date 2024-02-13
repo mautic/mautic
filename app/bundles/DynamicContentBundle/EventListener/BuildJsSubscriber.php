@@ -4,7 +4,7 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -13,42 +13,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     public function __construct(
-        AssetsHelper $assetsHelper,
-        TranslatorInterface $translator,
-        RequestStack $requestStack,
-        RouterInterface $router
+        private AssetsHelper $assetsHelper,
+        private TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private RouterInterface $router
     ) {
-        $this->assetsHelper = $assetsHelper;
-        $this->translator   = $translator;
-        $this->requestStack = $requestStack;
-        $this->router       = $router;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 200],
@@ -60,7 +33,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
      * JS functions for use in Bundles. This
      * must retain top priority of 1000.
      */
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);
 

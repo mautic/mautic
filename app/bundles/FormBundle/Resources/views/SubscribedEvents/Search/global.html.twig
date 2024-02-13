@@ -1,0 +1,14 @@
+{%- apply spaceless -%}
+  {%- if showMore is defined -%}
+    <a href="{{ url('mautic_form_index', {'search': searchString}) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+    </a>
+  {%- else -%}
+    <a href="{{ url('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}) }}" data-toggle="ajax">
+      {{- form.name -}}
+      <span class="label label-default pull-right" data-toggle="tooltip" title="{{ 'mautic.form.form.resultcount'|trans }}" data-placement="left">
+          {{- form.resultCount -}}
+      </span>
+    </a>
+  {%- endif -%}
+{%- endapply -%}

@@ -1,0 +1,79 @@
+{#
+  Variables
+    - type
+    - themes
+    - active
+#}
+{% set codeMode = 'mautic_code_mode' %}
+{% set isCodeMode = active == codeMode %}
+{% if themes %}
+  <div class="row">
+      <div class="col-md-3 theme-list">
+          <div class="panel panel-default {% if isCodeMode %}theme-selected{% endif %}">
+              <div class="panel-body text-center">
+                  <h3>{{ 'mautic.core.code.mode'|trans }}</h3>
+                  <div class="panel-body text-center" style="height: 250px">
+                      <i class="fa fa-code fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
+                  </div>
+                  <a href="#" type="button" data-theme="{{ codeMode }}" class="select-theme-link btn btn-default {% if isCodeMode %}hide{% endif %}" onclick="mQuery('#dynamic-content-tab').removeClass('hidden')">
+                      Select
+                  </a>
+                  <button type="button" class="select-theme-selected btn btn-default {% if not isCodeMode %}hide{% endif %}" disabled="disabled">
+                      Selected
+                  </button>
+              </div>
+          </div>
+      </div>
+      {% for themeKey, themeInfo in themes %}
+          {% set isSelected = active is same as themeKey %}
+          {% if not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features %}
+            {% if (themeInfo.dir ~ '/thumbnail_' ~ type ~ '.png') is file %}
+                {% set thumbnailName, hasThumbnail = 'thumbnail_' ~ type ~ '.png', true %}
+            {% else %}
+                {% set thumbnailName = 'thumbnail.png' %}
+                {% set hasThumbnail = is_file(themeInfo.dir ~ '/' ~ thumbnailName) %}
+            {% endif %}
+            {% set thumbnailUrl = getAssetUrl(themeInfo.themesLocalDir ~ '/' ~ themeKey ~ '/' ~ thumbnailName) %}
+            <div class="col-md-3 theme-list">
+                <div class="panel panel-default {% if isSelected %}theme-selected{% endif %}">
+                    <div class="panel-body text-center">
+                        <h3>{{ themeInfo.name }}</h3>
+                        {% if hasThumbnail %}
+                            <a href="#" data-toggle="modal" data-target="#theme-{{ themeKey }}">
+                                <div style="background-image: url({{ thumbnailUrl }});background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 250px"></div>
+                            </a>
+                        {% else %}
+                            <div class="panel-body text-center" style="height: 250px">
+                                <i class="fa fa-file-image-o fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
+                            </div>
+                        {% endif %}
+                        <a href="#" type="button" data-theme="{{ themeKey }}" class="select-theme-link btn btn-default {% if isSelected %}hide{% endif %}" onclick="mQuery('#dynamic-content-tab').addClass('hidden')">
+                            Select
+                        </a>
+                        <button type="button" class="select-theme-selected btn btn-default {% if not isSelected %}hide{% endif %}" disabled="disabled">
+                            Selected
+                        </button>
+                    </div>
+                </div>
+                {% if hasThumbnail %}
+                    <!-- Modal -->
+                    <div class="modal fade" id="theme-{{ themeKey }}" tabindex="-1" role="dialog" aria-labelledby="{{ themeKey }}">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="{{ themeKey }}">{{ themeInfo.name }}</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div style="background-image: url({{ thumbnailUrl }});background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+          {% endif %}
+      {% endfor %}
+      <div class="clearfix"></div>
+  </div>
+{% endif %}

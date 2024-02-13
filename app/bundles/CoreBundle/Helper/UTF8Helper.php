@@ -2,10 +2,15 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * @deprecated as unused and unnecessary. To be removed in Mautic 6 without replacement.
+ */
 class UTF8Helper
 {
     public const ICONV_TRANSLIT = 'TRANSLIT';
+
     public const ICONV_IGNORE   = 'IGNORE';
+
     public const WITHOUT_ICONV  = '';
 
     protected static $win1252ToUtf8 = [
@@ -142,46 +147,46 @@ class UTF8Helper
         $buf = '';
         for ($i = 0; $i < $max; ++$i) {
             $c1 = $text[$i];
-            if ($c1 >= "\xc0") { //Should be converted to UTF8, if it's not UTF8 already
+            if ($c1 >= "\xc0") { // Should be converted to UTF8, if it's not UTF8 already
                 $c2 = $i + 1 >= $max ? "\x00" : $text[$i + 1];
                 $c3 = $i + 2 >= $max ? "\x00" : $text[$i + 2];
                 $c4 = $i + 3 >= $max ? "\x00" : $text[$i + 3];
-                if ($c1 >= "\xc0" & $c1 <= "\xdf") { //looks like 2 bytes UTF8
-                    if ($c2 >= "\x80" && $c2 <= "\xbf") { //yeah, almost sure it's UTF8 already
+                if ($c1 >= "\xc0" & $c1 <= "\xdf") { // looks like 2 bytes UTF8
+                    if ($c2 >= "\x80" && $c2 <= "\xbf") { // yeah, almost sure it's UTF8 already
                         $buf .= $c1.$c2;
                         ++$i;
-                    } else { //not valid UTF8.  Convert it.
+                    } else { // not valid UTF8.  Convert it.
                         $cc1 = (chr(ord($c1) / 64) | "\xc0");
                         $cc2 = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1.$cc2;
                     }
-                } elseif ($c1 >= "\xe0" & $c1 <= "\xef") { //looks like 3 bytes UTF8
-                    if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf") { //yeah, almost sure it's UTF8 already
+                } elseif ($c1 >= "\xe0" & $c1 <= "\xef") { // looks like 3 bytes UTF8
+                    if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf") { // yeah, almost sure it's UTF8 already
                         $buf .= $c1.$c2.$c3;
                         $i = $i + 2;
-                    } else { //not valid UTF8.  Convert it.
+                    } else { // not valid UTF8.  Convert it.
                         $cc1 = (chr(ord($c1) / 64) | "\xc0");
                         $cc2 = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1.$cc2;
                     }
-                } elseif ($c1 >= "\xf0" & $c1 <= "\xf7") { //looks like 4 bytes UTF8
+                } elseif ($c1 >= "\xf0" & $c1 <= "\xf7") { // looks like 4 bytes UTF8
                     if ($c2 >= "\x80" && $c2 <= "\xbf" && $c3 >= "\x80" && $c3 <= "\xbf" && $c4 >= "\x80"
                         && $c4 <= "\xbf"
-                    ) { //yeah, almost sure it's UTF8 already
+                    ) { // yeah, almost sure it's UTF8 already
                         $buf .= $c1.$c2.$c3.$c4;
                         $i = $i + 3;
-                    } else { //not valid UTF8.  Convert it.
+                    } else { // not valid UTF8.  Convert it.
                         $cc1 = (chr(ord($c1) / 64) | "\xc0");
                         $cc2 = ($c1 & "\x3f") | "\x80";
                         $buf .= $cc1.$cc2;
                     }
-                } else { //doesn't look like UTF8, but should be converted
+                } else { // doesn't look like UTF8, but should be converted
                     $cc1 = (chr(ord($c1) / 64) | "\xc0");
                     $cc2 = (($c1 & "\x3f") | "\x80");
                     $buf .= $cc1.$cc2;
                 }
             } elseif ("\x80" == ($c1 & "\xc0")) { // needs conversion
-                if (isset(self::$win1252ToUtf8[ord($c1)])) { //found in Windows-1252 special cases
+                if (isset(self::$win1252ToUtf8[ord($c1)])) { // found in Windows-1252 special cases
                     $buf .= self::$win1252ToUtf8[ord($c1)];
                 } else {
                     $cc1 = (chr(ord($c1) / 64) | "\xc0");
@@ -240,7 +245,7 @@ class UTF8Helper
         return self::toUTF8(static::utf8_decode($text, $option));
     }
 
-    public static function UTF8FixWin1252Chars($text)
+    public static function UTF8FixWin1252Chars($text): string
     {
         // If you received an UTF-8 string that was converted from Windows-1252 as it was ISO8859-1
         // (ignoring Windows-1252 chars from 80 to 9F) use this function to fix it.
@@ -258,13 +263,13 @@ class UTF8Helper
         return $str;
     }
 
-    protected static function strlen($text)
+    protected static function strlen($text): int
     {
         return (function_exists('mb_strlen') && ((int) ini_get('mbstring.func_overload')) & 2) ?
             mb_strlen($text, '8bit') : strlen($text);
     }
 
-    public static function normalizeEncoding($encodingLabel)
+    public static function normalizeEncoding($encodingLabel): string
     {
         $encoding     = strtoupper($encodingLabel);
         $encoding     = preg_replace('/[^a-zA-Z0-9\s]/', '', $encoding);
@@ -297,20 +302,15 @@ class UTF8Helper
         return self::toUTF8($text);
     }
 
+    /**
+     * @return string|false
+     */
     protected static function utf8_decode($text, $option)
     {
-        if (self::WITHOUT_ICONV == $option || !function_exists('iconv')) {
-            $o = utf8_decode(
-                str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), self::toUTF8($text))
-            );
-        } else {
-            $o = iconv(
-                'UTF-8',
-                'Windows-1252'.(self::ICONV_TRANSLIT == $option ? '//TRANSLIT' : (self::ICONV_IGNORE == $option ? '//IGNORE' : '')),
-                $text
-            );
-        }
-
-        return $o;
+        return iconv(
+            'UTF-8',
+            'Windows-1252'.(self::ICONV_TRANSLIT == $option ? '//TRANSLIT' : (self::ICONV_IGNORE == $option ? '//IGNORE' : '')),
+            $text
+        );
     }
 }

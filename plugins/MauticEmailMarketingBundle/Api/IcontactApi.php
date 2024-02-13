@@ -43,7 +43,6 @@ class IcontactApi extends EmailMarketingApi
     }
 
     /**
-     * @param       $listId
      * @param array $fields
      *
      * @return mixed|string

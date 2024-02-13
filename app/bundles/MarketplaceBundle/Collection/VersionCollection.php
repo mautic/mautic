@@ -87,7 +87,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         ++$this->position;
     }
 
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }

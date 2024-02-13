@@ -9,22 +9,12 @@ interface ChannelInterface
      */
     public function getChannel();
 
-    /**
-     * @param $channel
-     *
-     * @return ChannelInterface
-     */
-    public function setChannel($channel);
+    public function setChannel($channel): void;
 
     /**
      * @return int
      */
     public function getChannelId();
 
-    /**
-     * @param $id
-     *
-     * @return ChannelInterface
-     */
-    public function setChannelId($id);
+    public function setChannelId($id): void;
 }

@@ -1,0 +1,166 @@
+{#
+  Variables
+    - searchValue
+    - items
+    - categories
+    - page
+    - limit
+    - permissions
+    - model
+    - tmpl
+    - security
+#}
+{% if items|length > 0 %}
+    <div class="table-responsive page-list">
+        <table class="table table-hover table-striped table-bordered pagetable-list" id="pageTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#pageTable',
+                        'routeBase': 'page',
+                        'templateButtons': {
+                            'delete': permissions['page:pages:deleteown'] or permissions['page:pages:deleteother'],
+                        },
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'p.title',
+                        'text': 'mautic.core.title',
+                        'class': 'col-page-title',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'c.title',
+                        'text': 'mautic.core.category',
+                        'class': 'visible-md visible-lg col-page-category',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'p.hits',
+                        'text': 'mautic.page.thead.hits',
+                        'class': 'col-page-hits visible-md visible-lg',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'p.dateAdded',
+                        'text': 'mautic.lead.import.label.dateAdded',
+                        'class': 'col-page-dateAdded visible-md visible-lg',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'p.dateModified',
+                        'text': 'mautic.lead.import.label.dateModified',
+                        'class': 'col-page-dateModified visible-md visible-lg',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'p.createdByUser',
+                        'text': 'mautic.core.createdby',
+                        'class': 'col-page-createdByUser visible-md visible-lg',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'submission_count',
+                        'text': 'mautic.form.form.results',
+                        'class': 'visible-md visible-lg col-page-submissions',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
+                        'orderBy': 'p.id',
+                        'text': 'mautic.core.id',
+                        'class': 'col-page-id visible-md visible-lg',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {% for i in items %}
+                {% set item = i[0] %}
+                <tr>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                'item': item,
+                                'templateButtons': {
+                                    'edit': securityHasEntityAccess(permissions['page:pages:editown'], permissions['page:pages:editother'], item.createdBy),
+                                    'clone': permissions['page:pages:create'],
+                                    'delete': securityHasEntityAccess(permissions['page:pages:deleteown'], permissions['page:pages:deleteother'], item.createdBy),
+                                },
+                                'routeBase': 'page',
+                                'nameGetter': 'getTitle',
+                        }) }}
+                    </td>
+                    <td>
+                        {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'page.page'}) }}
+                        <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                            {{ item.title }} ({{ item.alias }})
+                            {% if item.isVariant or item.isTranslation or item.isPreferenceCenter %}
+                                <span>
+                                    {% if item.isVariant %}
+                                        <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
+                                            <i class="fa fa-fw fa-sitemap"></i>
+                                        </span>
+                                    {% endif %}
+                                    {% if item.isTranslation %}
+                                        <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                                            <i class="fa fa-fw fa-language"></i>
+                                        </span>
+                                    {% endif %}
+                                    {% if item.isPreferenceCenter %}
+                                        <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.preference_center'|trans }}">
+                                            <i class="fa fa-fw fa-cog"></i>
+                                        </span>
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set category = item.category %}
+                        {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
+                        {% set color = category ? '#' ~ category.color : 'inherit' %}
+                        <span style="white-space: nowrap;">
+                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
+                          <span>{{ catName }}</span>
+                        </span>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.hits }}</td>
+                    <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">
+                        {% if item.dateAdded %}{{ dateToDate(item.dateAdded) }}{% endif %}
+                    </td>
+                    <td class="visible-md visible-lg" title="{% if item.dateModified %}{{ dateToFullConcat(item.dateModified) }}{% endif %}">
+                        {% if item.dateModified %}{{ dateToDate(item.dateModified) }}{% endif %}
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.createdByUser }}</td>
+                    <td class="visible-md visible-lg">
+                        <a href="{{ path('mautic_page_results', {'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
+                            {{- 'mautic.form.form.viewresults'|trans({'%count%': i.submission_count}) -}}
+                        </a>
+                    </td>
+                    <td class="visible-md visible-lg">{{ item.id }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page,
+                    'limit': limit,
+                    'menuLinkId': 'mautic_page_index',
+                    'baseUrl': path('mautic_page_index'),
+                    'sessionVar': 'page',
+            }) }}
+        </div>
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

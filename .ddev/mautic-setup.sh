@@ -1,20 +1,19 @@
 #!/bin/bash
 
 setup_mautic() {
-    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}/index_dev.php"
+    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}"
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
     printf "Installing Mautic Composer dependencies...\n"
     composer install
 
-    cp ./.ddev/local.config.php.dist ./app/config/local.php
-    cp ./.env.dist ./.env
+    cp ./.ddev/local.config.php.dist ./config/local.php
+    cp ./.ddev/.env.test.local ./.env.test.local
+    cp ./.ddev/.env.local.dist ./.env.local
 
     printf "Installing Mautic...\n"
-    php bin/console mautic:install "${MAUTIC_URL}" \
-        --mailer_from_name="DDEV" --mailer_from_email="mautic@ddev.local" \
-        --mailer_transport="smtp" --mailer_host="localhost" --mailer_port="1025" --messenger_type="sync"
+    php bin/console mautic:install "${MAUTIC_URL}"
     php bin/console cache:warmup --no-interaction --env=dev
 
     printf "Enabling plugins...\n"
@@ -22,7 +21,7 @@ setup_mautic() {
 
     tput setaf 2
     printf "All done! Here's some useful information:\n"
-    printf "🔒 The default login is admin/mautic\n"
+    printf "🔒 The default login is admin / Maut1cR0cks!\n"
     printf "🌐 To open the Mautic instance, go to ${MAUTIC_URL} in your browser.\n"
     printf "🌐 To open PHPMyAdmin for managing the database, go to ${PHPMYADMIN_URL} in your browser.\n"
     printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to ${MAILHOG_URL} in your browser.\n"

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
-use Exception;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
@@ -19,7 +18,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
     /**
      * @param array|null $metadata
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, ?Schema $installedSchema = null): void
     {
@@ -32,15 +31,6 @@ abstract class AbstractPluginBundle extends PluginBundleBase
             __DIR__.'/../../../../plugins/'.$plugin->getBundle(),
             $plugin->getBundle()
         );
-
-        if (method_exists(__CLASS__, 'installAllTablesIfMissing')) {
-            static::installAllTablesIfMissing(
-                $entityManager->getConnection()->getSchemaManager()->createSchema(),
-                $tablePrefix,
-                $factory,
-                $metadata
-            );
-        }
 
         $migrationEngine->up();
     }

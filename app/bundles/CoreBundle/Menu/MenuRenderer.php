@@ -5,30 +5,17 @@ namespace Mautic\CoreBundle\Menu;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Renderer\RendererInterface;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Twig\Environment;
 
 class MenuRenderer implements RendererInterface
 {
-    /**
-     * @var DelegatingEngine
-     */
-    private $engine;
+    private array $defaultOptions;
 
-    /**
-     * @var MatcherInterface
-     */
-    private $matcher;
-
-    /**
-     * @var array
-     */
-    private $defaultOptions;
-
-    public function __construct(MatcherInterface $matcher, TemplatingHelper $templatingHelper, array $defaultOptions = [])
-    {
-        $this->engine         = $templatingHelper->getTemplating();
-        $this->matcher        = $matcher;
+    public function __construct(
+        private MatcherInterface $matcher,
+        private Environment $twig,
+        array $defaultOptions = []
+    ) {
         $this->defaultOptions = array_merge(
             [
                 'depth'             => null,
@@ -38,7 +25,8 @@ class MenuRenderer implements RendererInterface
                 'ancestorClass'     => 'open',
                 'firstClass'        => 'first',
                 'lastClass'         => 'last',
-                'template'          => 'MauticCoreBundle:Menu:main.html.php',
+                'itemAttributes'    => [],
+                'template'          => '@MauticCore/Menu/main.html.twig',
                 'compressed'        => false,
                 'allow_safe_labels' => false,
                 'clear_matcher'     => true,
@@ -58,8 +46,8 @@ class MenuRenderer implements RendererInterface
             $this->matcher->clear();
         }
 
-        //render html
-        $html = $this->engine->render($options['template'], [
+        // render html
+        $html = $this->twig->render($options['template'], [
             'item'    => $item,
             'options' => $options,
             'matcher' => $this->matcher,

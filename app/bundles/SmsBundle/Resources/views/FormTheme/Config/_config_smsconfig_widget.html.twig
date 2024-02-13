@@ -1,0 +1,21 @@
+{% block _config_smsconfig_widget %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.smsconfig'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+            {% if form.sms_transport.vars.choices|length %}
+                {{ form_row(form.sms_transport) }}
+            {% else %}
+                {{ 'mautic.sms.config.smsconfig'|trans }}
+            {% endif %}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.sms_disable_trackable_urls) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

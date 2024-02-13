@@ -1,0 +1,21 @@
+{% if emailStats is defined %}
+<div class="lead-stats-title">{{ 'mautic.lead.stats.email_title'|trans }}</div>
+<div class="lead-stats">
+    <div class="lead-stats-el">
+        <span class="lead-stats-name">{{ 'mautic.lead.stats.sent_count'|trans }}</span>
+        <span class="lead-stats-val">{{ emailStats['sent_count'] }}</span>
+    </div>
+    <div>
+        <span class="lead-stats-name">{{ 'mautic.lead.stats.open_rate'|trans }}</span>
+        <span class="lead-stats-val">{{ emailStats['open_rate'] * 100 }}%</span>
+    </div>
+    <div>
+        <span class="lead-stats-name">{{ 'mautic.lead.stats.click_through_rate'|trans }}</span>
+        <span class="lead-stats-val">{{ emailStats['click_through_rate'] * 100 }}%</span>
+    </div>
+    <div>
+        <span class="lead-stats-name">{{ 'mautic.lead.stats.click_through_open_rate'|trans }}</span>
+        <span class="lead-stats-val">{{ emailStats['click_through_open_rate'] * 100 }}%</span>
+    </div>
+</div>
+{% endif %}

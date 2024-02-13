@@ -28,16 +28,16 @@ class UserToken
     private $secret;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
-    private $expiration = null;
+    private $expiration;
 
     /**
      * @var bool
      */
     private $oneTimeOnly = true;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -131,7 +131,7 @@ class UserToken
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getExpiration()
     {

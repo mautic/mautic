@@ -29,24 +29,20 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Used by search functions to search using aliases as commands.
      */
-    public function setAvailableSearchFields(array $fields)
+    public function setAvailableSearchFields(array $fields): void
     {
         $this->availableSearchFields = $fields;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int $id
-     *
-     * @return mixed|null
      */
-    public function getEntity($id = 0)
+    public function getEntity($id = 0): ?Company
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias());
@@ -58,12 +54,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
             $q->andWhere($this->getTableAlias().'.id = '.(int) $companyId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $entity = null;
         }
 
         if (null === $entity) {
-            return $entity;
+            return null;
         }
 
         if ($entity->getFields()) {
@@ -97,41 +93,35 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param $order
+     * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order)
+    public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
-            ->from('MauticLeadBundle:Company', $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(\Mautic\LeadBundle\Entity\Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         return $q;
     }
 
     /**
      * Get the groups available for fields.
-     *
-     * @return array
      */
-    public function getFieldGroups()
+    public function getFieldGroups(): array
     {
         return ['core', 'professional', 'other'];
     }
 
     /**
      * Get companies by lead.
-     *
-     * @param $leadId
-     *
-     * @return array
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry, cl.is_primary')
+        $q->select('comp.*, cl.is_primary')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
@@ -142,21 +132,15 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'comp';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -168,12 +152,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($q, $filter);
         $unique                  = $this->generateRandomParameterName();
         $returnParameter         = true;
         $command                 = $filter->command;
@@ -205,9 +186,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = $this->getStandardSearchCommands();
         if (!empty($this->availableSearchFields)) {
@@ -237,8 +218,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             return $companies[$key];
         }
 
-        $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
+        $q->select('comp.*, cl.is_primary')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id');
 
         if (!empty($id)) {
             $q->where(
@@ -253,7 +235,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->orderBy('comp.companyname', 'ASC');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $companies[$key] = $results;
 
@@ -262,8 +244,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a count of leads that belong to the company.
-     *
-     * @param $companyIds
      *
      * @return array
      */
@@ -274,7 +254,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $q->select('count(cl.lead_id) as thecount, cl.company_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
 
-        $returnArray = (is_array($companyIds));
+        $returnArray = is_array($companyIds);
 
         if (!$returnArray) {
             $companyIds = [$companyIds];
@@ -285,7 +265,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         )
             ->groupBy('cl.company_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {
@@ -304,11 +284,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a list of lists.
-     *
-     * @param      $companyName
-     * @param      $city
-     * @param      $country
-     * @param null $state
      *
      * @return array
      */
@@ -341,15 +316,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             )->setParameter('state', $state);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
 
-    /**
-     * @return array
-     */
-    public function getCompaniesForContacts(array $contacts)
+    public function getCompaniesForContacts(array $contacts): array
     {
         if (!$contacts) {
             return [];
@@ -360,12 +332,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
-        $companies = $qb->execute()->fetchAll();
+
+        $companies = $qb->executeQuery()->fetchAllAssociative();
 
         // Group companies per contact
         $contactCompanies = [];
@@ -401,11 +374,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
-     * @param     $query
      * @param int $limit
      * @param int $offset
      *
@@ -416,16 +388,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
-     * @param null   $labelColumn
      * @param string $valueColumn
-     *
-     * @return array
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -475,7 +444,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 ->setParameter('true', true, 'boolean');
         }
 
-        return $q->execute()->fetchAll();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -524,10 +493,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->setMaxResults($limit);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
-    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null)
+    /**
+     * @return Company[]
+     */
+    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null): array
     {
         $results = $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.*', $companyId, $limit);
 
@@ -537,7 +509,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $companies[(int) $r['id']] = $r;
         }
 
-        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('c')
             ->from(Company::class, 'c');
@@ -546,8 +517,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->expr()->in('c.id', ':ids')
         )
             ->setParameter('ids', array_keys($companies))
-            ->orderBy('c.dateAdded', 'DESC')
-            ->addOrderBy('c.id', 'DESC');
+            ->orderBy('c.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+            ->addOrderBy('c.id', \Doctrine\Common\Collections\Criteria::DESC);
 
         $entities = $q->getQuery()
             ->getResult();

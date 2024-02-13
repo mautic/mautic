@@ -8,10 +8,9 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
-use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -19,66 +18,22 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var AnalyticsHelper
-     */
-    private $analyticsHelper;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
-    /**
-     * @var TemplatingHelper
-     */
-    private $templatingHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        AssetModel $assetModel,
-        TranslatorInterface $translator,
-        AnalyticsHelper $analyticsHelper,
-        AssetsHelper $assetsHelper,
-        ThemeHelperInterface $themeHelper,
-        TemplatingHelper $templatingHelper,
-        CoreParametersHelper $coreParametersHelper
+        private AssetModel $assetModel,
+        protected TranslatorInterface $translator,
+        private AnalyticsHelper $analyticsHelper,
+        private AssetsHelper $assetsHelper,
+        private ThemeHelperInterface $themeHelper,
+        private Environment $twig,
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->assetModel           = $assetModel;
-        $this->translator           = $translator;
-        $this->analyticsHelper      = $analyticsHelper;
-        $this->assetsHelper         = $assetsHelper;
-        $this->themeHelper          = $themeHelper;
-        $this->templatingHelper     = $templatingHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD                 => ['onFormBuilder', 0],
@@ -92,7 +47,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a lead generation action to available form submit actions.
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('asset.download', [
             'group'              => 'mautic.asset.actions',
@@ -121,7 +76,7 @@ class FormSubscriber implements EventSubscriberInterface
         } elseif (null !== $categoryId) {
             try {
                 $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
-            } catch (NoResultException|NonUniqueResultException $e) {
+            } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }
         }
@@ -149,7 +104,7 @@ class FormSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
 
         /**
-         * @var Form
+         * @var Form   $form
          * @var Asset  $asset
          * @var string $message
          * @var bool   $messengerMode
@@ -160,7 +115,11 @@ class FormSubscriber implements EventSubscriberInterface
             'message'       => $message,
             'messengerMode' => $messengerMode,
         ]    = $event->getPostSubmitCallback('asset.download_file');
-        $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]).'&stream=0';
+
+        $url = $this->assetModel->generateUrl($asset, true, [
+            'lead'    => $event->getLead() ? $event->getLead()->getId() : null,
+            'channel' => ['form' => $form->getId()],
+            ]).'&stream=0';
 
         if ($messengerMode) {
             $event->setPostSubmitResponse(['download' => $url]);
@@ -179,14 +138,14 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $event->setPostSubmitResponse(new Response(
-            $this->templatingHelper->getTemplating()->renderResponse(
-                $this->themeHelper->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.php'),
+            $this->twig->render(
+                $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig'),
                 [
                     'message'  => $msg,
                     'type'     => 'notice',
                     'template' => $this->coreParametersHelper->get('theme'),
                 ]
-            )->getContent()
+            )
         ));
     }
 }

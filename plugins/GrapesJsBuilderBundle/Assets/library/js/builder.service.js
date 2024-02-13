@@ -6,7 +6,8 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
-import 'grapesjs-plugin-ckeditor';
+import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
+import 'grapesjs-plugin-ckeditor5';
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
@@ -33,9 +34,6 @@ export default class BuilderService {
     }
     if (!assets.conf.deletePath) {
       throw Error('No deletePath found');
-    }
-    if (!assets.files || !assets.files[0]) {
-      console.warn('no assets');
     }
 
     this.assets = assets.files;
@@ -116,6 +114,11 @@ export default class BuilderService {
     codeModeButton.addCommand();
     codeModeButton.addButton();
 
+    if (mauticEditorFonts) {
+      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
+    }
+
+    this.overrideCustomRteDisable();
     this.setListeners();
   }
 
@@ -125,20 +128,11 @@ export default class BuilderService {
     };
   }
 
-  static getCkeConf() {
+  static getCkeConf(tokenCallback) {
+    const ckEditorToolbarOptions = ['undo', 'redo', '|', 'bold','italic', 'underline','strikethrough', '|', 'fontSize','fontFamily','fontColor','fontBackgroundColor', '|' ,'alignment','outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'bulletedList','numberedList', '|', 'link', '|', 'TokenPlugin'];
     return {
-      options: {
-        language: 'en',
-        toolbar: [
-          { name: 'links', items: ['Link', 'Unlink'] },
-          { name: 'basicstyles', items: ['Bold', 'Italic', 'Strike', '-', 'RemoveFormat'] },
-          { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-'] },
-          { name: 'colors', items: ['TextColor', 'BGColor'] },
-          { name: 'document', items: ['Source'] },
-          { name: 'insert', items: ['SpecialChar','Token'] },
-        ],
-        extraPlugins: ['sharedspace', 'colorbutton', 'mautictoken'],
-      },
+      ckeditor_module: `${mauticBaseUrl}assets/ckeditor/build/ckeditor.js`,
+      options:  Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback)
     };
   }
 
@@ -160,13 +154,13 @@ export default class BuilderService {
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
+      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
         [grapesjswebpage]: {
           formsOpts: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
-        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf('page:getBuilderTokens'),
       },
     });
 
@@ -192,11 +186,11 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
-        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
     });
 
@@ -228,11 +222,11 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
         grapesjsnewsletter: {},
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
-        'gjs-plugin-ckeditor': BuilderService.getCkeConf(),
+        'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
     });
 
@@ -288,6 +282,28 @@ export default class BuilderService {
 
   getEditor() {
     return this.editor;
+  }
+
+  overrideCustomRteDisable() {
+    const richTextEditor = this.editor.RichTextEditor;
+
+    if (!richTextEditor) {
+      console.error('No RichTextEditor found');
+      return;
+    }
+
+    if (richTextEditor.customRte) {
+      richTextEditor.customRte.disable = (el, rte) => {
+        el.contentEditable = false;
+        if (rte && rte.focusManager) {
+          rte.focusManager.blur(true);
+        }
+
+        if (rte && typeof rte.destroy == 'function') {
+          rte.destroy();
+        }
+      };
+    }
   }
   /**
    * Generate assets list from GrapesJs

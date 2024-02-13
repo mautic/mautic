@@ -17,8 +17,6 @@ class FrequencyRuleRepository extends CommonRepository
      * @param string      $statTable
      * @param string      $statSentColumn
      * @param string      $statContactColumn
-     *
-     * @return array
      */
     public function getAppliedFrequencyRules(
         $channel,
@@ -28,7 +26,7 @@ class FrequencyRuleRepository extends CommonRepository
         $statTable = 'email_stats',
         $statContactColumn = 'lead_id',
         $statSentColumn = 'date_sent'
-    ) {
+    ): array {
         if (empty($leadIds)) {
             return [];
         }
@@ -52,13 +50,7 @@ class FrequencyRuleRepository extends CommonRepository
         return $violations;
     }
 
-    /**
-     * @param null $channel
-     * @param null $leadIds
-     *
-     * @return array
-     */
-    public function getFrequencyRules($channel = null, $leadIds = null)
+    public function getFrequencyRules($channel = null, $leadIds = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -84,7 +76,7 @@ class FrequencyRuleRepository extends CommonRepository
             }
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $frequencyRules = [];
 
@@ -103,12 +95,7 @@ class FrequencyRuleRepository extends CommonRepository
         return $frequencyRules;
     }
 
-    /**
-     * @param $leadId
-     *
-     * @return array
-     */
-    public function getPreferredChannel($leadId)
+    public function getPreferredChannel($leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -121,7 +108,7 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('leadId', $leadId);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -129,10 +116,8 @@ class FrequencyRuleRepository extends CommonRepository
      * @param string $statTable
      * @param string $statContactColumn
      * @param string $statSentColumn
-     *
-     * @return array
      */
-    private function getCustomFrequencyRuleViolations($channel, array $leadIds, $statTable, $statContactColumn, $statSentColumn)
+    private function getCustomFrequencyRuleViolations($channel, array $leadIds, $statTable, $statContactColumn, $statSentColumn): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -165,7 +150,7 @@ class FrequencyRuleRepository extends CommonRepository
 
         $q->having("count(ch.$statContactColumn) >= fr.frequency_number");
 
-        return $q->execute()->fetchAll();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -226,7 +211,8 @@ class FrequencyRuleRepository extends CommonRepository
         $q->having("count(ch.$statContactColumn) >= :defaultNumber")
             ->setParameter('defaultNumber', $defaultFrequencyNumber);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
+
         foreach ($results as $key => $result) {
             $results[$key]['frequency_number'] = $defaultFrequencyNumber;
             $results[$key]['frequency_time']   = $defaultFrequencyTime;

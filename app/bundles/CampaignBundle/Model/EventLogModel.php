@@ -2,54 +2,51 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends AbstractCommonModel<LeadEventLog>
  */
 class EventLogModel extends AbstractCommonModel
 {
-    protected EventModel $eventModel;
-
-    protected CampaignModel $campaignModel;
-
-    protected IpLookupHelper $ipLookupHelper;
-
-    protected EventScheduler $eventScheduler;
-
     public function __construct(
-        EventModel $eventModel,
-        CampaignModel $campaignModel,
-        IpLookupHelper $ipLookupHelper,
-        EventScheduler $eventScheduler
+        protected EventModel $eventModel,
+        protected CampaignModel $campaignModel,
+        protected IpLookupHelper $ipLookupHelper,
+        protected EventScheduler $eventScheduler,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->eventModel     = $eventModel;
-        $this->campaignModel  = $campaignModel;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->eventScheduler = $eventScheduler;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): LeadEventLogRepository
     {
-        $result = $this->em->getRepository(LeadEventLog::class);
-        \assert($result instanceof LeadEventLogRepository);
-
-        return $result;
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
@@ -82,9 +79,9 @@ class EventLogModel extends AbstractCommonModel
     }
 
     /**
-     * @return string|LeadEventLog
+     * @return string|mixed[]
      */
-    public function updateContactEvent(Event $event, Lead $contact, array $parameters)
+    public function updateContactEvent(Event $event, Lead $contact, array $parameters): string|array
     {
         $campaign = $event->getCampaign();
 
@@ -205,7 +202,7 @@ class EventLogModel extends AbstractCommonModel
         return [$log, $created];
     }
 
-    public function saveEntity(LeadEventLog $entity)
+    public function saveEntity(LeadEventLog $entity): void
     {
         $triggerDate = $entity->getTriggerDate();
         if (null === $triggerDate) {

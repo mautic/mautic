@@ -10,21 +10,16 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class NotificationSendType.
+ * @extends AbstractType<array<mixed>>
  */
 class NotificationSendType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'notification',
@@ -68,7 +63,11 @@ class NotificationSendType extends AbstractType
                 ]
             );
 
-            $notification = $options['data']['notification'];
+            if (array_key_exists('data', $options)) {
+                if (is_array($options['data']) && array_key_exists('notification', $options['data'])) {
+                    $notification = $options['data']['notification'];
+                }
+            }
 
             // create button edit notification
             $windowUrlEdit = $this->router->generate('mautic_notification_action', [
@@ -94,7 +93,7 @@ class NotificationSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }

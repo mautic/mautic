@@ -4,10 +4,8 @@ namespace Mautic\LeadBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -16,32 +14,13 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(EntityManagerInterface $entityManager, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->entityManager        = $entityManager;
-        $this->coreParametersHelper = $coreParametersHelper;
-    }
-
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var LeadRepository $leadRepo */
-        $leadRepo        = $this->entityManager->getRepository(Lead::class);
+        $leadRepo        = $manager->getRepository(Lead::class);
 
         /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo = $this->entityManager->getRepository(CompanyLead::class);
+        $companyLeadRepo = $manager->getRepository(CompanyLead::class);
 
         $today = new \DateTime();
         $leads = CsvHelper::csv_to_array(__DIR__.'/fakeleaddata.csv');
@@ -51,7 +30,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
             $lead = new Lead();
             $lead->setDateAdded($today);
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($l['ip'], $this->coreParametersHelper->get('parameters'));
+            $ipAddress->setIpAddress($l['ip']);
             $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);

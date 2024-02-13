@@ -13,14 +13,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class SegmentInUseValidator extends ConstraintValidator
 {
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
-    public function __construct(ListModel $listModel)
-    {
-        $this->listModel = $listModel;
+    public function __construct(
+        private ListModel $listModel
+    ) {
     }
 
     /**
@@ -40,7 +35,7 @@ class SegmentInUseValidator extends ConstraintValidator
 
         if (count($lists)) {
             $this->context->buildViolation($constraint->message)
-                ->setCode(Response::HTTP_UNPROCESSABLE_ENTITY)
+                ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
                 ->setParameter('%segments%', implode(',', $lists))
                 ->addViolation();
         }

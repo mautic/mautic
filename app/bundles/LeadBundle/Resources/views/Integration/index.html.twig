@@ -1,0 +1,36 @@
+{#
+  Variables
+    - lead
+    - integrations
+#}
+{% if integrations is empty %}
+  <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
+      <h4>{{ 'mautic.lead.integrations.header'|trans }}</h4>
+  </div>
+{% else %}
+  <div class="row">
+    {% for details in integrations %}
+      {{ cycle(['', '</div><div class="row">'], loop.index0) }}
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              {% if details.link is defined %}
+                <a href="{{ details.link }}" class="pull-right"><i class="fa fa-external-link"></i></a>
+              {% endif %}
+              {{ details.integration }}
+            </h3>
+          </div>
+          <div class="panel-body">
+            <dl class="dl-horizontal">
+              <dt>{{ 'mautic.integration.object'|trans }}</dt><dd>{{ details.integration_entity }}</dd>
+              <dt>{{ 'mautic.integration.object_id'|trans }}</dt><dd>{{ details.integration_entity_id }}</dd>
+              <dt>{{ 'mautic.core.date.added'|trans }}</dt><dd>{{ dateToText(details.date_added, 'UTC', 'Y-m-d H:i:s', true) }}</dd>
+              <dt>{{ 'mautic.integration.last_sync_date'|trans }}</dt><dd>{{ dateToText(details.last_sync_date, 'UTC', 'Y-m-d H:i:s', true) }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

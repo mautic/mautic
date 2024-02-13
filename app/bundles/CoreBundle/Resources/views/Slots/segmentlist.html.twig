@@ -1,0 +1,25 @@
+{% if form is defined %}
+    {% if showContactSegments is defined and showContactSegments and form.lead_lists is defined and form.lead_lists|length > 0 %}
+        <div class="contact-segments">
+            <div class="text-left">
+                <label class="control-label">{{ label_text|default('mautic.lead.form.list'|trans) }}</label>
+            </div>
+            {% for key, leadList in form.lead_lists %}
+                <div id="segment-{{ key }}" class="text-left">
+                    {{ form_widget(leadList) }}
+                    {{ form_label(leadList) }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="contact-segments">
+        <div class="text-left">
+            <label class="control-label">{{ 'mautic.lead.form.list'|trans }}</label>
+        </div>
+        <div id="segment-1" class="text-left">
+            <input type="checkbox" id="lead_contact_frequency_rules_lead_lists_1" name="lead_contact_frequency_rules[lead_lists][]" autocomplete="false" value="2" checked="checked">
+            <label for="lead_contact_frequency_rules_lead_lists_1">{{ 'mautic.lead.lead.field.list'|trans }}</label>
+        </div>
+    </div>
+{% endif %}

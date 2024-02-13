@@ -1,0 +1,26 @@
+<form action="{{ path('mautic_contactnote_index', {'page': page, 'leadId': lead.id, 'tmpl': 'list'}) }}" class="panel" id="note-filters" method="post">
+    <div class="form-control-icon pa-xs">
+        <input type="text"
+               name="search"
+               value="{{ search|e }}"
+               id="NoteFilter"
+               class="form-control bdr-w-0"
+               placeholder="{{ 'mautic.core.search.placeholder'|trans }}"
+               data-toggle="livesearch"
+               data-target="#NoteList"
+               data-action="{{ path('mautic_contactnote_index', {'leadId': lead.id, 'page': 1}) }}">
+        <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
+    </div>
+    <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}" />
+    <div class="panel-footer text-muted">
+        {% for typeKey, typeName in noteTypes %}
+            <div class="checkbox-inline custom-primary">
+                <label class="mb-0">
+                    <input name="noteTypes[]" type="checkbox" value="{{ typeKey }}" {% if typeKey in noteType %}checked{% endif %} />
+                    <span class="mr-0"></span>
+                    {{ typeName|trans }}
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+</form>

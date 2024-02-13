@@ -2,31 +2,19 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 
-/**
- * Class BaseDecorator.
- */
 class BaseDecorator implements FilterDecoratorInterface
 {
     use RegexTrait;
 
-    /**
-     * @var ContactSegmentFilterOperator
-     */
-    protected $contactSegmentFilterOperator;
-
-    /**
-     * BaseDecorator constructor.
-     */
     public function __construct(
-        ContactSegmentFilterOperator $contactSegmentFilterOperator
+        protected ContactSegmentFilterOperator $contactSegmentFilterOperator
     ) {
-        $this->contactSegmentFilterOperator = $contactSegmentFilterOperator;
     }
 
     /**
@@ -37,10 +25,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return $contactSegmentFilterCrate->getField();
     }
 
-    /**
-     * @return string
-     */
-    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         if ($contactSegmentFilterCrate->isContactType()) {
             return MAUTIC_TABLE_PREFIX.'leads';
@@ -56,20 +41,13 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         $operator = $this->contactSegmentFilterOperator->fixOperator($contactSegmentFilterCrate->getOperator());
 
-        switch ($operator) {
-            case 'startsWith':
-            case 'endsWith':
-            case 'contains':
-                return 'like';
-        }
-
-        return $operator;
+        return match ($operator) {
+            'startsWith', 'endsWith', 'contains' => 'like',
+            default => $operator,
+        };
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return BaseFilterQueryBuilder::getServiceId();
     }
@@ -96,7 +74,7 @@ class BaseDecorator implements FilterDecoratorInterface
     /**
      * @return array|bool|float|string|null
      */
-    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         $filter = $contactSegmentFilterCrate->getFilter();
 
@@ -110,7 +88,7 @@ class BaseDecorator implements FilterDecoratorInterface
                 return !is_array($filter) ? explode('|', $filter) : $filter;
             case 'like':
             case '!like':
-                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
+                return !str_contains($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':
@@ -134,10 +112,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return $filter;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): bool|string
     {
         return false;
     }

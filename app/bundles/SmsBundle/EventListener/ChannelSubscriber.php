@@ -13,27 +13,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
-    public function __construct(TransportChain $transportChain)
-    {
-        $this->transportChain = $transportChain;
+    public function __construct(
+        private TransportChain $transportChain
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 90],
         ];
     }
 
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addChannel(
@@ -47,7 +39,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                             'form.submit',
                         ],
                         'lookupFormType' => SmsListType::class,
-                        'repository'     => 'MauticSmsBundle:Sms',
+                        'repository'     => \Mautic\SmsBundle\Entity\Sms::class,
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],
                     ReportModel::CHANNEL_FEATURE => [

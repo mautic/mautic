@@ -14,29 +14,27 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
+class DecisionDispatcherTest extends TestCase
 {
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|LegacyEventDispatcher
      */
-    private $legacyDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $legacyDispatcher;
 
     /**
      * @var MockObject|DecisionAccessor
      */
-    private $config;
+    private \PHPUnit\Framework\MockObject\MockObject $config;
 
-    /**
-     * @var DecisionDispatcher
-     */
-    private $decisionDispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher $decisionDispatcher;
 
     protected function setUp(): void
     {

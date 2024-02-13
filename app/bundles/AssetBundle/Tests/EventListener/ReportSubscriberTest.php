@@ -7,6 +7,7 @@ namespace Mautic\AssetBundle\Tests\EventListener;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
@@ -14,34 +15,35 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $channelListHelper;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
 
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyReportData;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
      * @var DownloadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $downloadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $downloadRepository;
 
     /**
      * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
+
+    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
 
     public function setUp(): void
     {
         $this->queryBuilder       = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper  = $this->createMock(ChannelListHelper::class);
+        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $this->companyReportData  = $this->createMock(CompanyReportData::class);
         $this->downloadRepository = $this->createMock(DownloadRepository::class);
     }
@@ -96,19 +98,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $channelListHelper = new class() extends ChannelListHelper {
-            public function __construct()
-            {
-            }
-        };
-
-        $reportHelper = new class() extends ReportHelper {
-            public function __construct()
-            {
-            }
-        };
-
-        $event = new ReportBuilderEvent($this->createTranslatorMock(), $channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $reportHelper);
+        $event = new ReportBuilderEvent($this->createTranslatorMock(), $this->channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $this->reportHelper);
 
         $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository);
 

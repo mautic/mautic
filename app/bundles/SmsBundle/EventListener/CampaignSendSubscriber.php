@@ -13,28 +13,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
-
-    /**
-     * @var TransportChain
-     */
-    private $transportChain;
-
     public function __construct(
-        SmsModel $smsModel,
-        TransportChain $transportChain
+        private SmsModel $smsModel,
+        private TransportChain $transportChain
     ) {
-        $this->smsModel       = $smsModel;
-        $this->transportChain = $transportChain;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
@@ -42,7 +27,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addAction(
@@ -53,7 +38,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
                     'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                     'formType'         => SmsSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
-                    'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
+                    'formTheme'        => '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig',
                     'channel'          => 'sms',
                     'channelIdField'   => 'sms',
                 ]
@@ -61,10 +46,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return void
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $lead  = $event->getLead();
         $smsId = (int) $event->getConfig()['sms'];

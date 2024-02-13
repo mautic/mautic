@@ -25,7 +25,7 @@ class Point extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -40,12 +40,12 @@ class Point extends FormEntity
     private $repeatable = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -60,14 +60,16 @@ class Point extends FormEntity
     private $properties = [];
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
      */
     private $log;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
+
+    private ?Group $group = null;
 
     public function __clone()
     {
@@ -81,7 +83,7 @@ class Point extends FormEntity
         $this->log = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -112,9 +114,13 @@ class Point extends FormEntity
             ->build();
 
         $builder->addCategory();
+
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
+            ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -136,10 +142,8 @@ class Point extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('point')
             ->addListProperties(
@@ -214,10 +218,7 @@ class Point extends FormEntity
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -274,7 +275,7 @@ class Point extends FormEntity
         return $this;
     }
 
-    public function removeLog(LeadPointLog $log)
+    public function removeLog(LeadPointLog $log): void
     {
         $this->log->removeElement($log);
     }
@@ -301,7 +302,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -322,7 +323,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -340,7 +341,7 @@ class Point extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -356,7 +357,7 @@ class Point extends FormEntity
     /**
      * @param mixed $delta
      */
-    public function setDelta($delta)
+    public function setDelta($delta): void
     {
         $this->delta = (int) $delta;
     }
@@ -380,5 +381,15 @@ class Point extends FormEntity
     public function getRepeatable()
     {
         return $this->repeatable;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?Group $group): void
+    {
+        $this->group = $group;
     }
 }

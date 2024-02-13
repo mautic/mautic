@@ -1,0 +1,112 @@
+{% if (permissions['lead:leads:editown'] or permissions['lead:leads:editother']) %}
+    {% set customButtons = [
+      {
+          'attr': {
+              'class': 'btn btn-default btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_segment_batch_contact_view'),
+              'data-header': 'mautic.lead.batch.lists'|trans,
+          },
+          'btnText': 'mautic.lead.batch.lists'|trans,
+          'iconClass': 'fa fa-pie-chart',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-default btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchStages'}),
+              'data-header': 'mautic.lead.batch.stages'|trans,
+          },
+          'btnText': 'mautic.lead.batch.stages'|trans,
+          'iconClass': 'fa fa-tachometer',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-default btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchCampaigns'}),
+              'data-header': 'mautic.lead.batch.campaigns'|trans,
+          },
+          'btnText': 'mautic.lead.batch.campaigns'|trans,
+          'iconClass': 'fa fa-clock-o',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-default btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchOwners'}),
+              'data-header': 'mautic.lead.batch.owner'|trans,
+          },
+          'btnText': 'mautic.lead.batch.owner'|trans,
+          'iconClass': 'fa fa-user',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-default btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchDnc'}),
+              'data-header': 'mautic.lead.batch.dnc'|trans,
+          },
+          'btnText': 'mautic.lead.batch.dnc'|trans,
+          'iconClass': 'fa fa-ban text-danger',
+      },
+    ] %}
+{% endif %}
+
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered" id="leadTable">
+            <thead>
+                <tr>
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#leadTable',
+                        'templateButtons': {
+                            'delete': (permissions['lead:leads:deleteown'] or permissions['lead:leads:deleteother']),
+                        },
+                        'customButtons': customButtons|default([]),
+                        'langVar': 'lead.lead',
+                        'routeBase': 'contact',
+                        'tooltip': 'mautic.lead.list.checkall.help'|trans,
+                    }) }}
+
+                    {% for column, label in columns %}
+                        {{ include([('@MauticLead/Lead/_list_header_'~column~'.html.twig'), '@MauticLead/Lead/_list_header_default.html.twig'], {
+                              'label': label,
+                              'column': column,
+                              'class': (column in columns|keys) ? 'hidden-xs' : '',
+                        }) }}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {{ include('@MauticLead/Lead/_list_rows.html.twig', {
+                    'items': items,
+                    'columns': columns,
+                    'security': security,
+                    'currentList': currentList,
+                    'permissions': permissions,
+                    'noContactList': noContactList,
+                }) }}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems': totalItems,
+            'page': page,
+            'limit': limit,
+            'menuLinkId': 'mautic_contact_index',
+            'baseUrl': path('mautic_contact_index'),
+            'tmpl': indexMode,
+            'sessionVar': 'lead',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

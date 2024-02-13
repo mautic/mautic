@@ -18,7 +18,7 @@ interface ConfigFormInterface extends IntegrationInterface
     /**
      * Return the template to use from the controller. Return null to use the default.
      *
-     * @return string|null Name of the template like SomethingBundle:Config:form.html.php
+     * @return string|null Name of the template like SomethingBundle:Config:form.html.twig
      */
     public function getConfigFormContentTemplate(): ?string;
 }

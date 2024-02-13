@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -14,6 +20,18 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Disable API just for specific test.
         $this->configParams['api_enabled'] = 'testDisabledApi' !== $this->getName();
+
+        static::getContainer()->set(
+            'session',
+            new Session(
+                new class() extends FixedMockFileSessionStorage {
+                    public function start()
+                    {
+                        Assert::fail('Session cannot be started during API call. It must be stateless.');
+                    }
+                }
+            )
+        );
 
         parent::setUp();
     }
@@ -29,9 +47,25 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testActivityApi(): void
+    {
+        $this->client->request('GET', '/api/contacts/activity');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        Assert::assertArrayHasKey('events', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('filters', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('order', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('types', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('total', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('page', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('limit', json_decode($this->client->getResponse()->getContent(), true));
+        Assert::assertArrayHasKey('maxPages', json_decode($this->client->getResponse()->getContent(), true));
+    }
+
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
-        $payload = [
+        $companyA = $this->createCompany('CompanyA corp');
+        $companyB = $this->createCompany('CompanyB corp');
+        $payload  = [
             [
                 'email'            => 'batchemail1@email.com',
                 'firstname'        => 'BatchUpdate',
@@ -43,6 +77,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 'preferred_locale' => 'es_SV',
                 'timezone'         => 'America/Chicago',
                 'owner'            => 1,
+                'company'          => $companyA->getId(),
             ],
             [
                 'email'            => 'batchemail2@email.com',
@@ -60,7 +95,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
         Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -127,6 +162,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][1]['owner']);
         $this->assertEquals(null, $response['contacts'][2]['owner']);
 
+        // Assert company
+        $this->assertEquals($companyA->getId(), (int) $response['contacts'][0]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
+
         // Emulate an unsanitized email to ensure that doesn't cause duplicates
         $payload[0]['email'] = 'batchemail1@email.com,';
 
@@ -141,6 +181,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[0]['state']            = 'California';
         $payload[0]['timezone']         = 'America/Los_Angeles';
         $payload[0]['preferred_locale'] = 'en_US';
+        $payload[0]['company']          = $companyB->getId();
 
         // Update owner
         $payload[0]['owner'] = null;
@@ -153,7 +194,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload[1]['points'] = 3;
 
         // Update the 3 contacts
-        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
         Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -219,6 +260,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(null, $response['contacts'][0]['owner']);
         $this->assertEquals($payload[1]['owner'], $response['contacts'][1]['owner']['id']);
         $this->assertEquals(null, $response['contacts'][2]['owner']);
+
+        // Assert company
+        $this->assertEquals($companyB->getId(), (int) $response['contacts'][0]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][1]['fields']['all']['company']);
+        $this->assertEquals(null, $response['contacts'][2]['fields']['all']['company']);
     }
 
     /**
@@ -293,10 +339,13 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'owner'            => 1,
         ];
 
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $contactId      = $response['contact']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response  = json_decode($clientResponse->getContent(), true);
+        $contactId = $response['contact']['id'];
 
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
@@ -314,7 +363,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload['lastname'] = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -330,7 +379,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload['lastname']           = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -357,7 +406,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'owner'    => 2,
         ];
 
-        $this->client->request('POST', '/api/contacts/new', $updatedValues);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $updatedValues);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -375,9 +424,26 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
         $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
 
+        // test: create the same contact, merge it based on unique identifier (email) - without loosing the owner and stage
+        unset($updatedValues['owner']);
+
+        $this->client->request('POST', '/api/contacts/new', $updatedValues);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($updatedValues['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals($updatedValues['lastname'], $response['contact']['fields']['all']['lastname']);
+        $this->assertSame(4, $response['contact']['points']);
+        $this->assertNull($response['contact']['stage']); // stage was not set on the contact
+        $this->assertSame(2, $response['contact']['owner']['id']);
+
+        // set the owner again for the other tests to work
+        $updatedValues['owner'] = 2;
+
         // Test getting a contact
-        $this->client->request(
-            'GET', '/api/contacts/'.$contactId);
+        $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contactId);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -395,8 +461,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
 
         // Test fetching the batch of contacts
-        $this->client->request(
-            'GET', '/api/contacts');
+        $this->client->request(Request::METHOD_GET, '/api/contacts');
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -471,7 +536,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ];
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
@@ -481,9 +546,229 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['doNotContact'][0]['reason'], $response['contact']['doNotContact'][0]['reason']);
 
         // Remove contact
-        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    public function testBatchNewEndpointCreateAndUpdate(): void
+    {
+        $payload = [
+            [
+                'email'            => 'apiemail1@email.com',
+                'firstname'        => 'API',
+                'lastname'         => 'Update',
+                'points'           => 4,
+                'tags'             => ['apitest', 'testapi'],
+                'city'             => 'Houston',
+                'state'            => 'Texas',
+                'country'          => 'United States',
+                'preferred_locale' => 'es_SV',
+                'timezone'         => 'America/Chicago',
+                'owner'            => 1,
+            ], [
+                'email'            => 'apiemail2@email.com',
+                'firstname'        => 'API2',
+                'lastname'         => 'Update2',
+                'points'           => 3,
+            ],
+        ];
+
+        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contacts'][0]['id'];
+
+        $this->assertEquals($payload[0]['email'], $response['contacts'][0]['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
+        $this->assertEquals($payload[0]['lastname'], $response['contacts'][0]['fields']['all']['lastname']);
+        $this->assertSame(4, $response['contacts'][0]['points']);
+        $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contacts'][0]['tags']));
+        $this->assertEquals($payload[0]['city'], $response['contacts'][0]['fields']['all']['city']);
+        $this->assertEquals($payload[0]['state'], $response['contacts'][0]['fields']['all']['state']);
+        $this->assertEquals($payload[0]['country'], $response['contacts'][0]['fields']['all']['country']);
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contacts'][0]['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
+        $this->assertEquals($payload[0]['owner'], $response['contacts'][0]['owner']['id']);
+
+        // without overwriteWithBlank lastname is not set empty
+        $payload[0]['lastname'] = '';
+
+        // Lets try to create the same contact to see that the values are not re-setted
+        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contacts'][0]['id']);
+        $this->assertEquals($payload[0]['email'], $response['contacts'][0]['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
+        $this->assertNotEmpty($response['contacts'][0]['fields']['all']['lastname']);
+        $this->assertEquals(4, $response['contacts'][0]['points']);
+        $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contacts'][0]['tags']));
+        $this->assertEquals($payload[0]['city'], $response['contacts'][0]['fields']['all']['city']);
+        $this->assertEquals($payload[0]['state'], $response['contacts'][0]['fields']['all']['state']);
+        $this->assertEquals($payload[0]['country'], $response['contacts'][0]['fields']['all']['country']);
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contacts'][0]['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
+        $this->assertEquals($payload[0]['owner'], $response['contacts'][0]['owner']['id']);
+
+        // with overwriteWithBlank lastname is empty
+        $payload[0]['overwriteWithBlank'] = true;
+        $payload[0]['lastname']           = '';
+
+        // Lets try to create the same contact to see that the values are not re-setted
+        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contacts'][0]['id']);
+        $this->assertEquals($payload[0]['email'], $response['contacts'][0]['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
+        $this->assertEmpty($response['contacts'][0]['fields']['all']['lastname']);
+        $this->assertEquals(4, $response['contacts'][0]['points']);
+        $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contacts'][0]['tags']));
+
+        // with overwriteWithBlank lastname is empty
+        $payload[0]['overwriteWithBlank'] = true;
+        $payload[0]['lastname']           = '';
+
+        // Lets try to create the same contact to see that the values are not re-setted
+        $this->client->request('POST', '/api/contacts/batch/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contacts'][0]['id']);
+        $this->assertEquals($payload[0]['email'], $response['contacts'][0]['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
+        $this->assertEmpty($response['contacts'][0]['fields']['all']['lastname']);
+        $this->assertSame(4, $response['contacts'][0]['points']);
+        $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contacts'][0]['tags']));
+        $this->assertEquals($payload[0]['city'], $response['contacts'][0]['fields']['all']['city']);
+        $this->assertEquals($payload[0]['state'], $response['contacts'][0]['fields']['all']['state']);
+        $this->assertEquals($payload[0]['country'], $response['contacts'][0]['fields']['all']['country']);
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contacts'][0]['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
+        $this->assertEquals($payload[0]['owner'], $response['contacts'][0]['owner']['id']);
+
+        // Lets try to create the same contact and it should merge based on unique identifier (email)
+        $updatedValues = [
+            [
+                'email'    => 'apiemail1@email.com',
+                'lastname' => 'Update',
+                'city'     => 'Boston',
+                'state'    => 'Massachusetts',
+                'owner'    => 2,
+            ],
+        ];
+
+        $this->client->request('POST', '/api/contacts/batch/new', $updatedValues);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contacts'][0]['id']);
+        $this->assertEquals($updatedValues[0]['email'], $response['contacts'][0]['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
+        $this->assertEquals($updatedValues[0]['lastname'], $response['contacts'][0]['fields']['all']['lastname']);
+        $this->assertSame(4, $response['contacts'][0]['points']);
+        $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contacts'][0]['tags']));
+        $this->assertEquals($updatedValues[0]['city'], $response['contacts'][0]['fields']['all']['city']);
+        $this->assertEquals($updatedValues[0]['state'], $response['contacts'][0]['fields']['all']['state']);
+        $this->assertEquals($payload[0]['country'], $response['contacts'][0]['fields']['all']['country']);
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contacts'][0]['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues[0]['owner'], $response['contacts'][0]['owner']['id']);
+
+        // Test getting a contact
+        $this->client->request('GET', '/api/contacts/'.$contactId);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($payload[0]['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertSame(4, $response['contact']['points']);
+        $this->assertSame(4, $response['contact']['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertEquals($updatedValues[0]['city'], $response['contact']['fields']['all']['city']);
+        $this->assertEquals($updatedValues[0]['state'], $response['contact']['fields']['all']['state']);
+        $this->assertEquals($payload[0]['country'], $response['contact']['fields']['all']['country']);
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contact']['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[0]['timezone'], $response['contact']['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues[0]['owner'], $response['contact']['owner']['id']);
+
+        // Test fetching the batch of contacts
+        $this->client->request(
+            'GET', '/api/contacts');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertTrue(isset($response['contacts'][$contactId]));
+        $contact = $response['contacts'][$contactId];
+        $this->assertEquals($contactId, $contact['id']);
+        $this->assertEquals($payload[0]['email'], $contact['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $contact['fields']['all']['firstname']);
+        $this->assertSame(4, $contact['points']);
+        $this->assertSame(4, $contact['fields']['all']['points']);
+        $this->assertEquals(2, count($contact['tags']));
+        $this->assertEquals($updatedValues[0]['city'], $contact['fields']['all']['city']);
+        $this->assertEquals($updatedValues[0]['state'], $contact['fields']['all']['state']);
+        $this->assertEquals($payload[0]['country'], $contact['fields']['all']['country']);
+        $this->assertEquals($payload[0]['preferred_locale'], $contact['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[0]['timezone'], $contact['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues[0]['owner'], $contact['owner']['id']);
+
+        // Test patch and values should be updated
+        $updatedValues = [
+            [
+                'id'        => $contactId,
+                'email'     => 'apiemail1@email.com',
+                'city'      => 'Boston',
+                'state'     => 'Massachusetts',
+                'firstname' => '', // This will be ignored because overwriteWithBlank is false by default.
+                'owner'     => 2,
+                'points'    => 1,
+            ],
+        ];
+
+        $this->client->request('PATCH', '/api/contacts/batch/edit', $updatedValues);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contacts'][0]['id']);
+        $this->assertEquals($updatedValues[0]['email'], $response['contacts'][0]['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
+        $this->assertSame(1, $response['contacts'][0]['points']);
+        $this->assertSame(1, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contacts'][0]['tags']));
+        $this->assertEquals($updatedValues[0]['city'], $response['contacts'][0]['fields']['all']['city']);
+        $this->assertEquals($updatedValues[0]['state'], $response['contacts'][0]['fields']['all']['state']);
+        $this->assertEquals($payload[0]['country'], $response['contacts'][0]['fields']['all']['country']);
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contacts'][0]['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues[0]['owner'], $response['contacts'][0]['owner']['id']);
+
+        // with overwriteWithBlank lastname is empty
+        $updatedValues = [
+            [
+                'id'                 => $contactId,
+                'lastname'           => '',
+                'overwriteWithBlank' => true,
+            ],
+        ];
+
+        $this->client->request('PATCH', '/api/contacts/batch/edit', $updatedValues);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contacts'][0]['id']);
+        $this->assertEquals($payload[0]['email'], $response['contacts'][0]['fields']['all']['email']);
+        $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
+        $this->assertEmpty($response['contacts'][0]['fields']['all']['lastname']);
     }
 
     public function testBatchDncAddAndRemove(): void
@@ -496,7 +781,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'email' => $emailAddress,
         ];
 
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
@@ -517,7 +802,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $this->assertSame(3, $response['contacts'][0]['doNotContact'][0]['reason']);
@@ -538,14 +823,14 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $this->client->request(Request::METHOD_PUT, '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertEmpty($response['contacts'][0]['doNotContact']);
 
         // Remove contact
-        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -553,11 +838,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testAddAndRemoveDncToExistingContact(): void
     {
         // Create contact
-        $payload = [
-            'email' => 'addDncDemo@mautic.org',
-        ];
+        $payload = ['email' => 'addDncDemo@mautic.org'];
 
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(Request::METHOD_POST, '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
@@ -566,12 +849,10 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $response['contact']['doNotContact']);
 
         // Check with a DNC payload that has an empty reasoncode in it, this should throw a 400 Bad Request error
-        $dncPayload = [
-            'reason' => 0,
-        ];
+        $dncPayload = ['reason' => 0];
         $dncChannel = 'email';
 
-        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
 
@@ -579,7 +860,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $dncPayload = [];
 
         // Add DNC to the contact.
-        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
         $clientResponse = $this->client->getResponse();
         $dncResponse    = json_decode($clientResponse->getContent(), true);
 
@@ -587,16 +868,40 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(DoNotContact::MANUAL, $dncResponse['contact']['doNotContact'][0]['reason']);
         $this->assertSame($dncChannel, $dncResponse['contact']['doNotContact'][0]['channel']);
 
+        // Check DNC is recorded in the contact activity.
+        $this->client->request('GET', "/api/contacts/{$contactId}/activity");
+        $clientResponse = $this->client->getResponse();
+        self::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $activityResponse = json_decode($clientResponse->getContent(), true);
+        Assert::assertCount(2, $activityResponse['events']); // identified and dnc added events
+        $dncEvents = array_values(array_filter($activityResponse['events'], fn ($event) => 'lead.donotcontact' === $event['event']));
+        Assert::assertCount(1, $dncEvents);
+        Assert::assertSame('Email', $dncEvents[0]['eventLabel']);
+        Assert::assertSame('Contact was manually set as do not contact for this channel.', $dncEvents[0]['details']['dnc']['reason']);
+
         // Remove DNC from the contact.
-        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/remove");
+        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/remove");
         $clientResponse    = $this->client->getResponse();
+        self::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $dncRemoveResponse = json_decode($clientResponse->getContent(), true);
 
+        $this->assertArrayHasKey('contact', $dncRemoveResponse, $clientResponse->getContent());
         $this->assertSame([], $dncRemoveResponse['contact']['doNotContact']);
 
         // Remove the contact.
-        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    private function createCompany(string $name): Company
+    {
+        $company = new Company();
+        $company->setName($name);
+
+        $this->em->persist($company);
+        $this->em->flush();
+
+        return $company;
     }
 }

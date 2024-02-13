@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
@@ -75,6 +76,35 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         Assert::assertSame(404, $response->getStatusCode());
         Assert::assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
+    }
+
+    public function testCompanyLookupWithNoCompanySelected(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=unicorn');
+        $response = $this->client->getResponse();
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertSame('[]', $response->getContent());
+    }
+
+    public function testCompanyLookupWithCompanySelected(): void
+    {
+        $company = new Company();
+        $company->setName('SaaS Company');
+        $this->em->persist($company);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=sa');
+        $response = $this->client->getResponse();
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertSame('[{"text":"SaaS Company","value":"'.$company->getId().'"}]', $response->getContent());
+    }
+
+    public function testCompanyLookupWithNoModelSet(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn', [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        Assert::assertSame(400, $response->getStatusCode());
+        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
     }
 
     public function testSegmentDependencyTree(): void
@@ -321,7 +351,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 

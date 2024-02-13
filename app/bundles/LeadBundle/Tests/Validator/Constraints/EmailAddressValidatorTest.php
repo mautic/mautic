@@ -20,13 +20,13 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
     public function testValidate(?string $value, int $expectedViolationCount): void
     {
         /** @var EmailAddressValidator $emailAddressValidator */
-        $emailAddressValidator = self::$container->get('mautic.validator.emailaddress');
+        $emailAddressValidator = static::getContainer()->get('mautic.validator.emailaddress');
+        \assert($emailAddressValidator instanceof EmailAddressValidator);
 
-        $context = new ExecutionContext(
-            $this->createMock(ValidatorInterface::class),
-            null,
-            $this->createMock(TranslatorInterface::class)
-        );
+        $translator = static::getContainer()->get('translator');
+        \assert($translator instanceof TranslatorInterface);
+
+        $context = new ExecutionContext($this->createMock(ValidatorInterface::class), null, $translator);
 
         $emailAddressValidator->initialize($context);
         $emailAddressValidator->validate($value, new EmailAddress());
@@ -37,7 +37,7 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
     /**
      * @return iterable<mixed[]>
      */
-    public function provider(): iterable
+    public static function Provider(): iterable
     {
         yield [null, 0];
         yield ['', 0];

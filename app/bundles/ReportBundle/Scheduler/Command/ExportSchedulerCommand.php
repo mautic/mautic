@@ -13,37 +13,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends Command
 {
-    /**
-     * @var ReportExporter
-     */
-    private $reportExporter;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(ReportExporter $reportExporter, TranslatorInterface $translator)
-    {
+    public function __construct(
+        private ReportExporter $reportExporter,
+        private TranslatorInterface $translator
+    ) {
         parent::__construct();
-        $this->reportExporter = $reportExporter;
-        $this->translator     = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
             ->setName('mautic:reports:scheduler')
-            ->setDescription('Processes scheduler for report\'s export')
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $report = $input->getOption('report');
@@ -53,7 +36,7 @@ class ExportSchedulerCommand extends Command
         } catch (\InvalidArgumentException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         try {
@@ -64,6 +47,8 @@ class ExportSchedulerCommand extends Command
             $output->writeln('<error>'.$e->getMessage().'</error>');
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Processes scheduler for report\'s export';
 }

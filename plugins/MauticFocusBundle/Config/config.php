@@ -32,7 +32,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'focus',
                 'path'            => '/focus',
-                'controller'      => 'MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController',
+                'controller'      => \MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::class,
             ],
             'mautic_api_focusjs' => [
                 'path'       => '/focus/{id}/js',
@@ -43,19 +43,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.focus.model.focus' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Model\FocusModel::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                    'mautic.page.model.trackable',
-                    'mautic.helper.templating',
-                    'event_dispatcher',
-                    'mautic.lead.model.field',
-                    'mautic.tracker.contact',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.focus.helper.token' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,

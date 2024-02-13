@@ -8,6 +8,8 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,14 +33,14 @@ class PageControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pageData = [
             'title'    => 'Test Page',
             'template' => 'blank',
         ];
 
-        $model = self::$container->get('mautic.page.model.page');
+        $model = static::getContainer()->get('mautic.page.model.page');
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -70,13 +72,14 @@ class PageControllerTest extends MauticMysqlTestCase
             'title'        => 'Page:Page:LandingPageTracking',
             'alias'        => 'page-page-landingPageTracking',
             'template'     => 'blank',
+            'custom_html'  => 'some content',
             'hits'         => 0,
             'unique_hits'  => 0,
             'variant_hits' => 0,
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->connection->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
@@ -85,10 +88,10 @@ class PageControllerTest extends MauticMysqlTestCase
         if (!empty($leadIdsBeforeTest)) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
-        $newLeads = $this->connection->fetchAll($sql);
+        $newLeads = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeads);
         $leadId        = reset($newLeads)['id'];
-        $leadEventLogs = $this->connection->fetchAll('
+        $leadEventLogs = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -101,7 +104,7 @@ class PageControllerTest extends MauticMysqlTestCase
     /**
      * Skipped for now.
      */
-    public function LandingPageTrackingSecondVisit()
+    public function LandingPageTrackingSecondVisit(): void
     {
         $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
@@ -115,7 +118,7 @@ class PageControllerTest extends MauticMysqlTestCase
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->connection->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAllAssociative('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
@@ -123,10 +126,10 @@ class PageControllerTest extends MauticMysqlTestCase
         if (!empty($leadIdsBeforeTest)) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
-        $newLeadsAfterFirstVisit = $this->connection->fetchAll($sql);
+        $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);
         $this->assertCount(1, $newLeadsAfterFirstVisit);
         $leadId                   = reset($newLeadsAfterFirstVisit)['id'];
-        $eventLogsAfterFirstVisit = $this->connection->fetchAll('
+        $eventLogsAfterFirstVisit = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -136,7 +139,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $eventLogsAfterSecondVisit = $this->connection->fetchAll('
+        $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -184,6 +187,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $page->setAlias($alias);
         $page->setIsPublished($isPublished);
         $page->setTemplate($template);
+        $page->setCustomHtml('some content');
 
         $this->em->persist($page);
         $this->em->flush();
@@ -199,7 +203,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
+        $model                  = static::getContainer()->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
@@ -222,17 +226,15 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/pages/results/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
+        $model                  = static::getContainer()->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
     /**
      * Only tests if an actual CSV file is returned.
-     *
-     * @return void
      */
-    public function testCsvIsExportedCorrectly()
+    public function testCsvIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
@@ -249,10 +251,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual Excel file is returned.
-     *
-     * @return void
      */
-    public function testExcelIsExportedCorrectly()
+    public function testExcelIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
@@ -269,10 +269,8 @@ class PageControllerTest extends MauticMysqlTestCase
 
     /**
      * Only tests if an actual HTML file is returned.
-     *
-     * @return void
      */
-    public function testHTMLIsExportedCorrectly()
+    public function testHTMLIsExportedCorrectly(): void
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
@@ -285,5 +283,22 @@ class PageControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/html; charset=UTF-8');
+    }
+
+    public function testSavePageAliasWithUnderscores(): void
+    {
+        /** @var PageModel $pageModel */
+        $pageModel = static::getContainer()->get('mautic.page.model.page');
+
+        $parentPage = new Page();
+        $parentPage->setTitle('This is My Page');
+        $parentPage->setAlias('This_Is_My_Page');
+        $parentPage->setTemplate('blank');
+        $parentPage->setCustomHtml('This is My Page');
+        $pageModel->saveEntity($parentPage);
+
+        $this->client->request(Request::METHOD_GET, '/this_is_my_page');
+        $response = $this->client->getResponse();
+        Assert::assertTrue($response->isOk());
     }
 }
