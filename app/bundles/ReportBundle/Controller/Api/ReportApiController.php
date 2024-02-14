@@ -74,16 +74,9 @@ class ReportApiController extends CommonApiController
         );
     }
 
-    /**
-     * BC just in case a controller is forwarded but shouldn't be used.
-     *
-     * @param $id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getReportAction($id)
+    public function getReportAction(Request $request, int $id): Response
     {
-        return $this->getEntityAction($id);
+        return $this->getEntityAction($request, $id);
     }
 
     /**

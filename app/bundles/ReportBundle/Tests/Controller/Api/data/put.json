@@ -27,7 +27,6 @@
   ],
   "groupBy": null,
   "settings": [],
-  "aggregators": null,
   "isScheduled": true,
   "scheduleUnit": "DAILY",
   "toAddress": "test2@mailinator.com",
