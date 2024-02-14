@@ -50,7 +50,7 @@ class ListController extends FormController
         $session = $request->getSession();
 
         // set some permissions
-        $permissionsToCheck = $this->security->isGranted([
+        $permissionsToCheck = [
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             LeadPermissions::LISTS_EDIT_OWN,
@@ -59,7 +59,7 @@ class ListController extends FormController
             LeadPermissions::LISTS_DELETE_OWN,
             LeadPermissions::LISTS_DELETE_OTHER,
             LeadPermissions::LISTS_FULL,
-        ]);
+        ];
 
         $permissions = $this->security->isGranted($permissionsToCheck, 'RETURN_ARRAY');
 
