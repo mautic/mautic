@@ -84,9 +84,9 @@
                                                 {% else %}
                                                     {% set value = format(cellVal, cellType) %}
                                                     {% if collapse == false %}
-                                                        {{ value }}
+                                                        {{ format(cellVal, cellType) }}
                                                     {% else %}
-                                                        {% set value = htmlEntityDecode(value) %}
+                                                        {% set value = htmlEntityDecode(format(cellVal, cellType)) %}
                                                         <div data-toggle="collapse" data-target="#audit-log-details-{{ startCount }}" class="accordion-toggle" style="cursor: pointer">
                                                             {{ value|length > 50 ? value|slice(0, 50) ~ '...' : value }}
                                                         </div>
