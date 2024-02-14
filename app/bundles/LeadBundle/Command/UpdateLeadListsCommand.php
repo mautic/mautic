@@ -47,6 +47,13 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Measure timing of build with output to CLI .',
                 false
+            )
+            ->addOption(
+                'exclude',
+                'd',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude a specific segment from being rebuilt. Otherwise, all segments will be rebuilt.',
+                []
             );
 
         parent::configure();
@@ -65,6 +72,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
+        $excludeSegments       = $input->getOption('exclude');
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
@@ -100,11 +108,26 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
             }
         } else {
-            $leadLists = $listModel->getEntities(
-                [
-                    'iterator_mode' => true,
-                ]
-            );
+            $filter = [
+                'iterator_mode' => true,
+            ];
+
+            if (!is_array($excludeSegments) && is_numeric($excludeSegments)) {
+                $excludeSegments = [$excludeSegments];
+            }
+
+            if (is_array($excludeSegments) && count($excludeSegments) > 0) {
+                $filter['filter'] = [
+                    'force' => [
+                        [
+                            'expr'   => 'notIn',
+                            'column' => $listModel->getRepository()->getTableAlias().'.id',
+                            'value'  => $excludeSegments,
+                        ],
+                    ],
+                ];
+            }
+            $leadLists = $listModel->getEntities($filter);
 
             while (false !== ($leadList = $leadLists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0

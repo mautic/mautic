@@ -62,6 +62,7 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
         coverage: pcov
         ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~"
+        tools: composer:2.6.6 # see https://github.com/composer/composer/issues/11736
 
     - name: add MySQL config file
       run: |
@@ -159,6 +160,7 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        tools: composer:2.6.6 # see https://github.com/composer/composer/issues/11736
 
     - name: Install dependencies
       run: |
