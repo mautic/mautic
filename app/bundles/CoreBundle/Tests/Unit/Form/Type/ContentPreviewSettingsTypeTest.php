@@ -37,7 +37,6 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->security   = $this->createMock(CorePermissions::class);
         $this->form       = new ContentPreviewSettingsType($this->translator, $this->security);
-
         parent::setUp();
     }
 
@@ -75,39 +74,6 @@ class ContentPreviewSettingsTypeTest extends TestCase
         self::assertSame('content_preview_settings', $this->form->getBlockPrefix());
     }
 
-    public function testBuildFormWithTranslationAndVariantFieldNotAvailable(): void
-    {
-        $objectId = 1;
-        $options  = [
-            'objectId'      => $objectId,
-            'translations'  => [
-                'children' => [],
-            ],
-            'variants'     => [
-                'children' => [],
-            ],
-        ];
-
-        $this->translator->expects(self::exactly(2))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.lead.list.form.startTyping'],
-                ['mautic.core.form.nomatches']
-            )->willReturnOnConsecutiveCalls(
-                'startTyping',
-                'nomatches'
-            );
-
-        $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::once())
-            ->method('add')
-            ->withConsecutive(
-                $this->getContactFieldDefinition()
-            );
-
-        $this->form->buildForm($builder, $options);
-    }
-
     public function testBuildFormWithTranslationAndVariantFieldNotAvailableAndNoAccessPermissions(): void
     {
         $objectId = 1;
@@ -130,6 +96,8 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(false);
 
         $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::never())
+            ->method('add');
         $this->form->buildForm($builder, $options);
     }
 
@@ -191,7 +159,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects(self::once())
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother')
-            ->willReturn(false);
+            ->willReturn(true);
 
         $this->translator->expects(self::exactly(2))
             ->method('trans')
@@ -268,6 +236,10 @@ class ContentPreviewSettingsTypeTest extends TestCase
                 ],
             ],
         ];
+
+        $this->security->expects(self::once())
+            ->method('isAdmin')
+            ->willReturn(true);
 
         $this->translator->expects(self::exactly(4))
             ->method('trans')

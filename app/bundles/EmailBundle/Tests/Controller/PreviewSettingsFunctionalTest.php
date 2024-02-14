@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +14,7 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
     {
         $emailMain = new Email();
         $emailMain->setIsPublished(true);
-        $emailMain->setDateAdded(new DateTime());
+        $emailMain->setDateAdded(new \DateTime());
         $emailMain->setName('Preview settings test');
         $emailMain->setSubject('email-main');
         $emailMain->setTemplate('Blank');
@@ -52,7 +51,7 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 
         $emailTranslated = new Email();
         $emailTranslated->setIsPublished(true);
-        $emailTranslated->setDateAdded(new DateTime());
+        $emailTranslated->setDateAdded(new \DateTime());
         $emailTranslated->setName('Preview settings test - NL translation');
         $emailTranslated->setSubject('page-trans-nl');
         $emailTranslated->setTemplate('Blank');
@@ -65,7 +64,7 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 
         $emailVariant = new Email();
         $emailVariant->setIsPublished(true);
-        $emailVariant->setDateAdded(new DateTime());
+        $emailVariant->setDateAdded(new \DateTime());
         $emailVariant->setName('Preview settings test - B variant');
         $emailVariant->setSubject('page-variant-b');
         $emailVariant->setTemplate('Blank');

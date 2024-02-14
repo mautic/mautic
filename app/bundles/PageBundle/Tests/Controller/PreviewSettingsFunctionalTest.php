@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +14,7 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
     {
         $pageMain = new Page();
         $pageMain->setIsPublished(true);
-        $pageMain->setDateAdded(new DateTime());
+        $pageMain->setDateAdded(new \DateTime());
         $pageMain->setTitle('Preview settings test - main page');
         $pageMain->setAlias('page-main');
         $pageMain->setTemplate('Blank');
@@ -52,7 +51,7 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 
         $pageTranslated = new Page();
         $pageTranslated->setIsPublished(true);
-        $pageTranslated->setDateAdded(new DateTime());
+        $pageTranslated->setDateAdded(new \DateTime());
         $pageTranslated->setTitle('Preview settings test - NL translation');
         $pageTranslated->setAlias('page-trans-nl');
         $pageTranslated->setTemplate('Blank');
@@ -65,7 +64,7 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 
         $pageVariant = new Page();
         $pageVariant->setIsPublished(true);
-        $pageVariant->setDateAdded(new DateTime());
+        $pageVariant->setDateAdded(new \DateTime());
         $pageVariant->setTitle('Preview settings test - B variant');
         $pageVariant->setAlias('page-variant-b');
         $pageVariant->setTemplate('Blank');
