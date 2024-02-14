@@ -53,12 +53,9 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function contactListAction(Request $request): JsonResponse
+    public function contactListAction(Request $request, LeadModel $model): JsonResponse
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-
-        /** @var LeadModel $model */
-        $model     = $this->getModel('lead.lead');
         $results   = $model->getLookupResults('contact', $filter);
 
         $results['success'] = 1;
@@ -66,7 +63,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($results);
     }
 
-    protected function getLeadIdsByFieldValueAction(Request $request): JsonResponse
+    public function getLeadIdsByFieldValueAction(Request $request, LeadModel $leadModel): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
         $value     = InputHelper::clean($request->query->get('value'));
@@ -74,8 +71,6 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['items' => []];
 
         if ($field && $value) {
-            $leadModel = $this->getModel('lead.lead');
-            \assert($leadModel instanceof LeadModel);
             $repo                       = $leadModel->getRepository();
             $leads                      = $repo->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';

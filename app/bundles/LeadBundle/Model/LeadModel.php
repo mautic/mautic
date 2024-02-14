@@ -654,7 +654,7 @@ class LeadModel extends FormModel
                 /** @var Lead $fetchResult */
                 foreach ($fetchResults as $fetchResult) {
                     $results[] = [
-                        'value' => $fetchResult->getName(),
+                        'value' => $fetchResult->getName() ?: $fetchResult->getEmail(),
                         'id'    => $fetchResult->getId(),
                     ];
                 }

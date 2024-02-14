@@ -80,7 +80,7 @@ class ContentPreviewSettingsType extends AbstractType
     }
 
     /**
-     * @param array<mixed> $variants
+     * @param mixed[] $variants
      */
     private function addTranslationOrVariantChoicesElement(
         FormBuilderInterface $builder,
