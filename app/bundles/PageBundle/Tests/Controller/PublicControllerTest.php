@@ -42,6 +42,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class PublicControllerTest extends MauticMysqlTestCase
 {
@@ -270,7 +271,7 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->request->attributes->set('ignore_mismatch', true);
 
-        $router               = $this->createMock(Router::class);
+        $router               = $this->createMock(RouterInterface::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);

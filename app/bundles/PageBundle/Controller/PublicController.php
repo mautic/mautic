@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class PublicController extends AbstractFormController
 {
@@ -48,7 +48,7 @@ class PublicController extends AbstractFormController
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         Tracking404Model $tracking404Model,
-        Router $router,
+        RouterInterface $router,
         $slug)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */

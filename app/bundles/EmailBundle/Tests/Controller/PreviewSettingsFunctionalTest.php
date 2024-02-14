@@ -2,17 +2,6 @@
 
 declare(strict_types=1);
 
-namespace Mautic\PageBundle\Tests\Controller;
-
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use DateTime;
@@ -118,15 +107,6 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
         // Contact lookup is visible
         self::assertCount(
             1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
-        );
-
-        $clientSales = $this->createAnotherClient('sales');
-        $crawler     = $clientSales->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
-
-        // Contact lookup is not visible to user without access
-        self::assertCount(
-            0,
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
     }

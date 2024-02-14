@@ -11,7 +11,7 @@ class PageDisplayEvent extends Event
     /**
      * Preferred lead to be used in listeners.
      */
-    private ?Lead $lead;
+    private ?Lead $lead = null;
 
     public function __construct(
         private string $content,
