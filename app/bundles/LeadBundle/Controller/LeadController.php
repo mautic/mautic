@@ -1413,7 +1413,6 @@ class LeadController extends FormController
                     if (!empty($bodyCheck)) {
                         $mailer = $mailHelper->getMailer();
 
-                        // To lead
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
@@ -1432,11 +1431,8 @@ class LeadController extends FormController
                         // Set Content
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
-
-                        // Set lead
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-
                         $mailer->setSubject($email['subject']);
 
                         // Ensure safe emoji for notification
