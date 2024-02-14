@@ -99,8 +99,9 @@
                                                 <pre id="pre-audit-log-details-{{ startCount }}"></pre>
                                             </div>
                                             <script>
-                                                let txt = document.createElement("textarea");
-                                                txt.innerHTML = '{{ value }}';
+                                                var txt = document.createElement("textarea");
+                                                txt.innerHTML = '{{ (value) }}';
+                                                console.log(txt.value);
                                                 document.getElementById('pre-audit-log-details-{{ startCount }}').textContent
                                                     = JSON.stringify(JSON.parse((txt.value)), undefined, 2);
                                             </script>
