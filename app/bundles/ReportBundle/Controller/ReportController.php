@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Mautic\CoreBundle\EventListener\ReportSubscriber;
 
 class ReportController extends FormController
 {
@@ -63,6 +65,10 @@ class ReportController extends FormController
 
         if (!$permissions['report:reports:viewother']) {
             $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+        }
+
+        if (!$this->security->isAdmin()) {
+            $filter['force'][] = ['column' => 'r.source', 'expr' => 'neq', 'value' => ReportSubscriber::CONTEXT_AUDIT_LOG];
         }
 
         $orderBy    = $request->getSession()->get('mautic.report.orderby', 'r.dateModified');
