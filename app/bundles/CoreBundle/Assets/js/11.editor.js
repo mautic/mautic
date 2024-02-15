@@ -326,8 +326,7 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
                         target: '_blank',
                         rel: 'noopener noreferrer'
                     }
-                },
-                defaultProtocol: 'https://'
+                }
             }
         }
     };
