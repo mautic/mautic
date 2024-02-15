@@ -1,5 +1,6 @@
 import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
+import grapesjscustomcode from 'grapesjs-custom-code';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
@@ -186,11 +187,25 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', grapesjscustomcode],
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
+        [grapesjscustomcode]: {
+          blockCustomCode: {
+            label: 'Custom Code',
+            category: 'Blocks' // move to existing category
+          },
+          propsCustomCode: {
+            name: 'Custom Code',
+            components: '<span>Initial content</span>',
+            attributes: {
+              'data-gjs-type': 'custom-code', // make sure our block remains editable after saving & reopening
+              'style': 'font-size: initial;' // make sure the content doesn't inherrit size 0 from the column
+            }
+          }
+        }
       },
     });
 

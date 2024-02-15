@@ -263,3 +263,9 @@ html {
   display: inline-block;
   opacity: 0.5;
 }
+
+/* overrides for the icons that are SVGs */
+
+.gjs-pn-panel .gjs-block__media svg {
+  max-height: 42px;
+}
