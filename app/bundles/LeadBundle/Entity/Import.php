@@ -905,7 +905,7 @@ class Import extends FormEntity
      *
      * @return array{labels: mixed[], datasets: mixed[]}
      */
-    public function getRowStatusesPieChart(Translator $translator)
+    public function getRowStatusesPieChart(Translator $translator): array
     {
         $chart = new PieChart();
         $chart->setDataset($translator->trans('mautic.lead.import.inserted.count'), $this->getInsertedCount());
