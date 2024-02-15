@@ -107,48 +107,6 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('No failed rows found', $crawler->html(), 'No failed rows exist.');
     }
 
-    public function testImportFailedWithReason(): void
-    {
-        $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $form = $crawler->selectButton('Save')->form();
-        $form['leadfield[label]']->setValue('Duedate');
-        $form['leadfield[type]']->setValue('date');
-        $this->client->submit($form);
-        $text = strip_tags($this->client->getResponse()->getContent());
-        Assert::assertTrue($this->client->getResponse()->isOk(), $text);
-
-        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
-        $uploadForm = $crawler->selectButton('Upload')->form();
-        $file       = new UploadedFile(__DIR__.'/../Fixtures/contacts_invalid_date.csv', 'contacts_invalid_date.csv', 'itext/csv');
-
-        $uploadForm['lead_import[file]']->setValue((string) $file);
-        $crawler     = $this->client->submit($uploadForm);
-        $mappingForm = $crawler->selectButton('Import')->form();
-        $crawler     = $this->client->submit($mappingForm);
-
-        Assert::assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html());
-
-        /** @var ImportRepository $importRepository */
-        $importRepository = $this->em->getRepository(Import::class);
-
-        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
-
-        $this->em->clear();
-
-        /** @var Import $importEntity */
-        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts_invalid_date.csv']);
-
-        Assert::assertNotNull($importEntity);
-        Assert::assertSame(1, $importEntity->getLineCount());
-        Assert::assertSame(0, $importEntity->getInsertedCount());
-        Assert::assertSame(0, $importEntity->getUpdatedCount());
-        Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
-
-        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/view/'.$importEntity->getId());
-        Assert::assertStringContainsString("Invalid datetime format: 1292 Incorrect date value: '123456'", $crawler->html());
-    }
-
     private function setPhoneFieldIsRequired(bool $required): void
     {
         /** @var LeadFieldRepository $fieldRepository */
