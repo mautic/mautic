@@ -101,7 +101,6 @@
                                             <script>
                                                 var txt = document.createElement("textarea");
                                                 txt.innerHTML = '{{ (value) }}';
-                                                console.log(txt.value);
                                                 document.getElementById('pre-audit-log-details-{{ startCount }}').textContent
                                                     = JSON.stringify(JSON.parse((txt.value)), undefined, 2);
                                             </script>
