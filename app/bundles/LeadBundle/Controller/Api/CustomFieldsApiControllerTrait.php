@@ -2,13 +2,13 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,9 +18,16 @@ trait CustomFieldsApiControllerTrait
     private ?RequestStack $requestStack = null;
 
     /**
+     * @var mixed[]
+     */
+    private $fieldCache = [];
+
+    /**
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
-     * @param Lead $entity
+     * @param mixed[]      $parameters
+     * @param Lead|Company $entity
+     * @param string       $action
      *
      * @return mixed|void
      */
@@ -71,6 +78,11 @@ trait CustomFieldsApiControllerTrait
         }
     }
 
+    /**
+     * @param mixed[] $fields
+     *
+     * @return mixed[]
+     */
     private function fixNumbers(array $fields): array
     {
         $numberFields = [];
@@ -116,7 +128,15 @@ trait CustomFieldsApiControllerTrait
     protected function getEntityFormOptions(): array
     {
         $object = ('company' === $this->entityNameOne) ? 'company' : 'lead';
-        $fields = $this->getModel('lead.field')->getEntities(
+
+        if (isset($this->fieldCache[$object])) {
+            return $this->fieldCache[$object];
+        }
+
+        $model = $this->getModel('lead.field');
+        \assert($model instanceof FieldModel);
+
+        $fields = $model->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -136,15 +156,20 @@ trait CustomFieldsApiControllerTrait
                 'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
+        \assert($fields instanceof Paginator);
 
-        return ['fields' => $fields];
+        $this->fieldCache[$object] = ['fields' => $fields->getIterator()];
+
+        return $this->fieldCache[$object];
     }
 
     /**
      * @param Lead|Company $entity
      * @param Form         $form
-     * @param array        $parameters
+     * @param mixed[]      $parameters
      * @param bool         $isPostOrPatch
+     *
+     * @return bool|void
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
@@ -185,6 +210,8 @@ trait CustomFieldsApiControllerTrait
 
     /**
      * @param string $object
+     *
+     * @return void
      */
     protected function setCleaningRules($object = 'lead')
     {
@@ -193,7 +220,7 @@ trait CustomFieldsApiControllerTrait
         $fields = $leadFieldModel->getFieldListWithProperties($object);
         foreach ($fields as $field) {
             if (!empty($field['properties']['allowHtml'])) {
-                $this->dataInputMasks[$field['alias']]  = 'html';
+                $this->dataInputMasks[$field['alias']]  = 'html'; /** @phpstan-ignore-line this is accessing a property from the parent class. Terrible. Refactor for M6. */
             }
         }
     }

@@ -2,7 +2,7 @@ includes:
 	- phpstan-baseline.neon
 
 parameters:
-	tmpDir: ./var/cache/phpstan
+	tmpDir: ./var/phpstan-cache
 	level: 6
 	reportUnmatchedIgnoredErrors: false
 	checkGenericClassInNonGenericObjectType: false

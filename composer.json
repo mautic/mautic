@@ -133,7 +133,7 @@
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
     "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=4G bin/phpstan analyse --ansi",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
-    "fixcs": "bin/php-cs-fixer fix",
+    "fixcs": "bin/php-cs-fixer fix -v",
     "rector": "bin/rector process --ansi",
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",

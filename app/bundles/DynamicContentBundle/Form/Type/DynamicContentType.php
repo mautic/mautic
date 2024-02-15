@@ -133,16 +133,14 @@ class DynamicContentType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'description',
-                TextareaType::class,
-                [
-                    'label'      => 'mautic.dynamicContent.description',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
-                    'required'   => false,
-                ]
-            )
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.dynamicContent.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);

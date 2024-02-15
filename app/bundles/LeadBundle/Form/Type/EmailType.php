@@ -28,7 +28,7 @@ class EmailType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'raw']));
 
         $builder->add(
             'subject',
