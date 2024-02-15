@@ -903,7 +903,7 @@ class Import extends FormEntity
     /**
      * Get pie graph data for row status counts.
      *
-     * @return array
+     * @return array{labels: mixed[], datasets: mixed[]}
      */
     public function getRowStatusesPieChart(Translator $translator)
     {
