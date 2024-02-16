@@ -12,6 +12,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData;
@@ -21,7 +22,6 @@ use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use PHPUnit\Framework\Assert;
-use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
@@ -229,13 +229,13 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         return $reference;
     }
 
-    public function testSegmentRebuildCommandFailsOnMissingTable()
+    public function testSegmentRebuildCommandFailsOnMissingTable(): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
+        $contactSegmentService = $this->getContainer()->get('mautic.lead.model.lead_segment_service');
         $reference             = $this->fixtures->getReference('table-name-missing-in-filter');
 
         $this->expectException(TableNotFoundException::class);
-        $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($reference);
+        $contactSegmentService->getTotalLeadListLeadsCount($reference);
     }
 }
