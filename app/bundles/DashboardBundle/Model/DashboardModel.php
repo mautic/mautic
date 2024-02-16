@@ -33,7 +33,7 @@ class DashboardModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         private PathsHelper $pathsHelper,
-        private WidgetDetailEventFactory $eventFactory,
+        private WidgetDetailEventFactory $widgetEventFactory,
         private Filesystem $filesystem,
         private RequestStack $requestStack,
         EntityManagerInterface $em,
@@ -199,7 +199,7 @@ class DashboardModel extends FormModel
     {
         $event = $this->widgetEventFactory->create($widget, $this->userHelper->getUser()->getId());
 
-        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD, $event);
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD);
     }
 
     /**
