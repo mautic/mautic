@@ -48,6 +48,7 @@ class EmailSendEvent extends CommonEvent
     private bool $fatal = false;
 
     private bool $skip = false;
+
     /**
      * @var array<string>
      */
