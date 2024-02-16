@@ -143,9 +143,9 @@ class DashboardModel extends FormModel
     /**
      * Fill widgets with their empty content.
      *
-     * @param array $widgets
+     * @param array<mixed> $widgets
      */
-    public function populateWidgetPreviews(&$widgets)
+    public function populateWidgetPreviews(&$widgets): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -192,12 +192,10 @@ class DashboardModel extends FormModel
 
     /**
      * Populate widget preview.
-     *
-     * @param Widget $widget
      */
-    public function populateWidgetPreview(Widget $widget)
+    public function populateWidgetPreview(Widget $widget): void
     {
-        $event = $this->widgetEventFactory->create($widget, $this->userHelper->getUser()->getId());
+        $event = $this->widgetEventFactory->create($widget);
 
         $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD);
     }

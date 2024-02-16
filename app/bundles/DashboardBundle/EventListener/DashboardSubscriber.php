@@ -44,11 +44,9 @@ class DashboardSubscriber implements EventSubscriberInterface
     /**
      * Generates widget preview without data.
      *
-     * @param WidgetDetailEvent $event
-     *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function onWidgetDetailPreLoad(WidgetDetailEvent $event)
+    public function onWidgetDetailPreLoad(WidgetDetailEvent $event): void
     {
         $event->setTemplate('@MauticCore/Helper/chart.html.twig');
         $event->stopPropagation();

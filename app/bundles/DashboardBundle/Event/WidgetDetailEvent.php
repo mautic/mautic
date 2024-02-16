@@ -44,20 +44,16 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Act as widget preview without data.
-     *
-     * @param $isPreview
      */
-    public function setPreview($isPreview)
+    public function setPreview(bool $isPreview): void
     {
         $this->isPreview = $isPreview;
     }
 
     /**
      * Is preview without data?
-     *
-     * @return bool
      */
-    public function isPreview()
+    public function isPreview(): bool
     {
         return $this->isPreview;
     }

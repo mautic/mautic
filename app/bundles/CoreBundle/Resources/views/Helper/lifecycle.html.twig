@@ -22,7 +22,7 @@
         <div style="height:{{ chartHeight / 2.3 }}px;">
             {% if  chartType is defined %}
           <canvas class="chart {{ chartType }}-chart" style="font-size:9px!important;">{{ chartData|json_encode }}</canvas>
-            {% if endif %}
+            {% endif %}
         </div>
         <div class="legend" style="font-size: 9px;"></div>
       </div>
