@@ -160,7 +160,8 @@ class TriggerController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @param \Mautic\PointBundle\Entity\Trigger $entity
+     * @param Trigger      $entity
+     * @param array<mixed> $triggerEvents
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -170,7 +171,7 @@ class TriggerController extends FormController
         $model = $this->getModel('point.trigger');
 
         if (!($entity instanceof Trigger)) {
-            /** @var \Mautic\PointBundle\Entity\Trigger $entity */
+            /** @var Trigger $entity */
             $entity = $model->getEntity();
         }
 
