@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class TriggerEvent
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 

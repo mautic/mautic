@@ -160,7 +160,8 @@ class TriggerController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @param Trigger $entity
+     * @param Trigger      $entity
+     * @param array<mixed> $triggerEvents
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
