@@ -4,10 +4,7 @@ namespace Mautic\StatsBundle\Event\Options;
 
 class FetchOptions
 {
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options = [];
 
     /**
      * @var int|null
@@ -49,7 +46,6 @@ class FetchOptions
 
     /**
      * @param string $key
-     * @param null   $default
      *
      * @return mixed
      */

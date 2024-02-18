@@ -17,17 +17,22 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class ContactSegmentQueryBuilder is responsible for building queries for segments.
+ * Responsible for building queries for segments.
  */
 class ContactSegmentQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
-    /** @var array Contains segment edges mapping */
-    private $dependencyMap = [];
+    /**
+     * @var array Contains segment edges mapping
+     */
+    private array $dependencyMap = [];
 
-    public function __construct(private EntityManager $entityManager, private RandomParameterName $randomParameterName, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EntityManager $entityManager,
+        private RandomParameterName $randomParameterName,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

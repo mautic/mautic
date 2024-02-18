@@ -129,5 +129,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Pushes Mautic translation resources to Transifex';
 }

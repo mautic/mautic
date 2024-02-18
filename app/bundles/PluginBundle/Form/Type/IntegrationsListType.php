@@ -11,15 +11,16 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class IntegrationsListType extends AbstractType
 {
-    public function __construct(private IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        private IntegrationHelper $integrationHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
@@ -121,9 +122,6 @@ class IntegrationsListType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $formModifier);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['supported_features']);
@@ -134,9 +132,6 @@ class IntegrationsListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'integration_list';

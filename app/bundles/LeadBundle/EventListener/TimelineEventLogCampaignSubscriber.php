@@ -18,16 +18,16 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
-    public function __construct(LeadEventLogRepository $eventLogRepository, private UserHelper $userHelper, Translator $translator)
-    {
+    public function __construct(
+        LeadEventLogRepository $eventLogRepository,
+        private UserHelper $userHelper,
+        Translator $translator
+    ) {
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_LEADCHANGE     => 'onChange',

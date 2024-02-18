@@ -13,14 +13,13 @@ class FormExitSubscriber implements EventSubscriberInterface
      * @param string $model
      * @param array  $options
      */
-    public function __construct(private $model, private $options = [])
-    {
+    public function __construct(
+        private $model,
+        private $options = []
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [FormEvents::PRE_SET_DATA => 'preSetData'];
     }

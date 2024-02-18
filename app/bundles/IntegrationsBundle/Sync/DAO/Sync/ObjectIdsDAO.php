@@ -20,7 +20,7 @@ class ObjectIdsDAO
      *
      * @var array[]
      */
-    private $objects = [];
+    private array $objects = [];
 
     /**
      * Expected $cliOptions structure:

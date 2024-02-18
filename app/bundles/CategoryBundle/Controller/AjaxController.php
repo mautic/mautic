@@ -9,10 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function categoryListAction(Request $request)
+    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $bundle        = InputHelper::clean($request->query->get('bundle'));
         $filter        = InputHelper::clean($request->query->get('filter'));

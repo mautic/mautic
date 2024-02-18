@@ -8,22 +8,15 @@ class InputHelper
 {
     /**
      * String filter.
-     *
-     * @var InputFilter
      */
-    private static $stringFilter;
+    private static ?\Joomla\Filter\InputFilter $stringFilter = null;
 
     /**
      * HTML filter.
-     *
-     * @var InputFilter
      */
-    private static $htmlFilter;
+    private static ?\Joomla\Filter\InputFilter $htmlFilter = null;
 
-    /**
-     * @var InputFilter
-     */
-    private static $strictHtmlFilter;
+    private static ?\Joomla\Filter\InputFilter $strictHtmlFilter = null;
 
     /**
      * Adjust the boolean values from text to boolean.
@@ -424,8 +417,7 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
-            // detect if there is any unicode character in the passed string
-            $hasUnicode = strlen($value) != strlen(utf8_decode($value));
+            $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
 
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 
@@ -471,8 +463,6 @@ class InputHelper
 
     /**
      * Allows tags 'b', 'i', 'u', 'em', 'strong', 'a', 'span'.
-     *
-     * @param $data
      *
      * @return mixed|string
      */

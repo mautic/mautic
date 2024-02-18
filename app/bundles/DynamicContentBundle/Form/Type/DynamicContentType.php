@@ -33,6 +33,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<DynamicContent>
+ */
 class DynamicContentType extends AbstractType
 {
     private $fieldChoices;
@@ -66,13 +69,20 @@ class DynamicContentType extends AbstractType
      */
     private array $deviceOsChoices;
 
-    private $tagChoices = [];
+    /**
+     * @var array<string, string>
+     */
+    private array $tagChoices = [];
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(private EntityManager $em, ListModel $listModel, private TranslatorInterface $translator, private LeadModel $leadModel)
-    {
+    public function __construct(
+        private EntityManager $em,
+        ListModel $listModel,
+        private TranslatorInterface $translator,
+        private LeadModel $leadModel
+    ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
@@ -123,16 +133,14 @@ class DynamicContentType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'description',
-                TextareaType::class,
-                [
-                    'label'      => 'mautic.dynamicContent.description',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
-                    'required'   => false,
-                ]
-            )
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.dynamicContent.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
@@ -300,9 +308,6 @@ class DynamicContentType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields']       = $this->fieldChoices;

@@ -122,8 +122,6 @@ class ObjectMapping
     }
 
     /**
-     * ObjectMapping constructor.
-     *
      * @throws \Exception
      */
     public function __construct(?\DateTime $dateCreated = null)

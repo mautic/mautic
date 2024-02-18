@@ -18,24 +18,19 @@ class FieldBuilder
 {
     private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
 
-    /**
-     * @var array
-     */
-    private $mauticObject;
+    private ?array $mauticObject = null;
 
-    /**
-     * @var RequestObjectDAO
-     */
-    private $requestObject;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO $requestObject = null;
 
-    public function __construct(private Router $router, private FieldHelper $fieldHelper, private ContactObjectHelper $contactObjectHelper)
-    {
+    public function __construct(
+        private Router $router,
+        private FieldHelper $fieldHelper,
+        private ContactObjectHelper $contactObjectHelper
+    ) {
         $this->valueNormalizer = new ValueNormalizer();
     }
 
     /**
-     * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
     public function buildObjectField(
@@ -44,7 +39,7 @@ class FieldBuilder
         RequestObjectDAO $requestObject,
         string $integration,
         string $defaultState = ReportFieldDAO::FIELD_CHANGED
-    ) {
+    ): ReportFieldDAO {
         $this->mauticObject  = $mauticObject;
         $this->requestObject = $requestObject;
 

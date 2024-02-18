@@ -12,12 +12,14 @@ class EmailOpenEvent extends CommonEvent
     private ?\Mautic\EmailBundle\Entity\Email $email;
 
     /**
-     * @param Email   $email
      * @param Request $request
      * @param bool    $firstTime
      */
-    public function __construct(Stat $stat, private $request, private $firstTime = false)
-    {
+    public function __construct(
+        Stat $stat,
+        private $request,
+        private $firstTime = false
+    ) {
         $this->entity    = $stat;
         $this->email     = $stat->getEmail();
     }

@@ -116,7 +116,7 @@ class AuthenticationEvent extends Event
     {
         $this->token                 = $token;
         $this->authenticatingService = $service;
-        $this->isAuthenticated       = $token->isAuthenticated();
+        $this->isAuthenticated       = null !== $token->getUser();
 
         $this->stopPropagation();
     }
@@ -253,10 +253,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Check if this is a form login authentication request or pre-auth.
-     *
-     * @return bool
      */
-    public function isFormLogin()
+    public function isFormLogin(): bool
     {
         return $this->isFormLogin;
     }

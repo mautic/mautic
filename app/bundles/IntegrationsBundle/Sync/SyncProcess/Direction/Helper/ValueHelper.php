@@ -11,20 +11,11 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 class ValueHelper
 {
-    /**
-     * @var NormalizedValueDAO
-     */
-    private $normalizedValueDAO;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO $normalizedValueDAO = null;
 
-    /**
-     * @var string
-     */
-    private $fieldState;
+    private ?string $fieldState = null;
 
-    /**
-     * @var string
-     */
-    private $syncDirection;
+    private ?string $syncDirection = null;
 
     /**
      * @throws InvalidValueException

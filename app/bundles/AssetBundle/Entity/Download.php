@@ -64,15 +64,15 @@ class Download
      */
     private $email;
 
-    private ?string $utmCampaign;
+    private ?string $utmCampaign = null;
 
-    private ?string $utmContent;
+    private ?string $utmContent = null;
 
-    private ?string $utmMedium;
+    private ?string $utmMedium = null;
 
-    private ?string $utmSource;
+    private ?string $utmSource = null;
 
-    private ?string $utmTerm;
+    private ?string $utmTerm = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

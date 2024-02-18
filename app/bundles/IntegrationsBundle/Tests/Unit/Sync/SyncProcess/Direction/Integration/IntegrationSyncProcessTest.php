@@ -31,22 +31,22 @@ class IntegrationSyncProcessTest extends TestCase
     /**
      * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
      * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $mappingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
     /**
      * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectChangeGenerator;
+    private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
 
     /**
      * @var SyncDataExchangeInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
     protected function setUp(): void
     {

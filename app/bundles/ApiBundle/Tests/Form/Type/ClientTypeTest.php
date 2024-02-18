@@ -19,45 +19,42 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientTypeTest extends TestCase
 {
-    /**
-     * @var ClientType
-     */
-    private $clientType;
+    private \Mautic\ApiBundle\Form\Type\ClientType $clientType;
 
     /**
      * @var RequestStack
      */
-    private $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
 
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var ValidatorInterface
      */
-    private $validator;
+    private \PHPUnit\Framework\MockObject\MockObject $validator;
 
     /**
      * @var Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var RouterInterface
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var FormBuilderInterface
      */
-    private $builder;
+    private \PHPUnit\Framework\MockObject\MockObject $builder;
 
     /**
      * @var Request
      */
-    private $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
     private Client $client;
 

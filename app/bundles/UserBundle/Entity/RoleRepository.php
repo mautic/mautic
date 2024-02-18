@@ -55,10 +55,7 @@ class RoleRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -70,9 +67,6 @@ class RoleRepository extends CommonRepository
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
@@ -148,9 +142,9 @@ class RoleRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.user.user.searchcommand.isadmin',
@@ -160,9 +154,6 @@ class RoleRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -170,10 +161,7 @@ class RoleRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'r';
     }

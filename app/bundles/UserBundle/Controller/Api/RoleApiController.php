@@ -43,8 +43,6 @@ class RoleApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
      * @param string                         $action
      */

@@ -8,10 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class StageActionListType extends AbstractType
 {
-    public function __construct(private StageModel $model)
-    {
+    public function __construct(
+        private StageModel $model
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -32,16 +36,13 @@ class StageActionListType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string
      */
     public function getParent()
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'stageaction_list';

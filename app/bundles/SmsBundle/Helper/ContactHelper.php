@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -10,8 +11,11 @@ use Mautic\SmsBundle\Exception\NumberNotFoundException;
 
 class ContactHelper
 {
-    public function __construct(private LeadRepository $leadRepository, private Connection $connection, private PhoneNumberHelper $phoneNumberHelper)
-    {
+    public function __construct(
+        private LeadRepository $leadRepository,
+        private Connection $connection,
+        private PhoneNumberHelper $phoneNumberHelper
+    ) {
     }
 
     /**
@@ -34,7 +38,7 @@ class ContactHelper
                     'l.phone IN (:numbers)'
                 )
             )
-            ->setParameter('numbers', $searchForNumbers, Connection::PARAM_STR_ARRAY)
+            ->setParameter('numbers', $searchForNumbers, ArrayParameterType::STRING)
             ->executeQuery()
             ->fetchAllAssociative();
 

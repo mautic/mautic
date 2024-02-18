@@ -14,12 +14,17 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class FilterType extends AbstractType
 {
     use FilterTrait;
 
-    public function __construct(private FormAdjustmentsProviderInterface $formAdjustmentsProvider, private ListModel $listModel)
-    {
+    public function __construct(
+        private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        private ListModel $listModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -133,8 +138,8 @@ class FilterType extends AbstractType
      * to keep BC for segments created before the properties form was added and the fitler and display
      * fields were moved there.
      *
-     * @param FormInterface<FormInterface> $filterPropertiesType
-     * @param mixed[]                      $data
+     * @param FormInterface<mixed> $filterPropertiesType
+     * @param mixed[]              $data
      */
     private function setPropertiesFormData(FormInterface $filterPropertiesType, array $data): void
     {

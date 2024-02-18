@@ -15,19 +15,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $assetToken = '{assetlink=(.*?)}';
+    private string $assetToken = '{assetlink=(.*?)}';
 
-    public function __construct(private CorePermissions $security, private TokenHelper $tokenHelper, private ContactTracker $contactTracker, private BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private TokenHelper $tokenHelper,
+        private ContactTracker $contactTracker,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onBuilderBuild', 0],
@@ -71,13 +69,12 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     /**
      * @param PageDisplayEvent|EmailSendEvent $event
-     * @param int                             $leadId
      * @param array                           $source
-     * @param null                            $emailId
+     * @param int|null                        $emailId
      *
      * @return mixed[]
      */
-    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null): array
+    private function generateTokensFromContent($event, ?int $leadId, $source = [], $emailId = null): array
     {
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = [

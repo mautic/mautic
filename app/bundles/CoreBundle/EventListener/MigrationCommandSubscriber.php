@@ -15,11 +15,14 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class MigrationCommandSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private VersionProviderInterface $versionProvider, private GeneratedColumnsProviderInterface $generatedColumnsProvider, private Connection $connection)
-    {
+    public function __construct(
+        private VersionProviderInterface $versionProvider,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private Connection $connection
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['addGeneratedColumns'],
@@ -67,7 +70,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
 
     private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn): bool
     {
-        $tableColumns = $this->connection->getSchemaManager()->listTableColumns($generatedColumn->getTableName());
+        $tableColumns = $this->connection->createSchemaManager()->listTableColumns($generatedColumn->getTableName());
 
         if (isset($tableColumns[$generatedColumn->getColumnName()])) {
             return true;

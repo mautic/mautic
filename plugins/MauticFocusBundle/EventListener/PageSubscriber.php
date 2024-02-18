@@ -13,16 +13,17 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    private $regex = '{focus=(.*?)}';
+    private string $regex = '{focus=(.*?)}';
 
-    public function __construct(private CorePermissions $security, private FocusModel $model, private RouterInterface $router, private BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private FocusModel $model,
+        private RouterInterface $router,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],

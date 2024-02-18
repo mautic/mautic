@@ -14,10 +14,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class LeadImportFieldType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EntityManager $entityManager
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

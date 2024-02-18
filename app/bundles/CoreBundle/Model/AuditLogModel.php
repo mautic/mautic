@@ -11,8 +11,6 @@ use Mautic\UserBundle\Entity\User;
 class AuditLogModel extends AbstractCommonModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CoreBundle\Entity\AuditLogRepository
      */
     public function getRepository()

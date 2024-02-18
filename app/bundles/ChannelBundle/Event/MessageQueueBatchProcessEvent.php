@@ -10,8 +10,11 @@ class MessageQueueBatchProcessEvent extends Event
     /**
      * @param MessageQueue[] $messages
      */
-    public function __construct(private array $messages, private $channel, private $channelId)
-    {
+    public function __construct(
+        private array $messages,
+        private $channel,
+        private $channelId
+    ) {
     }
 
     public function checkContext($channel): bool

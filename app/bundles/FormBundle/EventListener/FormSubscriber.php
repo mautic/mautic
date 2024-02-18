@@ -31,13 +31,10 @@ class FormSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private RouterInterface $router
     ) {
-        $this->mailer               = $mailer->getMailer();
+        $this->mailer = $mailer->getMailer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
@@ -98,7 +95,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'           => SubmitActionEmailType::class,
             'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
-                'message' => 'html',
+                'message' => 'raw',
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
@@ -333,7 +330,6 @@ class FormSubscriber implements EventSubscriberInterface
                 $formViolations = $body['violations'];
 
                 // Ensure the violations match up to Mautic's
-                $violations = [];
                 foreach ($formViolations as $field => $violation) {
                     if (isset($matchedFields[$field])) {
                         $violations[$matchedFields[$field]] = $violation;

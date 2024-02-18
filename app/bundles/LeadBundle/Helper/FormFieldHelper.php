@@ -7,10 +7,7 @@ use Symfony\Component\Intl\Locales;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    /**
-     * @var array
-     */
-    private static $types = [
+    private static array $types = [
         'text' => [
             'properties' => [],
         ],

@@ -28,17 +28,14 @@ class ContactObjectSubscriberTest extends TestCase
     /**
      * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactObjectHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
 
     /**
      * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
-    /**
-     * @var ContactObjectSubscriber
-     */
-    private $subscriber;
+    private \Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber $subscriber;
 
     public function setUp(): void
     {

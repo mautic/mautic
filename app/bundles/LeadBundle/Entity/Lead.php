@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -24,10 +25,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     use CustomFieldEntityTrait;
 
     public const FIELD_ALIAS     = '';
+
     public const POINTS_ADD      = 'plus';
+
     public const POINTS_SUBTRACT = 'minus';
+
     public const POINTS_MULTIPLY = 'times';
+
     public const POINTS_DIVIDE   = 'divide';
+
+    public const POINTS_SET      = 'set';
+
     public const DEFAULT_ALIAS   = 'l';
 
     /**
@@ -126,7 +134,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $pushIds;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadEventLog>
+     * @var ArrayCollection<int, LeadEventLog>
      */
     private $eventLog;
 
@@ -970,9 +978,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pointsChangeLog;
     }
 
-    /**
-     * @param null $company
-     */
     public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
     {
         if (!$company) {
@@ -1084,6 +1089,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public function removeEventLog(LeadEventLog $eventLog): void
     {
         $this->eventLog->removeElement($eventLog);
+    }
+
+    public function getLastEventLogByAction(string $action): ?LeadEventLog
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('action', $action))
+            ->orderBy(['dateAdded' => Criteria::DESC])
+            ->setFirstResult(0)
+            ->setMaxResults(1);
+
+        return $this->eventLog->matching($criteria)->first() ?: null;
     }
 
     /**

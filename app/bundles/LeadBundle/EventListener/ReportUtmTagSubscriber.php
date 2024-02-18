@@ -13,14 +13,13 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     public const UTM_TAG = 'lead.utmTag';
 
-    public function __construct(private FieldsBuilder $fieldsBuilder, private CompanyReportData $companyReportData)
-    {
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],

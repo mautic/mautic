@@ -2,38 +2,25 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
 class TwitterIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Twitter';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         return 5000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): string
     {
         return 'twitter';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures(): array
     {
         return [
@@ -44,18 +31,12 @@ class TwitterIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://api.twitter.com/oauth/access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $url = 'https://api.twitter.com/oauth/authorize';
 
@@ -69,25 +50,16 @@ class TwitterIntegration extends SocialIntegration
         return $url;
     }
 
-    /**
-     * @return string
-     */
-    public function getRequestTokenUrl()
+    public function getRequestTokenUrl(): string
     {
         return 'https://api.twitter.com/oauth/request_token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth1a';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
         // Prevent SSL issues
@@ -106,17 +78,11 @@ class TwitterIntegration extends SocialIntegration
         return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint): string
     {
         return "https://api.twitter.com/1.1/$endpoint.json";
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUserData($identifier, &$socialCache)
     {
         $accessToken = $this->getContactAccessToken($socialCache);
@@ -204,7 +170,7 @@ class TwitterIntegration extends SocialIntegration
                 }
 
                 $tweet = [
-                    'tweet'       => EmojiHelper::toHtml($d['text']),
+                    'tweet'       => $d['text'],
                     'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
                     'coordinates' => $d['coordinates'],
                     'published'   => $d['created_at'],
@@ -242,9 +208,6 @@ class TwitterIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAvailableLeadFields($settings = []): array
     {
         return [
@@ -259,9 +222,6 @@ class TwitterIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function cleanIdentifier($identifier): string
     {
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
@@ -275,8 +235,6 @@ class TwitterIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $data
      * @param bool   $postAuthorization
      *
@@ -293,9 +251,6 @@ class TwitterIntegration extends SocialIntegration
         return json_decode($data, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType(): string
     {
         return TwitterType::class;

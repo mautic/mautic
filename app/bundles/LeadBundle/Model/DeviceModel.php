@@ -40,8 +40,6 @@ class DeviceModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return LeadDeviceRepository
      */
     public function getRepository()
@@ -49,9 +47,6 @@ class DeviceModel extends FormModel
         return $this->leadDeviceRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:leads';
@@ -59,10 +54,8 @@ class DeviceModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadDevice
     {
         if (null === $id) {
             return new LeadDevice();
@@ -72,9 +65,6 @@ class DeviceModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param null  $action
      * @param array $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
@@ -93,8 +83,6 @@ class DeviceModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

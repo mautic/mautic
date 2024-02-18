@@ -31,10 +31,7 @@ class DashboardSubscriber implements EventSubscriberInterface
      */
     protected $permissions = [];
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE   => ['onWidgetListGenerate', 0],

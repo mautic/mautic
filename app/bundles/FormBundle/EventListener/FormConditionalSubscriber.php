@@ -12,13 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormConditionalSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FormModel $formModel, private FieldModel $fieldModel)
-    {
+    public function __construct(
+        private FormModel $formModel,
+        private FieldModel $fieldModel
+    ) {
     }
 
-    /**
-     * @return array<string,mixed[]>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

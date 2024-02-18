@@ -7,13 +7,11 @@ use Tightenco\Collect\Support\Collection;
 
 class ConfigMetadata
 {
-    /**
-     * @var array
-     */
-    private $ipLookupServices = [];
+    private array $ipLookupServices = [];
 
-    public function __construct(private BundleMetadata $metadata)
-    {
+    public function __construct(
+        private BundleMetadata $metadata
+    ) {
     }
 
     public function build(): void

@@ -7,18 +7,16 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ContactIdentificationEvent extends Event
 {
-    /**
-     * @var Lead
-     */
-    private $identifiedContact;
+    private ?\Mautic\LeadBundle\Entity\Lead $identifiedContact = null;
 
     /**
      * @var string
      */
     private $identifiedByChannel;
 
-    public function __construct(private array $clickthrough)
-    {
+    public function __construct(
+        private array $clickthrough
+    ) {
     }
 
     /**

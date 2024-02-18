@@ -14,21 +14,30 @@ use MauticPlugin\MauticFullContactBundle\Exception\NotImplementedException;
 class FullContact_Base
 {
     public const REQUEST_LATENCY = 0.2;
+
     public const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
     private \DateTime $_next_req_time;
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
     protected $_baseUri     = 'https://api.fullcontact.com/';
+
     protected $_version     = 'v2';
+
     protected $_resourceUri = '';
+
     protected $_webhookUrl;
+
     protected $_webhookId;
+
     protected $_webhookJson      = false;
+
     protected $_supportedMethods = [];
 
     public $response_obj;
+
     public $response_code;
+
     public $response_json;
 
     /**
@@ -61,8 +70,9 @@ class FullContact_Base
      *
      * @param string $_apiKey
      */
-    public function __construct(protected $_apiKey)
-    {
+    public function __construct(
+        protected $_apiKey
+    ) {
         $this->_next_req_time = new \DateTime('@0');
     }
 

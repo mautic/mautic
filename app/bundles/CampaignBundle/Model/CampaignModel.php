@@ -57,13 +57,11 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CampaignBundle\Entity\CampaignRepository
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository(\Mautic\CampaignBundle\Entity\Campaign::class);
+        $repo = $this->em->getRepository(Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -74,7 +72,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Event::class);
+        return $this->em->getRepository(Event::class);
     }
 
     /**
@@ -82,7 +80,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignLeadRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class);
+        return $this->em->getRepository(CampaignLead::class);
     }
 
     /**
@@ -93,17 +91,12 @@ class CampaignModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
@@ -125,10 +118,8 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Campaign|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Campaign
     {
         if (null === $id) {
             return new Campaign();
@@ -138,24 +129,49 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param object $entity
+     * Delete an array of campaigns.
+     *
+     * @param int[] $campaignIds
+     *
+     * @return array<int,Campaign>
      */
+    public function deleteEntities($campaignIds): array
+    {
+        $entities = [];
+        foreach ($campaignIds as $campaignId) {
+            $campaign = $this->getEntity($campaignId);
+            if ($campaign) {
+                $entities[$campaignId] = $campaign;
+                $this->deleteEntity($campaign);
+            }
+        }
+
+        return $entities;
+    }
+
     public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
+        $this->dispatchEvent('pre_delete', $entity);
+        $this->getRepository()->setCampaignAsDeleted($entity->getId());
 
-        parent::deleteEntity($entity);
+        $this->dispatcher->dispatch(new Events\DeleteCampaign($entity), CampaignEvents::ON_CAMPAIGN_DELETE);
+    }
+
+    public function deleteCampaign(Campaign $campaign): void
+    {
+        $campaign->deletedId = $campaign->getId();
+        $this->getRepository()->deleteEntity($campaign);
+        $this->dispatchEvent('post_delete', $campaign);
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
-        if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
+        if ($entity instanceof CampaignLead) {
             return null;
         }
 
@@ -331,7 +347,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param bool $persist
-     * @param null $events
      *
      * @return array
      */
@@ -430,7 +445,7 @@ class CampaignModel extends CommonFormModel
                         $entity->addList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->addForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
+                        $entity->addForm($this->em->getReference(Form::class, $id));
                         break;
                     default:
                         break;
@@ -445,7 +460,7 @@ class CampaignModel extends CommonFormModel
                         $entity->removeList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->removeForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
+                        $entity->removeForm($this->em->getReference(Form::class, $id));
                         break;
                     default:
                         break;
@@ -542,11 +557,9 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets a list of published campaigns.
      *
-     * @param bool $forList
-     *
      * @return array
      */
-    public function getPublishedCampaigns($forList = false)
+    public function getPublishedCampaigns(bool $forList = false)
     {
         static $campaigns = [];
 
@@ -583,8 +596,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Get details of leads in a campaign.
      *
-     * @param null $leads
-     *
      * @return mixed
      */
     public function getLeadDetails($campaign, $leads = null)
@@ -595,7 +606,7 @@ class CampaignModel extends CommonFormModel
             $leads = array_keys($leads->toArray());
         }
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeadDetails($campaignId, $leads);
+        return $this->em->getRepository(CampaignLead::class)->getLeadDetails($campaignId, $leads);
     }
 
     /**
@@ -611,13 +622,10 @@ class CampaignModel extends CommonFormModel
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
+        return $this->em->getRepository(CampaignLead::class)->getLeads($campaignId, $eventId);
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignListIds($id)
+    public function getCampaignListIds($id): array
     {
         return $this->getRepository()->getCampaignListIds((int) $id);
     }
@@ -629,10 +637,8 @@ class CampaignModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -656,10 +662,8 @@ class CampaignModel extends CommonFormModel
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
      * @param array       $filter
-     *
-     * @return array
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -774,5 +778,13 @@ class CampaignModel extends CommonFormModel
         }
 
         return $ids;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getCampaignIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        return $this->getRepository()->getCampaignIdsWithDependenciesOnEmail($emailId);
     }
 }

@@ -11,8 +11,10 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DoNotContact implements MauticModelInterface
 {
-    public function __construct(protected LeadModel $leadModel, protected DoNotContactRepository $dncRepo)
-    {
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected DoNotContactRepository $dncRepo
+    ) {
     }
 
     /**
@@ -52,7 +54,7 @@ class DoNotContact implements MauticModelInterface
      * Create a DNC entry for a lead.
      *
      * @param \Mautic\LeadBundle\Entity\Lead|int|null $contactId
-     * @param string|array                            $channel                  If an array with an ID, use the structure ['email' => 123]
+     * @param string|mixed[]                          $channel                  If an array with an ID, use the structure ['email' => 123]
      * @param string                                  $comments
      * @param int                                     $reason                   Must be a class constant from the DoNotContact class
      * @param bool                                    $persist
@@ -153,9 +155,6 @@ class DoNotContact implements MauticModelInterface
         return DNC::IS_CONTACTABLE;
     }
 
-    /**
-     * @param null $comments
-     */
     public function createDncRecord(Lead $contact, $channel, $reason, $comments = null): DNC
     {
         $dnc = new DNC();
@@ -178,9 +177,6 @@ class DoNotContact implements MauticModelInterface
         return $dnc;
     }
 
-    /**
-     * @param null $comments
-     */
     public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null): void
     {
         // Update the DNC entry

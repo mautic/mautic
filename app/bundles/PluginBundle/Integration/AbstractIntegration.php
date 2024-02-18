@@ -56,16 +56,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
     public const FIELD_TYPE_STRING   = 'string';
+
     public const FIELD_TYPE_BOOL     = 'boolean';
+
     public const FIELD_TYPE_NUMBER   = 'number';
+
     public const FIELD_TYPE_DATETIME = 'datetime';
+
     public const FIELD_TYPE_DATE     = 'date';
 
     protected bool $coreIntegration = false;
+
     protected Integration $settings;
+
     protected array $keys = [];
+
     protected ?CacheStorageHelper $cache;
+
     protected ?SessionInterface $session;
+
     protected ?Request $request;
 
     /**
@@ -75,12 +84,18 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
-    protected array $notifications = [];
-    protected ?string $lastIntegrationError;
+    protected array $notifications              = [];
+
+    protected ?string $lastIntegrationError     = null;
+
     protected array $mauticDuplicates           = [];
+
     protected array $salesforceIdMapping        = [];
+
     protected array $deleteIntegrationEntities  = [];
+
     protected array $persistIntegrationEntities = [];
+
     protected array  $commandParameters         = [];
 
     public function __construct(
@@ -2320,8 +2335,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param null $object
-     *
      * @return mixed
      */
     public function prepareFieldsForSync($fields, $keys, $object = null)

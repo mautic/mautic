@@ -12,11 +12,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config, private InstallService $installer)
-    {
+    public function __construct(
+        private Config $config,
+        private InstallService $installer
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_ASSETS => ['injectAssets', 0],

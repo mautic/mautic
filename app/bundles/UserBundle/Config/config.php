@@ -256,23 +256,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.user.repository.user_token' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'arguments' => [\Mautic\UserBundle\Entity\UserToken::class],
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-            ],
-            'mautic.user.repository' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'arguments' => \Mautic\UserBundle\Entity\User::class,
-                'factory'   => ['@mautic.user.manager', 'getRepository'],
-            ],
-            'mautic.permission.repository' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'arguments' => \Mautic\UserBundle\Entity\Permission::class,
-                'factory'   => ['@mautic.permission.manager', 'getRepository'],
-            ],
-        ],
         'fixtures' => [
             'mautic.user.fixture.role' => [
                 'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class,

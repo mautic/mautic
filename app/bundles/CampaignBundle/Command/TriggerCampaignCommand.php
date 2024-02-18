@@ -28,8 +28,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
+
     private bool $kickoffOnly  = false;
+
     private bool $inactiveOnly = false;
+
     private bool $scheduleOnly = false;
 
     /**
@@ -37,15 +40,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected $output;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
     public function __construct(
         private CampaignRepository $campaignRepository,
@@ -204,11 +201,13 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         // All published campaigns
         /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
-        $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
+        $campaigns = $this->campaignRepository->getEntities([
+            'iterable_mode' => true,
+            'orderBy'       => 'c.dateAdded',
+            'orderByDir'    => 'DESC',
+        ]);
 
-        while (false !== ($next = $campaigns->next())) {
-            // Key is ID and not 0
-            $campaign = reset($next);
+        foreach ($campaigns as $campaign) {
             $this->triggerCampaign($campaign);
             if ($this->limiter->hasCampaignLimit()) {
                 $this->limiter->resetCampaignLimitRemaining();
@@ -356,5 +355,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+
     protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

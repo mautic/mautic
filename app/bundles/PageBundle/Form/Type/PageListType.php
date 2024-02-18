@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class PageListType extends AbstractType
 {
     /**
@@ -16,14 +19,13 @@ class PageListType extends AbstractType
      */
     private $canViewOther = false;
 
-    public function __construct(private PageModel $model, CorePermissions $corePermissions)
-    {
+    public function __construct(
+        private PageModel $model,
+        CorePermissions $corePermissions
+    ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $model        = $this->model;
@@ -60,9 +62,6 @@ class PageListType extends AbstractType
         $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

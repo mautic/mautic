@@ -12,8 +12,9 @@ class BaseDecorator implements FilterDecoratorInterface
 {
     use RegexTrait;
 
-    public function __construct(protected ContactSegmentFilterOperator $contactSegmentFilterOperator)
-    {
+    public function __construct(
+        protected ContactSegmentFilterOperator $contactSegmentFilterOperator
+    ) {
     }
 
     /**
@@ -46,10 +47,7 @@ class BaseDecorator implements FilterDecoratorInterface
         };
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return BaseFilterQueryBuilder::getServiceId();
     }

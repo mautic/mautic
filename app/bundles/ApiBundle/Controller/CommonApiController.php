@@ -55,8 +55,20 @@ class CommonApiController extends FetchCommonApiController
      */
     protected $entityRequestParameters = [];
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, protected RouterInterface $router, protected FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        protected RouterInterface $router,
+        protected FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
         parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
@@ -321,6 +333,9 @@ class CommonApiController extends FetchCommonApiController
         return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
+    /**
+     * @return FormInterface<mixed>
+     */
     protected function createEntityForm($entity): FormInterface
     {
         return $this->model->createForm(
@@ -387,7 +402,7 @@ class CommonApiController extends FetchCommonApiController
                     $entity
                 );
             }
-        } elseif (is_object($formResponse) && get_class($formResponse) === get_class($entity)) {
+        } elseif (is_object($formResponse) && $formResponse::class === $entity::class) {
             // Success
             $entities[$key] = $formResponse;
         } elseif (is_array($formResponse) && isset($formResponse['code'], $formResponse['message'])) {

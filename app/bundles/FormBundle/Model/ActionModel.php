@@ -13,8 +13,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 class ActionModel extends CommonFormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\FormBundle\Entity\ActionRepository
      */
     public function getRepository()
@@ -22,18 +20,12 @@ class ActionModel extends CommonFormModel
         return $this->em->getRepository(\Mautic\FormBundle\Entity\Action::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Action
     {
         if (null === $id) {
             return new Action();
@@ -44,7 +36,6 @@ class ActionModel extends CommonFormModel
 
     /**
      * @param object $entity
-     * @param null   $action
      * @param array  $options
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -92,5 +83,34 @@ class ActionModel extends CommonFormModel
         }
 
         return $dependents;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getFormsIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'LIKE', 'value' => 'email.send%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $formIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
+                $formIds[] = $entity->getForm()->getid();
+            }
+            if (isset($properties['useremail']['email']) && (int) $properties['useremail']['email'] === $emailId) {
+                $formIds[] = $entity->getForm()->getid();
+            }
+        }
+
+        return array_unique($formIds);
     }
 }

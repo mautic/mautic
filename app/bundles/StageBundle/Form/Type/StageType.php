@@ -18,15 +18,16 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Stage>
+ */
 class StageType extends AbstractType
 {
-    public function __construct(private CorePermissions $security)
-    {
+    public function __construct(
+        private CorePermissions $security
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -98,13 +99,10 @@ class StageType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => \Mautic\StageBundle\Entity\Stage::class,
+            'data_class' => Stage::class,
         ]);
 
         $resolver->setDefined(['stageActions', 'actionType']);

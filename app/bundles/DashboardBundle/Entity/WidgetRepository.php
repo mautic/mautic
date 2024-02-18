@@ -34,9 +34,6 @@ class WidgetRepository extends CommonRepository
         $this->saveEntities($widgets);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -44,9 +41,6 @@ class WidgetRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'w';

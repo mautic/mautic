@@ -104,10 +104,7 @@ class CampaignController extends AbstractStandardFormController
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    /**
-     * @return array
-     */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         // set some permissions
         return (array) $this->security->isGranted(
@@ -565,7 +562,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param null $objectId
      * @param bool $isClone
      */
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, $isClone = false)
@@ -605,7 +601,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param Campaign $entity
-     * @param null     $objectId
      * @param bool     $isClone
      */
     protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, $isClone = false): bool
@@ -685,8 +680,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)

@@ -6,12 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Role extends FormEntity
+class Role extends FormEntity implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'Role';
+
     /**
      * @var int
      */
@@ -47,9 +50,6 @@ class Role extends FormEntity
      */
     private $users;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
@@ -286,5 +286,13 @@ class Role extends FormEntity
     public function getUsers()
     {
         return $this->users;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [
+            self::CACHE_NAMESPACE,
+            User::CACHE_NAMESPACE,
+        ];
     }
 }

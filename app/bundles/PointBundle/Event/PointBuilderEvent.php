@@ -8,13 +8,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PointBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

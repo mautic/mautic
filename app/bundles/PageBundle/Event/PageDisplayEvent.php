@@ -10,8 +10,11 @@ class PageDisplayEvent extends Event
     /**
      * @param string $content
      */
-    public function __construct(private $content, private Page $page, private array $params = [])
-    {
+    public function __construct(
+        private $content,
+        private Page $page,
+        private array $params = []
+    ) {
     }
 
     /**

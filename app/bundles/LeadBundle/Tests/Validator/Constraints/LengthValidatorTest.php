@@ -10,7 +10,7 @@ class LengthValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @doesNotPerformAssertions
      */
-    public function testValidate()
+    public function testValidate(): void
     {
         $constraint = new Length(['min' => 3, 'allowEmptyString' => true]);
         $validator  = new LengthValidator();

@@ -23,8 +23,10 @@ class InstallCommand extends Command
 {
     public const COMMAND = 'mautic:install';
 
-    public function __construct(private InstallService $installer, private ManagerRegistry $doctrineRegistry)
-    {
+    public function __construct(
+        private InstallService $installer,
+        private ManagerRegistry $doctrineRegistry
+    ) {
         parent::__construct();
     }
 
@@ -448,5 +450,6 @@ class InstallCommand extends Command
             $output->writeln("  - [$type] $message");
         }
     }
+
     protected static $defaultDescription = 'Installs Mautic';
 }

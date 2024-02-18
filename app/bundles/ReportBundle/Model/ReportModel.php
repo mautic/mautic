@@ -79,8 +79,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\ReportBundle\Entity\ReportRepository
      */
     public function getRepository()
@@ -88,9 +86,6 @@ class ReportModel extends FormModel
         return $this->em->getRepository(Report::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'report:reports';
@@ -105,8 +100,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -133,12 +126,7 @@ class ReportModel extends FormModel
         return $reportGenerator->getForm($entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Report|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Report
     {
         if (null === $id) {
             return new Report();
@@ -148,8 +136,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -325,7 +311,7 @@ class ReportModel extends FormModel
      *
      * @param string $context
      *
-     * @return \stdClass [filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
+     * @return \stdClass[filterList => [], definitions => [], operatorChoices =>  [], operatorHtml => [], filterListHtml => '']
      */
     public function getFilterList($context = 'all'): \stdClass
     {
@@ -386,7 +372,6 @@ class ReportModel extends FormModel
      * Export report.
      *
      * @param string $format
-     * @param null   $handle
      * @param int    $page
      *
      * @return StreamedResponse|Response
@@ -661,9 +646,9 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    public function getReportsWithGraphs()
+    public function getReportsWithGraphs(): array
     {
         $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
@@ -739,6 +724,36 @@ class ReportModel extends FormModel
         }
 
         return $dependents;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getReportsIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $search = 'e.id';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.source', 'expr' => 'IN', 'value'=> ['emails', 'email.stats']],
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                if ($entityFilter['column'] == $search && $entityFilter['value'] == $emailId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return array_unique($dependents);
     }
 
     /**

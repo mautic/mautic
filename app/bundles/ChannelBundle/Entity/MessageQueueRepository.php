@@ -2,6 +2,7 @@
 
 namespace Mautic\ChannelBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -28,9 +29,6 @@ class MessageQueueRepository extends CommonRepository
     }
 
     /**
-     * @param null $channel
-     * @param null $channelId
-     *
      * @return array<int, MessageQueue>
      */
     public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
@@ -81,12 +79,9 @@ class MessageQueueRepository extends CommonRepository
         return (int) $q->select('count(*)')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', $this->getTableAlias())
             ->where($expr)
-            ->setParameters(
-                [
-                    'channel' => $channel,
-                    'status'  => MessageQueue::STATUS_SENT,
-                ]
-            )
+            ->setParameter('channel', $channel)
+            ->setParameter('status', MessageQueue::STATUS_SENT)
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
             ->executeQuery()
             ->fetchOne();
     }
@@ -102,8 +97,8 @@ class MessageQueueRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
-            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId, 
-            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded, 
+            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId,
+            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded,
             mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
 
         if ($leadId) {

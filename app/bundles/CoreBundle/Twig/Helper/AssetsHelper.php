@@ -23,15 +23,9 @@ final class AssetsHelper
      */
     public const CONTEXT_BUILDER = 'builder';
 
-    /**
-     * @var AssetGenerationHelper
-     */
-    private $assetHelper;
+    private ?\Mautic\CoreBundle\Helper\AssetGenerationHelper $assetHelper = null;
 
-    /**
-     * @var string
-     */
-    private $context = self::CONTEXT_APP;
+    private string $context = self::CONTEXT_APP;
 
     /**
      * @var array<mixed, mixed>
@@ -40,26 +34,23 @@ final class AssetsHelper
         self::CONTEXT_APP => [],
     ];
 
-    /**
-     * @var string|null
-     */
-    private $version;
+    private ?string $version = null;
 
     /**
      * @var string
      */
     private $siteUrl;
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private ?\Mautic\CoreBundle\Helper\PathsHelper $pathsHelper = null;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
+
     private InstallService $installService;
 
-    public function __construct(private Packages $packages, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private Packages $packages,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
@@ -73,9 +64,9 @@ final class AssetsHelper
     {
         $prefix = $this->pathsHelper->getSystemPath('asset_prefix');
         if (!empty($prefix)) {
-            if ($includeEndingSlash && '/' != substr($prefix, -1)) {
+            if ($includeEndingSlash && !str_ends_with($prefix, '/')) {
                 $prefix .= '/';
-            } elseif (!$includeEndingSlash && '/' == substr($prefix, -1)) {
+            } elseif (!$includeEndingSlash && str_ends_with($prefix, '/')) {
                 $prefix = substr($prefix, 0, -1);
             }
         }
@@ -394,10 +385,8 @@ final class AssetsHelper
 
     /**
      * Returns head scripts, stylesheets, and custom declarations.
-     *
-     * @return string
      */
-    public function getHeadDeclarations()
+    public function getHeadDeclarations(): string
     {
         $headOutput = $this->getStyles();
         if (!empty($this->assets[$this->context]['headDeclarations'])) {
@@ -688,7 +677,7 @@ final class AssetsHelper
     public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
         $country  = ucwords(str_replace(' ', '-', $country));
-        $flagImg  = $this->getOverridableUrl('images/flags/'.$country.'.png');
+        $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');
 
         if ($urlOnly) {
             return $flagImg;
@@ -720,7 +709,7 @@ final class AssetsHelper
      */
     public function setSiteUrl($siteUrl): void
     {
-        if ($siteUrl && '/' === substr($siteUrl, -1)) {
+        if ($siteUrl && str_ends_with($siteUrl, '/')) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
 

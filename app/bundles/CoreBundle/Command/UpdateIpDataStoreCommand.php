@@ -60,5 +60,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetch remote datastores for IP lookup services that leverage local lookups';
 }

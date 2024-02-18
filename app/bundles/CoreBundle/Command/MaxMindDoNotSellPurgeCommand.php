@@ -23,15 +23,14 @@ class MaxMindDoNotSellPurgeCommand extends Command
      */
     private \Doctrine\ORM\EntityRepository $leadRepository;
 
-    public function __construct(private EntityManager $em, private MaxMindDoNotSellList $doNotSellList)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private MaxMindDoNotSellList $doNotSellList
+    ) {
         parent::__construct();
         $this->leadRepository = $this->em->getRepository(Lead::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:max-mind:purge')
@@ -55,9 +54,6 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
@@ -148,5 +144,6 @@ EOT
 
         return false;
     }
+
     protected static $defaultDescription = 'Purge data connected to MaxMind Do Not Sell list.';
 }

@@ -14,8 +14,11 @@ class PreUpdateCheckResult
     /**
      * @param PreUpdateCheckError[] $errors
      */
-    public function __construct(public bool $success, public ?AbstractPreUpdateCheck $check, array $errors = [])
-    {
+    public function __construct(
+        public bool $success,
+        public ?AbstractPreUpdateCheck $check,
+        array $errors = []
+    ) {
         foreach ($errors as $error) {
             if (!($error instanceof PreUpdateCheckError)) {
                 throw new \InvalidArgumentException('Error must be of type PreUpdateCheckError');

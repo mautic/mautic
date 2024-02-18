@@ -17,12 +17,12 @@ use Symfony\Component\Form\FormBuilder;
 
 class DynamicsIntegration extends CrmAbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Dynamics';
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Dynamics CRM';
     }
@@ -34,10 +34,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -99,9 +97,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function sortFieldsAlphabetically(): bool
     {
         return false;
@@ -109,10 +104,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'access_token';
     }
@@ -133,30 +126,17 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $this->keys['resource'];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/authorize';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $url = parent::getAuthLoginUrl();
 
@@ -164,8 +144,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $inAuthorization
      */
     public function getBearerToken($inAuthorization = false)
@@ -183,8 +161,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string|array
      */
     public function getFormNotes($section)
@@ -537,7 +513,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $result = [];
         if (isset($data['value'])) {
-            $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
+            $this->em->getConnection()->getConfiguration()->setMiddlewares([]);
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
@@ -585,7 +561,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         }
 
                         if (count($newMatchedFields)) {
-                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false);
                             $this->companyModel->saveEntity($entity, false);
                             $isModified = true;
                         }

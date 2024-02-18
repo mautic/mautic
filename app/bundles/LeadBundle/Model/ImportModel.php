@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -14,6 +13,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
@@ -38,7 +38,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImportModel extends FormModel
 {
-    protected \Mautic\LeadBundle\Entity\LeadEventLogRepository $leadEventLogRepo;
+    protected LeadEventLogRepository $leadEventLogRepo;
 
     public function __construct(
         protected PathsHelper $pathsHelper,
@@ -52,7 +52,8 @@ class ImportModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
+        private ProcessSignalService $processSignalService
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 
@@ -381,12 +382,19 @@ class ImportModel extends FormModel
                 $batchSize = $config['batchlimit'];
             }
 
-            ++$counter;
-            if ($limit && $counter >= $limit) {
-                $import->setStatus($import::DELAYED);
-                $this->saveEntity($import);
+            if ($this->processSignalService->isSignalCaught()) {
                 break;
             }
+
+            ++$counter;
+            if ($limit && $counter >= $limit) {
+                break;
+            }
+        }
+
+        if ($import->getLastLineImported() < $import->getLineCount()) {
+            $import->setStatus($import::DELAYED);
+            $this->saveEntity($import);
         }
 
         // Close the file
@@ -489,10 +497,8 @@ class ImportModel extends FormModel
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     *
-     * @return array
      */
-    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
@@ -547,9 +553,6 @@ class ImportModel extends FormModel
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:imports';
@@ -575,10 +578,8 @@ class ImportModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Import
     {
         if (null === $id) {
             return new Import();
@@ -588,8 +589,6 @@ class ImportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

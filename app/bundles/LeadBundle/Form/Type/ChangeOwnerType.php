@@ -8,10 +8,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ChangeOwnerType extends AbstractType
 {
-    public function __construct(private UserModel $userModel)
-    {
+    public function __construct(
+        private UserModel $userModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

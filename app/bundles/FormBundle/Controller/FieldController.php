@@ -28,8 +28,24 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FieldController extends CommonFormController
 {
-    public function __construct(private FormModel $formModel, private FieldModel $formFieldModel, FormFieldHelper $fieldHelper, FormFactoryInterface $formFactory, private MappedObjectCollectorInterface $mappedObjectCollector, private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        private FormModel $formModel,
+        private FieldModel $formFieldModel,
+        FormFieldHelper $fieldHelper,
+        FormFactoryInterface $formFactory,
+        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 

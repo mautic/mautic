@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    private $response;
+    private ?\Psr\Http\Message\ResponseInterface $response = null;
 
     /**
      * @param mixed[] $parameters
@@ -15,8 +15,15 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      * @param mixed[] $settings
      * @param string  $authType
      */
-    public function __construct(UnifiedIntegrationInterface $integration, private $url, private $parameters, private $headers, private $method, private $settings, private $authType)
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private $url,
+        private $parameters,
+        private $headers,
+        private $method,
+        private $settings,
+        private $authType
+    ) {
         $this->integration = $integration;
     }
 

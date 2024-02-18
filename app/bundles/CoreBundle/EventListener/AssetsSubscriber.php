@@ -12,14 +12,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AssetsHelper $assetsHelper, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private AssetsHelper $assetsHelper,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['fetchCustomAssets', 0],

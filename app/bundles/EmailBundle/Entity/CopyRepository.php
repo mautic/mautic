@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
  * @extends CommonRepository<Copy>
@@ -22,9 +21,6 @@ class CopyRepository extends CommonRepository
         $db = $this->getEntityManager()->getConnection();
 
         try {
-            $body     = EmojiHelper::toShort($body);
-            $subject  = EmojiHelper::toShort($subject);
-            $bodyText = EmojiHelper::toShort($bodyText);
             $db->insert(
                 MAUTIC_TABLE_PREFIX.'email_copies',
                 [
@@ -45,8 +41,7 @@ class CopyRepository extends CommonRepository
     }
 
     /**
-     * @param string $string  md5 hash or content
-     * @param null   $subject If $string is the content, pass the subject to include it in the hash
+     * @param string $string md5 hash or content
      *
      * @return array
      */
@@ -75,9 +70,6 @@ class CopyRepository extends CommonRepository
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'ec';

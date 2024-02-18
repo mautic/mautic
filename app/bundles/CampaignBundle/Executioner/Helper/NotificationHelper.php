@@ -14,8 +14,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
-    public function __construct(private UserModel $userModel, private NotificationModel $notificationModel, private TranslatorInterface $translator, private Router $router, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private UserModel $userModel,
+        private NotificationModel $notificationModel,
+        private TranslatorInterface $translator,
+        private Router $router,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function notifyOfFailure(Lead $contact, Event $event): void

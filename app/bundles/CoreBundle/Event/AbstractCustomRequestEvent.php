@@ -22,9 +22,6 @@ abstract class AbstractCustomRequestEvent extends Event
      */
     protected $routeParams = [];
 
-    /**
-     * AbstractCustomRequestEvent constructor.
-     */
     public function __construct(Request $request = null)
     {
         if ($request) {

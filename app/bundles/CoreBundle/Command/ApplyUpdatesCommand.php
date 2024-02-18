@@ -139,5 +139,6 @@ EOT
 
         return 0;
     }
+
     protected static $defaultDescription = 'Updates the Mautic application';
 }

@@ -6,10 +6,7 @@ use Mautic\CampaignBundle\Entity\Event;
 
 class ConnectionBuilder
 {
-    /**
-     * @var array
-     */
-    private static $eventTypes = [];
+    private static array $eventTypes = [];
 
     /**
      * @var array

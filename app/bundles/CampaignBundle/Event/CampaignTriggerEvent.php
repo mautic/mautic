@@ -12,8 +12,9 @@ class CampaignTriggerEvent extends Event
      */
     protected $triggerCampaign = true;
 
-    public function __construct(protected Campaign $campaign)
-    {
+    public function __construct(
+        protected Campaign $campaign
+    ) {
     }
 
     /**

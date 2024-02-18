@@ -14,7 +14,7 @@ class InternalObjectUpdateEvent extends Event
     /**
      * @var UpdatedObjectMappingDAO[]
      */
-    private $updatedObjectMappings = [];
+    private array $updatedObjectMappings = [];
 
     public function __construct(
         private ObjectInterface $object,

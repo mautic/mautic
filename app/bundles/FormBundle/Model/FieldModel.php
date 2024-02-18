@@ -28,8 +28,18 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FieldModel extends CommonFormModel
 {
-    public function __construct(protected LeadFieldModel $leadFieldModel, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, private RequestStack $requestStack)
-    {
+    public function __construct(
+        protected LeadFieldModel $leadFieldModel,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private RequestStack $requestStack
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -42,6 +52,8 @@ class FieldModel extends CommonFormModel
      * @param object|array<mixed> $entity
      * @param string|null         $action
      * @param array               $options
+     *
+     * @return \Symfony\Component\Form\FormInterface<mixed>
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {

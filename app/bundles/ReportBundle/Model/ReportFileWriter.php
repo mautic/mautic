@@ -9,8 +9,10 @@ use Mautic\ReportBundle\Exception\FileIOException;
 
 class ReportFileWriter
 {
-    public function __construct(private CsvExporter $csvExporter, private ExportHandler $exportHandler)
-    {
+    public function __construct(
+        private CsvExporter $csvExporter,
+        private ExportHandler $exportHandler
+    ) {
     }
 
     /**
@@ -31,11 +33,9 @@ class ReportFileWriter
     }
 
     /**
-     * @return string
-     *
      * @throws FileIOException
      */
-    public function getFilePath(Scheduler $scheduler)
+    public function getFilePath(Scheduler $scheduler): string
     {
         $fileName = $this->getFileName($scheduler);
 

@@ -12,13 +12,11 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistence implements TokenPersistenceInterface
 {
-    /**
-     * @var Integration|null
-     */
-    private $integration;
+    private ?\Mautic\PluginBundle\Entity\Integration $integration = null;
 
-    public function __construct(private IntegrationsHelper $integrationsHelper)
-    {
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    ) {
     }
 
     /**

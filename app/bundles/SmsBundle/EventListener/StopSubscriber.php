@@ -10,14 +10,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StopSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private DoNotContactModel $doNotContactModel)
-    {
+    public function __construct(
+        private DoNotContactModel $doNotContactModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::ON_REPLY => ['onReply', 0],

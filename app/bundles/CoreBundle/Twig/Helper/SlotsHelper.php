@@ -10,16 +10,14 @@ final class SlotsHelper
     /**
      * @var array<string, mixed>
      */
-    private $slots     = [];
+    private array $slots     = [];
+
     /**
      * @var array<string, mixed>
      */
-    private $openSlots = [];
+    private array $openSlots = [];
 
-    /**
-     * @var bool
-     */
-    private $inBuilder = false;
+    private bool $inBuilder = false;
 
     /**
      * Starts a new slot.

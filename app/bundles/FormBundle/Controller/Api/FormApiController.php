@@ -126,9 +126,6 @@ class FormApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $fieldModel = $this->getModel('form.field');
@@ -286,7 +283,7 @@ class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @return FormInterface
+     * @return FormInterface<mixed>
      */
     protected function createActionEntityForm(Action $entity, array $action)
     {
@@ -313,7 +310,7 @@ class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @return FormInterface
+     * @return FormInterface<mixed>
      */
     protected function createFieldEntityForm($entity)
     {

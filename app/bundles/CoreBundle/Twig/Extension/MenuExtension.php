@@ -12,13 +12,11 @@ use Twig\TwigFunction;
 
 class MenuExtension extends AbstractExtension
 {
-    public function __construct(protected MenuHelper $menuHelper)
-    {
+    public function __construct(
+        protected MenuHelper $menuHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

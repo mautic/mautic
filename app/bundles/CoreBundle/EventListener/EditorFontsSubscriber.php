@@ -13,8 +13,9 @@ class EditorFontsSubscriber implements EventSubscriberInterface
 {
     public const PARAMETER_EDITOR_FONTS = 'editor_fonts';
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public static function getSubscribedEvents(): array

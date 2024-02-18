@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -23,13 +24,15 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var array
-     */
-    private $availableFields;
+    private ?array $availableFields = null;
 
-    public function __construct(private LeadModel $model, private LeadRepository $repository, private Connection $connection, private FieldModel $fieldModel, private DoNotContactModel $dncModel)
-    {
+    public function __construct(
+        private LeadModel $model,
+        private LeadRepository $repository,
+        private Connection $connection,
+        private FieldModel $fieldModel,
+        private DoNotContactModel $dncModel
+    ) {
     }
 
     /**
@@ -259,7 +262,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'c');
         $qb->where('c.owner_id IS NOT NULL');
         $qb->andWhere('c.id IN (:objectIds)');
-        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+        $qb->setParameter('objectIds', $objectIds, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
     }

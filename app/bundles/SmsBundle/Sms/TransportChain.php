@@ -17,8 +17,10 @@ class TransportChain
     /**
      * @param string $primaryTransport
      */
-    public function __construct(private $primaryTransport, private IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        private $primaryTransport,
+        private IntegrationHelper $integrationHelper
+    ) {
         $this->transports        = [];
     }
 

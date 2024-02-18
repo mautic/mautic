@@ -419,8 +419,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     *
      * @throws \Exception
      */
     public function redirectAction(
@@ -430,7 +428,7 @@ class PublicController extends CommonFormController
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
         $redirectId
-    ) {
+    ): \Symfony\Component\HttpFoundation\RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */

@@ -33,7 +33,7 @@ class Log
      */
     private $runtime;
 
-    private ?string $note;
+    private ?string $note = null;
 
     public static function loadMetadata(ClassMetadata $metadata): void
     {

@@ -8,10 +8,14 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class PreferenceChannelsType extends AbstractType
 {
-    public function __construct(private LeadModel $leadModel)
-    {
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void

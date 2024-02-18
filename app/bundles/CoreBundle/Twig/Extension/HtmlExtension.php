@@ -9,13 +9,11 @@ use Twig\TwigFunction;
 
 final class HtmlExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
             new TwigFunction('htmlAttributesStringToArray', [$this, 'convertHtmlAttributesToArray']),
+            new TwigFunction('htmlEntityDecode', [$this, 'htmlEntityDecode']),
         ];
     }
 
@@ -74,5 +72,10 @@ final class HtmlExtension extends AbstractExtension
         }
 
         return $attributes;
+    }
+
+    public function htmlEntityDecode(string $content): string
+    {
+        return html_entity_decode($content);
     }
 }

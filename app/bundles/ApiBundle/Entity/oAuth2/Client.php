@@ -172,9 +172,6 @@ class Client extends BaseClient
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRedirectUris(array $redirectUris): void
     {
         $this->isChanged('redirectUris', $redirectUris);

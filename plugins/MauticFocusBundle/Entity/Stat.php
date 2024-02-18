@@ -10,7 +10,9 @@ class Stat
 {
     // Used for querying stats
     public const TYPE_FORM         = 'submission';
+
     public const TYPE_CLICK        = 'click';
+
     public const TYPE_NOTIFICATION = 'view';
 
     /**

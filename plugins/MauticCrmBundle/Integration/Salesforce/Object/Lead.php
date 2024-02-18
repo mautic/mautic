@@ -6,8 +6,11 @@ class Lead
 {
     public const OBJECT = 'Lead';
 
-    public function __construct(private $id, private $campaignId, private $isDeleted)
-    {
+    public function __construct(
+        private $id,
+        private $campaignId,
+        private $isDeleted
+    ) {
     }
 
     /**

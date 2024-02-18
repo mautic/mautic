@@ -13,18 +13,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
+ * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper()
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
     public const PAGESIZE = 200;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Connectwise';
     }
@@ -49,57 +44,44 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for application cookie.
-     *
-     * @return string
      */
-    public function getCompanyCookieKey()
+    public function getCompanyCookieKey(): string
     {
         return 'appcookie';
     }
 
     /**
      * Get the array key for companyid.
-     *
-     * @return string
      */
-    public function getCompanyIdKey()
+    public function getCompanyIdKey(): string
     {
         return 'companyid';
     }
 
     /**
      * Get the array key for client id.
-     *
-     * @return string
      */
-    public function getIntegrator()
+    public function getIntegrator(): string
     {
         return 'username';
     }
 
     /**
      * Get the array key for client id.
-     *
-     * @return string
      */
-    public function getConnectwiseUrl()
+    public function getConnectwiseUrl(): string
     {
         return 'site';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'password';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecretKeys(): array
     {
         return [
@@ -113,8 +95,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -154,12 +134,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $error;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'basic';
     }
@@ -424,7 +399,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * Get Contacts from connectwise.
      *
      * @param array $params
-     * @param null  $query
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact'): int
     {
@@ -574,11 +548,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array|Lead $lead
      * @param array      $config
      *
-     * @return array|bool
-     *
      * @throws ApiErrorException
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
@@ -640,10 +612,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $leadPushed;
     }
 
-    /**
-     * @return array
-     */
-    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = [])
+    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = []): array
     {
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
@@ -796,7 +765,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed

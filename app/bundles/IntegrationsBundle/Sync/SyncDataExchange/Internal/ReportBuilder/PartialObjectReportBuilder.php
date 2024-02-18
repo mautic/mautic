@@ -37,13 +37,15 @@ class PartialObjectReportBuilder
      */
     private $objectsWithMissingFields = [];
 
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
 
-    public function __construct(private FieldChangeRepository $fieldChangeRepository, private FieldHelper $fieldHelper, private FieldBuilder $fieldBuilder, private ObjectProvider $objectProvider, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private FieldChangeRepository $fieldChangeRepository,
+        private FieldHelper $fieldHelper,
+        private FieldBuilder $fieldBuilder,
+        private ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public function buildReport(RequestDAO $requestDAO): ReportDAO

@@ -8,12 +8,16 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<string, mixed>|null>
+ */
 class FocusListType extends AbstractType
 {
     private $repo;
 
-    public function __construct(protected FocusModel $focusModel)
-    {
+    public function __construct(
+        protected FocusModel $focusModel
+    ) {
         $this->repo       = $this->focusModel->getRepository();
     }
 

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractFormController extends CommonController
 {
-    protected $permissionBase;
+    protected ?string $permissionBase = null;
 
     /**
      * @return mixed
@@ -152,8 +152,6 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Binds form data, checks validity, and determines cancel request.
-     *
-     * @param array $data
      */
     protected function isFormValid(FormInterface $form): bool
     {

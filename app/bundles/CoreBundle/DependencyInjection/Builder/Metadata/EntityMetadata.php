@@ -13,13 +13,11 @@ class EntityMetadata
      */
     private $ormConfig = [];
 
-    /**
-     * @var array
-     */
-    private $serializerConfig = [];
+    private array $serializerConfig = [];
 
-    public function __construct(private BundleMetadata $metadata)
-    {
+    public function __construct(
+        private BundleMetadata $metadata
+    ) {
     }
 
     public function build(): void

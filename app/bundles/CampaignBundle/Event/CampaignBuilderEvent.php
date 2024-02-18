@@ -11,30 +11,20 @@ class CampaignBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
-    /**
-     * @var array
-     */
-    private $decisions = [];
+    private array $decisions = [];
 
-    /**
-     * @var array
-     */
-    private $conditions = [];
+    private array $conditions = [];
 
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
     /**
      * Holds info if some property has been already sorted or not.
-     *
-     * @var array
      */
-    private $sortCache = [];
+    private array $sortCache = [];
 
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

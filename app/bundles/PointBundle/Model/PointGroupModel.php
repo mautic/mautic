@@ -33,8 +33,6 @@ class PointGroupModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object               $entity
      * @param FormFactory          $formFactory
      * @param string|null          $action
@@ -59,10 +57,8 @@ class PointGroupModel extends CommonFormModel
      * Get a specific entity or generate a new one if id is empty.
      *
      * @param int $id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Group
     {
         if (null === $id) {
             return new Group();
@@ -72,8 +68,6 @@ class PointGroupModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -130,6 +124,7 @@ class PointGroupModel extends CommonFormModel
             Lead::POINTS_SUBTRACT => $newScore -= $points,
             Lead::POINTS_MULTIPLY => $newScore *= $points,
             Lead::POINTS_DIVIDE   => $newScore /= $points,
+            Lead::POINTS_SET      => $newScore = $points,
             default               => throw new \UnexpectedValueException('Invalid operator'),
         };
         $contactScore->setScore($newScore);

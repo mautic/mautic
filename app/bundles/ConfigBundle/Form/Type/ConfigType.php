@@ -10,10 +10,15 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
-    public function __construct(private RestrictionHelper $restrictionHelper, private EscapeTransformer $escapeTransformer)
-    {
+    public function __construct(
+        private RestrictionHelper $restrictionHelper,
+        private EscapeTransformer $escapeTransformer
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -26,7 +31,7 @@ class ConfigType extends AbstractType
         }
 
         if (isset($options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'])
-            && 1209600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
+            && 1_209_600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
         ) {
             $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'] = 14;
         }

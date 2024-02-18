@@ -9,14 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GraphAggregateStatsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private StatsCollectionHelper $statsCollectionHelper)
-    {
+    public function __construct(
+        private StatsCollectionHelper $statsCollectionHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StatEvents::AGGREGATE_STAT_REQUEST => ['onStatRequest', 0],
