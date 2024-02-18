@@ -511,7 +511,7 @@ class CommonController extends AbstractController implements MauticController
 
         $session = $request->getSession();
 
-        if (null === $name) {
+        if (empty($name)) {
             $name = InputHelper::clean($request->query->get('name'));
         }
         $name = 'mautic.'.$name;
