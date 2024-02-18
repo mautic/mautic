@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -53,7 +54,11 @@ class BroadcastSubscriber implements EventSubscriberInterface
         $emails = $this->model->getRepository()->getPublishedBroadcasts($event->getId());
 
         while (false !== ($email = $emails->next())) {
+            /** @var Email $emailEntity */
             $emailEntity                                            = $email[0];
+            if ($emailEntity->isVariant(true)) {
+                continue;
+            }
             list($sentCount, $failedCount, $failedRecipientsByList) = $this->model->sendEmailToLists(
                 $emailEntity,
                 null,

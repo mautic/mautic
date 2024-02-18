@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -143,6 +144,67 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
+    }
+
+    public function testEmailDetailPageForDisabledSendButton(): void
+    {
+        $segment = $this->createSegment();
+        $this->em->persist($segment);
+        $email   = $this->createEmail();
+        $email->setPublishUp(new \DateTime('now -1 hour'));
+        $email->addList($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringContainsString('Send', $html, $html);
+
+        $email->setPublishUp(new \DateTime('now +1 hour'));
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
+
+        $email->setPublishUp(null);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
+        $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
+    public function testEmailDetailPageForABTest(): void
+    {
+        $segment = $this->createSegment();
+        $this->em->persist($segment);
+
+        $parent = $this->createEmail();
+        $parent->setPublishDown(new \DateTime('now -1 hour'));
+        $parent->addList($segment);
+        $this->em->persist($parent);
+
+        $children = clone $parent;
+        $children->setName(sprintf('Variant of %s', $parent->getName()));
+        $children->setVariantParent($parent);
+        $children->setIsPublished(true);
+        $children->setVariantStartDate(new \DateTime('now -1 hour'));
+        $variantSetting = Serializer::decode('a:2:{s:6:"weight";i:50;s:14:"winnerCriteria";s:14:"email.openrate";}');
+        $children->setVariantSettings($variantSetting);
+        $this->em->persist($children);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $text    = $crawler->filterXPath('//*[@id="variants-container"]')->text();
+        $text    = preg_replace('/\s+/', ' ', $text);
+
+        $this->assertStringContainsStringIgnoringCase('Email A Current Parent 50%', $text, $text);
+        $this->assertStringContainsStringIgnoringCase(sprintf('Variant of %s 50%% Read rate', $parent->getName()), $text, $text);
     }
 
     /**
