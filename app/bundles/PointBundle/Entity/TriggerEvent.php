@@ -54,6 +54,11 @@ class TriggerEvent
      */
     private $changes;
 
+    public function __clone(): void
+    {
+        $this->id = null;
+    }
+
     public function __construct()
     {
         $this->log = new ArrayCollection();
