@@ -1,0 +1,16 @@
+{#
+Variables
+  - form
+#}
+{% if fields is not empty %}
+    {{ form_start(form) }}
+    {% for field in fields %}
+        <div class="row mt-sm mb-sm">
+            <div class="col-sm-4">{{ form_label(form[field]) }}</div>
+            <div class="col-sm-8">{{ form_widget(form[field]) }}</div>
+        </div>
+    {% endfor %}
+    {{ form_end(form, render_rest = false) }}
+{% else %}
+    <div class="alert alert-info mb-0"><strong>{{ 'mautic.point.form.no_point_groups'|trans }}</strong></div>
+{% endif %}

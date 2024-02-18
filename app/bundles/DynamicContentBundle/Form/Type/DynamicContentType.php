@@ -33,6 +33,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<DynamicContent>
+ */
 class DynamicContentType extends AbstractType
 {
     private $fieldChoices;
@@ -130,16 +133,14 @@ class DynamicContentType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'description',
-                TextareaType::class,
-                [
-                    'label'      => 'mautic.dynamicContent.description',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
-                    'required'   => false,
-                ]
-            )
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.dynamicContent.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);

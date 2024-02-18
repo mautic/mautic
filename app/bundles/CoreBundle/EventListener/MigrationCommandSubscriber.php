@@ -70,7 +70,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
 
     private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn): bool
     {
-        $tableColumns = $this->connection->getSchemaManager()->listTableColumns($generatedColumn->getTableName());
+        $tableColumns = $this->connection->createSchemaManager()->listTableColumns($generatedColumn->getTableName());
 
         if (isset($tableColumns[$generatedColumn->getColumnName()])) {
             return true;

@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Stats\Helper;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -95,7 +96,7 @@ abstract class AbstractHelper implements StatHelperInterface
         }
 
         $q->andWhere("$prefix.$column IN (:email_ids)");
-        $q->setParameter('email_ids', $ids, Connection::PARAM_INT_ARRAY);
+        $q->setParameter('email_ids', $ids, ArrayParameterType::INTEGER);
     }
 
     /**

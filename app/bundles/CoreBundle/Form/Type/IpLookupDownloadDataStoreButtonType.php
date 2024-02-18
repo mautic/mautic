@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
     public function __construct(

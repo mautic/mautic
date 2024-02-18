@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -428,7 +429,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     if ($event->hasFilter('e.id')) {
                         $filterParam = $event->createParameterName();
                         $qbcut->andWhere($qb->expr()->in('cut2.channel_id', ":{$filterParam}"));
-                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), Connection::PARAM_INT_ARRAY);
+                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), ArrayParameterType::INTEGER);
                     }
 
                     $qb->leftJoin(

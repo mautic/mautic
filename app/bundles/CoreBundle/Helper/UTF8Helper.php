@@ -2,6 +2,9 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * @deprecated as unused and unnecessary. To be removed in Mautic 6 without replacement.
+ */
 class UTF8Helper
 {
     public const ICONV_TRANSLIT = 'TRANSLIT';
@@ -299,20 +302,15 @@ class UTF8Helper
         return self::toUTF8($text);
     }
 
+    /**
+     * @return string|false
+     */
     protected static function utf8_decode($text, $option)
     {
-        if (self::WITHOUT_ICONV == $option || !function_exists('iconv')) {
-            $o = utf8_decode(
-                str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), self::toUTF8($text))
-            );
-        } else {
-            $o = iconv(
-                'UTF-8',
-                'Windows-1252'.(self::ICONV_TRANSLIT == $option ? '//TRANSLIT' : (self::ICONV_IGNORE == $option ? '//IGNORE' : '')),
-                $text
-            );
-        }
-
-        return $o;
+        return iconv(
+            'UTF-8',
+            'Windows-1252'.(self::ICONV_TRANSLIT == $option ? '//TRANSLIT' : (self::ICONV_IGNORE == $option ? '//IGNORE' : '')),
+            $text
+        );
     }
 }

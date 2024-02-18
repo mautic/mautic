@@ -68,13 +68,6 @@ return [
                 'alias' => 'channel',
             ],
         ],
-        'repositories' => [
-            'mautic.channel.repository.message_queue' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [\Mautic\ChannelBundle\Entity\MessageQueue::class],
-            ],
-        ],
     ],
 
     'parameters' => [

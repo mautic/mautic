@@ -27,11 +27,11 @@ class NotifierTest extends MauticMysqlTestCase
         $leads = $leadRepository->findBy([], [], 2);
 
         /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
-        $syncIntegrationsHelper = self::$container->get('mautic.integrations.helper.sync_integrations');
+        $syncIntegrationsHelper = static::getContainer()->get('mautic.integrations.helper.sync_integrations');
         $syncIntegrationsHelper->addIntegration(new ExampleIntegration(new ExampleSyncDataExchange()));
 
         /** @var Notifier $notifier */
-        $notifier = self::$container->get('mautic.integrations.sync.notifier');
+        $notifier = static::getContainer()->get('mautic.integrations.sync.notifier');
 
         $contactNotification = new NotificationDAO(
             new ObjectChangeDAO(
@@ -72,7 +72,7 @@ class NotifierTest extends MauticMysqlTestCase
         $qb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('bundle', $qb->expr()->literal('integrations')),
                     $qb->expr()->eq('object', $qb->expr()->literal(ExampleIntegration::NAME))
                 )

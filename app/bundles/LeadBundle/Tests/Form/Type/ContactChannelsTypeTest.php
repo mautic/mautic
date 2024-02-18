@@ -29,7 +29,7 @@ final class ContactChannelsTypeTest extends AbstractMauticTestCase
     }
 
     /**
-     * @param FormInterface<FormInterface> $form
+     * @param FormInterface<FormInterface<mixed>> $form
      */
     private function assertOptions(FormInterface $form, string $name, bool $hasHtml5): void
     {
@@ -39,11 +39,11 @@ final class ContactChannelsTypeTest extends AbstractMauticTestCase
     }
 
     /**
-     * @return FormInterface<FormInterface>
+     * @return FormInterface<FormInterface<mixed>>
      */
     private function createForm(bool $publicView): FormInterface
     {
-        return self::$container->get('form.factory')->create(
+        return self::getContainer()->get('form.factory')->create(
             ContactChannelsType::class,
             null,
             [

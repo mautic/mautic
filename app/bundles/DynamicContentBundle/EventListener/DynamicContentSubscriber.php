@@ -15,6 +15,7 @@ use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -38,7 +39,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         private DynamicContentHelper $dynamicContentHelper,
         private DynamicContentModel $dynamicContentModel,
         private CorePermissions $security,
-        private ContactTracker $contactTracker
+        private ContactTracker $contactTracker,
+        private CompanyModel $companyModel
     ) {
     }
 
@@ -93,9 +95,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
-        if ($content) {
+        if ($lead instanceof Lead && $content) {
+            $leadArray              = $this->dynamicContentHelper->convertLeadToArray($lead);
+            $leadArray['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($leadArray['id']);
+
             $tokens = array_merge(
-                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
+                TokenHelper::findLeadTokens($content, $leadArray),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
                 $this->formTokenHelper->findFormTokens($content),
@@ -154,7 +159,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
-        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
         $xpath = new \DOMXPath($dom);
 
         $divContent = $xpath->query('//*[@data-slot="dwc"]');
@@ -169,7 +174,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
+            $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 

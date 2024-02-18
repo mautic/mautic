@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Segment\Stat;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 
@@ -17,7 +16,7 @@ class SegmentChartQueryFactory
 
     public function getContactsAdded(SegmentContactsLineChartQuery $query): array
     {
-        return ArrayHelper::sum($query->getAddedEventLogStats(), $query->getDataFromLeadListLeads());
+        return $query->getAddedEventLogStats();
     }
 
     /**

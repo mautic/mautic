@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignConditionLeadPageHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

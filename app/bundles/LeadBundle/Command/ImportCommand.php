@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
@@ -21,7 +22,8 @@ class ImportCommand extends Command
 
     public function __construct(
         private TranslatorInterface $translator,
-        private ImportModel $importModel
+        private ImportModel $importModel,
+        private ProcessSignalService $processSignalService
     ) {
         parent::__construct();
     }
@@ -46,6 +48,8 @@ EOT
         $progress = new Progress($output);
         $id       = (int) $input->getOption('id');
         $limit    = (int) $input->getOption('limit');
+
+        $this->processSignalService->registerSignalHandler(fn (int $signal) => $output->writeln(sprintf('Signal %d caught.', $signal)));
 
         if ($id) {
             $import = $this->importModel->getEntity($id);

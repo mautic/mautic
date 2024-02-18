@@ -57,13 +57,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.dynamicContent.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\DynamicContentBundle\Entity\Stat::class,
-            ],
-        ],
         'other' => [
             'mautic.helper.dynamicContent' => [
                 'class'     => \Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class,

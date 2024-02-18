@@ -176,7 +176,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                 }
 
                                 /**
-                                 * @return FormInterface<FormInterface>
+                                 * @return FormInterface<FormInterface<mixed>>
                                  */
                                 public function get(string $name)
                                 {
@@ -203,8 +203,8 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                                 }
 
                                 /**
-                                 * @param FormInterface<FormInterface>|string $child
-                                 * @param mixed[]                             $options
+                                 * @param FormInterface<FormInterface<mixed>>|string $child
+                                 * @param mixed[]                                    $options
                                  */
                                 public function add($child, $type = null, array $options = [])
                                 {
