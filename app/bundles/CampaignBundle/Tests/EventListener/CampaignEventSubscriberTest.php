@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Tests\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -23,32 +24,37 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignEventSubscriber;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CampaignEventSubscriberTest extends \PHPUnit_Framework_TestCase
+class CampaignEventSubscriberTest extends TestCase
 {
-    /**
-     * @var CampaignEventSubscriber
-     */
-    private $fixture;
+    private CampaignEventSubscriber $fixture;
 
     /**
-     * @var EventRepository
+     * @var EventRepository|MockObject
      */
     private $eventRepo;
 
     /**
-     * @var NotificationHelper
+     * @var NotificationHelper|MockObject
      */
     private $notificationHelper;
 
-    public function setUp()
+    /**
+     * @var CampaignRepository|MockObject
+     */
+    private $campaignRepository;
+
+    public function setUp(): void
     {
         $this->eventRepo          = $this->createMock(EventRepository::class);
         $this->notificationHelper = $this->createMock(NotificationHelper::class);
-        $this->fixture            = new CampaignEventSubscriber($this->eventRepo, $this->notificationHelper);
+        $this->campaignRepository = $this->createMock(CampaignRepository::class);
+        $this->fixture            = new CampaignEventSubscriber($this->eventRepo, $this->notificationHelper, $this->campaignRepository);
     }
 
-    public function testEventFailedCountsGetResetOnCampaignPublish()
+    public function testEventFailedCountsGetResetOnCampaignPublish(): void
     {
         $campaign = new Campaign();
         // Ensure the campaign is unpublished
@@ -63,7 +69,7 @@ class CampaignEventSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
     }
 
-    public function testEventFailedCountsDoesNotGetResetOnCampaignUnPublish()
+    public function testEventFailedCountsDoesNotGetResetOnCampaignUnPublish(): void
     {
         $campaign = new Campaign();
         // Ensure the campaign is published
@@ -77,7 +83,7 @@ class CampaignEventSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
     }
 
-    public function testEventFailedCountsDoesNotGetResetWhenPublishedStateIsNotChanged()
+    public function testEventFailedCountsDoesNotGetResetWhenPublishedStateIsNotChanged(): void
     {
         $campaign = new Campaign();
 
@@ -87,7 +93,7 @@ class CampaignEventSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
     }
 
-    public function testFailedEventGeneratesANotification()
+    public function testFailedEventGeneratesANotification(): void
     {
         $mockLead     = $this->createMock(Lead::class);
         $mockCampaign = $this->createMock(Campaign::class);
@@ -124,7 +130,7 @@ class CampaignEventSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->fixture->onEventFailed($failedEvent);
     }
 
-    public function testFailedCountOverDisableCampaignThresholdDisablesTheCampaign()
+    public function testFailedCountOverDisableCampaignThresholdDisablesTheCampaign(): void
     {
         $mockLead     = $this->createMock(Lead::class);
         $mockCampaign = $this->createMock(Campaign::class);
@@ -162,16 +168,13 @@ class CampaignEventSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
 
-        $mockEm = $this->createMock(EntityManager::class);
-        $mockEm->expects($this->once())
-            ->method('persist')
+        $this->campaignRepository->expects($this->once())
+            ->method('saveEntity')
             ->with($mockCampaign);
 
         $mockCampaign->expects($this->once())
             ->method('setIsPublished')
             ->with(false);
-
-        $this->fixture->setEntityManager($mockEm);
 
         $this->fixture->onEventFailed($failedEvent);
     }

@@ -62,11 +62,6 @@ class NotificationHelper
 
         $campaign = $event->getCampaign();
 
-        // Campaign is already unpublished, do not trigger further notification/email
-        if (!$campaign->isPublished()) {
-            return;
-        }
-
         $this->notificationModel->addNotification(
             $campaign->getName().' / '.$event->getName(),
             'error',
@@ -78,69 +73,6 @@ class NotificationHelper
                         'mautic_campaign_action',
                         ['objectAction' => 'view', 'objectId' => $campaign->getId()]
                     ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
-                    '%event%' => $event->getName(),
-                ]
-            ),
-            null,
-            null,
-            $user
-        );
-
-        $subject = $this->translator->trans(
-            'mautic.campaign.event.campaign_unpublished.title',
-            [
-                '%title%' => $campaign->getName(),
-            ]
-        );
-
-        $content = $this->translator->trans(
-            'mautic.campaign.event.failed.campaign.unpublished',
-            [
-                '%campaign%' => '<a href="'.$this->router->generate(
-                    'mautic_campaign_action',
-                    [
-                        'objectAction' => 'view',
-                        'objectId'     => $campaign->getId(),
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
-                '%event%' => $event->getName(),
-            ]
-        );
-
-        $sendToAuthor = $this->coreParametersHelper->get('campaign_send_notification_to_author', 1);
-        if ($sendToAuthor) {
-            $this->userModel->emailUser($user, $subject, $content);
-        } else {
-            $emailAddresses =  array_map('trim', explode(',', $this->coreParametersHelper->get('campaign_notification_email_addresses')));
-            $this->userModel->sendMailToEmailAddresses($emailAddresses, $subject, $content);
-        }
-    }
-
-    public function notifyOfUnpublish(Event $event)
-    {
-        /**
-         * Pass a fake lead so we can just get the campaign creator.
-         */
-        $user = $this->getUser(new Lead(), $event);
-
-        if (!$user || !$user->getId()) {
-            return;
-        }
-
-        $campaign = $event->getCampaign();
-
-        $this->notificationModel->addNotification(
-            $campaign->getName().' / '.$event->getName(),
-            'error',
-            false,
-            $this->translator->trans(
-                'mautic.campaign.event.failed.campaign.unpublished',
-                [
-                    '%campaign%' => '<a href="'.$this->router->generate(
-                            'mautic_campaign_action',
-                            ['objectAction' => 'view', 'objectId' => $campaign->getId()]
-                        ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
                     '%event%' => $event->getName(),
                 ]
             ),

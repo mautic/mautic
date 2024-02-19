@@ -12,39 +12,19 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignEventSubscriber extends CommonSubscriber
+class CampaignEventSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var float
-     */
-    private $disableCampaignThreshold = 0.1;
+    private float $disableCampaignThreshold = 0.1;
 
-    /**
-     * @var EventRepository
-     */
-    private $eventRepository;
-
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
-
-    /**
-     * @param EventRepository    $eventRepository
-     * @param NotificationHelper $notificationHelper
-     */
-    public function __construct(EventRepository $eventRepository, NotificationHelper $notificationHelper)
+    public function __construct(private EventRepository $eventRepository,private NotificationHelper $notificationHelper,private CampaignRepository $campaignRepository)
     {
-        $this->eventRepository    = $eventRepository;
-        $this->notificationHelper = $notificationHelper;
     }
 
     /**
@@ -63,10 +43,8 @@ class CampaignEventSubscriber extends CommonSubscriber
     /**
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
-     *
-     * @param CampaignEvent $event
      */
-    public function onCampaignPreSave(CampaignEvent $event)
+    public function onCampaignPreSave(CampaignEvent $event): void
     {
         $campaign = $event->getCampaign();
         $changes  = $campaign->getChanges();
@@ -84,10 +62,8 @@ class CampaignEventSubscriber extends CommonSubscriber
     /**
      * Process the FailedEvent event. Notifies users and checks
      * failed thresholds to notify CS and/or disable the campaign.
-     *
-     * @param FailedEvent $event
      */
-    public function onEventFailed(FailedEvent $event)
+    public function onEventFailed(FailedEvent $event): void
     {
         $log           = $event->getLog();
         $failedEvent   = $log->getEvent();
@@ -101,7 +77,7 @@ class CampaignEventSubscriber extends CommonSubscriber
         if ($failedPercent >= $this->disableCampaignThreshold) {
             $this->notificationHelper->notifyOfUnpublish($failedEvent);
             $campaign->setIsPublished(false);
-            $this->em->persist($campaign);
+            $this->campaignRepository->saveEntity($campaign);
         }
     }
 }

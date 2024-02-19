@@ -371,10 +371,6 @@ class EventRepository extends CommonRepository
     /**
      * Update the failed count using DBAL to avoid
      * race conditions and deadlocks.
-     *
-     * @param Event $event
-     *
-     * @return int The current value of the failed_count
      */
     public function incrementFailedCount(Event $event)
     {
@@ -385,7 +381,7 @@ class EventRepository extends CommonRepository
             ->where($q->expr()->eq('id', ':id'))
             ->setParameter('id', $event->getId());
 
-        $q->execute();
+        $q->executeStatement();
 
         return $this->getFailedCount($event);
     }
@@ -393,12 +389,8 @@ class EventRepository extends CommonRepository
     /**
      * Get the up to date failed count
      * for the given Event.
-     *
-     * @param Event $event
-     *
-     * @return int The current value of the failed_count
      */
-    public function getFailedCount(Event $event)
+    public function getFailedCount(Event $event): int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -407,16 +399,14 @@ class EventRepository extends CommonRepository
             ->where($q->expr()->eq('id', ':id'))
             ->setParameter(':id', $event->getId());
 
-        return (int) $q->execute()->fetchColumn();
+        return (int) $q->executeQuery()->fetchFirstColumn();
     }
 
     /**
      * Reset the failed_count's for all events
      * within the given Campaign.
-     *
-     * @param Campaign $campaign
      */
-    public function resetFailedCountsForEventsInCampaign(Campaign $campaign)
+    public function resetFailedCountsForEventsInCampaign(Campaign $campaign): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -426,6 +416,6 @@ class EventRepository extends CommonRepository
             ->setParameter('failedCount', 0)
             ->setParameter('campaignId', $campaign->getId());
 
-        $q->execute();
+        $q->executeStatement();
     }
 }
