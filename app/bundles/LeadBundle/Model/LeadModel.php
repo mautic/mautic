@@ -636,10 +636,29 @@ class LeadModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
     {
-        $results = [];
+        $results    = [];
+
         switch ($type) {
             case 'user':
                 $results = $this->em->getRepository(User::class)->getUserList($filter, $limit, $start, ['lead' => 'leads']);
+                break;
+            case 'contact':
+                $fetchResults = $this->getEntities([
+                    'start'          => $start,
+                    'limit'          => $limit,
+                    'filter'         => ['string' => $filter],
+                ]);
+
+                $results = [];
+
+                /** @var Lead $fetchResult */
+                foreach ($fetchResults as $fetchResult) {
+                    $results[] = [
+                        'value' => $fetchResult->getName() ?: $fetchResult->getEmail(),
+                        'id'    => $fetchResult->getId(),
+                    ];
+                }
+
                 break;
         }
 

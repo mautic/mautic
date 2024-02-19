@@ -11,8 +11,10 @@ use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -27,6 +29,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class AjaxController extends CommonAjaxController
 {
@@ -50,7 +53,17 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getLeadIdsByFieldValueAction(Request $request): JsonResponse
+    public function contactListAction(Request $request, LeadModel $model): JsonResponse
+    {
+        $filter    = InputHelper::clean($request->query->get('filter'));
+        $results   = $model->getLookupResults('contact', $filter);
+
+        $results['success'] = 1;
+
+        return $this->sendJsonResponse($results);
+    }
+
+    public function getLeadIdsByFieldValueAction(Request $request, LeadModel $leadModel): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
         $value     = InputHelper::clean($request->query->get('value'));
@@ -58,8 +71,6 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['items' => []];
 
         if ($field && $value) {
-            $leadModel = $this->getModel('lead.lead');
-            \assert($leadModel instanceof LeadModel);
             $repo                       = $leadModel->getRepository();
             $leads                      = $repo->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
@@ -302,7 +313,59 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function toggleLeadListAction(Request $request): JsonResponse
+    /**
+     * Updates the timeline events and gets returns updated HTML.
+     */
+    protected function updateTimelineAction(Request $request, Session $session): JsonResponse
+    {
+        $dataArray     = ['success' => 0];
+        $includeEvents = InputHelper::clean($request->request->get('includeEvents') ?? []);
+        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents') ?? []);
+        $search        = InputHelper::clean($request->request->get('search'));
+        $leadId        = (int) $request->request->get('leadId');
+
+        if (!empty($leadId)) {
+            // find the lead
+            $model = $this->getModel('lead.lead');
+            $lead  = $model->getEntity($leadId);
+
+            if (null !== $lead) {
+                $filter = [
+                    'search'        => $search,
+                    'includeEvents' => $includeEvents,
+                    'excludeEvents' => $excludeEvents,
+                ];
+
+                $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filter);
+
+                // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
+                $dispatcher = $this->dispatcher;
+                $event      = new LeadTimelineEvent($lead, $filter);
+                $dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
+
+                $events     = $event->getEvents();
+                $eventTypes = $event->getEventTypes();
+
+                $timeline = $this->renderView(
+                    'MauticLeadBundle:Lead:history.html.php',
+                    [
+                        'events'       => $events,
+                        'eventTypes'   => $eventTypes,
+                        'eventFilters' => $filter,
+                        'lead'         => $lead,
+                    ]
+                );
+
+                $dataArray['success']      = 1;
+                $dataArray['timeline']     = $timeline;
+                $dataArray['historyCount'] = count($events);
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    protected function toggleLeadListAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
         $leadId    = (int) $request->request->get('leadId');
@@ -465,7 +528,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the rows for new leads.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary)
     {

@@ -437,10 +437,11 @@ class PublicController extends CommonFormController
     /**
      * Preview email.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, $objectId)
+    public function previewAction(AnalyticsHelper $analyticsHelper, Request $request, string $objectId, string $objectType = null)
     {
+        $contactId = (int) $request->query->get('contactId');
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
@@ -459,6 +460,16 @@ class PublicController extends CommonFormController
                 ))
         ) {
             return $this->accessDenied();
+        }
+
+        // bogus ID
+        if ($contactId && (
+            !$this->security->isAdmin()
+            || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+        )
+        ) {
+            // disallow displaying contact information
+            $contactId = null;
         }
 
         // bogus ID
@@ -497,17 +508,29 @@ class PublicController extends CommonFormController
         // Override tracking_pixel
         $tokens = ['{tracking_pixel}' => ''];
 
-        // Prepare a fake lead
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $fields     = $fieldModel->getFieldList(false, false);
-        array_walk(
-            $fields,
-            function (&$field): void {
-                $field = "[$field]";
-            }
-        );
-        $fields['id'] = 0;
+        // Prepare contact
+        if ($contactId) {
+            // We have one from request parameter
+            /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead.lead');
+            /** @var Lead $contact */
+            $contact = $leadModel->getEntity($contactId);
+            $contact = $contact->convertToArray();
+        } else {
+            // Generate faked one
+            /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+            $fieldModel = $this->getModel('lead.field');
+            $contact    = $fieldModel->getFieldList(false, false);
+
+            array_walk(
+                $contact,
+                function (&$field): void {
+                    $field = "[$field]";
+                }
+            );
+
+            $contact['id'] = 0;
+        }
 
         // Generate and replace tokens
         $event = new EmailSendEvent(
@@ -518,7 +541,7 @@ class PublicController extends CommonFormController
                 'idHash'       => $idHash,
                 'tokens'       => $tokens,
                 'internalSend' => true,
-                'lead'         => $fields,
+                'lead'         => $contact,
             ]
         );
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
