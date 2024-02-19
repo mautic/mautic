@@ -817,6 +817,50 @@ class MailHelperTest extends TestCase
         $this->assertNull($headers['List-Unsubscribe-Post'] ?? null);
     }
 
+    public function testUnsubscribeHeaderParameterOrder(): void
+    {
+        $mockRouter  = $this->createMock(Router::class);
+        $mockRouter->expects($this->once())
+            ->method('generate')
+            ->with('mautic_email_unsubscribe',
+                ['idHash' => 'hash'],
+                UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('https://example.com/email/unsubscribe/65842d012b5b5772172137');
+
+        $parameterMap = [
+            ['mailer_custom_headers', [], [
+                'X-Mautic-Test'    => 'test',
+                'X-Mautic-Test2'   => 'test',
+                'List-Unsubscribe' => '<mailto:list@host.com?subject=unsubscribe>',
+            ]],
+        ];
+
+        /** @var MockObject|MauticFactory $mockFactory */
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $mockFactory->method('getRouter')
+            ->willReturnOnConsecutiveCalls($mockRouter);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html></html>');
+
+        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->setIdHash('hash');
+        $mailer->setEmail($email);
+        $lead = new Lead();
+        $lead->setEmail('someemail@email.test');
+        $mailer->setLead($lead);
+
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
+        $headers = $mailer->getCustomHeaders();
+        $this->assertSame('<https://example.com/email/unsubscribe/65842d012b5b5772172137>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
+        $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
+    }
+
     protected function mockEmptyMailHelper(): MailHelper
     {
         $transport     = new SmtpTransport();
