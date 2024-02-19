@@ -285,7 +285,6 @@ return [
                     'event_dispatcher',
                     'mautic.campaign.scheduler',
                     'monolog.logger.mautic',
-                    'mautic.campaign.helper.notification',
                     'mautic.factory',
                     'mautic.tracker.contact',
                 ],

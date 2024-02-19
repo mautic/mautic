@@ -248,7 +248,6 @@ class LegacyEventDispatcherTest extends TestCase
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailures');
 
-
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
