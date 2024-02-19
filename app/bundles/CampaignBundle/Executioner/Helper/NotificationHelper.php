@@ -78,7 +78,7 @@ class NotificationHelper
                         'mautic_campaign_action',
                         [
                             'objectAction' => 'view',
-                            'objectId' => $campaign->getId()
+                            'objectId'     => $campaign->getId(),
                         ],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
