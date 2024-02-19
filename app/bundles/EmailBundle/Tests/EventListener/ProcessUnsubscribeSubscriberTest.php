@@ -23,6 +23,8 @@ final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $feedbackLoop;
 
+    private ProcessUnsubscribeSubscriber $subscriber;
+
     protected function setup(): void
     {
         parent::setUp();
@@ -32,7 +34,7 @@ final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber       = new ProcessUnsubscribeSubscriber($this->unsubscribe, $this->feedbackLoop);
     }
 
-    public function testOnEmailSend()
+    public function testOnEmailSend(): void
     {
         $helper = $this->createMock(MailHelper::class);
         $helper->method('generateUnsubscribeEmail')->willReturn('unsubscribe@example.com');

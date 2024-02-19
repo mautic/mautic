@@ -819,45 +819,46 @@ class MailHelperTest extends TestCase
 
     public function testUnsubscribeHeaderParameterOrder(): void
     {
+        $params = [
+            ['mailer_custom_headers', [],
+                [
+                    'X-Mautic-Test'    => 'test',
+                    'X-Mautic-Test2'   => 'test',
+                    'List-Unsubscribe' => '<mailto:list@host.com?subject=unsubscribe>',
+                ]],
+            ['secret_key', null, 'secret'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $mockRouter  = $this->createMock(Router::class);
         $mockRouter->expects($this->once())
             ->method('generate')
             ->with('mautic_email_unsubscribe',
-                ['idHash' => 'hash'],
+                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
                 UrlGeneratorInterface::ABSOLUTE_URL)
-            ->willReturn('https://example.com/email/unsubscribe/65842d012b5b5772172137');
+            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
 
-        $parameterMap = [
-            ['mailer_custom_headers', [], [
-                'X-Mautic-Test'    => 'test',
-                'X-Mautic-Test2'   => 'test',
-                'List-Unsubscribe' => '<mailto:list@host.com?subject=unsubscribe>',
-            ]],
-        ];
-
-        /** @var MockObject|MauticFactory $mockFactory */
-        $mockFactory = $this->getMockFactory(true, $parameterMap);
-
-        $mockFactory->method('getRouter')
-            ->willReturnOnConsecutiveCalls($mockRouter);
+        $this->mockFactory->method('getRouter')->willReturnOnConsecutiveCalls($mockRouter);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper);
+        $mailer->setIdHash('hash');
 
         $email = new Email();
         $email->setSubject('Test');
         $email->setCustomHtml('<html></html>');
-
-        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
-        $mailer->setIdHash('hash');
-        $mailer->setEmail($email);
         $lead = new Lead();
         $lead->setEmail('someemail@email.test');
+        $mailer->setIdHash('hash');
+        $mailer->setEmail($email);
         $mailer->setLead($lead);
 
         $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
         $headers = $mailer->getCustomHeaders();
-        $this->assertSame('<https://example.com/email/unsubscribe/65842d012b5b5772172137>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
+
+        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
         $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
     }
 
