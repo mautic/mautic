@@ -75,13 +75,11 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @param int $leadId
-     *
-     * @return array
+     * @return mixed[]
      *
      * @throws PrimaryCompanyNotFoundException
      */
-    public function getPrimaryCompanyByLeadId($leadId)
+    public function getPrimaryCompanyByLeadId(int $leadId): array
     {
         $companies = $this->getCompaniesByLeadId($leadId);
         foreach ($companies as $company) {

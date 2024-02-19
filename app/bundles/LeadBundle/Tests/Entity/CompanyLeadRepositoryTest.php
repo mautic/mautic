@@ -5,21 +5,21 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
-class CompanyLeadRepositoryTest extends \PHPUnit_Framework_TestCase
+class CompanyLeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CompanyLeadRepository $repoMock */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository */
     private $repoMock;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->repoMock = $this->getMockBuilder(CompanyLeadRepository::class)
-            ->setMethodsExcept(['getPrimaryCompanyByLeadId'])
+            ->onlyMethods(['getCompaniesByLeadId'])
             ->disableOriginalConstructor()
             ->getMock();
     }
 
-    public function testGetPrimaryCompanyByLeadIdThrowsExceptionIfPrimaryIsMissing()
+    public function testGetPrimaryCompanyByLeadIdThrowsExceptionIfPrimaryIsMissing(): void
     {
         $this->repoMock->expects($this->once())
             ->method('getCompaniesByLeadId')
@@ -34,7 +34,7 @@ class CompanyLeadRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repoMock->getPrimaryCompanyByLeadId(1);
     }
 
-    public function testGetPrimaryCompanyByLeadIdReturnsCorrectRecord()
+    public function testGetPrimaryCompanyByLeadIdReturnsCorrectRecord(): void
     {
         $this->repoMock->expects($this->once())
             ->method('getCompaniesByLeadId')
