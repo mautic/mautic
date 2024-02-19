@@ -11,6 +11,8 @@ use Mautic\PageBundle\Entity\Page;
 
 class Submission
 {
+    public const TABLE_NAME = 'form_submissions';
+
     /**
      * @var string
      */
@@ -22,7 +24,7 @@ class Submission
     private $form;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
@@ -60,7 +62,7 @@ class Submission
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('form_submissions')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\SubmissionRepository::class)
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
@@ -72,7 +74,7 @@ class Submission
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->addLead(true, 'SET NULL');
 
@@ -219,9 +221,7 @@ class Submission
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

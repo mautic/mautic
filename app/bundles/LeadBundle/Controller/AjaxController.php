@@ -894,4 +894,16 @@ class AjaxController extends CommonAjaxController
             'leadCount' => $leadCount,
         ];
     }
+
+    public function removeTagFromLeadAction(Request $request, LeadModel $leadModel): JsonResponse
+    {
+        $leadId    = (int) $request->request->get('leadId');
+        $tagId     = (int) $request->request->get('tagId');
+
+        if (!empty($leadId) && !empty($tagId)) {
+            $leadModel->removeTagFromLead($leadId, $tagId);
+        }
+
+        return $this->sendJsonResponse([]);
+    }
 }

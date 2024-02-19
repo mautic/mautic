@@ -12,6 +12,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData;
@@ -226,5 +227,15 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $reference = $this->fixtures->getReference($name);
 
         return $reference;
+    }
+
+    public function testSegmentRebuildCommandFailsOnMissingTable(): void
+    {
+        /** @var ContactSegmentService $contactSegmentService */
+        $contactSegmentService = $this->getContainer()->get('mautic.lead.model.lead_segment_service');
+        $reference             = $this->fixtures->getReference('table-name-missing-in-filter');
+
+        $this->expectException(TableNotFoundException::class);
+        $contactSegmentService->getTotalLeadListLeadsCount($reference);
     }
 }

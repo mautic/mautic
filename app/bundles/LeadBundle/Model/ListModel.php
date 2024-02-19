@@ -32,6 +32,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Psr\Log\LoggerInterface;
@@ -333,6 +334,11 @@ class ListModel extends FormModel
             return 0;
         } catch (SegmentNotFoundException) {
             // A segment from filter does not exist anymore. Do not rebuild.
+            return 0;
+        } catch (TableNotFoundException $e) {
+            // Invalid filter table, filter definition is not well asset or it is deleted.  Do not rebuild but log.
+            $this->logger->error($e->getMessage());
+
             return 0;
         }
 
