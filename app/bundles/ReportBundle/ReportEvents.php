@@ -115,5 +115,5 @@ final class ReportEvents
      *
      * @var string
      */
-    const REPORT_PERMANENT_FILE_CREATED = 'mautic.report_permanent_file_created';
+    public const REPORT_PERMANENT_FILE_CREATED = 'mautic.report_permanent_file_created';
 }

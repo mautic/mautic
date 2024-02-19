@@ -9,8 +9,8 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {

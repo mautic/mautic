@@ -141,7 +141,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         $this->fileHandler->moveZipToPermanentLocation($report, $filePath);
     }
 
-    public function testDeleteCompressedCsvFileForReportId()
+    public function testDeleteCompressedCsvFileForReportId(): void
     {
         $reportId   = 33;
         $tempDir    = sys_get_temp_dir();
@@ -156,7 +156,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         $this->createTmpFile('csv_reports/'.$fileName);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_temp_dir')
             ->willReturn($tempDir);
 

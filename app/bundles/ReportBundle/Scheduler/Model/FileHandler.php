@@ -14,10 +14,7 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class FileHandler
 {
-    /**
-     * @const string
-     */
-    const REPORTS_DIR = 'csv_reports';
+    private const REPORTS_DIR = 'csv_reports';
 
     public function __construct(
         private FilePathResolver $filePathResolver,
@@ -65,12 +62,7 @@ class FileHandler
         return $this->getPathToCompressedCsvFileForReportId($report->getId());
     }
 
-    /**
-     * @param int $reportId
-     *
-     * @return string;
-     */
-    public function getPathToCompressedCsvFileForReportId($reportId)
+    public function getPathToCompressedCsvFileForReportId(int $reportId): string
     {
         return $this->getCompressedCsvFileForReportDir()."/report_{$reportId}.zip";
     }
@@ -94,18 +86,12 @@ class FileHandler
         $this->filePathResolver->move($originalPath, $compressedCsvPath);
     }
 
-    /**
-     * @param string $filePath
-     */
-    public function delete($filePath)
+    public function delete(string $filePath): void
     {
         $this->filePathResolver->delete($filePath);
     }
 
-    /**
-     * @param int $reportId
-     */
-    public function deleteCompressedCsvFileForReportId($reportId)
+    public function deleteCompressedCsvFileForReportId(int $reportId): void
     {
         $filePath = $this->getPathToCompressedCsvFileForReportId($reportId);
         if (file_exists($filePath)) {
@@ -113,12 +99,10 @@ class FileHandler
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getCompressedCsvFileForReportDir()
+    public function getCompressedCsvFileForReportDir(): string
     {
         $reportDir = $this->coreParametersHelper->get('report_temp_dir');
+
         return $reportDir.'/'.self::REPORTS_DIR;
     }
 }

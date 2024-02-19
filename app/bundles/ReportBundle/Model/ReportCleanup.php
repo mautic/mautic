@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\ReportBundle\Model;
 
@@ -14,28 +6,13 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 
 class ReportCleanup
 {
-    /**
-     * @const int KEEP_FILE_DAYS
-     */
-    const KEEP_FILE_DAYS = 7;
+    public const KEEP_FILE_DAYS = 7;
 
-    /**
-     * @var FileHandler
-     */
-    private $fileHandler;
-
-    /**
-     * @param FileHandler $fileHandler
-     */
-    public function __construct(FileHandler $fileHandler)
+    public function __construct(private FileHandler $fileHandler)
     {
-        $this->fileHandler = $fileHandler;
     }
 
-    /**
-     * @param int $reportId
-     */
-    public function cleanup($reportId)
+    public function cleanup(int $reportId): void
     {
         if ($this->shouldBeDeleted($this->fileHandler->getPathToCompressedCsvFileForReportId($reportId))) {
             $this->fileHandler->deleteCompressedCsvFileForReportId($reportId);
@@ -45,7 +22,7 @@ class ReportCleanup
     /**
      * Deletes files older than KEEP_FILE_DAYS.
      */
-    public function cleanupAll()
+    public function cleanupAll(): void
     {
         $reportDirectory = $this->fileHandler->getCompressedCsvFileForReportDir();
 
@@ -67,14 +44,7 @@ class ReportCleanup
         }
     }
 
-    /**
-     * @param string $filePath
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    private function shouldBeDeleted($filePath)
+    private function shouldBeDeleted(string $filePath): bool
     {
         if (!file_exists($filePath)) {
             return false;

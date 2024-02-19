@@ -48,7 +48,7 @@ class SendSchedule
                 $this->fileHandler->moveZipToPermanentLocation($report, $zipFilePath);
                 $message = $this->messageSchedule->getMessageForLinkedFile($report);
                 $event   = new PermanentReportFileCreatedEvent($report);
-                $this->eventDispatcher->dispatch(ReportEvents::REPORT_PERMANENT_FILE_CREATED, $event);
+                $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_PERMANENT_FILE_CREATED);
             }
         }
 

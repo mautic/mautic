@@ -1,37 +1,25 @@
 <?php
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\ReportBundle\Model\ReportCleanup;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ReportCleanupTest extends \PHPUnit_Framework_TestCase
+class ReportCleanupTest extends TestCase
 {
-    /**
-     * @var FileHandler
-     */
-    private $fileHandler;
+    private MockObject|FileHandler $fileHandler;
 
-    /**
-     * @var ReportCleanup
-     */
-    private $cleanup;
+    private ReportCleanup $cleanup;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileHandler = $this->createMock(FileHandler::class);
         $this->cleanup     =  new ReportCleanup($this->fileHandler);
     }
 
-    public function testCleanupAll()
+    public function testCleanupAll(): void
     {
         $reportIds  = [11, 13, 33];
         $reportsDir = sys_get_temp_dir().'/csv_reports';
@@ -49,7 +37,7 @@ class ReportCleanupTest extends \PHPUnit_Framework_TestCase
             $days = ReportCleanup::KEEP_FILE_DAYS + 1;
 
             // this report shouldn't be deleted
-            if ($reportId === 33) {
+            if (33 === $reportId) {
                 $days = ReportCleanup::KEEP_FILE_DAYS - 1;
             }
 
@@ -62,15 +50,8 @@ class ReportCleanupTest extends \PHPUnit_Framework_TestCase
             ->willReturn($reportsDir);
 
         $this->fileHandler->expects($this->exactly(2))
-            ->method('delete');
-
-        $this->fileHandler->expects($this->at(1))
             ->method('delete')
-            ->with($filePaths[0]);
-
-        $this->fileHandler->expects($this->at(2))
-            ->method('delete')
-            ->with($filePaths[1]);
+            ->willReturnOnConsecutiveCalls($filePaths[0], $filePaths[1]);
 
         $this->cleanup->cleanupAll();
 
@@ -81,7 +62,7 @@ class ReportCleanupTest extends \PHPUnit_Framework_TestCase
         rmdir($reportsDir);
     }
 
-    public function testCleanup()
+    public function testCleanup(): void
     {
         $reportId   = 9;
         $reportsDir = sys_get_temp_dir().'/csv_reports';
@@ -111,7 +92,7 @@ class ReportCleanupTest extends \PHPUnit_Framework_TestCase
         rmdir($reportsDir);
     }
 
-    private function createTmpFile($filePath, $modifiedDate = null, $content = '')
+    private function createTmpFile(string $filePath, ?int $modifiedDate = null, string $content = ''): string
     {
         file_put_contents($filePath, $content);
         if (null !== $modifiedDate) {
@@ -121,11 +102,8 @@ class ReportCleanupTest extends \PHPUnit_Framework_TestCase
         return $filePath;
     }
 
-    private function getFilePath($reportsDir, $reportId)
+    private function getFilePath(string $reportsDir, int $reportId): string
     {
-        $fileName     = "report_{$reportId}.zip";
-        $filePath     = $reportsDir.'/'.$fileName;
-
-        return $filePath;
+        return $reportsDir.'/'."report_{$reportId}.zip";
     }
 }
