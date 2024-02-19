@@ -833,7 +833,7 @@ class AjaxController extends CommonAjaxController
         $ids      = $request->query->all()['ids'] ?? [];
         $entityid = $request->query->get('entityId');
 
-        $data = $segmentCampaignShareService->getCampaignsSegmentShare($entityid, $ids);
+        $data = $segmentCampaignShareService->getCampaignsSegmentShare((int) $entityid, $ids);
 
         $data = [
             'success' => 1,

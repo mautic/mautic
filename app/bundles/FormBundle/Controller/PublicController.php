@@ -26,7 +26,7 @@ class PublicController extends CommonFormController
         if ('POST' !== $request->getMethod()) {
             return $this->accessDenied();
         }
-        $isAjax        = $request->query->get('ajax', false);
+        $isAjax        = $request->query->get('ajax');
         $form          = null;
         $post          = $request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));

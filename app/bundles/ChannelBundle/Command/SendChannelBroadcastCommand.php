@@ -93,6 +93,30 @@ EOT
         $maxThreads    = $input->getOption('max-threads');
         $key           = sprintf('%s-%s-%s-%s', $channel, $channelId, $threadId, $maxThreads);
 
+        if (is_numeric($limit)) {
+            $limit = (int) $limit;
+        }
+
+        if (is_numeric($batch)) {
+            $batch = (int) $batch;
+        }
+
+        if (is_numeric($minContactId)) {
+            $minContactId = (int) $minContactId;
+        }
+
+        if (is_numeric($maxContactId)) {
+            $maxContactId = (int) $maxContactId;
+        }
+
+        if (is_numeric($threadId)) {
+            $threadId = (int) $threadId;
+        }
+
+        if (is_numeric($maxThreads)) {
+            $maxThreads = (int) $maxThreads;
+        }
+
         if ($threadId && $maxThreads) {
             if ((int) $threadId > (int) $maxThreads) {
                 $output->writeln('--thread-id cannot be larger than --max-thread');

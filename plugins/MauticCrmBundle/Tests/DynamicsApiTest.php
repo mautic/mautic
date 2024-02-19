@@ -32,7 +32,8 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->notificationModel,
             $this->fieldModel,
             $this->integrationEntityModel,
-            $this->doNotContact
+            $this->doNotContact,
+            $this->fieldsWithUniqueIdentifier
         );
 
         $this->api         = new DynamicsApi($this->integration);

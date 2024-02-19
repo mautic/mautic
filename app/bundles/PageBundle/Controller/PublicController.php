@@ -44,6 +44,7 @@ class PublicController extends CommonFormController
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         Tracking404Model $tracking404Model,
+        UrlGeneratorInterface $router,
         $slug)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
@@ -147,7 +148,7 @@ class PublicController extends CommonFormController
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
                                 // if not the parent, show the specific variant already displayed to the visitor
-                                if ($variantCookie !== $entity->getId()) {
+                                if ((int) $variantCookie !== $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
                                 } // otherwise proceed with displaying parent
                             }
@@ -273,7 +274,7 @@ class PublicController extends CommonFormController
             }
 
             $assetsHelper->addScript(
-                $this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                $router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'

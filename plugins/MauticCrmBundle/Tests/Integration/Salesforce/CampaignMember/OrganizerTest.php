@@ -3,8 +3,6 @@
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
-use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
-use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
 class OrganizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -118,22 +116,18 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
         $leads     = ['00Qf100000YjYv4EAF', '00Qf100000YjYv9EAF', '00Qf100000YjYvEEAV', '00Qf100000YjYvJEAV', '00Qf100000YjYvOEAV'];
         $this->assertEquals($leads, $organizer->getLeadIds());
 
-        /** @var Lead[] $organizedLeads */
         $organizedLeads = $organizer->getLeads();
         foreach ($leads as $id) {
             $this->assertArrayHasKey($id, $organizedLeads);
-            $this->assertInstanceOf(Lead::class, $organizedLeads[$id]);
             $this->assertEquals($id, $organizedLeads[$id]->getId());
         }
 
         $contacts  = ['00Qf100000YjYvTEAV', '00Qf100000X1NR5EAN', '00Qf100000YjYvYEAV', '00Qf100000YjYvdEAF', '00Qf100000YjYviEAF'];
         $this->assertEquals($contacts, $organizer->getContactIds());
 
-        /** @var Contact[] $organizedLeads */
         $organizedContacts = $organizer->getContacts();
         foreach ($contacts as $id) {
             $this->assertArrayHasKey($id, $organizedContacts);
-            $this->assertInstanceOf(Contact::class, $organizedContacts[$id]);
             $this->assertEquals($id, $organizedContacts[$id]->getId());
         }
     }

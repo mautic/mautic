@@ -158,6 +158,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->scheduleOnly = $input->getOption('scheduled-only');
         $this->inactiveOnly = $input->getOption('inactive-only');
 
+        $id            = $input->getOption('campaign-id');
         $batchLimit    = $input->getOption('batch-limit');
         $campaignLimit = $input->getOption('campaign-limit');
         $contactMinId  = $input->getOption('min-contact-id');
@@ -166,6 +167,34 @@ class TriggerCampaignCommand extends ModeratedCommand
         $contactIds    = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
         $threadId      = $input->getOption('thread-id');
         $maxThreads    = $input->getOption('max-threads');
+
+        if (is_numeric($id)) {
+            $id = (int) $id;
+        }
+
+        if (is_numeric($maxThreads)) {
+            $maxThreads = (int) $maxThreads;
+        }
+
+        if (is_numeric($threadId)) {
+            $threadId = (int) $threadId;
+        }
+
+        if (is_numeric($contactMaxId)) {
+            $contactMaxId = (int) $contactMaxId;
+        }
+
+        if (is_numeric($contactMinId)) {
+            $contactMinId = (int) $contactMinId;
+        }
+
+        if (is_numeric($contactId)) {
+            $contactId = (int) $contactId;
+        }
+
+        if (is_numeric($campaignLimit)) {
+            $campaignLimit = (int) $campaignLimit;
+        }
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
@@ -176,7 +205,6 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
-        $id = $input->getOption('campaign-id');
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {

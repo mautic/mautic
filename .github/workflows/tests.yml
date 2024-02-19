@@ -65,7 +65,7 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
         coverage: pcov
-        ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~"
+        ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
 
     - name: add MySQL config file
       run: |

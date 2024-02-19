@@ -501,7 +501,7 @@ class Import extends FormEntity
             return round(($processed / $total) * 100, 2);
         }
 
-        return 0;
+        return 0.0;
     }
 
     /**
@@ -562,8 +562,6 @@ class Import extends FormEntity
     }
 
     /**
-     * @param int $dateStarted
-     *
      * @return Import
      */
     public function setDateStarted(\DateTime $dateStarted)
@@ -575,7 +573,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateStarted()
     {
@@ -695,7 +693,7 @@ class Import extends FormEntity
             return round($processedRows / $runtime, 2);
         }
 
-        return $processedRows;
+        return (float) $processedRows;
     }
 
     /**

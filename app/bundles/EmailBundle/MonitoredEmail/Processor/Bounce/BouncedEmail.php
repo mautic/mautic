@@ -24,10 +24,7 @@ class BouncedEmail
      */
     private $bounceType;
 
-    /**
-     * @var int
-     */
-    private $final = 0;
+    private bool $final = false;
 
     /**
      * @var string|null
@@ -115,7 +112,7 @@ class BouncedEmail
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function isFinal()
     {

@@ -186,7 +186,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration = $this->createMock(SalesforceIntegration::class);
         $message     = 'Fatal error';
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturn(
                 [
@@ -218,7 +218,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -228,7 +228,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
@@ -267,7 +267,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -277,7 +277,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
@@ -314,7 +314,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -324,7 +324,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {
@@ -356,7 +356,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl'])
             ->getMock();
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('mergeConfigToFeatureSettings')
             ->willReturn(
                 [
@@ -366,7 +366,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $integration->expects($this->exactly(1))
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturnCallback(
                 function ($url, $parameters = [], $method = 'GET', $settings = []): void {

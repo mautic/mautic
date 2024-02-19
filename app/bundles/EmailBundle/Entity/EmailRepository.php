@@ -49,7 +49,7 @@ class EmailRepository extends CommonRepository
      *
      * @param string $email
      *
-     * @return bool
+     * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
     public function checkDoNotEmail($email)
     {

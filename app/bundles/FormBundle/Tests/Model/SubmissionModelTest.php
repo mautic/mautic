@@ -328,7 +328,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         };
         $formModel->setFields($form, $fields);
 
-        /** @var SubmissionEvent $submissionEvent */
         $submissionEvent = $this->submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
         $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
         $tokens = $submissionEvent->getTokens();

@@ -46,7 +46,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 }
 
                 /**
-                 * @param array<mixed> $requestedPermission
+                 * @param string $requestedPermission
                  */
                 public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
                 {
@@ -73,7 +73,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 }
 
                 /**
-                 * @param array<mixed> $requestedPermission
+                 * @param string $requestedPermission
                  */
                 public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
                 {
