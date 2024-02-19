@@ -372,7 +372,7 @@ class EventRepository extends CommonRepository
      * Update the failed count using DBAL to avoid
      * race conditions and deadlocks.
      */
-    public function incrementFailedCount(Event $event)
+    public function incrementFailedCount(Event $event): int
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 

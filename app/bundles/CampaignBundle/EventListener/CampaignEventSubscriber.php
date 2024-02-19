@@ -1,13 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\CampaignBundle\EventListener;
 
@@ -23,14 +15,14 @@ class CampaignEventSubscriber implements EventSubscriberInterface
 {
     private float $disableCampaignThreshold = 0.1;
 
-    public function __construct(private EventRepository $eventRepository,private NotificationHelper $notificationHelper,private CampaignRepository $campaignRepository)
+    public function __construct(private EventRepository $eventRepository, private NotificationHelper $notificationHelper, private CampaignRepository $campaignRepository)
     {
     }
 
     /**
      * Get the subscribed events for this listener.
      *
-     * @return array
+     * @return array<string,mixed>
      */
     public static function getSubscribedEvents()
     {
@@ -53,7 +45,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
             list($actual, $inMemory) = $changes['isPublished'];
 
             // If we're publishing the campaign
-            if ($actual === false && $inMemory === true) {
+            if (false === $actual && true === $inMemory) {
                 $this->eventRepository->resetFailedCountsForEventsInCampaign($campaign);
             }
         }
