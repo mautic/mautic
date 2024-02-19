@@ -85,7 +85,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function getSecretKeys(): array
     {
         return [
-            'password','appcookie'
+            'password', 'appcookie',
         ];
     }
 
@@ -135,13 +135,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Append ClientID into header to enable authentication
+     * Append ClientID into header to enable authentication.
      *
-     * @param string $url
+     * @param string       $url
      * @param array<mixed> $parameters
-     * @param string $method
+     * @param string       $method
      * @param array<mixed> $settings
-     * @param string $authType
+     * @param string       $authType
      *
      * @return array<mixed>
      */
