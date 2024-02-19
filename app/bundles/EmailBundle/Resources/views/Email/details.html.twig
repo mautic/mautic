@@ -321,20 +321,54 @@
                   <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
               </div>
               <div class="panel-body pt-xs">
-                  <div class="input-group">
-                      <div class="input-group-addon">
-                          {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
-                              'item'  : email,
-                              'model' : 'email',
-                              'query' : 'customToggle=publicPreview'
-                          }) -}}
+                  {% if previewSettingsForm.translation is defined %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="control-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
+                          {{ form_widget(previewSettingsForm.translation, {'attr': {'class': 'form-control'}}) }}
                       </div>
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
-                      <span class="input-group-btn">
-                      <button class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
-                          <i class="fa fa-external-link"></i>
-                      </button>
-                  </span>
+                  </div>
+                  {% endif %}
+                  {% if previewSettingsForm.variant is defined %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="control-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
+                          {{ form_widget(previewSettingsForm.variant, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                  </div>
+                  {% endif %}
+                  {% if previewSettingsForm.contact is defined %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                          {{ form_widget(previewSettingsForm.contact, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                  </div>
+                  {% endif %}
+                  {% if previewSettingsForm.company is defined %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="control-label">{{ 'mautic.email.preview.show.company'|trans }}</div>
+                          {{ form_widget(previewSettingsForm.company, {'attr': {'class': 'form-control'}}) }}
+                      </div>
+                  </div>
+                  {% endif %}
+                  <div class="row">
+                      <div class="input-group">
+                          <div class="input-group-addon">
+                              {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                  'item'  : email,
+                                  'model' : 'email',
+                                  'query' : 'customToggle=publicPreview'
+                              }) -}}
+                          </div>
+                          <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
+                          <span class="input-group-btn">
+                              <button class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
+                                  <i class="fa fa-external-link"></i>
+                              </button>
+                          </span>
+                      </div>
                   </div>
               </div>
           </div>
