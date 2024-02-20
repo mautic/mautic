@@ -2,8 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
-use Doctrine\ORM\EntityManager;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;

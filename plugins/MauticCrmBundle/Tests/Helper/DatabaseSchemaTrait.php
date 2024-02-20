@@ -1,12 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        http://mautic.com
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Helper;
 
@@ -27,7 +20,7 @@ trait DatabaseSchemaTrait
             static::$kernel->boot();
             $container = static::$kernel->getContainer();
 
-            //setup the request stack
+            // setup the request stack
             $request      = Request::createFromGlobals();
             $requestStack = new RequestStack();
             $requestStack->push($request);

@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
-use GuzzleHttp\Psr7\Request;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\Notification;
@@ -44,7 +35,8 @@ use Symfony\Component\Routing\Router;
 
 class SalesforceIntegrationFunctionalTest extends WebTestCase
 {
-    use DatabaseSchemaTrait, FixtureObjectsTrait;
+    use DatabaseSchemaTrait;
+    use FixtureObjectsTrait;
 
     /**
      * @var array
@@ -73,7 +65,7 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
             $fixturesDirectory.'/roles.yml',
             $fixturesDirectory.'/users.yml',
             $fixturesDirectory.'/leads.yml',
-        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+        ], false, null, 'doctrine'); // ,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
 
@@ -184,7 +176,7 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
         $sf->method('request')
             ->will(
                 $this->returnCallback(
-                    function () use ($maxSfContacts, $maxSfLeads, $updateObject) {
+                    function () {
                     }
                 )
             );
@@ -213,25 +205,25 @@ class SalesforceIntegrationFunctionalTest extends WebTestCase
             $args = func_get_args();
             // Determine what to return by analyzing the URL and query parameters
             switch (true) {
-                case strpos($args[0], '/query') !== false:
-                    if (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
+                case false !== strpos($args[0], '/query'):
+                    if (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Campaign')) {
                         return [
                             'totalSize' => 0,
                             'records'   => [],
                         ];
-                    } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
+                    } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Account')) {
                         return [
                             'totalSize' => 0,
                             'records'   => [],
                         ];
-                    } elseif (isset($args[1]['q']) && $args[1]['q'] === 'SELECT CreatedDate from Organization') {
+                    } elseif (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
                         return [
                             'records' => [
                                 ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
                             ],
                         ];
-                    } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Lead') !== false) {
-                        if (strpos($args[1]['q'], 'HasOptedOutOfEmail') !== false) {
+                    } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Lead')) {
+                        if (false !== strpos($args[1]['q'], 'HasOptedOutOfEmail')) {
                             $errorMessage = "
 SELECT Company, Email, LastName, HasOptedOutOfEmail, Id from Lead
                                  ^
@@ -246,7 +238,7 @@ No such column 'HasOptedOutOfEmail' on entity 'Lead'. If you are attempting to u
 
                             return $response;
                         }
-                    } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Contact') !== false) {
+                    } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Contact')) {
                         $response = [
                             'totalSize' => 1,
                             'done'      => true,
@@ -262,7 +254,8 @@ No such column 'HasOptedOutOfEmail' on entity 'Lead'. If you are attempting to u
 
                         return $response;
                     }
-                case strpos($args[0], '/composite') !== false:
+                    // no break
+                case false !== strpos($args[0], '/composite'):
                     return $this->getSalesforceCompositeResponse($args[1]);
             }
         });
