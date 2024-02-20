@@ -65,7 +65,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
 
         $this->notificationHelper->notifyOfFailure($log->getLead(), $failedEvent);
 
-        if ($failedPercent >= $this->disableCampaignThreshold) {
+        if ($failedPercent >= $this->disableCampaignThreshold && $campaign->isPublished()) {
             $this->notificationHelper->notifyOfUnpublish($failedEvent);
             $campaign->setIsPublished(false);
             $this->campaignRepository->saveEntity($campaign);

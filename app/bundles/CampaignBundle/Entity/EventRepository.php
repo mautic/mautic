@@ -397,9 +397,9 @@ class EventRepository extends CommonRepository
         $q->select('failed_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->where($q->expr()->eq('id', ':id'))
-            ->setParameter(':id', $event->getId());
+            ->setParameter('id', $event->getId());
 
-        return (int) $q->executeQuery()->fetchFirstColumn();
+        return (int) $q->executeQuery()->fetchOne();
     }
 
     /**
