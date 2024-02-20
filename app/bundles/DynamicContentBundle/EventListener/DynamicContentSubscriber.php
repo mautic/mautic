@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -96,9 +97,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $clickthrough = $event->getClickthrough();
 
         if ($lead instanceof Lead && $content) {
-            $leadArray              = $this->dynamicContentHelper->convertLeadToArray($lead);
-            $leadArray['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($leadArray['id']);
-
+            $leadArray = $lead->getProfileFields();
+            try {
+                $primaryCompany         = $this->companyModel->getCompanyLeadRepository()->getPrimaryCompanyByLeadId($lead->getId());
+                $leadArray['companies'] = [$primaryCompany];
+            } catch (PrimaryCompanyNotFoundException) {
+            }
             $tokens = array_merge(
                 TokenHelper::findLeadTokens($content, $leadArray),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
@@ -150,8 +154,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        $result    = [];
+        $leadArray = [];
+        if ($lead instanceof Lead) {
+            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
+        }
+
+        $result = [];
         foreach ($tokens as $token => $dwc) {
             $result[$token] = '';
             if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
