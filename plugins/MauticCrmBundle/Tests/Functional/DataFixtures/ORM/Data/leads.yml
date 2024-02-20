@@ -1,7 +1,0 @@
-Mautic\LeadBundle\Entity\Lead:
-  contact{1..10}:
-    firstname: '<firstName()>'
-    lastname: '<lastName()>'
-    is_published: 1
-    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
-    email: '<email()>'

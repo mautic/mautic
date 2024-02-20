@@ -7,7 +7,6 @@ use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
-use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * @property SalesforceIntegration $integration
@@ -234,11 +233,11 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      *
      * @throws ApiErrorException
      */
-    public function createLeadActivity(array $activity, $object)
+    public function createLeadActivity(array $activity, $object): array
     {
         $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
