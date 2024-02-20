@@ -138,15 +138,15 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param int            $emailId
-     * @param int[]|null     $variantIds
-     * @param int[]|null     $listIds
-     * @param bool           $countOnly
-     * @param int|null       $limit
-     * @param int|null       $minContactId
-     * @param int|null       $maxContactId
-     * @param bool           $countWithMaxMin
-     * @param \DateTime|null $maxDate
+     * @param int                     $emailId
+     * @param int[]|null              $variantIds
+     * @param int[]|null              $listIds
+     * @param bool                    $countOnly
+     * @param int|null                $limit
+     * @param int|null                $minContactId
+     * @param int|null                $maxContactId
+     * @param bool                    $countWithMaxMin
+     * @param \DateTimeInterface|null $maxDate
      *
      * @return QueryBuilder|int|array
      */
@@ -318,8 +318,7 @@ class EmailRepository extends CommonRepository
         $q->select('COUNT(l.id) as count, MIN(l.id) as min_id, MAX(l.id) as max_id');
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
         $q->innerJoin('l', '('.$pq->getSQL().')', 's', $q->expr()->eq('l.id', 's.id'));
-
-        $this->copyParams($pq, $q);
+        $q->setParameter('false', false, 'boolean');
 
         if (null !== $maxDate) {
             $q->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
