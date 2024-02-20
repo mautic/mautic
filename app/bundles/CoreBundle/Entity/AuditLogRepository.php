@@ -231,11 +231,9 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param int $limit
-     *
      * @return array<mixed>
      */
-    public function getLogsForUser(User $user, $limit = 15)
+    public function getLogsForUser(User $user, int $limit = 15): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object,
