@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $ipLookupHelper   = $this->createMock(IpLookupHelper::class);
         $auditLogModel    = $this->createMock(AuditLogModel::class);
@@ -32,13 +32,13 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnSegmentPostSave()
+    public function testOnSegmentPostSave(): void
     {
         $this->onSegmentPostSaveMethodCall(false); // update segment log
         $this->onSegmentPostSaveMethodCall(true); // create segment log
     }
 
-    public function testOnSegmentDelete()
+    public function testOnSegmentDelete(): void
     {
         $segmentId        = 1;
         $segmentName      = 'name';
@@ -86,7 +86,7 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
      *
      * @param bool $isNew
      */
-    private function onSegmentPostSaveMethodCall($isNew)
+    private function onSegmentPostSaveMethodCall($isNew): void
     {
         $segmentId = 1;
         $changes   = ['changes'];

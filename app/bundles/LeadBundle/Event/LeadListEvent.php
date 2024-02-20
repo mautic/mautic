@@ -29,7 +29,7 @@ class LeadListEvent extends CommonEvent
     /**
      * Sets the List entity.
      */
-    public function setList(LeadList $list)
+    public function setList(LeadList $list): void
     {
         $this->entity = $list;
     }

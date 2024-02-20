@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -32,8 +32,8 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('objectType', $objectType)
             ->setParameter('objectId', $objectId)
-            ->setParameter('columnNames', $columnNames, Connection::PARAM_STR_ARRAY)
-            ->execute();
+            ->setParameter('columnNames', $columnNames, ArrayParameterType::STRING)
+            ->executeStatement();
     }
 
     /**
@@ -57,16 +57,14 @@ class FieldChangeRepository extends CommonRepository
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where($expr)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * @param int|null $afterObjectId
      * @param int      $objectCount
-     *
-     * @return array
      */
-    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100)
+    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100): array
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -93,7 +91,7 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         $objectIds = [];
         foreach ($results as $result) {
@@ -120,15 +118,13 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectType', $objectType)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     /**
      * @param int $objectId
-     *
-     * @return array
      */
-    public function findChangesForObject(string $integration, string $objectType, $objectId)
+    public function findChangesForObject(string $integration, string $objectType, $objectId): array
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -147,6 +143,6 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectId', (int) $objectId)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

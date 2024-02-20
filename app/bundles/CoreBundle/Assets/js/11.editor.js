@@ -159,7 +159,45 @@ Mautic.configureDynamicContentAtWhoTokens = function() {
 };
 
 Mautic.insertTextInEditor = function (obj, text) {
-    obj.ckeditor().editor.insertHtml(text);
+    const ckEditor = ckEditors.get( obj[0] );
+    ckEditor.model.change( writer => {
+        writer.insertText( text, ckEditor.model.document.selection.getFirstPosition() );
+    });
+}
+
+Mautic.MentionLinks =  function (editor) {
+
+    editor.conversion.for( 'upcast' ).elementToAttribute( {
+        view: {
+            name: 'span',
+            key: 'data-fr-verified',
+            classes: 'atwho-inserted'
+        },
+        model: {
+            key: 'mention',
+            value: viewItem => editor.plugins.get( 'Mention' ).toMentionAttribute( viewItem )
+        },
+        converterPriority: 'high'
+    } );
+
+    editor.conversion.for( 'downcast' ).attributeToElement( {
+        model: 'mention',
+        view: ( modelAttributeValue, { writer } ) => {
+            if ( !modelAttributeValue ) {
+                return;
+            }
+
+            return writer.createAttributeElement( 'span', {
+                class: 'atwho-inserted',
+                'data-fr-verified': true
+            }, {
+                priority: 20,
+                id: modelAttributeValue.uid
+            } );
+        },
+        converterPriority: 'high'
+
+    } );
 }
 
 /*
@@ -167,8 +205,11 @@ Mautic.insertTextInEditor = function (obj, text) {
  */
 Mautic.customItemRenderer = function (item) {
     let tokenId = item.id;
-    const id = item.id;
-    let tokenName = item.token_name;
+    let tokenName = item.name;
+    const itemElement = document.createElement( 'span' );
+    const idElement = document.createElement( 'span' );
+    idElement.classList.add( 'custom-item-id' );
+    itemElement.classList.add( 'custom-item' );
     const tokenNameArr = tokenName.split(':');
 
     if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
@@ -183,76 +224,56 @@ Mautic.customItemRenderer = function (item) {
         tokenName = 'Company ' + tokenName;
     }
 
-    return '<li data-id="'+id+'">' +
-    '<strong class="mention_token_name">'+tokenName+'</strong>' +
-    '<span class="mention_token_id"> '+tokenId+'</span>' +
-    '</li>';
+    itemElement.textContent = tokenName;
+    idElement.textContent = tokenId;
+    itemElement.appendChild( idElement );
+    return itemElement;
 }
 
-Mautic.customItemOutputRenderer = function (item) {
-    let id = original_id = item.id;
-    let label = item.token_name;
-    const tokenNameArr = label.split(':');
-    if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
-    {
-        id = label =  tokenNameArr[1];
+Mautic.getFeedItems = function (queryText) {
+    return new Promise( resolve => {
+        setTimeout( () => {
+            const itemsToDisplay = Mautic.builderTokensForCkEditor
+                .filter( isItemMatching )
+                .slice( 0, 5 );
+            resolve( itemsToDisplay );
+        }, 100 );
+    } );
+
+    function isItemMatching(item) {
+        const searchString = queryText.toLowerCase();
+        return (
+            item.name.toLowerCase().includes( searchString ) ||
+            item.id.toLowerCase().includes( searchString )
+        );
     }
-
-    let content = "<span class='atwho-inserted' data-fr-verified='true'>"+id+"</span>";
-    if (original_id.match(/assetlink=/i)) {
-        content = '<a title="Asset Link" href="' + id + '">' + label + '</a>';
-    } else if (original_id.match(/pagelink=/i)) {
-        content = '<a title="Page Link" href="' + id + '">' + label + '</a>';
-    }
-    return content;
-}
-
-Mautic.getFeedItems = function (opts, callback) {
-    let data = Mautic.builderTokensForCkEditor.filter(function(item) {
-            const searchString = opts.query.toLowerCase();
-            return (
-                item.token_name.toLowerCase().includes( searchString ) ||
-                item.id.toLowerCase().includes( searchString )
-            );
-        });
-
-    data = data.sort(function(a, b) {
-        return a.token_name.localeCompare(b.token_name, undefined, {
-            sensitivity: 'accent'
-        });
-    });
-
-    callback(data);
 }
 
 Mautic.getTokensForPlugIn = function(method) {
     method = typeof method != 'undefined' ? method : 'page:getBuilderTokens';
-    const d = mQuery.Deferred();
     // OK, let's fetch the tokens.
     mQuery.ajax({
         url: mauticAjaxUrl,
         data: 'action=' + method,
+        async: false,
         success: function (response) {
             if (typeof response.tokens === 'object') {
                 Mautic.builderTokens = response.tokens;
                 Mautic.configureDynamicContentAtWhoTokens();
                 mQuery.extend(Mautic.builderTokens, Mautic.dynamicContentTokens);
                 Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
-                    return {'id':i, 'name':value, 'token_name': value};
+                    return {'id':i, 'name':value};
                 });
-                d.resolve(Mautic.builderTokensForCkEditor);
             }
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            d.reject();
         },
         complete: function() {
             Mautic.builderTokensRequestInProgress = false;
-            return d.promise();
         }
     });
-    return d.promise();
+    return Mautic.builderTokensForCkEditor;
 };
 
 Mautic.getCKEditorFonts = function(fonts) {
@@ -269,92 +290,148 @@ Mautic.getCKEditorFonts = function(fonts) {
 }
 
 Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
-    const defaultOptions = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
+    if (ckEditors.has( textarea[0] ))
+    {
+        ckEditors.get( textarea[0] ).destroy();
+        ckEditors.delete( textarea[0] )
+    }
+    const tokenCallback = textarea.attr('data-token-callback');
+    Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback));
+}
+
+Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback) {
+    const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
     const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
 
     const ckEditorOption = {
-        toolbar: ckEditorToolbar,
-        skin: 'moono-lisa',
-        extraPlugins: 'sourcedialog,mentions',
-        removePlugins: 'flash,forms,iframe,exportpdf',
-        allowedContent: true,
-        entities:  false,
-        enterMode: CKEDITOR.ENTER_P,
-        fillEmptyBlocks: false,
-        font_names: Mautic.getCKEditorFonts(mauticEditorFonts).join(';'),
-        filebrowserBrowseUrl : Mautic.elfinderURL+'?editor=ckeditor',
-        customConfig: '', // disable loading the default config.js file that is disabling the Underscore button.
+        toolbar: {
+            items: ckEditorToolbar,
+            shouldNotGroupWhenFull: true
+        },
+        fontFamily: {
+            options: Mautic.getCKEditorFonts(mauticEditorFonts),
+            shouldNotGroupWhenFull: true
+        },
+        fontSize: {
+            options: [8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48, 72],
+            supportAllValues : true
+        }
     };
-    if (ckEditorToolbar[0].indexOf('InsertToken') > -1)
+
+
+    mQuery.extend(ckEditorOption, {
+        autosave: {
+            save( editor ) {
+                editor.updateSourceElement();
+            }
+        }
+    });
+
+    if (ckEditorToolbar.indexOf('ckfinder') > -1)
     {
-        Mautic.getTokensForPlugIn(textarea.attr('data-token-callback')).done(function(tokens) {
-            mQuery.extend(ckEditorOption, {
-                mentions: [{
-                    marker: '{',
-                    minChars: 0,
-                    feed: Mautic.getFeedItems,
-                    itemTemplate: Mautic.customItemRenderer,
-                    outputTemplate: Mautic.customItemOutputRenderer,
-                }],
-                on: {
-                    pluginsLoaded: function() {
-                        const editor = this,
-                            config = editor.config;
+        mQuery.extend(ckEditorOption, {
+            ckfinder: {
+                uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor'
+            },
+            image: {
+                toolbar: [
+                    'imageResize',
+                    'imageTextAlternative',
+                    '|',
+                    'imageStyle:inline',
+                    'imageStyle:block',
+                    'imageStyle:side',
+                    '|',
+                    'linkImage'
+                ],
+            }
+        });
+    } else {
+        mQuery.extend(ckEditorOption, {
+            removePlugins: ["Image", "ImageCaption", "ImageInsert", "ImageResize", "ImageStyle", "ImageToolbar", "AutoImage", "ImageInline"]
+        });
+    }
 
-                        editor.ui.addRichCombo( 'InsertToken', {
-                            label: 'Insert Token',
-                            title: 'Insert Token',
+    if (ckEditorToolbar.indexOf('insertTable') > -1)
+    {
+        mQuery.extend(ckEditorOption, {
+            table: {
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells'
+                ]
+            }
+        });
+    }
 
-                            panel: {
-                                css: [ CKEDITOR.skin.getPath( 'editor' ) ].concat( config.contentsCss ),
-                                multiSelect: false,
-                                attributes: { 'aria-label': 'Insert Token' }
-                            },
-
-                            init: function() {
-                                const me = this;
-                                Mautic.builderTokensForCkEditor.forEach(function(item){
-                                    let key = item.id;
-                                    let value = item.name;
-                                    if (key.match(/assetlink=/i) && value.match(/a:/)){
-                                        const nv = value.replace('a:', '');
-                                        key = '<a title="Asset Link" href="' + key + '">' + nv + '</a>';
-                                        value = nv;
-                                    } else if (key.match(/pagelink=/i) && value.match(/a:/)){
-                                        const nv = value.replace('a:', '');
-                                        key = '<a title="Page Link" href="' + key + '">' + nv + '</a>';
-                                        value = nv;
-                                    } else if (key.match(/dwc=/i)){
-                                        var tn = key.substr(5, key.length - 6);
-                                        value = value + ' (' + tn + ')';
-                                    } else if (key.match(/contactfield=company/i) && !value.match(/company/i)){
-                                        value = 'Company ' + value;
-                                    }
-
-                                    me.add( key, value);
-                                })
-                            },
-
-                            onClick: function( value ) {
-                                editor.focus();
-                                editor.fire( 'saveSnapshot' );
-                                editor.insertHtml( value)
-                                editor.fire( 'saveSnapshot' );
-                            }
-                        } );
+    if (ckEditorToolbar.indexOf('TokenPlugin') > -1)
+    {
+        const tokens = Mautic.getTokensForPlugIn(tokenCallback);
+        mQuery.extend(ckEditorOption, {
+            extraPlugins: [Mautic.MentionLinks],
+            dynamicTokenLabel: 'Insert token',
+            dynamicToken: tokens,
+            mention: {
+                feeds: [
+                    {
+                        marker: '{',
+                        feed: Mautic.getFeedItems,
+                        itemRenderer: Mautic.customItemRenderer
                     }
-                }
-            });
-
-            Mautic.InitCkEditor(textarea, ckEditorOption);
-        })
+                ]
+            }
+        });
     }
-    else
-    {
-        Mautic.InitCkEditor(textarea, ckEditorOption);
-    }
+    return ckEditorOption;
 }
 
 Mautic.InitCkEditor  = function(textarea, options) {
-    editor = textarea.ckeditor(options);
+    ClassicEditor
+        .create( textarea[0], options)
+        .then( editor => {
+            ckEditors.set( textarea[0], editor);
+            if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
+                editor.editing.view.document.on('change:isFocused', (evt, data, isFocused) => {
+                    Mautic.showChangeThemeWarning = isFocused;
+                });
+            }
+
+            const ckf = editor.commands.get('ckfinder');
+            if (ckf) {
+                ckf.execute = () => {
+                    const width = screen.width * 0.7;
+                    const height = screen.height * 0.7;
+                    const iLeft = (screen.width - width) / 2 ;
+                    const iTop = (screen.height - height) / 2 ;
+                    let sOptions = "toolbar=no,status=no,resizable=yes,dependent=yes" ;
+                    sOptions += ",width=" + width ;
+                    sOptions += ",height=" + height ;
+                    sOptions += ",left=" + iLeft ;
+                    sOptions += ",top=" + iTop ;
+                    const elPopup = window.open( Mautic.elfinderURL+ '?editor=ckeditor', "BrowseWindow", sOptions ) ;
+                    elPopup.addEventListener('load', function(){
+                        elPopup.editor = editor;
+                    });
+                };
+            }
+        } )
+        .catch( err => {
+            console.error( err.stack );
+        } );
+}
+
+window.document.ckEditorInsertImages = function(editor, imageUrl) {
+    const ntf = editor.plugins.get('Notification'),
+        i18 = editor.locale.t,
+        imgCmd = editor.commands.get('imageUpload');
+
+    if (!imgCmd.isEnabled) {
+        ntf.showWarning(i18('Could not insert image at the current position.'), {
+            title: i18('Inserting image failed'),
+            namespace: 'ckfinder'
+        });
+        return;
+    }
+    editor.execute('imageInsert', { source: imageUrl });
 }

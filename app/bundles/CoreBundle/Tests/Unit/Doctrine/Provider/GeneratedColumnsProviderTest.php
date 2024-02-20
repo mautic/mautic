@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
-use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
@@ -18,17 +17,14 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private $versionProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $versionProvider;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var GeneratedColumnsProvider
-     */
-    private $provider;
+    private \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider $provider;
 
     protected function setUp(): void
     {
@@ -54,7 +50,6 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
 
         $generatedColumns = $this->provider->getGeneratedColumns();
 
-        $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
         $this->assertCount(0, $generatedColumns);
     }
 
@@ -80,7 +75,6 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
             );
 
         $generatedColumns = $this->provider->getGeneratedColumns();
-        $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
 
         /** @var GeneratedColumn $generatedColumn */
         $generatedColumn = $generatedColumns->current();

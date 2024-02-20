@@ -13,10 +13,7 @@ class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @return array
-     */
-    public function getSentStats($dynamicContentId)
+    public function getSentStats($dynamicContentId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
@@ -24,7 +21,7 @@ class StatRepository extends CommonRepository
             ->where('s.dynamic_content_id = :dynamic_content')
             ->setParameter('dynamic_content', $dynamicContentId);
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         // index by lead
         $stats = [];
@@ -59,7 +56,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -67,12 +64,9 @@ class StatRepository extends CommonRepository
     /**
      * Get sent counts based grouped by dynamic content Id.
      *
-     * @param array     $dynamicContentIds
-     * @param \DateTime $fromDate
-     *
-     * @return array
+     * @param array $dynamicContentIds
      */
-    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')
@@ -91,7 +85,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('e.dynamic_content_id');
 
         // get a total number of sent DC stats first
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $counts = [];
 
@@ -136,27 +130,24 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content_stats')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * Delete a stat.
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }

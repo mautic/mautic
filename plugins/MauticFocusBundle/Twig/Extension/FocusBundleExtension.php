@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Twig\Extension;
 
+use MatthiasMullie\Minify;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -41,6 +42,6 @@ class FocusBundleExtension extends AbstractExtension
 
     public function minifyCss(string $css): string
     {
-        return \Minify_CSSmin::minify($css);
+        return (new Minify\CSS($css))->minify();
     }
 }

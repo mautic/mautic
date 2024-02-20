@@ -12,6 +12,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData;
@@ -59,7 +60,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             false
         )->getReferenceRepository();
 
-        $this->contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
+        $this->contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
     }
 
     protected function beforeBeginTransaction(): void
@@ -132,7 +133,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         $segmentTest3Ref       = $this->getReference('segment-test-3');
 
-        $this->runCommand(
+        $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest3Ref->getId(),
@@ -151,7 +152,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         // Remove the title from all contacts, rebuild the list, and check that list is updated
         $this->em->getConnection()->executeQuery(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
 
-        $this->runCommand(
+        $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest3Ref->getId(),
@@ -168,7 +169,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         $segmentTest40Ref      = $this->getReference('segment-test-include-segment-with-or');
-        $this->runCommand('mautic:segments:update', [
+        $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segmentTest40Ref->getId(),
             '--env' => 'test',
         ]);
@@ -182,7 +183,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         $segmentTest51Ref      = $this->getReference('has-email-and-visited-url');
-        $this->runCommand('mautic:segments:update', [
+        $this->testSymfonyCommand('mautic:segments:update', [
             '-i'    => $segmentTest51Ref->getId(),
             '--env' => 'test',
         ]);
@@ -203,7 +204,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'abcdr')
         );
 
-        $this->runCommand(
+        $this->testSymfonyCommand(
             'mautic:segments:update',
             [
                 '-i'    => $segmentTest51Ref->getId(),
@@ -226,5 +227,15 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $reference = $this->fixtures->getReference($name);
 
         return $reference;
+    }
+
+    public function testSegmentRebuildCommandFailsOnMissingTable(): void
+    {
+        /** @var ContactSegmentService $contactSegmentService */
+        $contactSegmentService = $this->getContainer()->get('mautic.lead.model.lead_segment_service');
+        $reference             = $this->fixtures->getReference('table-name-missing-in-filter');
+
+        $this->expectException(TableNotFoundException::class);
+        $contactSegmentService->getTotalLeadListLeadsCount($reference);
     }
 }

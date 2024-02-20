@@ -9,7 +9,6 @@
     <script src="{{ asset("#{prefix}/../../media/js/libraries.js") }}"></script>
     <script src="{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/elfinder.min.js") }}"></script>
 <script type="text/javascript" charset="utf-8">
-    var editorType = '';
     var editor = null;
 
     {# based on https://github.com/Studio-42/elFinder/wiki/Client-configuration-options-2.1#lang #}
@@ -31,12 +30,7 @@
                 const editorParam = new RegExp('(?:[\?&]|&amp;)editor=([^&]+)', 'i');
                 const editorMatch = window.location.search.match(editorParam);
                 if (editorMatch && editorMatch.length > 1 && editorMatch[1] == 'ckeditor') {
-                    window.opener.CKEDITOR.tools.callFunction((function () {
-                        const reParam = new RegExp('(?:[\?&]|&amp;)CKEditorFuncNum=([^&]+)', 'i');
-                        const match = window.location.search.match(reParam);
-                        return (match && match.length > 1) ? match[1] : '';
-                    })(), fm.convAbsUrl(fileUrl));
-                    fm.destroy();
+                    window.opener.document.ckEditorInsertImages(editor, fileUrl);
                 } else {
                     window.opener.document.fileManagerInsertImageCallback('textarea.editor', fileUrl);
                 }

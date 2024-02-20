@@ -18,22 +18,19 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     /**
      * @var MockObject|ExpressionBuilder
      */
-    private $expressionBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $expressionBuilder;
 
     /**
      * @var MockObject|ContactSegmentFilter
      */
-    private $contactSegmentFilter;
+    private \PHPUnit\Framework\MockObject\MockObject $contactSegmentFilter;
 
-    /**
-     * @var SegmentOperatorQuerySubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\SegmentOperatorQuerySubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -104,16 +101,12 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->expressionBuilder->expects($this->once())
             ->method('isNull')
             ->with('l.email')
-            ->willReturnCallback(function ($x) {
-                return $x.' IS NULL';
-            });
+            ->willReturnCallback(fn ($x) => $x.' IS NULL');
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('eq')
             ->with('l.email')
-            ->willReturnCallback(function ($x, $y) {
-                return $x.' = '.$y;
-            });
+            ->willReturnCallback(fn ($x, $y) => $x.' = '.$y);
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('literal')
@@ -190,16 +183,12 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->expressionBuilder->expects($this->once())
             ->method('isNotNull')
             ->with('l.email')
-            ->willReturnCallback(function ($x) {
-                return $x.' IS NOT NULL';
-            });
+            ->willReturnCallback(fn ($x) => $x.' IS NOT NULL');
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('neq')
             ->with('l.email')
-            ->willReturnCallback(function ($x, $y) {
-                return $x.' <> '.$y;
-            });
+            ->willReturnCallback(fn ($x, $y) => $x.' <> '.$y);
 
         $this->expressionBuilder->expects($doesColumnSupportEmptyValue ? $this->once() : $this->never())
             ->method('literal')

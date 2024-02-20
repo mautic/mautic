@@ -30,14 +30,14 @@ class UserToken
     /**
      * @var \DateTimeInterface|null
      */
-    private $expiration = null;
+    private $expiration;
 
     /**
      * @var bool
      */
     private $oneTimeOnly = true;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 

@@ -16,27 +16,24 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|SchedulerRepository
      */
-    private $schedulerRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $schedulerRepository;
 
     /**
      * @var MockObject|EntityManager
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var MockObject|SchedulerPlanner
      */
-    private $schedulerPlanner;
+    private \PHPUnit\Framework\MockObject\MockObject $schedulerPlanner;
 
     /**
      * @var MockObject|ExportOption
      */
-    private $exportOption;
+    private \PHPUnit\Framework\MockObject\MockObject $exportOption;
 
-    /**
-     * @var ScheduleModel
-     */
-    private $scheduleModel;
+    private \Mautic\ReportBundle\Model\ScheduleModel $scheduleModel;
 
     protected function setUp(): void
     {
@@ -53,7 +50,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->scheduleModel = new ScheduleModel($this->entityManager, $this->schedulerPlanner);
     }
 
-    public function testGetScheduledReportsForExport()
+    public function testGetScheduledReportsForExport(): void
     {
         $this->schedulerRepository->expects($this->once())
             ->method('getScheduledReportsForExport')
@@ -62,7 +59,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->scheduleModel->getScheduledReportsForExport($this->exportOption);
     }
 
-    public function testReportWasScheduled()
+    public function testReportWasScheduled(): void
     {
         $report = new Report();
 
@@ -73,7 +70,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->scheduleModel->reportWasScheduled($report);
     }
 
-    public function testTurnOffScheduler()
+    public function testTurnOffScheduler(): void
     {
         $report = new Report();
 

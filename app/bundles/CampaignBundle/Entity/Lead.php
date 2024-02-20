@@ -6,9 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Lead.
- */
 class Lead
 {
     /**
@@ -46,12 +43,12 @@ class Lead
      */
     private $rotation = 1;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaign_leads')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadRepository')
+            ->setCustomRepositoryClass(\Mautic\CampaignBundle\Entity\LeadRepository::class)
             ->addIndex(['date_added'], 'campaign_leads_date_added')
             ->addIndex(['date_last_exited'], 'campaign_leads_date_exited')
             ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
@@ -82,7 +79,7 @@ class Lead
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaignLead')
             ->addListProperties(
@@ -114,7 +111,7 @@ class Lead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date)
+    public function setDateAdded($date): void
     {
         $this->dateAdded = $date;
     }
@@ -127,7 +124,7 @@ class Lead
         return $this->lead;
     }
 
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -140,7 +137,7 @@ class Lead
         return $this->campaign;
     }
 
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): void
     {
         $this->campaign = $campaign;
     }
@@ -156,7 +153,7 @@ class Lead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -180,7 +177,7 @@ class Lead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }

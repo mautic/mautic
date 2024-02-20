@@ -15,15 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProcessWebhookQueuesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
-    private CoreParametersHelper $coreParametersHelper;
-    private WebhookModel $webhookModel;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, WebhookModel $webhookModel)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private WebhookModel $webhookModel
+    ) {
         parent::__construct();
-
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->webhookModel         = $webhookModel;
     }
 
     protected function configure()
@@ -90,5 +87,6 @@ class ProcessWebhookQueuesCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Process queued webhook payloads';
 }

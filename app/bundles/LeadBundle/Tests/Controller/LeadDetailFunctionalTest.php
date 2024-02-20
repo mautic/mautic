@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -72,9 +72,9 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
             ->setParameter(
                 'leadFields',
                 $leadFields,
-                Connection::PARAM_STR_ARRAY
+                ArrayParameterType::STRING
             )
-            ->execute()
+            ->executeQuery()
             ->fetchFirstColumn();
 
         $expectedLabels = array_merge(['Created on', 'ID'], $expectedLabels);

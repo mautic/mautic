@@ -21,22 +21,19 @@ class ReportSubscriberTest extends TestCase
     /**
      * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyReportData;
+    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
      * @var HitRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $hitRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var ReportSubscriber
-     */
-    private $subscriber;
+    private \Mautic\PageBundle\EventListener\ReportSubscriber $subscriber;
 
     public function setUp(): void
     {
@@ -54,17 +51,7 @@ class ReportSubscriberTest extends TestCase
 
     public function testOnReportBuilderAddsPageAndPageHitReports(): void
     {
-        $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
-                'checkContext',
-                'addGraph',
-                'getStandardColumns',
-                'getCategoryColumns',
-                'getCampaignByChannelColumns',
-                'addTable',
-            ])
-            ->getMock();
+        $mockEvent = $this->createMock(ReportBuilderEvent::class);
 
         $mockEvent->expects($this->once())
             ->method('getStandardColumns')
@@ -87,7 +74,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables) {
+            ->willReturnCallback(function () use (&$setTables): void {
                 $args = func_get_args();
 
                 $setTables[] = $args;
@@ -95,7 +82,7 @@ class ReportSubscriberTest extends TestCase
 
         $mockEvent->expects($this->exactly(9))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs) {
+            ->willReturnCallback(function () use (&$setGraphs): void {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;

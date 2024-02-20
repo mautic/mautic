@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -16,26 +17,11 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class CompanyObjectHelper implements ObjectHelperInterface
 {
-    /**
-     * @var CompanyModel
-     */
-    private $model;
-
-    /**
-     * @var CompanyRepository
-     */
-    private $repository;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    public function __construct(CompanyModel $model, CompanyRepository $repository, Connection $connection)
-    {
-        $this->model      = $model;
-        $this->repository = $repository;
-        $this->connection = $connection;
+    public function __construct(
+        private CompanyModel $model,
+        private CompanyRepository $repository,
+        private Connection $connection
+    ) {
     }
 
     /**
@@ -63,7 +49,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                     'Created company ID %d',
                     $company->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $objectMapping = new ObjectMapping();
@@ -101,7 +87,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 count($companies),
                 implode(', ', $ids)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         foreach ($companies as $company) {
@@ -122,7 +108,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                     'Updated company ID %d',
                     $company->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Integration name and ID are stored in the change's mappedObject/mappedObjectId
@@ -165,7 +151,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
             ->setFirstResult($start)
             ->setMaxResults($limit);
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     public function findObjectsByIds(array $ids): array
@@ -181,7 +167,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 $qb->expr()->in('id', $ids)
             );
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     public function findObjectsByFieldValues(array $fields): array
@@ -196,7 +182,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     public function findOwnerIds(array $objectIds): array
@@ -210,8 +196,18 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->from(MAUTIC_TABLE_PREFIX.'companies', 'c');
         $qb->where('c.owner_id IS NOT NULL');
         $qb->andWhere('c.id IN (:objectIds)');
-        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+        $qb->setParameter('objectIds', $objectIds, ArrayParameterType::INTEGER);
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
+    }
+
+    public function findObjectById(int $id): ?Company
+    {
+        return $this->repository->getEntity($id);
+    }
+
+    public function setFieldValues(Company $company): void
+    {
+        $this->model->setFieldValues($company, []);
     }
 }

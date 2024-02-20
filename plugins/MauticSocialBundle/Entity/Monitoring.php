@@ -8,9 +8,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Monitoring.
- */
 class Monitoring extends FormEntity
 {
     /**
@@ -68,12 +65,12 @@ class Monitoring extends FormEntity
      */
     private $publishUp;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitoring')
-            ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository')
+            ->setCustomRepositoryClass(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)
             ->addLifecycleEvent('cleanMonitorData', 'preUpdate')
             ->addLifecycleEvent('cleanMonitorData', 'prePersist');
 
@@ -97,7 +94,7 @@ class Monitoring extends FormEntity
     /**
      * Constraints for required fields.
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('title', new Assert\NotBlank(
             ['message' => 'mautic.core.title.required']
@@ -221,7 +218,7 @@ class Monitoring extends FormEntity
      *
      * @param \Mautic\CategoryBundle\Entity\Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -361,7 +358,7 @@ class Monitoring extends FormEntity
     /**
      * Clear out old properties data.
      */
-    public function cleanMonitorData()
+    public function cleanMonitorData(): void
     {
         $property = $this->getProperties();
 
