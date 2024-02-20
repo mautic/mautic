@@ -213,7 +213,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $user = $this->currentUser;
         }
 
-        $key = (int) $id;
+        if (is_numeric($id) && $id > 0) {
+            $key = (int) $id;
+        } else {
+            // cache all companies
+            $key = 0;
+        }
+
         if (isset($companies[$key])) {
             return $companies[$key];
         }
