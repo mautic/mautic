@@ -330,7 +330,6 @@ class FormApiController extends CommonApiController
 
     public function newEntityAction(Request $request): Response
     {
-        // Check for an email to see if the lead already exists
         $parameters = $request->request->all();
 
         if (!isset($parameters['postAction'])) {
