@@ -614,7 +614,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
     private function createDOMXPathForContent(string $content): \DOMXPath
     {
         $domDocument = new \DOMDocument('1.0', 'utf-8');
-        $domDocument->loadHTML(mb_encode_numericentity($content, [0x80, 0x10ffff, 0, 0xfffff], 'UTF-8'), LIBXML_NOERROR);
+        $domDocument->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
 
         return new \DOMXPath($domDocument);
     }
