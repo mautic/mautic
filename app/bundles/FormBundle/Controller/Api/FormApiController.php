@@ -351,6 +351,7 @@ class FormApiController extends CommonApiController
         );
     }
 
+<<<<<<< HEAD
     /**
      * @param CommonEntity $entity
      * @param array<mixed> $parameters
@@ -368,6 +369,11 @@ class FormApiController extends CommonApiController
 
     public function newEntityAction(Request $request): Response
     {
+=======
+    public function newEntityAction(Request $request): Response
+    {
+        // Check for an email to see if the lead already exists
+>>>>>>> b3715407e9 (Add new entity action to check for existing post action.)
         $parameters = $request->request->all();
 
         if (!isset($parameters['postAction'])) {
