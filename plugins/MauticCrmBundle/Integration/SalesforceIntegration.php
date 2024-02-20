@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Exception;
 use Mautic\CoreBundle\Entity\Notification;
@@ -949,8 +948,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     private function getAdminUsers(): array
     {
-        $userRepository = $this->getEntityManager()->getRepository(User::class);
-        $adminRole      = $this->getEntityManager()->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
+        $userRepository = $this->em->getRepository(User::class);
+        $adminRole      = $this->em->getRepository(Role::class)->findOneBy(['isAdmin' => true]);
 
         return $userRepository->findBy(
             [
@@ -3078,13 +3077,5 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $matchedFields;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    public function getEntityManager()
-    {
-        return $this->em;
     }
 }
