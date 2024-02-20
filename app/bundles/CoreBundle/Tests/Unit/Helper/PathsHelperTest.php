@@ -102,14 +102,14 @@ class PathsHelperTest extends TestCase
         $this->assertEquals(__DIR__.'/resource/paths/plugins', $this->helper->getPluginsPath());
     }
 
-    public function testTempDirectoryIsCreatedIfItDoesNotExist()
+    public function testTempDirectoryIsCreatedIfItDoesNotExist(): void
     {
         $tempPath = __DIR__.'/resource/paths/no_exist/tmp';
 
-        /** @var UserHelper|MockObject $userHelper */
-        $userHelper           = $this->createMock(UserHelper::class);
+        /** @var UserHelper&MockObject $userHelper */
+        $userHelper = $this->createMock(UserHelper::class);
 
-        /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
@@ -123,7 +123,7 @@ class PathsHelperTest extends TestCase
                 }
             );
 
-        $this->assertFileNotExists($tempPath);
+        $this->assertFileDoesNotExist($tempPath);
 
         $helper = new PathsHelper($userHelper, $coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
 
@@ -136,11 +136,11 @@ class PathsHelperTest extends TestCase
         $fs->remove(__DIR__.'/resource/paths/no_exist');
     }
 
-    public function testUserDashboardDirectoryIsCreatedIfItDoesNotExist()
+    public function testUserDashboardDirectoryIsCreatedIfItDoesNotExist(): void
     {
         $dashboardDir = __DIR__.'/resource/paths/no_exist/dashboard';
 
-        /** @var UserHelper|MockObject $userHelper */
+        /** @var UserHelper&MockObject $userHelper */
         $userHelper           = $this->createMock(UserHelper::class);
         $user                 = $this->createMock(User::class);
         $user->method('getId')
@@ -148,7 +148,7 @@ class PathsHelperTest extends TestCase
         $userHelper->method('getUser')
             ->willReturn($user);
 
-        /** @var CoreParametersHelper|MockObject $coreParametersHelper */
+        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(
@@ -162,7 +162,7 @@ class PathsHelperTest extends TestCase
                 }
             );
 
-        $this->assertFileNotExists($dashboardDir);
+        $this->assertFileDoesNotExist($dashboardDir);
 
         $helper = new PathsHelper($userHelper, $coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
         $helper->getSystemPath('dashboard.user');

@@ -147,7 +147,7 @@ class PathsHelper
                 return $this->kernelLogsDir;
             case 'temporary':
             case 'tmp':
-                if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
+                if (!file_exists($this->temporaryDir)) {
                     mkdir($this->temporaryDir, 0777, true);
                 }
 
@@ -171,7 +171,7 @@ class PathsHelper
 
                 $userPath .= '/'.$this->user->getId();
 
-                if (!is_dir($userPath) && !file_exists($userPath) && is_writable($userPath)) {
+                if (!file_exists($userPath)) {
                     mkdir($userPath, 0777, true);
                 }
 
