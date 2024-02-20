@@ -946,7 +946,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getEmailPendingLeadsIdRange(
         int $emailId,
         int $batchSize,
-        \DateTime $maxDate
+        \DateTimeInterface $maxDate
     ): array {
         return $this->getRepository()->getEmailPendingLeadsIdRange(
             $emailId,

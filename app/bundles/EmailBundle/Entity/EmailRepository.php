@@ -283,18 +283,15 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param int        $emailId
-     * @param int        $batchSize
-     * @param \DateTime  $maxDate
      * @param int[]|null $variantIds
      * @param int[]|null $listIds
      *
      * @return array<mixed>
      */
     public function getEmailPendingLeadsIdRange(
-        $emailId,
-        $batchSize,
-        $maxDate,
+        int $emailId,
+        int $batchSize,
+        \DateTimeInterface $maxDate,
         $variantIds = null,
         $listIds = null
     ): array {
