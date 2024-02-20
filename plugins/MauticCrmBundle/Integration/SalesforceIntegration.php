@@ -900,17 +900,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $executed;
     }
 
-    /**
-     * Notify all admins of the messages.
-     *
-     * @param string $header
-     * @param string $message
-     * @param string $type
-     * @param bool   $preventUnreadDuplicates prevent unread duplicates
-     *
-     * @throws Exception
-     */
-    public function upsertUnreadAdminsNotification($header, $message, $type = 'error', $preventUnreadDuplicates = true)
+    public function upsertUnreadAdminsNotification(string $header, string $message, string $type = 'error', bool $preventUnreadDuplicates = true): void
     {
         $notificationTemplate = new Notification();
         $notificationTemplate->setType($type);
@@ -956,19 +946,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array|User[]
      */
-    private function getAdminUsers()
+    private function getAdminUsers(): array
     {
         $userRepository = $this->getEntityManager()->getRepository(User::class);
         $adminRole      = $this->getEntityManager()->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
 
-        $admins = $userRepository->findBy(
+        return $userRepository->findBy(
             [
                 'role'        => $adminRole,
                 'isPublished' => true,
             ]
         );
-
-        return $admins;
     }
 
     /**
@@ -1344,7 +1332,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      *
      * @throws Exception
      */
@@ -1366,7 +1354,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
      * @throws InvalidArgumentException
      */

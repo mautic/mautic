@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- * @created     8.4.19
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity\Transformer;
 
 use InvalidArgumentException;

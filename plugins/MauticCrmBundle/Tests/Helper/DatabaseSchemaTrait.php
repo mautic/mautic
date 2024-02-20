@@ -1,13 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        http://mautic.com
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Helper;
 
 use Doctrine\ORM\EntityManager;
@@ -17,10 +9,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 trait DatabaseSchemaTrait
 {
-    /** @var EntityManager */
-    private $entityManager;
+    private EntityManager $entityManager;
 
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         if (is_null($this->entityManager)) {
             static::$kernel = static::createKernel();
@@ -48,10 +39,7 @@ trait DatabaseSchemaTrait
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDownDatabase(EntityManager $entityManager)
+    protected function tearDownDatabase(EntityManager $entityManager): void
     {
         $entityManager->close();
     }

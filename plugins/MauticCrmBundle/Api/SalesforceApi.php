@@ -7,6 +7,7 @@ use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * @property SalesforceIntegration $integration
@@ -25,12 +26,7 @@ class SalesforceApi extends CrmApi
 
     protected $maxLockRetries      = 3;
 
-    /**
-     * We will attempt to fetch the opt-out field, if this fails; we will flag it.
-     *
-     * @var bool
-     */
-    private $optOutFieldAccessible = true;
+    private bool $optOutFieldAccessible = true;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -345,16 +341,14 @@ class SalesforceApi extends CrmApi
     /**
      * Perform queryAll request and retry if HasOptedOutOfEmail is not accessible.
      *
-     * @param string $queryUrl
-     * @param array  $fields
-     * @param        $object
-     * @param array  $query
+     * @param array<mixed> $fields
+     * @param array<mixed> $query
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    private function requestQueryAllAndHandle($queryUrl, array $fields, $object, array $query)
+    private function requestQueryAllAndHandle(string $queryUrl, array $fields, string $object, array $query)
     {
         $config = $this->integration->mergeConfigToFeatureSettings([]);
         if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
@@ -646,20 +640,12 @@ class SalesforceApi extends CrmApi
         return $value;
     }
 
-    /**
-     * @return bool
-     */
-    public function isOptOutFieldAccessible()
+    public function isOptOutFieldAccessible(): bool
     {
         return $this->optOutFieldAccessible;
     }
 
-    /**
-     * @param bool $optOutFieldAccessible
-     *
-     * @return SalesforceApi
-     */
-    public function setOptOutFieldAccessible($optOutFieldAccessible)
+    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): SalesforceApi
     {
         $this->optOutFieldAccessible = $optOutFieldAccessible;
 
