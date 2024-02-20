@@ -941,6 +941,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @return array<mixed>
+     */
+    public function getEmailPendingLeadsIdRange(
+        int $emailId,
+        int $batchSize,
+        \DateTime $maxDate
+    ): array {
+        return $this->getRepository()->getEmailPendingLeadsIdRange(
+            $emailId,
+            $batchSize,
+            $maxDate,
+            null,
+            null
+        );
+    }
+
+    /**
      * @param bool $includeVariants
      */
     public function getQueuedCounts(Email $email, $includeVariants = true): int

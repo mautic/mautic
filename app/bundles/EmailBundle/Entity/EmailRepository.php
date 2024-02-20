@@ -49,7 +49,7 @@ class EmailRepository extends CommonRepository
      *
      * @param string $email
      *
-     * @return bool
+     * @return mixed
      */
     public function checkDoNotEmail($email)
     {
@@ -280,6 +280,55 @@ class EmailRepository extends CommonRepository
         }
 
         return $q;
+    }
+
+    /**
+     * @param int        $emailId
+     * @param int        $batchSize
+     * @param \DateTime  $maxDate
+     * @param int[]|null $variantIds
+     * @param int[]|null $listIds
+     *
+     * @return array<mixed>
+     */
+    public function getEmailPendingLeadsIdRange(
+        $emailId,
+        $batchSize,
+        $maxDate,
+        $variantIds = null,
+        $listIds = null
+    ): array {
+        $countOnly = false;
+        $limit     = null;
+
+        $pq = $this->getEmailPendingQuery(
+            $emailId,
+            $variantIds,
+            $listIds,
+            $countOnly,
+            $limit,
+            null,
+            null,
+            false,
+            $maxDate
+        );
+
+        $pq->orderBy('id');
+        $pq->setMaxResults($batchSize);
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('COUNT(l.id) as count, MIN(l.id) as min_id, MAX(l.id) as max_id');
+        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $q->innerJoin('l', '('.$pq->getSQL().')', 's', $q->expr()->eq('l.id', 's.id'));
+
+        $this->copyParams($pq, $q);
+
+        if (null !== $maxDate) {
+            $q->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
+        }
+
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
