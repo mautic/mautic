@@ -15,6 +15,11 @@ use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @runTestsInSeparateProcesses
+ *
+ * @preserveGlobalState disabled
+ */
 class BuilderSubscriberTest extends AbstractMauticTestCase
 {
     // Custom preference center page
@@ -46,7 +51,7 @@ class BuilderSubscriberTest extends AbstractMauticTestCase
      */
     public function testUnsubscribeFormRendersPreferenceCenterPageCorrectly(array $configParams, array $selectorsAndExpectedCounts, bool $hasPreferenceCenter): void
     {
-        $this->setUpSymfony(array_merge(['show_contact_preferences' => 1], $configParams));
+        $this->setUpSymfony(array_merge(['show_contact_preferences' => 1], $configParams, $this->configParams));
 
         $emailStat = $this->createStat(
             $this->createEmail($hasPreferenceCenter),
