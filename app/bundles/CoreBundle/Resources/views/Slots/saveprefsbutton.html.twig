@@ -2,6 +2,9 @@
 {% set background = saveprefsbutton.background|default('') %}
 
 {% if form is defined %}
+    {% do form.lead_channels.subscribed_channels.setRendered() %}
+    {% do form.buttons.save.setRendered() %}
+    {% do form.buttons.cancel.setRendered() %}
     {# add form tag #}
     <script src="{{ getAssetUrl('app/bundles/PageBundle/Assets/js/prefcenter.js') }}"></script>
 
