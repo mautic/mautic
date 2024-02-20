@@ -125,6 +125,10 @@ class CampaignEventSubscriberTest extends TestCase
         $mockLead     = $this->createMock(Lead::class);
         $mockCampaign = $this->createMock(Campaign::class);
         $mockCampaign->expects($this->once())
+            ->method('isPublished')
+            ->willReturn(true);
+
+        $mockCampaign->expects($this->once())
             ->method('getLeads')
             ->willReturn(new ArrayCollection(range(0, 99)));
 
