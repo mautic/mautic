@@ -73,8 +73,11 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::mailerCallbackAction',
             ],
             'mautic_email_preview' => [
-                'path'       => '/email/preview/{objectId}',
+                'path'       => '/email/preview/{objectId}/{objectType}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
+                'defaults'   => [
+                    'objectType'    => null,
+                ],
             ],
         ],
     ],
