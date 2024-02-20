@@ -34,10 +34,28 @@ class WidgetDetailEvent extends CommonEvent
 
     private string $cacheKeyPath = 'dashboard.widget.';
 
+    private bool $isPreview = false;
+
     public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProvider $cacheProvider = null)
     {
         $this->startTime = microtime(true);
         $this->setWidget($widget);
+    }
+
+    /**
+     * Act as widget preview without data.
+     */
+    public function setPreview(bool $isPreview): void
+    {
+        $this->isPreview = $isPreview;
+    }
+
+    /**
+     * Is preview without data?
+     */
+    public function isPreview(): bool
+    {
+        return $this->isPreview;
     }
 
     /**
