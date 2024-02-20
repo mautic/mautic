@@ -11,15 +11,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class SegmentOperatorQueryBuilderEvent extends Event
 {
-    private QueryBuilder $queryBuilder;
-
-    private ContactSegmentFilter $filter;
-
-    /**
-     * @var string|string[]
-     */
-    private $parameterHolder;
-
     private bool $operatorHandled = false;
 
     private string $leadsTableAlias;
@@ -27,11 +18,11 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     /**
      * @param string|string[] $parameterHolder
      */
-    public function __construct(QueryBuilder $queryBuilder, ContactSegmentFilter $filter, $parameterHolder)
-    {
-        $this->queryBuilder    = $queryBuilder;
-        $this->filter          = $filter;
-        $this->parameterHolder = $parameterHolder;
+    public function __construct(
+        private QueryBuilder $queryBuilder,
+        private ContactSegmentFilter $filter,
+        private $parameterHolder
+    ) {
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 

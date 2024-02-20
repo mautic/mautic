@@ -12,7 +12,7 @@ class SyncDateHelperTest extends TestCase
     /**
      * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     protected function setUp(): void
     {

@@ -10,9 +10,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 class ContentType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'headline',
@@ -78,7 +81,7 @@ class ContentType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.link_new_window',
-                'data'  => (isset($options['link_new_window'])) ? $options['link_new_window'] : true,
+                'data'  => $options['link_new_window'] ?? true,
                 'attr'  => [
                     'onchange'     => 'Mautic.focusUpdatePreview()',
                     'data-show-on' => '{"focus_html_mode_0":"checked"}',
@@ -143,10 +146,7 @@ class ContentType extends AbstractType
         return 'focus_content';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

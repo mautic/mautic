@@ -55,7 +55,6 @@ class NotificationController extends AbstractFormController
 
         $session = $request->getSession();
 
-        // set limits
         $limit = $session->get('mautic.notification.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -718,10 +717,7 @@ class NotificationController extends AbstractFormController
         );
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function previewAction($objectId)
+    public function previewAction($objectId): Response
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model        = $this->getModel('notification');

@@ -71,10 +71,8 @@ class CategoryRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'c.title',
@@ -84,14 +82,12 @@ class CategoryRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $field                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
@@ -117,9 +113,9 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -132,7 +128,7 @@ class CategoryRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['c.title', 'ASC'],
@@ -165,10 +161,7 @@ class CategoryRepository extends CommonRepository
         return $results['aliascount'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'c';
     }

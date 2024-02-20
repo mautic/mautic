@@ -10,39 +10,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(Connection $db, TranslatorInterface $translator)
-    {
-        $this->db         = $db;
-        $this->translator = $translator;
+    public function __construct(
+        private Connection $db,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', 10], // Cleanup before visitors are processed
         ];
     }
 
-    public function onDataCleanup(MaintenanceEvent $event)
+    public function onDataCleanup(MaintenanceEvent $event): void
     {
         $this->cleanData($event, 'page_hits');
         $this->cleanData($event, 'lead_utmtags');
     }
 
-    private function cleanData(MaintenanceEvent $event, $table)
+    private function cleanData(MaintenanceEvent $event, $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
@@ -64,7 +51,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
 
-            $rows = $qb->execute()->fetchOne();
+            $rows = $qb->executeQuery()->fetchOne();
         } else {
             $subQb = $this->db->createQueryBuilder();
             $subQb->select('id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
@@ -86,7 +73,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
             while (true) {
                 $subQb->setMaxResults(10000)->setFirstResult($loop * 10000);
 
-                $leadsIds = array_column($subQb->execute()->fetchAllAssociative(), 'id');
+                $leadsIds = array_column($subQb->executeQuery()->fetchAllAssociative(), 'id');
 
                 if (0 === sizeof($leadsIds)) {
                     break;
@@ -98,7 +85,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                           'lead_id', $leadsIds
                       )
                   )
-                  ->execute();
+                  ->executeStatement();
                 ++$loop;
             }
         }

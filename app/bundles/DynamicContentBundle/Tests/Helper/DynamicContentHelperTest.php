@@ -22,27 +22,24 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&DynamicContentModel
      */
-    private $mockModel;
+    private \PHPUnit\Framework\MockObject\MockObject $mockModel;
 
     /**
      * @var MockObject&RealTimeExecutioner
      */
-    private $realTimeExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
 
     /**
      * @var MockObject&EventDispatcher
      */
-    private $mockDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $mockDispatcher;
 
     /**
      * @var MockObject&LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
-    /**
-     * @var DynamicContentHelper
-     */
-    private $helper;
+    private \Mautic\DynamicContentBundle\Helper\DynamicContentHelper $helper;
 
     protected function setUp(): void
     {

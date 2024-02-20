@@ -8,11 +8,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class ConfigType.
+ * @extends AbstractType<mixed>
  */
 class ConfigThemeType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'theme',
@@ -21,7 +21,7 @@ class ConfigThemeType extends AbstractType
                 'label' => 'mautic.core.config.form.theme',
                 'attr'  => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.form.template.help',
+                    'tooltip' => 'mautic.core.config.form.theme.tooltip',
                 ],
             ]
         );
@@ -44,9 +44,6 @@ class ConfigThemeType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'themeconfig';

@@ -9,37 +9,19 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class AssetListType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
-
-    /**
-     * @var AssetModel
-     */
-    private $assetModel;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
     public function __construct(
-        CorePermissions $corePermissions,
-        AssetModel $assetModel,
-        UserHelper $userHelper
+        private CorePermissions $corePermissions,
+        private AssetModel $assetModel,
+        private UserHelper $userHelper
     ) {
-        $this->corePermissions = $corePermissions;
-        $this->assetModel      = $assetModel;
-        $this->userHelper      = $userHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'choices'           => $this->getAssetChoices(),
@@ -50,18 +32,12 @@ class AssetListType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return array
-     */
-    private function getAssetChoices()
+    private function getAssetChoices(): array
     {
         $choices   = [];
         $viewOther = $this->corePermissions->isGranted('asset:assets:viewother');

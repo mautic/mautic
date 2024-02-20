@@ -146,7 +146,7 @@
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
-                                      'chartData': item.rowStatusesPieChart(translatorGetHelper()),
+                                      'chartData': item.getRowStatusesPieChart(translatorGetHelper()),
                                       'chartType': 'pie',
                                       'chartHeight': 210,
                                 }) }}

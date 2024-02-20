@@ -17,12 +17,12 @@ class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|ConditionAccessor
      */
-    private $config;
+    private \PHPUnit\Framework\MockObject\MockObject $config;
 
     protected function setUp(): void
     {

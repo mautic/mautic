@@ -21,12 +21,9 @@ class ReferenceResolverTest extends TestCase
     /**
      * @var Connection|MockObject
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
-    /**
-     * @var ReferenceResolver
-     */
-    private $referenceResolver;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolver $referenceResolver;
 
     protected function setup(): void
     {
@@ -111,7 +108,7 @@ class ReferenceResolverTest extends TestCase
             ->willReturnOnConsecutiveCalls(...$returnValues);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->method('execute')
+        $queryBuilder->method('executeQuery')
             ->willReturn($result);
 
         return $queryBuilder;

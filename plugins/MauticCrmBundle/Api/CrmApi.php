@@ -5,16 +5,12 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 
 /**
- * Class CrmApi.
- *
- * @method createLead
+ * @method createLead()
  */
 class CrmApi
 {
-    protected $integration;
-
-    public function __construct(CrmAbstractIntegration $integration)
-    {
-        $this->integration = $integration;
+    public function __construct(
+        protected CrmAbstractIntegration $integration
+    ) {
     }
 }

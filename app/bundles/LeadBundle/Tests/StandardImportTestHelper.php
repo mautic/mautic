@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\Entity\Import;
@@ -21,7 +22,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 abstract class StandardImportTestHelper extends CommonMocks
 {
     protected $eventEntities = [];
+
     protected static $csvPath;
+
     protected static $largeCsvPath;
 
     /**
@@ -64,7 +67,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         parent::tearDownAfterClass();
     }
 
-    public static function generateSmallCSV()
+    public static function generateSmallCSV(): void
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_test_');
         $file    = fopen($tmpFile, 'w');
@@ -77,7 +80,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         self::$csvPath = $tmpFile;
     }
 
-    public static function generateLargeCSV()
+    public static function generateLargeCSV(): void
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_large_test_');
         $file    = fopen($tmpFile, 'w');
@@ -107,7 +110,7 @@ abstract class StandardImportTestHelper extends CommonMocks
     {
         /** @var Import&MockObject $entity */
         $entity = $this->getMockBuilder(Import::class)
-            ->setMethods($methods)
+            ->onlyMethods($methods ?? [])
             ->getMock();
 
         $entity->setFilePath(self::$csvPath)
@@ -200,7 +203,8 @@ abstract class StandardImportTestHelper extends CommonMocks
             $this->createMock(UrlGeneratorInterface::class),
             $translator,
             $userHelper,
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            new ProcessSignalService()
         );
 
         return $importModel;

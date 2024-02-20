@@ -9,9 +9,11 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $fieldModel;
-    private $fieldRepository;
-    private $helper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+
+    private \PHPUnit\Framework\MockObject\MockObject $fieldRepository;
+
+    private \Mautic\LeadBundle\Helper\FieldAliasHelper $helper;
 
     protected function setUp(): void
     {
@@ -29,16 +31,14 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
             'lastname',
         ]);
 
-        $this->fieldModel->method('cleanAlias')->will($this->returnCallback(function () {
-            return func_get_args()[0];
-        }));
+        $this->fieldModel->method('cleanAlias')->will($this->returnCallback(fn () => func_get_args()[0]));
 
         $this->fieldModel->method('getRepository')->willReturn($this->fieldRepository);
 
         $this->helper = new FieldAliasHelper($this->fieldModel);
     }
 
-    public function testDuplicatedAliasWithAliasSet()
+    public function testDuplicatedAliasWithAliasSet(): void
     {
         $field = new LeadField();
         $field->setAlias('title');
@@ -47,7 +47,7 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('title1', $field->getAlias());
     }
 
-    public function testDuplicatedAliasWithAliasEmpty()
+    public function testDuplicatedAliasWithAliasEmpty(): void
     {
         $field = new LeadField();
         $field->setName('title');
@@ -56,7 +56,7 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('title1', $field->getAlias());
     }
 
-    public function testUniqueAliasWithAliasEmpty()
+    public function testUniqueAliasWithAliasEmpty(): void
     {
         $field = new LeadField();
         $field->setName('phone');

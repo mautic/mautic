@@ -1,0 +1,24 @@
+/*
+ * The base configuration used by all other configuration.
+ *
+ * Be careful when updating this file. It may affect building docs, preparing DLLs, executing tests, or impacts the release process.
+ */
+{
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "strict": true,
+    "module": "es6",
+    "target": "es2019",
+    "sourceMap": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  },
+  "include": [
+  ]
+}
