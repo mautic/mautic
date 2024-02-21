@@ -1,27 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class FormFieldHelperTest extends TestCase
+final class FormFieldHelperTest extends TestCase
 {
-    private $defaultUploadDir;
+    private ?string $defaultUploadDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->defaultUploadDir    = $_ENV['MAUTIC_UPLOAD_DIR'] ?? null;
         $_ENV['MAUTIC_UPLOAD_DIR'] = __DIR__; // may not be set unless Symfony is booted
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $_ENV['MAUTIC_UPLOAD_DIR'] = $this->defaultUploadDir;
     }
 
-    public function testDefaultCountryList()
+    public function testDefaultCountryList(): void
     {
         $list  = FormFieldHelper::getCountryChoices();
         $first = array_shift($list);
@@ -30,7 +32,7 @@ class FormFieldHelperTest extends TestCase
         Assert::assertEquals('Zimbabwe', $last);
     }
 
-    public function testCustomCountryList()
+    public function testCustomCountryList(): void
     {
         $_ENV['MAUTIC_UPLOAD_DIR'] = __DIR__.'/files';
         $list                      = FormFieldHelper::getCountryChoices();
@@ -40,7 +42,7 @@ class FormFieldHelperTest extends TestCase
         Assert::assertEquals('Fillory', $last);
     }
 
-    public function testDefaultRegionList()
+    public function testDefaultRegionList(): void
     {
         $list               = FormFieldHelper::getRegionChoices();
         $firstCountry       = array_shift($list);
@@ -51,7 +53,7 @@ class FormFieldHelperTest extends TestCase
         Assert::assertEquals('St. Maarten', $lastCountryRegion);
     }
 
-    public function testCustomRegionList()
+    public function testCustomRegionList(): void
     {
         $_ENV['MAUTIC_UPLOAD_DIR'] = __DIR__.'/files';
         $list                      = FormFieldHelper::getRegionChoices();
