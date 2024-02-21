@@ -18,8 +18,9 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
@@ -40,8 +41,9 @@ class ContactObjectHelper implements ObjectHelperInterface
         private LeadModel $model,
         private LeadRepository $repository,
         private Connection $connection,
-        private FieldModel $fieldModel,
-        private DoNotContactModel $dncModel
+        private DoNotContactModel $dncModel,
+        private FieldList $fieldList,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
     ) {
     }
 
@@ -298,7 +300,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     private function getAvailableFields(): array
     {
         if (null === $this->availableFields) {
-            $availableFields       = $this->fieldModel->getFieldList(false, false);
+            $availableFields       = $this->fieldList->getFieldList(false, false);
             $this->availableFields = array_keys($availableFields);
         }
 
@@ -311,7 +313,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     private function getUniqueIdentifierFields(): array
     {
         if (null === $this->uniqueIdentifierFields) {
-            $uniqueIdentifierFields       = $this->fieldModel->getUniqueIdentifierFields(['object' => MauticSyncDataExchange::OBJECT_CONTACT]);
+            $uniqueIdentifierFields       = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => MauticSyncDataExchange::OBJECT_CONTACT]);
             $this->uniqueIdentifierFields = array_keys($uniqueIdentifierFields);
         }
 

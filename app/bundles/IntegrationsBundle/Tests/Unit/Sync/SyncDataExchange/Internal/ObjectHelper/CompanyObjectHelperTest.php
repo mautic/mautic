@@ -13,8 +13,8 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\Compan
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -22,33 +22,33 @@ use PHPUnit\Framework\TestCase;
 class CompanyObjectHelperTest extends TestCase
 {
     /**
-     * @var CompanyMod&MockObject
+     * @var CompanyModel&MockObject
      */
     private MockObject $model;
 
     /**
-     * @var CompanyRepository&ockObject
+     * @var CompanyRepository&MockObject
      */
     private MockObject $repository;
 
     /**
-     * @var Connecti&MockObject
+     * @var Connection&MockObject
      */
     private MockObject $connection;
 
     /**
-     * @var FieldModel&MockObject
+     * @var FieldsWithUniqueIdentifier&MockObject
      */
-    private MockObject $fieldModel;
+    private MockObject $fieldsWithUniqueIdentifier;
 
     protected function setUp(): void
     {
-        $this->model      = $this->createMock(CompanyModel::class);
-        $this->repository = $this->createMock(CompanyRepository::class);
-        $this->connection = $this->createMock(Connection::class);
-        $this->fieldModel = $this->createMock(FieldModel::class);
+        $this->model                      = $this->createMock(CompanyModel::class);
+        $this->repository                 = $this->createMock(CompanyRepository::class);
+        $this->connection                 = $this->createMock(Connection::class);
+        $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
-        $this->fieldModel->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
             ->with(['object' => CompanyObject::NAME])
             ->willReturn(
                 [
@@ -241,12 +241,9 @@ class CompanyObjectHelperTest extends TestCase
         Assert::assertSame([], $objectMappings);
     }
 
-    /**
-     * @return CompanyObjectHelper
-     */
-    private function getObjectHelper()
+    private function getObjectHelper(): CompanyObjectHelper
     {
-        return new CompanyObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel);
+        return new CompanyObjectHelper($this->model, $this->repository, $this->connection, $this->fieldsWithUniqueIdentifier);
     }
 
     /**

@@ -16,8 +16,9 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -26,39 +27,45 @@ use PHPUnit\Framework\TestCase;
 class ContactObjectHelperTest extends TestCase
 {
     /**
-     * @var LeadModel|MockObject
+     * @var LeadModel&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $model;
+    private MockObject $model;
 
     /**
-     * @var LeadRepository|MockObject
+     * @var LeadRepository&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $repository;
+    private MockObject $repository;
 
     /**
-     * @var Connection|MockObject
+     * @var Connection&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
-     * @var FieldModel|MockObject
+     * @var DoNotContact&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $doNotContactModel;
 
     /**
-     * @var DoNotContact|MockObject
+     * @var FieldList&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $doNotContactModel;
+    private MockObject $fieldList;
+
+    /**
+     * @var FieldsWithUniqueIdentifier&MockObject
+     */
+    private MockObject $fieldsWithUniqueIdentifier;
 
     protected function setUp(): void
     {
-        $this->model             = $this->createMock(LeadModel::class);
-        $this->repository        = $this->createMock(LeadRepository::class);
-        $this->connection        = $this->createMock(Connection::class);
-        $this->fieldModel        = $this->createMock(FieldModel::class);
-        $this->doNotContactModel = $this->createMock(DoNotContact::class);
+        $this->model                      = $this->createMock(LeadModel::class);
+        $this->repository                 = $this->createMock(LeadRepository::class);
+        $this->connection                 = $this->createMock(Connection::class);
+        $this->doNotContactModel          = $this->createMock(DoNotContact::class);
+        $this->fieldList                  = $this->createMock(FieldList::class);
+        $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
-        $this->fieldModel->method('getFieldList')
+        $this->fieldList->method('getFieldList')
             ->willReturn(
                 [
                     'email'   => [],
@@ -66,7 +73,7 @@ class ContactObjectHelperTest extends TestCase
                 ]
             );
 
-        $this->fieldModel->method('getUniqueIdentifierFields')
+        $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
             ->with(['object' => Contact::NAME])
             ->willReturn(
                 [
@@ -347,12 +354,9 @@ class ContactObjectHelperTest extends TestCase
         $this->getObjectHelper()->setFieldValues($contact);
     }
 
-    /**
-     * @return ContactObjectHelper
-     */
-    private function getObjectHelper()
+    private function getObjectHelper(): ContactObjectHelper
     {
-        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
+        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->doNotContactModel, $this->fieldList, $this->fieldsWithUniqueIdentifier);
     }
 
     private function assertManipulator(Lead $lead, string $objectName): void
@@ -368,7 +372,7 @@ class ContactObjectHelperTest extends TestCase
      */
     private function getObject(int $mappedId, array $fieldValues): ObjectChangeDAO
     {
-        $object = new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', $mappedId, new DateTime());
+        $object = new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', $mappedId, new \DateTime());
 
         foreach ($fieldValues as $name => $value) {
             $object->addField(

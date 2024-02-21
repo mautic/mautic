@@ -14,8 +14,8 @@ use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 
 class CompanyObjectHelper implements ObjectHelperInterface
 {
@@ -33,7 +33,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
         private CompanyModel $model,
         private CompanyRepository $repository,
         private Connection $connection,
-        private FieldModel $fieldModel
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
     ) {
     }
 
@@ -237,7 +237,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     private function getUniqueIdentifierFields(): array
     {
         if (null === $this->uniqueIdentifierFields) {
-            $uniqueIdentifierFields       = $this->fieldModel->getUniqueIdentifierFields(['object' => MauticSyncDataExchange::OBJECT_COMPANY]);
+            $uniqueIdentifierFields       = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => MauticSyncDataExchange::OBJECT_COMPANY]);
             $this->uniqueIdentifierFields = array_keys($uniqueIdentifierFields);
         }
 
