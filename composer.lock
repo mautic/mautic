@@ -635,7 +635,7 @@
                 "seld/jsonlint": "^1.4",
                 "seld/phar-utils": "^1.2",
                 "seld/signal-handler": "^2.0",
-                "symfony/console": "^5.4.11 || ^6.0.11",
+                "symfony/console": "^5.4.11 || ^6.0.11 || ^7",
                 "symfony/filesystem": "^5.4 || ^6.0 || ^7",
                 "symfony/finder": "^5.4 || ^6.0 || ^7",
                 "symfony/polyfill-php73": "^1.24",
@@ -6003,7 +6003,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "05f968726cecb5faeae31b348bde65e776e6dbcb"
+                "reference": "d25d52459cb506b9997bcba8d16c6ee6870492fc"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6015,6 +6015,7 @@
                 "composer/package-versions-deprecated": "1.11.99.1",
                 "doctrine/annotations": "^2.0",
                 "doctrine/data-fixtures": "^1.6.6",
+                "doctrine/dbal": "^3.6.2 < 3.8.0",
                 "doctrine/doctrine-bundle": "^2.7",
                 "doctrine/doctrine-fixtures-bundle": "^3.4.4",
                 "doctrine/doctrine-migrations-bundle": "^3.2.2",
