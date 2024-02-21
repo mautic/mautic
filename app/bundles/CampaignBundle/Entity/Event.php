@@ -160,11 +160,8 @@ class Event implements ChannelInterface
     private $changes = [];
 
     private ?\DateTimeInterface $deleted = null;
-
-    /**
-     * @var int
-     */
-    private $failedCount = 0;
+    
+    private int $failedCount = 0;
 
     public function __construct()
     {
