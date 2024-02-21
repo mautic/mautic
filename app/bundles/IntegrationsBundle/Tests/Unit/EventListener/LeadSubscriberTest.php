@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -85,7 +86,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        Assert::assertEquals(
             [
                 LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],

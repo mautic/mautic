@@ -1,9 +1,11 @@
 <div class="chart-wrapper">
     <div class="pt-sd pr-md pb-md pl-md">
+        {% if  chartType is defined %}
         <div style="height:{{ chartHeight }}px">
             <canvas class="chart {{ chartType }}-chart" {{ disableLegend is defined ? 'data-disable-legend' : '' }}>
                 {{ chartData|json_encode }}
             </canvas>
         </div>
+        {% endif %}
     </div>
 </div>
