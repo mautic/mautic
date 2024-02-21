@@ -817,6 +817,51 @@ class MailHelperTest extends TestCase
         $this->assertNull($headers['List-Unsubscribe-Post'] ?? null);
     }
 
+    public function testUnsubscribeHeaderParameterOrder(): void
+    {
+        $params = [
+            ['mailer_custom_headers', [],
+                [
+                    'X-Mautic-Test'    => 'test',
+                    'X-Mautic-Test2'   => 'test',
+                    'List-Unsubscribe' => '<mailto:list@host.com?subject=unsubscribe>',
+                ]],
+            ['secret_key', null, 'secret'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
+        $mockRouter  = $this->createMock(Router::class);
+        $mockRouter->expects($this->once())
+            ->method('generate')
+            ->with('mautic_email_unsubscribe',
+                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
+                UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+
+        $this->mockFactory->method('getRouter')->willReturnOnConsecutiveCalls($mockRouter);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper);
+        $mailer->setIdHash('hash');
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html></html>');
+        $lead = new Lead();
+        $lead->setEmail('someemail@email.test');
+        $mailer->setIdHash('hash');
+        $mailer->setEmail($email);
+        $mailer->setLead($lead);
+
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
+        $headers = $mailer->getCustomHeaders();
+
+        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
+        $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
+    }
+
     protected function mockEmptyMailHelper(): MailHelper
     {
         $transport     = new SmtpTransport();
