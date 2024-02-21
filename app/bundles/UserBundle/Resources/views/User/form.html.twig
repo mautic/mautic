@@ -160,8 +160,6 @@
 						{% set userPath = userPath|merge([user_id, user_username]) %}
 					{% endif %}
 				{% endif %}
-
-
 				<li class="media">
 					<div class="media-object pull-left">
 					{% if log.action == 'login' %}
@@ -173,7 +171,6 @@
 					{% endif %}
 					</div>
 					<div class="media-body">
-
 						{% if log.object == 'user' %}
 							{% if log.action == 'update' %}
 									{{ 'mautic.user.user.form.update_update'|trans }}
@@ -196,9 +193,6 @@
 
 							{% endif %}
 						{% endif %}
-
-
-
 
 						{% if log.userId is defined and log.userId is not empty %}
 							<a
