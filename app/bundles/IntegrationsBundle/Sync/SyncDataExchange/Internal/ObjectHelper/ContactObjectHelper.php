@@ -29,12 +29,12 @@ class ContactObjectHelper implements ObjectHelperInterface
     /**
      * @var string[]|null
      */
-    private $uniqueIdentifierFields;
+    private ?array $uniqueIdentifierFields = null;
 
     /**
      * @var array<string,Lead>
      */
-    private $contactsCreated = [];
+    private array $contactsCreated = [];
 
     public function __construct(
         private LeadModel $model,

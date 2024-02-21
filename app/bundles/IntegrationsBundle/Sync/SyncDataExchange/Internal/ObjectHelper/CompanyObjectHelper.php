@@ -14,7 +14,6 @@ use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 
@@ -23,12 +22,12 @@ class CompanyObjectHelper implements ObjectHelperInterface
     /**
      * @var string[]|null
      */
-    private $uniqueIdentifierFields;
+    private ?array $uniqueIdentifierFields = null;
 
     /**
      * @var array<string,Company>
      */
-    private $companiesCreated = [];
+    private array $companiesCreated = [];
 
     public function __construct(
         private CompanyModel $model,

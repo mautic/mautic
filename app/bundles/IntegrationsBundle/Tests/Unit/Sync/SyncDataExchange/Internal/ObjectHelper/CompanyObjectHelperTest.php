@@ -22,24 +22,24 @@ use PHPUnit\Framework\TestCase;
 class CompanyObjectHelperTest extends TestCase
 {
     /**
-     * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var CompanyMod&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $model;
+    private MockObject $model;
 
     /**
-     * @var CompanyRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var CompanyRepository&ockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $repository;
+    private MockObject $repository;
 
     /**
-     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
+     * @var Connecti&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
-     * @var FieldModel|MockObject
+     * @var FieldModel&MockObject
      */
-    private $fieldModel;
+    private MockObject $fieldModel;
 
     protected function setUp(): void
     {
