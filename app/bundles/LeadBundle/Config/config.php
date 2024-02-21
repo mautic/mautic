@@ -483,6 +483,10 @@ return [
                 'arguments' => [
                 ],
             ],
+            'mautic.form.type.html' => [
+                'class' => Mautic\LeadBundle\Form\Type\HtmlType::class,
+                'alias' => 'html',
+            ],
             'mautic.lead.segment.stat.campaign.share' => [
                 'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare::class,
                 'arguments' => [
