@@ -149,7 +149,7 @@ class BuilderSubscriberTest extends TestCase
         ];
     }
 
-    public function testUnsubscribeTestTokensAreReplacedOnEmailGenerate()
+    public function testUnsubscribeTestTokensAreReplacedOnEmailGenerate(): void
     {
         $lead = new Lead();
         $lead->setId(7);
@@ -159,7 +159,7 @@ class BuilderSubscriberTest extends TestCase
         $company->setName('ACME');
 
         $leadArray                = $lead->convertToArray();
-        $leadArray['companies'][] = ['companyname'=> $company->getName()];
+        $leadArray['companies'][] = ['companyname' => $company->getName(), 'is_primary' => true];
 
         $args = [
             'lead' => $leadArray,
@@ -167,10 +167,10 @@ class BuilderSubscriberTest extends TestCase
         ];
         $event = new EmailSendEvent(null, $args);
 
-        $unsubscribeTokenizedText = '{contactfield=companyname} {leadfield=lastname}';
+        $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
 
         $this->coreParametersHelper->expects($this->exactly(4))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(['unsubscribe_text'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
             ->willReturnOnConsecutiveCalls($unsubscribeTokenizedText, 'Just a text', 'Signature', 'jan.kozak@acquia.com');
 

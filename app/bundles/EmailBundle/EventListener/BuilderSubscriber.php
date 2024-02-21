@@ -276,9 +276,6 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         // We will replace tokens in unsubscribe text too
         $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
-
-        $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
-
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
