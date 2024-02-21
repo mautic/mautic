@@ -30,6 +30,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -93,10 +94,11 @@ class ReportModel extends FormModel
 
     protected function getSession(): Session
     {
-        $session = $this->requestStack->getSession();
-        \assert($session instanceof Session);
-
-        return $session;
+        try {
+            return $this->requestStack->getSession();
+        } catch (SessionNotFoundException $e) {
+            return new Session(); // in case of CLI
+        }
     }
 
     /**
