@@ -222,6 +222,7 @@ class PageType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                     'rows'  => '8',
+                    'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
             ]
@@ -236,6 +237,7 @@ class PageType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                     'rows'  => '8',
+                    'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
             ]
