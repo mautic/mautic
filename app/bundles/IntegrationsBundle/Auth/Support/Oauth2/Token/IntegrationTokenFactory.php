@@ -9,7 +9,7 @@ use kamermans\OAuth2\Token\TokenInterface;
 class IntegrationTokenFactory implements TokenFactoryInterface
 {
     /**
-     * @param mixed[] $extraKeysToStore Extra keys returned by the service during the token process that needs to be captured
+     * @param mixed[]  $extraKeysToStore Extra keys returned by the service during the token process that needs to be captured
      * @param int|null $defaultExpiresIn Default time in seconds that tokens are good for if not given in the response
      */
     public function __construct(
@@ -55,6 +55,9 @@ class IntegrationTokenFactory implements TokenFactoryInterface
         return $extraData;
     }
 
+    /**
+     * @param mixed[] $data
+     */
     private function getExpiration(array $data): ?int
     {
         // Read the "expires_at" attribute
