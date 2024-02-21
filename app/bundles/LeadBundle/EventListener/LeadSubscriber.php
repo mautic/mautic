@@ -114,7 +114,7 @@ class LeadSubscriber implements EventSubscriberInterface
             $this->lastContactId = $lead->getId();
         }
 
-        //Because there is an event within an event, there is a risk that something will trigger a loop which needs to be prevented
+        // Because there is an event within an event, there is a risk that something will trigger a loop which needs to be prevented
         $check = base64_encode($lead->getId().md5(json_encode($details)));
         if (in_array($check, $this->preventLoop)) {
             return;
@@ -135,7 +135,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         // Date identified entry
         if (isset($details['dateIdentified'])) {
-            //log the day lead was identified
+            // log the day lead was identified
             $log = [
                 'bundle'    => 'lead',
                 'object'    => 'lead',

@@ -10,8 +10,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
-use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -29,41 +29,41 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriberTest extends CommonMocks
 {
     /**
-     * @var IpLookupHelper|MockObject
+     * @var IpLookupHelper&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
-     * @var AuditLogModel|MockObject
+     * @var AuditLogModel&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+    private MockObject $auditLogModel;
 
     /**
-     * @var LeadChangeEventDispatcher|MockObject
+     * @var LeadChangeEventDispatcher&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEventDispatcher;
+    private MockObject $leadEventDispatcher;
 
     private \Mautic\LeadBundle\Twig\Helper\DncReasonHelper $dncReasonHelper;
 
     /**
-     * @var EntityManager|MockObject
+     * @var EntityManager&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private MockObject $entityManager;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var TranslatorInterface&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
-     * @var RouterInterface|MockObject
+     * @var RouterInterface&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
+    private MockObject $router;
 
     /**
      * @var ModelFactory<object>&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $modelFacotry;
+    private MockObject $modelFacotry;
 
     /**
      * @var CoreParametersHelper
@@ -243,7 +243,7 @@ class LeadSubscriberTest extends CommonMocks
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }
 
-    public function testOnLeadPostSaveWillNotProcessTheSameContactMultipleTimesBetweenContacts()
+    public function testOnLeadPostSaveWillNotProcessTheSameContactMultipleTimesBetweenContacts(): void
     {
         $lead = new Lead();
         $lead->setId(54);
@@ -263,16 +263,8 @@ class LeadSubscriberTest extends CommonMocks
         $lead3->setId(58);
         $lead3->addUpdatedField('lastname', 'Somebody');
 
-        $ipLookupHelper      = $this->createMock(IpLookupHelper::class);
-        $auditLogModel       = $this->createMock(AuditLogModel::class);
-        $leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
-        $dncReasonHelper     = $this->createMock(DncReasonHelper::class);
-        $entityManager       = $this->createMock(EntityManager::class);
-        $translator          = $this->createMock(TranslatorInterface::class);
-        $router              = $this->createMock(RouterInterface::class);
-
         // This method will be called exactly once per set of changes
-        $auditLogModel->expects($this->exactly(3))
+        $this->auditLogModel->expects($this->exactly(3))
             ->method('writeToLog')
             ->withConsecutive(
                 [
@@ -331,18 +323,20 @@ class LeadSubscriberTest extends CommonMocks
             );
 
         $subscriber = new LeadSubscriber(
-            $ipLookupHelper,
-            $auditLogModel,
-            $leadEventDispatcher,
-            $dncReasonHelper,
-            $entityManager,
-            $translator,
-            $router
+            $this->ipLookupHelper,
+            $this->auditLogModel,
+            $this->leadEventDispatcher,
+            $this->dncReasonHelper,
+            $this->entityManager,
+            $this->translator,
+            $this->router,
+            $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository,
+            true
         );
 
-        $leadEvent = $this->getMockBuilder(LeadEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadEvent = $this->createMock(LeadEvent::class);
 
         $leadEvent->expects($this->exactly(6))
             ->method('getLead')
@@ -374,7 +368,7 @@ class LeadSubscriberTest extends CommonMocks
         $subscriber->onLeadPostSave($leadEvent);
     }
 
-    public function testManipulatorLogged()
+    public function testManipulatorLogged(): void
     {
         $lead = new Lead();
         $lead->setId(54);
@@ -387,17 +381,9 @@ class LeadSubscriberTest extends CommonMocks
         $lead->addUpdatedField('firstname', 'John');
         $lead->addUpdatedField('lastname', 'Test');
 
-        $ipLookupHelper      = $this->createMock(IpLookupHelper::class);
-        $auditLogModel       = $this->createMock(AuditLogModel::class);
-        $leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
-        $dncReasonHelper     = $this->createMock(DncReasonHelper::class);
-        $entityManager       = $this->createMock(EntityManager::class);
-        $translator          = $this->createMock(TranslatorInterface::class);
-        $router              = $this->createMock(RouterInterface::class);
-
         // This method will be called exactly once
         // even though the onLeadPostSave was called twice for the same lead
-        $auditLogModel->expects($this->once())
+        $this->auditLogModel->expects($this->once())
             ->method('writeToLog')
             ->with(
                 [
@@ -422,18 +408,20 @@ class LeadSubscriberTest extends CommonMocks
             );
 
         $subscriber = new LeadSubscriber(
-            $ipLookupHelper,
-            $auditLogModel,
-            $leadEventDispatcher,
-            $dncReasonHelper,
-            $entityManager,
-            $translator,
-            $router
+            $this->ipLookupHelper,
+            $this->auditLogModel,
+            $this->leadEventDispatcher,
+            $this->dncReasonHelper,
+            $this->entityManager,
+            $this->translator,
+            $this->router,
+            $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository,
+            true
         );
 
-        $leadEvent = $this->getMockBuilder(LeadEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadEvent = $this->createMock(LeadEvent::class);
 
         $leadEvent->expects($this->once())
             ->method('getLead')
