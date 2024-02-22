@@ -2417,13 +2417,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $sfObject
      * @param string $sfFieldString
      *
-     * @return mixed|string
+     * @return mixed
      *
      * @throws ApiErrorException
      */
     public function getDncHistory($sfObject, $sfFieldString)
     {
-        $this->getDoNotContactHistory($sfObject, $sfFieldString, 'DESC');
+        return $this->getDoNotContactHistory($sfObject, $sfFieldString, 'DESC');
     }
 
     public function getDoNotContactHistory(string $object, string $ids, string $order = 'DESC'): mixed
@@ -2443,9 +2443,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             ORDER BY CreatedDate %s', $object, $object, $object, $ids, $order);
 
         $url      = $this->getQueryUrl();
-        $history  = $this->getApiHelper()->request('query', ['q' => $query], 'GET', false, null, $url);
 
-        return $history;
+        return $this->getApiHelper()->request('query', ['q' => $query], 'GET', false, null, $url);
     }
 
     /**
