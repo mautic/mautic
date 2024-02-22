@@ -19,13 +19,12 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\LeadBundle\LeadEvents;
-
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -42,11 +41,11 @@ class FormSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
-            FormEvents::ON_OBJECT_COLLECT        => ['onObjectCollect', 0],
-            FormEvents::ON_FIELD_COLLECT         => ['onFieldCollect', 0],
+            FormEvents::FORM_ON_BUILD                    => ['onFormBuilder', 0],
+            FormEvents::ON_OBJECT_COLLECT                => ['onObjectCollect', 0],
+            FormEvents::ON_FIELD_COLLECT                 => ['onFieldCollect', 0],
             LeadEvents::LEAD_ON_SEGMENTS_CHANGE          => ['onLeadSegmentsChange', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
+            FormEvents::ON_EXECUTE_SUBMIT_ACTION         => [
                 ['onFormSubmitActionChangePoints', 0],
                 ['onFormSubmitActionChangeList', 1],
                 ['onFormSubmitActionChangeTags', 2],
@@ -76,7 +75,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.changelist',
             'description' => 'mautic.lead.lead.events.changelist_descr',
             'formType'    => ListActionType::class,
-            'eventName'   => LeadEvents::LEAD_ON_SEGMENTS_CHANGE,
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
         $event->addSubmitAction('lead.changetags', [
@@ -291,14 +290,11 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param SubmissionEvent $event
-     */
-    public function onLeadSegmentsChange(SubmissionEvent $event)
+    public function onLeadSegmentsChange(SubmissionEvent $event): void
     {
         $properties = $event->getActionConfig();
 
-        $lead       = $event->getLead();
+        $lead       = $this->contactTracker->getContact();
         $addTo      = $properties['addToLists'];
         $removeFrom = $properties['removeFromLists'];
 

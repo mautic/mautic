@@ -13,14 +13,13 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\EventListener\FormSubscriber;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\LeadEvents;
 
 class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -56,7 +55,7 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
-    private \PHPUnit\Framework\MockObject\MockObject|SubmissionEvent $submissionEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $submissionEvent;
 
     protected function setUp(): void
     {
@@ -99,7 +98,7 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $submissionEvent->getSubmission()->getLead()->getPoints());
     }
 
-    public function testThatTheLeadIsAddedToTheSegmentOnLeadOnSegmentsChangeEvent()
+    public function testThatTheLeadIsAddedToTheSegmentOnLeadOnSegmentsChangeEvent(): void
     {
         $this->submissionEvent
             ->method('getActionConfig')
@@ -112,7 +111,7 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
     }
 
-    public function testThatTheLeadIsRemovedFromTheSegmentOnLeadOnSegmentsChangeEvent()
+    public function testThatTheLeadIsRemovedFromTheSegmentOnLeadOnSegmentsChangeEvent(): void
     {
         $this->submissionEvent
             ->method('getActionConfig')
@@ -125,7 +124,7 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
     }
 
-    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired()
+    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
     {
         $subscribers = FormSubscriber::getSubscribedEvents();
         $this->assertArrayHasKey(LeadEvents::LEAD_ON_SEGMENTS_CHANGE, $subscribers);

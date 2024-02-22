@@ -19,14 +19,14 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     private \Mautic\LeadBundle\EventListener\PointSubscriber $subscriber;
-    private \PHPUnit\Framework\MockObject\MockObject|TriggerExecutedEvent $triggerExecutedEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $triggerExecutedEvent;
 
-    private \PHPUnit\Framework\MockObject\MockObject|TriggerEventEntity $triggerEventEntity;
+    private \PHPUnit\Framework\MockObject\MockObject $triggerEventEntity;
 
     protected function setUp(): void
     {
-        $this->leadModel  = $this->createMock(LeadModel::class);
-        $this->subscriber = new PointSubscriber($this->leadModel);
+        $this->leadModel            = $this->createMock(LeadModel::class);
+        $this->subscriber           = new PointSubscriber($this->leadModel);
         $this->triggerExecutedEvent = $this->createMock(TriggerExecutedEvent::class);
         $this->triggerEventEntity   = $this->createMock(TriggerEventEntity::class);
 
@@ -64,7 +64,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 
-    public function testThatTheLeadIsAddedToTheSegmentOnTriggerOnLeadSegmentsChangeEvent()
+    public function testThatTheLeadIsAddedToTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
         $this->triggerEventEntity
             ->method('getProperties')
@@ -77,7 +77,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
     }
 
-    public function testThatTheLeadIsRemovedFromTheSegmentOnTriggerOnLeadSegmentsChangeEvent()
+    public function testThatTheLeadIsRemovedFromTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
         $this->triggerEventEntity
             ->method('getProperties')
@@ -90,7 +90,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
     }
 
-    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired()
+    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
     {
         $subscribers = PointSubscriber::getSubscribedEvents();
         $this->assertArrayHasKey(PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE, $subscribers);
