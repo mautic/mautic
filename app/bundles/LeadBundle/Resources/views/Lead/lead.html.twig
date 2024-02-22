@@ -192,7 +192,7 @@
                                                             {% elseif 'url' == field.type %}
                                                                 <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
                                                             {% elseif 'html' == field.type %}
-                                                                <div style="resize: vertical; overflow: auto">{{ field.value|purify }}</div>
+                                                                <div style="resize: vertical; overflow: auto">{{ field.value|e }}</div>
                                                             {% elseif 'datetime' == field.type %}
                                                                 {{ dateToFullConcat(field.value, 'UTC') }}
                                                             {% else %}
