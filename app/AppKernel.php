@@ -2,7 +2,6 @@
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
-use Mautic\QueueBundle\Queue\QueueProtocol;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -27,6 +26,11 @@ class AppKernel extends Kernel
     private $parameterLoader;
 
     /**
+     * @var string
+     */
+    private $projectDir;
+
+    /**
      * @param string $environment The environment
      * @param bool   $debug       Whether to enable debugging or not
      *
@@ -39,21 +43,21 @@ class AppKernel extends Kernel
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
         defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
 
-        /*
+        /**
          * This is required for Doctrine's automatic database detection. When Mautic hasn't been
          * installed yet, we don't have a database to connect to, causing automatic database platform
          * detection to fail. We use the MAUTIC_DB_SERVER_VERSION constant to temporarily set a server_version
          * if no database settings have been provided yet.
          */
         if (!defined('MAUTIC_DB_SERVER_VERSION')) {
-            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app', false);
+            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getApplicationDir().'/app', false);
             define('MAUTIC_DB_SERVER_VERSION', file_exists($localConfigFile) ? null : '5.7');
         }
 
         parent::__construct($environment, $debug);
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
     {
         if (false !== strpos($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
@@ -158,19 +162,8 @@ class AppKernel extends Kernel
             new Mautic\CacheBundle\MauticCacheBundle(),
         ];
 
-        $queueProtocol = $this->getParameterLoader()->getLocalParameterBag()->get('queue_protocol', '');
-        $bundles[]     = new Mautic\QueueBundle\MauticQueueBundle($queueProtocol);
-        switch ($queueProtocol) {
-            case QueueProtocol::RABBITMQ:
-                $bundles[] = new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle();
-                break;
-            case QueueProtocol::BEANSTALKD:
-                $bundles[] = new Leezy\PheanstalkBundle\LeezyPheanstalkBundle();
-                break;
-        }
-
         // dynamically register Mautic Plugin Bundles
-        $searchPath = $this->getProjectDir().'/plugins';
+        $searchPath = $this->getApplicationDir().'/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->followLinks()
@@ -212,8 +205,8 @@ class AppKernel extends Kernel
         }
 
         // Check for local bundle inclusion
-        if (file_exists($this->getProjectDir().'/app/config/bundles_local.php')) {
-            include $this->getProjectDir().'/app/config/bundles_local.php';
+        if (file_exists($this->getProjectDir().'/config/bundles_local.php')) {
+            include $this->getProjectDir().'/config/bundles_local.php';
         }
 
         return $bundles;
@@ -225,9 +218,6 @@ class AppKernel extends Kernel
             ->addTag(\Mautic\CoreBundle\DependencyInjection\Compiler\ModelPass::TAG);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function boot(): void
     {
         if (true === $this->booted) {
@@ -264,12 +254,16 @@ class AppKernel extends Kernel
         $this->booted = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    protected function prepareContainer(ContainerBuilder $container): void
+    {
+        $container->setParameter('mautic.application_dir', $this->getApplicationDir());
+
+        parent::prepareContainer($container);
+    }
+
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load($this->getProjectDir().'/app/config/config_'.$this->getEnvironment().'.php');
+        $loader->load($this->getApplicationDir().'/app/config/config_'.$this->getEnvironment().'.php');
     }
 
     /**
@@ -296,14 +290,35 @@ class AppKernel extends Kernel
         return $this->installed;
     }
 
-    public function getProjectDir(): string
+    public function getApplicationDir(): string
     {
         return dirname(__DIR__);
     }
 
+    public function getProjectDir()
+    {
+        if (null === $this->projectDir) {
+            $r = new \ReflectionObject($this);
+
+            if (!is_file($dir = $r->getFileName())) {
+                throw new \LogicException(sprintf('Cannot auto-detect project dir for kernel of class "%s".', $r->name));
+            }
+
+            // We need 1 level deeper than the parent method, as the app folder contains a composer.json file
+            $dir = $rootDir = \dirname($dir, 2);
+            while (!is_file($dir.'/composer.json')) {
+                if ($dir === \dirname($dir)) {
+                    return $this->projectDir = $rootDir;
+                }
+                $dir = \dirname($dir);
+            }
+            $this->projectDir = $dir;
+        }
+
+        return $this->projectDir;
+    }
+
     /**
-     * {@inheritdoc}
-     *
      * @api
      */
     public function getCacheDir(): string
@@ -331,7 +346,7 @@ class AppKernel extends Kernel
      */
     public function getLocalConfigFile(): string
     {
-        return ParameterLoader::getLocalConfigFile($this->getProjectDir().'/app');
+        return ParameterLoader::getLocalConfigFile($this->getApplicationDir().'/app');
     }
 
     private function getParameterLoader(): ParameterLoader

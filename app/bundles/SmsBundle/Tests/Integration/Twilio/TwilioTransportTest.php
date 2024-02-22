@@ -16,10 +16,11 @@ use PHPUnit\Framework\TestCase;
 class TwilioTransportTest extends TestCase
 {
     private TwilioTransport $twilioTransport;
+
     /**
      * @var MockObject&\Monolog\Logger
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     protected function setUp(): void
     {
@@ -43,7 +44,7 @@ class TwilioTransportTest extends TestCase
 
     public function testCreatePayload(): void
     {
-        $reflection = new \ReflectionClass(get_class($this->twilioTransport));
+        $reflection = new \ReflectionClass($this->twilioTransport::class);
         $method     = $reflection->getMethod('createPayload');
         $method->setAccessible(true);
 

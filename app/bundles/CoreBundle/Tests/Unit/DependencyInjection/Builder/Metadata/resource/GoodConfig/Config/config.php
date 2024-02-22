@@ -21,7 +21,7 @@ return [
     'services' => [
         'helpers'  => [
             'mautic.helper.bundle' => [
-                'class'     => 'Mautic\CoreBundle\Helper\BundleHelper',
+                'class'     => \Mautic\CoreBundle\Helper\BundleHelper::class,
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
@@ -44,7 +44,7 @@ return [
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => 'Mautic\CoreBundle\IpLookup\ExtremeIpLookup',
+            'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
         ],
     ],
 

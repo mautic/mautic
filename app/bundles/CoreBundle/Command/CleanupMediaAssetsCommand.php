@@ -14,8 +14,9 @@ use Symfony\Component\Finder\Finder;
  */
 class CleanupMediaAssetsCommand extends Command
 {
-    public function __construct(private PathsHelper $pathsHelper)
-    {
+    public function __construct(
+        private PathsHelper $pathsHelper
+    ) {
         parent::__construct();
     }
 
@@ -79,5 +80,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Cleans up obsolete files in the media folder that are present in the app/assets folder';
 }

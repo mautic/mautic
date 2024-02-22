@@ -9,7 +9,8 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/middlewares')
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins')
-    ->in(__DIR__.'/.github/workflows/mautic-asset-upload');
+    ->in(__DIR__.'/.github/workflows/mautic-asset-upload')
+    ->append([__DIR__.'/rector.php', __DIR__.'/rector-older-symfony.php', __DIR__.'/.php-cs-fixer.php', __DIR__.'/ecs.php']);
 
 return (new PhpCsFixer\Config())
     ->setRules([
@@ -36,6 +37,7 @@ return (new PhpCsFixer\Config())
             'header' => '',
         ],
         'Mautic/no_table_prefix_definition_in_tests' => true,
+        'multiline_whitespace_before_semicolons'     => true,
     ])
     ->registerCustomFixers([new Mautic\CodingStandards\PhpCSFixer\NoTablePrefixDefinitionInTestsFixer()])
     ->setFinder($finder);

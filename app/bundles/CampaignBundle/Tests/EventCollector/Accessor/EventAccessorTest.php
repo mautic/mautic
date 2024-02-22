@@ -51,7 +51,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    public function testEventsArrayIsBuiltWithAccessors()
+    public function testEventsArrayIsBuiltWithAccessors(): void
     {
         $eventAccessor = new EventAccessor($this->events);
 

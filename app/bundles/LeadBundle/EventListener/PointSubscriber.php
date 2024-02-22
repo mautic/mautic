@@ -12,17 +12,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    public function __construct(LeadModel $leadModel)
-    {
-        $this->leadModel = $leadModel;
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::TRIGGER_ON_BUILD         => ['onTriggerBuild', 0],
@@ -30,14 +25,14 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $event->addEvent(
             'lead.changelists',
             [
                 'group'    => 'mautic.lead.point.trigger',
                 'label'    => 'mautic.lead.point.trigger.changelists',
-                'callback' => ['\\Mautic\\LeadBundle\\Helper\\PointEventHelper', 'changeLists'],
+                'callback' => [\Mautic\LeadBundle\Helper\PointEventHelper::class, 'changeLists'],
                 'formType' => ListActionType::class,
             ]
         );
@@ -63,6 +58,8 @@ class PointSubscriber implements EventSubscriberInterface
         $addTags    = $properties['add_tags'] ?: [];
         $removeTags = $properties['remove_tags'] ?: [];
 
-        $this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags);
+        if ($this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags)) {
+            $event->setSucceded();
+        }
     }
 }

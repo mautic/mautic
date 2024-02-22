@@ -22,22 +22,31 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class AuthenticationListenerTest extends TestCase
 {
-    /** @var AuthenticationListener */
-    private $authenticationListener;
+    private \Mautic\UserBundle\Security\Firewall\AuthenticationListener $authenticationListener;
 
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
+    /**
+     * @var TokenStorageInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $tokenStorage;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    /**
+     * @var EntityManagerInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
-    /** @var ObjectRepository<User>&MockObject */
-    private $objectRepository;
+    /**
+     * @var ObjectRepository<User>&MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $objectRepository;
 
-    /** @var OAuthToken */
-    private $token;
+    /**
+     * @var OAuthToken
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $token;
 
-    /** @var AccessToken */
+    /**
+     * @var AccessToken
+     */
     private $accessToken;
 
     public function setUp(): void
@@ -107,7 +116,7 @@ class AuthenticationListenerTest extends TestCase
             ->with($this->callback(function (User $user) use ($adminRole) {
                 $this->assertSame('test-client', $user->getFirstName());
                 $this->assertSame('[123]', $user->getLastName());
-                $this->assertSame('test-client [123]', $user->getUsername());
+                $this->assertSame('test-client [123]', $user->getUserIdentifier());
                 $this->assertSame($adminRole, $user->getRole());
 
                 return true;

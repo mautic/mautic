@@ -29,17 +29,17 @@ class MauticSyncProcessTest extends TestCase
     /**
      * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
      * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectChangeGenerator;
+    private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
 
     /**
      * @var MauticSyncDataExchange|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
     protected function setUp(): void
     {

@@ -6,14 +6,14 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 
 class DecisionAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEventNameIsReturned()
+    public function testEventNameIsReturned(): void
     {
         $accessor = new DecisionAccessor(['eventName' => 'test']);
 
         $this->assertEquals('test', $accessor->getEventName());
     }
 
-    public function testExtraParamIsReturned()
+    public function testExtraParamIsReturned(): void
     {
         $accessor = new DecisionAccessor(['eventName' => 'test', 'foo' => 'bar']);
 

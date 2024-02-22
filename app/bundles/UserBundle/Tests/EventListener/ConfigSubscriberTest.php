@@ -13,14 +13,14 @@ class ConfigSubscriberTest extends TestCase
     /**
      * @var ConfigEvent|MockObject
      */
-    private $configEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $configEvent;
 
     protected function setUp(): void
     {
         $this->configEvent = $this->createMock(ConfigEvent::class);
     }
 
-    public function testOwnPasswordIsNotWipedOutOnConfigSaveIfEmpty()
+    public function testOwnPasswordIsNotWipedOutOnConfigSaveIfEmpty(): void
     {
         $subscriber = new ConfigSubscriber();
         $this->configEvent->expects($this->once())
@@ -35,7 +35,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testMetadataFileIsDetectedAsXml()
+    public function testMetadataFileIsDetectedAsXml(): void
     {
         $subscriber = new ConfigSubscriber();
         $this->configEvent->expects($this->once())
@@ -62,7 +62,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testMetadataFileFailsValidationIfNotXml()
+    public function testMetadataFileFailsValidationIfNotXml(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -87,7 +87,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testCertificatePassesValidationIfValid()
+    public function testCertificatePassesValidationIfValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -111,7 +111,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testCertificateFailsValidationIfNotValid()
+    public function testCertificateFailsValidationIfNotValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -136,7 +136,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyPassesValidationIfValid()
+    public function testPrivateKeyPassesValidationIfValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -160,7 +160,7 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyFailsValidationIfNotValid()
+    public function testPrivateKeyFailsValidationIfNotValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
@@ -185,12 +185,12 @@ class ConfigSubscriberTest extends TestCase
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testEncryptedPrivateKeyPassesValidationIfValid()
+    public function testEncryptedPrivateKeyPassesValidationIfValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
         $file = $this->createMock(UploadedFile::class);
-        $key  = <<<KEY
+        $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
 MBQGCCqGSIb3DQMHBAg1HGrSHb7zVwSCAoBG89zqAxAx+vPvhQVW6dfJFBTSpAGq
@@ -208,7 +208,7 @@ ZTJUgHdZ6Tfe2jPFJjSZVoU/en0W5BQXgy1u3BDX68C8nAfZ4xmeyELcMub9hTYb
 HTDmYIBozZNIcYHB6OGZnURuGeofMVJqMkNfnEuSuoCJsXGIhLznDKp8G00F9eR2
 1L+B0ZUZv/O82qEGzC/IX7+CFmSDStV9R400cDvi+8BsdMMB+WV6SMnK
 -----END ENCRYPTED PRIVATE KEY-----
-KEY;
+KEY_WRAP;
 
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
@@ -230,12 +230,12 @@ KEY;
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyFailsValidationIfPasswordNotValid()
+    public function testPrivateKeyFailsValidationIfPasswordNotValid(): void
     {
         $subscriber = new ConfigSubscriber();
 
         $file = $this->createMock(UploadedFile::class);
-        $key  = <<<KEY
+        $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
 MBQGCCqGSIb3DQMHBAg1HGrSHb7zVwSCAoBG89zqAxAx+vPvhQVW6dfJFBTSpAGq
@@ -253,7 +253,7 @@ ZTJUgHdZ6Tfe2jPFJjSZVoU/en0W5BQXgy1u3BDX68C8nAfZ4xmeyELcMub9hTYb
 HTDmYIBozZNIcYHB6OGZnURuGeofMVJqMkNfnEuSuoCJsXGIhLznDKp8G00F9eR2
 1L+B0ZUZv/O82qEGzC/IX7+CFmSDStV9R400cDvi+8BsdMMB+WV6SMnK
 -----END ENCRYPTED PRIVATE KEY-----
-KEY;
+KEY_WRAP;
 
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
@@ -276,12 +276,12 @@ KEY;
         $subscriber->onConfigSave($this->configEvent);
     }
 
-    public function testPrivateKeyFailsValidationIfPasswordMissing()
+    public function testPrivateKeyFailsValidationIfPasswordMissing(): void
     {
         $subscriber = new ConfigSubscriber();
 
         $file = $this->createMock(UploadedFile::class);
-        $key  = <<<KEY
+        $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
 MBQGCCqGSIb3DQMHBAg1HGrSHb7zVwSCAoBG89zqAxAx+vPvhQVW6dfJFBTSpAGq
@@ -299,7 +299,7 @@ ZTJUgHdZ6Tfe2jPFJjSZVoU/en0W5BQXgy1u3BDX68C8nAfZ4xmeyELcMub9hTYb
 HTDmYIBozZNIcYHB6OGZnURuGeofMVJqMkNfnEuSuoCJsXGIhLznDKp8G00F9eR2
 1L+B0ZUZv/O82qEGzC/IX7+CFmSDStV9R400cDvi+8BsdMMB+WV6SMnK
 -----END ENCRYPTED PRIVATE KEY-----
-KEY;
+KEY_WRAP;
 
         $this->configEvent->expects($this->once())
             ->method('getFileContent')

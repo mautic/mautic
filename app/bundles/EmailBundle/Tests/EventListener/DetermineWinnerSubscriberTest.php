@@ -20,17 +20,14 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EntityManagerInterface
      */
-    private $em;
+    private \PHPUnit\Framework\MockObject\MockObject $em;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private \Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -41,7 +38,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
     }
 
-    public function testOnDetermineOpenRateWinner()
+    public function testOnDetermineOpenRateWinner(): void
     {
         $parentMock = $this->createMock(Email::class);
         $children   = [2 => $this->createMock(Email::class)];
@@ -115,7 +112,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 
-    public function testOnDetermineOClickthroughRateWinner()
+    public function testOnDetermineOClickthroughRateWinner(): void
     {
         $parentMock    = $this->createMock(Email::class);
         $children      = [2 => $this->createMock(Email::class)];

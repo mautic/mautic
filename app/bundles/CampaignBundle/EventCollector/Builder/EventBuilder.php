@@ -8,10 +8,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 
 class EventBuilder
 {
-    /**
-     * @return array
-     */
-    public static function buildActions(array $actions)
+    public static function buildActions(array $actions): array
     {
         $converted = [];
         foreach ($actions as $key => $actionArray) {
@@ -21,10 +18,7 @@ class EventBuilder
         return $converted;
     }
 
-    /**
-     * @return array
-     */
-    public static function buildConditions(array $conditions)
+    public static function buildConditions(array $conditions): array
     {
         $converted = [];
         foreach ($conditions as $key => $conditionArray) {
@@ -34,10 +28,7 @@ class EventBuilder
         return $converted;
     }
 
-    /**
-     * @return array
-     */
-    public static function buildDecisions(array $decisions)
+    public static function buildDecisions(array $decisions): array
     {
         $converted = [];
         foreach ($decisions as $key => $decisionArray) {
