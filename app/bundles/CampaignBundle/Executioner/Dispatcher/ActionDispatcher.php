@@ -14,7 +14,6 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,18 +24,15 @@ class ActionDispatcher
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
         private EventScheduler $scheduler,
-        private NotificationHelper $notificationHelper,
         private LegacyEventDispatcher $legacyDispatcher
     ) {
     }
 
     /**
-     * @return PendingEvent
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
+    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null): PendingEvent
     {
         if (!$pendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);
@@ -56,7 +52,7 @@ class ActionDispatcher
             }
 
             if ($failed) {
-                $this->dispatchedFailedEvent($config, $failed);
+                $this->dispatchFailedEvent($config, $failed);
             }
 
             // Dispatch legacy ON_EVENT_EXECUTION event for BC
@@ -89,7 +85,7 @@ class ActionDispatcher
         );
     }
 
-    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs): void
+    private function dispatchFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -105,8 +101,6 @@ class ActionDispatcher
                 new FailedEvent($config, $log),
                 CampaignEvents::ON_EVENT_FAILED
             );
-
-            $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
         }
 
         $this->scheduler->rescheduleFailures($logs);
