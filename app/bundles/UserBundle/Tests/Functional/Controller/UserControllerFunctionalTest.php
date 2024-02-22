@@ -47,6 +47,9 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Test User</a>', $clientResponse->getContent());
     }
 
+    /**
+     * @param array<mixed> $details
+     */
     public function auditLogSetter(int $userId, string $userName, string $bundle,
         string $object, int $objectId, string $action, array $details): AuditLog
     {
