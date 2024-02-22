@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,10 +27,15 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $userModel = $this->createMock(UserModel::class);
 
-        $user = new User();
-        $user->setUsername('testuser');
-        $user->setEmail('test@email.com');
-        $user->setPassword('password');
+        $role = new Role();
+        $role->setName('Administrator');
+
+        $user = $this->userSetter($role);
+
+        $this->em->persist($auditLog);
+        $this->em->persist($user);
+        $this->em->persist($role);
+        $this->em->flush();
 
         $userModel->method('getEntity')->willReturn($user);
 
@@ -37,7 +43,8 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(200, $clientResponse->getStatusCode());
-        $this->assertStringContainsString('<!-- Recent activity block(audit_log table) -->', $clientResponse->getContent());
+        $this->assertStringContainsString('Login by', $clientResponse->getContent());
+        $this->assertStringContainsString('Test User</a>', $clientResponse->getContent());
     }
 
     public function auditLogSetter(int $userId, string $userName, string $bundle,
@@ -51,7 +58,23 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $auditLog->setObjectId($objectId);
         $auditLog->setAction($action);
         $auditLog->setDetails($details);
+        $auditLog->setDateAdded(new \DateTime());
+        $auditLog->setIpAddress('127.0.0.1');
 
         return $auditLog;
+    }
+
+    public function userSetter(Role $role): User
+    {
+        $user = new User();
+        $user->setUsername('testuser');
+        $user->setEmail('test@email.com');
+        $user->setFirstName('Test');
+        $user->setLastName('User');
+        $user->setPassword('password');
+        $user->setRole($role);
+        $user->setLastLogin('2024-02-22 10:30:00');
+
+        return $user;
     }
 }
