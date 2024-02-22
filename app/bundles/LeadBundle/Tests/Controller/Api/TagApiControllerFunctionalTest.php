@@ -50,7 +50,7 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         // Delete:
         $this->client->request('DELETE', "/api/tags/{$tagId}/delete");
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
         // Get (ensure it's deleted):
         $this->client->request('GET', "/api/tags/{$tagId}");

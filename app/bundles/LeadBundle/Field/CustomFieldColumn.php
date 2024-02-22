@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -29,24 +30,31 @@ class CustomFieldColumn
 
     /**
      * @throws AbortColumnCreateException
+     * @throws AbortColumnUpdateException
      * @throws CustomFieldLimitException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function createLeadColumn(LeadField $leadField): void
     {
         $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
 
-        // We do not need to do anything if the column already exists
-        // But we have to check if the LeadField entity is new.
+        // We have to check if the LeadField entity is new and the column already exists .
         // In such case we must throw an exception to warn users that the column already exists.
         try {
-            if ($leadsSchema->checkColumnExists($leadField->getAlias(), $leadField->isNew())) {
+            $columnExists = $leadsSchema->checkColumnExists($leadField->getAlias(), $leadField->isNew());
+
+            if ($columnExists && $this->customFieldIndex->isUpdatePending($leadField)) {
+                $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+                $this->processUpdateLeadColumn($leadField);
+            }
+
+            if ($columnExists) {
                 return;
             }
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             // We use slightly different error message if the column already exists in this case.
             throw new SchemaException($this->translator->trans('mautic.lead.field.column.already.exists', ['%field%' => $leadField->getName()], 'validators'));
         }
@@ -70,7 +78,7 @@ class CustomFieldColumn
      * @throws CustomFieldLimitException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function processCreateLeadColumn(LeadField $leadField, bool $saveLeadField = true): void
     {
@@ -84,7 +92,8 @@ class CustomFieldColumn
         $schemaDefinition = $this->schemaDefinition->getSchemaDefinitionNonStatic(
             $leadField->getAlias(),
             $leadField->getType(),
-            (bool) $leadField->getIsUniqueIdentifier()
+            (bool) $leadField->getIsUniqueIdentifier(),
+            (int) $leadField->getCharLengthLimit()
         );
 
         $leadsSchema->addColumn($schemaDefinition);
@@ -106,8 +115,28 @@ class CustomFieldColumn
             $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
         }
 
-        if ('string' === $schemaDefinition['type']) {
+        if ($leadField->isIsIndex() || $leadField->getIsUniqueIdentifier()) {
             $this->customFieldIndex->addIndexOnColumn($leadField);
         }
+    }
+
+    /**
+     * Updates the field column in the leads table.
+     *
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
+     */
+    public function processUpdateLeadColumn(LeadField $leadField): void
+    {
+        $hasIndex = $this->customFieldIndex->hasIndex($leadField);
+
+        if ($leadField->isIsIndex() && !$hasIndex) {
+            $this->customFieldIndex->addIndexOnColumn($leadField);
+        } elseif (!$leadField->isIsIndex() && $hasIndex) {
+            $this->customFieldIndex->dropIndexOnColumn($leadField);
+        }
+
+        $this->customFieldIndex->updateUniqueIdentifierIndex($leadField);
     }
 }

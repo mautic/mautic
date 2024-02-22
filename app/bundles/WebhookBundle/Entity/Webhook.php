@@ -20,12 +20,12 @@ class Webhook extends FormEntity
     public const LOGS_DISPLAY_LIMIT = 100;
 
     /**
-     * @var int
+     * @var ?int
      */
     private $id;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $name;
 
@@ -35,7 +35,7 @@ class Webhook extends FormEntity
     private $description;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $webhookUrl;
 
@@ -45,17 +45,17 @@ class Webhook extends FormEntity
     private $secret;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Event>
+     * @var ArrayCollection<int, Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Log>
+     * @var ArrayCollection<int, Log>
      */
     private $logs;
 
@@ -297,7 +297,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection<int,Event>
      */
     public function getEvents()
     {
@@ -305,6 +305,8 @@ class Webhook extends FormEntity
     }
 
     /**
+     * @param ArrayCollection<int,Event> $events
+     *
      * @return $this
      */
     public function setEvents($events)
@@ -312,7 +314,7 @@ class Webhook extends FormEntity
         $this->isChanged('events', $events);
 
         $this->events = $events;
-        /** @var \Mautic\WebhookBundle\Entity\Event $event */
+
         foreach ($events as $event) {
             $event->setWebhook($this);
         }
@@ -421,7 +423,7 @@ class Webhook extends FormEntity
     /**
      * Get log entities.
      *
-     * @return ArrayCollection
+     * @return ArrayCollection<int,Log>
      */
     public function getLogs()
     {
@@ -429,7 +431,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return Collection<int, \Mautic\WebhookBundle\Entity\Log>
+     * @return Collection<int,Log>
      */
     public function getLimitedLogs(): Collection
     {
@@ -440,6 +442,8 @@ class Webhook extends FormEntity
     }
 
     /**
+     * @param ArrayCollection<int,Log> $logs
+     *
      * @return $this
      */
     public function addLogs($logs)

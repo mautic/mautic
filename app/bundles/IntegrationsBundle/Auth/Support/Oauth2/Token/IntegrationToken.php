@@ -52,6 +52,12 @@ class IntegrationToken implements TokenInterface
 
     public function isExpired(): bool
     {
+        // Consider expired if there is not an access token
+        if (!$this->getAccessToken()) {
+            return true;
+        }
+
+        // Otherwise, consider expired if the expiration time has passed
         return $this->expiresAt && $this->expiresAt < time();
     }
 
