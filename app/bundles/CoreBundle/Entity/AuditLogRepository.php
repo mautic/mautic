@@ -246,7 +246,7 @@ class AuditLogRepository extends CommonRepository
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();
-
+    }
     /**
      * @throws DBALException
      */
