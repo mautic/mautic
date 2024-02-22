@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Form\Type\HtmlType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
-class HtmlTypeTest extends TestCase
+final class HtmlTypeTest extends TestCase
 {
     /** @var HtmlType */
     private $htmlType;

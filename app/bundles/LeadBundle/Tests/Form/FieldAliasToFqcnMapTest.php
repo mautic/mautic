@@ -25,7 +25,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 
-class FieldAliasToFqcnMapTest extends TestCase
+final class FieldAliasToFqcnMapTest extends TestCase
 {
     /**
      * @dataProvider aliasFqcnProvider
@@ -43,6 +43,9 @@ class FieldAliasToFqcnMapTest extends TestCase
         FieldAliasToFqcnMap::getFqcn($alias);
     }
 
+    /**
+     * @return mixed[]
+     */
     public function aliasFqcnProvider(): array
     {
         return [
