@@ -298,7 +298,7 @@ class FormSubscriber implements EventSubscriberInterface
     {
         $properties = $event->getActionConfig();
 
-        $lead       = $this->leadModel->getCurrentLead();
+        $lead       = $event->getLead();
         $addTo      = $properties['addToLists'];
         $removeFrom = $properties['removeFromLists'];
 
