@@ -68,6 +68,8 @@ class BuilderSubscriberTest extends TestCase
             $this->translator,
             $mailHashHelper
         );
+        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
+        $this->translator->method('trans')->willReturn('some translation');
     }
 
     /**
@@ -75,9 +77,6 @@ class BuilderSubscriberTest extends TestCase
      */
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
-        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
-        $this->translator->method('trans')->willReturn('some translation');
-
         $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
             if ('locale' === $key) {
                 return 'default_locale';
@@ -183,10 +182,6 @@ class BuilderSubscriberTest extends TestCase
             ->method('trans')
             ->withConsecutive([$unsubscribeTokenizedText], [])
             ->willReturn($unsubscribeTokenizedText);
-
-        $this->emailModel->expects($this->any())
-            ->method('buildUrl')
-            ->willReturn('https://mautic.local');
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(
