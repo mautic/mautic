@@ -24,6 +24,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\LeadBundle\LeadEvents;
+
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -43,6 +45,7 @@ class FormSubscriber implements EventSubscriberInterface
             FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
             FormEvents::ON_OBJECT_COLLECT        => ['onObjectCollect', 0],
             FormEvents::ON_FIELD_COLLECT         => ['onFieldCollect', 0],
+            LeadEvents::LEAD_ON_SEGMENTS_CHANGE          => ['onLeadSegmentsChange', 0],
             FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionChangePoints', 0],
                 ['onFormSubmitActionChangeList', 1],
@@ -73,7 +76,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.changelist',
             'description' => 'mautic.lead.lead.events.changelist_descr',
             'formType'    => ListActionType::class,
-            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'eventName'   => LeadEvents::LEAD_ON_SEGMENTS_CHANGE,
         ]);
 
         $event->addSubmitAction('lead.changetags', [
@@ -285,6 +288,26 @@ class FormSubscriber implements EventSubscriberInterface
 
         if ($event->getLead()) {
             $this->doNotContact->removeDncForContact($event->getLead()->getId(), 'email');
+        }
+    }
+
+    /**
+     * @param SubmissionEvent $event
+     */
+    public function onLeadSegmentsChange(SubmissionEvent $event)
+    {
+        $properties = $event->getActionConfig();
+
+        $lead       = $this->leadModel->getCurrentLead();
+        $addTo      = $properties['addToLists'];
+        $removeFrom = $properties['removeFromLists'];
+
+        if (!empty($addTo)) {
+            $this->leadModel->addToLists($lead, $addTo);
+        }
+
+        if (!empty($removeFrom)) {
+            $this->leadModel->removeFromLists($lead, $removeFrom);
         }
     }
 }

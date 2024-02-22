@@ -19,6 +19,8 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\LeadEvents;
 
 class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -54,6 +56,8 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
+    private \PHPUnit\Framework\MockObject\MockObject|SubmissionEvent $submissionEvent;
+
     protected function setUp(): void
     {
         $this->leadModel          = $this->createMock(LeadModel::class);
@@ -62,6 +66,7 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
         $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
         $this->doNotContact       = $this->createMock(DoNotContact::class);
+        $this->submissionEvent    = $this->createMock(SubmissionEvent::class);
         $this->subscriber         = new FormSubscriber(
             $this->leadModel,
             $this->contactTracker,
@@ -92,5 +97,38 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onFormSubmitActionChangePoints($submissionEvent);
 
         $this->assertEquals(1, $submissionEvent->getSubmission()->getLead()->getPoints());
+    }
+
+    public function testThatTheLeadIsAddedToTheSegmentOnLeadOnSegmentsChangeEvent()
+    {
+        $this->submissionEvent
+            ->method('getActionConfig')
+            ->willReturn([
+                'addToLists'      => 1,
+                'removeFromLists' => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('addToLists');
+        $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
+    }
+
+    public function testThatTheLeadIsRemovedFromTheSegmentOnLeadOnSegmentsChangeEvent()
+    {
+        $this->submissionEvent
+            ->method('getActionConfig')
+            ->willReturn([
+                'removeFromLists' => 1,
+                'addToLists'      => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('removeFromLists');
+        $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
+    }
+
+    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired()
+    {
+        $subscribers = FormSubscriber::getSubscribedEvents();
+        $this->assertArrayHasKey(LeadEvents::LEAD_ON_SEGMENTS_CHANGE, $subscribers);
+        $this->assertSame(['onLeadSegmentsChange', 0], $subscribers[LeadEvents::LEAD_ON_SEGMENTS_CHANGE]);
     }
 }

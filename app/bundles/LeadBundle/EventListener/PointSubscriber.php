@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
@@ -22,6 +23,7 @@ class PointSubscriber implements EventSubscriberInterface
         return [
             PointEvents::TRIGGER_ON_BUILD         => ['onTriggerBuild', 0],
             PointEvents::TRIGGER_ON_EVENT_EXECUTE => ['onTriggerExecute', 0],
+            PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
         ];
     }
 
@@ -32,7 +34,7 @@ class PointSubscriber implements EventSubscriberInterface
             [
                 'group'    => 'mautic.lead.point.trigger',
                 'label'    => 'mautic.lead.point.trigger.changelists',
-                'callback' => [\Mautic\LeadBundle\Helper\PointEventHelper::class, 'changeLists'],
+                'eventName'   => PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE,
                 'formType' => ListActionType::class,
             ]
         );
@@ -60,6 +62,26 @@ class PointSubscriber implements EventSubscriberInterface
 
         if ($this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags)) {
             $event->setSucceded();
+        }
+    }
+
+    /**
+     * @param TriggerExecutedEvent $event
+     */
+    public function onLeadSegmentsChange(TriggerExecutedEvent $event)
+    {
+        $lead = $event->getLead();
+
+        $properties = $event->getTriggerEvent()->getProperties();
+        $addTo      = $properties['addToLists'];
+        $removeFrom = $properties['removeFromLists'];
+
+        if (!empty($addTo)) {
+            $this->leadModel->addToLists($lead, $addTo);
+        }
+
+        if (!empty($removeFrom)) {
+            $this->leadModel->removeFromLists($lead, $removeFrom);
         }
     }
 }
