@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
@@ -371,6 +371,18 @@ class EmailController extends FormController
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
 
+        $variants = [
+            'parent'             => $parent,
+            'children'           => $children,
+            'properties'         => $properties,
+            'criteria'           => $criteria['criteria'],
+        ];
+
+        $translations = [
+            'parent'   => $translationParent,
+            'children' => $translationChildren,
+        ];
+
         return $this->delegateView(
             [
                 'returnUrl' => $this->generateUrl(
@@ -385,17 +397,9 @@ class EmailController extends FormController
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
                     'isEmbedded'   => $request->get('isEmbedded') ?: false,
-                    'variants'     => [
-                        'parent'     => $parent,
-                        'children'   => $children,
-                        'properties' => $properties,
-                        'criteria'   => $criteria['criteria'],
-                    ],
-                    'translations' => [
-                        'parent'   => $translationParent,
-                        'children' => $translationChildren,
-                    ],
-                    'permissions' => $security->isGranted(
+                    'variants'     => $variants,
+                    'translations' => $translations,
+                    'permissions'  => $security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -424,7 +428,17 @@ class EmailController extends FormController
                             'ignoreAjax' => true,
                         ]
                     )->getContent(),
-                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'dateRangeForm'       => $dateRangeForm->createView(),
+                    'previewSettingsForm' => $this->createForm(
+                        ContentPreviewSettingsType::class,
+                        null,
+                        [
+                            'type'         => ContentPreviewSettingsType::TYPE_EMAIL,
+                            'objectId'     => $email->getId(),
+                            'variants'     => $variants,
+                            'translations' => $translations,
+                        ]
+                    )->createView(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/details.html.twig',
                 'passthroughVars' => [
@@ -1106,9 +1120,6 @@ class EmailController extends FormController
             // Update the content for processSlots
             $entity->setContent($content);
         }
-
-        // Replace short codes to emoji
-        $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
         $this->processSlots($slotsHelper, $slots, $entity);
 

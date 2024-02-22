@@ -32,7 +32,7 @@ class AjaxController extends CommonAjaxController
             $bus->dispatch($message);
         } catch (\Throwable $e) {
             $data['success'] = 0;
-            $data['message'] = $this->translator->trans('mautic.messenger.config.dns.test_message_failed', ['%message%' => $e->getMessage()]);
+            $data['message'] = $this->translator->trans('mautic.messenger.config.dsn.test_message_failed', ['%message%' => $e->getMessage()]);
         }
 
         return $this->sendJsonResponse($data);

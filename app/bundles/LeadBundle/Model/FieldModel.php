@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
@@ -298,12 +299,20 @@ class FieldModel extends FormModel
             'properties' => [
                 'list' => [
                     [
+                        'label' => 'Aerospace & Defense',
+                        'value' => 'Aerospace & Defense',
+                    ],
+                    [
                         'label' => 'Agriculture',
                         'value' => 'Agriculture',
                     ],
                     [
                         'label' => 'Apparel',
                         'value' => 'Apparel',
+                    ],
+                    [
+                        'label' => 'Automotive & Assembly',
+                        'value' => 'Automotive & Assembly',
                     ],
                     [
                         'label' => 'Banking',
@@ -324,6 +333,10 @@ class FieldModel extends FormModel
                     [
                         'label' => 'Construction',
                         'value' => 'Construction',
+                    ],
+                    [
+                        'label' => 'Consumer Packaged Goods',
+                        'value' => 'Consumer Packaged Goods',
                     ],
                     [
                         'label' => 'Education',
@@ -386,20 +399,48 @@ class FieldModel extends FormModel
                         'value' => 'Media',
                     ],
                     [
+                        'label' => 'Metals & Mining',
+                        'value' => 'Metals & Mining',
+                    ],
+                    [
                         'label' => 'Not for Profit',
                         'value' => 'Not for Profit',
+                    ],
+                    [
+                        'label' => 'Oil & Gas',
+                        'value' => 'Oil & Gas',
+                    ],
+                    [
+                        'label' => 'Packaging & Paper',
+                        'value' => 'Packaging & Paper',
+                    ],
+                    [
+                        'label' => 'Private Equity & Principal Investors',
+                        'value' => 'Private Equity & Principal Investors',
                     ],
                     [
                         'label' => 'Recreation',
                         'value' => 'Recreation',
                     ],
                     [
+                        'label' => 'Real Estate',
+                        'value' => 'Real Estate',
+                    ],
+                    [
                         'label' => 'Retail',
                         'value' => 'Retail',
                     ],
                     [
+                        'label' => 'Semiconductors',
+                        'value' => 'Semiconductors',
+                    ],
+                    [
                         'label' => 'Shipping',
                         'value' => 'Shipping',
+                    ],
+                    [
+                        'label' => 'Social Sector',
+                        'value' => 'Social Sector',
                     ],
                     [
                         'label' => 'Technology',
@@ -508,6 +549,49 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @return LeadField[]
+     */
+    public function getLeadFieldCustomFields(): array
+    {
+        $forceFilter = [
+            [
+                'column' => $this->getRepository()->getTableAlias().'.object',
+                'expr'   => 'like',
+                'value'  => 'lead',
+            ],
+            [
+                'column' => $this->getRepository()->getTableAlias().'.dateAdded',
+                'expr'   => 'isNotNull',
+            ],
+        ];
+
+        return $this->getEntities([
+            'filter' => [
+                'force' => $forceFilter,
+            ],
+            'ignore_paginator' => true,
+        ]);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getLeadFieldCustomFieldSchemaDetails(): array
+    {
+        $fields     = $this->getLeadFieldCustomFields();
+        $columns    = $this->columnSchemaHelper->setName('leads')->getColumns();
+
+        $schemaDetails = [];
+        foreach ($fields as $value) {
+            if (!empty($columns[$value->getAlias()])) {
+                $schemaDetails[$value->getAlias()] = $columns[$value->getAlias()];
+            }
+        }
+
+        return $schemaDetails;
+    }
+
+    /**
      * @return array
      */
     public function getCompanyFields()
@@ -530,6 +614,7 @@ class FieldModel extends FormModel
      * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
+     * @throws AbortColumnUpdateException
      * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
@@ -641,7 +726,7 @@ class FieldModel extends FormModel
     /**
      * Returns list of all segments that use $field.
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
     public function getFieldSegments(LeadField $field)
     {
@@ -767,9 +852,9 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'pre_save':
@@ -925,9 +1010,9 @@ class FieldModel extends FormModel
      *
      * @deprecated to be removed in 3.0
      *
-     * @return array
+     * @return array<mixed>
      */
-    public function getUniqueIdentiferFields($filters = [])
+    public function getUniqueIdentiferFields($filters = []): array
     {
         return $this->getUniqueIdentifierFields($filters);
     }
@@ -937,11 +1022,11 @@ class FieldModel extends FormModel
      *
      * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
      *
-     * @param array $filters
+     * @param array<mixed> $filters
      *
-     * @return mixed
+     * @return array<mixed>
      */
-    public function getUniqueIdentifierFields($filters = [])
+    public function getUniqueIdentifierFields(array $filters = []): array
     {
         return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }

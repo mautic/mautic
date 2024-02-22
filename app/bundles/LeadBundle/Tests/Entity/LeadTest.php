@@ -297,13 +297,13 @@ class LeadTest extends TestCase
     {
         $lead = new Lead();
 
-        $lead->addEventLog((new LeadEventLog())->setAction('first'));
-        $lead->addEventLog((new LeadEventLog())->setAction('first'));
-        $lead->addEventLog($lastFirst = (new LeadEventLog())->setAction('first'));
+        $lead->addEventLog((new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2017-01-01')));
+        $lead->addEventLog((new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2018-01-01')));
+        $lead->addEventLog($lastFirst = (new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2019-01-01')));
 
-        $lead->addEventLog((new LeadEventLog())->setAction('second'));
-        $lead->addEventLog((new LeadEventLog())->setAction('second'));
-        $lead->addEventLog($lastSecond = (new LeadEventLog())->setAction('second'));
+        $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2017-01-01')));
+        $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2018-01-01')));
+        $lead->addEventLog($lastSecond = (new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2019-01-01')));
 
         Assert::assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
         Assert::assertSame($lastSecond, $lead->getLastEventLogByAction('second'));

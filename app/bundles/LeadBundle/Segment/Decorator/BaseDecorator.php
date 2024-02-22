@@ -31,7 +31,11 @@ class BaseDecorator implements FilterDecoratorInterface
             return MAUTIC_TABLE_PREFIX.'leads';
         }
 
-        return MAUTIC_TABLE_PREFIX.'companies';
+        if ($contactSegmentFilterCrate->isCompanyType()) {
+            return MAUTIC_TABLE_PREFIX.'companies';
+        }
+
+        return '';
     }
 
     /**

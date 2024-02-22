@@ -14,7 +14,6 @@ use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -32,7 +31,6 @@ class LegacyEventDispatcher
         private EventDispatcherInterface $dispatcher,
         private EventScheduler $scheduler,
         private LoggerInterface $logger,
-        private NotificationHelper $notificationHelper,
         private MauticFactory $factory,
         private ContactTracker $contactTracker
     ) {
@@ -259,8 +257,6 @@ class LegacyEventDispatcher
             new FailedEvent($config, $log),
             CampaignEvents::ON_EVENT_FAILED
         );
-
-        $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
     }
 
     private function isFailed($result): bool

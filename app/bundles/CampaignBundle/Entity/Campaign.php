@@ -370,6 +370,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
+    /**
+     * @param string $type
+     *
+     * @return ArrayCollection<int,Event>
+     */
     public function getEventsByType($type): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
