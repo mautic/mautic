@@ -247,6 +247,7 @@ class AuditLogRepository extends CommonRepository
 
         return $query->getQuery()->getArrayResult();
     }
+
     /**
      * @throws DBALException
      */
@@ -257,6 +258,5 @@ class AuditLogRepository extends CommonRepository
         $conn       = $this->getEntityManager()->getConnection();
 
         return $conn->executeQuery($sql)->rowCount();
-
     }
 }
