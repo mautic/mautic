@@ -32,7 +32,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $this->testSymfonyCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 
-        // There should still be trhee events scheduled
+        // There should still be three events scheduled
         $byEvent = $this->getCampaignEventLogs([2]);
         $this->assertCount(3, $byEvent[2]);
 
