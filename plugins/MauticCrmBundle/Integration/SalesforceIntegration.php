@@ -2426,18 +2426,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $this->getDoNotContactHistory($sfObject, $sfFieldString, 'DESC');
     }
 
-    /**
-     * @param string $object
-     * @param string $ids
-     * @param string $order
-     *
-     * @return mixed|array
-     *
-     * @throws ApiErrorException
-     */
-    public function getDoNotContactHistory($object, $ids, $order = 'DESC')
+    public function getDoNotContactHistory(string $object, string $ids, string $order = 'DESC'): mixed
     {
-        //get last modified date for do not contact in Salesforce
+        // get last modified date for do not contact in Salesforce
         $query = sprintf('Select
                 Field,
                 %sId,
@@ -2487,7 +2478,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $historySF = $this->getDoNotContactHistory($sfObject, $sfFieldString, 'ASC');
 
-        //if there is no records of when it was modified in SF then just exit
+        // if there is no records of when it was modified in SF then just exit
         if (empty($historySF['records'])) {
             return;
         }
