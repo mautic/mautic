@@ -46,6 +46,10 @@ class BuilderSubscriberTest extends TestCase
      */
     private $translator;
 
+    /**
+     * @param array<mixed> $data
+     * @param int|string   $dataName
+     */
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -55,7 +59,7 @@ class BuilderSubscriberTest extends TestCase
         $this->trackableModel       = $this->createMock(TrackableModel::class);
         $this->redirectModel        = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
+        $mailHashHelper             = new MailHashHelper($this->coreParametersHelper);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
@@ -65,6 +69,7 @@ class BuilderSubscriberTest extends TestCase
             $mailHashHelper
         );
     }
+
     /**
      * @dataProvider fixEmailAccessibilityContent
      */
@@ -178,6 +183,10 @@ class BuilderSubscriberTest extends TestCase
             ->method('trans')
             ->withConsecutive([$unsubscribeTokenizedText], [])
             ->willReturn($unsubscribeTokenizedText);
+
+        $this->emailModel->expects($this->any())
+            ->method('buildUrl')
+            ->willReturn('https://mautic.local');
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(

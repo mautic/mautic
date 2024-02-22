@@ -19,7 +19,6 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\FormBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
@@ -298,6 +297,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $fromName      = $this->coreParametersHelper->get('mailer_from_name');
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
+
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
     }
 
