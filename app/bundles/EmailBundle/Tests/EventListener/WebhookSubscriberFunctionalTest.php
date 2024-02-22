@@ -114,7 +114,7 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $emailModel->sendEmailToLists($email);
 
         $stat = $this->em->getRepository(Stat::class)->findOneBy([]);
-        $emailModel->hitEmail($stat, new Request());
+        $emailModel->hitEmail($stat, new Request(), false, true, new \DateTimeImmutable());
 
         $webHookQueues = $this->em->getRepository(WebhookQueue::class)->findAll();
 
