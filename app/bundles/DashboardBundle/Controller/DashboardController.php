@@ -70,6 +70,8 @@ class DashboardController extends AbstractFormController
         $model->populateWidgetsContent($widgets, $filter);
         $releaseMetadata = ThisRelease::getMetadata();
 
+        $model->populateWidgetPreviews($widgets);
+
         return $this->delegateView([
             'viewParameters' => [
                 'security'      => $this->security,
@@ -551,6 +553,8 @@ class DashboardController extends AbstractFormController
      * Gets name from request and defaults it to the timestamp if not provided.
      *
      * @return string
+     *
+     * @throws \Exception
      */
     private function getNameFromRequest(Request $request)
     {

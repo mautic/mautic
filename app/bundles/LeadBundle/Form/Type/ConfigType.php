@@ -21,6 +21,19 @@ class ConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
+            'contact_allow_multiple_companies',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.allow_multiple_companies',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.allow_multiple_companies.tooltip',
+                ],
+                'data' => (bool) ($options['data']['contact_allow_multiple_companies'] ?? true),
+            ]
+        );
+
+        $builder->add(
             'contact_unique_identifiers_operator',
             ChoiceType::class,
             [

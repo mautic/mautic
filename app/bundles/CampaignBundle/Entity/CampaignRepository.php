@@ -19,9 +19,8 @@ class CampaignRepository extends CommonRepository
 
     public function getEntities(array $args = [])
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($this->getTableAlias().', cat')
+        $q = $this->getEntityManager()->createQueryBuilder();
+        $q->select($this->getTableAlias().', cat')
             ->from(\Mautic\CampaignBundle\Entity\Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
@@ -32,33 +31,27 @@ class CampaignRepository extends CommonRepository
         if (!empty($args['joinForms'])) {
             $q->leftJoin($this->getTableAlias().'.forms', 'f');
         }
-
+        $q->where($q->expr()->isNull($this->getTableAlias().'.deleted'));
         $args['qb'] = $q;
 
         return parent::getEntities($args);
     }
 
-    /**
-     * @param object $entity
-     * @param bool   $flush
-     */
-    public function deleteEntity($entity, $flush = true): void
+    public function setCampaignAsDeleted(int $campaignId): void
     {
-        // Null parents of associated events first
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
-            ->set('parent_id', ':null')
-            ->setParameter('null', null)
-            ->where('campaign_id = '.$entity->getId())
-            ->executeStatement();
+        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
 
-        // Delete events
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->delete(MAUTIC_TABLE_PREFIX.'campaign_events')
-            ->where('campaign_id = '.$entity->getId())
-            ->executeStatement();
+        $this->getEntityManager()->getConnection()->update(
+            MAUTIC_TABLE_PREFIX.Event::TABLE_NAME,
+            ['deleted'     => $dateTime],
+            ['campaign_id' => $campaignId]
+        );
 
-        parent::deleteEntity($entity, $flush);
+        $this->getEntityManager()->getConnection()->update(
+            MAUTIC_TABLE_PREFIX.Campaign::TABLE_NAME,
+            ['deleted'   => $dateTime, 'is_published' => 0],
+            ['id'        => $campaignId]
+        );
     }
 
     /**

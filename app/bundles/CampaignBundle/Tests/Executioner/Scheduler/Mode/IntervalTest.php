@@ -220,6 +220,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
+        $event->method('getId')
+            ->willReturn(1);
 
         $interval = $this->getInterval();
         $contact1 = $this->createMock(Lead::class);
@@ -297,12 +299,12 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
                 case 'America/North_Dakota/Center':
                     $this->assertCount(2, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([3, 4], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertEquals('2018-10-19 06:00', $executionDate->format('Y-m-d H:i'));
                     break;
                 case 'America/New_York':
                     $this->assertCount(4, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([5, 6, 7, 8], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertEquals('2018-10-19 06:00', $executionDate->format('Y-m-d H:i'));
                     break;
             }
         }
@@ -320,6 +322,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn(Event::TRIGGER_MODE_INTERVAL);
         $event->method('getTriggerIntervalUnit')
             ->willReturn('d');
+        $event->method('getTriggerInterval')
+            ->willReturn(1);
         $event->method('getTriggerHour')
             ->willReturn(new \DateTime('now'));
         $event->method('getTriggerRestrictedDaysOfWeek')
@@ -338,7 +342,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $interval = $this->getInterval();
 
         Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        Assert::assertEquals($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsFalse(): void
@@ -542,5 +546,41 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $executionDate->setTimezone(new \DateTimeZone('UTC'));
 
         $this->assertEquals('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
+    }
+
+    public function testValidateExecutionDateTimeWhenForExactHour(): void
+    {
+        $expectedDateTime    = new \DateTime('now');
+        $compareFromDateTime = new \DateTime('now');
+
+        $event = $this->createMock(Event::class);
+        $event->method('getId')
+            ->willReturn(1);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('i');
+        $event->method('getTriggerInterval')
+            ->willReturn(0);
+        $event->method('getTriggerHour')
+            ->willReturn(new \DateTime('now'));
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
+
+        $lead = $this->createMock(Lead::class);
+        $lead->method('getTimezone')
+            ->willReturn('UTC');
+
+        $log = $this->createMock(LeadEventLog::class);
+        $log->method('getEvent')
+            ->willReturn($event);
+        $log->method('getDateTriggered')
+            ->willReturn(new \DateTime('now'));
+        $log->method('getLead')
+            ->willReturn($lead);
+
+        $interval = $this->getInterval();
+
+        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 }

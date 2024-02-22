@@ -75,7 +75,7 @@ class WebhookKillNotificator
         if ($sendToAuthor) {
             $mailer->setTo($toUser->getEmail());
             if ($ccToUser) {
-                $mailer->setCc($ccToUser->getEmail());
+                $mailer->setCc([$ccToUser->getEmail() => null]);
             }
         } else {
             $emailAddresses = array_map('trim', explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));

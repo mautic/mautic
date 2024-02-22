@@ -388,7 +388,8 @@ class ReportType extends AbstractType
                     $data    = $event->getData();
                     $graphs  = $data['graphs'] ?? [];
                     $columns = $data['columns'] ?? [];
-                    $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
+                    $source  = $data['source'] ?? null;
+                    $formModifier($event->getForm(), $source, $columns, $graphs, $data);
                 }
             );
 

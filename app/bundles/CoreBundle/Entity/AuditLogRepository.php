@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -245,5 +246,17 @@ class AuditLogRepository extends CommonRepository
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();
+
+    /**
+     * @throws DBALException
+     */
+    public function anonymizeAllIpAddress(): int
+    {
+        $table_name = $this->getTableName();
+        $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
+        $conn       = $this->getEntityManager()->getConnection();
+
+        return $conn->executeQuery($sql)->rowCount();
+
     }
 }
