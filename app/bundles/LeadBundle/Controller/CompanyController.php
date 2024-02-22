@@ -853,7 +853,7 @@ class CompanyController extends FormController
                         'flashes' => [
                             [
                                 'type'    => 'error',
-                                'msg'     => 'mautic.lead.company.error.notfound',
+                                'msg'     => 'mautic.company.error.notfound',
                                 'msgVars' => ['%id%' => $objectId],
                             ],
                         ],
@@ -889,7 +889,7 @@ class CompanyController extends FormController
                                     'flashes' => [
                                         [
                                             'type'    => 'error',
-                                            'msg'     => 'mautic.lead.company.error.notfound',
+                                            'msg'     => 'mautic.company.error.notfound',
                                             'msgVars' => ['%id%' => $primaryCompany->getId()],
                                         ],
                                     ],

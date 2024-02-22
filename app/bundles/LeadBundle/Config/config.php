@@ -505,6 +505,7 @@ return [
                     'mautic.lead.model.lead_segment_schema_cache',
                     '@service_container',
                     'mautic.lead.model.lead_segment_decorator_factory',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.tracker.contact' => [
@@ -562,6 +563,8 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'router',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.repository.company_lead',
                 ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
@@ -584,6 +587,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\TableSchemaColumnsCache::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.model.relative_date' => [
@@ -934,6 +938,7 @@ return [
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'contact_api_count_cache_ttl'         => 5, // in seconds, set null to disable.
         'contact_columns'                     => [
             '0' => 'name',
             '1' => 'email',
@@ -951,5 +956,6 @@ return [
         'contact_export_in_background'                                                          => true,
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
+        'contact_allow_multiple_companies'                                                      => true,
     ],
 ];

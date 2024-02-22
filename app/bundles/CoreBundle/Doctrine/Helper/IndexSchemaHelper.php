@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Exception\SchemaException;
+use Mautic\LeadBundle\Entity\LeadField;
 
 class IndexSchemaHelper
 {
@@ -77,7 +78,8 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param array $options
+     * @param string $name
+     * @param array  $options
      *
      * @return $this
      *
@@ -85,17 +87,21 @@ class IndexSchemaHelper
      */
     public function addIndex($columns, $name, $options = [])
     {
-        $columns = $this->getTextColumns($columns);
+        $textColumns = $this->getTextColumns($columns);
 
-        if (!empty($columns)) {
-            $index = new Index($this->prefix.$name, $columns, false, false, $options);
-
-            if ($this->table->hasIndex($this->prefix.$name)) {
-                $this->changedIndexes[] = $index;
-            } else {
-                $this->addedIndexes[] = $index;
-            }
+        if (empty($textColumns)) {
+            return $this;
         }
+
+        $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
+
+        if ($this->table->hasIndex($this->prefix.$name)) {
+            $this->changedIndexes[] = $index;
+
+            return $this;
+        }
+
+        $this->addedIndexes[] = $index;
 
         return $this;
     }
@@ -113,8 +119,8 @@ class IndexSchemaHelper
     {
         $textColumns = $this->getTextColumns($columns);
 
-        $index = new Index($name, $textColumns, false, false, $options);
-        if ($this->table->hasIndex($name)) {
+        $index = new Index($this->prefix.$name, $textColumns, false, false, $options);
+        if ($this->table->hasIndex($this->prefix.$name)) {
             $this->dropIndexes[] = $index;
         }
 
@@ -129,23 +135,17 @@ class IndexSchemaHelper
         $platform = $this->db->getDatabasePlatform();
 
         $sql = [];
-        if (count($this->changedIndexes)) {
-            foreach ($this->changedIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index, $this->table);
-                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
-            }
+        foreach ($this->changedIndexes as $index) {
+            $sql[] = $platform->getDropIndexSQL($index, $this->table);
+            $sql[] = $platform->getCreateIndexSQL($index, $this->table);
         }
 
-        if (count($this->dropIndexes)) {
-            foreach ($this->dropIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index, $this->table);
-            }
+        foreach ($this->dropIndexes as $index) {
+            $sql[] = $platform->getDropIndexSQL($index, $this->table);
         }
 
-        if (count($this->addedIndexes)) {
-            foreach ($this->addedIndexes as $index) {
-                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
-            }
+        foreach ($this->addedIndexes as $index) {
+            $sql[] = $platform->getCreateIndexSQL($index, $this->table);
         }
 
         if (count($sql)) {
@@ -159,6 +159,46 @@ class IndexSchemaHelper
     }
 
     /**
+     * @throws SchemaException
+     */
+    public function hasIndex(LeadField $leadField): bool
+    {
+        $alias = $leadField->getAlias();
+        $this->setName($leadField->getCustomFieldObject());
+
+        return $this->table->hasIndex($this->prefix."{$alias}_search");
+    }
+
+    /**
+     * @param array<mixed> $uniqueIdentifierColumns
+     */
+    public function hasMatchingUniqueIdentifierIndex(LeadField $leadField, array $uniqueIdentifierColumns): bool
+    {
+        $this->setName($leadField->getCustomFieldObject());
+
+        $index = $this->table->getIndex($this->prefix.'unique_identifier_search');
+
+        $columns = $index->getColumns();
+
+        asort($columns);
+        asort($uniqueIdentifierColumns);
+
+        return $columns === $uniqueIdentifierColumns;
+    }
+
+    /**
+     * @throws SchemaException
+     */
+    public function hasUniqueIdentifierIndex(LeadField $leadField): bool
+    {
+        $this->setName($leadField->getCustomFieldObject());
+
+        return $this->table->hasIndex($this->prefix.'unique_identifier_search');
+    }
+
+    /**
+     * @param mixed $columns
+     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     private function getTextColumns($columns): array

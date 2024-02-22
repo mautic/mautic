@@ -152,7 +152,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
     private function checkSegmentResult(string $name, Lead $lead): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
+        $contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
 
         $alias = strtolower(InputHelper::alphanum($name, false, '-'));
 
@@ -176,7 +176,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
     private function createLead(string $name, string $initialTime, string $dateModifier): Lead
     {
         /** @var LeadRepository $leadRepository */
-        $leadRepository = self::$container->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
+        $leadRepository = static::getContainer()->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
 
         $date = new \DateTime($initialTime, new \DateTimeZone('UTC'));
         $date->modify($dateModifier);

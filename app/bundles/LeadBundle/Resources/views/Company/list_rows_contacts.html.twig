@@ -167,7 +167,7 @@
                             }]) %}
                         {% endif %}
 
-                        {% if fields.core.email.value is not empty %}
+                        {% if fields.core.email is defined %}
                             {% set custom = custom|merge([{
                                 'attr': {
                                     'data-toggle': 'ajaxmodal',
@@ -198,17 +198,17 @@
                     </td>
                     <td class="visible-md visible-lg">{{ fields.core.email.value|purify }}</td>
                     <td class="visible-md visible-lg">
-                        {% set flag = fields.core.country is not empty and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+                        {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
                         {% if flag is not empty %}
                           <img src="{{ flag }}" style="max-height: 24px;" class="mr-sm" />
                         {% endif %}
                         {% set location = [] %}
-                        {% if fields.core.city.value is not empty %}
+                        {% if fields.core.city is defined %}
                             {% set location = location|merge([fields.core.city.value]) %}
                         {% endif %}
-                        {% if fields.core.state.value is not empty %}
+                        {% if fields.core.state is defined %}
                             {% set location = location|merge([fields.core.state.value]) %}
-                        {% elseif fields.core.country.value is not empty %}
+                        {% elseif fields.core.country is defined %}
                             {% set location = location|merge([fields.core.country.value]) %}
                         {% endif %}
                         {{ location|join(', ') }}
