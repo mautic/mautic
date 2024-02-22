@@ -26,19 +26,11 @@ class PushTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:push';
 
-    private TransifexFactory $transifexFactory;
-    private TranslatorInterface $translator;
-    private LanguageHelper $languageHelper;
-
     public function __construct(
-        TransifexFactory $transifexFactory,
-        TranslatorInterface $translator,
-        LanguageHelper $languageHelper
+        private TransifexFactory $transifexFactory,
+        private TranslatorInterface $translator,
+        private LanguageHelper $languageHelper
     ) {
-        $this->transifexFactory = $transifexFactory;
-        $this->translator       = $translator;
-        $this->languageHelper   = $languageHelper;
-
         parent::__construct();
     }
 
@@ -65,7 +57,7 @@ EOT
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
-        } catch (InvalidConfigurationException $e) {
+        } catch (InvalidConfigurationException) {
             $output->writeln($this->translator->trans(
                 'mautic.core.command.transifex_no_credentials')
             );
@@ -121,7 +113,7 @@ EOT
 
         $transifex->getApiConnector()->fulfillPromises(
             $promises,
-            function (ResponseInterface $response, Promise $promise) use ($output) {
+            function (ResponseInterface $response, Promise $promise) use ($output): void {
                 $output->writeln(
                     $this->translator->trans(
                         'mautic.core.command.transifex_resource_updated',
@@ -129,7 +121,7 @@ EOT
                     )
                 );
             },
-            function (ResponseException $exception, Promise $promise) use ($output) {
+            function (ResponseException $exception, Promise $promise) use ($output): void {
                 $output->writeln($promise->getFilePath());
                 $output->writeln($exception->getMessage());
             }
@@ -137,5 +129,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Pushes Mautic translation resources to Transifex';
 }

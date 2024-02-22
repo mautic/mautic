@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Tag;
 
-/**
- * Class TagEvent.
- */
 class TagEvent extends CommonEvent
 {
     /**

@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -24,6 +24,23 @@ class LeadEventLogRepository extends CommonRepository
     public function getFailedRows($importId, array $args = [], $bundle = 'lead', $object = 'import')
     {
         return $this->getSpecificRows($importId, 'failed', $args, $bundle, $object);
+    }
+
+    public function getEntities(array $args = [])
+    {
+        $entities = parent::getEntities($args);
+        $entities = iterator_to_array($entities);
+
+        foreach ($entities as $key => $row) {
+            if (
+                isset($row['properties']['error'])
+                && preg_match('/SQLSTATE\[\w+\]: (.*)/', $row['properties']['error'], $matches)
+            ) {
+                $entities[$key]['properties']['error'] = $matches[1];
+            }
+        }
+
+        return $entities;
     }
 
     /**
@@ -108,7 +125,7 @@ class LeadEventLogRepository extends CommonRepository
                 $qb->andWhere(
                     $qb->expr()->in($alias.'.action', ':actions')
                 )
-                    ->setParameter('actions', $actions, Connection::PARAM_STR_ARRAY);
+                    ->setParameter('actions', $actions, ArrayParameterType::STRING);
             } else {
                 $qb->andWhere($alias.'.action = :action')
                     ->setParameter('action', $actions);
@@ -128,7 +145,7 @@ class LeadEventLogRepository extends CommonRepository
      * @param int $fromLeadId
      * @param int $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_event_log')
@@ -139,10 +156,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Defines default table alias for lead_event_log table.
-     *
-     * @return string
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lel';
     }

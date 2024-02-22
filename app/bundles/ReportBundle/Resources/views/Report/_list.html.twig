@@ -17,8 +17,36 @@
                         'sessionVar': 'report',
                         'orderBy': 'r.name',
                         'text': 'mautic.core.name',
-                        'class': 'col-report-name',
-                        'default': true,
+                        'class': 'col-report-name'
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'report',
+                    'text': 'mautic.report.report.form.source',
+                    'class': 'visible-lg col-email-source'
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'report',
+                    'orderBy': 'r.dateAdded',
+                    'text': 'mautic.lead.import.label.dateAdded',
+                    'class': 'visible-lg col-report-dateAdded'
+                }) }}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'report',
+                    'orderBy'    : 'r.dateModified',
+                    'dir'        : 'DESC',
+                    'text'       : 'mautic.lead.import.label.dateModified',
+                    'class'      : 'visible-lg col-report-dateModified',
+                    'default'    : true,
+                }) -}}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'report',
+                    'orderBy': 'r.createdByUser',
+                    'text': 'mautic.core.createdby',
+                    'class': 'visible-lg col-report-createdByUser'
                 }) }}
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -77,6 +105,17 @@
                             </div>
                         {% endif %}
                     </td>
+
+                    <td>{{ (model.getTableData()[item.getSource()]['display_name'] ?? item.getSource())|trans }}</td>
+
+                    <td class="visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
+                        {{ item.getDateAdded() ? dateToDate(item.getDateAdded()) : '' }}
+                    </td>
+                    <td class="visible-lg" title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
+                        {{ item.getDateModified() ? dateToDate(item.getDateModified()) : '' }}
+                    </td>
+                    <td class="visible-lg">{{ item.getCreatedByUser()|escape }}</td>
+
                     <td class="visible-md visible-lg">{{ item.id }}</td>
                 </tr>
             {% endfor %}

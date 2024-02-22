@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
@@ -27,17 +28,14 @@ class ContactObjectSubscriberTest extends TestCase
     /**
      * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactObjectHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
 
     /**
      * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
-    /**
-     * @var ContactObjectSubscriber
-     */
-    private $subscriber;
+    private \Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber $subscriber;
 
     public function setUp(): void
     {
@@ -98,11 +96,13 @@ class ContactObjectSubscriberTest extends TestCase
 
     public function testUpdateContactsWithRightObject(): void
     {
-        $event = new InternalObjectUpdateEvent(new Contact(), [123], [['id' => 345]]);
+        $objectChangeDAO = new ObjectChangeDAO('integration', 'object', 'objectId', 'mappedObject', 'mappedId');
+
+        $event = new InternalObjectUpdateEvent(new Contact(), [123], [$objectChangeDAO]);
 
         $this->contactObjectHelper->expects($this->once())
             ->method('update')
-            ->with([123], [['id' => 345]])
+            ->with([123], [$objectChangeDAO])
             ->willReturn([['object_mapping_1']]);
 
         $this->subscriber->updateContacts($event);

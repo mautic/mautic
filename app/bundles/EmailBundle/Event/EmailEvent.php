@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 
-/**
- * Class EmailEvent.
- */
 class EmailEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class EmailEvent extends CommonEvent
     /**
      * Sets the Email entity.
      */
-    public function setEmail(Email $email)
+    public function setEmail(Email $email): void
     {
         $this->entity = $email;
     }

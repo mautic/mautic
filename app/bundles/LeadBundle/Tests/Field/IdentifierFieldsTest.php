@@ -15,17 +15,14 @@ class IdentifierFieldsTest extends TestCase
     /**
      * @var FieldsWithUniqueIdentifier&MockObject
      */
-    private $fieldsWithUniqueIdentifiers;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldsWithUniqueIdentifiers;
 
     /**
      * @var FieldList&MockObject
      */
-    private $fieldList;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldList;
 
-    /**
-     * @var IdentifierFields
-     */
-    private $identifierFields;
+    private \Mautic\LeadBundle\Field\IdentifierFields $identifierFields;
 
     protected function setUp(): void
     {

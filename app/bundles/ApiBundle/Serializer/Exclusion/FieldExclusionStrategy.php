@@ -12,43 +12,25 @@ use JMS\Serializer\Metadata\PropertyMetadata;
  */
 class FieldExclusionStrategy implements ExclusionStrategyInterface
 {
-    /**
-     * @var array
-     */
-    private $fields = [];
-
-    /**
-     * @var int
-     */
-    private $level;
-
-    /**
-     * @var string|null
-     */
-    private $path;
+    private int $level;
 
     /**
      * @param int         $level
      * @param string|null $path
      */
-    public function __construct(array $fields, $level = 3, $path = null)
-    {
-        $this->fields = $fields;
+    public function __construct(
+        private array $fields,
+        $level = 3,
+        private $path = null
+    ) {
         $this->level  = (int) $level;
-        $this->path   = $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {

@@ -9,14 +9,14 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 class Config
 {
     public const MARKETPLACE_ENABLED                     = 'marketplace_enabled';
+
     public const MARKETPLACE_ALLOWLIST_URL               = 'marketplace_allowlist_url';
+
     public const MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS = 'marketplace_allowlist_cache_ttl_seconds';
 
-    private CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function marketplaceIsEnabled(): bool

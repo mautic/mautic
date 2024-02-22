@@ -86,9 +86,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     private $slotName;
 
-    /**
-     * DynamicContent constructor.
-     */
     public function __construct()
     {
         $this->stats               = new ArrayCollection();
@@ -113,19 +110,19 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * Clear stats.
      */
-    public function clearStats()
+    public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content')
             ->addIndex(['is_campaign_based'], 'is_campaign_based_index')
             ->addIndex(['slot_name'], 'slot_name_index')
-            ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\DynamicContentRepository')
+            ->setCustomRepositoryClass(\Mautic\DynamicContentBundle\Entity\DynamicContentRepository::class)
             ->addLifecycleEvent('cleanSlotName', Events::prePersist)
             ->addLifecycleEvent('cleanSlotName', Events::preUpdate);
 
@@ -176,12 +173,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @throws \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @throws \Symfony\Component\Validator\Exception\MissingOptionsException
      */
-    public static function loadValidatorMetaData(ClassMetadata $metadata)
+    public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
 
         $metadata->addConstraint(new Callback([
-            'callback' => function (self $dwc, ExecutionContextInterface $context) {
+            'callback' => function (self $dwc, ExecutionContextInterface $context): void {
                 if (!$dwc->getIsCampaignBased()) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
@@ -194,12 +191,10 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                             ),
                         ]
                     );
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                    ->atPath('slotName')
-                                    ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                                ->atPath('slotName')
+                                ->addViolation();
                     }
                     $violations = $validator->validate(
                         $dwc->getFilters(),
@@ -212,19 +207,17 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                             ),
                         ]
                     );
-                    if (count($violations) > 0) {
-                        foreach ($violations as $violation) {
-                            $context->buildViolation($violation->getMessage())
-                                    ->atPath('filters')
-                                    ->addViolation();
-                        }
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
+                                ->atPath('filters')
+                                ->addViolation();
                     }
                 }
             },
         ]));
     }
 
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('dwc')
             ->addListProperties([
@@ -471,7 +464,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * Lifecycle callback to clear the slot name if is_campaign is true.
      */
-    public function cleanSlotName()
+    public function cleanSlotName(): void
     {
         if ($this->getIsCampaignBased()) {
             $this->setSlotName('');

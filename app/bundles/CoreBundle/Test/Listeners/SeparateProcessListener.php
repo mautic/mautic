@@ -84,7 +84,7 @@ class SeparateProcessListener implements TestListener
             throw new \InvalidArgumentException(sprintf('$test must be an instance of "%s".', TestCase::class));
         }
 
-        $testName = sprintf('%s::%s', get_class($test), $test->getName());
+        $testName = sprintf('%s::%s', $test::class, $test->getName());
 
         $this->problematicTests[$testName] = $problematicConstants;
     }

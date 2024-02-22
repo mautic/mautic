@@ -15,7 +15,7 @@
   {% endif %}
 {% endset %}
 
-{% set flag = fields.core.country.value is not null ? assetGetCountryFlag(fields.core.country.value) : '' %}
+{% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
@@ -28,7 +28,7 @@
     {% set buttons = [] %}
 
     {# Send email button #}
-    {% if fields.core.email.value is not empty %}
+    {% if fields.core.email is defined %}
       {% set buttons = buttons|merge([{
           'attr': {
               'id': 'sendEmailButton',
@@ -55,6 +55,20 @@
           'btnText': 'mautic.lead.contact.frequency'|trans,
           'iconClass': 'fa fa-signal',
       }]) %}
+
+      {% if pointGroups is not empty %}
+          {% set buttons = buttons|merge([{
+              'attr': {
+                  'data-toggle': 'ajaxmodal',
+                  'data-target': '#MauticSharedModal',
+                  'data-header': 'mautic.lead.groups.panel.title'|trans,
+                  'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactGroupPoints'}),
+              },
+              'btnText': 'mautic.lead.groups.panel.title'|trans,
+              'iconClass': 'fa fa-calculator',
+          }]) %}
+      {% endif %}
+
     {% endif %}
 
     {# View Campaigns List button #}
@@ -428,7 +442,7 @@
                 </h6>
                 <address class="text-muted">
                     {% if fields.core.address1 is defined %}{{ fields.core.address1.value|purify }}<br>{% endif %}
-                    {% if fields.core.address2.value is not empty %}{{ fields.core.address2.value|purify }}<br>{% endif %}
+                    {% if fields.core.address2 is defined %}{{ fields.core.address2.value|purify }}<br>{% endif %}
                     {{ lead.location|purify }}
                     {% if fields.core.zipcode is defined %}{{ fields.core.zipcode.value|purify }}{% endif %}
                     <br>
@@ -489,13 +503,16 @@
         {% endif %}
         <div class="pa-sm">
             {% for tag in lead.tags %}
-                <h5 class="pull-left mt-xs mr-xs">
-                    <span class="label label-success label-tag">
-                        <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
-                             {{ tag.tag|purify }}
-                        </a>
-                    </span>
-                </h5>
+                <div id="tagLabel{{ tag.id }}">
+                    <h5 class="pull-left mt-xs mr-xs">
+                        <span class="label label-success label-tag">
+                            <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
+                                {{ tag.tag|purify }}
+                            </a>
+                            <i class="fa fa-times has-click-event" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
+                        </span>
+                    </h5>
+                </div>
             {% endfor %}
             <div class="clearfix"></div>
         </div>

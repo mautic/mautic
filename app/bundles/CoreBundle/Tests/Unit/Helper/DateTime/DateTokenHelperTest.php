@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Helper\DateTime;
+namespace Mautic\CoreBundle\Tests\Unit\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeLocalization;
@@ -17,6 +17,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     public const DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
 
     public const TIMEZONE        = 'Europe/Paris';
+
     public const TIMEZONE_CUSTOM = 'America/Chicago';
 
     public function testGetTokens(): void
