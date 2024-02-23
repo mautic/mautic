@@ -105,10 +105,11 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $languageHelper = $this->getContainer()->get('mautic.helper.language');
 
         $formPayload = [
-            'name'     => 'Test Form',
-            'formType' => 'campaign',
-            'language' => 'fr',
-            'fields'   => [
+            'name'       => 'Test Form',
+            'formType'   => 'campaign',
+            'language'   => 'fr',
+            'postAction' => 'return',
+            'fields'     => [
                [
                     'label'      => 'Email',
                     'alias'      => 'email',
