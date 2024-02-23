@@ -51,13 +51,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getreports' => [
-                'path'       => '/reports',
-                'controller' => 'Mautic\ReportBundle\Controller\Api\ReportApiController::getEntitiesAction',
-            ],
-            'mautic_api_getreport' => [
-                'path'       => '/reports/{id}',
-                'controller' => 'Mautic\ReportBundle\Controller\Api\ReportApiController::getReportAction',
+            'mautic_api_reportsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'reports',
+                'path'            => '/reports',
+                'controller'      => 'Mautic\ReportBundle\Controller\Api\ReportApiController',
             ],
         ],
     ],
@@ -125,6 +123,7 @@ return [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
                     'mautic.report.model.file_handler',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.report.model.file_handler' => [

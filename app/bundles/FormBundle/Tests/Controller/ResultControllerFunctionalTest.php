@@ -39,6 +39,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
                     ],
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request('POST', '/api/forms/new', $formPayload);

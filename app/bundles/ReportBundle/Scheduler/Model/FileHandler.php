@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Scheduler\Model;
 
+use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
@@ -13,6 +14,8 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 
 class FileHandler
 {
+    private const REPORTS_DIR = 'csv_reports';
+
     public function __construct(
         private FilePathResolver $filePathResolver,
         private FileProperties $fileProperties,
@@ -56,9 +59,12 @@ class FileHandler
 
     public function getPathToCompressedCsvFileForReport(Report $report): string
     {
-        $reportDir = $this->coreParametersHelper->get('report_temp_dir');
+        return $this->getPathToCompressedCsvFileForReportId($report->getId());
+    }
 
-        return "{$reportDir}/csv_reports/report_{$report->getId()}.zip";
+    public function getPathToCompressedCsvFileForReportId(int $reportId): string
+    {
+        return $this->getCompressedCsvFileForReportDir()."/report_{$reportId}.zip";
     }
 
     /**
@@ -66,7 +72,9 @@ class FileHandler
      */
     public function compressedCsvFileForReportExists(Report $report): bool
     {
-        return file_exists($this->getPathToCompressedCsvFileForReport($report));
+        $filePath = $this->getPathToCompressedCsvFileForReport($report);
+
+        return file_exists($filePath);
     }
 
     public function moveZipToPermanentLocation(Report $report, string $originalPath): void
@@ -76,5 +84,25 @@ class FileHandler
         $this->filePathResolver->delete($compressedCsvPath);
         $this->filePathResolver->createDirectory(dirname($compressedCsvPath));
         $this->filePathResolver->move($originalPath, $compressedCsvPath);
+    }
+
+    public function delete(string $filePath): void
+    {
+        $this->filePathResolver->delete($filePath);
+    }
+
+    public function deleteCompressedCsvFileForReportId(int $reportId): void
+    {
+        $filePath = $this->getPathToCompressedCsvFileForReportId($reportId);
+        if (file_exists($filePath)) {
+            $this->delete($filePath);
+        }
+    }
+
+    public function getCompressedCsvFileForReportDir(): string
+    {
+        $reportDir = $this->coreParametersHelper->get('report_temp_dir');
+
+        return $reportDir.'/'.self::REPORTS_DIR;
     }
 }

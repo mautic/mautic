@@ -95,6 +95,13 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'The maximum number of processes you intend to run in parallel.'
+            )
+            ->addOption(
+                'exclude',
+                'd',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude a specific campaign from being rebuilt. Otherwise, all campaigns will be rebuilt.',
+                []
             );
 
         parent::configure();
@@ -102,17 +109,18 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $id             = $input->getOption('campaign-id');
-        $batchLimit     = $input->getOption('batch-limit');
-        $contactMinId   = $input->getOption('min-contact-id');
-        $contactMaxId   = $input->getOption('max-contact-id');
-        $contactId      = $input->getOption('contact-id');
-        $contactIds     = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
-        $threadId       = $input->getOption('thread-id');
-        $maxThreads     = $input->getOption('max-threads');
-        $this->runLimit = $input->getOption('max-contacts');
-        $this->quiet    = (bool) $input->getOption('quiet');
-        $this->output   = ($this->quiet) ? new NullOutput() : $output;
+        $id               = $input->getOption('campaign-id');
+        $batchLimit       = $input->getOption('batch-limit');
+        $contactMinId     = $input->getOption('min-contact-id');
+        $contactMaxId     = $input->getOption('max-contact-id');
+        $contactId        = $input->getOption('contact-id');
+        $contactIds       = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
+        $threadId         = $input->getOption('thread-id');
+        $maxThreads       = $input->getOption('max-threads');
+        $this->runLimit   = $input->getOption('max-contacts');
+        $this->quiet      = (bool) $input->getOption('quiet');
+        $this->output     = ($this->quiet) ? new NullOutput() : $output;
+        $excludeCampaigns = $input->getOption('exclude');
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
@@ -136,11 +144,22 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
             $this->updateCampaign($campaign);
         } else {
-            $campaigns = $this->campaignRepository->getEntities(
-                [
-                    'iterable_mode' => true,
-                ]
-            );
+            $filter = [
+                'iterable_mode' => true,
+            ];
+
+            if (is_array($excludeCampaigns) && count($excludeCampaigns) > 0) {
+                $filter['filter'] = [
+                    'force' => [
+                        [
+                            'expr'   => 'notIn',
+                            'column' => $this->campaignRepository->getTableAlias().'.id',
+                            'value'  => $excludeCampaigns,
+                        ],
+                    ],
+                ];
+            }
+            $campaigns = $this->campaignRepository->getEntities($filter);
 
             foreach ($campaigns as $campaign) {
                 $this->updateCampaign($campaign);

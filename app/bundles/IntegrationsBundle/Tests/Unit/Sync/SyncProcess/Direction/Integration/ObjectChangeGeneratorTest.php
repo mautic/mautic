@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class ObjectChangeGeneratorTest extends TestCase
@@ -120,6 +121,43 @@ class ObjectChangeGeneratorTest extends TestCase
         // First name should not be included because it wasn't found in the internal object
         $fields = $objectChangeDAO->getFields();
         $this->assertFalse(isset($fields['first_name']));
+    }
+
+    public function testFieldsWithDirectionToIntegrationAreSkipped(): void
+    {
+        $objectChangeGenerator = new ObjectChangeGenerator(
+            new class() extends ValueHelper {
+            }
+        );
+
+        $integrationName   = 'Integration A';
+        $reportDAO         = new ReportDAO($integrationName);
+        $mappingManualDAO  = new MappingManualDAO($integrationName);
+        $objectMappingDAO  = new ObjectMappingDAO(Contact::NAME, 'Lead');
+        $internalObject    = new ReportObjectDAO(Contact::NAME, 123);
+        $integrationObject = new ReportObjectDAO('Lead', 'integration-id-1');
+
+        $objectMappingDAO->addFieldMapping('email', 'Email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $objectMappingDAO->addFieldMapping('firstname', 'FirstName', ObjectMappingDAO::SYNC_TO_INTEGRATION);
+        $objectMappingDAO->addFieldMapping('points', 'Score', ObjectMappingDAO::SYNC_TO_MAUTIC);
+
+        $internalObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'john@doe.email')));
+        $internalObject->addField(new ReportFieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'John')));
+        $internalObject->addField(new ReportFieldDAO('points', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 40)));
+
+        $reportDAO->addObject($internalObject);
+
+        $objectChange = $objectChangeGenerator->getSyncObjectChange($reportDAO, $mappingManualDAO, $objectMappingDAO, $internalObject, $integrationObject);
+
+        // The points/Score field should not be recorded as a change because it has direction to Mautic.
+        Assert::assertCount(2, $objectChange->getFields());
+        Assert::assertSame('john@doe.email', $objectChange->getField('Email')->getValue()->getNormalizedValue());
+        Assert::assertSame('John', $objectChange->getField('FirstName')->getValue()->getNormalizedValue());
+        Assert::assertSame(Contact::NAME, $objectChange->getMappedObject());
+        Assert::assertSame(123, $objectChange->getMappedObjectId());
+        Assert::assertSame('integration-id-1', $objectChange->getObjectId());
+        Assert::assertSame('Lead', $objectChange->getObject());
+        Assert::assertSame($integrationName, $objectChange->getIntegration());
     }
 
     /**

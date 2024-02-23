@@ -65,4 +65,27 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
     }
+
+    public function testSuccessfulSubmitActionForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/forms/new/');
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
+
+        $this->assertEquals('message', $selectedValue);
+
+        $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
+        $form->setValues(
+            [
+                'mauticform[name]' => 'Test',
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $divClass = $crawler->filter('#mauticform_postActionProperty')->parents()->first()->attr('class');
+
+        $this->assertStringContainsString('has-error', $divClass);
+    }
 }

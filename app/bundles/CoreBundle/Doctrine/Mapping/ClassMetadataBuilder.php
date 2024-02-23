@@ -329,7 +329,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             ->cascadePersist()
             ->cascadeMerge()
             ->cascadeDetach()
-            ->addJoinColumn('ip_id', 'id', $nullable)
+            ->addJoinColumn('ip_id', 'id', $nullable, false, 'SET NULL')
             ->build();
 
         return $this;
