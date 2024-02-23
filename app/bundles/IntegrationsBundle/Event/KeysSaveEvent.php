@@ -5,30 +5,21 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-class KeysSaveEvent extends Event
+final class KeysSaveEvent extends Event
 {
-    private Integration $integrationConfiguration;
-
     /**
-     * @var array<mixed>
-     */
-    private array $oldKeys;
-
-    /**
-     * @var array<mixed>
+     * @var array<string,string>
      */
     private array $newKeys;
 
     /**
-     * @param array<mixed> $keys
+     * @param array<string,string> $oldKeys
      */
-    public function __construct(Integration $integrationConfiguration, array $keys)
+    public function __construct(private Integration $integrationConfiguration, private array $oldKeys)
     {
-        $this->integrationConfiguration = $integrationConfiguration;
-        $this->oldKeys                  = $keys;
-        $this->newKeys                  = $integrationConfiguration->getApiKeys();
+        $this->newKeys = $integrationConfiguration->getApiKeys();
     }
 
     public function getIntegrationConfiguration(): Integration
@@ -37,7 +28,7 @@ class KeysSaveEvent extends Event
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string,string>
      */
     public function getOldKeys(): array
     {
@@ -45,7 +36,7 @@ class KeysSaveEvent extends Event
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string,string>
      */
     public function getNewKeys(): array
     {

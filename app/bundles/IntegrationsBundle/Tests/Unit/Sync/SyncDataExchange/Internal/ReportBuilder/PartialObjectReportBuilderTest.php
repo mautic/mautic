@@ -373,20 +373,20 @@ class PartialObjectReportBuilderTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
-                     $this->assertSame([1], $event->getIds());
-                     $this->assertSame($internalObject, $event->getObject());
+                    $this->assertSame([1], $event->getIds());
+                    $this->assertSame($internalObject, $event->getObject());
 
-                     // Mock a subscriber:
-                     $event->setFoundObjects([
-                         [
-                             'id'          => 1,
-                             'email'       => 'test@test.com',
-                             'companyname' => 'Bob and Cat',
-                         ],
-                     ]);
+                    // Mock a subscriber:
+                    $event->setFoundObjects([
+                        [
+                            'id'          => 1,
+                            'email'       => 'test@test.com',
+                            'companyname' => 'Bob and Cat',
+                        ],
+                    ]);
 
-                     return true;
-                 }),
+                    return true;
+                }),
                 IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 

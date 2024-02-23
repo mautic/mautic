@@ -111,12 +111,10 @@ class ConfigController extends AbstractFormController
         $oldApiKeys        = $this->integrationConfiguration->getApiKeys();
 
         // Submit the form
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
-        $eventDispatcher = $this->get('event_dispatcher');
-        \assert($eventDispatcher instanceof EventDispatcherInterface);
-        $configEvent     = new KeysSaveEvent($this->integrationConfiguration, $oldApiKeys);
-        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_API_KEYS_BEFORE_SAVE, $configEvent);
+        $configEvent = new KeysSaveEvent($this->integrationConfiguration, $oldApiKeys);
+        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_API_KEYS_BEFORE_SAVE);
 
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();

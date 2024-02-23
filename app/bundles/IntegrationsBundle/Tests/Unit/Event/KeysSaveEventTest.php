@@ -13,14 +13,12 @@ class KeysSaveEventTest extends TestCase
     public function testGetters(): void
     {
         $integration = $this->createMock(Integration::class);
-        $keys        = [
-            'apikey' => 'test',
-        ];
+        $keys        = ['apikey' => 'test'];
         $integration->expects(self::once())
             ->method('getApiKeys')
             ->willReturn($keys);
 
-        $event       = new KeysSaveEvent($integration, $keys);
+        $event = new KeysSaveEvent($integration, $keys);
 
         self::assertSame($integration, $event->getIntegrationConfiguration());
         self::assertSame($keys, $event->getOldKeys());
