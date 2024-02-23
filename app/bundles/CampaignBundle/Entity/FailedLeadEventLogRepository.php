@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -23,7 +23,7 @@ class FailedLeadEventLogRepository extends CommonRepository
             ->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log')
             ->where('log_id IN (:ids)')
-            ->setParameter('ids', $ids, Connection::PARAM_STR_ARRAY)
-            ->execute();
+            ->setParameter('ids', $ids, ArrayParameterType::STRING)
+            ->executeStatement();
     }
 }

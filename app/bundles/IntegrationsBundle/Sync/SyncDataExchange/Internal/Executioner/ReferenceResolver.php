@@ -13,7 +13,6 @@ use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Exception\ReferenceNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\SalesforceBundle\Integration\Salesforce2Integration;
 
 final class ReferenceResolver implements ReferenceResolverInterface
 {
@@ -29,7 +28,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
     {
         if (Contact::NAME !== $objectName) {
             DebugLogger::log(
-                Salesforce2Integration::NAME,
+                'N/A',
                 sprintf(
                     'references are currently resolved only for %s. Given %s',
                     Contact::NAME,

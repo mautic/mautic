@@ -12,11 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventLogCleanupSubscriber implements EventSubscriberInterface
 {
-    private FailedLeadEventLogRepository $failedLeadEventLogRepository;
-
-    public function __construct(FailedLeadEventLogRepository $failedLeadEventLogRepository)
+    public function __construct(private FailedLeadEventLogRepository $failedLeadEventLogRepository)
     {
-        $this->failedLeadEventLogRepository = $failedLeadEventLogRepository;
     }
 
     public static function getSubscribedEvents(): array
