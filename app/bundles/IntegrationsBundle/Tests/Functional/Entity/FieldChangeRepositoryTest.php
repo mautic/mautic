@@ -12,9 +12,9 @@ use PHPUnit\Framework\Assert;
 
 final class FieldChangeRepositoryTest extends MauticMysqlTestCase
 {
-    const INTEGRATION = 'someIntegration';
-    const COLUMN_NAME = 'some_column';
-    const OBJECT_ID   = 100;
+    private const INTEGRATION = 'someIntegration';
+    private const COLUMN_NAME = 'some_column';
+    private const OBJECT_ID   = 100;
 
     private FieldChangeRepository $repository;
 
