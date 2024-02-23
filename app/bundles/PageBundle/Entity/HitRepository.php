@@ -217,7 +217,7 @@ class HitRepository extends CommonRepository
      *
      * @param array $options
      */
-    public function getLatestHit($options): \DateTime
+    public function getLatestHit($options): ?\DateTime
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('h.date_hit latest_hit')
@@ -242,7 +242,7 @@ class HitRepository extends CommonRepository
         }
         $result = $sq->executeQuery()->fetchAssociative();
 
-        return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
+        return $result ? new \DateTime($result['latest_hit'], new \DateTimeZone('UTC')) : null;
     }
 
     /**

@@ -134,7 +134,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $pushIds;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\LeadEventLog>
+     * @var ArrayCollection<int, LeadEventLog>
      */
     private $eventLog;
 
@@ -294,7 +294,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $builder->createManyToMany('ipAddresses', \Mautic\CoreBundle\Entity\IpAddress::class)
             ->setJoinTable('lead_ips_xref')
-            ->addInverseJoinColumn('ip_id', 'id', false)
+            ->addInverseJoinColumn('ip_id', 'id', true, false, 'CASCADE')
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
             ->cascadeDetach()

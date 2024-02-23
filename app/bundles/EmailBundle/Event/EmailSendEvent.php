@@ -65,7 +65,7 @@ class EmailSendEvent extends CommonEvent
         $this->textHeaders = $args['textHeaders'] ?? [];
 
         if (!$this->subject && $this->email instanceof Email) {
-            $this->subject = $args['email']->getSubject();
+            $this->subject = (string) $args['email']->getSubject();
         }
 
         if (isset($args['internalSend'])) {

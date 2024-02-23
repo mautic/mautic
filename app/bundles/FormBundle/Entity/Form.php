@@ -55,7 +55,7 @@ class Form extends FormEntity
     /**
      * @var string
      */
-    private $postAction = 'return';
+    private $postAction = 'message';
 
     /**
      * @var string|null
@@ -444,11 +444,12 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostActionProperty()
+    public function getPostActionProperty(): ?string
     {
+        if ('return' === $this->getPostAction()) {
+            return null;
+        }
+
         return $this->postActionProperty;
     }
 
