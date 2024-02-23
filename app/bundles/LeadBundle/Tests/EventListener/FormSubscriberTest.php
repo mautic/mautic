@@ -66,7 +66,6 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
         $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
         $this->doNotContact       = $this->createMock(DoNotContact::class);
-        $this->lead               = new Lead();
         $this->submissionEvent    = $this->createMock(SubmissionEvent::class);
         $this->subscriber         = new FormSubscriber(
             $this->leadModel,

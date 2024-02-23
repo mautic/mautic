@@ -290,10 +290,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param SubmissionEvent $event
-     */
-    public function onLeadSegmentsChange(SubmissionEvent $event)
+    public function onLeadSegmentsChange(SubmissionEvent $event): void
     {
         $properties = $event->getActionConfig();
 

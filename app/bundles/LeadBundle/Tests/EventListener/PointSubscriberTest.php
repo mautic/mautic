@@ -14,26 +14,28 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     private \Mautic\LeadBundle\EventListener\PointSubscriber $subscriber;
 
-    /** @var TriggerExecutedEvent */
-    private $triggerExecutedEvent;
+    /**
+     * @var TriggerExecutedEvent&MockObject
+     */
+    private MockObject $triggerExecutedEvent;
 
-    /** @var TriggerEvent */
-    private $triggerEventEntity;
+    /**
+     * @var TriggerEvent&MockObject
+     */
+    private MockObject $triggerEventEntity;
 
     protected function setUp(): void
     {
-        $this->leadModel  = $this->createMock(LeadModel::class);
-        $this->subscriber = new PointSubscriber($this->leadModel);
+        $this->leadModel            = $this->createMock(LeadModel::class);
+        $this->subscriber           = new PointSubscriber($this->leadModel);
         $this->triggerExecutedEvent = $this->createMock(TriggerExecutedEvent::class);
         $this->triggerEventEntity   = $this->createMock(TriggerEvent::class);
 
-        $this->triggerExecutedEvent
-            ->method('getTriggerEvent')
-            ->willReturn($this->triggerEventEntity);
+        $this->triggerExecutedEvent->method('getTriggerEvent')->willReturn($this->triggerEventEntity);
     }
 
     public function testOnPointTriggerExecutedIfNotChangeTagsTyoe(): void
@@ -65,7 +67,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 
-    public function testThatTheLeadIsAddedToTheSegmentOnTriggerOnLeadSegmentsChangeEvent()
+    public function testThatTheLeadIsAddedToTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
         $this->triggerEventEntity
             ->method('getProperties')
@@ -78,7 +80,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
     }
 
-    public function testThatTheLeadIsRemovedFromTheSegmentOnTriggerOnLeadSegmentsChangeEvent()
+    public function testThatTheLeadIsRemovedFromTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
         $this->triggerEventEntity
             ->method('getProperties')

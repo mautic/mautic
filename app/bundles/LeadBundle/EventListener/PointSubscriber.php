@@ -64,10 +64,7 @@ class PointSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param TriggerExecutedEvent $event
-     */
-    public function onLeadSegmentsChange(TriggerExecutedEvent $event)
+    public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
     {
         $lead = $event->getLead();
 
