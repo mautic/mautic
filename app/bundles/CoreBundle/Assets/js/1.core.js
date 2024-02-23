@@ -650,9 +650,8 @@ var Mautic = {
     },
 
     /**
-     * Call at the end of the moderated interval callback function to let
-     * setModeratedInterval know the action is done and it's safe to execute
-     * again
+     * Call at the end of the moderated interval callback function to let setModeratedInterval know
+     * the action is done and it's safe to execute again
      *
      * @param key
      */
