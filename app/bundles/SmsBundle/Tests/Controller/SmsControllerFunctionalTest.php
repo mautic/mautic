@@ -41,19 +41,19 @@ class SmsControllerFunctionalTest extends MauticMysqlTestCase
             'The return must contain sms_sent:1'
         );
 
-        $this->assertStringNotContainsStringg(
+        $this->assertStringNotContainsString(
             'sms_delivered:1',
             $responseContent,
             'The return must not contain sms_sent:1'
         );
 
-        $this->assertStringNotContainsStringg(
+        $this->assertStringNotContainsString(
             'sms_read:1',
             $responseContent,
             'The return must not contain sms_read:1'
         );
 
-        $this->assertStringNotContainsStringg(
+        $this->assertStringNotContainsString(
             'sms_failed:1',
             $responseContent,
             'The return must not contain sms_failed:1'
