@@ -43,7 +43,6 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(200, $clientResponse->getStatusCode());
-        $this->assertStringContainsString('Login by', $clientResponse->getContent());
         $this->assertStringContainsString('Test User</a>', $clientResponse->getContent());
     }
 

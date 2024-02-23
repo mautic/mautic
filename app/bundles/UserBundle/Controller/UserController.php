@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
+use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -226,6 +227,11 @@ class UserController extends FormController
         $userActivity       = $auditLogRepository->getLogsForUser($user);
         $users              = $model->getEntities();
 
+        $roleModel = $this->getModel('user.role');
+        \assert($roleModel instanceof RoleModel);
+        $roleRepository     = $roleModel->getRepository();
+        $roles              = $roleRepository->getEntities();
+
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
 
@@ -329,6 +335,8 @@ class UserController extends FormController
                 'form'          => $form->createView(),
                 'logs'          => $userActivity,
                 'users'         => $users,
+                'roles'         => $roles,
+                'editAction'    => true,
             ],
             'contentTemplate' => '@MauticUser/User/form.html.twig',
             'passthroughVars' => [
