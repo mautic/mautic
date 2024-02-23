@@ -157,6 +157,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
             'name'        => 'Test Form',
             'formType'    => 'standalone',
             'description' => 'API test',
+            'postAction'  => 'return',
             'fields'      => [
                 [
                     'label'     => 'firstname',
