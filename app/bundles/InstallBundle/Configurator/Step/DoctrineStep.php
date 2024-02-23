@@ -22,6 +22,11 @@ class DoctrineStep implements StepInterface
     public $host = 'localhost';
 
     /**
+     * Database host. Read Only Replica.
+     */
+    public ?string $host_ro = null;
+
+    /**
      * Database table prefix.
      * Required in step.
      *
@@ -66,6 +71,8 @@ class DoctrineStep implements StepInterface
      * @var string
      */
     public $backup_prefix = 'bak_';
+
+    public ?string $server_version;
 
     public function __construct(Configurator $configurator)
     {

@@ -64,6 +64,16 @@
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
                                 {{- include('@MauticCore/Helper/details.html.twig', {'entity' : sms}) -}}
+                                {% if sms.getSmsType() == 'list' %}
+                                    <tr>
+                                        <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.lead.lists'|trans }}</span></td>
+                                        <td>
+                                            {% set segments = sms.getLists %}
+                                            {% set segmentNames = segments.toArray|map(segment => segment.getName) %}
+                                            {{ segmentNames|join(', ') }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
