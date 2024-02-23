@@ -56,7 +56,7 @@ class IntegrationSyncProcess
                 $mappedInternalObjectsNames = [];
                 try {
                     $mappedInternalObjectsNames = $this->mappingManualDAO->getMappedInternalObjectsNames($integrationObjectName);
-                } catch (ObjectNotFoundException $e) {
+                } catch (ObjectNotFoundException) {
                 }
 
                 if (1 > count(array_intersect($mauticObjectTypes, $mappedInternalObjectsNames))) {

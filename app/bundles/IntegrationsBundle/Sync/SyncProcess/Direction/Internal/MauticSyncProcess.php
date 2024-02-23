@@ -53,7 +53,7 @@ class MauticSyncProcess
             if ($hasMauticObjectIDs) {
                 try {
                     $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor($internalObjectName);
-                } catch (ObjectNotFoundException $e) {
+                } catch (ObjectNotFoundException) {
                     DebugLogger::log(
                         $this->mappingManualDAO->getIntegration(),
                         sprintf(

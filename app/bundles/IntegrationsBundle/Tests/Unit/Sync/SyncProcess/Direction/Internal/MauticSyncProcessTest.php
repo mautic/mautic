@@ -23,7 +23,6 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
 use PHPUnit\Framework\TestCase;
-use Rector\CodingStyle\Tests\Rector\Use_\RemoveUnusedAliasRector\Source\Mapping;
 
 class MauticSyncProcessTest extends TestCase
 {

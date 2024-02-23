@@ -53,7 +53,7 @@ class Notifier
         }
     }
 
-    private function getObjectDisplayName(string $integration, string $object)
+    private function getObjectDisplayName(string $integration, string $object): string
     {
         try {
             $configIntegration = $this->configIntegrationsHelper->getIntegration($integration);
