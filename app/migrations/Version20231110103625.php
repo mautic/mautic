@@ -17,14 +17,16 @@ final class Version20231110103625 extends AbstractMauticMigration
         $results        = $this->connection->executeQuery($sql)->fetchAllAssociative();
         $updatedRecords = 0;
 
+        $addPermissions = [];
         foreach ($results as $row) {
             $permissionsArray = unserialize($row['readable_permissions']);
-
             // Add permissions if not exists
             $permissionsToAdd = ['lead:export', 'form:export', 'report:export'];
+
             foreach ($permissionsToAdd as $permission) {
                 if (!isset($permissionsArray[$permission])) {
-                    $permissionsArray[$permission] = ['enable'];
+                    $permissionsArray[$permission]           = ['enable'];
+                    $addPermissions[$row['id']][$permission] = 1024;
                 }
             }
 
@@ -35,6 +37,19 @@ final class Version20231110103625 extends AbstractMauticMigration
             $stmt->bindValue('permissions', $permissionsString, \PDO::PARAM_STR);
             $stmt->bindValue('id', $row['id'], \PDO::PARAM_INT);
             $updatedRecords += $stmt->executeStatement();
+
+            foreach ($addPermissions as $roleId => $permissionsToAdd) {
+                foreach ($permissionsToAdd as $permissionToAdd => $bitwise) {
+                    $sql             = sprintf('INSERT IGNORE  INTO %s (role_id, bundle, name, bitwise) VALUES (:role_id, :bundle, :name, :bitwise)', $this->prefix.'permissions');
+                    $stmt            = $this->connection->prepare($sql);
+                    $permissionArray = explode(':', $permissionToAdd);
+                    $stmt->bindValue('role_id', $row['id'], \PDO::PARAM_INT);
+                    $stmt->bindValue('bundle', $permissionArray[0], \PDO::PARAM_STR);
+                    $stmt->bindValue('name', $permissionArray[1], \PDO::PARAM_STR);
+                    $stmt->bindValue('bitwise', $bitwise, \PDO::PARAM_INT);
+                    $stmt->executeStatement();
+                }
+            }
         }
 
         $this->write(sprintf('<comment>%s record(s) have been updated successfully.</comment>', $updatedRecords));
