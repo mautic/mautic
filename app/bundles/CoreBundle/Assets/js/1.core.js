@@ -407,7 +407,8 @@ var Mautic = {
 
         if (mQuery(target).length) {
             var hasBtn = mQuery(target).hasClass('btn');
-            var hasIcon = mQuery(target).hasClass('fa');
+            var className = mQuery(target).attr('class');
+            var hasIcon = mQuery(target).hasClass('fa') || className.startsWith('ri');
             var dontspin = mQuery(target).hasClass('btn-nospin');
 
             var i = (hasBtn && mQuery(target).find('i.fa').length) ? mQuery(target).find('i.fa') : target;
@@ -649,8 +650,9 @@ var Mautic = {
     },
 
     /**
-     * Call at the end of the moderated interval callback function to let setModeratedInterval know
-     * the action is done and it's safe to execute again
+     * Call at the end of the moderated interval callback function to let
+     * setModeratedInterval know the action is done and it's safe to execute
+     * again
      *
      * @param key
      */
