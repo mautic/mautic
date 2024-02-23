@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Scheduler\Command;
 
 use Mautic\ReportBundle\Exception\FileIOException;
+use Mautic\ReportBundle\Model\ReportCleanup;
 use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\Console\Command\Command;
@@ -15,6 +16,7 @@ class ExportSchedulerCommand extends Command
 {
     public function __construct(
         private ReportExporter $reportExporter,
+        private ReportCleanup $reportCleanup,
         private TranslatorInterface $translator
     ) {
         parent::__construct();
@@ -40,6 +42,12 @@ class ExportSchedulerCommand extends Command
         }
 
         try {
+            if ($exportOption->getReportId()) {
+                $this->reportCleanup->cleanup($exportOption->getReportId());
+            } else {
+                $this->reportCleanup->cleanupAll();
+            }
+
             $this->reportExporter->processExport($exportOption);
 
             $output->writeln('<info>'.$this->translator->trans('mautic.report.schedule.command.finished').'</info>');

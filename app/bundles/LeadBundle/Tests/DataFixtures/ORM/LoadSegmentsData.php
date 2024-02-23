@@ -1042,6 +1042,24 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
+            [ // ID 52
+                'name'    => 'Missing table name',
+                'alias'   => 'table-name-missing-in-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'custom_object',
+                        'field'    => 'firstnameLOL',
+                        'operator' => '!=',
+                        'filter'   => 'xxxxx',
+                        'display'  => null,
+                        'table'    => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

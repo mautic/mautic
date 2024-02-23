@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
 /**
  * @extends CommonRepository<CompanyLead>
@@ -71,6 +72,23 @@ class CompanyLeadRepository extends CommonRepository
         }
 
         return $q->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @return mixed[]
+     *
+     * @throws PrimaryCompanyNotFoundException
+     */
+    public function getPrimaryCompanyByLeadId(int $leadId): array
+    {
+        $companies = $this->getCompaniesByLeadId($leadId);
+        foreach ($companies as $company) {
+            if ($company['is_primary']) {
+                return $company;
+            }
+        }
+
+        throw new PrimaryCompanyNotFoundException();
     }
 
     /**

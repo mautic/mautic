@@ -159,7 +159,10 @@ final class AnalyseCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         }
 
         array_pop($text);
-        $text[count($text) - 1] .= '.';
+
+        if (isset($text[count($text) - 1])) {
+            $text[count($text) - 1] .= '.';
+        }
 
         return implode('', $text);
     }
