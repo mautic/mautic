@@ -31,6 +31,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 class MailHelper
@@ -227,7 +228,8 @@ class MailHelper
         private CoreParametersHelper $coreParametersHelper,
         private Mailbox $mailbox,
         private LoggerInterface $logger,
-        private MailHashHelper $mailHashHelper
+        private MailHashHelper $mailHashHelper,
+        private RouterInterface $router
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -354,7 +356,7 @@ class MailHelper
                 self::searchReplaceTokens($search, $replace, $this->message);
             }
 
-            if (true === $this->factory->getParameter('mailer_convert_embed_images')) {
+            if (true === $this->coreParametersHelper->get('mailer_convert_embed_images')) {
                 $this->convertEmbedImages();
             }
 
@@ -771,7 +773,7 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false): void
     {
-        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
+        if (!$ignoreTrackingPixel && $this->coreParametersHelper->get('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
             if (str_contains((string) $content, '</body>')) {
@@ -811,13 +813,13 @@ class MailHelper
 
                 $path = $match;
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
-                if (str_starts_with($match, $this->factory->getParameter('site_url'))) {
-                    $path = str_replace($this->factory->getParameter('site_url'), '', $match);
+                if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
+                    $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
                     $path = $this->factory->getSystemPath('root', true).$path;
                 }
 
-                if ($file_content = file_get_contents($path)) {
-                    $this->message->embed($file_content, md5($match));
+                if ($imageContent = file_get_contents($path)) {
+                    $this->message->embed($imageContent, md5($match));
                     $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
                 }
             }
@@ -1349,12 +1351,12 @@ class MailHelper
 
             if ($toEmail) {
                 $unsubscribeHash = $this->mailHashHelper->getEmailHash($toEmail);
-                $url             = $this->factory->getRouter()->generate('mautic_email_unsubscribe',
+                $url             = $this->router->generate('mautic_email_unsubscribe',
                     ['idHash' => $this->idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
             } else {
-                $url             = $this->factory->getRouter()->generate('mautic_email_unsubscribe',
+                $url             = $this->router->generate('mautic_email_unsubscribe',
                     ['idHash' => $this->idHash],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
@@ -1392,7 +1394,7 @@ class MailHelper
 
         // Include the tracking pixel token as it's auto appended to the body
         if ($this->appendTrackingPixel) {
-            $tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate(
+            $tokens['{tracking_pixel}'] = $this->router->generate(
                 'mautic_email_tracker',
                 [
                     'idHash' => $this->idHash,
