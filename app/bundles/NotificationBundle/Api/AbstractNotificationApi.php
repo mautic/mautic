@@ -23,7 +23,10 @@ abstract class AbstractNotificationApi
      */
     abstract public function send(string $endpoint, array $data): ResponseInterface;
 
-    abstract public function sendNotification($id, Notification $notification): ResponseInterface;
+    /**
+     * @return ResponseInterface
+     */
+    abstract public function sendNotification($id, Notification $notification);
 
     /**
      * Convert a non-tracked url to a tracked url.

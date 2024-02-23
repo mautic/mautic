@@ -13,10 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 trait NotificationTrait
 {
-    /**
-     * @var MockHandler
-     */
-    private $transportMock;
+    private MockHandler $transportMock;
 
     private function getMockHandler(ContainerInterface $container): MockHandler
     {
