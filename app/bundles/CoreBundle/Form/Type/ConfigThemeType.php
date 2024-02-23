@@ -21,7 +21,7 @@ class ConfigThemeType extends AbstractType
                 'label' => 'mautic.core.config.form.theme',
                 'attr'  => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.form.template.help',
+                    'tooltip' => 'mautic.core.config.form.theme.tooltip',
                 ],
             ]
         );

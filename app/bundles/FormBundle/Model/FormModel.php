@@ -409,20 +409,19 @@ class FormModel extends CommonFormModel
      */
     public function generateHtml(Form $entity, $persist = true): string
     {
-        $theme         = $entity->getTemplate();
+        // Use specific template or system-wide default theme
+        $theme         = $entity->getTemplate() ?? $this->coreParametersHelper->get('theme');
         $submissions   = null;
         $lead          = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
         $style         = '';
         $styleToRender = '@MauticForm/Builder/_style.html.twig';
         $formToRender  = '@MauticForm/Builder/form.html.twig';
 
-        if (!empty($theme)) {
-            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
-                $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
-            }
-            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
-                $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
-            }
+        if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
+            $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
+        }
+        if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
+            $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
         }
 
         if ($lead instanceof Lead && $lead->getId() && $entity->usesProgressiveProfiling()) {
