@@ -4,12 +4,18 @@ namespace Mautic\InstallBundle\Tests\Install;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class InstallSchemaTest extends \PHPUnit\Framework\TestCase
+/**
+ * @template T of AbstractPlatform
+ */
+class InstallSchemaTest extends TestCase
 {
     private Connection $connection;
 
@@ -19,6 +25,11 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
     private array $dbParams;
 
     private string $indexTableName;
+
+    /**
+     * @var AbstractSchemaManager<T>
+     */
+    private AbstractSchemaManager $schemaManager;
 
     public function setUp(): void
     {
@@ -50,18 +61,19 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $t->addIndex(['a_column'], 'index_with_options', [], $indexOptions);
-        $this->connection->getSchemaManager()->createTable($t);
+        $this->schemaManager = $this->connection->createSchemaManager();
+        $this->schemaManager->createTable($t);
     }
 
     public function tearDown(): void
     {
         parent::tearDown();
 
-        if ($this->connection->getSchemaManager()->tablesExist([$this->indexTableName])) {
-            $this->connection->getSchemaManager()->dropTable($this->indexTableName);
+        if ($this->schemaManager->tablesExist([$this->indexTableName])) {
+            $this->schemaManager->dropTable($this->indexTableName);
         }
-        if ($this->connection->getSchemaManager()->tablesExist([$this->dbParams['backup_prefix'].$this->indexTableName])) {
-            $this->connection->getSchemaManager()->dropTable($this->dbParams['backup_prefix'].$this->indexTableName);
+        if ($this->schemaManager->tablesExist([$this->dbParams['backup_prefix'].$this->indexTableName])) {
+            $this->schemaManager->dropTable($this->dbParams['backup_prefix'].$this->indexTableName);
         }
     }
 
@@ -77,7 +89,8 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         // Set the platform property, as that one is only set in the installSchema method, which we want to avoid.
         $property = $controllerReflection->getProperty('platform');
         $property->setAccessible(true);
-        $property->setValue($schemaHelper, DriverManager::getConnection($this->dbParams)->getSchemaManager()->getDatabasePlatform());
+        $connection = DriverManager::getConnection($this->dbParams);
+        $property->setValue($schemaHelper, $connection->getDatabasePlatform());
 
         $tables       = [$this->indexTableName];
         $mauticTables = [$this->indexTableName => $this->dbParams['backup_prefix'].$this->indexTableName];

@@ -31,7 +31,7 @@ class SchedulerBuilder
     /**
      * @param int $count
      *
-     * @return \Recurr\Recurrence[]|\Recurr\RecurrenceCollection
+     * @return \Recurr\RecurrenceCollection
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException

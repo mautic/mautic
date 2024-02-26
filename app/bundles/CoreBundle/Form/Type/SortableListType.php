@@ -14,6 +14,9 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class SortableListType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

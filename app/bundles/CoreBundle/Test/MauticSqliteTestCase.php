@@ -10,6 +10,9 @@ use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 {
     protected function setUp(): void
@@ -32,7 +35,7 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
         $tablePrefix = new TablePrefix('prefix_');
         $this->em->getEventManager()->addEventListener(Events::loadClassMetadata, $tablePrefix);
 
-        $dbParams = array_merge(self::$container->get('doctrine')->getConnection()->getParams(), [
+        $dbParams = array_merge(static::getContainer()->get('doctrine')->getConnection()->getParams(), [
             'table_prefix'  => null,
             'backup_tables' => 0,
         ]);
@@ -64,6 +67,6 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 
     private function getDatabasePath()
     {
-        return self::$container->get('doctrine')->getConnection()->getParams()['path'];
+        return static::getContainer()->get('doctrine')->getConnection()->getParams()['path'];
     }
 }

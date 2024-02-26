@@ -50,9 +50,9 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::fetch()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getMessages()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getConfigs()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::fetch
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getMessages
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Fetcher::getConfigs
      */
     public function testMessagesAreFetchedAndEventDispatched(): void
     {

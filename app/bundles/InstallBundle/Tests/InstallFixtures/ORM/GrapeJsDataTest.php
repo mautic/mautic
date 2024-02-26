@@ -21,7 +21,7 @@ class GrapeJsDataTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->fixture = new GrapesJsData();
-        $this->fixture->setContainer(self::$container);
+        $this->fixture->setContainer(static::getContainer());
     }
 
     public function testGetGroups(): void

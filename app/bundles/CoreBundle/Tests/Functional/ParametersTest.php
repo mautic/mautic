@@ -11,6 +11,6 @@ class ParametersTest extends AbstractMauticTestCase
 {
     public function testRememberMeParameterUsesIntProcessor(): void
     {
-        Assert::assertSame(31_536_000, self::$container->getParameter('mautic.rememberme_lifetime'));
+        Assert::assertSame(31_536_000, static::getContainer()->getParameter('mautic.rememberme_lifetime'));
     }
 }

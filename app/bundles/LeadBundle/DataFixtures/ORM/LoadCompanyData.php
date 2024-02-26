@@ -26,7 +26,7 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
             foreach ($l as $col => $val) {
                 $company->addUpdatedField($col, $val);
             }
-            $this->companyModel->saveEntity($company);
+            $this->companyModel->getRepository()->saveEntity($company);
 
             $this->setReference('company-'.$count, $company);
         }

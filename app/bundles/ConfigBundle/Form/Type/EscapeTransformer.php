@@ -6,6 +6,9 @@ namespace Mautic\ConfigBundle\Form\Type;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<array<string|int|float|array<string|int|float>>|string|int|float, array<string|int|float|array<string|int|float>>|string|int|float>
+ */
 class EscapeTransformer implements DataTransformerInterface
 {
     /**
@@ -18,6 +21,11 @@ class EscapeTransformer implements DataTransformerInterface
         $this->allowedParameters = array_filter($allowedParameters);
     }
 
+    /**
+     * @param array<string|int|float|array<string|int|float>>|string|int|float $value
+     *
+     * @return array<string|int|float|array<string|int|float>>|string|int|float
+     */
     public function transform($value)
     {
         if (is_array($value)) {
@@ -27,6 +35,11 @@ class EscapeTransformer implements DataTransformerInterface
         return $this->unescape($value);
     }
 
+    /**
+     * @param array<string|int|float|array<string|int|float>>|string|int|float $value
+     *
+     * @return array<string|int|float|array<string|int|float>>|string|int|float
+     */
     public function reverseTransform($value)
     {
         if (is_array($value)) {

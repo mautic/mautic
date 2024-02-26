@@ -9,14 +9,18 @@ use Symfony\Contracts\EventDispatcher\Event;
 class CampaignLeadChangeEvent extends Event
 {
     /**
-     * @var Lead
+     * @var ?Lead
      */
     private $lead;
 
+    /**
+     * @var Lead[]
+     */
     private array $leads = [];
 
     /**
-     * @param string $action
+     * @param Lead|Lead[] $leads
+     * @param ?string     $action
      */
     public function __construct(
         private Campaign $campaign,
@@ -43,7 +47,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * Returns the Lead entity.
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -53,7 +57,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * If this is a batch event, return array of leads.
      *
-     * @return array
+     * @return Lead[]|null
      */
     public function getLeads()
     {
@@ -63,7 +67,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * Returns added or removed.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getAction()
     {
@@ -75,7 +79,7 @@ class CampaignLeadChangeEvent extends Event
      */
     public function wasRemoved(): bool
     {
-        return 'removed' == $this->action;
+        return 'removed' === $this->action;
     }
 
     /**
@@ -83,6 +87,6 @@ class CampaignLeadChangeEvent extends Event
      */
     public function wasAdded(): bool
     {
-        return 'added' == $this->action;
+        return 'added' === $this->action;
     }
 }

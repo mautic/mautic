@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -14,12 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
+    private const RETRY_COUNT = 3;
+
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
         private EmailModel $emailModel,
-        private TranslatorInterface $translator,
-        private EntityManager $entityManager
+        private TranslatorInterface $translator
     ) {
     }
 
@@ -94,29 +94,31 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailResend(Events\QueueEmailEvent $event): void
     {
-        $message    = $event->getMessage();
-        $leadIdHash = $message->getLeadIdHash();
+        $message = $event->getMessage();
 
-        if (isset($leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($leadIdHash);
-            if (null !== $stat) {
-                $stat->upRetryCount();
-
-                $retries = $stat->getRetryCount();
-                if ($retries > 3) {
-                    // tried too many times so just fail
-                    $reason = $this->translator->trans('mautic.email.dnc.retries', [
-                        '%subject%' => EmojiHelper::toShort($message->getSubject()),
-                    ]);
-                    $this->emailModel->setDoNotContact($stat, $reason);
-                } else {
-                    // set it to try again
-                    $event->tryAgain();
-                }
-
-                $this->entityManager->persist($stat);
-                $this->entityManager->flush();
-            }
+        if (empty($message->getLeadIdHash())) {
+            return;
         }
+
+        $stat = $this->emailModel->getEmailStatus($message->getLeadIdHash());
+
+        if (!$stat) {
+            return;
+        }
+
+        $stat->upRetryCount();
+
+        if ($stat->getRetryCount() > self::RETRY_COUNT) {
+            // tried too many times so just fail
+            $reason = $this->translator->trans('mautic.email.dnc.retries', [
+                '%subject%' => EmojiHelper::toShort($message->getSubject()),
+            ]);
+            $this->emailModel->setDoNotContact($stat, $reason);
+        } else {
+            // set it to try again
+            $event->tryAgain();
+        }
+
+        $this->emailModel->saveEmailStat($stat);
     }
 }

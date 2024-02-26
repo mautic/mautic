@@ -147,20 +147,22 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param Lead|array $lead
      * @param string     $source
+     *
+     * @return Stat|null
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): void
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
         if (empty($lead)) {
-            return;
+            return null;
         }
 
         if ($lead instanceof Lead && !$lead->getId()) {
-            return;
+            return null;
         }
 
         if (is_array($lead)) {
             if (empty($lead['id'])) {
-                return;
+                return null;
             }
 
             $lead = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $lead['id']);
@@ -173,6 +175,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $stat->setSource($source);
 
         $this->getStatRepository()->saveEntity($stat);
+
+        return $stat;
     }
 
     /**

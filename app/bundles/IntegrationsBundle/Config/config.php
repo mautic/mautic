@@ -129,30 +129,6 @@ return [
                 'class' => \Mautic\IntegrationsBundle\Helper\TokenParser::class,
             ],
         ],
-        'repositories' => [
-            'mautic.integrations.repository.field_change' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\IntegrationsBundle\Entity\FieldChange::class,
-                ],
-            ],
-            'mautic.integrations.repository.object_mapping' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\IntegrationsBundle\Entity\ObjectMapping::class,
-                ],
-            ],
-            // Placeholder till the plugin bundle implements this
-            'mautic.plugin.integrations.repository.integration' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PluginBundle\Entity\Integration::class,
-                ],
-            ],
-        ],
         'sync' => [
             'mautic.sync.logger' => [
                 'class'     => \Mautic\IntegrationsBundle\Sync\Logger\DebugLogger::class,

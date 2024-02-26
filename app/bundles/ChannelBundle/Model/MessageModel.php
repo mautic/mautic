@@ -91,6 +91,8 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param object $entity
      * @param array  $options
+     *
+     * @return \Symfony\Component\Form\FormInterface<mixed>
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {

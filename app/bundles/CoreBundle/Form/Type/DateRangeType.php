@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DateRangeType extends AbstractType
 {
     public function __construct(

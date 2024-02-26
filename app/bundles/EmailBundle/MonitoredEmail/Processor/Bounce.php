@@ -5,8 +5,8 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Mailer\Transport\BounceProcessorInterface;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
@@ -20,6 +20,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Bounce implements ProcessorInterface
 {
+    private const RETRY_COUNT = 5;
+
     /**
      * @var string
      */
@@ -33,7 +35,7 @@ class Bounce implements ProcessorInterface
     public function __construct(
         protected TransportInterface $transport,
         protected ContactFinder $contactFinder,
-        protected StatRepository $statRepository,
+        protected EmailStatModel $emailStatModel,
         protected LeadModel $leadModel,
         protected TranslatorInterface $translator,
         protected LoggerInterface $logger,
@@ -113,10 +115,10 @@ class Bounce implements ProcessorInterface
         ++$retryCount;
         $stat->setRetryCount($retryCount);
 
-        if ($fail = $bouncedEmail->isFinal() || $retryCount >= 5) {
+        if ($bouncedEmail->isFinal() || $retryCount >= self::RETRY_COUNT) {
             $stat->setIsFailed(true);
         }
 
-        $this->statRepository->saveEntity($stat);
+        $this->emailStatModel->saveEntity($stat);
     }
 }

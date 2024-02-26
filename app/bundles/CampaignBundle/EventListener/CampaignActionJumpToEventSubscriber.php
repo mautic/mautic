@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -22,7 +23,8 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         private EventRepository $eventRepository,
         private EventExecutioner $eventExecutioner,
         private TranslatorInterface $translator,
-        private LeadRepository $leadRepository
+        private LeadRepository $leadRepository,
+        private EventScheduler $eventScheduler
     ) {
     }
 
@@ -82,12 +84,23 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
                 );
             }
         } else {
+            $contacts = $campaignEvent->getContactsKeyedById();
+
             // Increment the campaign rotation for the given contacts and current campaign
             $this->leadRepository->incrementCampaignRotationForContacts(
-                $campaignEvent->getContactsKeyedById()->getKeys(),
+                $contacts->getKeys(),
                 $event->getCampaign()->getId()
             );
-            $this->eventExecutioner->executeForContacts($jumpTarget, $campaignEvent->getContactsKeyedById());
+
+            // Schedule the jump action as per configuration, if any.
+            $executionDate       = $event->getTriggerDate() ?? new \DateTime();
+            $targetExecutionDate = $this->eventScheduler->getExecutionDateTime($jumpTarget, $executionDate);
+            if ($this->eventScheduler->shouldScheduleEvent($jumpTarget, $targetExecutionDate, $executionDate)) {
+                $this->eventScheduler->schedule($jumpTarget, $targetExecutionDate, $contacts);
+            } else {
+                $this->eventExecutioner->executeForContacts($jumpTarget, $contacts);
+            }
+
             $campaignEvent->passRemaining();
         }
     }

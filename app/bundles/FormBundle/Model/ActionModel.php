@@ -84,4 +84,33 @@ class ActionModel extends CommonFormModel
 
         return $dependents;
     }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getFormsIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'LIKE', 'value' => 'email.send%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $formIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
+                $formIds[] = $entity->getForm()->getid();
+            }
+            if (isset($properties['useremail']['email']) && (int) $properties['useremail']['email'] === $emailId) {
+                $formIds[] = $entity->getForm()->getid();
+            }
+        }
+
+        return array_unique($formIds);
+    }
 }

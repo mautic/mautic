@@ -94,23 +94,4 @@ return [
     'categories' => [
         'point' => null,
     ],
-
-    'services' => [
-        'repositories' => [
-            'mautic.point.repository.lead_point_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PointBundle\Entity\LeadPointLog::class,
-                ],
-            ],
-            'mautic.point.repository.lead_trigger_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PointBundle\Entity\LeadTriggerLog::class,
-                ],
-            ],
-        ],
-    ],
 ];

@@ -81,4 +81,33 @@ class TriggerEventModel extends CommonFormModel
 
         return $dependents;
     }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getPointTriggerIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'in', 'value' => ['email.send', 'email.send_to_user']],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $triggerIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
+                $triggerIds[] = $entity->getTrigger()->getId();
+            }
+            if (isset($properties['useremail']['email']) && (int) $properties['useremail']['email'] === $emailId) {
+                $triggerIds[] = $entity->getTrigger()->getId();
+            }
+        }
+
+        return array_unique($triggerIds);
+    }
 }

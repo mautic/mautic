@@ -4,12 +4,16 @@ namespace MauticPlugin\MauticTagManagerBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<Tag>
+ */
 class TagEntityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

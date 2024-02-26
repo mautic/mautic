@@ -21,7 +21,7 @@ class FieldChange
     private $integration;
 
     /**
-     * @var string
+     * @var int|string
      */
     private $objectId;
 

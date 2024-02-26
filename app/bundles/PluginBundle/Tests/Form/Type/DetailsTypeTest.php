@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\PluginBundle\Tests\FormType;
+namespace Mautic\PluginBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\PluginBundle\Entity\Integration;

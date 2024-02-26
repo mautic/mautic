@@ -54,7 +54,7 @@ class DoNotContact implements MauticModelInterface
      * Create a DNC entry for a lead.
      *
      * @param \Mautic\LeadBundle\Entity\Lead|int|null $contactId
-     * @param string|array                            $channel                  If an array with an ID, use the structure ['email' => 123]
+     * @param string|mixed[]                          $channel                  If an array with an ID, use the structure ['email' => 123]
      * @param string                                  $comments
      * @param int                                     $reason                   Must be a class constant from the DoNotContact class
      * @param bool                                    $persist

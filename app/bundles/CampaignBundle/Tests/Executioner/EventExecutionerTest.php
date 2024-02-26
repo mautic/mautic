@@ -199,7 +199,8 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(new EvaluatedContacts());
 
-        $this->leadRepository->expects($this->once())
+        // This should not be called because the rotation is already incremented in the subscriber
+        $this->leadRepository->expects($this->never())
             ->method('incrementCampaignRotationForContacts');
 
         $this->getEventExecutioner()->executeEventsForContacts($events, $contacts);
@@ -219,7 +220,6 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->logger,
             $this->eventScheduler,
             $this->removedContactTracker,
-            $this->leadRepository
         );
     }
 
@@ -277,7 +277,15 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventRepository->method('getEntities')
             ->willReturn([]);
 
-        $subscriber = new CampaignActionJumpToEventSubscriber($this->eventRepository, $this->getEventExecutioner(), $this->translator, $this->leadRepository);
+        $eventScheduler = $this->createMock(EventScheduler::class);
+
+        $subscriber = new CampaignActionJumpToEventSubscriber(
+            $this->eventRepository,
+            $this->getEventExecutioner(),
+            $this->translator,
+            $this->leadRepository,
+            $eventScheduler
+        );
         $subscriber->onJumpToEvent($pendingEvent);
 
         $this->assertEquals(count($pendingEvent->getSuccessful()), 1);

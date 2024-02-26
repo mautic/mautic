@@ -41,15 +41,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.tagmanager.repository.tag' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \MauticPlugin\MauticTagManagerBundle\Entity\Tag::class,
-                ],
-            ],
-        ],
     ],
     'menu' => [
         'main' => [

@@ -48,6 +48,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);

@@ -10,6 +10,7 @@ use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
@@ -27,50 +28,51 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    use MockedConnectionTrait;
     /**
      * @var MockObject|Connection
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connectionMock;
+    private MockObject $connectionMock;
 
     /**
      * @var MockObject|CompanyReportData
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportDataMock;
+    private MockObject $companyReportDataMock;
 
     /**
      * @var MockObject|StatRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
+    private MockObject $statRepository;
 
     /**
      * @var MockObject&GeneratedColumnsProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
+    private MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Report
      */
-    private \PHPUnit\Framework\MockObject\MockObject $report;
+    private MockObject $report;
 
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private \Doctrine\DBAL\Query\QueryBuilder $queryBuilder;
+    private QueryBuilder $queryBuilder;
 
     private ReportSubscriber $subscriber;
 
     /**
      * @var MockObject|FieldsBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilderMock;
+    private MockObject $fieldsBuilderMock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->connectionMock           = $this->createMock(Connection::class);
+        $this->connectionMock           = $this->getMockedConnection();
         $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
         $this->statRepository           = $this->createMock(StatRepository::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);

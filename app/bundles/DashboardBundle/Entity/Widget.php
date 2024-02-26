@@ -363,7 +363,7 @@ class Widget extends FormEntity
     /**
      * Set cached flag.
      *
-     * @param string $cached
+     * @param bool $cached
      *
      * @return Widget
      */
@@ -387,7 +387,7 @@ class Widget extends FormEntity
     /**
      * Set loadTime.
      *
-     * @param string $loadTime
+     * @param string|float|int $loadTime
      *
      * @return Widget
      */

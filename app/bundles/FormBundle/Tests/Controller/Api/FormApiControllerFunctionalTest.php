@@ -83,6 +83,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ],
         'actions' => [
         ],
+        'postAction'  => 'return',
     ];
 
     public function testFormWorkflow(): void
@@ -100,6 +101,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                     'leadField' => 'email',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Create:
@@ -382,6 +384,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                     ],
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Create form with lead.changetags action:

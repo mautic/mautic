@@ -79,7 +79,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->event = new ConsoleCommandEvent($this->command, $input, $this->output);
 
-        $this->connection->method('getSchemaManager')->willReturn($this->schemaManager);
+        $this->connection->method('createSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
 

@@ -322,7 +322,7 @@ class LeadRepository extends CommonRepository
     public function getContactRotations(array $contactIds, $campaignId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->select('cl.lead_id, cl.rotation')
+        $qb->select('cl.lead_id, cl.rotation, cl.manually_removed')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $qb->expr()->and(
@@ -337,7 +337,7 @@ class LeadRepository extends CommonRepository
 
         $contactRotations = [];
         foreach ($results as $result) {
-            $contactRotations[$result['lead_id']] = $result['rotation'];
+            $contactRotations[$result['lead_id']] = ['rotation' => $result['rotation'], 'manually_removed' => $result['manually_removed']];
         }
 
         return $contactRotations;

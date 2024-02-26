@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class AggregatorType extends AbstractType
 {
     public function __construct(

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -32,7 +32,7 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('objectType', $objectType)
             ->setParameter('objectId', $objectId)
-            ->setParameter('columnNames', $columnNames, Connection::PARAM_STR_ARRAY)
+            ->setParameter('columnNames', $columnNames, ArrayParameterType::STRING)
             ->executeStatement();
     }
 

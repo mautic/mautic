@@ -68,15 +68,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.webhook.repository.queue' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\WebhookBundle\Entity\WebhookQueue::class,
-                ],
-            ],
-        ],
     ],
 
     'parameters' => [

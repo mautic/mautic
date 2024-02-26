@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\PointBundle\Tests\Functional\EmailTriggerTest;
+namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;

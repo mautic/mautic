@@ -82,11 +82,28 @@ class DateOptionFactory
             case $timeframe && (
                 str_contains($timeframe[0], '-') || // -5 days
                 str_contains($timeframe[0], '+') || // +5 days
-                str_contains($timeframe, ' ago')    // 5 days ago
+                false !== $this->isRelativeFormatsPresent($timeframe)
             ):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
         }
+    }
+
+    protected function isRelativeFormatsPresent(string $timeframe): bool
+    {
+        $notations = [
+            'first day of ', // first day of January 2021
+            'last day of ', // last day of January 2021
+            ' ago', // 5 days ago
+        ];
+
+        foreach ($notations as $notation) {
+            if (str_contains($timeframe, $notation)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

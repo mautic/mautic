@@ -11,7 +11,7 @@ class SamlTest extends AbstractMauticTestCase
 {
     public function testDiscoveryTemplateIsOverridden(): void
     {
-        $twig    = self::$container->get('twig');
+        $twig    = static::getContainer()->get('twig');
         $content = $twig->render('@LightSamlSp/discovery.html.twig', ['parties' => []]);
 
         Assert::assertStringContainsString('SAML not configured or configured incorrectly.', $content);

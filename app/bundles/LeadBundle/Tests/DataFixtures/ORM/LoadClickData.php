@@ -19,6 +19,7 @@ class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
         // Create an email for clicks
         $email = new Email();
         $email->setSubject('Email Test');
+        $email->setCustomHtml('some content');
         $email->setName('Email Test');
         $manager->persist($email);
         $manager->flush();

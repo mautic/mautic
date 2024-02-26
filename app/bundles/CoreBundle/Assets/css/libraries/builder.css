@@ -5488,7 +5488,7 @@ div[data-slot].ui-sortable-helper {
   z-index: 50;
 }
 .chosen-container .chosen-results li {
-  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  font-family: "Source Sans 3", Helvetica, Arial, sans-serif;
 }
 .chosen-container .chosen-results li:before {
   font: normal normal normal 14px/1 FontAwesome;

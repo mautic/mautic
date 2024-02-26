@@ -81,6 +81,10 @@ trait EntityFieldsBuildFormTrait
                 $field['isRequired'] = false;
             }
 
+            if ($field['charLengthLimit'] > 0) {
+                $constraints[] = new Length(['max' => $field['charLengthLimit']]);
+            }
+
             switch ($type) {
                 case NumberType::class:
                     if (empty($properties['scale'])) {

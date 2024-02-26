@@ -124,15 +124,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.sms.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\SmsBundle\Entity\Stat::class,
-                ],
-            ],
-        ],
     ],
     'routes' => [
         'main' => [

@@ -33,6 +33,8 @@ class WebhookQueueRepository extends CommonRepository
      * Gets a count of the webhook queues filtered by the webhook id.
      *
      * @param $id int (for Webhooks)
+     *
+     * @deprecated Use exists() instead
      */
     public function getQueueCountByWebhookId($id): int
     {
@@ -49,5 +51,22 @@ class WebhookQueueRepository extends CommonRepository
             ->setParameter('id', $id)
             ->executeQuery()
             ->fetchOne();
+    }
+
+    /**
+     * Check if there is webhook to process.
+     */
+    public function exists(int $id): bool
+    {
+        $qb     = $this->_em->getConnection()->createQueryBuilder();
+        $result = $qb->select($this->getTableAlias().'.id')
+            ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
+            ->where($this->getTableAlias().'.webhook_id = :id')
+            ->setParameter('id', $id)
+            ->setMaxResults(1)
+            ->executeQuery()
+            ->fetchOne();
+
+        return (bool) $result;
     }
 }

@@ -133,7 +133,8 @@
                             }) -}}
 							</td>
 							<td>
-								<span class="label label-default pa-10" style="background: #{{ item.getColor() }};"> </span>
+								{% set color = item.getColor() %}
+								<span class="label label-default pa-10" style="background: {{ '#' not in color ? '#' : ''}}{{ color }};"> </span>
 							</td>
 							<td>
                                 <div>

@@ -6,60 +6,65 @@ namespace Mautic\DashboardBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class DashboardModelTest extends TestCase
+final class DashboardModelTest extends TestCase
 {
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var PathsHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var MockObject|Filesystem
      */
-    private \PHPUnit\Framework\MockObject\MockObject $filesystem;
+    private MockObject $filesystem;
 
     /**
      * @var MockObject|Session
      */
-    private \PHPUnit\Framework\MockObject\MockObject $session;
+    private MockObject $session;
 
-    private \Mautic\DashboardBundle\Model\DashboardModel $model;
+    private DashboardModel $model;
+
+    private WidgetDetailEventFactory $widgetDetailEventFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
-        $this->filesystem           = $this->createMock(Filesystem::class);
-        $this->session              = $this->createMock(Session::class);
-        $requestStack               = $this->createMock(RequestStack::class);
+        $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $this->pathsHelper              = $this->createMock(PathsHelper::class);
+        $this->widgetDetailEventFactory = $this->createMock(WidgetDetailEventFactory::class);
+        $this->filesystem               = $this->createMock(Filesystem::class);
+        $this->session                  = $this->createMock(Session::class);
+        $requestStack                   = $this->createMock(RequestStack::class);
         $requestStack->method('getSession')
             ->willReturn($this->session);
 
         $this->model = new DashboardModel(
             $this->coreParametersHelper,
             $this->pathsHelper,
+            $this->widgetDetailEventFactory,
             $this->filesystem,
             $requestStack,
             $this->createMock(EntityManagerInterface::class),
@@ -85,10 +90,6 @@ class DashboardModelTest extends TestCase
 
         $this->session->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(
-                ['mautic.daterange.form.from'],
-                ['mautic.daterange.form.to']
-            )
             ->willReturnOnConsecutiveCalls(
                 $dateFrom->format(\DateTimeInterface::ATOM),
                 $dateTo->format(\DateTimeInterface::ATOM)

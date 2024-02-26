@@ -44,6 +44,9 @@
     <dt>{{ 'mautic.sms.timeline.type'|trans }}</dt>
     <dd>{{ item.type|trans }}</dd>
 </dl>
+{% endif %}
+
+{% if item.message is defined and item.message is not empty %}
 <div class="small">
     <hr />
     <strong>{{ 'mautic.sms.timeline.content.heading'|trans }}</strong>

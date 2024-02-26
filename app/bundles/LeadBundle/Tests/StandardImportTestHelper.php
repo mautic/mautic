@@ -110,7 +110,7 @@ abstract class StandardImportTestHelper extends CommonMocks
     {
         /** @var Import&MockObject $entity */
         $entity = $this->getMockBuilder(Import::class)
-            ->setMethods($methods)
+            ->onlyMethods($methods ?? [])
             ->getMock();
 
         $entity->setFilePath(self::$csvPath)

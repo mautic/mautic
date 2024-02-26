@@ -43,7 +43,7 @@ class LeadPointLogRepository extends CommonRepository
                 ->where('lead_id = '.(int) $fromLeadId)
                 ->executeStatement();
         } else {
-            $q->executeQuery();
+            $q->executeStatement();
         }
     }
 }

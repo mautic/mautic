@@ -138,6 +138,9 @@ class FieldHelper
         return $this->syncFields[$objectName];
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getRequiredFields(string $object): array
     {
         if (isset($this->requiredFieldList[$object])) {

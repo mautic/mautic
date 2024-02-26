@@ -84,7 +84,11 @@ class EventLoggerTest extends TestCase
 
         $this->leadRepository->expects($this->exactly(3))
             ->method('getContactRotations')
-            ->willReturnOnConsecutiveCalls([1 => 1], [1 => 2], [1 => 1]);
+            ->willReturnOnConsecutiveCalls(
+                [1 => ['rotation' => 1, 'manually_removed' => 0]],
+                [1 => ['rotation' => 2, 'manually_removed' => 0]],
+                [1 => ['rotation' => 1, 'manually_removed' => 0]],
+            );
 
         $campaign = $this->createMock(Campaign::class);
         $campaign->method('getId')->willReturnOnConsecutiveCalls([1, 1, 2]);

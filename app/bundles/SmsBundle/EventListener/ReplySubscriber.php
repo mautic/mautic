@@ -50,6 +50,7 @@ class ReplySubscriber implements EventSubscriberInterface
 
         $this->eventLogRepository->saveEntity($log);
         $this->eventLogRepository->detachEntity($log);
+        $event->setEventLog($log);
     }
 
     public function onTimelineGenerate(LeadTimelineEvent $event): void

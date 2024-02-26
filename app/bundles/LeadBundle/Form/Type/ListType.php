@@ -22,6 +22,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<LeadList>
+ */
 class ListType extends AbstractType
 {
     public function __construct(

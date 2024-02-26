@@ -26,17 +26,14 @@ class MonitoringRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @return float|int
-     */
-    public function getPublishedEntitiesCount()
+    public function getPublishedEntitiesCount(): int
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
         $q->where($expr);
         $args['qb'] = $q;
 
-        return parent::getEntities($args)->count();
+        return count(parent::getEntities($args));
     }
 
     /**

@@ -75,7 +75,7 @@ Mautic.resetEmailsToNotification = function(obj) {
     }
 };
 
-Mautic.configDnsTestExecute = function(element, action, key) {
+Mautic.configDsnTestExecute = function(element, action, key) {
     const $button = mQuery(element),
         $container = $button.closest('.config-dsn-container');
 
@@ -90,7 +90,7 @@ Mautic.configDnsTestExecute = function(element, action, key) {
     });
 };
 
-Mautic.configDnsTestDisable = function(element) {
+Mautic.configDsnTestDisable = function(element) {
     const $container = mQuery(element).closest('.config-dsn-container');
 
     $container.find('.help-block .status-msg').html('');

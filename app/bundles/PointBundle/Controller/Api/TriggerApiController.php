@@ -113,6 +113,9 @@ class TriggerApiController extends CommonApiController
         }
     }
 
+    /**
+     * @return FormInterface<mixed>
+     */
     protected function createTriggerEventEntityForm($entity): FormInterface
     {
         $triggerEventModel = $this->getModel('point.triggerevent');

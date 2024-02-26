@@ -199,7 +199,7 @@ class PageTestAbstract extends TestCase
                 $this->createMock(CoreParametersHelper::class),
                 $shortener,
             ])
-            ->setMethods(['createRedirectEntity', 'generateRedirectUrl'])
+            ->onlyMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
 
         $mockRedirect = $this->getMockBuilder(\Mautic\PageBundle\Entity\Redirect::class)

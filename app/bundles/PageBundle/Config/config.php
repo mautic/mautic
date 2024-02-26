@@ -90,29 +90,6 @@ return [
     ],
 
     'services' => [
-        'repositories' => [
-            'mautic.page.repository.hit' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Hit::class,
-                ],
-            ],
-            'mautic.page.repository.page' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Page::class,
-                ],
-            ],
-            'mautic.page.repository.redirect' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Redirect::class,
-                ],
-            ],
-        ],
         'fixtures' => [
             'mautic.page.fixture.page_category' => [
                 'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,

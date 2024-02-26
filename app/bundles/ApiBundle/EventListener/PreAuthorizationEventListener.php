@@ -51,6 +51,6 @@ class PreAuthorizationEventListener
      */
     protected function getUser(PreAuthorizationEvent $event)
     {
-        return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUsername());
+        return $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneByUsername($event->getUser()->getUserIdentifier());
     }
 }

@@ -46,23 +46,4 @@ return [
     'categories' => [
         'stage' => null,
     ],
-
-    'services' => [
-        'repositories' => [
-            'mautic.stage.repository.lead_stage_log' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\StageBundle\Entity\LeadStageLog::class,
-                ],
-            ],
-            'mautic.stage.repository.stage' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\StageBundle\Entity\Stage::class,
-                ],
-            ],
-        ],
-    ],
 ];

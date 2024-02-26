@@ -95,7 +95,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'           => SubmitActionEmailType::class,
             'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
-                'message' => 'html',
+                'message' => 'raw',
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,

@@ -12,7 +12,7 @@ class AssetExtensionTest extends AbstractMauticTestCase
 {
     public function testGetCountryFlag(): void
     {
-        $assetExtension = self::$container->get(AssetExtension::class);
+        $assetExtension = static::getContainer()->get(AssetExtension::class);
         \assert($assetExtension instanceof AssetExtension);
 
         Assert::assertStringStartsWith('/app/assets/images/flags/Belgium.png', $assetExtension->getCountryFlag('Belgium'));

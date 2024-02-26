@@ -29,7 +29,7 @@ class IP2LocationAPILookup extends AbstractRemoteDataLookup
             }
         } catch (\Exception $exception) {
             if ($this->logger) {
-                $this->logger->warn('IP LOOKUP: '.$exception->getMessage());
+                $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
             }
         }
     }

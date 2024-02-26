@@ -188,6 +188,7 @@ class TriggerEventController extends CommonFormController
                         // save the properties to session
                         $session  = $request->getSession();
                         $events   = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified');
+                        /** @var array<mixed> $formData */
                         $formData = $form->getData();
                         // overwrite with updated data
                         $triggerEvent = array_merge($events[$objectId], $formData);

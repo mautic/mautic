@@ -28,7 +28,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->repository = self::$container->get('mautic.integrations.repository.object_mapping');
+        $this->repository = static::getContainer()->get('mautic.integrations.repository.object_mapping');
     }
 
     public function testGetInternalObject(): void

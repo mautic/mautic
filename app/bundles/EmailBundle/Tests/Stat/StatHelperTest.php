@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Tests\Stat;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -13,15 +14,16 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStatsAreCreatedAndDeleted(): void
     {
-        $mockStatRepository = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailStatmodel     = $this->createMock(EmailStatModel::class);
+        $mockStatRepository = $this->createMock(StatRepository::class);
+
+        $emailStatmodel->method('getRepository')->willReturn($mockStatRepository);
 
         $mockStatRepository->expects($this->once())
             ->method('deleteStats')
             ->withConsecutive([[1, 2, 3, 4, 5]]);
 
-        $statHelper = new StatHelper($mockStatRepository);
+        $statHelper = new StatHelper($emailStatmodel);
 
         $mockEmail = $this->getMockBuilder(Email::class)
             ->getMock();
@@ -69,12 +71,9 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
     public function testExceptionIsThrownIfEmailAddressIsNotFound(): void
     {
         $this->expectException(StatNotFoundException::class);
-        $mockStatRepository = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        $statHelper = new StatHelper($mockStatRepository);
+        $statHelper = new StatHelper($this->createMock(EmailStatModel::class));
 
-        $reference = $statHelper->getStat('nada@nada.com');
+        $statHelper->getStat('nada@nada.com');
     }
 }

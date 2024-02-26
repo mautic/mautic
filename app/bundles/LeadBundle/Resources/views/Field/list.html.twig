@@ -118,6 +118,9 @@
                           {% if item.isUniqueIdentifer %}
                               <i class="fa fa-key " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isuniqueidentifer'|trans }}"></i>
                           {% endif %}
+                          {% if item.isIsIndex %}
+                              <i class="fa fa-key " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
+                          {% endif %}
                       </td>
                   </tr>
               {% endfor %}

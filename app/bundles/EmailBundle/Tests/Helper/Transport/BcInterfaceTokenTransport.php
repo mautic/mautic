@@ -16,12 +16,26 @@ class BcInterfaceTokenTransport implements TransportInterface
      */
     private $transports = []; // @phpstan-ignore-line
 
+    /**
+     * @var string[]
+     */
     private $fromAddresses = [];
 
-    private $metadatas = [];
+    /**
+     * @var string[]
+     */
+    private $fromNames = [];
 
     private $numberToFail;
 
+    /**
+     * @var mixed[]
+     */
+    private array $metadatas = [];
+
+    /**
+     * @var RawMessage
+     */
     private $message;
 
     /**
@@ -37,23 +51,36 @@ class BcInterfaceTokenTransport implements TransportInterface
 
     public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        $address = null;
         if ($message instanceof Email) {
-            $address = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+            $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+            $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
         }
 
-        $this->message         = $message;
-        $this->fromAddresses[] = $address;
-        $this->metadatas[]     = $this->getMetadata();
+        $this->message     = $message;
+        $this->metadatas[] = $this->getMetadata();
 
         return null;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFromAddresses(): array
     {
         return $this->fromAddresses;
     }
 
+    /**
+     * @return string[]
+     */
+    public function getFromNames(): array
+    {
+        return $this->fromNames;
+    }
+
+    /**
+     * @return mixed[]
+     */
     public function getMetadatas(): array
     {
         return $this->metadatas;

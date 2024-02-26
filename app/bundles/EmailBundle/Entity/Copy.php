@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 
 class Copy
 {
@@ -107,9 +106,6 @@ class Copy
      */
     public function setBody($body)
     {
-        // Ensure it's clean of emoji
-        $body = EmojiHelper::toShort($body);
-
         $this->body = $body;
 
         return $this;
@@ -130,9 +126,6 @@ class Copy
      */
     public function setSubject($subject)
     {
-        // Ensure it's clean of emoji
-        $subject = EmojiHelper::toShort($subject);
-
         $this->subject = $subject;
 
         return $this;
@@ -145,7 +138,6 @@ class Copy
 
     public function setBodyText(?string $bodyText): self
     {
-        $bodyText       = EmojiHelper::toShort($bodyText);
         $this->bodyText = $bodyText;
 
         return $this;

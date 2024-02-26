@@ -685,6 +685,16 @@ final class LeadEvents
     public const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
 
     /**
+     * The mautic.list_filters_merge event is dispatched when the lists rebuilding.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListMergeFiltersEvent instance.
+     *
+     * @var string
+     */
+    public const LIST_FILTERS_MERGE = 'mautic.list_filters_merge';
+
+    /**
      * The mautic.list_filters_querybuilder_generated event is dispatched when the queryBuilder for segment was generated.
      *
      * The event listener receives a
@@ -745,6 +755,26 @@ final class LeadEvents
      */
     public const LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_add_column_background_job';
 
+    /**
+     * The mautic.lead_field_pre_update_column event is dispatched before pdating a column in the lead_fields table.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Field\Event\UpdateColumnEvent instance.
+     *
+     * @var string
+     */
+    public const LEAD_FIELD_PRE_UPDATE_COLUMN = 'mautic.lead_field_pre_update_column';
+
+    /**
+     * The mautic.lead_field_pre_add_column_background_job event is dispatched before updating a column in the lead_fields table.
+     * in background job.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Field\Event\UpdateColumnBackgroundEvent instance.
+     *
+     * @var string
+     */
+    public const LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_update_column_background_job';
     /**
      * The mautic.post_contact_export_scheduled event is dispatched when a contact export is scheduled.
      *

@@ -25,7 +25,7 @@ class EmailRepository extends CommonRepository
         $q->select('l.id, l.email')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
-            ->where('dnc.channel = "email"')
+            ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
         if ($leadIds) {
@@ -57,7 +57,7 @@ class EmailRepository extends CommonRepository
         $q->select('dnc.*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
-            ->where('dnc.channel = "email"')
+            ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
@@ -101,7 +101,7 @@ class EmailRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from(\Mautic\EmailBundle\Entity\Email::class, 'e', 'e.id');
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
 
             if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || 'list' == $args['email_type'])) {
@@ -646,9 +646,24 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * @depreacated The method is replaced by getPublishedBroadcastsIterable
+     *
      * @param int|null $id
      */
     public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    {
+        return $this->getPublishedBroadcastsQuery($id)->iterate();
+    }
+
+    /**
+     * @return iterable<Email>
+     */
+    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    {
+        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+    }
+
+    private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -657,14 +672,14 @@ class EmailRepository extends CommonRepository
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
         );
 
-        if (!empty($id)) {
+        if (null !== $id && 0 !== $id) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
         $qb->where($expr);
 
-        return $qb->getQuery()->iterate();
+        return $qb->getQuery();
     }
 
     /**
@@ -691,6 +706,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Is one of emails unpublished?
+     *
+     * @deprecated to be removed in 6.0 with no replacement
      */
     public function isOneUnpublished(array $ids): bool
     {

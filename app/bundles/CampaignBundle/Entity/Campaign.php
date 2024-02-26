@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
+    public const TABLE_NAME = 'campaigns';
     /**
      * @var int
      */
@@ -41,6 +42,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      * @var \DateTimeInterface|null
      */
     private $publishDown;
+
+    public ?\DateTimeInterface $deleted = null;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
@@ -72,10 +75,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     private $canvasSettings = [];
 
-    /**
-     * @var int
-     */
-    private $allowRestart = 0;
+    private bool $allowRestart = false;
 
     public function __construct()
     {
@@ -100,7 +100,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaigns')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CampaignRepository::class);
 
         $builder->addIdColumns();
@@ -141,7 +141,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->nullable()
             ->build();
 
-        $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
+        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
+        $builder->addNullableField('deleted', 'datetime');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -191,6 +192,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                     'events',
                     'publishUp',
                     'publishDown',
+                    'deleted',
                 ]
             )
             ->build();
@@ -329,7 +331,12 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     public function getRootEvents(): ArrayCollection
     {
-        $criteria = Criteria::create()->where(Criteria::expr()->isNull('parent'));
+        $criteria = Criteria::create()->where(
+            Criteria::expr()->andX(
+                Criteria::expr()->isNull('parent'),
+                Criteria::expr()->isNull('deleted')
+            )
+        );
         $events   = $this->getEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
@@ -363,6 +370,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
+    /**
+     * @param string $type
+     *
+     * @return ArrayCollection<int,Event>
+     */
     public function getEventsByType($type): ArrayCollection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
@@ -576,11 +588,23 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     public function setAllowRestart($allowRestart)
     {
+        $allowRestart = (bool) $allowRestart;
         $this->isChanged('allowRestart', $allowRestart);
 
-        $this->allowRestart = (int) $allowRestart;
+        $this->allowRestart = $allowRestart;
 
         return $this;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deleted): void
+    {
+        $this->isChanged('deleted', $deleted);
+        $this->deleted = $deleted;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
     }
 
     /**

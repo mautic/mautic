@@ -84,7 +84,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
             $requestStack,
             $security
         );
-        $controller->setContainer(self::$container);
+        $controller->setContainer(static::getContainer());
 
         return $controller;
     }

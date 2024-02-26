@@ -40,15 +40,6 @@ return [
                 'alias' => 'notification_api',
             ],
         ],
-        'repositories' => [
-            'mautic.notification.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\NotificationBundle\Entity\Stat::class,
-                ],
-            ],
-        ],
         'integrations' => [
             'mautic.integration.onesignal' => [
                 'class'     => \Mautic\NotificationBundle\Integration\OneSignalIntegration::class,

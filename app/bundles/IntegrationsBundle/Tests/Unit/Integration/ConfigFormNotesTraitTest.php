@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\IntegrationsBundle\Tests\Integration;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Integration;
 
 use Mautic\IntegrationsBundle\DTO\Note;
 use Mautic\IntegrationsBundle\Integration\ConfigFormNotesTrait;

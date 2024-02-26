@@ -7,6 +7,9 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @implements DataTransformerInterface<array<mixed>|int|null, array<mixed>|object|null>
+ */
 class TagEntityModelTransformer implements DataTransformerInterface
 {
     /**
@@ -24,7 +27,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
     {
         if (!$this->isArray) {
             if (is_null($entity) || !is_object($entity)) {
-                return '';
+                return null;
             }
 
             return $entity->getTag();

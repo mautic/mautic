@@ -142,8 +142,8 @@ class RestrictionHelperTest extends TypeTestCase
     /**
      * @testdox Test that the restricted fields are removed from the config
      *
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions()
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField()
+     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions
+     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField
      */
     public function testRestrictedFieldsAreRemoved(): void
     {
@@ -176,8 +176,8 @@ class RestrictionHelperTest extends TypeTestCase
     /**
      * @testdox Test that the restricted fields are masked
      *
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions()
-     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField()
+     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::applyRestrictions
+     * @covers \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::restrictField
      */
     public function testRestrictedFieldsAreMasked(): void
     {
@@ -189,7 +189,7 @@ class RestrictionHelperTest extends TypeTestCase
             ->getFormFactory();
 
         $form = $this->factory->create(ConfigType::class, $this->forms);
-        /** @var FormInterface $address */
+        /** @var FormInterface<mixed> $address */
         $address = $form['emailconfig']['monitored_email']['EmailBundle_unsubscribes']['address'];
 
         $this->assertTrue($address->getConfig()->getOption('attr')['readonly']);

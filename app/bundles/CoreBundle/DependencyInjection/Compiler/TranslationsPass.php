@@ -15,6 +15,13 @@ class TranslationsPass implements CompilerPassInterface
             return;
         }
 
+        $translator        = $container->findDefinition('translator');
+        $translatorOptions = $translator->getArgument(4);
+
+        $translatorOptions['cache_vary'] = [];
+
+        $translator->replaceArgument(4, $translatorOptions);
+
         $container->register('translator.decorated', Translator::class)
             ->setDecoratedService('translator', 'translator.decorated.inner', -100)
             ->setArgument(0, new Reference('translator.decorated.inner'));

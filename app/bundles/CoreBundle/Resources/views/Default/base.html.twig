@@ -9,6 +9,8 @@
         <section id="app-wrapper">
             {{ outputScripts('bodyOpen') }}
 
+            {{ include('@MauticCore/Notification/flashes.html.twig') }}
+
             <aside class="app-sidebar sidebar-left">
                 {{ include('@MauticCore/LeftPanel/index.html.twig') }}
             </aside>
@@ -19,8 +21,6 @@
 
             <header id="app-header" class="navbar">
                 {{ include('@MauticCore/Default/navbar.html.twig') }}
-
-                {{ include('@MauticCore/Notification/flashes.html.twig') }}
             </header>
 
             <!-- start: app-footer(need to put on top of #app-content)-->

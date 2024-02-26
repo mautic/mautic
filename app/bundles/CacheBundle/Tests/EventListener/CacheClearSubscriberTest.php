@@ -25,7 +25,7 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->adapter = $this->getMockBuilder(FilesystemTagAwareAdapter::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['clear', 'commit'])
-            ->addMethods(['getCacheAdapter'])
+            ->addMethods(['getCacheAdapter']) // because CacheProvider does not have an interface.
             ->getMock();
         $this->adapter->method('clear')->willReturn($this->random);
         $this->adapter->method('commit')->willReturn(null);

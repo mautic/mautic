@@ -130,7 +130,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $contactExportScheduler = new ContactExportScheduler();
         $contactExportScheduler
             ->setUser($this->userHelper->getUser())
-            ->setScheduledDateTime(new \DateTimeImmutable('now', new \DateTimeZone('UTC')))
+            ->setScheduledDateTime(new \DateTimeImmutable())
             ->setData($data);
 
         $this->em->persist($contactExportScheduler);

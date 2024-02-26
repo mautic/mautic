@@ -39,7 +39,7 @@ class TableSchemaHelper
         protected $prefix,
         protected ColumnSchemaHelper $columnHelper
     ) {
-        $this->sm           = $db->getSchemaManager();
+        $this->sm = $db->createSchemaManager();
     }
 
     /**

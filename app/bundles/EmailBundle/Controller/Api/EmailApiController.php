@@ -136,64 +136,65 @@ class EmailApiController extends CommonApiController
     public function sendLeadAction(Request $request, $id, $leadId)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
-            if (!$this->checkEntityAccess($entity)) {
-                return $this->accessDenied();
-            }
 
-            /** @var Lead $lead */
-            $lead = $this->checkLeadAccess($leadId, 'edit');
-            if ($lead instanceof Response) {
-                return $lead;
-            }
-
-            $post       = $request->request->all();
-            $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
-            $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
-            $response   = ['success' => false];
-
-            $cleanTokens = [];
-
-            foreach ($tokens as $token => $value) {
-                $value = InputHelper::clean($value);
-                if (!preg_match('/^{.*?}$/', $token)) {
-                    $token = '{'.$token.'}';
-                }
-
-                $cleanTokens[$token] = $value;
-            }
-
-            $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
-            // Set owner_id to support the "Owner is mailer" feature
-            if ($lead->getOwner()) {
-                $leadFields['owner_id'] = $lead->getOwner()->getId();
-            }
-
-            $result = $this->model->sendEmail(
-                $entity,
-                $leadFields,
-                [
-                    'source'            => ['api', 0],
-                    'tokens'            => $cleanTokens,
-                    'assetAttachments'  => $assetsIds,
-                    'return_errors'     => true,
-                    'ignoreDNC'         => true,
-                    'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
-                ]
-            );
-
-            if (is_bool($result)) {
-                $response['success'] = $result;
-            } else {
-                $response['failed'] = $result;
-            }
-
-            $view = $this->view($response, Response::HTTP_OK);
-
-            return $this->handleView($view);
+        if (!$entity) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        if (!$this->checkEntityAccess($entity)) {
+            return $this->accessDenied();
+        }
+
+        /** @var Lead $lead */
+        $lead = $this->checkLeadAccess($leadId, 'edit');
+        if ($lead instanceof Response) {
+            return $lead;
+        }
+
+        $post       = $request->request->all();
+        $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
+        $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+        $response   = ['success' => false];
+
+        $cleanTokens = [];
+
+        foreach ($tokens as $token => $value) {
+            $value = InputHelper::html($value);
+            if (!preg_match('/^{.*?}$/', $token)) {
+                $token = '{'.$token.'}';
+            }
+
+            $cleanTokens[$token] = $value;
+        }
+
+        $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
+        // Set owner_id to support the "Owner is mailer" feature
+        if ($lead->getOwner()) {
+            $leadFields['owner_id'] = $lead->getOwner()->getId();
+        }
+
+        $result = $this->model->sendEmail(
+            $entity,
+            $leadFields,
+            [
+                'source'            => ['api', 0],
+                'tokens'            => $cleanTokens,
+                'assetAttachments'  => $assetsIds,
+                'return_errors'     => true,
+                'ignoreDNC'         => true,
+                'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+            ]
+        );
+
+        if (is_bool($result)) {
+            $response['success'] = $result;
+        } else {
+            $response['failed'] = $result;
+        }
+
+        $view = $this->view($response, Response::HTTP_OK);
+
+        return $this->handleView($view);
     }
 
     /**

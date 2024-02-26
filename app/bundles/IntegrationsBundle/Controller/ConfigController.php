@@ -89,7 +89,7 @@ class ConfigController extends AbstractFormController
     }
 
     /**
-     * @param FormInterface<FormInterface> $form
+     * @param FormInterface<mixed> $form
      */
     private function submitForm(
         Request $request,
@@ -160,7 +160,7 @@ class ConfigController extends AbstractFormController
     }
 
     /**
-     * @return FormInterface<FormInterface>
+     * @return FormInterface<mixed>
      */
     private function getForm(FormFactoryInterface $formFactory)
     {
@@ -175,7 +175,7 @@ class ConfigController extends AbstractFormController
     }
 
     /**
-     * @param FormInterface<FormInterface> $form
+     * @param FormInterface<mixed> $form
      */
     private function showForm(Request $request, FormInterface $form, FormExtension $formExtension): Response
     {
