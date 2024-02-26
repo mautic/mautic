@@ -490,14 +490,17 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
 {% set onchange = "Mautic.toggleYesNoButtonClass(mQuery(this).attr('id'));" %}
+{% set is_disabled = attr.disabled is defined ? attr.disable : false %}
 
-{% if attr.onchange is defined %}
-    {% if not (attr.onchange ends with ';') %}
-        {% set attr = attr|merge({'onchange': attr.onchange ~ ';'}) %}
+{% if is_disabled != false %}
+    {% if attr.onchange is defined %}
+        {% if not (attr.onchange ends with ';') %}
+            {% set attr = attr|merge({'onchange': attr.onchange ~ ';'}) %}
+        {% endif %}
+        {% set attr = attr|merge({'onchange': attr.onchange ~ ' ' ~ onchange}) %}
+    {% else %}
+        {% set attr = attr|merge({'onchange': onchange}) %}
     {% endif %}
-    {% set attr = attr|merge({'onchange': attr.onchange ~ ' ' ~ onchange}) %}
-{% else %}
-    {% set attr = attr|merge({'onchange': onchange}) %}
 {% endif %}
 
 {% set attr = attr|merge({'style' : 'width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;'}) %}
