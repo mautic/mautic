@@ -62,11 +62,6 @@ class NotificationHelper
 
         $campaign = $event->getCampaign();
 
-        // Campaign is already unpublished, do not trigger further notification/email
-        if (!$campaign->isPublished()) {
-            return;
-        }
-
         $this->notificationModel->addNotification(
             $campaign->getName().' / '.$event->getName(),
             'error',
