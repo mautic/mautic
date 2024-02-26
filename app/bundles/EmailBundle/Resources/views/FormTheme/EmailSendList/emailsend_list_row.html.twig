@@ -18,6 +18,11 @@
               {{ form_row(form.attempts) }}
           </div>
       {% endif %}
+      {% if form.attempts is defined %}
+          <div id="send_to_dnc" class="col-xs-12">
+              {{ form_row(form.send_to_dnc) }}
+          </div>
+      {% endif %}
   </div>
   <div class="row">
       <div class="col-xs-12 mt-lg">
