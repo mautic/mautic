@@ -242,23 +242,23 @@ class PublicController extends CommonFormController
                     if (str_contains($html, 'data-slot="saveprefsbutton"') || str_contains($html, BuilderSubscriber::saveprefsRegex)) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
-                        $params     = array_merge(
+                        $showParameters  = $this->buildSlotShowParametersBasedOnContent($html, $viewParameters);
+                        $eventParameters = array_merge(
                             $viewParameters,
+                            $showParameters,
                             [
-                                'form'                         => $formView,
-                                'startform'                    => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
-                                'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
-                                'showContactFrequency'         => str_contains($html, 'data-slot="channelfrequency"') || str_contains($html, BuilderSubscriber::channelfrequency),
-                                'showContactSegments'          => str_contains($html, 'data-slot="segmentlist"') || str_contains($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'        => str_contains($html, 'data-slot="categorylist"') || str_contains($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels' => str_contains($html, 'data-slot="preferredchannel"') || str_contains($html, BuilderSubscriber::preferredchannel),
+                                'form'       => $formView,
+                                'startform'  => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
+                                'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
                             ]
                         );
-                        // Replace tokens in preference center page
-                        $event = new PageDisplayEvent($html, $prefCenter, $params);
-                        $this->dispatcher
-                            ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+
+                        $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
+
+                        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+
                         $html = $event->getContent();
+
                         if (!$session->has($successSessionName)) {
                             $successMessageDataSlots       = [
                                 'data-slot="successmessage"',
@@ -773,5 +773,39 @@ class PublicController extends CommonFormController
             ],
             $message
         );
+    }
+
+    /**
+     * The $viewParameters here have already been used to build the $form.
+     * Fields that are set to show based on the app configuration are part
+     * of the form. If the field is not configured to show, but a slot exists
+     * for that field in the content, then we need to keep the configuration
+     * value instead of letting the content determine if it should show. This
+     * is because of what was stated above - fields that are not configured to
+     * to show are not part of the form. Attempting to render them will result
+     * in an error.
+     *
+     * @param mixed[] $viewParameters
+     *
+     * @return mixed[]
+     */
+    private function buildSlotShowParametersBasedOnContent(string $content, array $viewParameters): array
+    {
+        /*
+         * Since we're going to be merging this with the $viewParameters, filter out `true` values. We do not
+         * want to change a configured value from `false` to `true` because a value of `false` in the $viewParameters
+         * means that the field is not configured to show and therefore is not part of the form. Attempting to
+         * render that field just because a slot for it exists will result in an error.
+         */
+        $showParamsBasedOnContent = array_filter([
+            'showContactFrequency'         => str_contains($content, 'data-slot="channelfrequency"') || str_contains($content, BuilderSubscriber::channelfrequency),
+            'showContactSegments'          => str_contains($content, 'data-slot="segmentlist"') || str_contains($content, BuilderSubscriber::segmentListRegex),
+            'showContactCategories'        => str_contains($content, 'data-slot="categorylist"') || str_contains($content, BuilderSubscriber::categoryListRegex),
+            'showContactPreferredChannels' => str_contains($content, 'data-slot="preferredchannel"') || str_contains($content, BuilderSubscriber::preferredchannel),
+        ], fn (bool $value) =>!$value);
+
+        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
+
+        return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }
 }

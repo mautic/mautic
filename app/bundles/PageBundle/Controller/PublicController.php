@@ -382,8 +382,8 @@ class PublicController extends AbstractFormController
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-            $event = new PageDisplayEvent($content, $page);
-            if (isset($contact)) {
+            $event = new PageDisplayEvent($content, $page, $this->getPreferenceCenterConfig());
+            if (isset($contact) && $contact instanceof Lead) {
                 $event->setLead($contact);
             }
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
@@ -666,5 +666,19 @@ class PublicController extends AbstractFormController
         }
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * @return array<string,bool>
+     */
+    private function getPreferenceCenterConfig(): array
+    {
+        return [
+            'showContactFrequency'         => $this->coreParametersHelper->get('show_contact_frequency'),
+            'showContactPauseDates'        => $this->coreParametersHelper->get('show_contact_pause_dates'),
+            'showContactPreferredChannels' => $this->coreParametersHelper->get('show_contact_preferred_channels'),
+            'showContactCategories'        => $this->coreParametersHelper->get('show_contact_categories'),
+            'showContactSegments'          => $this->coreParametersHelper->get('show_contact_segments'),
+        ];
     }
 }
