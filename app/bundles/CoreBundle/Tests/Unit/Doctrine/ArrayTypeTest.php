@@ -102,6 +102,27 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGivenObjectWithPrivatePropertyWhenConvertsToDatabaseValue(): void
+    {
+        $value = [
+            'fields' => [
+                'field_account_executive_o' => [
+                    null,
+                    new \Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO(),
+                ],
+            ],
+            'dateModified' => [
+                '2022-05-02T21:39:27+00:00',
+                '2022-05-03T14:22:33+00:00',
+            ],
+        ];
+
+        $serialized   = $this->arrayType->convertToDatabaseValue($value, $this->platform);
+        $unserialized = $this->arrayType->convertToPHPValue($serialized, $this->platform);
+
+        $this->assertEquals($value, $unserialized);
+    }
+
     public function testGivenObjectWithPrivatePropertyWhenConvertsToPHPValueThenGetsArrayWithoutObject(): void
     {
         $array = [
