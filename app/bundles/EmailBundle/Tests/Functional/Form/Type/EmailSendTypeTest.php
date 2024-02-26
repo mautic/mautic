@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -19,6 +18,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -62,14 +62,14 @@ class EmailSendTypeTest extends MauticMysqlTestCase
         $this->removeContactFromCategory((int) $contactIds[3], $category);
         $segment       = $this->createSegment();
         $commandTester = $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
-        Assert::assertSame(ExitCode::SUCCESS, $commandTester->getStatusCode());
+        Assert::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
         Assert::assertStringContainsString(($contactIdsCount = count($contactIds)).' total contact(s) to be added', $commandTester->getDisplay());
         $segmentLeadCount = $this->em->getRepository(ListLead::class)->count(['list' => $segment]);
         Assert::assertSame($contactIdsCount, $segmentLeadCount);
 
-        $campaign      = $this->createCampaign($segment, ($emailId = (int) $email->getId()), $sendToDnc);
+        $campaign      = $this->createCampaign($segment, $emailId = (int) $email->getId(), $sendToDnc);
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:update', ['-i' => ($campaignId = $campaign->getId())]);
-        Assert::assertSame(ExitCode::SUCCESS, $commandTester->getStatusCode());
+        Assert::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
         Assert::assertStringContainsString($contactIdsCount.' total contact(s) to be added', $commandTester->getDisplay());
         $campaignLeadCount = $this->em->getRepository(CampaignLead::class)->count(['campaign' => $campaign]);
         Assert::assertSame($contactIdsCount, $campaignLeadCount);
@@ -77,7 +77,7 @@ class EmailSendTypeTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
-        Assert::assertSame(ExitCode::SUCCESS, $commandTester->getStatusCode());
+        Assert::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
         Assert::assertStringContainsString($contactIdsCount.' total events(s) to be processed', $commandTester->getDisplay());
 
         $stats = $this->em->getRepository(Stat::class)->count(['email' => $emailId]);
@@ -109,6 +109,7 @@ class EmailSendTypeTest extends MauticMysqlTestCase
         ]);
         $segment->setName('Segment A');
         $segment->setAlias('segment-a');
+        $segment->setPublicName('Segment A');
         $this->em->persist($segment);
         $this->em->flush();
 
@@ -132,9 +133,10 @@ class EmailSendTypeTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Test');
         $email->setCustomHtml('html');
-        $email->setTemplate('beefree-empty');
+        $email->setTemplate('empty');
         $email->setEmailType('template');
         $email->setCategory($category);
+        $email->setSubject('Test subject');
         $this->em->persist($email);
 
         return $email;
