@@ -135,6 +135,9 @@ class SyncProcessTest extends TestCase
             ->method('pushIsEnabled')
             ->willReturn(true);
 
+        $this->syncDateHelper->expects($this->once())
+            ->method('setInternalSyncStartDateTime');
+
         // Integration to Mautic
 
         // fetch the report from the integration
