@@ -123,6 +123,7 @@ return [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
                     'mautic.report.model.file_handler',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.report.model.file_handler' => [
