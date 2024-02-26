@@ -53,7 +53,7 @@ class FieldType extends AbstractType
     /**
      * @var string[]
      */
-    private static $fieldsWithNoLengthLimit = [
+    private static array $fieldsWithNoLengthLimit = [
         'textarea',
         'html',
     ];
@@ -685,7 +685,7 @@ class FieldType extends AbstractType
         /** @var LeadField $field */
         $field = $context->getRoot()->getViewData();
 
-        if (in_array($field->getType(), static::$fieldsWithNoLengthLimit)) {
+        if (in_array($field->getType(), self::$fieldsWithNoLengthLimit)) {
             return;
         }
 

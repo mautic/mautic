@@ -2,80 +2,29 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Mautic\LeadBundle\Field\Helper\IndexHelper;
-use Mautic\LeadBundle\Field\IdentifierFields;
 use Mautic\LeadBundle\Form\Type\FieldType;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
-class FieldTypeTest extends TestCase
+final class FieldTypeTest extends TestCase
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private MockObject $executionContext;
 
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private MockObject $formInterface;
 
-    /**
-     * @var IdentifierFields
-     */
-    private $identifierFields;
-
-    /**
-     * @var IndexHelper
-     */
-    private $indexHelper;
-
-    /**
-     * @var ExecutionContextInterface
-     */
-    private $executionContext;
-
-    /**
-     * @var FormInterface
-     */
-    private $formInterface;
-
-    /**
-     * @var FieldType
-     */
-    private $fieldType;
-
-    /**
-     * @var ConstraintViolationBuilder
-     */
-    private $constraintViolationBuilder;
+    private MockObject $constraintViolationBuilder;
 
     protected function setUp(): void
     {
-        $this->leadFieldRepository        = $this->createMock(LeadFieldRepository::class);
-        $this->translator                 = $this->createMock(TranslatorInterface::class);
-        $this->identifierFields           = $this->createMock(IdentifierFields::class);
-        $this->indexHelper                = $this->createMock(IndexHelper::class);
         $this->executionContext           = $this->createMock(ExecutionContextInterface::class);
         $this->formInterface              = $this->createMock(FormInterface::class);
         $this->constraintViolationBuilder = $this->createMock(ConstraintViolationBuilder::class);
-        $this->fieldType                  = new FieldType($this->leadFieldRepository, $this->translator, $this->identifierFields, $this->indexHelper);
     }
 
     public function testThatItFailsValidationIfTheDefaultValueExceedsTheFieldLengthLimit(): void
