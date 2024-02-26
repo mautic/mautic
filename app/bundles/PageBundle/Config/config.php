@@ -119,7 +119,6 @@ return [
                     'mautic.cache.provider',
                     'mautic.helper.core_parameters',
                     'request_stack',
-                    'mautic.tracker.contact',
                 ],
             ],
         ],

@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class TrackingHelper
 {
     public function __construct(
+        protected ContactTracker $contactTracker,
         protected CacheProvider $cache,
         protected CoreParametersHelper $coreParametersHelper,
         protected RequestStack $requestStack,
-        protected ContactTracker $contactTracker
     ) {
     }
 
@@ -51,37 +51,35 @@ class TrackingHelper
     }
 
     /**
-     * @param array $values
+     * @param mixed[] $values
      *
      * @throws InvalidArgumentException
      */
-    public function updateCacheItem($values)
+    public function updateCacheItem(array $values): void
     {
         $cacheKey = $this->getCacheKey();
-        if ($cacheKey !== null) {
+        if (null !== $cacheKey) {
             /** @var CacheItemInterface $item */
             $item = $this->cache->getItem($cacheKey);
             $item->set(serialize(array_merge($values, $this->getCacheItem())));
-            $item->expiresAfter(86400); //one day in seconds
+            $item->expiresAfter(86400); // one day in seconds
 
             $this->cache->save($item);
         }
     }
 
     /**
-     * @param bool $remove
-     *
-     * @return array
+     * @return mixed[]
      *
      * @throws InvalidArgumentException
      */
-    public function getCacheItem($remove = false)
+    public function getCacheItem(bool $remove = false): array
     {
         $cacheKey   = $this->getCacheKey();
         $cacheValue = [];
 
         /* @var CacheItemInterface $item */
-        if ($cacheKey !== null) {
+        if (null !== $cacheKey) {
             $item = $this->cache->getItem($cacheKey);
             if ($item->isHit()) {
                 $cacheValue = Serializer::decode($item->get(), ['allowed_classes' => false]);
@@ -136,10 +134,8 @@ class TrackingHelper
 
     /**
      * @deprecated No session for anonymous users. Use getCacheKey.
-     *
-     * @return string|null
      */
-    public function getSessionName()
+    public function getSessionName(): ?string
     {
         return $this->getCacheKey();
     }
@@ -147,13 +143,11 @@ class TrackingHelper
     /**
      * @deprecated No session for anonymous users. Use updateCacheItem.
      *
-     * @param array $values
+     * @param mixed[] $values
      *
-     * @return array
-     *
-     * @throws InvalidArgumentException
+     * @return mixed[]
      */
-    public function updateSession($values)
+    public function updateSession(array $values): array
     {
         $this->updateCacheItem($values);
 
@@ -162,14 +156,8 @@ class TrackingHelper
 
     /**
      * @deprecated No session for anonymous users. Use getCacheItem.
-     *
-     * @param bool $remove
-     *
-     * @return array
-     *
-     * @throws InvalidArgumentException
      */
-    public function getSession($remove = false)
+    public function getSession(bool $remove = false): array
     {
         return $this->getCacheItem($remove);
     }

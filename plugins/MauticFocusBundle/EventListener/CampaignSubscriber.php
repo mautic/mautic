@@ -51,10 +51,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('focus.show', $action);
     }
 
-    /**
-     * @return CampaignExecutionEvent
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $focusId = (int) $event->getConfig()['focus'];

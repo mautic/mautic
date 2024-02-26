@@ -218,11 +218,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(false);
     }
 
-    /**
-     * @return CampaignExecutionEvent
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $config = $event->getConfig();
