@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\StageBundle\Entity\Stage;
@@ -17,6 +18,7 @@ use Mautic\StageBundle\EventListener\CampaignSubscriber;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriberTest extends TestCase
@@ -49,6 +51,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line getEntity() has parameter $id with no type specified */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -57,7 +60,8 @@ final class CampaignSubscriberTest extends TestCase
             }
         };
 
-        $subscriber = new CampaignSubscriber($contactModel, $stageModel, $this->createTranslatorMock());
+        $leadModel   = $this->createMock(LeadModel::class);
+        $subscriber  = new CampaignSubscriber($leadModel, $stageModel, $this->createTranslatorMock());
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
@@ -101,6 +105,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line getEntity() has parameter $id with no type specified */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -155,9 +160,14 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
-            public function __construct()
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->any())
+            ->method('info');
+
+        $contactModel = new class($logger) extends LeadModel {
+            public function __construct(LoggerInterface $logger)
             {
+                $this->logger = $logger;
             }
 
             public function saveEntity($entity, $unlock = true): void
@@ -170,6 +180,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line getEntity() has parameter $id with no type specified */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -232,9 +243,15 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
-            public function __construct()
+        $translator = $this->createMock(Translator::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('[trans]mautic.stage.campaign.event.already_in_stage[/trans]');
+
+        $contactModel = new class($translator) extends LeadModel {
+            public function __construct(Translator $translator)
             {
+                $this->translator = $translator;
             }
         };
 
@@ -243,6 +260,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line getEntity() has parameter $id with no type specified */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -313,9 +331,15 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
-            public function __construct()
+        $translator = $this->createMock(Translator::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('[trans]mautic.stage.campaign.event.stage_invalid[/trans]');
+
+        $contactModel = new class($translator) extends LeadModel {
+            public function __construct(Translator $translator)
             {
+                $this->translator = $translator;
             }
         };
 
@@ -324,6 +348,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line getEntity() has parameter $id with no type specified */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -395,9 +420,14 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class() extends LeadModel {
-            public function __construct()
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->any())
+            ->method('info');
+
+        $contactModel = new class($logger) extends LeadModel {
+            public function __construct(LoggerInterface $logger)
             {
+                $this->logger = $logger;
             }
 
             public function saveEntity($entity, $unlock = true): void
@@ -410,6 +440,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
+            /** @phpstan-ignore-next-line getEntity() has parameter $id with no type specified */
             public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
@@ -443,7 +474,10 @@ final class CampaignSubscriberTest extends TestCase
     private function createTranslatorMock(): TranslatorInterface
     {
         return new class() implements TranslatorInterface {
-            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
+            /**
+             * @param array<int|string> $parameters
+             */
+            public function trans(string $id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }
