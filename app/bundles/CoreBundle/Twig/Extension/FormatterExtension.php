@@ -11,16 +11,11 @@ use Twig\TwigFunction;
 
 class FormatterExtension extends AbstractExtension
 {
-    protected FormatterHelper $formatterHelper;
-
-    public function __construct(FormatterHelper $formatterHelper)
-    {
-        $this->formatterHelper = $formatterHelper;
+    public function __construct(
+        protected FormatterHelper $formatterHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFilters()
     {
         return [
@@ -28,9 +23,6 @@ class FormatterExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

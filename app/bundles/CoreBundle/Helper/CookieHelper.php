@@ -13,11 +13,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class CookieHelper implements EventSubscriberInterface
 {
-    private ?string $path;
-    private ?string $domain;
-    private bool $secure;
-    private bool $httponly;
-    private RequestStack $requestStack;
     private ?Request $request = null;
 
     /**
@@ -25,13 +20,13 @@ class CookieHelper implements EventSubscriberInterface
      */
     private array $cookies = [];
 
-    public function __construct(string $cookiePath, ?string $cookieDomain, bool $cookieSecure, bool $cookieHttp, RequestStack $requestStack)
-    {
-        $this->path         = $cookiePath;
-        $this->domain       = $cookieDomain;
-        $this->secure       = $cookieSecure;
-        $this->httponly     = $cookieHttp;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private ?string $path,
+        private ?string $domain,
+        private bool $secure,
+        private bool $httponly,
+        private RequestStack $requestStack
+    ) {
     }
 
     /**

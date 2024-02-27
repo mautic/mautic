@@ -21,7 +21,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getYears();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(YearStat::class, $stat);
         });
     }
@@ -37,7 +37,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getMonths();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(MonthStat::class, $stat);
         });
     }
@@ -53,7 +53,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getWeeks();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(WeekStat::class, $stat);
         });
     }
@@ -70,7 +70,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getDays();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(DayStat::class, $stat);
         });
     }
@@ -89,7 +89,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getHours();
         $this->assertEquals($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat) {
+        array_walk($stats, function ($stat): void {
             $this->assertTrue(is_int($stat->getCount()));
         });
     }

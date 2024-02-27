@@ -7,80 +7,52 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerBag;
 
 class SubmissionEvent extends CommonEvent
 {
     /**
-     * Raw POST results.
-     *
-     * @var array
-     */
-    private $post = [];
-
-    /**
-     * @var array
-     */
-    private $server = [];
-
-    /**
      * Cleaned post results.
-     *
-     * @var array
      */
-    private $results = [];
+    private array $results = [];
 
     /**
      * Form fields.
-     *
-     * @var array
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * Results converted to tokens.
-     *
-     * @var array
      */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * Callback for post form submit.
      *
-     * @var mixed
+     * @var array<string, mixed[]>
      */
-    private $callbacks = [];
+    private array $callbacks = [];
 
     /**
-     * @var mixed
+     * @var mixed[]
      */
-    private $callbackResponses = [];
+    private array $callbackResponses = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $contactFieldMatches = [];
+    private array $contactFieldMatches = [];
 
     /**
      * Array to hold information set by other actions that may be useful to subsequent actions.
      *
-     * @var array
+     * @var mixed[]
      */
-    private $feedback = [];
+    private array $feedback = [];
 
-    /**
-     * @var Action
-     */
-    private $action;
+    private ?\Mautic\FormBundle\Entity\Action $action = null;
 
-    /**
-     * @var string
-     */
-    private $context;
-
-    /**
-     * @var Request
-     */
-    private $request;
+    private ?string $context = null;
 
     /**
      * @var array|Response|null
@@ -90,25 +62,22 @@ class SubmissionEvent extends CommonEvent
     /**
      * @var array<mixed>
      */
-    private $postSubmitPayload;
+    private ?array $postSubmitPayload = null;
 
     /**
-     * SubmissionEvent constructor.
+     * @param mixed[]                 $post   raw POST results
+     * @param mixed[]|array|ServerBag $server
      */
-    public function __construct(Submission $submission, $post, $server, Request $request)
-    {
+    public function __construct(
+        Submission $submission,
+        private $post,
+        private $server,
+        private Request $request
+    ) {
         $this->entity  = $submission;
-        $this->post    = $post;
-        $this->server  = $server;
-        $this->request = $request;
     }
 
-    /**
-     * Returns the Submission entity.
-     *
-     * @return Submission
-     */
-    public function getSubmission()
+    public function getSubmission(): Submission
     {
         return $this->entity;
     }
@@ -225,15 +194,13 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    public function setActionFeedback($key, $feedback)
+    public function setActionFeedback($key, $feedback): void
     {
         $this->feedback[$key] = $feedback;
     }
 
     /**
      * Get feedback injected by another action.
-     *
-     * @param null $key
      *
      * @return array|bool|mixed
      */
@@ -258,7 +225,7 @@ class SubmissionEvent extends CommonEvent
         $this->context = $context;
     }
 
-    public function setAction(?Action $action = null)
+    public function setAction(?Action $action = null): void
     {
         $this->action = $action;
         if (!is_null($action)) {
@@ -281,7 +248,7 @@ class SubmissionEvent extends CommonEvent
      *
      * @param string $key
      */
-    public function setPostSubmitCallback($key, array $callback)
+    public function setPostSubmitCallback($key, array $callback): void
     {
         if (!array_key_exists('eventName', $callback)) {
             throw new \InvalidArgumentException('eventName required');
@@ -298,10 +265,7 @@ class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbacks : $this->callbacks[$key];
     }
 
-    /**
-     * @return int
-     */
-    public function hasPostSubmitCallbacks()
+    public function hasPostSubmitCallbacks(): bool
     {
         return count($this->callbacks) || count($this->callbackResponses);
     }

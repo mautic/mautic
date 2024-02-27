@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -32,14 +32,14 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('objectType', $objectType)
             ->setParameter('objectId', $objectId)
-            ->setParameter('columnNames', $columnNames, Connection::PARAM_STR_ARRAY)
-            ->execute();
+            ->setParameter('columnNames', $columnNames, ArrayParameterType::STRING)
+            ->executeStatement();
     }
 
     /**
      * Takes an object id & type and deletes all entities that match.
      */
-    public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null): void
+    public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null, \DateTimeInterface $toDateTime = null): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -51,22 +51,25 @@ class FieldChangeRepository extends CommonRepository
             $qb->setParameter('integration', $integration);
         }
 
+        if (null !== $toDateTime) {
+            $expr = $expr->with($qb->expr()->lte('modified_at', ':toDateTime'));
+            $qb->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'));
+        }
+
         $qb->setParameter('objectType', $objectType)
-            ->setParameter('objectId', (int) $objectId);
+            ->setParameter('objectId', $objectId);
 
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where($expr)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * @param int|null $afterObjectId
      * @param int      $objectCount
-     *
-     * @return array
      */
-    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100)
+    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100): array
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -93,7 +96,7 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
         $objectIds = [];
         foreach ($results as $result) {
@@ -118,17 +121,17 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
-            ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
+            // 1. We must sort by f.object_id. Otherwise values stored in PartialObjectReportBuilder::lastProcessedTrackedId will be incorrect.
+            // 2. Newer updated fields must override older updated fields
+            ->orderBy('f.object_id, f.modified_at', 'ASC');
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 
     /**
      * @param int $objectId
-     *
-     * @return array
      */
-    public function findChangesForObject(string $integration, string $objectType, $objectId)
+    public function findChangesForObject(string $integration, string $objectType, $objectId): array
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -147,6 +150,6 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectId', (int) $objectId)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

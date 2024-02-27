@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,27 +17,15 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * Class WidgetType.
+ * @extends AbstractType<mixed>
  */
 class WidgetType extends AbstractType
 {
-    /**
-     * @var ContainerAwareEventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
+    public function __construct(protected EventDispatcherInterface $dispatcher, protected CorePermissions $security)
     {
-        $this->dispatcher = $dispatcher;
-        $this->security   = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
@@ -55,9 +42,7 @@ class WidgetType extends AbstractType
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
 
-        $types = array_map(function ($category) {
-            return array_flip($category);
-        }, $event->getTypes());
+        $types = array_map(fn ($category): array => array_flip($category), $event->getTypes());
 
         $builder->add(
             'type',
@@ -112,7 +97,7 @@ class WidgetType extends AbstractType
         );
 
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();

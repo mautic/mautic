@@ -14,14 +14,11 @@ class InstallCommand extends Command
 {
     public const NAME = 'mautic:marketplace:install';
 
-    private ComposerHelper $composer;
-    private PackageModel $packageModel;
-
-    public function __construct(ComposerHelper $composer, PackageModel $packageModel)
-    {
+    public function __construct(
+        private ComposerHelper $composer,
+        private PackageModel $packageModel
+    ) {
         parent::__construct();
-        $this->composer     = $composer;
-        $this->packageModel = $packageModel;
     }
 
     protected function configure(): void
@@ -76,5 +73,6 @@ class InstallCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Installs a plugin that is available at Packagist.org';
 }

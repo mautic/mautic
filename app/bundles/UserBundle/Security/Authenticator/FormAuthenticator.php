@@ -32,46 +32,30 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'login';
+    public const LOGIN_ROUTE       = 'login';
 
-    private UserPasswordHasher $hasher;
-
-    private EventDispatcherInterface $dispatcher;
-
-    private IntegrationHelper $integrationHelper;
-
-    private ?RequestStack $requestStack;
-
-    private CsrfTokenManagerInterface $csrfTokenManager;
-
-    private UrlGeneratorInterface $urlGenerator;
+    public const LOGIN_CHECK_ROUTE = 'mautic_user_logincheck';
 
     /**
      * @var string|null After upgrade to Symfony 5.2 we should use Passport system to store the authenticatingService
      */
     private ?string $authenticatingService = null;
 
-    private ?Response $authEventResponse;
+    private ?Response $authEventResponse = null;
 
     public function __construct(
-        IntegrationHelper $integrationHelper,
-        UserPasswordHasher $hasher,
-        EventDispatcherInterface $dispatcher,
-        RequestStack $requestStack,
-        CsrfTokenManagerInterface $csrfTokenManager,
-        UrlGeneratorInterface $urlGenerator
+        private IntegrationHelper $integrationHelper,
+        private UserPasswordHasher $hasher,
+        private EventDispatcherInterface $dispatcher,
+        private ?RequestStack $requestStack,
+        private CsrfTokenManagerInterface $csrfTokenManager,
+        private UrlGeneratorInterface $urlGenerator
     ) {
-        $this->hasher            = $hasher;
-        $this->dispatcher        = $dispatcher;
-        $this->integrationHelper = $integrationHelper;
-        $this->requestStack      = $requestStack;
-        $this->csrfTokenManager  = $csrfTokenManager;
-        $this->urlGenerator      = $urlGenerator;
     }
 
     public function supports(Request $request): bool
     {
-        return self::LOGIN_ROUTE === $request->attributes->get('_route')
+        return self::LOGIN_CHECK_ROUTE === $request->attributes->get('_route')
             && $request->isMethod(Request::METHOD_POST);
     }
 
@@ -81,8 +65,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     public function getCredentials(Request $request): array
     {
         $credentials = [
-            'username'    => $request->request->get('username'),
-            'password'    => $request->request->get('password'),
+            'username'    => $request->request->get('_username'),
+            'password'    => $request->request->get('_password'),
             'csrf_token'  => $request->request->get('_csrf_token'),
             'integration' => $request->get('integration'),
         ];
@@ -101,8 +85,8 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
         try {
             /** @var User $user */
-            $user = $userProvider->loadUserByUsername($credentials['username']);
-        } catch (UserNotFoundException $e) {
+            $user = $userProvider->loadUserByIdentifier($credentials['username']);
+        } catch (UserNotFoundException) {
             /** @var string $user */
             $user = $credentials['username'];
         }
@@ -110,38 +94,45 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         $this->authenticatingService = $credentials['integration'] ?? null;
 
         // Try authenticating with a plugin first
+        $integrations = $this->integrationHelper->getIntegrationObjects($this->authenticatingService, ['sso_form'], false, null, true);
+        $token        = new PluginToken(
+            null, // In 4.4 there was a provider key. If the issue will be severe we need to override whole guard. Otherwise, wait for Symfony 5.2 and Passport.
+            $this->authenticatingService,
+            $user,
+            ($user instanceof User) ? $this->getPassword($credentials) : '',
+            ($user instanceof User) ? $user->getRoles() : [],
+            $this->authEventResponse // though this will be null ?
+        );
+        $authEvent = new AuthenticationEvent(
+            $user,
+            $token,
+            $userProvider,
+            $this->requestStack->getCurrentRequest(),
+            false,
+            $this->authenticatingService,
+            $integrations
+        );
+
         if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
-            $integrations = $this->integrationHelper->getIntegrationObjects($this->authenticatingService, ['sso_form'], false, null, true);
-            $authEvent    = new AuthenticationEvent(
-                $user,
-                new PluginToken(
-                    null, // In 4.4 there was a provider key. If the issue will be severe we need to override whole guard. Otherwise, wait for Symfony 5.2 and Passport.
-                    $this->authenticatingService,
-                    $user,
-                    ($user instanceof User) ? $user->getPassword() : '',
-                    ($user instanceof User) ? $user->getRoles() : [],
-                    $this->authEventResponse // though this will be null ?
-                ),
-                $userProvider,
-                $this->requestStack->getCurrentRequest(),
-                false,
-                $this->authenticatingService,
-                $integrations
-            );
             $this->dispatcher->dispatch($authEvent, UserEvents::USER_FORM_AUTHENTICATION);
-
-            if ($authEvent->isAuthenticated()) {
-                $user                        = $authEvent->getUser();
-                $this->authenticatingService = $authEvent->getAuthenticatingService();
-            } elseif ($authEvent->isFailed()) {
-                throw new AuthenticationException($authEvent->getFailedAuthenticationMessage());
-            }
-
-            $this->authEventResponse = $authEvent->getResponse();
         }
+
+        if ($authEvent->isAuthenticated()) {
+            $user                        = $authEvent->getUser();
+            $this->authenticatingService = $authEvent->getAuthenticatingService();
+        } elseif ($authEvent->isFailed()) {
+            throw new AuthenticationException($authEvent->getFailedAuthenticationMessage());
+        }
+
+        $this->authEventResponse = $authEvent->getResponse();
 
         if (!$user instanceof User) {
             throw new BadCredentialsException();
+        }
+
+        if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION)) {
+            $authEvent = new AuthenticationEvent($user, $token, $userProvider, $this->requestStack->getCurrentRequest());
+            $this->dispatcher->dispatch($authEvent, UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION);
         }
 
         return $user;
@@ -151,15 +142,15 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
     {
         // Temp solution to remap a UserInterface object to a PasswordAuthenticatedUserInterface object
         $newUser = new User();
-        $newUser->setUsername($user->getUserName());
+        $newUser->setUsername($user->getUserIdentifier());
         $newUser->setPassword($user->getPassword());
 
-        return $this->hasher->isPasswordValid($newUser, $credentials['password']);
+        return $this->hasher->isPasswordValid($newUser, $this->getPassword($credentials));
     }
 
     public function getPassword($credentials): ?string
     {
-        return $credentials['password'];
+        return $credentials['password'] ?? null;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?RedirectResponse

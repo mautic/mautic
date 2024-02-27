@@ -58,7 +58,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'pages',
                 'path'            => '/pages',
-                'controller'      => 'Mautic\PageBundle\Controller\Api\PageApiController',
+                'controller'      => \Mautic\PageBundle\Controller\Api\PageApiController::class,
             ],
         ],
         'catchall' => [
@@ -90,29 +90,6 @@ return [
     ],
 
     'services' => [
-        'repositories' => [
-            'mautic.page.repository.hit' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Hit::class,
-                ],
-            ],
-            'mautic.page.repository.page' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Page::class,
-                ],
-            ],
-            'mautic.page.repository.redirect' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Redirect::class,
-                ],
-            ],
-        ],
         'fixtures' => [
             'mautic.page.fixture.page_category' => [
                 'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
@@ -132,11 +109,11 @@ return [
         ],
         'other' => [
             'mautic.page.helper.token' => [
-                'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
+                'class'     => \Mautic\PageBundle\Helper\TokenHelper::class,
                 'arguments' => 'mautic.page.model.page',
             ],
             'mautic.page.helper.tracking' => [
-                'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
+                'class'     => \Mautic\PageBundle\Helper\TrackingHelper::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',

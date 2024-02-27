@@ -16,9 +16,6 @@ abstract class DateWeekAbstract extends DateOptionAbstract
         return '+1 week';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
         $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
@@ -31,9 +28,6 @@ abstract class DateWeekAbstract extends DateOptionAbstract
         return [$startWith, $endWith];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
         return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notBetween' : 'between';

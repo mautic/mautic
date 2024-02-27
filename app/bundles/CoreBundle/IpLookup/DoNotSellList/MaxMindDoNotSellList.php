@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class MaxMindDoNotSellList implements DoNotSellListInterface
 {
-    private $position = 0;
+    private int $position = 0;
 
     private $list = [];
 

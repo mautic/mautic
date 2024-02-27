@@ -3,7 +3,6 @@
 namespace Mautic\NotificationBundle;
 
 /**
- * Class NotificationEvents
  * Events available for NotificationBundle.
  */
 final class NotificationEvents

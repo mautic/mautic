@@ -3,7 +3,6 @@
 namespace Mautic\CategoryBundle;
 
 /**
- * Class CategoryBundle
  * Events available for CategoryBundle.
  */
 final class CategoryEvents

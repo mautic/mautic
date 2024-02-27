@@ -132,9 +132,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $this->dynamicContentModel->setSlotContentForLead($dwc, $lead, $slot);
             }
 
-            $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+            $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+            $tokenEvent->setStat($stat);
             $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
             $content = $tokenEvent->getContent();

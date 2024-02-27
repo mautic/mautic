@@ -129,30 +129,6 @@ return [
                 'class' => \Mautic\IntegrationsBundle\Helper\TokenParser::class,
             ],
         ],
-        'repositories' => [
-            'mautic.integrations.repository.field_change' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\IntegrationsBundle\Entity\FieldChange::class,
-                ],
-            ],
-            'mautic.integrations.repository.object_mapping' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\IntegrationsBundle\Entity\ObjectMapping::class,
-                ],
-            ],
-            // Placeholder till the plugin bundle implements this
-            'mautic.plugin.integrations.repository.integration' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PluginBundle\Entity\Integration::class,
-                ],
-            ],
-        ],
         'sync' => [
             'mautic.sync.logger' => [
                 'class'     => \Mautic\IntegrationsBundle\Sync\Logger\DebugLogger::class,
@@ -162,25 +138,6 @@ return [
             ],
             'mautic.integrations.helper.sync_judge' => [
                 'class' => \Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
-            ],
-            'mautic.integrations.helper.contact_object' => [
-                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.lead.repository.lead',
-                    'doctrine.dbal.default_connection',
-                    'mautic.lead.model.field',
-                    'mautic.lead.model.dnc',
-                    'mautic.lead.model.company',
-                ],
-            ],
-            'mautic.integrations.helper.company_object' => [
-                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class,
-                'arguments' => [
-                    'mautic.lead.model.company',
-                    'mautic.lead.repository.company',
-                    'doctrine.dbal.default_connection',
-                ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.order_executioner' => [
                 'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner::class,
@@ -255,6 +212,7 @@ return [
                     'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.order_executioner',
+                    'mautic.integrations.helper.sync_date',
                 ],
             ],
             'mautic.integrations.sync.integration_process.object_change_generator' => [
@@ -330,6 +288,7 @@ return [
                     'mautic.integrations.sync.notification.handler_container',
                     'mautic.integrations.helper.sync_integrations',
                     'mautic.integrations.helper.config_integrations',
+                    'translator',
                 ],
             ],
             'mautic.integrations.sync.notification.writer' => [

@@ -18,44 +18,29 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     protected $repositories = [];
 
     /**
-     * @var null
+     * @var array<string, mixed>
      */
-    protected $selects;
+    protected array $selects = [];
 
     /**
      * @var array
      */
     protected $permissions = [];
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
     public function __construct(
-        CorePermissions $security,
-        EntityManager $entityManager
+        protected CorePermissions $security,
+        protected EntityManager $entityManager
     ) {
-        $this->security      = $security;
-        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::LIST_STATS => ['onStatsFetch', 0],
         ];
     }
 
-    public function onStatsFetch(StatsEvent $event)
+    public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */
         foreach ($this->repositories as $repository) {
@@ -65,7 +50,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $permissions  = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
+            $permissions  = $this->permissions[$table] ?? [];
             $allowedJoins = [];
 
             foreach ($permissions as $tableAlias => $permBase) {
@@ -107,7 +92,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
                 throw new AccessDeniedException(sprintf('You do not have the view permission to load data from the %s table', $tableAlias));
             }
 
-            $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
+            $select = $this->selects[$table] ?? null;
             $event->setSelect($select)->setRepository($repository, $allowedJoins);
         }
     }

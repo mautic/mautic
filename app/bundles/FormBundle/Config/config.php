@@ -53,7 +53,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'forms',
                 'path'            => '/forms',
-                'controller'      => 'Mautic\FormBundle\Controller\Api\FormApiController',
+                'controller'      => \Mautic\FormBundle\Controller\Api\FormApiController::class,
             ],
             'mautic_api_formresults' => [
                 'path'       => '/forms/{formId}/submissions',
@@ -168,18 +168,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.form.repository.form' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\FormBundle\Entity\Form::class,
-            ],
-            'mautic.form.repository.submission' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\FormBundle\Entity\Submission::class,
-            ],
-        ],
         'other' => [
             'mautic.form.collector.object' => [
                 'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,
@@ -264,7 +252,7 @@ return [
     ],
 
     'parameters' => [
-        'form_upload_dir'           => '%kernel.project_dir%/media/files/form',
+        'form_upload_dir'           => '%mautic.application_dir%/media/files/form',
         'blacklisted_extensions'    => ['php', 'sh'],
         'do_not_submit_emails'      => [],
         'form_results_data_sources' => false,

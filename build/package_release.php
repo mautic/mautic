@@ -74,7 +74,7 @@ if (!isset($args['repackage'])) {
     // In this step, we'll compile a list of files that may have been deleted so our update script can remove them
     // First, get a list of git tags since the minimal version.
     ob_start();
-    passthru($systemGit.' for-each-ref --sort=creatordate --format \'%(refname)\' refs/tags | cut -d\/ -f3 | sed -n \'/^'.$minimalVersion.'$/,${p;/^'.$gitSource.'$/q}\' | sed \'$d\'', $tags);
+    passthru($systemGit.' for-each-ref --sort=creatordate --format \'%(refname)\' refs/tags | cut -d\/ -f3 | sed \'/-/!{s/$/_/}\' | sort -V | sed \'s/_$//\' | sed -n \'/^'.$minimalVersion.'$/,${p;/^'.$gitSource.'$/q}\' | sed \'$d\'', $tags);
     $tags = explode("\n", trim(ob_get_clean()));
 
     // Only add deleted files to our list; new and modified files will be covered by the archive
@@ -86,6 +86,13 @@ if (!isset($args['repackage'])) {
         // Temp fix for GrapesJs builder
         'plugins/GrapesJsBuilderBundle/' => true,
     ];
+
+    // Ensure the generated media files don't end up in the deleted files by explicitly adding them to the release files.
+    foreach (['css', 'js', 'libraries/ckeditor', 'libraries/ckeditor/translations'] as $dir) {
+        $files = array_diff(scandir(__DIR__.'/packaging/media/'.$dir), ['..', '.']);
+        array_walk($files, function (&$item) use ($dir) { $item = 'media/'.$dir.'/'.$item; });
+        $releaseFiles = array_merge($releaseFiles, $files);
+    }
 
     // Create a flag to check if the vendors changed
     $vendorsChanged = false;
@@ -122,11 +129,9 @@ if (!isset($args['repackage'])) {
 
     // Include assets just in case they weren't
     $assetFiles = [
-        'media/css/app.css'       => true,
-        'media/css/libraries.css' => true,
-        'media/js/app.js'         => true,
-        'media/js/libraries.js'   => true,
-        'media/js/mautic-form.js' => true,
+        'media/css/'       => true,
+        'media/js/'        => true,
+        'media/libraries/' => true,
     ];
     $modifiedFiles = $modifiedFiles + $assetFiles;
 
@@ -155,9 +160,11 @@ system("rm -f ../packages/{$appVersion}.zip ../packages/{$appVersion}-update.zip
 
 echo "Packaging Mautic Full Installation\n";
 system('zip -qr ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../exclude_files_full.txt');
+system('zip -qr ../packages/'.$appVersion.'.zip ./config/.gitkeep');
 
 echo "Packaging Mautic Update Package\n";
 system('zip -qr ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt');
+system('zip -qr ../packages/'.$appVersion.'-update.zip ./config/.gitkeep');
 
 // Write output to file (so that the CI pipeline can add it to the release notes), then output to console
 system('cd ../packages && openssl sha1 '.$appVersion.'.zip > build-sha1-all');
