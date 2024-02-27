@@ -8,6 +8,7 @@ import 'grapesjs/dist/css/grapes.min.css';
 // import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
 import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import './grapesjs-custom.css';
+import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
 
 /**
  * Launch builder
@@ -75,13 +76,18 @@ function setThemeHtml(theme) {
 
       if (typeof textareaMjml !== 'undefined') {
         textareaMjml.val(response.templateMjml);
-      }
 
-      // If MJML template, generate HTML before save
-      // if (!textareaHtml.val().length && textareaMjml.val().length) {
-      //   builder.mjmlToHtml(textareaMjml, textareaHtml);
-      // }
-      // }
+        // If MJML template, generate HTML before save
+        if (!textareaHtml.val().length) {
+          const convertedMjml = MjmlService.mjmlToHtml(response.templateMjml);
+
+          if (typeof convertedMjml === 'string') {
+            textareaHtml.val(convertedMjml);
+          } else if (typeof convertedMjml === 'object' && convertedMjml.hasOwnProperty('html')) {
+            textareaHtml.val(convertedMjml.html);
+          }
+        }
+      }
     },
     error(request, textStatus) {
       console.log(`setThemeHtml - Request failed: ${textStatus}`);
