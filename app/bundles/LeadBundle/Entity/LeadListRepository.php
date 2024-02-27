@@ -512,6 +512,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Returns array of campaigns related to this segment.
+     *
+     * @return array<int, string>
      */
     public function getSegmentCampaigns(int $segmentId): array
     {
@@ -525,7 +527,7 @@ class LeadListRepository extends CommonRepository
         );
 
         $lists   = [];
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         foreach ($results as $row) {
             $lists[$row['campaign_id']] = $row['name'];

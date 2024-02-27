@@ -8,24 +8,15 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ListModel
-     */
-    protected $listModel;
+    protected ListModel $listModel;
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     protected function setUp(): void
     {
@@ -316,6 +307,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segmentName = 'Segment1';
         $segment     = new LeadList();
         $segment->setName($segmentName);
+        $segment->setPublicName($segmentName);
         $segment->setAlias(mb_strtolower($segmentName));
         $segment->setIsPublished(true);
         $this->em->persist($segment);
@@ -338,10 +330,10 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         Assert::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
         Assert::assertArrayHasKey('errors', $response);
-        $errorMessage = $this->translator->transChoice(
+        $errorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns',
-            1,
             [
+                '%count%'         => '1',
                 '%campaignNames%' => '"'.$campaignName.'"',
             ],
             'validators'
@@ -354,6 +346,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segmentName = 'Segment1';
         $segment     = new LeadList();
         $segment->setName($segmentName);
+        $segment->setPublicName($segmentName);
         $segment->setAlias(mb_strtolower($segmentName));
         $segment->setIsPublished(true);
         $this->em->persist($segment);
@@ -493,7 +486,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();
-        $segment->setName($name)->setAlias($alias)->setFilters($filters);
+        $segment->setName($name)->setPublicName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
         return $segment;

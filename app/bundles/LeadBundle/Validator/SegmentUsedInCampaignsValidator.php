@@ -2,38 +2,17 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Validator;
 
 use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentUsedInCampaignsValidator
 {
-    /**
-     * @var LeadListRepository
-     */
-    private $leadListRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(LeadListRepository $leadListRepository, TranslatorInterface $translator)
+    public function __construct(private LeadListRepository $leadListRepository, private TranslatorInterface $translator)
     {
-        $this->leadListRepository = $leadListRepository;
-        $this->translator         = $translator;
     }
 
     /**
@@ -45,28 +24,22 @@ class SegmentUsedInCampaignsValidator
             return;
         }
 
-        $segments = $this->leadListRepository->getSegmentCampaigns($segment->getId());
-        if (1 > count($segments)) {
+        $campaignNames = $this->leadListRepository->getSegmentCampaigns($segment->getId());
+
+        if (1 > count($campaignNames)) {
             return;
         }
 
-        $campaignNames = array_map([$this, 'decorateCampaignName'], $segments);
-        $campaignNames = implode(', ', $campaignNames);
-
-        $errorMessage = $this->translator->transChoice(
+        $campaignNames = array_map(fn (string $segmentName): string => sprintf('"%s"', $segmentName), $campaignNames);
+        $errorMessage  = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns',
-            count($segments),
             [
-                '%campaignNames%' => $campaignNames,
+                '%count%'         => count($campaignNames),
+                '%campaignNames%' => implode(', ', $campaignNames),
             ],
             'validators'
         );
 
         throw new RecordNotUnpublishedException($errorMessage);
-    }
-
-    private function decorateCampaignName($campaignName): string
-    {
-        return sprintf('"%s"', $campaignName);
     }
 }

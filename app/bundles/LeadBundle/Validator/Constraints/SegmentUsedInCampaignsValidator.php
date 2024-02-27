@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Validator\Constraints;
 
 use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
@@ -22,14 +13,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class SegmentUsedInCampaignsValidator extends ConstraintValidator
 {
-    /**
-     * @var InternalValidator
-     */
-    private $internalValidator;
-
-    public function __construct(InternalValidator $internalValidator)
+    public function __construct(private InternalValidator $internalValidator)
     {
-        $this->internalValidator = $internalValidator;
     }
 
     public function validate($segment, Constraint $constraint): void
@@ -44,7 +29,7 @@ class SegmentUsedInCampaignsValidator extends ConstraintValidator
         } catch (RecordNotUnpublishedException $exception) {
             $this->context->buildViolation($exception->getMessage())
                 ->atPath('isPublished')
-                ->setCode(Response::HTTP_UNPROCESSABLE_ENTITY)
+                ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
                 ->addViolation();
         }
     }

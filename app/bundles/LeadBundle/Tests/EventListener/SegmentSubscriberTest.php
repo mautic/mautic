@@ -9,36 +9,37 @@ use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriberTest extends TestCase
 {
     /**
-     * @var IpLookupHelper
+     * @var IpLookupHelper&MockObject
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
-     * @var AuditLogModel
+     * @var AuditLogModel&MockObject
      */
-    private $auditLogModel;
+    private MockObject $auditLogModel;
 
     /**
-     * @var ListModel
+     * @var ListModel&MockObject
      */
-    private $listModel;
+    private MockObject $listModel;
 
     /**
-     * @var TranslatorInterface
+     * @var TranslatorInterface&MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
-     * @var SegmentUsedInCampaignsValidator
+     * @var SegmentUsedInCampaignsValidator&MockObject
      */
-    private $segmentUsedInCampaignsValidator;
+    private MockObject $segmentUsedInCampaignsValidator;
 
     public function setUp(): void
     {
