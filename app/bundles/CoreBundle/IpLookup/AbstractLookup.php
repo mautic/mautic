@@ -29,7 +29,7 @@ abstract class AbstractLookup
     public $extra        = '';
 
     /**
-     * @var string IP Address
+     * @var string|null IP Address
      */
     protected $ip;
 

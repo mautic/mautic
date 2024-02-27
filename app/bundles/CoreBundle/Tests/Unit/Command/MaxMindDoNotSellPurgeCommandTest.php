@@ -11,11 +11,13 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
+class MaxMindDoNotSellPurgeCommandTest extends TestCase
 {
-    protected $mockLeadRepository;
+    protected MockObject $mockLeadRepository;
 
     protected function setUp(): void
     {
@@ -33,10 +35,8 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $lead->setCountry('United States');
         $lead->setZipcode('02113');
 
-        $mockLeadRepository = $this->createMock(LeadRepository::class);
-        $mockLeadRepository->method('findOneBy')->with(['id' => 1])->willReturn($lead);
-
-        $this->mockLeadRepository = $mockLeadRepository;
+        $this->mockLeadRepository = $this->createMock(LeadRepository::class);
+        $this->mockLeadRepository->method('findOneBy')->with(['id' => 1])->willReturn($lead);
     }
 
     public function testCommandDryRun(): void

@@ -18,12 +18,9 @@ class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
-    /**
-     * @var MockObject|Client
-     */
-    protected $mockHttp;
+    protected MockObject $mockHttp;
 
-    protected $mockCoreParamsHelper;
+    protected MockObject $mockCoreParamsHelper;
 
     protected function setUp(): void
     {
@@ -164,7 +161,7 @@ RESPONSE);
     {
         $ipService = $this->getMockBuilder(MaxmindCountryLookup::class)
             ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
-            ->setMethods(['shouldPerformLookup'])
+            ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
         $ipService->method('shouldPerformLookup')->willReturn(true);
 
@@ -177,7 +174,7 @@ RESPONSE);
     {
         $ipService = $this->getMockBuilder(MaxmindOmniLookup::class)
             ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
-            ->setMethods(['shouldPerformLookup'])
+            ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
         $ipService->method('shouldPerformLookup')->willReturn(true);
 
@@ -190,7 +187,7 @@ RESPONSE);
     {
         $ipService = $this->getMockBuilder(MaxmindPrecisionLookup::class)
             ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
-            ->setMethods(['shouldPerformLookup'])
+            ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
         $ipService->method('shouldPerformLookup')->willReturn(true);
 

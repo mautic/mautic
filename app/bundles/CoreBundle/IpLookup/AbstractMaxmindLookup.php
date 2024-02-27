@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Psr\Log\LoggerInterface;
@@ -14,9 +14,15 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
      */
     private $doNotSellList;
 
-    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null, Http $httpConnector = null, CoreParametersHelper $coreParametersHelper = null)
-    {
-        parent::__construct($auth, $ipLookupConfig, $cacheDir, $logger, $httpConnector, $coreParametersHelper);
+    public function __construct(
+        protected ?string $auth = null,
+        protected $config = null,
+        protected ?string $cacheDir = null,
+        protected ?LoggerInterface $logger = null,
+        protected ?Client $client = null,
+        protected ?CoreParametersHelper $coreParametersHelper = null
+    ) {
+        parent::__construct($auth, $config, $cacheDir, $logger, $client, $coreParametersHelper);
         $this->doNotSellList = new MaxMindDoNotSellList($coreParametersHelper);
     }
 
