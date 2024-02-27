@@ -20,12 +20,12 @@ class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|SmsModel
      */
-    private $smsModel;
+    private \PHPUnit\Framework\MockObject\MockObject $smsModel;
 
     /**
      * @var MockObject|TransportChain
      */
-    private $transportChain;
+    private \PHPUnit\Framework\MockObject\MockObject $transportChain;
 
     protected function setUp(): void
     {

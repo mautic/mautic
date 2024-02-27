@@ -18,9 +18,6 @@ class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    /**
-     * @return array<string, array<int, string|int>>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

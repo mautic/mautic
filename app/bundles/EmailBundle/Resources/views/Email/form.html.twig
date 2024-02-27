@@ -181,7 +181,7 @@
                 {% endif %}
 
                 {{ form_row(form.unsubscribeForm) }}
-                {% if permissions['page:preference_center:viewown'] is not empty and permissions['page:preference_center:viewother'] is empty %}
+                {% if permissions['page:preference_center:viewown'] is not empty or permissions['page:preference_center:viewother'] is not empty %}
                     {{ form_row(form.preferenceCenter) }}
                 {% endif %}
                 <hr/>

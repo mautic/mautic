@@ -9,15 +9,10 @@ use Mautic\CoreBundle\Event\CommonEvent;
 /**
  * This event is dispatched to allow plugins to provide tokens which create links
  * to any synced integration objects they may provide.
- *
- * Class MappedIntegrationObjectTokenEvent
  */
 class MappedIntegrationObjectTokenEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * Add a new mapped integration object token.

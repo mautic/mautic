@@ -12,72 +12,30 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\QueryBuilder;
 
 class Fetcher
 {
-    /**
-     * @var IntegrationEntityRepository
-     */
-    private $repo;
+    private array $leads = [];
+
+    private array $knownLeadIds = [];
+
+    private array $unknownLeadIds = [];
+
+    private array $contacts = [];
+
+    private array $knownContactIds = [];
+
+    private array $unknownContactIds = [];
+
+    private array $mauticIds = [];
+
+    private array $knownCampaignMembers = [];
 
     /**
-     * @var Organizer
-     */
-    private $organizer;
-
-    /**
-     * @var string
-     */
-    private $campaignId;
-
-    /**
-     * @var array
-     */
-    private $leads = [];
-
-    /**
-     * @var array
-     */
-    private $knownLeadIds = [];
-
-    /**
-     * @var array
-     */
-    private $unknownLeadIds = [];
-
-    /**
-     * @var array
-     */
-    private $contacts = [];
-
-    /**
-     * @var array
-     */
-    private $knownContactIds = [];
-
-    /**
-     * @var array
-     */
-    private $unknownContactIds = [];
-
-    /**
-     * @var array
-     */
-    private $mauticIds = [];
-
-    /**
-     * @var array
-     */
-    private $knownCampaignMembers = [];
-
-    /**
-     * Fetcher constructor.
-     *
      * @param string $campaignId
      */
-    public function __construct(IntegrationEntityRepository $repo, Organizer $organizer, $campaignId)
-    {
-        $this->repo       = $repo;
-        $this->organizer  = $organizer;
-        $this->campaignId = $campaignId;
-
+    public function __construct(
+        private IntegrationEntityRepository $repo,
+        private Organizer $organizer,
+        private $campaignId
+    ) {
         $this->fetchLeads();
         $this->fetchContacts();
     }
@@ -85,29 +43,22 @@ class Fetcher
     /**
      * Return SF query to fetch the object information for a CampaignMember.
      *
-     * @return string
-     *
      * @throws NoObjectsToFetchException
      * @throws InvalidObjectException
      */
-    public function getQueryForUnknownObjects(array $fields, $object)
+    public function getQueryForUnknownObjects(array $fields, $object): string
     {
-        switch ($object) {
-            case Lead::OBJECT:
-                return QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds);
-            case Contact::OBJECT:
-                return QueryBuilder::getContactQuery($fields, $this->unknownContactIds);
-            default:
-                throw new InvalidObjectException();
-        }
+        return match ($object) {
+            Lead::OBJECT    => QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds),
+            Contact::OBJECT => QueryBuilder::getContactQuery($fields, $this->unknownContactIds),
+            default         => throw new InvalidObjectException(),
+        };
     }
 
     /**
      * Fetch the Mautic contact IDs that are not already tracked as SF campaign members.
-     *
-     * @return array
      */
-    public function getUnknownCampaignMembers()
+    public function getUnknownCampaignMembers(): array
     {
         // First, find those already tracked as part of this campaign
         $this->fetchCampaignMembers();
@@ -116,9 +67,7 @@ class Fetcher
         $this->fetchNewlyCreated();
 
         $mauticLeadIds = array_map(
-            function ($entity) {
-                return $entity['internal_entity_id'];
-            },
+            fn ($entity) => $entity['internal_entity_id'],
             $this->knownCampaignMembers
         );
 
@@ -128,7 +77,7 @@ class Fetcher
     /**
      * Fetch SF leads already identified.
      */
-    private function fetchLeads()
+    private function fetchLeads(): void
     {
         if (!$campaignMembers = $this->organizer->getLeadIds()) {
             return;
@@ -158,7 +107,7 @@ class Fetcher
     /**
      * Fetch SF contacts already identified.
      */
-    private function fetchContacts()
+    private function fetchContacts(): void
     {
         if (!$campaignMembers = $this->organizer->getContactIds()) {
             return;
@@ -188,7 +137,7 @@ class Fetcher
     /**
      * Fetch SF campaign members already identified.
      */
-    private function fetchCampaignMembers()
+    private function fetchCampaignMembers(): void
     {
         if (!$this->mauticIds) {
             return;
@@ -211,7 +160,7 @@ class Fetcher
     /**
      * Fetch a list of all identified objects for SF contacts and leads.
      */
-    private function fetchNewlyCreated()
+    private function fetchNewlyCreated(): void
     {
         if (!$allUnknownContacts = array_merge($this->unknownLeadIds, $this->unknownContactIds)) {
             return;

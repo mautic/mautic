@@ -291,10 +291,7 @@ class RoleController extends FormController
         ]);
     }
 
-    /**
-     * @return array
-     */
-    private function getPermissionsConfig(Entity\Role $role)
+    private function getPermissionsConfig(Entity\Role $role): array
     {
         $permissionObjects = $this->security->getPermissionObjects();
         $translator        = $this->translator;
@@ -319,7 +316,7 @@ class RoleController extends FormController
                 $data = $object->convertBitsToPermissionNames($permissionsArray);
 
                 // get the ratio of granted/total
-                list($granted, $total) = $object->getPermissionRatio($data);
+                [$granted, $total] = $object->getPermissionRatio($data);
 
                 $permissions[$bundle] = [
                     'label'            => $label,
@@ -338,9 +335,7 @@ class RoleController extends FormController
         }
 
         // order permissions by label
-        uasort($permissions, function ($a, $b) {
-            return strnatcmp($a['label'], $b['label']);
-        });
+        uasort($permissions, fn ($a, $b): int => strnatcmp($a['label'], $b['label']));
 
         return ['config' => $permissions, 'list' => $permissionsList];
     }

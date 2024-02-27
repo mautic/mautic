@@ -11,28 +11,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 class DecisionResultsEvent extends Event
 {
     /**
-     * @var AbstractEventAccessor
+     * @param ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog> $eventLogs
      */
-    private $eventConfig;
-
-    /**
-     * @var ArrayCollection|LeadEventLog[]
-     */
-    private $eventLogs;
-
-    /**
-     * @var EvaluatedContacts
-     */
-    private $evaluatedContacts;
-
-    /**
-     * DecisionResultsEvent constructor.
-     */
-    public function __construct(AbstractEventAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
-    {
-        $this->eventConfig       = $config;
-        $this->eventLogs         = $logs;
-        $this->evaluatedContacts = $evaluatedContacts;
+    public function __construct(
+        private AbstractEventAccessor $eventConfig,
+        private ArrayCollection $eventLogs,
+        private EvaluatedContacts $evaluatedContacts
+    ) {
     }
 
     /**

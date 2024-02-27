@@ -9,14 +9,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $objects = [];
+    private array $objects = [];
 
-    /**
-     * @return Integration
-     */
     public function addObject(ObjectInterface $object): void
     {
         $this->objects[] = $object;

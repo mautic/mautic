@@ -20,7 +20,9 @@ class PreUpAssertionMigrationTest extends TestCase
              */
             public array $messages = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }
@@ -48,7 +50,9 @@ class PreUpAssertionMigrationTest extends TestCase
              */
             public array $messages = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }
@@ -83,7 +87,7 @@ class PreUpAssertionMigrationTest extends TestCase
         try {
             $migration->preUp($this->createMock(Schema::class));
             $this->fail(sprintf('Exception %s should have been thrown', SkipMigration::class));
-        } catch (SkipMigration $e) {
+        } catch (SkipMigration) {
         }
 
         Assert::assertCount(3, $migration->messages);
@@ -102,7 +106,9 @@ class PreUpAssertionMigrationTest extends TestCase
              */
             public array $messages = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }

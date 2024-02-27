@@ -15,45 +15,21 @@ class InputOptionsDAO
      */
     private $integration;
 
-    /**
-     * @var bool
-     */
-    private $firstTimeSync;
+    private bool $firstTimeSync;
 
-    /**
-     * @var bool
-     */
-    private $disablePush;
+    private bool $disablePush;
 
-    /**
-     * @var bool
-     */
-    private $disablePull;
+    private bool $disablePull;
 
-    /**
-     * @var bool
-     */
-    private $disableActivityPush;
+    private bool $disableActivityPush;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $mauticObjectIds;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $mauticObjectIds;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $integrationObjectIds;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $integrationObjectIds;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $startDateTime;
+    private ?\DateTimeInterface $startDateTime;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $endDateTime;
+    private ?\DateTimeInterface $endDateTime;
 
     private array $options;
 
@@ -155,7 +131,7 @@ class InputOptionsDAO
         } else {
             try {
                 return is_string($input[$optionName]) ? new \DateTimeImmutable($input[$optionName], new \DateTimeZone('UTC')) : null;
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
             }
         }

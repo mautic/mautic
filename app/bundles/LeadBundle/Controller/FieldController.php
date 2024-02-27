@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
@@ -153,7 +154,7 @@ class FieldController extends FormController
                             $model->saveEntity($field);
                         } catch (\Doctrine\DBAL\Exception $ee) {
                             $flashMessage = $ee->getMessage();
-                        } catch (AbortColumnCreateException $e) {
+                        } catch (AbortColumnCreateException) {
                             $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
                         } catch (SchemaException $e) {
                             $flashMessage = $e->getMessage();
@@ -289,10 +290,20 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
-                        // form is valid so process the data
-                        $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                        $flashMessage = 'mautic.core.notice.updated';
 
-                        $this->addFlashMessage('mautic.core.notice.updated', [
+                        // form is valid so process the data
+                        try {
+                            $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                        } catch (AbortColumnUpdateException) {
+                            $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
+                        } catch (SchemaException $e) {
+                            $flashMessage = $e->getMessage();
+                            $form['alias']->addError(new FormError($e->getMessage()));
+                            $valid = false;
+                        }
+
+                        $this->addFlashMessage($flashMessage, [
                             '%name%'      => $field->getLabel(),
                             '%menu_link%' => 'mautic_contactfield_index',
                             '%url%'       => $this->generateUrl('mautic_contactfield_action', [
@@ -361,6 +372,7 @@ class FieldController extends FormController
             }
 
             $clone = clone $entity;
+            $clone->setId(null);
             $clone->setIsPublished(false);
             $clone->setIsFixed(false);
             $fieldAliasHelper->makeAliasUnique($clone);
@@ -504,14 +516,12 @@ class FieldController extends FormController
                 $segments          = [];
                 $usedFieldsNames   = [];
 
-                if ($usedFieldIds) {
-                    // Iterating through all used fileds to get segments they are used in
-                    foreach ($usedFieldIds as $usedFieldId) {
-                        $fieldEntity = $model->getEntity($usedFieldId);
-                        foreach ($model->getFieldSegments($fieldEntity) as $segment) {
-                            $segments[$segment->getId()] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
-                            $usedFieldsNames[]           = sprintf('"%s"', $fieldEntity->getName());
-                        }
+                // Iterating through all used fileds to get segments they are used in
+                foreach ($usedFieldIds as $usedFieldId) {
+                    $fieldEntity = $model->getEntity($usedFieldId);
+                    foreach ($model->getFieldSegments($fieldEntity) as $segment) {
+                        $segments[$segment->getId()] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
+                        $usedFieldsNames[]           = sprintf('"%s"', $fieldEntity->getName());
                     }
                 }
 

@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -29,57 +30,54 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var MockObject&ListModel
      */
-    private $listModel;
+    private \PHPUnit\Framework\MockObject\MockObject $listModel;
 
     /**
      * @var MockObject&campaignModel
      */
-    private $campaignModel;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignModel;
 
     /**
      * @var MockObject&emailModel
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var MockObject&StageModel
      */
-    private $stageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $stageModel;
 
     /**
      * @var MockObject&StageRepository
      */
-    private $stageRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $stageRepository;
 
     /**
      * @var MockObject&CategoryModel
      */
-    private $categoryModel;
+    private \PHPUnit\Framework\MockObject\MockObject $categoryModel;
 
     /**
      * @var MockObject&AssetModel
      */
-    private $assetModel;
+    private \PHPUnit\Framework\MockObject\MockObject $assetModel;
 
     /**
      * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
-     * @var MockObject&FormInterface<FormInterface>
+     * @var MockObject&FormInterface<FormInterface<mixed>>
      */
-    private $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
-    /**
-     * @var TypeOperatorSubscriber
-     */
-    private $subscriber;
+    private \Mautic\LeadBundle\EventListener\TypeOperatorSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -229,6 +227,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'multiple'                  => true,
                     'choice_translation_domain' => false,
                     'disabled'                  => false,
+                    'constraints'               => [new NotBlank(['message' => 'mautic.core.value.required'])],
                     'attr'                      => [
                         'class'                => 'form-control',
                         'data-placeholder'     => 'mautic.lead.tags.select_or_create',
@@ -487,6 +486,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'multiple'                  => true,
                     'choice_translation_domain' => false,
                     'disabled'                  => false,
+                    'constraints'               => [new NotBlank(['message' => 'mautic.core.value.required'])],
                 ]
             );
 

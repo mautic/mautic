@@ -3,7 +3,6 @@
 namespace Mautic\WebhookBundle;
 
 /**
- * Class MauticWebhookEvents
  * Events available for MauticWebhookBundle.
  */
 final class WebhookEvents

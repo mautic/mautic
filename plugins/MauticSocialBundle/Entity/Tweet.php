@@ -116,7 +116,7 @@ class Tweet extends FormEntity
         parent::__clone();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -155,7 +155,7 @@ class Tweet extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('tweet')
             ->addListProperties(
@@ -183,7 +183,7 @@ class Tweet extends FormEntity
     /**
      * Constraints for required fields.
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('text', new Assert\Length(
             [

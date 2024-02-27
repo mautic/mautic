@@ -14,9 +14,12 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class SortableListType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraints = ($options['option_required']) ? [
             new Count(
@@ -68,13 +71,13 @@ class SortableListType extends AbstractType
         )->addModelTransformer(new SortableListTransformer($options['with_labels'], $options['key_value_pairs']));
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['isSortable']     = (!empty($options['sortable']));
         $view->vars['addValueButton'] = $options['add_value_button'];
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
