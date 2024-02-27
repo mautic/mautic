@@ -2,29 +2,15 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security;
 
 use Mautic\UserBundle\Entity\UserRepository;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class UserTokenSetter implements UserTokenSetterInterface
 {
-    private $userRepository;
-    private $tokenStorage;
-
-    public function __construct(UserRepository $userRepository, TokenStorage $tokenStorage)
+    public function __construct(private UserRepository $userRepository, private TokenStorageInterface $tokenStorage)
     {
-        $this->userRepository = $userRepository;
-        $this->tokenStorage   = $tokenStorage;
     }
 
     public function setUser(int $userId): void

@@ -23,12 +23,12 @@ class UserTokenSetterTest extends AbstractMauticTestCase
             ->with(1)
             ->willReturn($user);
 
-        $userTokenSetter = new UserTokenSetter($userRepo, $this->container->get('security.token_storage'));
+        $userTokenSetter = new UserTokenSetter($userRepo, $this->getContainer()->get('security.token_storage'));
 
         $userTokenSetter->setUser(1);
 
         /** @var UserHelper $userHelper */
-        $userHelper = $this->container->get('mautic.helper.user');
+        $userHelper = $this->getContainer()->get('mautic.helper.user');
 
         $this->assertSame($user, $userHelper->getUser());
     }
