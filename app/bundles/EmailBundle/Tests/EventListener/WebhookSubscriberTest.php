@@ -27,7 +27,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->webhookModel = $this->createMock(WebhookModel::class);
-        $this->subscriber   = new WebhookSubscriber($this->webhookModel);
+        $this->subscriber   = new WebhookSubscriber($this->webhookModel, true);
     }
 
     public function testOnWebhookBuild(): void
