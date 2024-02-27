@@ -19,32 +19,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DynamicContentModel
-     */
-    private $dynamicContentModel;
-
-    /**
-     * @var CacheProvider
-     */
-    protected $cache;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(DynamicContentModel $dynamicContentModel, CacheProvider $cache, EventDispatcherInterface $dispatcher)
-    {
-        $this->dynamicContentModel = $dynamicContentModel;
-        $this->cache               = $cache;
-        $this->dispatcher          = $dispatcher;
+    public function __construct(
+        private DynamicContentModel $dynamicContentModel,
+        protected CacheProvider $cache,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                  => ['onCampaignBuild', 0],
@@ -53,7 +35,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addAction(
             'dwc.push_content',
