@@ -27,7 +27,7 @@ class CommandListEvent extends Event
      * @param string $header   String name for section header
      * @param array  $commands Array of commands supported by the repository
      */
-    public function addCommands($header, array $commands)
+    public function addCommands($header, array $commands): void
     {
         $this->commands[$header] = $commands;
     }

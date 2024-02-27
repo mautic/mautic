@@ -28,10 +28,8 @@ class ClientEvent extends CommonEvent
 
     /**
      * Returns the api mode.
-     *
-     * @return string
      */
-    public function getApiMode()
+    public function getApiMode(): string
     {
         return $this->apiMode;
     }

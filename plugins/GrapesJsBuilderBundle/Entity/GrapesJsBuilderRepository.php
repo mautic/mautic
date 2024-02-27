@@ -11,10 +11,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class GrapesJsBuilderRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'gjb';
     }

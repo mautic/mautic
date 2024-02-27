@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ScheduleController extends CommonAjaxController
 {
-    public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
     {
         $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 
@@ -31,10 +31,8 @@ class ScheduleController extends CommonAjaxController
      * Sets report to schedule NOW if possible.
      *
      * @param int $reportId
-     *
-     * @return JsonResponse
      */
-    public function nowAction($reportId)
+    public function nowAction($reportId): JsonResponse
     {
         /** @var \Mautic\ReportBundle\Model\ReportModel $model */
         $model = $this->getModel('report');
@@ -74,10 +72,7 @@ class ScheduleController extends CommonAjaxController
         return $this->flushFlash();
     }
 
-    /**
-     * @return JsonResponse
-     */
-    private function flushFlash()
+    private function flushFlash(): JsonResponse
     {
         return new JsonResponse(['flashes' => $this->getFlashContent()]);
     }

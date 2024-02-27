@@ -19,14 +19,9 @@ class StatsCollectionHelper
 
     public const GENERAL_STAT_PREFIX = 'email';
 
-    /**
-     * @var StatHelperContainer
-     */
-    private $helperContainer;
-
-    public function __construct(StatHelperContainer $helperContainer)
-    {
-        $this->helperContainer = $helperContainer;
+    public function __construct(
+        private StatHelperContainer $helperContainer
+    ) {
     }
 
     /**
@@ -112,7 +107,7 @@ class StatsCollectionHelper
         \DateTime $toDateTime,
         EmailStatOptions $options,
         StatCollection $statCollection
-    ) {
+    ): void {
         $this->helperContainer->getHelper($statName)->generateStats($fromDateTime, $toDateTime, $options, $statCollection);
     }
 }

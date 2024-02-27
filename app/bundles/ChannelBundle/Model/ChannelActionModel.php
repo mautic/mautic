@@ -10,35 +10,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChannelActionModel
 {
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
-    /**
-     * @var DoNotContact
-     */
-    private $doNotContact;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        LeadModel $contactModel,
-        DoNotContact $doNotContact,
-        TranslatorInterface $translator
+        private LeadModel $contactModel,
+        private DoNotContact $doNotContact,
+        private TranslatorInterface $translator
     ) {
-        $this->contactModel = $contactModel;
-        $this->doNotContact = $doNotContact;
-        $this->translator   = $translator;
     }
 
     /**
      * Update channels and frequency rules.
      */
-    public function update(array $contactIds, array $subscribedChannels)
+    public function update(array $contactIds, array $subscribedChannels): void
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
 
@@ -56,7 +38,7 @@ class ChannelActionModel
      * Add contact's channels.
      * Only resubscribe if the contact did not opt out themselves.
      */
-    private function addChannels(Lead $contact, array $subscribedChannels)
+    private function addChannels(Lead $contact, array $subscribedChannels): void
     {
         $contactChannels = $this->contactModel->getContactChannels($contact);
 
@@ -73,7 +55,7 @@ class ChannelActionModel
     /**
      * Remove contact's channels.
      */
-    private function removeChannels(Lead $contact, array $subscribedChannels)
+    private function removeChannels(Lead $contact, array $subscribedChannels): void
     {
         $allChannels = $this->contactModel->getPreferenceChannels();
         $dncChannels = array_diff($allChannels, $subscribedChannels);

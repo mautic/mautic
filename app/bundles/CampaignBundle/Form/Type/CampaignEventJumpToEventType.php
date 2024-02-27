@@ -7,12 +7,15 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventJumpToEventType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $jumpProps = $builder->getData();
-        $selected  = isset($jumpProps['jumpToEvent']) ? $jumpProps['jumpToEvent'] : null;
+        $selected  = $jumpProps['jumpToEvent'] ?? null;
 
         $builder->add(
             'jumpToEvent',

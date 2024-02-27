@@ -227,16 +227,51 @@
                   <div class="panel-title">{{ 'mautic.page.preview.url'|trans }}</div>
               </div>
               <div class="panel-body pt-xs">
-                  <div class="input-group">
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                             readonly
-                             value="{{ previewUrl|e }}"/>
-                      <span class="input-group-btn">
-                      <button class="btn btn-default btn-nospin"
-                              onclick="window.open('{{ previewUrl }}', '_blank');">
-                          <i class="fa fa-external-link"></i>
-                      </button>
-                  </span>
+                  {% if previewSettingsForm.translation is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.translation) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  {% if previewSettingsForm.variant is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.variant) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  {% if previewSettingsForm.contact is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.contact) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="input-group">
+                              <input id="content_preview_url"
+                                     data-route="page/preview"
+                                     onclick="this.setSelectionRange(0, this.value.length);"
+                                     type="text"
+                                     class="form-control"
+                                     readonly
+                                     value="{{ previewUrl|e }}"/>
+                              <span class="input-group-btn">
+                                  <button id="content_preview_url_button"
+                                          class="btn btn-default btn-nospin"
+                                          onclick="window.open('{{ previewUrl }}', '_blank');">
+                                      <i class="fa fa-external-link"></i>
+                                  </button>
+                              </span>
+                              <input type="hidden" id="content_preview_settings_object_id" value="{{ activePage.id }}">
+                              <input type="hidden" id="content_preview_settings_contact_id" value="">
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>

@@ -3,23 +3,22 @@
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
     /**
      * @param MauticFactory $factory
-     *
-     * @return bool
      */
-    public static function validatePageHit($factory, $eventDetails, $action)
+    public static function validatePageHit($factory, $eventDetails, $action): bool
     {
         $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel               = $factory->getModel('page');
-            list($parent, $children) = $pageHit->getVariants();
+            [$parent, $children]     = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
@@ -41,10 +40,8 @@ class PointActionHelper
 
     /**
      * @param MauticFactory $factory
-     *
-     * @return bool
      */
-    public static function validateUrlHit($factory, $eventDetails, $action)
+    public static function validateUrlHit($factory, $eventDetails, $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();
@@ -68,7 +65,13 @@ class PointActionHelper
             }
         }
         $now       = new \DateTime();
-        $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+
+        if ($action['properties']['returns_within'] || $action['properties']['returns_after']) {
+            // get the latest hit only when it's needed
+            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+        } else {
+            $latestHit = null;
+        }
 
         if ($action['properties']['accumulative_time']) {
             if (!isset($hitStats)) {
@@ -96,14 +99,14 @@ class PointActionHelper
             }
         }
         if ($action['properties']['returns_within']) {
-            if ($now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
+            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
                 $changePoints['returns_within'] = true;
             } else {
                 $changePoints['returns_within'] = false;
             }
         }
         if ($action['properties']['returns_after']) {
-            if ($now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
+            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
                 $changePoints['returns_after'] = true;
             } else {
                 $changePoints['returns_after'] = false;

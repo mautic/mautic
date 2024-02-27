@@ -99,17 +99,17 @@ class Sms extends FormEntity
     /**
      * Clear stats.
      */
-    public function clearStats()
+    public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('sms_messages')
-            ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\SmsRepository');
+            ->setCustomRepositoryClass(\Mautic\SmsBundle\Entity\SmsRepository::class);
 
         $builder->addIdColumns();
 
@@ -133,7 +133,7 @@ class Sms extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToMany('lists', \Mautic\LeadBundle\Entity\LeadList::class)
             ->setJoinTable('sms_message_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -149,7 +149,7 @@ class Sms extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -161,7 +161,7 @@ class Sms extends FormEntity
         );
 
         $metadata->addConstraint(new Callback([
-            'callback' => function (Sms $sms, ExecutionContextInterface $context) {
+            'callback' => function (Sms $sms, ExecutionContextInterface $context): void {
                 $type = $sms->getSmsType();
                 if ('list' == $type) {
                     $validator  = $context->getValidator();
@@ -190,7 +190,7 @@ class Sms extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('sms')
             ->addListProperties(
@@ -260,7 +260,7 @@ class Sms extends FormEntity
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -306,7 +306,7 @@ class Sms extends FormEntity
     /**
      * @param string $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->isChanged('message', $message);
         $this->message = $message;
@@ -410,7 +410,7 @@ class Sms extends FormEntity
     /**
      * Remove list.
      */
-    public function removeList(LeadList $list)
+    public function removeList(LeadList $list): void
     {
         $this->lists->removeElement($list);
     }
@@ -434,7 +434,7 @@ class Sms extends FormEntity
     /**
      * @param string $smsType
      */
-    public function setSmsType($smsType)
+    public function setSmsType($smsType): void
     {
         $this->isChanged('smsType', $smsType);
         $this->smsType = $smsType;

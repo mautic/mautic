@@ -11,7 +11,7 @@ class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Tests that getters returns same values as the contstruct
      */
-    public function testGetterReturnConstruct()
+    public function testGetterReturnConstruct(): void
     {
         $lead      = new Lead();
         $channel   = 'email';
@@ -31,13 +31,13 @@ class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that the default verb is unsubscribed if not recongized
      */
-    public function testGetStatusVerbReturnsUnsubscribedForUnrecognized()
+    public function testGetStatusVerbReturnsUnsubscribedForUnrecognized(): void
     {
         $lead      = new Lead();
         $channel   = 'email';
         $oldStatus = DoNotContact::IS_CONTACTABLE;
 
-        $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, 'foobar');
+        $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, 456);
 
         $this->assertEquals('unsubscribed', $event->getNewStatusVerb());
     }

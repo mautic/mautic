@@ -29,7 +29,7 @@ class ReportEvent extends CommonEvent
     /**
      * Sets the Report entity.
      */
-    public function setReport(Report $report)
+    public function setReport(Report $report): void
     {
         $this->entity = $report;
     }

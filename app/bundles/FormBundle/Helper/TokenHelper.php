@@ -7,26 +7,13 @@ use Mautic\FormBundle\Model\FormModel;
 
 class TokenHelper
 {
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(FormModel $formModel, CorePermissions $security)
-    {
-        $this->formModel = $formModel;
-        $this->security  = $security;
+    public function __construct(
+        protected FormModel $formModel,
+        protected CorePermissions $security
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function findFormTokens($content)
+    public function findFormTokens($content): array
     {
         $tokens = [];
 

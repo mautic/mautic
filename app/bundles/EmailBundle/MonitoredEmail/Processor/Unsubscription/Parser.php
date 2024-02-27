@@ -7,26 +7,19 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 
 class Parser
 {
-    /**
-     * @var Message
-     */
-    protected $message;
-
-    public function __construct(Message $message)
-    {
-        $this->message = $message;
+    public function __construct(
+        protected Message $message
+    ) {
     }
 
     /**
-     * @return UnsubscribedEmail
-     *
      * @throws UnsubscriptionNotFound
      */
-    public function parse()
+    public function parse(): UnsubscribedEmail
     {
         $unsubscriptionEmail = null;
         foreach ($this->message->to as $to => $name) {
-            if (false !== strpos($to, '+unsubscribe')) {
+            if (str_contains($to, '+unsubscribe')) {
                 $unsubscriptionEmail = $to;
 
                 break;

@@ -10,34 +10,21 @@ use Symfony\Component\Form\FormEvents;
 class FormExitSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var string
-     */
-    private $model;
-
-    /**
-     * @var array
-     */
-    private $options;
-
-    /**
      * @param string $model
      * @param array  $options
      */
-    public function __construct($model, $options = [])
-    {
-        $this->model   = $model;
-        $this->options = $options;
+    public function __construct(
+        private $model,
+        private $options = []
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [FormEvents::PRE_SET_DATA => 'preSetData'];
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;
         if ($id && empty($this->options['ignore_formexit'])) {

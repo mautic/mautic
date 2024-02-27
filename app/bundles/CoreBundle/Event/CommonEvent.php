@@ -38,7 +38,7 @@ class CommonEvent extends Event
      *
      * @param EntityManagerInterface $em
      */
-    public function setEntityManager($em)
+    public function setEntityManager($em): void
     {
         $this->em = $em;
     }

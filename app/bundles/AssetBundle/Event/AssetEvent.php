@@ -29,7 +29,7 @@ class AssetEvent extends CommonEvent
     /**
      * Sets the Asset entity.
      */
-    public function setAsset(Asset $asset)
+    public function setAsset(Asset $asset): void
     {
         $this->entity = $asset;
     }

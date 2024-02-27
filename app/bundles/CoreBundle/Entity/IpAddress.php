@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class IpAddress
 {
+    public const TABLE_NAME = 'ip_addresses';
+
     /**
      * Set by factory of configured IPs to not track.
      */
@@ -19,21 +21,16 @@ class IpAddress
     private $id;
 
     /**
-     * @var string
-     */
-    private $ipAddress;
-
-    /**
      * @var array<string,string>
      */
     private $ipDetails;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('ip_addresses')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\IpAddressRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(\Mautic\CoreBundle\Entity\IpAddressRepository::class)
             ->addIndex(['ip_address'], 'ip_search');
 
         $builder->addId();
@@ -52,7 +49,7 @@ class IpAddress
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('ipAddress')
             ->addListProperties(
@@ -72,13 +69,11 @@ class IpAddress
     }
 
     /**
-     * IpAddress constructor.
-     *
      * @param string|null $ipAddress
      */
-    public function __construct($ipAddress = null)
-    {
-        $this->ipAddress = $ipAddress;
+    public function __construct(
+        private $ipAddress = null
+    ) {
     }
 
     /**
@@ -130,7 +125,7 @@ class IpAddress
     /**
      * Get ipDetails.
      *
-     * @return array<string,string>
+     * @return array<string,string>|null
      */
     public function getIpDetails()
     {
@@ -140,7 +135,7 @@ class IpAddress
     /**
      * Set list of IPs to not track.
      */
-    public function setDoNotTrackList(array $ips)
+    public function setDoNotTrackList(array $ips): void
     {
         $this->doNotTrack = $ips;
     }
@@ -158,16 +153,16 @@ class IpAddress
     /**
      * Determine if this IP is trackable.
      */
-    public function isTrackable()
+    public function isTrackable(): bool
     {
         foreach ($this->doNotTrack as $ip) {
-            if (false !== strpos($ip, '/')) {
+            if (str_contains($ip, '/')) {
                 // has a netmask range
                 // https://gist.github.com/tott/7684443
-                list($range, $netmask) = explode('/', $ip, 2);
+                [$range, $netmask]     = explode('/', $ip, 2);
                 $range_decimal         = ip2long($range);
                 $ip_decimal            = ip2long($this->ipAddress);
-                $wildcard_decimal      = pow(2, 32 - $netmask) - 1;
+                $wildcard_decimal      = 2 ** (32 - $netmask) - 1;
                 $netmask_decimal       = ~$wildcard_decimal;
 
                 if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {

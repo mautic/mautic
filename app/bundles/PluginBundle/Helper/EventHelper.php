@@ -9,7 +9,7 @@ class EventHelper
 {
     use PushToIntegrationTrait;
 
-    public static function pushLead($config, $lead, MauticFactory $factory)
+    public static function pushLead($config, $lead, MauticFactory $factory): bool
     {
         $contact = $factory->getEntityManager()->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getEntityWithPrimaryCompany($lead);
 

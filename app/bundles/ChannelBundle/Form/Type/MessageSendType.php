@@ -10,18 +10,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class MessageSendType extends AbstractType
 {
-    protected $router;
-    protected $messageModel;
-
-    public function __construct(RouterInterface $router, MessageModel $messageModel)
-    {
-        $this->router       = $router;
-        $this->messageModel = $messageModel;
+    public function __construct(
+        protected RouterInterface $router,
+        protected MessageModel $messageModel
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'marketingMessage',
@@ -89,7 +89,7 @@ class MessageSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }

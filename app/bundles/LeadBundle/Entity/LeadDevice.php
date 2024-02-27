@@ -68,12 +68,12 @@ class LeadDevice
      */
     private $dateAdded;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_devices')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadDeviceRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class)
             ->addIndex(['date_added'], 'date_added_search')
             ->addIndex(['device'], 'device_search')
             ->addIndex(['device_os_name'], 'device_os_name_search')
@@ -136,7 +136,7 @@ class LeadDevice
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadDevice')
             ->addProperties(
@@ -156,18 +156,12 @@ class LeadDevice
             ->build();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getSignature()
+    public function getSignature(): string
     {
         return md5(json_encode($this->clientInfo).$this->device.$this->deviceOsName.$this->deviceOsPlatform.$this->deviceBrand.$this->deviceModel);
     }
@@ -183,7 +177,7 @@ class LeadDevice
     /**
      * @param mixed $clientInfo
      */
-    public function setClientInfo($clientInfo)
+    public function setClientInfo($clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }
@@ -199,7 +193,7 @@ class LeadDevice
     /**
      * @param mixed $device
      */
-    public function setDevice($device)
+    public function setDevice($device): void
     {
         $this->device = $device;
     }
@@ -212,7 +206,7 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    public function setDeviceBrand($brand)
+    public function setDeviceBrand($brand): void
     {
         $this->deviceBrand = $brand;
     }
@@ -228,7 +222,7 @@ class LeadDevice
     /**
      * @param mixed $deviceModel
      */
-    public function setDeviceModel($deviceModel)
+    public function setDeviceModel($deviceModel): void
     {
         $this->deviceModel = $deviceModel;
     }
@@ -324,7 +318,7 @@ class LeadDevice
     /**
      * @param array $deviceOs
      */
-    public function setDeviceOs($deviceOs)
+    public function setDeviceOs($deviceOs): void
     {
         if (isset($deviceOs['name'])) {
             $this->deviceOsName = $deviceOs['name'];
@@ -389,7 +383,7 @@ class LeadDevice
     /**
      * @param mixed $dateAdded
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }

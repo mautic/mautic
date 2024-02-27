@@ -29,7 +29,7 @@ class StageEvent extends CommonEvent
     /**
      * Sets the Stage entity.
      */
-    public function setStage(Stage $stage)
+    public function setStage(Stage $stage): void
     {
         $this->entity = $stage;
     }

@@ -8,19 +8,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EmailReplyEvent extends Event
 {
-    /**
-     * @var Email
-     */
-    private $email;
+    private ?\Mautic\EmailBundle\Entity\Email $email;
 
-    /**
-     * @var Stat
-     */
-    private $stat;
-
-    public function __construct(Stat $stat)
-    {
-        $this->stat  = $stat;
+    public function __construct(
+        private Stat $stat
+    ) {
         $this->email = $stat->getEmail();
     }
 

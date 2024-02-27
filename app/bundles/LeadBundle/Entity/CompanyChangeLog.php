@@ -42,12 +42,12 @@ class CompanyChangeLog
      */
     private $dateAdded;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_companies_change_log')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyChangeLogRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\CompanyChangeLogRepository::class)
             ->addIndex(['date_added'], 'company_date_added');
 
         $builder->addId();

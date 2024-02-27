@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SlotSeparatorType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'color',

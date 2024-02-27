@@ -11,11 +11,9 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 class BodyParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message, $contactEmail = null)
+    public function getBounce(Message $message, $contactEmail = null): BouncedEmail
     {
         $report = $this->parse($message->textPlain, $contactEmail);
 
@@ -37,10 +35,8 @@ class BodyParser
      * @todo - refactor to get rid of the if/else statements
      *
      * @param string $knownEmail
-     *
-     * @return array
      */
-    public function parse($body, $knownEmail = '')
+    public function parse($body, $knownEmail = ''): array
     {
         // initialize the result array
         $result = [

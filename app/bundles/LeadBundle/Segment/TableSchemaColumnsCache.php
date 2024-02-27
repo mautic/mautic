@@ -7,18 +7,13 @@ use Doctrine\ORM\EntityManager;
 class TableSchemaColumnsCache
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var array
      */
     private $cache;
 
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private EntityManager $entityManager
+    ) {
         $this->cache         = [];
     }
 
@@ -28,7 +23,7 @@ class TableSchemaColumnsCache
     public function getColumns($tableName)
     {
         if (!isset($this->cache[$tableName])) {
-            $columns                 = $this->entityManager->getConnection()->getSchemaManager()->listTableColumns($tableName);
+            $columns                 = $this->entityManager->getConnection()->createSchemaManager()->listTableColumns($tableName);
             $this->cache[$tableName] = $columns ?: [];
         }
 

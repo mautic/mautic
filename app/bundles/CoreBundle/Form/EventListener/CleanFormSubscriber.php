@@ -13,29 +13,21 @@ use Symfony\Component\Form\FormEvents;
 class CleanFormSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var string|mixed[]
-     */
-    private $masks;
-
-    /**
      * @param string|mixed[] $masks
      */
-    public function __construct($masks = 'clean')
-    {
-        $this->masks = $masks;
+    public function __construct(
+        private $masks = 'clean'
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SUBMIT => 'preSubmitData',
         ];
     }
 
-    public function preSubmitData(FormEvent $event)
+    public function preSubmitData(FormEvent $event): void
     {
         $data = $event->getData();
 

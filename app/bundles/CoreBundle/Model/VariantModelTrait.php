@@ -15,12 +15,12 @@ trait VariantModelTrait
     /**
      * Converts a variant to the main item and the original main item a variant.
      */
-    public function convertVariant(VariantEntityInterface $entity)
+    public function convertVariant(VariantEntityInterface $entity): void
     {
         // let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
 
-        list($parent, $children) = $entity->getVariants();
+        [$parent, $children] = $entity->getVariants();
 
         $save = [];
 
@@ -76,14 +76,14 @@ trait VariantModelTrait
      *
      * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
      */
-    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null)
+    protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null): bool
     {
         $isVariant = $entity->isVariant();
 
         if (!$isVariant && $entity instanceof TranslationEntityInterface) {
             // Translations could be assigned to a variant and thus applicable to be reset
             if ($translationParent = $entity->getTranslationParent()) {
-                $isVariant = $translationParent->isVariant();
+                $isVariant = $translationParent->isVariant(); /** @phpstan-ignore-line @todo for M6, extend the TranslationEntityInterface from The VariantEntityInterface */
             }
         }
 
@@ -136,9 +136,6 @@ trait VariantModelTrait
         }
     }
 
-    /**
-     * @param \DateTime $variantStartDate
-     */
     protected function resetVariants($entity, $relatedIds = null, \DateTime $variantStartDate = null)
     {
         $repo = $this->getRepository();

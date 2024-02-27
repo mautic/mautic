@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -65,19 +64,9 @@ class DynamicContentTypeTest extends TestCase
             $tagChoices[$tag['value']] = $tag['label'];
         }
 
-        $formBuilderInterfaceMock->expects($this->exactly(3))
+        $formBuilderInterfaceMock->expects($this->exactly(2))
             ->method('create')
             ->withConsecutive(
-                [
-                    'description',
-                    TextareaType::class,
-                    [
-                        'label'      => 'mautic.dynamicContent.description',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => ['class' => 'form-control'],
-                        'required'   => false,
-                    ],
-                ],
                 [
                     'translationParent',
                     DynamicContentListType::class,
@@ -99,7 +88,7 @@ class DynamicContentTypeTest extends TestCase
                     'filters',
                     CollectionType::class,
                     [
-                        'entry_type'     => 'Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType',
+                        'entry_type'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
                         'entry_options'  => [
                             'countries'    => FormFieldHelper::getCountryChoices(),
                             'regions'      => FormFieldHelper::getRegionChoices(),

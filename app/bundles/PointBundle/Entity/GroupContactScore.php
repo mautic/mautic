@@ -15,7 +15,9 @@ class GroupContactScore extends CommonEntity
     public const TABLE_NAME = 'point_group_contact_score';
 
     private Lead $contact;
+
     private Group $group;
+
     private int $score;
 
     public function __construct()
@@ -35,7 +37,7 @@ class GroupContactScore extends CommonEntity
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(GroupContactScoreRepository::class);
 
-        $builder->addContact(false, 'CASCADE', true, 'group_score');
+        $builder->addContact(false, 'CASCADE', true, 'groupScores');
 
         $builder->createManyToOne('group', Group::class)
             ->isPrimaryKey()

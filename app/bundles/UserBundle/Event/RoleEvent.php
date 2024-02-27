@@ -29,7 +29,7 @@ class RoleEvent extends CommonEvent
     /**
      * Sets the Role entity.
      */
-    public function setRole(Role $role)
+    public function setRole(Role $role): void
     {
         $this->entity = $role;
     }

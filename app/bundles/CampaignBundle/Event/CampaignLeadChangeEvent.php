@@ -9,34 +9,29 @@ use Symfony\Contracts\EventDispatcher\Event;
 class CampaignLeadChangeEvent extends Event
 {
     /**
-     * @var Campaign
-     */
-    private $campaign;
-
-    /**
-     * @var Lead
+     * @var ?Lead
      */
     private $lead;
 
     /**
-     * @var array
+     * @var Lead[]
      */
-    private $leads = [];
+    private array $leads = [];
 
     /**
-     * @var string
+     * @param Lead|Lead[] $leads
+     * @param ?string     $action
      */
-    private $action;
-
-    public function __construct(Campaign $campaign, $leads, $action)
-    {
-        $this->campaign = $campaign;
+    public function __construct(
+        private Campaign $campaign,
+        $leads,
+        private $action
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
             $this->lead = $leads;
         }
-        $this->action = $action;
     }
 
     /**
@@ -52,7 +47,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * Returns the Lead entity.
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -62,7 +57,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * If this is a batch event, return array of leads.
      *
-     * @return array
+     * @return Lead[]|null
      */
     public function getLeads()
     {
@@ -72,7 +67,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * Returns added or removed.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getAction()
     {
@@ -81,21 +76,17 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Lead was removed from the campaign.
-     *
-     * @return bool
      */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
-        return 'removed' == $this->action;
+        return 'removed' === $this->action;
     }
 
     /**
      * Lead was added to the campaign.
-     *
-     * @return bool
      */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
-        return 'added' == $this->action;
+        return 'added' === $this->action;
     }
 }

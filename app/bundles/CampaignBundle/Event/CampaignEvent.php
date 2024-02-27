@@ -29,7 +29,7 @@ class CampaignEvent extends CommonEvent
     /**
      * Sets the Campaign entity.
      */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): void
     {
         $this->entity = $campaign;
     }

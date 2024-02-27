@@ -38,16 +38,16 @@ class LeadCategory
      */
     private $manuallyAdded = false;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_categories')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadCategoryRepository');
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadCategoryRepository::class);
 
         $builder->addId();
 
-        $builder->createManyToOne('category', 'Mautic\CategoryBundle\Entity\Category')
+        $builder->createManyToOne('category', \Mautic\CategoryBundle\Entity\Category::class)
             ->addJoinColumn('category_id', 'id', false, false, 'CASCADE')
             ->build();
 
@@ -83,7 +83,7 @@ class LeadCategory
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date)
+    public function setDateAdded($date): void
     {
         $this->dateAdded = $date;
     }
@@ -99,7 +99,7 @@ class LeadCategory
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -115,7 +115,7 @@ class LeadCategory
     /**
      * @param Category $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -131,7 +131,7 @@ class LeadCategory
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -155,7 +155,7 @@ class LeadCategory
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }

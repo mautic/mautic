@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 
 class StatDevice
 {
+    public const TABLE_NAME = 'email_stats_devices';
     /**
      * @var string
      */
@@ -35,17 +36,17 @@ class StatDevice
      */
     private $dateOpened;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stats_devices')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatDeviceRepository::class)
             ->addIndex(['date_opened'], 'date_opened_search');
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', \Mautic\LeadBundle\Entity\LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
             ->build();
 
@@ -63,7 +64,7 @@ class StatDevice
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -77,10 +78,7 @@ class StatDevice
             ->build();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -96,7 +94,7 @@ class StatDevice
     /**
      * @param mixed $ip
      */
-    public function setIpAddress(IpAddress $ip)
+    public function setIpAddress(IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -112,7 +110,7 @@ class StatDevice
     /**
      * @param Stat
      */
-    public function setStat(Stat $stat)
+    public function setStat(Stat $stat): void
     {
         $this->stat = $stat;
     }
@@ -128,7 +126,7 @@ class StatDevice
     /**
      * @param mixed $dateOpened
      */
-    public function setDateOpened($dateOpened)
+    public function setDateOpened($dateOpened): void
     {
         $this->dateOpened = $dateOpened;
     }
@@ -144,7 +142,7 @@ class StatDevice
     /**
      * @param mixed $device
      */
-    public function setDevice(LeadDevice $device)
+    public function setDevice(LeadDevice $device): void
     {
         $this->device = $device;
     }

@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PagePermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -18,18 +15,12 @@ class PagePermissions extends AbstractPermissions
         $this->addExtendedPermissions('preference_center');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'page';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('page', 'categories', $builder, $data);
         $this->addExtendedFormFields('page', 'pages', $builder, $data);

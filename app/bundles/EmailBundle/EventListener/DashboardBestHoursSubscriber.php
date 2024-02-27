@@ -38,20 +38,15 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
         'email:emails:viewother',
     ];
 
-    /**
-     * @var EmailModel
-     */
-    protected $emailModel;
-
-    public function __construct(EmailModel $emailModel)
-    {
-        $this->emailModel = $emailModel;
+    public function __construct(
+        protected EmailModel $emailModel
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('email:emails:viewother');

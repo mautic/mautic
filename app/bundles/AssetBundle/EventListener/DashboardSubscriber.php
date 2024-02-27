@@ -38,26 +38,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother',
     ];
 
-    /**
-     * @var AssetModel
-     */
-    protected $assetModel;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(AssetModel $assetModel, RouterInterface $router)
-    {
-        $this->assetModel = $assetModel;
-        $this->router     = $router;
+    public function __construct(
+        protected AssetModel $assetModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('asset:assets:viewother');

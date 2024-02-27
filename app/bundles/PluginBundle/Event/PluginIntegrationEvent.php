@@ -20,7 +20,7 @@ class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
         return $this->integration->getIntegrationSettings();
     }
 
-    public function setEntity(Integration $integration)
+    public function setEntity(Integration $integration): void
     {
         $this->integration->setIntegrationSettings($integration);
     }

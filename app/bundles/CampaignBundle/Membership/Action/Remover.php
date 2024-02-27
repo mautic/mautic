@@ -13,30 +13,14 @@ class Remover
 {
     public const NAME = 'removed';
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $leadEventLogRepository;
-
-    /**
-     * @var string
-     */
-    private $unscheduledMessage;
+    private ?string $unscheduledMessage;
 
     public function __construct(
-        LeadRepository $leadRepository,
-        LeadEventLogRepository $leadEventLogRepository,
+        private LeadRepository $leadRepository,
+        private LeadEventLogRepository $leadEventLogRepository,
         TranslatorInterface $translator,
         DateHelper $dateHelper
     ) {
-        $this->leadRepository         = $leadRepository;
-        $this->leadEventLogRepository = $leadEventLogRepository;
-
         $dateRemoved              = $dateHelper->toFull(new \DateTime());
         $this->unscheduledMessage = $translator->trans('mautic.campaign.member.removed', ['%date%' => $dateRemoved]);
     }
@@ -46,7 +30,7 @@ class Remover
      *
      * @throws ContactAlreadyRemovedFromCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isExit)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isExit): void
     {
         if ($isExit) {
             // Contact was removed by the change campaign action or a segment
@@ -72,7 +56,7 @@ class Remover
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember)
+    private function saveCampaignMember($campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);
