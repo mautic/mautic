@@ -141,6 +141,9 @@ class PointType extends AbstractType
             [
                 'label' => 'mautic.point.form.repeat',
                 'data'  => $options['data']->getRepeatable() ?: false,
+                'attr' => [
+                    'tooltip' => 'mautic.point.form.repeat.help',
+                ],
             ]
         );
 
