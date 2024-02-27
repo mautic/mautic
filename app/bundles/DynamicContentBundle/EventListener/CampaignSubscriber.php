@@ -12,12 +12,10 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -25,10 +23,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @var DynamicContentModel
      */
     private $dynamicContentModel;
-    /**
-     * @var SessionInterface
-     */
-    private $session;
+
     /**
      * @var CacheProvider
      */
@@ -39,11 +34,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $dispatcher;
 
-    /**
-     * @param DynamicContentModel $dynamicContentModel
-     * @param CacheProvider $cache
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(DynamicContentModel $dynamicContentModel, CacheProvider $cache, EventDispatcherInterface $dispatcher)
     {
         $this->dynamicContentModel = $dynamicContentModel;
@@ -107,7 +97,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return bool|CampaignExecutionEvent
+     * @return false|CampaignExecutionEvent
+     *
+     * @throws InvalidArgumentException
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
@@ -132,7 +124,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         /** @var CacheItemInterface $item */
         $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
         $item->set($eventDetails);
-        $item->expiresAfter(86400); //one day in seconds
+        $item->expiresAfter(86400); // one day in seconds
         $this->cache->save($item);
 
         $event->stopPropagation();
@@ -140,13 +132,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     *
-     * @return CampaignExecutionEvent
-     *
-     * @throws InvalidArgumentException
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $eventConfig = $event->getConfig();
