@@ -63,7 +63,7 @@ final class GeneratedColumnsProviderTest extends TestCase
         $supportedMySqlVersion = '5.7.14';
 
         $event = new GeneratedColumnsEvent();
-        $event->addGeneratedColumn(new GeneratedColumn(MAUTIC_TABLE_PREFIX.'page_hits', 'generated_hit_date', 'DATE', 'not important'));
+        $event->addGeneratedColumn(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
 
         $this->versionProvider->expects($this->exactly(2))
             ->method('getVersion')
