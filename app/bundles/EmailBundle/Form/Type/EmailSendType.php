@@ -228,12 +228,12 @@ class EmailSendType extends AbstractType
                 'data-cancel-callback'   => 'setSendToDncToNo',
                 'data-confirm-btn-class' => 'btn btn-success',
                 'tooltip'                => 'mautic.email.send.dnc.tooltip',
-                'data-show-on'           => '{"campaignevent_properties_email_type_1":"checked"}',
+                'data-show-on'           => '{"campaignevent_properties_email_type_0":"checked"}',
             ];
         } else {
             $sendToDncAttr = [
                 'tooltip'      => 'mautic.email.send.dnc.tooltip',
-                'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
+                'data-show-on' => '{"campaignevent_properties_email_type_0":"checked"}',
                 'disabled'     => true,
                 'readonly'     => true,
             ];
