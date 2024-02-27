@@ -139,6 +139,9 @@ trait CreateTestEntitiesTrait
         $this->em->persist($listLead);
     }
 
+    /**
+     * @param array<mixed> $properties
+     */
     private function createLeadEventLogEntry(Lead $lead, string $bundle, string $object, string $action, int $objectId, array $properties = []): LeadEventLog
     {
         $listEventLog = new LeadEventLog();
