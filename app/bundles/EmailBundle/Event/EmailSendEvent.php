@@ -45,6 +45,8 @@ class EmailSendEvent extends CommonEvent
 
     private array $textHeaders = [];
 
+    private bool $stopSending = false;
+
     /**
      * @param array $args
      * @param bool  $isDynamicContentParsing
@@ -327,5 +329,21 @@ class EmailSendEvent extends CommonEvent
         $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
 
         return $content.implode(' ', $this->getTextHeaders());
+    }
+
+    /**
+     * Set stop sending.
+     */
+    public function setStopSending(bool $stopSending): void
+    {
+        $this->stopSending = $stopSending;
+    }
+
+    /**
+     * Get stop sending.
+     */
+    public function getStopSending(): bool
+    {
+        return $this->stopSending;
     }
 }
