@@ -26,16 +26,23 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
 
     public function testThatFindChangesBeforeMethodReturnsChangesInCorrectOrder(): void
     {
-        $fieldChanges = $this->generateFieldChanges(3);
-        $fieldChanges[0]->setObjectId(3);
-        $fieldChanges[1]->setObjectId(1);
-        $fieldChanges[2]->setObjectId(2);
+        $lead1        = $this->createLead();
+        $lead2        = $this->createLead();
+        $lead3        = $this->createLead();
+        $lead4        = $this->createLead();
+        $fieldChanges = $this->generateFieldChanges(4);
+        $fieldChanges[0]->setObjectId((int) $lead3->getId());
+        $fieldChanges[1]->setObjectId((int) $lead4->getId());
+        $fieldChanges[2]->setObjectId((int) $lead1->getId());
+        $fieldChanges[3]->setObjectId((int) $lead2->getId());
 
         foreach ($fieldChanges as $fieldChange) {
             $this->em->persist($fieldChange);
         }
 
         $this->em->flush();
+
+        $this->deleteLead($lead2);
 
         $changes = $this->repository->findChangesBefore(
             static::INTEGRATION,
@@ -45,8 +52,8 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
             2
         );
 
-        Assert::assertSame(1, (int) $changes[0]['object_id']);
-        Assert::assertSame(2, (int) $changes[1]['object_id']);
+        Assert::assertEquals($lead1->getId(), $changes[0]['object_id']);
+        Assert::assertEquals($lead3->getId(), $changes[1]['object_id'], 'Lead 2 record is not fetched as lead 2 is deleted');
     }
 
     public function testThatItDoesntDeleteObjectsThatCameDuringInternalSynchronization(): void
@@ -95,6 +102,26 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         }
 
         return $fieldChanges;
+    }
+
+    private function createLead(): Lead
+    {
+        $lead = new Lead();
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        return $lead;
+    }
+
+    private function deleteLead(Lead $lead): void
+    {
+        $qb2 = $this->em->getConnection()->createQueryBuilder();
+        $qb2->delete(MAUTIC_TABLE_PREFIX.'leads')
+            ->where(
+                $qb2->expr()->eq('id', $lead->getId())
+            );
+
+        $qb2->execute();
     }
 
     private function getNow(): \DateTime
