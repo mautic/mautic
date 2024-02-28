@@ -5,6 +5,12 @@
 {% block mauticContent %}dashboard{% endblock %}
 
 {% block actions %}
+<div class="btn-group">
+    <a type="button" class="btn btn-default btn-nospin hidden-xs hidden-sm" href="/s/campaigns/new?tmpl=list">
+      <i class="ri-add-line"></i>
+      <span>{{ 'mautic.dashboard.label.campaign'|trans }}</span>
+    </a>
+  </div>
   {{ include('@MauticCore/Helper/page_actions.html.twig', {
       'routeBase': 'dashboard',
       'langVar': 'dashboard',
@@ -52,6 +58,7 @@
       ],
   }) }}
 {% endblock %}
+
 
 {% block content %}
   {% if true == phpVersion['isOutdated'] %}
