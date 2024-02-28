@@ -8,19 +8,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class AddToCompanyActionType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'company',

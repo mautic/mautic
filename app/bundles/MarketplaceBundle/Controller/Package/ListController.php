@@ -24,17 +24,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
-    private PluginCollector $pluginCollector;
-
-    private RouteProvider $routeProvider;
-
-    private Config $config;
-
     public function __construct(
-        PluginCollector $pluginCollector,
-        RouteProvider $routeProvider,
+        private PluginCollector $pluginCollector,
+        private RouteProvider $routeProvider,
         ManagerRegistry $doctrine,
-        Config $config,
+        private Config $config,
         MauticFactory $factory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -45,10 +39,6 @@ class ListController extends CommonController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->pluginCollector = $pluginCollector;
-        $this->routeProvider   = $routeProvider;
-        $this->config          = $config;
-
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -62,9 +52,18 @@ class ListController extends CommonController
             return $this->accessDenied();
         }
 
+        $this->setListFilters();
+
         $request = $this->getCurrentRequest();
         $search  = InputHelper::clean($request->get('search', ''));
-        $limit   = (int) $request->get('limit', 30);
+
+        $session = $request->getSession();
+        if (empty($page)) {
+            $page = $session->get('mautic.marketplace.package.page', 1);
+        }
+
+        // set limits
+        $limit   = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $route   = $this->routeProvider->buildListRoute($page);
 
         return $this->delegateView(

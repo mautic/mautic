@@ -124,15 +124,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.sms.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\SmsBundle\Entity\Stat::class,
-                ],
-            ],
-        ],
     ],
     'routes' => [
         'main' => [
@@ -168,7 +159,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'smses',
                 'path'            => '/smses',
-                'controller'      => 'Mautic\SmsBundle\Controller\Api\SmsApiController',
+                'controller'      => \Mautic\SmsBundle\Controller\Api\SmsApiController::class,
             ],
             'mautic_api_smses_send' => [
                 'path'       => '/smses/{id}/contact/{contactId}/send',

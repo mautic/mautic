@@ -3,7 +3,6 @@
 namespace Mautic\SmsBundle;
 
 /**
- * Class SmsEvents
  * Events available for SmsBundle.
  */
 final class SmsEvents
@@ -95,4 +94,12 @@ final class SmsEvents
      * @var string
      */
     public const ON_CAMPAIGN_REPLY = 'mautic.sms.on_campaign_reply';
+
+    /**
+     * The mautic.sms.on_tokens_build event is dispatched when a contact generate tokens are build.
+     *
+     * The event listener receives a
+     * Mautic\SmsBundle\Event\TokensBuildEvent
+     */
+    public const ON_SMS_TOKENS_BUILD = 'mautic.sms.on_tokens_build';
 }

@@ -24,7 +24,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testCreatingMultiselectField()
+    public function testCreatingMultiselectField(): void
     {
         $payload = [
             'label'               => 'Shops (TB)',
@@ -168,22 +168,12 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         foreach ($payload as $key => $value) {
             $this->assertTrue(isset($response['field'][$key]));
 
-            switch ($key) {
-                case 'alias':
-                    $this->assertEquals($alias, $response['field'][$key]);
-                    break;
-
-                case 'object':
-                    $this->assertEquals('lead', $response['field'][$key]);
-                    break;
-
-                case 'type':
-                    $this->assertEquals('text', $response['field'][$key]);
-                    break;
-
-                default:
-                    $this->assertEquals($value, $response['field'][$key]);
-            }
+            match ($key) {
+                'alias'  => $this->assertEquals($alias, $response['field'][$key]),
+                'object' => $this->assertEquals('lead', $response['field'][$key]),
+                'type'   => $this->assertEquals('text', $response['field'][$key]),
+                default  => $this->assertEquals($value, $response['field'][$key]),
+            };
         }
     }
 
@@ -200,27 +190,13 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             // use array has key because ID will now be null
             $this->assertArrayHasKey($key, $response['field']);
 
-            switch ($key) {
-                case 'id':
-                    // ID is expected to now be null
-                    $this->assertNull($response['field'][$key]);
-                    break;
-
-                case 'alias':
-                    $this->assertEquals($alias, $response['field'][$key]);
-                    break;
-
-                case 'object':
-                    $this->assertEquals('lead', $response['field'][$key]);
-                    break;
-
-                case 'type':
-                    $this->assertEquals('text', $response['field'][$key]);
-                    break;
-
-                default:
-                    $this->assertEquals($value, $response['field'][$key]);
-            }
+            match ($key) {
+                'id'     => $this->assertNull($response['field'][$key]),
+                'alias'  => $this->assertEquals($alias, $response['field'][$key]),
+                'object' => $this->assertEquals('lead', $response['field'][$key]),
+                'type'   => $this->assertEquals('text', $response['field'][$key]),
+                default  => $this->assertEquals($value, $response['field'][$key]),
+            };
         }
     }
 

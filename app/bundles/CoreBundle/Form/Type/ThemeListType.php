@@ -9,28 +9,20 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class ThemeListType.
+ * @extends AbstractType<mixed>
  */
 class ThemeListType extends AbstractType
 {
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
-    /**
-     * ThemeListType constructor.
-     */
-    public function __construct(ThemeHelperInterface $helper)
-    {
-        $this->themeHelper = $helper;
+    public function __construct(
+        private ThemeHelperInterface $themeHelper
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'choices'           => function (Options $options) {
+                'choices'           => function (Options $options): array {
                     $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
                     $themes['mautic_code_mode'] = 'Code Mode';
 

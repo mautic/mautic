@@ -18,17 +18,14 @@ class DetermineWinnerSubscriberTest extends TestCase
     /**
      * @var MockObject|HitRepository
      */
-    private $hitRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private \Mautic\PageBundle\EventListener\DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -84,11 +81,11 @@ class DetermineWinnerSubscriberTest extends TestCase
 
         $parentMock
             ->method('hasTranslations')
-            ->willReturn(true);
+            ->willReturn(1);
 
         $childMock
             ->method('hasTranslations')
-            ->willReturn(true);
+            ->willReturn(1);
 
         $transChildren->method('getKeys')
             ->willReturnOnConsecutiveCalls([2], [4]);
@@ -133,7 +130,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         self::assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
     }
 
-    public function testOnDetermineDwellTimeWinner()
+    public function testOnDetermineDwellTimeWinner(): void
     {
         $parentMock  = $this->createMock(Page::class);
         $ids         = [1, 2];

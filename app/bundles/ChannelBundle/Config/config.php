@@ -29,7 +29,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'messages',
                 'path'            => '/messages',
-                'controller'      => 'Mautic\ChannelBundle\Controller\Api\MessageApiController',
+                'controller'      => \Mautic\ChannelBundle\Controller\Api\MessageApiController::class,
             ],
         ],
         'public' => [
@@ -66,13 +66,6 @@ return [
                     'translator',
                 ],
                 'alias' => 'channel',
-            ],
-        ],
-        'repositories' => [
-            'mautic.channel.repository.message_queue' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [\Mautic\ChannelBundle\Entity\MessageQueue::class],
             ],
         ],
     ],

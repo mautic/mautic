@@ -2,10 +2,12 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
@@ -39,22 +41,15 @@ class EventModel extends FormModel
         return $this->em->getRepository(LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Event
     {
         if (null === $id) {
             return new Event();
@@ -63,7 +58,7 @@ class EventModel extends FormModel
         return parent::getEntity($id);
     }
 
-    public function deleteEvents($currentEvents, $deletedEvents)
+    public function deleteEvents($currentEvents, $deletedEvents): void
     {
         $deletedKeys = [];
         foreach ($deletedEvents as $k => $deleteMe) {
@@ -71,7 +66,7 @@ class EventModel extends FormModel
                 $deleteMe = $deleteMe->getId();
             }
 
-            if (0 === strpos($deleteMe, 'new')) {
+            if (str_starts_with($deleteMe, 'new')) {
                 unset($deletedEvents[$k]);
             }
 
@@ -87,13 +82,24 @@ class EventModel extends FormModel
         if (count($deletedEvents)) {
             // wipe out any references to these events to prevent restraint violations
             $this->getRepository()->nullEventRelationships($deletedKeys);
-
-            foreach ($deletedEvents as $eventToDelete) {
-                // delete the events
-                $this->getLeadEventLogRepository()->removeEventLogs($eventToDelete);
-                $this->deleteEntities([$eventToDelete]);
-            }
+            $this->getRepository()->setEventsAsDeleted($deletedEvents);
+            $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);
         }
+    }
+
+    public function deleteEventsByCampaignId(int $campaignId): void
+    {
+        $eventIds = $this->getRepository()->getCampaignEventIds($campaignId);
+        $this->deleteEventsByEventIds($eventIds);
+    }
+
+    /**
+     * @param string[] $eventIds
+     */
+    public function deleteEventsByEventIds(array $eventIds): void
+    {
+        $this->getRepository()->deleteEvents($eventIds);
+        $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
     }
 
     /**
@@ -103,10 +109,8 @@ class EventModel extends FormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

@@ -13,10 +13,26 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->add(
+            'contact_allow_multiple_companies',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.allow_multiple_companies',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.allow_multiple_companies.tooltip',
+                ],
+                'data' => (bool) ($options['data']['contact_allow_multiple_companies'] ?? true),
+            ]
+        );
+
         $builder->add(
             'contact_unique_identifiers_operator',
             ChoiceType::class,
@@ -48,7 +64,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $formModifier = static function (FormInterface $form, $currentColumns) {
+        $formModifier = static function (FormInterface $form, $currentColumns): void {
             $order        = [];
             $orderColumns = [];
             if (!empty($currentColumns)) {
@@ -81,9 +97,9 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data    = $event->getData();
-                $columns = isset($data['contact_columns']) ? $data['contact_columns'] : [];
+                $columns = $data['contact_columns'] ?? [];
                 $formModifier($event->getForm(), $columns);
             }
         );
@@ -91,9 +107,9 @@ class ConfigType extends AbstractType
         // Build the columns selector
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data    = $event->getData();
-                $columns = isset($data['contact_columns']) ? $data['contact_columns'] : [];
+                $columns = $data['contact_columns'] ?? [];
                 $formModifier($event->getForm(), $columns);
             }
         );

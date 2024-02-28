@@ -7,31 +7,14 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class TableSchemaHelper.
- *
- * Used to manipulate creation/removal of tables
+ * Used to manipulate creation/removal of tables.
  */
 class TableSchemaHelper
 {
     /**
-     * @var Connection
-     */
-    protected $db;
-
-    /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $sm;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
-     * @var ColumnSchemaHelper
-     */
-    protected $columnHelper;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
      * @var \Doctrine\DBAL\Schema\Schema
@@ -39,21 +22,24 @@ class TableSchemaHelper
     protected $schema;
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $dropTables;
+    protected array $dropTables = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $addTables;
+    protected array $addTables = [];
 
-    public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
-    {
-        $this->db           = $db;
-        $this->sm           = $db->getSchemaManager();
-        $this->prefix       = $prefix;
-        $this->columnHelper = $columnHelper;
+    /**
+     * @param string $prefix
+     */
+    public function __construct(
+        protected Connection $db,
+        protected $prefix,
+        protected ColumnSchemaHelper $columnHelper
+    ) {
+        $this->sm = $db->createSchemaManager();
     }
 
     /**
@@ -96,7 +82,6 @@ class TableSchemaHelper
     /**
      * Add a table to the db.
      *
-     * @param array $table
      *                     ['name']    string (required) unique name of table; cannot already exist
      *                     ['columns'] array  (optional) Array of columns to add in the format of
      *                     array(
@@ -132,8 +117,8 @@ class TableSchemaHelper
 
         $this->addTables[] = $table;
 
-        $options = (isset($table['options'])) ? $table['options'] : [];
-        $columns = (isset($table['columns'])) ? $table['columns'] : [];
+        $options = $table['options'] ?? [];
+        $columns = $table['columns'] ?? [];
 
         $newTable = $this->getSchema()->createTable($this->prefix.$table['name']);
 
@@ -146,8 +131,8 @@ class TableSchemaHelper
                 }
 
                 if (!isset($columns[$column['name']])) {
-                    $type       = (isset($column['type'])) ? $column['type'] : 'text';
-                    $colOptions = (isset($column['options'])) ? $column['options'] : [];
+                    $type       = $column['type'] ?? 'text';
+                    $colOptions = $column['options'] ?? [];
 
                     $newTable->addColumn($column['name'], $type, $colOptions);
                     $columnsAdded[] = $column['name'];
@@ -182,22 +167,18 @@ class TableSchemaHelper
     /**
      * Executes the changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         $platform = $this->db->getDatabasePlatform();
 
-        if (!empty($this->dropTables)) {
-            foreach ($this->dropTables as $t) {
-                $this->sm->dropTable($this->prefix.$t);
-            }
+        foreach ($this->dropTables as $t) {
+            $this->sm->dropTable($this->prefix.$t);
         }
 
         $sql = $this->getSchema()->toSql($platform);
 
-        if (!empty($sql)) {
-            foreach ($sql as $s) {
-                $this->db->executeStatement($s);
-            }
+        foreach ($sql as $s) {
+            $this->db->executeStatement($s);
         }
 
         // reset schema
@@ -211,11 +192,9 @@ class TableSchemaHelper
      * @param string $table
      * @param bool   $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function checkTableExists($table, $throwException = false)
+    public function checkTableExists($table, $throwException = false): bool
     {
         if ($this->sm->tablesExist($this->prefix.$table)) {
             if ($throwException) {

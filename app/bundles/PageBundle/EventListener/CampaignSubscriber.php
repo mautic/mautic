@@ -18,35 +18,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
-
-    /**
-     * @var RealTimeExecutioner
-     */
-    private $realTimeExecutioner;
-
     public function __construct(
-        LeadModel $leadModel,
-        TrackingHelper $trackingHelper,
-        RealTimeExecutioner $realTimeExecutioner
+        private LeadModel $leadModel,
+        private TrackingHelper $trackingHelper,
+        private RealTimeExecutioner $realTimeExecutioner
     ) {
-        $this->leadModel           = $leadModel;
-        $this->trackingHelper      = $trackingHelper;
-        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -62,7 +41,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add trigger
         $pageHitTrigger = [
@@ -111,7 +90,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger actions for page hits.
      */
-    public function onPageHit(PageHitEvent $event)
+    public function onPageHit(PageHitEvent $event): void
     {
         $hit       = $event->getHit();
         $channel   = 'page';
@@ -184,14 +163,14 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         // Check Landing Pages
         if ($pageHit instanceof Page) {
-            list($parent, $children) = $pageHit->getVariants();
+            [$parent, $children] = $pageHit->getVariants();
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;
         }
 
-        $limitToPages = (isset($config['pages'])) ? $config['pages'] : [];
+        $limitToPages = $config['pages'] ?? [];
 
         $urlMatches = [];
 

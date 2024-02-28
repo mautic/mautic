@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Scheduler\Command;
 
 use Mautic\ReportBundle\Exception\FileIOException;
+use Mautic\ReportBundle\Model\ReportCleanup;
 use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\Console\Command\Command;
@@ -13,26 +14,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends Command
 {
-    /**
-     * @var ReportExporter
-     */
-    private $reportExporter;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(ReportExporter $reportExporter, TranslatorInterface $translator)
-    {
+    public function __construct(
+        private ReportExporter $reportExporter,
+        private ReportCleanup $reportCleanup,
+        private TranslatorInterface $translator
+    ) {
         parent::__construct();
-        $this->reportExporter = $reportExporter;
-        $this->translator     = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -40,9 +29,6 @@ class ExportSchedulerCommand extends Command
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $report = $input->getOption('report');
@@ -56,6 +42,12 @@ class ExportSchedulerCommand extends Command
         }
 
         try {
+            if ($exportOption->getReportId()) {
+                $this->reportCleanup->cleanup($exportOption->getReportId());
+            } else {
+                $this->reportCleanup->cleanupAll();
+            }
+
             $this->reportExporter->processExport($exportOption);
 
             $output->writeln('<info>'.$this->translator->trans('mautic.report.schedule.command.finished').'</info>');
@@ -65,5 +57,6 @@ class ExportSchedulerCommand extends Command
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Processes scheduler for report\'s export';
 }
