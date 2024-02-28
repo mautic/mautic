@@ -121,7 +121,7 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
                 $qb2->expr()->eq('id', $lead->getId())
             );
 
-        $qb2->execute();
+        $qb2->executeStatement();
     }
 
     private function getNow(): \DateTime
