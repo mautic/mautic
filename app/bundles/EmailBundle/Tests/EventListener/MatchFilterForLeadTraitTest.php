@@ -153,6 +153,18 @@ class MatchFilterForLeadTraitTest extends TestCase
                 'value' => 'one',
             ],
             [
+                'operator'  => '=',
+                'value'     => 'one',
+            ],
+            true,
+        ];
+        yield [
+            [
+                'name'  => 'field_select',
+                'type'  => 'select',
+                'value' => 'one',
+            ],
+            [
                 'operator'  => OperatorOptions::IN,
                 'value'     => 'one',
             ],
