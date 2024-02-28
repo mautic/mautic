@@ -39,7 +39,7 @@ class FieldChangeRepository extends CommonRepository
     /**
      * Takes an object id & type and deletes all entities that match.
      */
-    public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null): void
+    public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null, \DateTimeInterface $toDateTime = null): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -51,8 +51,13 @@ class FieldChangeRepository extends CommonRepository
             $qb->setParameter('integration', $integration);
         }
 
+        if (null !== $toDateTime) {
+            $expr = $expr->with($qb->expr()->lte('modified_at', ':toDateTime'));
+            $qb->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'));
+        }
+
         $qb->setParameter('objectType', $objectType)
-            ->setParameter('objectId', (int) $objectId);
+            ->setParameter('objectId', $objectId);
 
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
@@ -116,7 +121,9 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
-            ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
+            // 1. We must sort by f.object_id. Otherwise values stored in PartialObjectReportBuilder::lastProcessedTrackedId will be incorrect.
+            // 2. Newer updated fields must override older updated fields
+            ->orderBy('f.object_id, f.modified_at', 'ASC');
 
         return $qb->executeQuery()->fetchAllAssociative();
     }

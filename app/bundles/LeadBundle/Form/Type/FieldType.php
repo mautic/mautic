@@ -50,6 +50,14 @@ class FieldType extends AbstractType
         'email',
     ];
 
+    /**
+     * @var string[]
+     */
+    private static array $fieldsWithNoLengthLimit = [
+        'textarea',
+        'html',
+    ];
+
     public function __construct(
         private EntityManagerInterface $em,
         private Translator $translator,
@@ -670,14 +678,32 @@ class FieldType extends AbstractType
 
     public static function validateDefaultValue(?string $value, ExecutionContextInterface $context): void
     {
-        if (!empty($value)) {
-            $root  = $context->getRoot();
-            $limit = $root->getViewData()->getCharLengthLimit();
-
-            if (strlen($value) > $limit) {
-                $context->buildViolation('mautic.lead.defaultValue.invalid')->addViolation();
-            }
+        if (empty($value)) {
+            return;
         }
+
+        /** @var LeadField $field */
+        $field = $context->getRoot()->getViewData();
+
+        if (in_array($field->getType(), self::$fieldsWithNoLengthLimit)) {
+            return;
+        }
+
+        $limit              = $field->getCharLengthLimit();
+        $defaultValueLength = mb_strlen($value);
+
+        if ($defaultValueLength <= $limit) {
+            return;
+        }
+
+        $translationParameters = [
+            '%currentLength%'           => $defaultValueLength,
+            '%defaultValueLengthLimit%' => $limit,
+        ];
+
+        $context
+            ->buildViolation('mautic.lead.defaultValue.maxlengthexceeded', $translationParameters)
+            ->addViolation();
     }
 
     private function addLengthValidationField(FormInterface $form, bool $new = true): void
