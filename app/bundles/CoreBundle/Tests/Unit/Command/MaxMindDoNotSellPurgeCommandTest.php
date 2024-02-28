@@ -15,15 +15,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class MaxMindDoNotSellPurgeCommandTest extends TestCase
+final class MaxMindDoNotSellPurgeCommandTest extends TestCase
 {
-    protected MockObject $mockLeadRepository;
+    private MockObject $mockLeadRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        define('MAUTIC_TABLE_PREFIX', 'test');
 
         $ip = new IpAddress('123.123.123.123');
         $ip->setIpDetails(['city' => 'Boston', 'region' => 'MA', 'country' => 'United States', 'zipcode' => '02113']);

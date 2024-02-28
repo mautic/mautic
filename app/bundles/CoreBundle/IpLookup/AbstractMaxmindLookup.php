@@ -2,30 +2,10 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-use GuzzleHttp\Client;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
-use Psr\Log\LoggerInterface;
 
 abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 {
-    /**
-     * @var MaxMindDoNotSellList
-     */
-    private $doNotSellList;
-
-    public function __construct(
-        protected ?string $auth = null,
-        protected $config = null,
-        protected ?string $cacheDir = null,
-        protected ?LoggerInterface $logger = null,
-        protected ?Client $client = null,
-        protected ?CoreParametersHelper $coreParametersHelper = null
-    ) {
-        parent::__construct($auth, $config, $cacheDir, $logger, $client, $coreParametersHelper);
-        $this->doNotSellList = new MaxMindDoNotSellList($coreParametersHelper);
-    }
-
     /**
      * @return string
      */
@@ -115,10 +95,12 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
             return false;
         }
 
+        $doNotSellList = new MaxMindDoNotSellList($this->coreParametersHelper);
+
         $ip = $this->ip;
-        $this->doNotSellList->loadList();
-        $ipMatch = array_filter($this->doNotSellList->getList(), function ($item) use ($ip) {
-            return $this->doNotSellList->stripCIDR($item['value']) == $ip;
+        $doNotSellList->loadList();
+        $ipMatch = array_filter($doNotSellList->getList(), function ($item) use ($ip, $doNotSellList): bool {
+            return $doNotSellList->stripCIDR($item['value']) == $ip;
         });
 
         return !boolval(count($ipMatch));
