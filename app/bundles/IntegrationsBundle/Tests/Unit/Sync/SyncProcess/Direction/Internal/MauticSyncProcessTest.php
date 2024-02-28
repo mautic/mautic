@@ -12,10 +12,12 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
@@ -41,11 +43,23 @@ class MauticSyncProcessTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
+    /**
+     * @var InputOptionsDAO
+     */
+    private $inputOptionsDAO;
+
+    /**
+     * @var MauticSyncProcess
+     */
+    private $mauticSyncProcess;
+
     protected function setUp(): void
     {
         $this->syncDateHelper        = $this->createMock(SyncDateHelper::class);
         $this->objectChangeGenerator = $this->createMock(ObjectChangeGenerator::class);
         $this->syncDataExchange      = $this->createMock(MauticSyncDataExchange::class);
+        $this->inputOptionsDAO       = new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]);
+        $this->mauticSyncProcess     = new MauticSyncProcess($this->syncDateHelper, $this->objectChangeGenerator);
     }
 
     public function testThatMauticGetSyncReportIsCalledBasedOnRequest(): void
@@ -86,7 +100,7 @@ class MauticSyncProcessTest extends TestCase
                 }
             );
 
-        $this->getSyncProcess($mappingManual)->getSyncReport(1);
+        $this->createMauticSyncProcess($mappingManual)->getSyncReport(1);
     }
 
     public function testThatMauticGetSyncReportIsNotCalledBasedOnRequest(): void
@@ -102,7 +116,7 @@ class MauticSyncProcessTest extends TestCase
         $this->syncDataExchange->expects($this->never())
             ->method('getSyncReport');
 
-        $report = $this->getSyncProcess($mappingManual)->getSyncReport(1);
+        $report = $this->createMauticSyncProcess($mappingManual)->getSyncReport(1);
 
         $this->assertEquals(MauticSyncDataExchange::NAME, $report->getIntegration());
     }
@@ -142,21 +156,67 @@ class MauticSyncProcessTest extends TestCase
             ->method('getSyncObjectChange')
             ->willReturn($objectChangeDAO);
 
-        $syncOrder = $this->getSyncProcess($mappingManual)->getSyncOrder($syncReport);
+        $syncOrder = $this->createMauticSyncProcess($mappingManual)->getSyncOrder($syncReport);
 
         // The change should have been added to the order as an identified object
         $this->assertEquals([Contact::NAME => [1 => $objectChangeDAO]], $syncOrder->getIdentifiedObjects());
     }
 
-    /**
-     * @return MauticSyncProcess
-     */
-    private function getSyncProcess(MappingManualDAO $mappingManualDAO)
+    private function createMauticSyncProcess(MappingManualDAO $mappingManualDAO): MauticSyncProcess
     {
-        $syncProcess = new MauticSyncProcess($this->syncDateHelper, $this->objectChangeGenerator);
+        $this->mauticSyncProcess->setupSync($this->inputOptionsDAO, $mappingManualDAO, $this->syncDataExchange);
 
-        $syncProcess->setupSync(new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]), $mappingManualDAO, $this->syncDataExchange);
+        return $this->mauticSyncProcess;
+    }
 
-        return $syncProcess;
+    public function testThatItDoesntSyncOtherEntityTypesWhenIDsForSomeEntityAreSpecified(): void
+    {
+        $mappingManual         = new MappingManualDAO(self::INTEGRATION_NAME);
+        $this->inputOptionsDAO = new InputOptionsDAO([
+            'integration'      => self::INTEGRATION_NAME,
+            'mautic-object-id' => ['contact:1'],
+        ]);
+
+        $contactMapping = new ObjectMappingDAO(Contact::NAME, 'Contact');
+        $contactMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $mappingManual->addObjectMapping($contactMapping);
+
+        $leadMapping = new ObjectMappingDAO(Contact::NAME, 'Lead');
+        $leadMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $mappingManual->addObjectMapping($leadMapping);
+
+        $companyMapping = new ObjectMappingDAO(Company::NAME, 'Account');
+        $companyMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $mappingManual->addObjectMapping($companyMapping);
+
+        $fromSyncDateTime = new \DateTimeImmutable();
+        $this->syncDateHelper->expects($this->once())
+            ->method('getSyncFromDateTime')
+            ->with(MauticSyncDataExchange::NAME, Contact::NAME)
+            ->willReturn($fromSyncDateTime);
+
+        $toSyncDateTime   = new \DateTimeImmutable();
+        $this->syncDateHelper->expects($this->once())
+            ->method('getSyncToDateTime')
+            ->willReturn($toSyncDateTime);
+
+        $this->syncDataExchange->expects($this->once())
+            ->method('getSyncReport')
+            ->willReturnCallback(
+                function (RequestDAO $requestDAO): ReportDAO {
+                    $requestObjects = $requestDAO->getObjects();
+                    $this->assertCount(1, $requestObjects);
+
+                    /** @var ObjectDAO $requestObject */
+                    $requestObject = $requestObjects[0];
+                    $this->assertEquals(['email'], $requestObject->getRequiredFields());
+                    $this->assertEquals(Contact::NAME, $requestObject->getObject());
+
+                    return new ReportDAO(self::INTEGRATION_NAME);
+                }
+            );
+
+        $syncReport = $this->createMauticSyncProcess($mappingManual)->getSyncReport(1);
+        $this->assertEquals(self::INTEGRATION_NAME, $syncReport->getIntegration());
     }
 }

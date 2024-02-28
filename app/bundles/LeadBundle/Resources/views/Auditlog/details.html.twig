@@ -3,12 +3,7 @@
     - event
     - lead
 #}
-{% if event.details.fields is defined %}
-    {% set objects = event.details.fields %}
-{% else %}
-    {% set objects = {} %}
-{% endif %}
-
+{% set objects = event.details.fields is defined ? event.details.fields : {} %}
 {% for key, value in event.details %}
     {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key %}
         {% set objects = objects|merge({(key): value}) %}
