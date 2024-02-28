@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,10 +10,12 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 
 class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 {
     use ContactLimiterTrait;
+    use MockedConnectionTrait;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Connection
@@ -28,15 +29,11 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection = $this->getMockedConnection();
 
         $expr = new ExpressionBuilder($this->connection);
         $this->connection->method('getExpressionBuilder')
-            ->willReturn($expr);
-
-        $platform = $this->createMock(AbstractPlatform::class);
-        $this->connection->method('getDatabasePlatform')
-            ->willReturn($platform);
+          ->willReturn($expr);
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->entityManager->method('getExpressionBuilder')

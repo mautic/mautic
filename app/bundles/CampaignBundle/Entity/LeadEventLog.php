@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 class LeadEventLog implements ChannelInterface
 {
     public const TABLE_NAME = 'campaign_lead_event_log';
+
     /**
      * @var string|null
      */

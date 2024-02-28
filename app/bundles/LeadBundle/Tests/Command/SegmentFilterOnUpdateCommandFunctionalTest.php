@@ -66,6 +66,26 @@ final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCa
             [
                 'object'     => 'lead',
                 'glue'       => 'and',
+                'field'      => 'address1',
+                'type'       => 'text',
+                'operator'   => '!empty',
+                'properties' => ['filter' => null],
+                // The filter key is deprecated but sometimes it contains rubbish values including a string.
+                'filter'     => 'somestring',
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'address1',
+                'type'       => 'text',
+                'operator'   => '!=',
+                'properties' => ['filter' => null],
+                // The filter key is deprecated but sometimes it contains rubbish values including an array.
+                'filter'     => ['option A', 'option B'],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
                 'field'      => 'firstname',
                 'type'       => 'text',
                 'operator'   => '=',

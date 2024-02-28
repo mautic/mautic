@@ -2,16 +2,19 @@
 
 namespace Mautic\PageBundle\Event;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class PageDisplayEvent extends Event
 {
     /**
-     * @param string $content
+     * Preferred lead to be used in listeners.
      */
+    private ?Lead $lead = null;
+
     public function __construct(
-        private $content,
+        private string $content,
         private Page $page,
         private array $params = []
     ) {
@@ -29,10 +32,8 @@ class PageDisplayEvent extends Event
 
     /**
      * Get page content.
-     *
-     * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -65,5 +66,15 @@ class PageDisplayEvent extends Event
     public function setParams($params): void
     {
         $this->params = $params;
+    }
+
+    public function getLead(): ?Lead
+    {
+        return $this->lead;
+    }
+
+    public function setLead(Lead $lead): void
+    {
+        $this->lead = $lead;
     }
 }

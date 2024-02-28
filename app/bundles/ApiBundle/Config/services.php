@@ -15,7 +15,6 @@ return function (ContainerConfigurator $configurator): void {
         ->public();
 
     $excludes = [
-        'Serializer/Driver',
         'Serializer/Exclusion',
         'Helper/BatchIdToEntityHelper.php',
     ];

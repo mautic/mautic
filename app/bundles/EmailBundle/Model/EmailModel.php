@@ -115,9 +115,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        private EmailStatModel $emailStatModel
     ) {
-        $this->connection               = $connection;
+        $this->connection = $connection;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -130,12 +131,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
     }
 
-    /**
-     * @return StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->emailStatModel->getRepository();
     }
 
     /**
@@ -173,8 +171,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
-            /** @var Email $translationParent */
             if ($translationParent = $entity->getTranslationParent()) {
+                \assert($translationParent instanceof Email);
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }
@@ -442,7 +440,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_OPEN);
         }
 
-        $this->em->persist($stat);
+        $this->emailStatModel->saveEntity($stat);
 
         // Only up counts if associated with both an email and lead
         if ($firstTime && $email && $lead) {
@@ -491,6 +489,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
+    }
+
+    public function saveEmailStat(Stat $stat): void
+    {
+        $this->emailStatModel->saveEntity($stat);
     }
 
     /**
@@ -662,8 +665,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        /** @var StatRepository $statRepo */
-        $statRepo = $this->em->getRepository(Stat::class);
+        $statRepo = $this->getStatRepository();
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
@@ -1635,7 +1637,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if (isset($saveEntities)) {
-            $this->getStatRepository()->saveEntities($saveEntities);
+            $this->emailStatModel->saveEntities($saveEntities);
         }
 
         // save some memory
@@ -2226,7 +2228,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if (isset($saveEntities)) {
-            $this->getStatRepository()->saveEntities($saveEntities);
+            $this->emailStatModel->saveEntities($saveEntities);
         }
 
         // save some memory

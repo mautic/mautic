@@ -1220,6 +1220,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "ajitdev",
+      "name": "Ajit",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3738249?v=4",
+      "profile": "https://github.com/ajitdev",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

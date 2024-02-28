@@ -16,6 +16,6 @@ class TrailingSlashHelper
         $siteUrl  = $this->coreParametersHelper->get('site_url');
         $pathInfo = substr($request->getPathInfo(), 0, -1);
 
-        return $siteUrl.$pathInfo;
+        return rtrim($siteUrl, '/').'/'.ltrim($pathInfo, '/');
     }
 }

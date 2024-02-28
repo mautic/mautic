@@ -29,7 +29,8 @@ class ConfigTrackingPageType extends AbstractType
                 'label' => 'mautic.page.config.form.anonymize_ip',
                 'data'  => isset($options['data']['anonymize_ip']) && (bool) $options['data']['anonymize_ip'],
                 'attr'  => [
-                    'tooltip' => 'mautic.page.config.form.anonymize_ip.tooltip',
+                    'tooltip'  => 'mautic.page.config.form.anonymize_ip.tooltip',
+                    'onchange' => 'Mautic.showAnonymizeWarningMessage(this.value)',
                 ],
             ]
         );
