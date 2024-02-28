@@ -160,7 +160,7 @@ RESPONSE);
     public function testCountryIpLookupSuccessful(): void
     {
         $ipService = $this->getMockBuilder(MaxmindCountryLookup::class)
-            ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
+            ->setConstructorArgs(['test', null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
             ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
         $ipService->method('shouldPerformLookup')->willReturn(true);
@@ -173,7 +173,7 @@ RESPONSE);
     public function testOmniIpLookupSuccessful(): void
     {
         $ipService = $this->getMockBuilder(MaxmindOmniLookup::class)
-            ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
+            ->setConstructorArgs(['test', null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
             ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
         $ipService->method('shouldPerformLookup')->willReturn(true);
@@ -186,7 +186,7 @@ RESPONSE);
     public function testPrecisionIpLookupSuccessful(): void
     {
         $ipService = $this->getMockBuilder(MaxmindPrecisionLookup::class)
-            ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
+            ->setConstructorArgs(['test', null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
             ->onlyMethods(['shouldPerformLookup'])
             ->getMock();
         $ipService->method('shouldPerformLookup')->willReturn(true);
