@@ -111,10 +111,12 @@
 						</td>
 						<td>
 							<div>
-								{{- include('@MauticUser/Helper/publishstatus_icon.html.twig', {
-								    'item'  : item,
-								    'model' : 'user',
-								}) -}}
+								{% if item.getId() != currentUserId %}
+									{{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+										'item'  : item,
+										'model' : 'user',
+									}) -}}
+								{% endif %}
 								{% if permissions['edit'] %}
 									<a href="{{ path( 'mautic_user_action', {'objectAction' : 'edit', 'objectId' : item.getId()} ) }}" data-toggle="ajax">
 										{{ item.getName(true) }}

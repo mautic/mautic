@@ -31,17 +31,17 @@ class UserController extends FormController
         if (!$this->security->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
-
         $pageHelper = $pageHelperFactory->make('mautic.user', $page);
 
         $this->setListFilters();
 
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $orderBy    = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
-        $orderByDir = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
-        $search     = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
-        $search     = html_entity_decode($search);
+        $currentUserId = $this->user->getId();
+        $limit         = $pageHelper->getLimit();
+        $start         = $pageHelper->getStart();
+        $orderBy       = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
+        $orderByDir    = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
+        $search        = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
+        $search        = html_entity_decode($search);
         $request->getSession()->set('mautic.user.filter', $search);
 
         // do some default filtering
@@ -82,12 +82,13 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'       => $users,
-                'searchValue' => $search,
-                'page'        => $page,
-                'limit'       => $limit,
-                'tmpl'        => $tmpl,
-                'permissions' => [
+                'items'         => $users,
+                'searchValue'   => $search,
+                'page'          => $page,
+                'limit'         => $limit,
+                'tmpl'          => $tmpl,
+                'currentUserId' => $currentUserId,
+                'permissions'   => [
                     'create' => $this->security->isGranted('user:users:create'),
                     'edit'   => $this->security->isGranted('user:users:editother'),
                     'delete' => $this->security->isGranted('user:users:deleteother'),
