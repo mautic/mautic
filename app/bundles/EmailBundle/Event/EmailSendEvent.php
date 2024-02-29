@@ -47,6 +47,8 @@ class EmailSendEvent extends CommonEvent
 
     private bool $stopSending = false;
 
+    private string|\Exception $stopSendingError = '';
+
     /**
      * @param array $args
      * @param bool  $isDynamicContentParsing
@@ -345,5 +347,21 @@ class EmailSendEvent extends CommonEvent
     public function getStopSending(): bool
     {
         return $this->stopSending;
+    }
+
+    /**
+     * Set stop sending errror.
+     */
+    public function setStopSendingError(string|\Exception $error): void
+    {
+        $this->stopSendingError = $error;
+    }
+
+    /**
+     * Get stop sending errror.
+     */
+    public function getStopSendingError(): string|\Exception
+    {
+        return $this->stopSendingError;
     }
 }

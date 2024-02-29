@@ -1466,7 +1466,9 @@ class MailHelper
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
         if ($event->getStopSending()) {
-            $this->logError('Event said to stop sending.');
+            $this->logError($event->getStopSendingError());
+            // When a string is used for logging the error, fatal is not set
+            // and therefore mail sending is not stopped.
             $this->fatal = true;
         }
         unset($event);
