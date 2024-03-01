@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
+use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,17 +31,17 @@ class UserController extends FormController
         if (!$this->security->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
-
         $pageHelper = $pageHelperFactory->make('mautic.user', $page);
 
         $this->setListFilters();
 
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $orderBy    = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
-        $orderByDir = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
-        $search     = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
-        $search     = html_entity_decode($search);
+        $currentUserId = $this->user->getId();
+        $limit         = $pageHelper->getLimit();
+        $start         = $pageHelper->getStart();
+        $orderBy       = $request->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
+        $orderByDir    = $request->getSession()->get('mautic.user.orderbydir', 'ASC');
+        $search        = $request->get('search', $request->getSession()->get('mautic.user.filter', ''));
+        $search        = html_entity_decode($search);
         $request->getSession()->set('mautic.user.filter', $search);
 
         // do some default filtering
@@ -81,12 +82,13 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'       => $users,
-                'searchValue' => $search,
-                'page'        => $page,
-                'limit'       => $limit,
-                'tmpl'        => $tmpl,
-                'permissions' => [
+                'items'         => $users,
+                'searchValue'   => $search,
+                'page'          => $page,
+                'limit'         => $limit,
+                'tmpl'          => $tmpl,
+                'currentUserId' => $currentUserId,
+                'permissions'   => [
                     'create' => $this->security->isGranted('user:users:create'),
                     'edit'   => $this->security->isGranted('user:users:editother'),
                     'delete' => $this->security->isGranted('user:users:deleteother'),
@@ -220,6 +222,17 @@ class UserController extends FormController
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
 
+        /** @var \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel */
+        $auditLogModel      = $this->getModel('core.auditlog');
+        $auditLogRepository = $auditLogModel->getRepository();
+        $userActivity       = $auditLogRepository->getLogsForUser($user);
+        $users              = $model->getEntities();
+
+        $roleModel = $this->getModel('user.role');
+        \assert($roleModel instanceof RoleModel);
+        $roleRepository     = $roleModel->getRepository();
+        $roles              = $roleRepository->getEntities();
+
         // set the page we came from
         $page = $request->getSession()->get('mautic.user.page', 1);
 
@@ -319,7 +332,13 @@ class UserController extends FormController
         }
 
         return $this->delegateView([
-            'viewParameters'  => ['form' => $form->createView()],
+            'viewParameters'  => [
+                'form'          => $form->createView(),
+                'logs'          => $userActivity,
+                'users'         => $users,
+                'roles'         => $roles,
+                'editAction'    => true,
+            ],
             'contentTemplate' => '@MauticUser/User/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',

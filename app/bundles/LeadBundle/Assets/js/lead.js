@@ -693,7 +693,7 @@ Mautic.leadfieldOnLoad = function (container) {
     if (mQuery(container + ' .leadfield-list').length) {
         var bodyOverflow = {};
         mQuery(container + ' .leadfield-list tbody').sortable({
-            handle: '.fa-ellipsis-v',
+            handle: '.ri-draggable',
             helper: function(e, ui) {
                 ui.children().each(function() {
                     mQuery(this).width(mQuery(this).width());

@@ -2414,17 +2414,37 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return mixed|string
+     * @param string $sfObject
+     * @param string $sfFieldString
+     *
+     * @return mixed
      *
      * @throws ApiErrorException
      */
     public function getDncHistory($sfObject, $sfFieldString)
     {
-        // get last modified date for donot contact in Salesforce
-        $historySelect = 'Select Field, '.$sfObject.'Id, CreatedDate, isDeleted, NewValue from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$sfFieldString.') ORDER BY CreatedDate DESC';
-        $queryUrl      = $this->getQueryUrl();
+        return $this->getDoNotContactHistory($sfObject, $sfFieldString, 'DESC');
+    }
 
-        return $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
+    public function getDoNotContactHistory(string $object, string $ids, string $order = 'DESC'): mixed
+    {
+        // get last modified date for do not contact in Salesforce
+        $query = sprintf('Select
+                Field,
+                %sId,
+                CreatedDate,
+                isDeleted,
+                NewValue
+            from
+                %sHistory
+            where
+                Field = \'HasOptedOutOfEmail\'
+                and %sId IN (%s)
+            ORDER BY CreatedDate %s', $object, $object, $object, $ids, $order);
+
+        $url      = $this->getQueryUrl();
+
+        return $this->getApiHelper()->request('query', ['q' => $query], 'GET', false, null, $url);
     }
 
     /**
@@ -2455,7 +2475,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $sfFieldString = "'".implode("','", $leadIds)."'";
 
-        $historySF = $this->getDncHistory($sfObject, $sfFieldString);
+        $historySF = $this->getDoNotContactHistory($sfObject, $sfFieldString, 'ASC');
+
         // if there is no records of when it was modified in SF then just exit
         if (empty($historySF['records'])) {
             return;
