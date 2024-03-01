@@ -8,24 +8,28 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class LeadPermissions extends AbstractPermissions
 {
+    public const LISTS_VIEW         = 'lead:lists:view';
+    public const LISTS_VIEW_OWN     = 'lead:lists:viewown';
+    public const LISTS_VIEW_OTHER   = 'lead:lists:viewother';
+    public const LISTS_EDIT_OWN     = 'lead:lists:editown';
+    public const LISTS_EDIT_OTHER   = 'lead:lists:editother';
+    public const LISTS_CREATE       = 'lead:lists:create';
+    public const LISTS_DELETE_OWN   = 'lead:lists:deleteown';
+    public const LISTS_DELETE_OTHER = 'lead:lists:deleteother';
+    public const LISTS_FULL         = 'lead:lists:full';
+
     public function __construct($params)
     {
         parent::__construct($params);
 
         $this->permissions = [
-            'lists' => [
-                'viewother'   => 2,
-                'viewown'     => 4,
-                'editother'   => 8,
-                'deleteother' => 64,
-                'full'        => 1024,
-            ],
             'fields' => [
                 'full' => 1024,
-                'view' => 1,
             ],
         ];
+
         $this->addExtendedPermissions('leads', false);
+        $this->addExtendedPermissions('lists', false);
         $this->addStandardPermissions('imports');
     }
 
@@ -38,22 +42,7 @@ class LeadPermissions extends AbstractPermissions
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
 
-        $builder->add(
-            'lead:lists',
-            PermissionListType::class,
-            [
-                'choices' => [
-                    'mautic.core.permissions.viewother'   => 'viewother',
-                    'mautic.core.permissions.editother'   => 'editother',
-                    'mautic.core.permissions.deleteother' => 'deleteother',
-                    'mautic.core.permissions.full'        => 'full',
-                ],
-                'label'             => 'mautic.lead.permissions.lists',
-                'data'              => (!empty($data['lists']) ? $data['lists'] : []),
-                'bundle'            => 'lead',
-                'level'             => 'lists',
-            ]
-        );
+        $this->addExtendedFormFields('lead', 'lists', $builder, $data, false);
 
         $builder->add(
             'lead:fields',
@@ -61,7 +50,6 @@ class LeadPermissions extends AbstractPermissions
             [
                 'choices' => [
                     'mautic.core.permissions.manage' => 'full',
-                    'mautic.core.permissions.view'   => 'view',
                 ],
                 'label'             => 'mautic.lead.permissions.fields',
                 'data'              => (!empty($data['fields']) ? $data['fields'] : []),
@@ -100,15 +88,6 @@ class LeadPermissions extends AbstractPermissions
                 case 'publishown':
                 case 'publishother':
                     $level = 'full';
-                    break;
-            }
-        }
-
-        if ('lists' === $name) {
-            switch ($level) {
-                case 'view':
-                case 'viewown':
-                    $name = 'leads';
                     break;
             }
         }

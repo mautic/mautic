@@ -3,12 +3,11 @@
 namespace Mautic\ApiBundle\Serializer\Driver;
 
 use JMS\Serializer\Metadata\ClassMetadata;
-use JMS\Serializer\Metadata\Driver\AnnotationOrAttributeDriver as BaseAnnotationDriver;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use Metadata\ClassMetadata as BaseClassMetadata;
 use Metadata\Driver\DriverInterface;
 
-class ApiMetadataDriver extends BaseAnnotationDriver implements DriverInterface
+class ApiMetadataDriver implements DriverInterface
 {
     private ?\JMS\Serializer\Metadata\ClassMetadata $metadata = null;
 

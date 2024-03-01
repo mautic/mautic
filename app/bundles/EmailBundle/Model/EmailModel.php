@@ -169,8 +169,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
-            /** @var Email $translationParent */
             if ($translationParent = $entity->getTranslationParent()) {
+                \assert($translationParent instanceof Email);
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }

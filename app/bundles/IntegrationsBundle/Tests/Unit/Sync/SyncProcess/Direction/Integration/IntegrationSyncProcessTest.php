@@ -17,6 +17,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
@@ -48,12 +49,24 @@ class IntegrationSyncProcessTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
+    /**
+     * @var InputOptionsDAO
+     */
+    private $inputOptionsDAO;
+
+    /**
+     * @var IntegrationSyncProcess
+     */
+    private $integrationSyncProcess;
+
     protected function setUp(): void
     {
-        $this->syncDateHelper        = $this->createMock(SyncDateHelper::class);
-        $this->mappingHelper         = $this->createMock(MappingHelper::class);
-        $this->objectChangeGenerator = $this->createMock(ObjectChangeGenerator::class);
-        $this->syncDataExchange      = $this->createMock(SyncDataExchangeInterface::class);
+        $this->syncDateHelper         = $this->createMock(SyncDateHelper::class);
+        $this->mappingHelper          = $this->createMock(MappingHelper::class);
+        $this->objectChangeGenerator  = $this->createMock(ObjectChangeGenerator::class);
+        $this->syncDataExchange       = $this->createMock(SyncDataExchangeInterface::class);
+        $this->inputOptionsDAO        = new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]);
+        $this->integrationSyncProcess = new IntegrationSyncProcess($this->syncDateHelper, $this->mappingHelper, $this->objectChangeGenerator);
     }
 
     public function testThatIntegrationGetSyncReportIsCalledBasedOnRequest(): void
@@ -75,11 +88,6 @@ class IntegrationSyncProcessTest extends TestCase
         $this->syncDateHelper->expects($this->once())
             ->method('getSyncToDateTime')
             ->willReturn($toSyncDateTime);
-
-        $this->syncDateHelper->expects($this->once())
-            ->method('getLastSyncDateForObject')
-            ->with(self::INTEGRATION_NAME, $objectName)
-            ->willReturn(null);
 
         // SyncDateExchangeInterface::getSyncReport should sync because an object was added to the report
         $this->syncDataExchange->expects($this->once())
@@ -161,15 +169,63 @@ class IntegrationSyncProcessTest extends TestCase
         $this->assertEquals([$objectName => [2 => $objectChangeDAO]], $syncOrder->getIdentifiedObjects());
     }
 
-    /**
-     * @return IntegrationSyncProcess
-     */
-    private function getSyncProcess(MappingManualDAO $mappingManualDAO)
+    private function getSyncProcess(MappingManualDAO $mappingManualDAO): IntegrationSyncProcess
     {
-        $syncProcess = new IntegrationSyncProcess($this->syncDateHelper, $this->mappingHelper, $this->objectChangeGenerator);
+        $this->integrationSyncProcess->setupSync($this->inputOptionsDAO, $mappingManualDAO, $this->syncDataExchange);
 
-        $syncProcess->setupSync(new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]), $mappingManualDAO, $this->syncDataExchange);
+        return $this->integrationSyncProcess;
+    }
 
-        return $syncProcess;
+    public function testThatItDoesntSyncOtherEntityTypesWhenIDsForSomeEntityAreSpecified(): void
+    {
+        $mappingManual         = new MappingManualDAO(self::INTEGRATION_NAME);
+        $this->inputOptionsDAO = new InputOptionsDAO([
+            'integration'      => self::INTEGRATION_NAME,
+            'mautic-object-id' => ['contact:1'],
+        ]);
+
+        $contactMapping = new ObjectMappingDAO(Contact::NAME, 'Contact');
+        $contactMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $mappingManual->addObjectMapping($contactMapping);
+
+        $leadMapping = new ObjectMappingDAO(Contact::NAME, 'Lead');
+        $leadMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $mappingManual->addObjectMapping($leadMapping);
+
+        $companyMapping = new ObjectMappingDAO(Company::NAME, 'Account');
+        $companyMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
+        $mappingManual->addObjectMapping($companyMapping);
+
+        $fromSyncDateTime = new \DateTimeImmutable();
+        $this->syncDateHelper->expects($this->exactly(2))
+            ->method('getSyncFromDateTime')
+            ->withConsecutive([self::INTEGRATION_NAME, 'Contact'], [self::INTEGRATION_NAME, 'Lead'])
+            ->willReturn($fromSyncDateTime);
+
+        $toSyncDateTime   = new \DateTimeImmutable();
+        $this->syncDateHelper->expects($this->exactly(2))
+            ->method('getSyncToDateTime')
+            ->willReturn($toSyncDateTime);
+
+        // SyncDateExchangeInterface::getSyncReport should sync because an object was added to the report
+        $this->syncDataExchange->expects($this->once())
+            ->method('getSyncReport')
+            ->willReturnCallback(
+                function (RequestDAO $requestDAO): ReportDAO {
+                    $requestObjects = $requestDAO->getObjects();
+                    $this->assertCount(2, $requestObjects);
+
+                    /** @var RequestObjectDAO $requestObject */
+                    $requestObject = $requestObjects[0];
+                    $this->assertEquals(['email'], $requestObject->getRequiredFields());
+                    $this->assertEquals(['email'], $requestObject->getFields());
+                    $this->assertEquals('Contact', $requestObject->getObject());
+
+                    return new ReportDAO(self::INTEGRATION_NAME);
+                }
+            );
+
+        $syncReport = $this->getSyncProcess($mappingManual)->getSyncReport(1);
+        $this->assertEquals(self::INTEGRATION_NAME, $syncReport->getIntegration());
     }
 }

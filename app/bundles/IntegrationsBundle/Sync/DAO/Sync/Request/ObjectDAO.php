@@ -27,6 +27,9 @@ class ObjectDAO
          * Date/Time the sync started.
          */
         private ?\DateTimeInterface $toDateTime = null,
+        /**
+         * @deprecated Not used. To be removed in Mautic 6. Use SyncDateHelper instead
+         */
         private ?\DateTimeInterface $objectLastSyncDateTime = null
     ) {
     }
@@ -77,6 +80,9 @@ class ObjectDAO
         return $this->toDateTime;
     }
 
+    /**
+     * @deprecated Not used. To be removed in Mautic 6. Use SyncDateHelper instead
+     */
     public function getObjectLastSyncDateTime(): ?\DateTimeInterface
     {
         return $this->objectLastSyncDateTime;
