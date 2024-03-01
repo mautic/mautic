@@ -63,6 +63,12 @@ return [
                 'controller' => 'Mautic\PointBundle\Controller\Api\PointApiController::adjustPointsAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_pointgroupsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'groups',
+                'path'            => '/points/groups',
+                'controller'      => \Mautic\PointBundle\Controller\Api\PointGroupsApiController::class,
+            ],
         ],
     ],
 
