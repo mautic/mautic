@@ -1239,6 +1239,15 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "magdalenaleonow",
+      "name": "magdalenaleonow",
+      "avatar_url": "https://avatars.githubusercontent.com/u/130159751?v=4",
+      "profile": "https://github.com/magdalenaleonow",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
