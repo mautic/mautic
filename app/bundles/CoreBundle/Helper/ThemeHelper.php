@@ -371,7 +371,7 @@ class ThemeHelper implements ThemeHelperInterface
     public function zip($themeName)
     {
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
-        $tmpPath   = $this->pathsHelper->getSystemPath('cache', true).'/tmp_'.$themeName.'.zip';
+        $tmpPath   = $this->pathsHelper->getSystemPath('tmp', true).'/tmp_'.$themeName.'.zip';
         $zipper    = new \ZipArchive();
 
         if ($this->filesystem->exists($tmpPath)) {
