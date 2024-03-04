@@ -33,13 +33,10 @@ class PointGroupsApiController extends CommonApiController
      */
     protected $model;
 
-    private LeadModel $leadModel;
-
     /** @phpstan-ignore-next-line */
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory, PointGroupModel $pointGroupModel, LeadModel $leadModel)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory, PointGroupModel $pointGroupModel, private LeadModel $leadModel)
     {
         $this->model            = $pointGroupModel;
-        $this->leadModel        = $leadModel;
         $this->entityClass      = Group::class;
         $this->entityNameOne    = 'pointGroup';
         $this->entityNameMulti  = 'pointGroups';
