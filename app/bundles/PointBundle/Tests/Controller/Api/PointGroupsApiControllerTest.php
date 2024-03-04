@@ -3,6 +3,9 @@
 namespace Mautic\PointBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\HttpFoundation\Response;
 
 final class PointGroupsApiControllerTest extends MauticMysqlTestCase
@@ -64,5 +67,102 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $deleteData = $responseData['group'];
         $this->assertEquals('Updated Point Group Name', $deleteData['name']);
         $this->assertEquals('Updated description of the point group', $deleteData['description']);
+    }
+
+    public function testAdjustContactGroupPointsAction(): void
+    {
+        // Arrange
+        $contact     = $this->createContact('test@example.com');
+        $pointGroupA = $this->createGroup('Group A');
+        $pointGroupB = $this->createGroup('Group B');
+        $this->em->flush();
+
+        // Act & Assert
+        $this->adjustPointsAndAssert($contact, $pointGroupA, 'plus', 10, 10);
+        $this->adjustPointsAndAssert($contact, $pointGroupA, 'minus', 2, 8);
+        $this->adjustPointsAndAssert($contact, $pointGroupA, 'divide', 2, 4);
+        $this->adjustPointsAndAssert($contact, $pointGroupA, 'times', 4, 16);
+        $this->adjustPointsAndAssert($contact, $pointGroupB, 'set', 21, 21);
+
+        $this->assertContactGroupPoints($contact, [
+            [
+                'score' => 16,
+                'group' => [
+                    'id'          => $pointGroupA->getId(),
+                    'name'        => 'Group A',
+                    'description' => '',
+                ],
+            ],
+            [
+                'score' => 21,
+                'group' => [
+                    'id'          => $pointGroupB->getId(),
+                    'name'        => 'Group B',
+                    'description' => '',
+                ],
+            ],
+        ]);
+
+        $this->assertPointsChangeLogEntries($contact, [
+            ['delta' => 10, 'groupId' => $pointGroupA->getId()],
+            ['delta' => -2, 'groupId' => $pointGroupA->getId()],
+            ['delta' => -4, 'groupId' => $pointGroupA->getId()],
+            ['delta' => 12, 'groupId' => $pointGroupA->getId()],
+            ['delta' => 21, 'groupId' => $pointGroupB->getId()],
+        ]);
+    }
+
+    private function adjustPointsAndAssert(Lead $contact, Group $pointGroup, string $operator, int $value, int $expectedScore): void
+    {
+        $this->client->request('POST', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/$operator/{$value}");
+        $adjustResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $adjustResponse->getStatusCode());
+        $responseData = json_decode($adjustResponse->getContent(), true);
+        $this->assertSame($expectedScore, $responseData['groupScore']['score']);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $expectedGroups
+     */
+    private function assertContactGroupPoints(Lead $contact, array $expectedGroups): void
+    {
+        $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups");
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertSame(count($expectedGroups), $responseData['total']);
+        $this->assertSame($expectedGroups, $responseData['groupScores']);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $expectedEntries
+     */
+    private function assertPointsChangeLogEntries(Lead $contact, array $expectedEntries): void
+    {
+        $logs = $this->em->getRepository(PointsChangeLog::class)->findBy(['lead' => $contact->getId()]);
+        $this->assertCount(count($expectedEntries), $logs);
+        foreach ($expectedEntries as $index => $expectedEntry) {
+            $this->assertEquals($expectedEntry['delta'], $logs[$index]->getDelta());
+            $this->assertEquals($expectedEntry['groupId'], $logs[$index]->getGroup()->getId());
+        }
+    }
+
+    private function createContact(string $email): Lead
+    {
+        $contact = new Lead();
+        $contact->setEmail($email);
+        $this->em->persist($contact);
+
+        return $contact;
+    }
+
+    private function createGroup(
+        string $name
+    ): Group {
+        $group = new Group();
+        $group->setName($name);
+        $this->em->persist($group);
+
+        return $group;
     }
 }
