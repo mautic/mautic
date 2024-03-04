@@ -69,7 +69,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals('Updated description of the point group', $deleteData['description']);
     }
 
-    public function testAdjustContactGroupPointsAction(): void
+    public function testContactGroupPointsActions(): void
     {
         // Arrange
         $contact     = $this->createContact('test@example.com');
@@ -84,7 +84,8 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->adjustPointsAndAssert($contact, $pointGroupA, 'times', 4, 16);
         $this->adjustPointsAndAssert($contact, $pointGroupB, 'set', 21, 21);
 
-        $this->assertContactGroupPoints($contact, [
+        // Test GET all contact's point groups endpoint
+        $this->assertContactPointGroups($contact, [
             [
                 'score' => 16,
                 'group' => [
@@ -102,6 +103,10 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
                 ],
             ],
         ]);
+
+        // Test GET single contact's point group endpoint
+        $this->assertContactSinglePointGroup($contact, $pointGroupA, 16);
+        $this->assertContactSinglePointGroup($contact, $pointGroupB, 21);
 
         $this->assertPointsChangeLogEntries($contact, [
             ['delta' => 10, 'groupId' => $pointGroupA->getId()],
@@ -124,7 +129,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     /**
      * @param array<int, array<string, mixed>> $expectedGroups
      */
-    private function assertContactGroupPoints(Lead $contact, array $expectedGroups): void
+    private function assertContactPointGroups(Lead $contact, array $expectedGroups): void
     {
         $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups");
         $response = $this->client->getResponse();
@@ -132,6 +137,15 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame(count($expectedGroups), $responseData['total']);
         $this->assertSame($expectedGroups, $responseData['groupScores']);
+    }
+
+    private function assertContactSinglePointGroup(Lead $contact, Group $pointGroup, int $expectedScore): void
+    {
+        $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}");
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertSame($expectedScore, $responseData['groupScore']['score']);
     }
 
     /**

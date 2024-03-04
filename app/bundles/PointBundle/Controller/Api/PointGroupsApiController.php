@@ -48,19 +48,19 @@ class PointGroupsApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
-    public function getLeadGroupPointsAction(int $leadId): Response
+    public function getContactPointGroupsAction(int $contactId): Response
     {
-        $lead = $this->leadModel->getEntity($leadId);
+        $contact = $this->leadModel->getEntity($contactId);
 
-        if (null === $lead) {
+        if (null === $contact) {
             return $this->notFound($this->translator->trans('mautic.lead.event.api.lead.not.found'));
         }
 
-        if (!$this->checkEntityAccess($lead)) {
+        if (!$this->checkEntityAccess($contact)) {
             return $this->accessDenied();
         }
 
-        $groupScores = $lead->getGroupScores();
+        $groupScores = $contact->getGroupScores();
         $view        = $this->view(
             [
                 'total'       => count($groupScores),
@@ -75,15 +75,46 @@ class PointGroupsApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    public function adjustGroupPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int $leadId, int $groupId, string $operator, int $value): Response
+    public function getContactPointGroupAction(int $contactId, int $groupId): Response
     {
-        $lead = $this->leadModel->getEntity($leadId);
+        $contact = $this->leadModel->getEntity($contactId);
 
-        if (null === $lead) {
+        if (null === $contact) {
             return $this->notFound($this->translator->trans('mautic.lead.event.api.lead.not.found'));
         }
 
-        if (!$this->checkEntityAccess($lead)) {
+        if (!$this->checkEntityAccess($contact)) {
+            return $this->accessDenied();
+        }
+
+        $pointGroup = $this->model->getEntity($groupId);
+        if (null === $pointGroup) {
+            return $this->notFound($this->translator->trans('mautic.lead.event.api.point.group.not.found'));
+        }
+
+        $groupScore  = $contact->getGroupScore($pointGroup);
+        $view        = $this->view(
+            [
+                'groupScore' => $groupScore,
+            ],
+            Response::HTTP_OK
+        );
+
+        $context = $view->getContext()->setGroups(['groupContactScoreDetails', 'pointGroupDetails']);
+        $view->setContext($context);
+
+        return $this->handleView($view);
+    }
+
+    public function adjustGroupPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int $contactId, int $groupId, string $operator, int $value): Response
+    {
+        $contact = $this->leadModel->getEntity($contactId);
+
+        if (null === $contact) {
+            return $this->notFound($this->translator->trans('mautic.lead.event.api.lead.not.found'));
+        }
+
+        if (!$this->checkEntityAccess($contact)) {
             return $this->accessDenied();
         }
 
@@ -96,14 +127,14 @@ class PointGroupsApiController extends CommonApiController
             return $this->badRequest($this->translator->trans('mautic.lead.event.api.operation.not.allowed'));
         }
 
-        $oldScore = $lead->getGroupScore($pointGroup)?->getScore();
-        $lead     = $this->model->adjustPoints($lead, $pointGroup, $value, $operator);
-        $newScore = $lead->getGroupScore($pointGroup)->getScore();
-        $delta    = $newScore - ($oldScore ?? 0);
+        $oldScore    = $contact->getGroupScore($pointGroup)?->getScore();
+        $contact     = $this->model->adjustPoints($contact, $pointGroup, $value, $operator);
+        $newScore    = $contact->getGroupScore($pointGroup)->getScore();
+        $delta       = $newScore - ($oldScore ?? 0);
 
         $eventName  = InputHelper::clean($request->request->get('eventName', $this->translator->trans('mautic.point.event.manual_change')));
         $actionName = InputHelper::clean($request->request->get('actionName', $this->translator->trans('mautic.lead.event.api')));
-        $lead->addPointsChangeLogEntry(
+        $contact->addPointsChangeLogEntry(
             type: 'API',
             name: $eventName,
             action: $actionName,
@@ -111,9 +142,9 @@ class PointGroupsApiController extends CommonApiController
             ip: $ipLookupHelper->getIpAddress(),
             group: $pointGroup
         );
-        $this->leadModel->saveEntity($lead, false);
+        $this->leadModel->saveEntity($contact, false);
 
-        $view    = $this->view(['groupScore' => $lead->getGroupScore($pointGroup)], Response::HTTP_OK);
+        $view    = $this->view(['groupScore' => $contact->getGroupScore($pointGroup)], Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['groupContactScoreDetails', 'pointGroupDetails']);
         $view->setContext($context);
 
