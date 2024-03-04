@@ -2,6 +2,7 @@
   "name": "Paprika",
   "author": "Mautic team",
   "authorUrl": "https://mautic.org",
+  "isVisibleInGUI": true,
   "builder": ["grapesjsbuilder"],
   "features": [
     "email"

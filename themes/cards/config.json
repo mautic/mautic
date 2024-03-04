@@ -2,6 +2,7 @@
   "name": "Cards",
   "author": "Mautic",
   "authorUrl": "http://www.mautic.com",
+  "isVisibleInGUI": true,
   "features": [
     "email"
   ]

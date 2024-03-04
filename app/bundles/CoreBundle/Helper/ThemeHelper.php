@@ -455,6 +455,12 @@ class ThemeHelper implements ThemeHelperInterface
 
             $config = json_decode($this->filesystem->readFile($theme->getRealPath().'/config.json'), true);
 
+            // if (in_array('email', $config['features'])) {
+            //     if (isset($config['isVisibleInGUI']) && $config['isVisibleInGUI'] === false) {
+            //         continue;
+            //     }
+            // }
+
             if (!$this->shouldLoadTheme($config, $specificFeature)) {
                 continue;
             }

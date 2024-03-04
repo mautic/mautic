@@ -2,6 +2,7 @@
   "name": "Blank",
   "author": "Mautic team",
   "authorUrl": "https://mautic.org",
+  "isVisibleInGUI": true,
   "builder": ["legacy", "grapesjsbuilder"],
   "features": ["page", "email", "form"]
 }

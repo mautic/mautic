@@ -2,6 +2,7 @@
   "name": "Oxygen",
   "author": "Mautic team based on a theme by Sendwithus",
   "authorUrl": "https://www.sendwithus.com/resources/templates/oxygen",
+  "isVisibleInGUI": true,
   "features": [
     "page",
     "email",

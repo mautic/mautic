@@ -2,6 +2,7 @@
   "name": "Neopolitan",
   "author": "Mautic team based on a theme by Sendwithus",
   "authorUrl": "https://www.sendwithus.com/resources/templates/neopolitan",
+  "isVisibleInGUI": true,
   "features": [
     "page",
     "email",
