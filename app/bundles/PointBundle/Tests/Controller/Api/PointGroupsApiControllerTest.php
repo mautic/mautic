@@ -22,8 +22,8 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $createResponse->getStatusCode());
         $responseData = json_decode($createResponse->getContent(), true);
-        $this->assertArrayHasKey('group', $responseData);
-        $createdData = $responseData['group'];
+        $this->assertArrayHasKey('pointGroup', $responseData);
+        $createdData = $responseData['pointGroup'];
         $this->assertArrayHasKey('id', $createdData);
         $this->assertEquals('New Point Group', $createdData['name']);
         $this->assertEquals('Description of the new point group', $createdData['description']);
@@ -34,9 +34,9 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_OK, $getAllResponse->getStatusCode());
         $responseData = json_decode($getAllResponse->getContent(), true);
-        $this->assertArrayHasKey('groups', $responseData);
+        $this->assertArrayHasKey('pointGroups', $responseData);
         $this->assertEquals(1, $responseData['total']);
-        $allData = $responseData['groups'];
+        $allData = $responseData['pointGroups'];
         $this->assertIsArray($allData);
         $this->assertArrayHasKey(0, $allData);  // Ensure the response is array-indexed from 0
         $this->assertCount(1, $allData);
@@ -52,8 +52,8 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_OK, $updateResponse->getStatusCode());
         $responseData = json_decode($updateResponse->getContent(), true);
-        $this->assertArrayHasKey('group', $responseData);
-        $updatedData = $responseData['group'];
+        $this->assertArrayHasKey('pointGroup', $responseData);
+        $updatedData = $responseData['pointGroup'];
         $this->assertEquals('Updated Point Group Name', $updatedData['name']);
         $this->assertEquals('Updated description of the point group', $updatedData['description']);
 
@@ -63,8 +63,8 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $deleteResponse->getStatusCode());
         $responseData = json_decode($deleteResponse->getContent(), true);
-        $this->assertArrayHasKey('group', $responseData);
-        $deleteData = $responseData['group'];
+        $this->assertArrayHasKey('pointGroup', $responseData);
+        $deleteData = $responseData['pointGroup'];
         $this->assertEquals('Updated Point Group Name', $deleteData['name']);
         $this->assertEquals('Updated description of the point group', $deleteData['description']);
     }

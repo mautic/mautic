@@ -41,8 +41,8 @@ class PointGroupsApiController extends CommonApiController
         $this->model            = $pointGroupModel;
         $this->leadModel        = $leadModel;
         $this->entityClass      = Group::class;
-        $this->entityNameOne    = 'group';
-        $this->entityNameMulti  = 'groups';
+        $this->entityNameOne    = 'pointGroup';
+        $this->entityNameMulti  = 'pointGroups';
         $this->serializerGroups = ['pointGroupDetails', 'pointGroupList', 'publishDetails'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
