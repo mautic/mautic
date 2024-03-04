@@ -41,8 +41,15 @@ class Group extends FormEntity
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
-        $metadata->setGroupPrefix('group')
+        $metadata->setGroupPrefix('pointGroup')
             ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                ]
+            )
+            ->addProperties(
                 [
                     'id',
                     'name',

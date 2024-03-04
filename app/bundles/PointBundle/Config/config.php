@@ -69,6 +69,15 @@ return [
                 'path'            => '/points/groups',
                 'controller'      => \Mautic\PointBundle\Controller\Api\PointGroupsApiController::class,
             ],
+            'mautic_api_getcontactgrouppoints' => [
+                'path'       => '/contacts/{leadId}/points/groups',
+                'controller' => 'Mautic\PointBundle\Controller\Api\PointGroupsApiController::getLeadGroupPointsAction',
+            ],
+            'mautic_api_adjustcontactgrouppoints' => [
+                'path'       => '/contacts/{leadId}/points/groups/{groupId}/{operator}/{value}',
+                'controller' => 'Mautic\PointBundle\Controller\Api\PointGroupsApiController::adjustGroupPointsAction',
+                'method'     => 'POST',
+            ],
         ],
     ],
 
