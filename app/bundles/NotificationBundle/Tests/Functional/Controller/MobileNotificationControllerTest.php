@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\NotificationBundle\Tests\Controller;
+namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
