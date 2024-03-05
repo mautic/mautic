@@ -402,13 +402,13 @@ class InputHelper
                 $value = str_replace($from, $to, $value);
             }
 
-            // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
+            // Special handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
                 "/<\/*[o|w|v]:[^>]*>/is",
                 fn ($matches): string => '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>',
                 $value, -1, $needsDecoding);
 
-            // Slecial handling for script tags
+            // Special handling for script tags
             $value = preg_replace_callback(
                 "/<script>(.*?)<\/script>/is",
                 fn ($matches): string => '<mscript>'.base64_encode($matches[0]).'</mscript>',

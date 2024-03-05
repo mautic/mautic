@@ -1773,4 +1773,17 @@ class CommonRepository extends ServiceEntityRepository
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
         }
     }
+
+    /**
+     * Checks if table contains any rows.
+     */
+    protected function tableHasRows(string $table): bool
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('null')
+            ->from($table)
+            ->setMaxResults(1);
+
+        return (bool) count($query->executeQuery()->fetchAllAssociative());
+    }
 }

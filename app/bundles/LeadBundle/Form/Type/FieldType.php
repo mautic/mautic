@@ -50,6 +50,14 @@ class FieldType extends AbstractType
         'email',
     ];
 
+    /**
+     * @var string[]
+     */
+    private static array $fieldsWithNoLengthLimit = [
+        'textarea',
+        'html',
+    ];
+
     public function __construct(
         private EntityManagerInterface $em,
         private Translator $translator,
@@ -489,11 +497,11 @@ class FieldType extends AbstractType
                 'order',
                 EntityType::class,
                 [
-                    'label'         => 'mautic.core.order',
+                    'label'         => 'mautic.core.order.field',
                     'class'         => LeadField::class,
                     'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
-                    'attr'          => ['class' => 'form-control'],
+                    'attr'          => ['class' => 'form-control', 'tooltip' => 'mautic.core.order.field.tooltip'],
                     'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC),
                     'required'      => false,
                 ]
@@ -670,14 +678,32 @@ class FieldType extends AbstractType
 
     public static function validateDefaultValue(?string $value, ExecutionContextInterface $context): void
     {
-        if (!empty($value)) {
-            $root  = $context->getRoot();
-            $limit = $root->getViewData()->getCharLengthLimit();
-
-            if (strlen($value) > $limit) {
-                $context->buildViolation('mautic.lead.defaultValue.invalid')->addViolation();
-            }
+        if (empty($value)) {
+            return;
         }
+
+        /** @var LeadField $field */
+        $field = $context->getRoot()->getViewData();
+
+        if (in_array($field->getType(), self::$fieldsWithNoLengthLimit)) {
+            return;
+        }
+
+        $limit              = $field->getCharLengthLimit();
+        $defaultValueLength = mb_strlen($value);
+
+        if ($defaultValueLength <= $limit) {
+            return;
+        }
+
+        $translationParameters = [
+            '%currentLength%'           => $defaultValueLength,
+            '%defaultValueLengthLimit%' => $limit,
+        ];
+
+        $context
+            ->buildViolation('mautic.lead.defaultValue.maxlengthexceeded', $translationParameters)
+            ->addViolation();
     }
 
     private function addLengthValidationField(FormInterface $form, bool $new = true): void

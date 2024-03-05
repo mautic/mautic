@@ -11,7 +11,7 @@ use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
-use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -78,6 +78,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|ContactTracker
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
 
     private \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber $subscriber;
     /**
@@ -89,20 +90,20 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->trackableModel       = $this->createMock(TrackableModel::class);
-        $this->pageTokenHelper      = $this->createMock(PageTokenHelper::class);
-        $this->assetTokenHelper     = $this->createMock(AssetTokenHelper::class);
-        $this->formTokenHelper      = $this->createMock(FormTokenHelper::class);
-        $this->focusTokenHelper     = $this->createMock(FocusTokenHelper::class);
-        $this->auditLogModel        = $this->createMock(AuditLogModel::class);
-        $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->dynamicContentHelper = $this->createMock(DynamicContentHelper::class);
-        $this->dynamicContentModel  = $this->createMock(DynamicContentModel::class);
-        $this->security             = $this->createMock(CorePermissions::class);
-        $this->contactTracker       = $this->createMock(ContactTracker::class);
-        $this->companyModel         = $this->createMock(CompanyModel::class);
-
-        $this->subscriber           = new DynamicContentSubscriber(
+        $this->trackableModel            = $this->createMock(TrackableModel::class);
+        $this->pageTokenHelper           = $this->createMock(PageTokenHelper::class);
+        $this->assetTokenHelper          = $this->createMock(AssetTokenHelper::class);
+        $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
+        $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
+        $this->auditLogModel             = $this->createMock(AuditLogModel::class);
+        $this->leadModel                 = $this->createMock(LeadModel::class);
+        $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
+        $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
+        $this->security                  = $this->createMock(CorePermissions::class);
+        $this->contactTracker            = $this->createMock(ContactTracker::class);
+        $this->companyModel              = $this->createMock(CompanyModel::class);
+        $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
+        $this->subscriber                = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
             $this->assetTokenHelper,
@@ -224,7 +225,7 @@ HTML;
     </body>
 </html>
 HTML;
-        $contact = new Lead();
+        $contact = $this->createMock(Lead::class);
         $event   = $this->createMock(TokenReplacementEvent::class);
 
         $event
@@ -246,9 +247,9 @@ HTML;
                 'lead'               => 1,
             ]);
 
-        $this->dynamicContentHelper
+        $contact
             ->expects($this->once())
-            ->method('convertLeadToArray')
+            ->method('getProfileFields')
             ->willReturn([
                 'id'        => 1,
                 'firstname' => 'John',
@@ -257,23 +258,22 @@ HTML;
                 'email'     => 'john@doe.com',
             ]);
 
-        $repo = $this->createMock(CompanyRepository::class);
-        $repo->expects($this->once())
-            ->method('getCompaniesByLeadId')
-            ->willReturn([
+        $this->companyModel
+            ->expects($this->once())
+            ->method('getCompanyLeadRepository')
+            ->willReturn($this->companyLeadRepositoryMock);
+
+        $this->companyLeadRepositoryMock->expects($this->once())
+            ->method('getPrimaryCompanyByLeadId')
+            ->willReturn(
                 [
                     'id'             => 1,
                     'companyname'    => 'Doe Corp',
                     'companycountry' => 'India',
                     'companywebsite' => 'https://www.doe.corp',
                     'is_primary'     => true,
-                ],
-            ]);
-
-        $this->companyModel
-            ->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repo);
+                ]
+            );
 
         $this->pageTokenHelper
             ->method('findPageTokens')
