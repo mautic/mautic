@@ -249,12 +249,12 @@
                     <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.automaticcopy'|trans }}</h5>
                 </div>
                 <div class="modal-body">
-                    <p>{{ 'mautic.form.form.help.embedded'|trans }}</p>
-                    <h3>{{ 'mautic.form.form.help.embedded.js'|trans }}</h3>
+                    <p>{{ 'mautic.form.form.help.automaticcopy'|trans }}</p>
+                    <h3>{{ 'mautic.form.form.help.automaticcopy.js'|trans }}</h3>
                     <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="{{ url('mautic_form_generateform', {'id': activeForm.id}, true) }}"&gt;&lt;/script&gt;</textarea>
-                    <h3 class="pt-lg">{{ 'mautic.form.form.help.embedded.iframe'|trans }}</h3>
+                    <h3 class="pt-lg">{{ 'mautic.form.form.help.automaticcopy.iframe'|trans }}</h3>
                     <textarea class="form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;iframe src="{{ url('mautic_form_preview', {'id': activeForm.id}, true) }}" width="300" height="300"&gt;&lt;p&gt;Your browser does not support iframes.&lt;/p&gt;&lt;/iframe&gt;</textarea>
-                    <i>{{ 'mautic.form.form.help.embedded.iframe.note'|trans }}</i>
+                    <i>{{ 'mautic.form.form.help.automaticcopy.iframe.note'|trans }}</i>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'mautic.core.close'|trans }}</button>
