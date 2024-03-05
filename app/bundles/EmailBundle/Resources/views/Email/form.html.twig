@@ -163,6 +163,7 @@
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
                         {{ form_row(form.lists) }}
+                        {{ form_row(form.excludedLists) }}
                     </div>
                     {{ form_row(form.category) }}
                     {{ form_row(form.language) }}

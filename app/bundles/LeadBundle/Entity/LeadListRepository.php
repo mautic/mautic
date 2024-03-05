@@ -509,4 +509,30 @@ class LeadListRepository extends CommonRepository
 
         return 1 === $result;
     }
+
+    /**
+     * Returns array of campaigns related to this segment.
+     *
+     * @return array<int, string>
+     */
+    public function getSegmentCampaigns(int $segmentId): array
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('clx.campaign_id, c.name')
+            ->distinct()
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx')
+            ->join('clx', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = clx.campaign_id');
+        $q->where(
+            $q->expr()->eq('clx.leadlist_id', $segmentId)
+        );
+
+        $lists   = [];
+        $results = $q->executeQuery()->fetchAllAssociative();
+
+        foreach ($results as $row) {
+            $lists[$row['campaign_id']] = $row['name'];
+        }
+
+        return $lists;
+    }
 }
