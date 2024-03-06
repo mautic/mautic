@@ -9,6 +9,5 @@
   "minimum-stability": "dev",
   "require": {
     "mautic/core-lib": "^5.0"
-  },
-  "isVisibleInGUI": true
+  }
 }
