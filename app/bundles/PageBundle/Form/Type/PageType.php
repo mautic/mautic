@@ -220,8 +220,8 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.headscript',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => '8',
+                    'class'   => 'form-control',
+                    'rows'    => '8',
                     'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
@@ -235,8 +235,8 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.footerscript',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => '8',
+                    'class'   => 'form-control',
+                    'rows'    => '8',
                     'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
