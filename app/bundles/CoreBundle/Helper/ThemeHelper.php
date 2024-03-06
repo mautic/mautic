@@ -463,10 +463,6 @@ class ThemeHelper implements ThemeHelperInterface
                     $newJsonString            = json_encode($config, JSON_PRETTY_PRINT);
                     file_put_contents($theme->getRealPath().'/config.json', $newJsonString);
                 }
-
-                if (isset($config['isVisibleInGUI']) && false === $config['isVisibleInGUI']) {
-                    continue;
-                }
             }
 
             if (!$this->shouldLoadTheme($config, $specificFeature)) {
