@@ -2,23 +2,29 @@
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ListModel
-     */
-    protected $listModel;
+    protected ListModel $listModel;
+
+    private string $prefix;
+
+    private TranslatorInterface $translator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        /* @var ListModel $listModel */
-        $this->listModel = static::getContainer()->get('mautic.lead.model.list');
+
+        $this->listModel  = static::getContainer()->get('mautic.lead.model.list');
+        $this->prefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->translator = static::getContainer()->get('translator');
     }
 
     public function testSingleSegmentWorkflow(): void
@@ -296,6 +302,68 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $response2['lists'][1]['filters']);
     }
 
+    public function testWeGet422ResponseCodeIfSegmentIsBeingUsedInSomeCampaignAndWeUnpublishIt(): void
+    {
+        $segmentName = 'Segment1';
+        $segment     = new LeadList();
+        $segment->setName($segmentName);
+        $segment->setPublicName($segmentName);
+        $segment->setAlias(mb_strtolower($segmentName));
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+
+        $campaign     = new Campaign();
+        $campaignName = 'Campaign1';
+        $campaign->setName($campaignName);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // insert unpublished record
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id'   => $campaign->getId(),
+            'leadlist_id'   => $segment->getId(),
+        ]);
+
+        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
+        Assert::assertArrayHasKey('errors', $response);
+        $errorMessage = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns',
+            [
+                '%count%'         => '1',
+                '%campaignNames%' => '"'.$campaignName.'"',
+            ],
+            'validators'
+        );
+        Assert::assertStringContainsString($errorMessage, $response['errors'][0]['message']);
+    }
+
+    public function testWeGet200ResponseCodeIfSegmentIsNotUsedInCampaignsAndWeUnpublishIt(): void
+    {
+        $segmentName = 'Segment1';
+        $segment     = new LeadList();
+        $segment->setName($segmentName);
+        $segment->setPublicName($segmentName);
+        $segment->setAlias(mb_strtolower($segmentName));
+        $segment->setIsPublished(true);
+        $this->em->persist($segment);
+
+        $campaign = new Campaign();
+        $campaign->setName('campaign1');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertArrayNotHasKey('errors', $response);
+    }
+
     public function testUnpublishUsedSingleSegment(): void
     {
         $filter = [[
@@ -418,7 +486,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();
-        $segment->setName($name)->setAlias($alias)->setFilters($filters);
+        $segment->setName($name)->setPublicName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
 
         return $segment;
