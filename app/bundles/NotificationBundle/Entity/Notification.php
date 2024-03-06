@@ -107,7 +107,7 @@ class Notification extends FormEntity
     private $mobile = false;
 
     /**
-     * @var array
+     * @var ?array
      */
     private $mobileSettings;
 
@@ -633,7 +633,7 @@ class Notification extends FormEntity
      */
     public function getMobileSettings()
     {
-        return $this->mobileSettings;
+        return $this->mobileSettings ?? [];
     }
 
     /**
