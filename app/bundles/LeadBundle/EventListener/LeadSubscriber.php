@@ -39,6 +39,16 @@ class LeadSubscriber implements EventSubscriberInterface
     private $router;
 
     /**
+     * @var string[]
+     */
+    private $preventLoop = [];
+
+    /**
+     * @var int|null
+     */
+    private $lastContactId;
+
+    /**
      * @param ModelFactory<object> $modelFactory
      * @param bool                 $isTest       whether or not we're running in a test environment
      */
@@ -81,64 +91,76 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadPostSave(Events\LeadEvent $event): void
     {
-        // Because there is an event within an event, there is a risk that something will trigger a loop which
-        // needs to be prevented
-        static $preventLoop = [];
-
         $lead = $event->getLead();
 
-        if ($details = $event->getChanges()) {
-            // Unset dateLastActive and dateModified and ipAddress to prevent un-necessary audit log entries
-            unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList']);
-            if (empty($details)) {
-                return;
-            }
-
-            $check = base64_encode($lead->getId().md5(json_encode($details)));
-            if (!in_array($check, $preventLoop)) {
-                $preventLoop[] = $check;
-
-                // Change entry
-                $log = [
-                    'bundle'    => 'lead',
-                    'object'    => 'lead',
-                    'objectId'  => $lead->getId(),
-                    'action'    => ($event->isNew()) ? 'create' : 'update',
-                    'details'   => $details,
-                    'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                ];
-                $this->auditLogModel->writeToLog($log);
-
-                // Date identified entry
-                if (isset($details['dateIdentified'])) {
-                    // log the day lead was identified
-                    $log = [
-                        'bundle'    => 'lead',
-                        'object'    => 'lead',
-                        'objectId'  => $lead->getId(),
-                        'action'    => 'identified',
-                        'details'   => [],
-                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                    ];
-                    $this->auditLogModel->writeToLog($log);
-                }
-
-                // IP added entry
-                if (isset($details['ipAddresses']) && !empty($details['ipAddresses'][1])) {
-                    $log = [
-                        'bundle'    => 'lead',
-                        'object'    => 'lead',
-                        'objectId'  => $lead->getId(),
-                        'action'    => 'ipadded',
-                        'details'   => $details['ipAddresses'],
-                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                    ];
-                    $this->auditLogModel->writeToLog($log);
-                }
-
-                $this->leadEventDispatcher->dispatchEvents($event, $details);
-            }
+        if (!$details = $event->getChanges()) {
+            return;
         }
+
+        // Unset dateLastActive and dateModified and ipAddress to prevent un-necessary audit log entries
+        unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList'], $details['manipulator']);
+        if (empty($details)) {
+            return;
+        }
+
+        if ($manipulator = $lead->getManipulator()) {
+            $details['manipulated_by']  = $manipulator->getManipulatedBy();
+            $details['manipulator_key'] = $manipulator->getManipulatorKey();
+        }
+
+        // Reset the loop prevention if processing a new contact to prevent a memory leak when manipulating large numbers of contacts
+        if ($lead->getId() !== $this->lastContactId) {
+            $this->preventLoop   = [];
+            $this->lastContactId = $lead->getId();
+        }
+
+        // Because there is an event within an event, there is a risk that something will trigger a loop which needs to be prevented
+        $check = base64_encode($lead->getId().md5(json_encode($details)));
+        if (in_array($check, $this->preventLoop)) {
+            return;
+        }
+
+        $this->preventLoop[] = $check;
+
+        // Change entry
+        $log = [
+            'bundle'    => 'lead',
+            'object'    => 'lead',
+            'objectId'  => $lead->getId(),
+            'action'    => ($event->isNew()) ? 'create' : 'update',
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
+
+        // Date identified entry
+        if (isset($details['dateIdentified'])) {
+            // log the day lead was identified
+            $log = [
+                'bundle'    => 'lead',
+                'object'    => 'lead',
+                'objectId'  => $lead->getId(),
+                'action'    => 'identified',
+                'details'   => [],
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
+        }
+
+        // IP added entry
+        if (isset($details['ipAddresses']) && !empty($details['ipAddresses'][1])) {
+            $log = [
+                'bundle'    => 'lead',
+                'object'    => 'lead',
+                'objectId'  => $lead->getId(),
+                'action'    => 'ipadded',
+                'details'   => $details['ipAddresses'],
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
+        }
+
+        $this->leadEventDispatcher->dispatchEvents($event, $details);
     }
 
     /**

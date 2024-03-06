@@ -147,6 +147,50 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedLeadIds, $actualLeadIds);
     }
 
+    public function testGetEmailPendingQueryWithExcludedLists(): void
+    {
+        // create some leads
+        $leadOne   = $this->createLead('one');
+        $leadTwo   = $this->createLead('two');
+        $leadThree = $this->createLead('three');
+        $leadFour  = $this->createLead('four');
+        $leadFive  = $this->createLead('five');
+        $leadSix   = $this->createLead('six');
+
+        // add some leads in lists for inclusion
+        $sourceListOne  = $this->createLeadList('Source', $leadOne, $leadTwo, $leadThree);
+        $sourceListTwo  = $this->createLeadList('Source', $leadOne, $leadFour, $leadFive, $leadSix);
+
+        // add some leads in lists for exclusion
+        $excludeListOne = $this->createLeadList('Exclude', $leadTwo, $leadSix);
+        $excludeListTwo = $this->createLeadList('Exclude', $leadTwo, $leadThree);
+
+        // create an email with included/excluded lists
+        $email = new Email();
+        $email->setName('Email');
+        $email->setSubject('Subject');
+        $email->setEmailType('list');
+        $email->addList($sourceListOne);
+        $email->addList($sourceListTwo);
+        $email->addExcludedList($excludeListOne);
+        $email->addExcludedList($excludeListTwo);
+        $this->em->persist($email);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $actualLeadIds = $this->emailRepository->getEmailPendingQuery($email->getId())
+            ->executeQuery()
+            ->fetchFirstColumn();
+        sort($actualLeadIds);
+
+        $expectedLeadIds = [$leadOne->getId(), $leadFour->getId(), $leadFive->getId()];
+        $expectedLeadIds = array_map(fn (int $id) => (string) $id, $expectedLeadIds);
+        sort($expectedLeadIds);
+
+        Assert::assertSame($expectedLeadIds, $actualLeadIds);
+    }
+
     /**
      * @throws ORMException
      */
