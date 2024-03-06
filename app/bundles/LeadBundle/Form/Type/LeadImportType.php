@@ -61,8 +61,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.delimiter',
                 'attr'  => [
-                    'class' => 'form-control',
-                    'tooltip' => 'mautic.lead.import.delimiter.help'
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.delimiter.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -76,8 +76,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.enclosure',
                 'attr'  => [
-                    'class' => 'form-control',
-                    'tooltip' => 'mautic.lead.import.enclosure.help'
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.enclosure.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -91,8 +91,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.escape',
                 'attr'  => [
-                    'class' => 'form-control',
-                    'tooltip' => 'mautic.lead.import.escape.help'
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.escape.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
