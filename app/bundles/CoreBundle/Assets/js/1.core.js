@@ -712,6 +712,16 @@ var Mautic = {
         return elDiv;
     },
 
+    addErrorFlashMessage: function(message) {
+        return this.addFlashMessage(message);
+    },
+
+    addInfoFlashMessage: function(message) {
+        const el = this.addFlashMessage(message);
+        el.classList.remove('alert-growl--error');
+        return el;
+    },
+
     /**
      *
      * @param notifications
