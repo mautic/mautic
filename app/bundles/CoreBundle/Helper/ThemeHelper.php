@@ -457,6 +457,13 @@ class ThemeHelper implements ThemeHelperInterface
 
             $features = $config['features'] ?? [];
             if (in_array('email', $features)) {
+                if (!array_key_exists('isVisibleInGUI', $config)) {
+                    // Add 'isVisibleInGUI' key with a value of true for external themes
+                    $config['isVisibleInGUI'] = true;
+                    $newJsonString            = json_encode($config, JSON_PRETTY_PRINT);
+                    file_put_contents($theme->getRealPath().'/config.json', $newJsonString);
+                }
+
                 if (isset($config['isVisibleInGUI']) && false === $config['isVisibleInGUI']) {
                     continue;
                 }
