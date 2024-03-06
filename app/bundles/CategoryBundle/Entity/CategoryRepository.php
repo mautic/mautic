@@ -31,7 +31,7 @@ class CategoryRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      *
-     * @return array
+     * @return mixed[]
      */
     public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, $includeGlobal = true)
     {

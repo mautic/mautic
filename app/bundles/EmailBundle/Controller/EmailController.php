@@ -1329,7 +1329,9 @@ class EmailController extends FormController
             ]);
         }
 
-        if ($translationParent = $entity->getTranslationParent()) {
+        $translationParent = $entity->getTranslationParent();
+
+        if ($translationParent instanceof Email) {
             return $this->redirectToRoute('mautic_email_action', [
                 'objectAction' => 'send',
                 'objectId'     => $translationParent->getId(),

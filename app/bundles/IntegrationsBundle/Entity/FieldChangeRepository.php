@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * @extends CommonRepository<FieldChange>
@@ -39,7 +40,7 @@ class FieldChangeRepository extends CommonRepository
     /**
      * Takes an object id & type and deletes all entities that match.
      */
-    public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null): void
+    public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null, \DateTimeInterface $toDateTime = null): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -51,8 +52,13 @@ class FieldChangeRepository extends CommonRepository
             $qb->setParameter('integration', $integration);
         }
 
+        if (null !== $toDateTime) {
+            $expr = $expr->with($qb->expr()->lte('modified_at', ':toDateTime'));
+            $qb->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'));
+        }
+
         $qb->setParameter('objectType', $objectType)
-            ->setParameter('objectId', (int) $objectId);
+            ->setParameter('objectId', $objectId);
 
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
@@ -77,8 +83,11 @@ class FieldChangeRepository extends CommonRepository
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->lte('f.modified_at', ':toDateTime')
                 )
-            )
-            ->setParameter('integration', $integration)
+            );
+        if (Lead::class === $objectType) {
+            $qb->join('f', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = f.object_id');
+        }
+        $qb->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
             ->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'))
             ->orderBy('f.object_id')
@@ -91,18 +100,13 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results = $qb->executeQuery()->fetchAllAssociative();
-
-        $objectIds = [];
-        foreach ($results as $result) {
-            $objectIds[] = (int) $result['object_id'];
-        }
+        $objectIds = $qb->executeQuery()->fetchFirstColumn();
 
         if (!$objectIds) {
             return [];
         }
 
-        // Get all the field changes for the requested objects objects
+        // Get all the field changes for the requested objects
         $qb
             ->resetQueryParts()
             ->select('*')
@@ -116,7 +120,9 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
-            ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
+            // 1. We must sort by f.object_id. Otherwise values stored in PartialObjectReportBuilder::lastProcessedTrackedId will be incorrect.
+            // 2. Newer updated fields must override older updated fields
+            ->orderBy('f.object_id, f.modified_at', 'ASC');
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
@@ -144,5 +150,52 @@ class FieldChangeRepository extends CommonRepository
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
         return $qb->executeQuery()->fetchAllAssociative();
+    }
+
+    public function deleteOrphanLeadChanges(): int
+    {
+        $totalDeleted      = 0;
+        $limit             = 1000;
+        $totalLimit        = 100000;
+        $deletedInLastLoop = $limit;
+
+        while ($totalDeleted < $totalLimit && $deletedInLastLoop === $limit && $deleted = $this->doDeleteOrphanLeadChanges($limit)) {
+            $deletedInLastLoop = $deleted;
+            $totalDeleted += $deleted;
+        }
+
+        return $totalDeleted;
+    }
+
+    private function doDeleteOrphanLeadChanges(int $limit): int
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->select('f.id')
+            ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
+            ->leftJoin('f', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = f.object_id')
+            ->where(
+                $qb->expr()->and(
+                    $qb->expr()->eq('object_type', ':objectType'),
+                    $qb->expr()->isNull('l.id')
+                )
+            )
+            ->setMaxResults($limit)
+            ->setParameter('objectType', Lead::class);
+
+        $objectIds = $qb->executeQuery()->fetchFirstColumn();
+
+        if (!$objectIds) {
+            return 0;
+        }
+
+        $qb2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb2->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
+            ->where(
+                $qb2->expr()->in('id', ':ids')
+            )
+            ->setParameter('ids', $objectIds, ArrayParameterType::INTEGER);
+
+        return $qb2->executeStatement();
     }
 }
