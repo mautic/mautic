@@ -1336,6 +1336,11 @@ blockquote > p:after {
 .btn .fa {
   min-width: 13px;
 }
+.btn [class^="ri-"],
+.btn [class*=" ri-"] {
+  font-size: 1.25em;
+  vertical-align: -0.05em;
+}
 .btn > .caret {
   margin-top: -1px;
 }
