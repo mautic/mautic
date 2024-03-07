@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Exception\IntervalNotConfiguredException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Behavioral as BehavioralScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -27,6 +28,7 @@ class EventScheduler
         private EventLogger $eventLogger,
         private Interval $intervalScheduler,
         private DateTime $dateTimeScheduler,
+        private BehavioralScheduler $behavioralScheduler,
         private EventCollector $collector,
         private EventDispatcherInterface $dispatcher,
         private CoreParametersHelper $coreParametersHelper
@@ -153,6 +155,7 @@ class EventScheduler
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
+            case Event::TRIGGER_MODE_BEHAVIORAL:
             case null: // decision
                 $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
 
@@ -181,6 +184,7 @@ class EventScheduler
 
         switch ($event->getTriggerMode()) {
             case Event::TRIGGER_MODE_IMMEDIATE:
+            case Event::TRIGGER_MODE_BEHAVIORAL:
             case null: // decision
                 $this->logger->debug('CAMPAIGN: ('.$event->getId().') Executing immediately');
 
@@ -320,8 +324,14 @@ class EventScheduler
             // Create the entry
             $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
 
-            // Schedule it
-            $log->setTriggerDate($executionDate);
+            // Determine the execution date based on the trigger mode
+            if (Event::TRIGGER_MODE_BEHAVIORAL === $event->getTriggerMode()) {
+                $behavioralExecutionDate = $this->behavioralScheduler->getExecutionDateTimeForContact($event, $contact, $executionDate);
+                $log->setTriggerDate($behavioralExecutionDate);
+            } else {
+                // For other trigger modes, use the provided execution date
+                $log->setTriggerDate($executionDate);
+            }
 
             // Add it to the queue to persist to the DB
             $this->eventLogger->queueToPersist($log);

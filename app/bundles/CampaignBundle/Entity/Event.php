@@ -30,6 +30,8 @@ class Event implements ChannelInterface
 
     public const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
+    public const TRIGGER_MODE_BEHAVIORAL = 'behavioral';
+
     public const CHANNEL_EMAIL = 'email';
 
     /**

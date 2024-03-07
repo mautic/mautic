@@ -179,6 +179,10 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.campaign.scheduler.behavioral'      => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Behavioral::class,
+                'arguments' => [],
+            ],
             'mautic.campaign.scheduler'               => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::class,
                 'arguments' => [
@@ -186,6 +190,7 @@ return [
                     'mautic.campaign.event_logger',
                     'mautic.campaign.scheduler.interval',
                     'mautic.campaign.scheduler.datetime',
+                    'mautic.campaign.scheduler.behavioral',
                     'mautic.campaign.event_collector',
                     'event_dispatcher',
                     'mautic.helper.core_parameters',

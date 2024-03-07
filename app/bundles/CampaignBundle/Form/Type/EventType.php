@@ -55,6 +55,11 @@ class EventType extends AbstractType
                 'date'      => 'mautic.campaign.form.type.date',
             ];
 
+            // todo consider injection of choice using event listener
+            if ('email.send' === $options['data']['type']) {
+                $choices['behavioral'] = 'mautic.campaign.form.type.optimal';
+            }
+
             if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['anchorEventType']
                 && 'condition' != $options['data']['eventType']
             ) {
@@ -212,6 +217,20 @@ class EventType extends AbstractType
                     'expanded'          => true,
                     'multiple'          => true,
                     'required'          => false,
+                ]
+            );
+
+            $builder->add(
+                'triggerOptimalMode',
+                ChoiceType::class,
+                [
+                    'label'    => 'mautic.campaign.form.type.optimal_mode',
+                    'choices'  => [
+                        'mautic.campaign.form.type.optimal_mode_day'     => 1,
+                        'mautic.campaign.form.type.optimal_mode_week'    => 7,
+                    ],
+                    'required'          => false,
+                    'expanded'          => true,
                 ]
             );
         }
