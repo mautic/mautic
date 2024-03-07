@@ -49,7 +49,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @method pushLead(Lead $lead, array $config = [])
- * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
+ * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaignId, mixed $personIds = null, array $config = [])
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
  *
