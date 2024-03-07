@@ -40,7 +40,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param string $operator empty, !empty, in, !in
+     * @param string $operator   empty, !empty, in, !in
      * @param ?int[] $segmentIds
      */
     private function isContactSegmentRelationshipValid(Lead $contact, string $operator, array $segmentIds = null): bool

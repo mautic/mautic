@@ -3,13 +3,9 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
-use PDO;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -557,7 +553,7 @@ SQL;
             ->executeQuery(
                 $sql,
                 [$contactId],
-                [PDO::PARAM_INT]
+                [\PDO::PARAM_INT]
             )
             ->fetchFirstColumn();
 
@@ -621,7 +617,7 @@ SQL;
                 $sql,
                 [$contactId, $expectedSegmentIds],
                 [
-                    PDO::PARAM_INT,
+                    \PDO::PARAM_INT,
                     ArrayParameterType::INTEGER,
                 ]
             )

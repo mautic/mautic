@@ -14,7 +14,6 @@ use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -74,7 +73,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
     private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
-    
+
     private \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber $subscriber;
     /**
      * @var CompanyModel|(CompanyModel&MockObject)|MockObject

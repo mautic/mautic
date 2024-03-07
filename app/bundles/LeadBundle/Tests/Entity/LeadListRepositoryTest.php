@@ -6,11 +6,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
-use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -133,7 +129,7 @@ class LeadListRepositoryTest extends TestCase
     private function mockIsContactInAnySegment(int $contactId, array $queryResult): void
     {
         $prefix = MAUTIC_TABLE_PREFIX;
-        $sql = <<<SQL
+        $sql    = <<<SQL
             SELECT leadlist_id 
             FROM {$prefix}lead_lists_leads
             WHERE lead_id = ?
@@ -156,7 +152,7 @@ SQL;
     private function mockIsContactInSegments(int $contactId, array $expectedSegmentIds, array $queryResult): void
     {
         $prefix = MAUTIC_TABLE_PREFIX;
-        $sql = <<<SQL
+        $sql    = <<<SQL
             SELECT leadlist_id 
             FROM {$prefix}lead_lists_leads
             WHERE lead_id = ?

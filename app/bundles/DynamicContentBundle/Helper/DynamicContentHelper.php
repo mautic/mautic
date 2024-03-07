@@ -21,12 +21,12 @@ class DynamicContentHelper
     /**
      * @const DYNAMIC_CONTENT_REGEX
      */
-    const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
+    public const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
 
     /**
      * @const DYNAMIC_WEB_CONTENT_REGEX
      */
-    const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
+    public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
 
     public function __construct(
         protected DynamicContentModel $dynamicContentModel,

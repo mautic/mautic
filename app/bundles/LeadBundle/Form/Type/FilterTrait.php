@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use Exception;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
