@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 /**
@@ -206,27 +205,12 @@ trait MatchFilterForLeadTrait
      */
     private function isContactSegmentRelationshipValid(int $contactId, string $operator, array $segmentIds = null): bool
     {
-        switch ($operator) {
-            case OperatorOptions::EMPTY:
-                // Contact is not in any segment
-                $return = $this->segmentRepository->isNotContactInAnySegment($contactId);
-                break;
-            case OperatorOptions::NOT_EMPTY:
-                // Contact is in any segment
-                $return = $this->segmentRepository->isContactInAnySegment($contactId);
-                break;
-            case OperatorOptions::IN:
-                // Contact is in all segments provided in $segmentsIds
-                $return = $this->segmentRepository->isContactInSegments($contactId, $segmentIds);
-                break;
-            case OperatorOptions::NOT_IN:
-                // Contact is not in all segments provided in $segmentsIds
-                $return = $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds);
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator));
-        }
-
-        return $return;
+        return match ($operator) {
+            OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId),
+            OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId),
+            OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds),
+            OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds),
+            default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+        };
     }
 }
