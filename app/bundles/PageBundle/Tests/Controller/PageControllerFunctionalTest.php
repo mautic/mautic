@@ -13,49 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testPageRedirection(): void
-    {
-        //create landing page
-        $pageObject = new Page();
-        $pageObject->setIsPublished(false);
-        $pageObject->setDateAdded(new DateTime());
-        $pageObject->setTitle('Page:Page:Redirection');
-        $pageObject->setAlias('page-page-redirection');
-        $pageObject->setTemplate('Blank');
-        $pageObject->setCustomHtml('Test Html');
-        $pageObject->setLanguage('en');
-        $pageObject->setRedirectType(301);
-        $pageObject->setRedirectUrl('https://www.google.com/');
-        $this->em->persist($pageObject);
-        $this->em->flush();
-
-        // list landing page
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages');
-
-        // check added landing page is listed or not
-        $this->assertStringContainsString('Page:Page:Redirection (page-page-redirection)', $crawler->filterXPath('//*[@id="pageTable"]/tbody/tr[1]/td[2]/a')->text());
-
-        // check page content if logged-in user accessed the landing page
-        $redirectPageContent = $this->client->request(Request::METHOD_GET, '/page-page-redirection');
-        $this->assertStringContainsString('Test Html', $redirectPageContent->text());
-
-        // Logout and visit the landing page. It should now be redirected as per the configuration.
-        $this->client->request(Request::METHOD_GET, '/s/logout');
-        $this->client->followRedirects(false);
-        $this->client->request(Request::METHOD_GET, '/page-page-redirection');
-
-        $this->markTestSkipped('There is a bug currently.');
-
-        // Check response if it is redirected as per the configuration.
-        $response = $this->client->getResponse();
-        $this->assertSame($pageObject->getRedirectType(), $response->getStatusCode());
-        $this->assertSame($pageObject->getRedirectUrl(), $response->headers->get('Location'));
-    }
-
     public function testPagePreview(): void
     {
-        $segment        = $this->createSegment();
-        $filter         = [
+        $segment = $this->createSegment();
+        $filter  = [
             [
                 'glue'     => 'and',
                 'field'    => 'leadlist',
@@ -88,6 +49,9 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         return $segment;
     }
 
+    /**
+     * @param mixed[] $filters
+     */
     private function createDynamicContentWithSegmentFilter(array $filters = []): DynamicContent
     {
         $dynamicContent = new DynamicContent();

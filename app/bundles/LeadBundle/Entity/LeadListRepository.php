@@ -541,9 +541,6 @@ class LeadListRepository extends CommonRepository
         return $lists;
     }
 
-    /**
-     * @throws DBALException,
-     */
     public function isContactInAnySegment(int $contactId): bool
     {
         $tableName = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
@@ -562,43 +559,28 @@ SQL;
                 [$contactId],
                 [PDO::PARAM_INT]
             )
-            ->fetch(FetchMode::COLUMN);
+            ->fetchFirstColumn();
 
         return !empty($segmentIds);
     }
 
-    /**
-     * @throws DBALException,
-     */
     public function isNotContactInAnySegment(int $contactId): bool
     {
         return !$this->isContactInAnySegment($contactId);
     }
 
     /**
-     * @throws DBALException,
+     * @param int[] $expectedSegmentIds
      */
     public function isContactInSegments(int $contactId, array $expectedSegmentIds): bool
     {
         $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
 
-        if (empty($segmentIds)) {
-            return false; // Contact is not associated wit any segment
-        }
-
-        foreach ($expectedSegmentIds as $expectedSegmentId) {
-            if (in_array($expectedSegmentId, $segmentIds)) {
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
+        return !empty($segmentIds);
     }
 
     /**
-     * @throws DBALException,
+     * @param int[] $expectedSegmentIds
      */
     public function isNotContactInSegments(int $contactId, array $expectedSegmentIds): bool
     {
@@ -618,9 +600,9 @@ SQL;
     }
 
     /**
-     * @return string[] Segment IDs as string in array
+     * @param int[] $expectedSegmentIds
      *
-     * @throws DBALException
+     * @return int[]
      */
     private function fetchContactToSegmentIdsRelationships(int $contactId, array $expectedSegmentIds): array
     {
@@ -640,9 +622,9 @@ SQL;
                 [$contactId, $expectedSegmentIds],
                 [
                     PDO::PARAM_INT,
-                    Connection::PARAM_INT_ARRAY,
+                    ArrayParameterType::INTEGER,
                 ]
             )
-            ->fetchAll(FetchMode::COLUMN);
+            ->fetchFirstColumn();
     }
 }

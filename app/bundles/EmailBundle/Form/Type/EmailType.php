@@ -5,7 +5,6 @@ namespace Mautic\EmailBundle\Form\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -576,9 +575,9 @@ class EmailType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $data = $event->getData();
-                /** @var DynamicContentEntityTrait $entity */
+                /** @var Email $entity */
                 $entity = $event->getForm()->getData();
 
                 if (empty($data['dynamicContent'])) {

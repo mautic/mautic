@@ -329,7 +329,7 @@ class DynamicContentType extends AbstractType
 
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
-            function ($key) use ($customFields) {
+            function ($key) use ($customFields): bool {
                 return in_array(
                     $key,
                     array_merge(

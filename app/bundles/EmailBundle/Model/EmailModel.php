@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
@@ -43,6 +42,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
+use Mautic\EmailBundle\Stats\Helper\FilterTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -75,6 +75,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
+    use FilterTrait;
 
     /**
      * @var bool
@@ -104,7 +105,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         private DNC $doNotContact,
         private StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $security,
-        Connection $connection,
         EntityManagerInterface $em,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -114,8 +114,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         CoreParametersHelper $coreParametersHelper,
         private EmailStatModel $emailStatModel
     ) {
-        $this->connection = $connection;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 

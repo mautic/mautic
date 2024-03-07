@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\FetchMode;
@@ -126,11 +127,15 @@ class LeadListRepositoryTest extends TestCase
         self::assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
     }
 
+    /**
+     * @param array<int> $queryResult
+     */
     private function mockIsContactInAnySegment(int $contactId, array $queryResult): void
     {
+        $prefix = MAUTIC_TABLE_PREFIX;
         $sql = <<<SQL
             SELECT leadlist_id 
-            FROM lead_lists_leads
+            FROM {$prefix}lead_lists_leads
             WHERE lead_id = ?
                 AND manually_removed = 0
             LIMIT 1
@@ -138,18 +143,22 @@ SQL;
         $this->connection->expects(self::once())
             ->method('executeQuery')
             ->with($sql, [$contactId], [\PDO::PARAM_INT])
-            ->willReturn($this->stmt);
-        $this->stmt->expects(self::once())
-            ->method('fetch')
-            ->with(FetchMode::COLUMN)
+            ->willReturn($this->result);
+        $this->result->expects(self::once())
+            ->method('fetchFirstColumn')
             ->willReturn($queryResult);
     }
 
+    /**
+     * @param array<int> $expectedSegmentIds
+     * @param array<int> $queryResult
+     */
     private function mockIsContactInSegments(int $contactId, array $expectedSegmentIds, array $queryResult): void
     {
+        $prefix = MAUTIC_TABLE_PREFIX;
         $sql = <<<SQL
             SELECT leadlist_id 
-            FROM lead_lists_leads
+            FROM {$prefix}lead_lists_leads
             WHERE lead_id = ?
                 AND leadlist_id IN (?)
                 AND manually_removed = 0
@@ -159,12 +168,12 @@ SQL;
             ->with(
                 $sql,
                 [$contactId, $expectedSegmentIds],
-                [\PDO::PARAM_INT, Connection::PARAM_INT_ARRAY]
+                [\PDO::PARAM_INT, ArrayParameterType::INTEGER]
             )
-            ->willReturn($this->stmt);
-        $this->stmt->expects(self::once())
-            ->method('fetchAll')
-            ->with(FetchMode::COLUMN)
+            ->willReturn($this->result);
+
+        $this->result->expects(self::once())
+            ->method('fetchFirstColumn')
             ->willReturn($queryResult);
     }
 
@@ -196,7 +205,7 @@ SQL;
 
         $this->expressionMock->expects(self::once())
             ->method('in')
-            ->with('l.leadlist_id', ':listIds')
+            ->with('l.leadlist_id', $listIds)
             ->willReturnSelf();
 
         $this->expressionMock->expects(self::once())
@@ -204,10 +213,9 @@ SQL;
             ->with('l.manually_removed', ':false')
             ->willReturnSelf();
 
-        $this->queryBuilderMock->expects(self::exactly(2))
+        $this->queryBuilderMock->expects(self::once())
             ->method('setParameter')
             ->withConsecutive(
-                ['listIds', $listIds, Connection::PARAM_INT_ARRAY],
                 ['false', false, 'boolean']
             )
             ->willReturnSelf();
