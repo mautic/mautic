@@ -41,6 +41,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName('Segment 1');
+        $segment->setPublicName('Segment 1');
         $segment->setAlias('segment_1');
         $this->em->persist($segment);
         $this->em->flush();

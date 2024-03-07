@@ -47,14 +47,12 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
     {
         $contactId = (int) $contact->getId();
 
-        $return = match ($operator) {
+        return match ($operator) {
             OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId),
             OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId),
             OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds),
             OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds),
             default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
-
-        return $return;
     }
 }

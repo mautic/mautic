@@ -330,15 +330,15 @@ class DynamicContentType extends AbstractType
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
             fn ($key): bool => in_array(
-                    $key,
-                    array_merge(
-                        array_keys($customFields[0]),
-                        ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags', 'leadlist']
-                    ),
-                    true
+                $key,
+                array_merge(
+                    array_keys($customFields[0]),
+                    ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags', 'leadlist']
                 ),
-                ARRAY_FILTER_USE_KEY
-            );
+                true
+            ),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     /**
