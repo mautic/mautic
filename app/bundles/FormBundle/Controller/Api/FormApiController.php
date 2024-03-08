@@ -328,14 +328,12 @@ class FormApiController extends CommonApiController
         );
     }
 
-    public function newEntityAction(Request $request): Response
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
     {
-        $parameters = $request->request->all();
-
         if (!isset($parameters['postAction'])) {
-            $request->request->add(['postAction' => 'return']);
+            $parameters['postAction'] = 'return';
         }
 
-        return parent::newEntityAction($request);
+        return parent::processForm($request, $entity, $parameters, $method);
     }
 }
