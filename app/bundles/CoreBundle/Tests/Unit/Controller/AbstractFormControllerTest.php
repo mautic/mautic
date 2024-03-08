@@ -22,12 +22,12 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|AbstractFormController
      */
-    private $classFromAbstractFormController;
+    private \Mautic\CoreBundle\Controller\AbstractFormController $classFromAbstractFormController;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Form
      */
-    private $formMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formMock;
 
     private RequestStack $requestStack;
 

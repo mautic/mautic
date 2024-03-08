@@ -17,7 +17,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'hooks',
                 'path'            => '/hooks',
-                'controller'      => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController',
+                'controller'      => \Mautic\WebhookBundle\Controller\Api\WebhookApiController::class,
             ],
             'mautic_api_webhookevents' => [
                 'path'       => '/hooks/triggers',
@@ -65,15 +65,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.http.client',
-                ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.webhook.repository.queue' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\WebhookBundle\Entity\WebhookQueue::class,
                 ],
             ],
         ],

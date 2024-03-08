@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -27,53 +28,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @param LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var LeadFieldRepository
-     */
-    protected $leadFieldRepository;
-
-    private DoNotContact $doNotContact;
-
     public function __construct(
-        LeadModel $leadModel,
-        ContactTracker $contactTracker,
-        IpLookupHelper $ipLookupHelper,
-        LeadFieldRepository $leadFieldRepository,
+        protected LeadModel $leadModel,
+        protected ContactTracker $contactTracker,
+        protected IpLookupHelper $ipLookupHelper,
+        protected LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
-        DoNotContact $doNotContact
+        private DoNotContact $doNotContact
     ) {
-        $this->leadModel           = $leadModel;
-        $this->contactTracker      = $contactTracker;
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->leadFieldRepository = $leadFieldRepository;
-        $this->doNotContact        = $doNotContact;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
-            FormEvents::ON_OBJECT_COLLECT        => ['onObjectCollect', 0],
-            FormEvents::ON_FIELD_COLLECT         => ['onFieldCollect', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
+            FormEvents::FORM_ON_BUILD                    => ['onFormBuilder', 0],
+            FormEvents::ON_OBJECT_COLLECT                => ['onObjectCollect', 0],
+            FormEvents::ON_FIELD_COLLECT                 => ['onFieldCollect', 0],
+            LeadEvents::LEAD_ON_SEGMENTS_CHANGE          => ['onLeadSegmentsChange', 0],
+            FormEvents::ON_EXECUTE_SUBMIT_ACTION         => [
                 ['onFormSubmitActionChangePoints', 0],
                 ['onFormSubmitActionChangeList', 1],
                 ['onFormSubmitActionChangeTags', 2],
@@ -87,7 +59,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a lead generation action to available form submit actions.
      */
-    public function onFormBuilder(FormBuilderEvent $event)
+    public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('lead.pointschange', [
             'group'       => 'mautic.lead.lead.submitaction',
@@ -315,6 +287,23 @@ class FormSubscriber implements EventSubscriberInterface
 
         if ($event->getLead()) {
             $this->doNotContact->removeDncForContact($event->getLead()->getId(), 'email');
+        }
+    }
+
+    public function onLeadSegmentsChange(SubmissionEvent $event): void
+    {
+        $properties = $event->getActionConfig();
+
+        $lead       = $this->contactTracker->getContact();
+        $addTo      = $properties['addToLists'];
+        $removeFrom = $properties['removeFromLists'];
+
+        if (!empty($addTo)) {
+            $this->leadModel->addToLists($lead, $addTo);
+        }
+
+        if (!empty($removeFrom)) {
+            $this->leadModel->removeFromLists($lead, $removeFrom);
         }
     }
 }

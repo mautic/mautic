@@ -17,51 +17,35 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class EntityLookupType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var ModelFactory<object>
-     */
-    private $modelFactory;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
      * @var EntityLookupChoiceLoader[]
      */
-    private $choiceLoaders;
+    private ?array $choiceLoaders = null;
 
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, RouterInterface $router)
-    {
-        $this->translator   = $translator;
-        $this->router       = $router;
-        $this->connection   = $connection;
-        $this->modelFactory = $modelFactory;
+    public function __construct(
+        private ModelFactory $modelFactory,
+        private TranslatorInterface $translator,
+        private Connection $connection,
+        private RouterInterface $router
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Let the form builder notify us about initial/submitted choices
-        $formModifier = function (FormEvent $event) {
+        $formModifier = function (FormEvent $event): void {
             $options = $event->getForm()->getConfig()->getOptions();
-            $this->choiceLoaders[$options['model']]->setOptions($options);
-            $this->choiceLoaders[$options['model']]->onFormPostSetData($event);
+            $model   = $this->getModelName($options);
+            $this->choiceLoaders[$model]->setOptions($options);
+            $this->choiceLoaders[$model]->onFormPostSetData($event);
         };
 
         $builder->addEventListener(
@@ -75,13 +59,10 @@ class EntityLookupType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['model', 'ajax_lookup_action']);
-        $resolver->setDefined(['model_lookup_method', 'repo_lookup_method', 'lookup_arguments']);
+        $resolver->setDefined(['model_lookup_method', 'repo_lookup_method', 'lookup_arguments', 'model_key']);
         $resolver->setDefaults(
             [
                 'modal_route'            => false,
@@ -92,14 +73,16 @@ class EntityLookupType extends AbstractType
                 'entity_id_column'       => 'id',
                 'choice_loader'          => function (Options $options) {
                     // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
-                    $this->choiceLoaders[$options['model']] = new EntityLookupChoiceLoader(
+                    // if you have multiple lookup fields with same type then use different - 2 'key' for all fields
+                    $model                       = $this->getModelName($options);
+                    $this->choiceLoaders[$model] = new EntityLookupChoiceLoader(
                         $this->modelFactory,
                         $this->translator,
                         $this->connection,
                         $options
                     );
 
-                    return $this->choiceLoaders[$options['model']];
+                    return $this->choiceLoaders[$model];
                 },
                 'choice_translation_domain' => false,
                 'expanded'                  => false,
@@ -118,7 +101,7 @@ class EntityLookupType extends AbstractType
         return ChoiceType::class;
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $attr =
             [
@@ -143,5 +126,18 @@ class EntityLookupType extends AbstractType
         }
 
         $view->vars['attr'] = array_merge($view->vars['attr'], $attr);
+    }
+
+    /**
+     * @param Options<mixed[]>|array<mixed> $options
+     */
+    private function getModelName($options): string
+    {
+        $key = $options['model_key'] ?? null;
+        if (!$key) {
+            return $options['model'];
+        }
+
+        return sprintf('%s.%s', $options['model'], $key);
     }
 }

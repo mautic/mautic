@@ -154,7 +154,7 @@ RESPONSE);
             ->willReturn($mockResponse);
     }
 
-    public function testCountryIpLookupSuccessful()
+    public function testCountryIpLookupSuccessful(): void
     {
         $ipService = new MaxmindCountryLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
@@ -163,7 +163,7 @@ RESPONSE);
         $this->checkDetails($details);
     }
 
-    public function testOmniIpLookupSuccessful()
+    public function testOmniIpLookupSuccessful(): void
     {
         $ipService = new MaxmindOmniLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
@@ -172,7 +172,7 @@ RESPONSE);
         $this->checkDetails($details);
     }
 
-    public function testPrecisionIpLookupSuccessful()
+    public function testPrecisionIpLookupSuccessful(): void
     {
         $ipService = new MaxmindPrecisionLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
 
@@ -181,7 +181,7 @@ RESPONSE);
         $this->checkDetails($details);
     }
 
-    private function checkDetails($details)
+    private function checkDetails($details): void
     {
         $this->assertEquals('Los Angeles', $details['city']);
         $this->assertEquals('California', $details['region']);

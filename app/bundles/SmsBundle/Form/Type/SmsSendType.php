@@ -10,21 +10,16 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class SmsSendType.
+ * @extends AbstractType<array<mixed>>
  */
 class SmsSendType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'sms',
@@ -72,8 +67,6 @@ class SmsSendType extends AbstractType
                 ]
             );
 
-            $sms = $options['data']['sms'];
-
             // create button edit sms
             $windowUrlEdit = $this->router->generate(
                 'mautic_sms_action',
@@ -92,7 +85,7 @@ class SmsSendType extends AbstractType
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardSmsUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
-                        'disabled' => !isset($sms),
+                        'disabled' => !isset($options['data']['sms']),
                         'icon'     => 'fa fa-edit',
                     ],
                     'label' => 'mautic.sms.send.edit.sms',
@@ -101,7 +94,7 @@ class SmsSendType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }

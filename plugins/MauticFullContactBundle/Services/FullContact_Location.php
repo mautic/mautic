@@ -16,12 +16,12 @@ class FullContact_Location extends FullContact_Base
      * @var array
      */
     protected $_supportedMethods = ['normalizer', 'enrichment'];
+
     protected $_resourceUri      = '';
 
     /**
      * This takes a name and breaks it into its individual parts.
      *
-     * @param type $name
      * @param type $casing -> valid values are uppercase, lowercase, titlecase
      *
      * @return type

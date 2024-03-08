@@ -30,7 +30,7 @@ trait TimelineTrait
         $resultsParserCallback = null
     ) {
         if (!empty($options['unitCounts'])) {
-            list($tablePrefix, $column) = explode('.', $timestampColumn);
+            [$tablePrefix, $column] = explode('.', $timestampColumn);
 
             // Get counts grouped by unit based on date range
             /** @var ChartQuery $cq */
@@ -63,17 +63,12 @@ trait TimelineTrait
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = $eventNameColumn;
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = $timestampColumn;
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => $eventNameColumn,
+                default      => $timestampColumn,
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }

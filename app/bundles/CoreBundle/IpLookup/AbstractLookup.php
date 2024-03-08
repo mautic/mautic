@@ -8,35 +8,29 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractLookup
 {
     public $city         = '';
-    public $region       = '';
-    public $zipcode      = '';
-    public $country      = '';
-    public $latitude     = '';
-    public $longitude    = '';
-    public $isp          = '';
-    public $organization = '';
-    public $timezone     = '';
-    public $extra        = '';
 
-    protected ?Client $client;
+    public $region       = '';
+
+    public $zipcode      = '';
+
+    public $country      = '';
+
+    public $latitude     = '';
+
+    public $longitude    = '';
+
+    public $isp          = '';
+
+    public $organization = '';
+
+    public $timezone     = '';
+
+    public $extra        = '';
 
     /**
      * @var string IP Address
      */
     protected $ip;
-
-    /**
-     * Authorization for lookup service.
-     */
-    protected ?string $auth;
-
-    protected ?string $cacheDir;
-    protected ?LoggerInterface $logger;
-
-    /**
-     * @var mixed
-     */
-    protected $config;
 
     /**
      * Return attribution HTML displayed in the configuration UI.
@@ -50,19 +44,13 @@ abstract class AbstractLookup
      */
     abstract protected function lookup();
 
-    /**
-     * AbstractLookup constructor.
-     *
-     * @param null $ipLookupConfig
-     * @param null $cacheDir
-     */
-    public function __construct(?string $auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
-    {
-        $this->cacheDir  = $cacheDir;
-        $this->logger    = $logger;
-        $this->auth      = $auth;
-        $this->config    = $ipLookupConfig;
-        $this->client    = $client;
+    public function __construct(
+        protected ?string $auth = null,
+        protected $config = null,
+        protected ?string $cacheDir = null,
+        protected ?LoggerInterface $logger = null,
+        protected ?Client $client = null
+    ) {
     }
 
     /**

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FieldModelTest extends TestCase
 {
-    public function testGenerateAlias()
+    public function testGenerateAlias(): void
     {
         $connection = $this->createMock(Connection::class);
 

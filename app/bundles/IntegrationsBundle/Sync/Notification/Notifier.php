@@ -12,32 +12,16 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Notifier
 {
-    /**
-     * @var HandlerContainer
-     */
-    private $handlerContainer;
-
-    /**
-     * @var SyncIntegrationsHelper
-     */
-    private $syncIntegrationsHelper;
-
-    /**
-     * @var ConfigIntegrationsHelper
-     */
-    private $configIntegrationsHelper;
-
     public function __construct(
-        HandlerContainer $handlerContainer,
-        SyncIntegrationsHelper $syncIntegrationsHelper,
-        ConfigIntegrationsHelper $configIntegrationsHelper
+        private HandlerContainer $handlerContainer,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private ConfigIntegrationsHelper $configIntegrationsHelper,
+        private TranslatorInterface $translator
     ) {
-        $this->handlerContainer         = $handlerContainer;
-        $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
-        $this->configIntegrationsHelper = $configIntegrationsHelper;
     }
 
     /**
@@ -69,14 +53,11 @@ class Notifier
         }
     }
 
-    /**
-     * @return string
-     */
-    private function getObjectDisplayName(string $integration, string $object)
+    private function getObjectDisplayName(string $integration, string $object): string
     {
         try {
             $configIntegration = $this->configIntegrationsHelper->getIntegration($integration);
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return ucfirst($object);
         }
 
@@ -90,6 +71,6 @@ class Notifier
             return ucfirst($object);
         }
 
-        return $objects[$object];
+        return $this->translator->trans($objects[$object]);
     }
 }
