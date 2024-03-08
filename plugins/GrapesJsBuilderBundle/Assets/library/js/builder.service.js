@@ -21,7 +21,11 @@ import StorageService from "./storage.service";
 // import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 
 import CodeModeButton from './codeMode/codeMode.button';
+<<<<<<< HEAD
 import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+=======
+import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
+>>>>>>> 788b1edba3 (DPMMA-2600 Fix for Grapesjs-Mjml self-closing tag issue (#13431))
 
 export default class BuilderService {
   editor;
@@ -265,6 +269,14 @@ export default class BuilderService {
         ...BuilderService.getPluginOptions('email-mjml'),
       },
     });
+    this.unsetComponentVoidTypes(this.editor);
+    this.editor.setComponents(components);
+
+    // Reinitialize the content after parsing MJML.
+    // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
+    // See: https://github.com/GrapesJS/mjml/issues/149
+    const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
+    this.editor.setComponents(parsedContent);
 
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
@@ -484,6 +496,7 @@ export default class BuilderService {
     }
   }
 
+<<<<<<< HEAD
   /**
    * Move the blocks and categories in the sidebar
    */
@@ -504,6 +517,42 @@ export default class BuilderService {
           order: -1
         });
       }
+=======
+  unsetComponentVoidTypes(editor) {
+    // Support for self-closing components is temporarily disabled due to parsing issues with mjml tags.
+    // Browsers only recognize explicit self-closing tags like <img /> and <br />, leading to rendering problems.
+    // This can be reverted once the issue with self-closing tags is resolved in grapesjs-mjml.
+    // See: https://github.com/GrapesJS/mjml/issues/149
+    const voidTypes = ['mj-image', 'mj-divider', 'mj-font'];
+    voidTypes.forEach(function(component) {
+      editor.DomComponents.addType(component, {
+        model: {
+          defaults: {
+            void: false
+          },
+          toHTML() {
+            const tag = this.get('tagName');
+            const attr = this.getAttrToHTML();
+            const content = this.get('content');
+            let strAttr = '';
+
+            for (let prop in attr) {
+              const val = attr[prop];
+              const hasValue = typeof val !== 'undefined' && val !== '';
+              strAttr += hasValue ? ` ${prop}="${val}"` : '';
+            }
+
+            let html = `<${tag}${strAttr}>${content}</${tag}>`;
+
+            // Add the components after the closing tag
+            const componentsHtml = this.get('components')
+                .map(model => model.toHTML())
+                .join('');
+            return html + componentsHtml;
+          },
+        }
+      });
+>>>>>>> 788b1edba3 (DPMMA-2600 Fix for Grapesjs-Mjml self-closing tag issue (#13431))
     });
   }
 
