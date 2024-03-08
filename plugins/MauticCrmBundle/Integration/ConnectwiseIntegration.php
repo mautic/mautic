@@ -45,7 +45,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Get the array key for application cookie.
      */
-    public function getCompanyCookieKey(): string
+    public function getClientId(): string
     {
         return 'appcookie';
     }
@@ -85,7 +85,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function getSecretKeys(): array
     {
         return [
-            'password',
+            'password', 'appcookie',
         ];
     }
 
@@ -132,6 +132,26 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         return $error;
+    }
+
+    /**
+     * Append ClientID into header to enable authentication.
+     *
+     * @param string       $url
+     * @param array<mixed> $parameters
+     * @param string       $method
+     * @param array<mixed> $settings
+     * @param string       $authType
+     *
+     * @return array<mixed>
+     */
+    public function prepareRequest($url, $parameters, $method, $settings, $authType): array
+    {
+        [$parameters,$headers] = parent::prepareRequest($url, $parameters, $method, $settings, $authType);
+
+        $headers['clientId'] = $this->keys['appcookie'];    // Even though it is called appcookie it is ClientID
+
+        return [$parameters, $headers];
     }
 
     public function getAuthenticationType(): string
