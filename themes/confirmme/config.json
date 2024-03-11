@@ -5,6 +5,5 @@
   "builder": ["grapesjsbuilder"],
   "features": [
     "email"
-  ],
-  "isVisibleInGUI": true
+  ]
 }

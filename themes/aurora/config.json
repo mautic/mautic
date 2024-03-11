@@ -4,6 +4,5 @@
   "authorUrl": "http://www.mautic.com",
   "features": [
     "email"
-  ],
-  "isVisibleInGUI": true
+  ]
 }
