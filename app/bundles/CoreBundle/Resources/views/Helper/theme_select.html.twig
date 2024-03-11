@@ -26,7 +26,6 @@
       </div>
       {% for themeKey, themeInfo in themes %}
           {% set isSelected = active is same as themeKey %}
-          {% if themeInfo.config.isVisibleInGUI == true %}
             {% if not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features %}
                 {% if (themeInfo.dir ~ '/thumbnail_' ~ type ~ '.png') is file %}
                     {% set thumbnailName, hasThumbnail = 'thumbnail_' ~ type ~ '.png', true %}
@@ -73,7 +72,6 @@
                         </div>
                     {% endif %}
                 </div>
-            {% endif %}
           {% endif %}
       {% endfor %}
       <div class="clearfix"></div>
