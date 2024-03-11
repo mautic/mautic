@@ -179,10 +179,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.campaign.scheduler.behavioral'      => [
-                'class'     => \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Behavioral::class,
-                'arguments' => [],
-            ],
             'mautic.campaign.scheduler'               => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::class,
                 'arguments' => [
