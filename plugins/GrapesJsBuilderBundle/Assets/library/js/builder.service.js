@@ -98,11 +98,14 @@ export default class BuilderService {
     Mousetrap.reset();
     if (object === 'page') {
       this.editor = this.initPage();
+      this.addGrapeJsThemeEditorExtensions('page-html');
     } else if (object === 'emailform') {
       if (mjmlService.getOriginalContentMjml()) {
         this.editor = this.initEmailMjml();
+        this.addGrapeJsThemeEditorExtensions('email-mjml');
       } else {
         this.editor = this.initEmailHtml();
+        this.addGrapeJsThemeEditorExtensions('email-html');
       }
     } else {
       throw Error(`Not supported builder type: ${object}`);
@@ -129,10 +132,10 @@ export default class BuilderService {
   }
 
   static getCkeConf(tokenCallback) {
-    const ckEditorToolbarOptions = ['undo', 'redo', '|', 'bold','italic', 'underline','strikethrough', '|', 'fontSize','fontFamily','fontColor','fontBackgroundColor', '|' ,'alignment','outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'bulletedList','numberedList', '|', 'link', '|', 'TokenPlugin'];
+    const ckEditorToolbarOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|', 'alignment', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', '|', 'bulletedList', 'numberedList', '|', 'link', '|', 'TokenPlugin'];
     return {
       ckeditor_module: `${mauticBaseUrl}assets/ckeditor/build/ckeditor.js`,
-      options:  Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback)
+      options: Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback)
     };
   }
 
@@ -305,6 +308,65 @@ export default class BuilderService {
       };
     }
   }
+
+  /**
+   * Extends GrapesJS using a JSON file provided by the current theme.
+   *
+   * The file has to be located in /themes/${Mautic.builderTheme}/grapejsblocks/
+   * The needs to be named:
+   * - page-html.json for the landing page editor
+   * - email-mjml.json for the MJML email editor
+   * - email-html.json for the HTML email editor
+   *
+   * The JSON should have two base properties: `blocks` and `types`.
+   *
+   * Example:
+   *
+   * ```js
+   * {
+   * 	"blocks": {
+   * 		"someSection": {
+   * 			// block definition here
+   * 		}
+   * 	},
+   * 	"types": {
+   * 		"aHeading": {
+   * 			// type definition here
+   * 		}
+   * 	}
+   * }
+   * ```
+   *
+   * @param {string} mode - The editor mode, either 'page-html', 'email-mjml' or 'email-html'
+   */
+  addGrapeJsThemeEditorExtensions(mode) {
+    const url = `/themes/${Mautic.builderTheme}/grapejsblocks/${mode}.json`;
+
+    fetch(url).then((res) => res.json()).then((data) => {
+      const blocks = data.blocks;
+      const types = data.types;
+
+      // Add blocks
+      if (blocks) {
+        for (const blockId in blocks) {
+          console.debug(`Add block ${blockId}`);
+          this.editor.BlockManager.add(blockId, blocks[blockId]);
+        }
+      }
+
+      // Add component types
+      if (types) {
+        for (const typeId in types) {
+          console.debug(`Add type ${typeId}`);
+          this.editor.DomComponents.addType(typeId, types[typeId]);
+        }
+      }
+    }).catch((error) => {
+      console.error('Error while trying to extend grapesJS: ', error);
+    });
+
+  }
+
   /**
    * Generate assets list from GrapesJs
    */
