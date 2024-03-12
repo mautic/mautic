@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -81,7 +82,8 @@ class DynamicContentType extends AbstractType
         private EntityManager $em,
         ListModel $listModel,
         private TranslatorInterface $translator,
-        private LeadModel $leadModel
+        private LeadModel $leadModel,
+        private RelativeDate $relativeDate
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -253,7 +255,7 @@ class DynamicContentType extends AbstractType
             );
         }
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate);
         $builder->add(
             $builder->create(
                 'filters',
