@@ -6,7 +6,9 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 
 class SegmentFilterFunctionalTest extends MauticMysqlTestCase
@@ -16,6 +18,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
      */
     private $leads = [];
 
+    protected $useCleanupRollback = false;
+
     /**
      * Test creates: contacts, segment
      * Test rebuilds segment
@@ -23,6 +27,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
      */
     public function testSegments(): void
     {
+        $this->createCustomCompanyDateField();
+
         foreach ($this->getSegmentsProvider() as $scenario) {
             $this->runTestSegments($scenario['contacts'], $scenario['segment']);
         }
@@ -83,7 +89,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $filters = [];
         foreach ($segmentFilters as $segmentFilter) {
             $filters[] = [
-                'object'     => 'lead',
+                'object'     => $segmentFilter['object'] ?? 'lead',
                 'glue'       => $segmentFilter['glue'],
                 'field'      => $segmentFilter['field'],
                 'type'       => $segmentFilter['type'],
@@ -171,5 +177,25 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
                 ['field' => 'points', 'operator' => 'gte', 'value' => 20, 'glue' => 'and', 'type' => 'text'],
             ],
         ];
+
+        yield [
+            'contacts' => [
+                ['email' => 'lukas@mautic.com', 'in_segment' => true],
+            ],
+            'segment' => [
+                ['field' => 'companydatetime', 'object' => 'company',  'operator' => 'empty', 'value' => null, 'glue' => 'and', 'type' => 'datetime'],
+            ],
+        ];
+    }
+
+    protected function createCustomCompanyDateField(): void
+    {
+        $field = new LeadField();
+        $field->setType('datetime');
+        $field->setObject('company');
+        $field->setAlias('companydatetime');
+        $field->setName('Company datetime');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel->saveEntity($field);
     }
 }
