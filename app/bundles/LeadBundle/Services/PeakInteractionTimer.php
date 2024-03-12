@@ -7,9 +7,10 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class PeakInteractionTimer
 {
-    public const DEFAULT_HOUR_START = 9; // 9 AM
-    public const DEFAULT_HOUR_END   = 12; // 12 PM
-    public const DEFAULT_DAYS       = ['Tuesday', 'Monday', 'Thursday'];
+    private const BEST_DEFAULT_HOUR_START = 9; // 9 AM
+    private const BEST_DEFAULT_HOUR_END   = 12; // 12 PM
+    private const MINUTES_START_OF_HOUR   = 0;    // Start of the hour
+    private const BEST_DEFAULT_DAYS       = ['Tuesday', 'Monday', 'Thursday'];
 
     private ?\DateTimeZone $defaultTimezone = null;
 
@@ -20,30 +21,25 @@ class PeakInteractionTimer
 
     public function getOptimalTime(Lead $contact): \DateTimeInterface
     {
-        if ($contactTimezoneString = $contact->getTimezone()) {
-            $contactTimezone = new \DateTimeZone($contactTimezoneString);
-        } else {
-            $contactTimezone = $this->getDefaultTimezone();
-        }
+        $contactTimezoneString = $contact->getTimezone();
+        $contactTimezone       = $contactTimezoneString ? new \DateTimeZone($contactTimezoneString) : $this->getDefaultTimezone();
 
         $currentDateTime = $this->getCurrentDateTime($contactTimezone);
 
         $firstOptimalToday = clone $currentDateTime;
-        $firstOptimalToday->setTime(self::DEFAULT_HOUR_START, 0);
+        $firstOptimalToday->setTime(self::BEST_DEFAULT_HOUR_START, self::MINUTES_START_OF_HOUR);
         $lastOptimalToday = clone $currentDateTime;
-        $lastOptimalToday->setTime(self::DEFAULT_HOUR_END, 0);
+        $lastOptimalToday->setTime(self::BEST_DEFAULT_HOUR_END, self::MINUTES_START_OF_HOUR);
 
-        // Check if it's optimal now
-        if ($currentDateTime <= $lastOptimalToday && $currentDateTime >= $firstOptimalToday) {
+        // Return current time if it's within the optimal range
+        if ($currentDateTime >= $firstOptimalToday && $currentDateTime <= $lastOptimalToday) {
             return $currentDateTime;
         }
 
-        // Use the best default interaction hour
+        // Set time to the start of the optimal range and adjust to the next day if needed
         $optimalDateTime = clone $currentDateTime;
-        $optimalDateTime->setTime(self::DEFAULT_HOUR_START, 0);
-
-        // If the current time is past the optimal time range, move to the next day
-        if ($optimalDateTime < $currentDateTime) {
+        $optimalDateTime->setTime(self::BEST_DEFAULT_HOUR_START, self::MINUTES_START_OF_HOUR);
+        if ($optimalDateTime <= $currentDateTime) {
             $optimalDateTime->modify('+1 day');
         }
 
