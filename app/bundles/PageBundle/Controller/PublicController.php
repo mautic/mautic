@@ -466,7 +466,9 @@ class PublicController extends AbstractFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
-        $redirectId
+        PageModel $pageModel,
+        $redirectId,
+        ?string $ct = null
     ): \Symfony\Component\HttpFoundation\RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
@@ -490,7 +492,20 @@ class PublicController extends AbstractFormController
         // Get query string
         $query = $request->query->all();
 
-        $ct = $query['ct'] ?? null;
+        // Unset the clickthrough from the URL query
+        $ct = $query['ct'] ?? $query['ct'] = $request->attributes->get('ct');
+        unset($query['ct']);
+
+        try {
+            $clickthrough = $pageModel->decodeArrayFromUrl($ct);
+            $utmTags      = $clickthrough['utmTags'] ?? [];
+            if (!empty($utmTags)) {
+                $query = array_merge($query, $utmTags);
+                unset($clickthrough['utmTags']);
+                $ct          = $pageModel->encodeArrayForUrl($clickthrough);
+            }
+        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+        }
 
         // Tak on anything left to the URL
         if (count($query)) {
@@ -519,8 +534,11 @@ class PublicController extends AbstractFormController
 
                     $request->request->set('ct', '');
                     $request->query->set('ct', '');
-                    $lead = $contactRequestHelper->getContactFromQuery();
-                    $pageModel->hitPage($redirect, $request, 200, $lead);
+                    try {
+                        $lead = $contactRequestHelper->getContactFromQuery();
+                        $pageModel->hitPage($redirect, $request, 200, $lead);
+                    } catch (InvalidDecodedStringException $e) {
+                    }
                 }
 
                 $leadArray = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
