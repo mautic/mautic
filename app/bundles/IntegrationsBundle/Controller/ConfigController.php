@@ -25,6 +25,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormNotesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -129,6 +130,8 @@ class ConfigController extends AbstractFormController
             }
 
             $settings['sync']['fieldMappings'] = $fieldMerger->getFieldMappings();
+            // add new flag for each integration object based on each field's sync direction
+            $settings['sync']['directions'] = $this->setObjectSyncDirection($settings['sync']['fieldMappings']);
 
             $fieldValidator->validateRequiredFields($form, $this->integrationObject, $settings['sync']['fieldMappings']);
 
@@ -268,5 +271,27 @@ class ConfigController extends AbstractFormController
     {
         $session = $request->getSession();
         $session->remove("{$this->integrationObject->getName()}-fields");
+    }
+
+    /**
+     * @param mixed[] $fieldMappings
+     *
+     * @return mixed[]
+     */
+    private function setObjectSyncDirection(array $fieldMappings): array
+    {
+        $syncDirections = [];
+
+        foreach ($fieldMappings as $integrationObject => $objectFieldMappings) {
+            $syncDirections[$integrationObject] = ObjectMappingDAO::SYNC_TO_MAUTIC;
+            foreach ($objectFieldMappings as $eachFieldMapping) {
+                if (ObjectMappingDAO::SYNC_TO_MAUTIC != $eachFieldMapping['syncDirection']) {
+                    $syncDirections[$integrationObject] = $eachFieldMapping['syncDirection'];
+                    break;
+                }
+            }
+        }
+
+        return $syncDirections;
     }
 }

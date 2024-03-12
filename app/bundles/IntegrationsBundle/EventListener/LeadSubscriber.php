@@ -146,6 +146,11 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event): void
     {
+        if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(Contact::NAME)) {
+            // Only track if an integration is syncing with contacts
+            return;
+        }
+
         $lead = $event->getLead();
 
         // This mechanism is not able to record multiple company changes.
