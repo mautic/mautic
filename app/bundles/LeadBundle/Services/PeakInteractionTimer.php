@@ -7,10 +7,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class PeakInteractionTimer
 {
-    private $bestDefaultHourStart = 9; // 9 AM
-    private $bestDefaultHourEnd   = 12;  // 12 PM
-
-    private $defaultSendingDays = ['Tuesday', 'Monday', 'Thursday'];
+    public const DEFAULT_HOUR_START = 9; // 9 AM
+    public const DEFAULT_HOUR_END   = 12; // 12 PM
+    public const DEFAULT_DAYS       = ['Tuesday', 'Monday', 'Thursday'];
 
     private ?\DateTimeZone $defaultTimezone = null;
 
@@ -27,28 +26,33 @@ class PeakInteractionTimer
             $contactTimezone = $this->getDefaultTimezone();
         }
 
-        $currentDateTime = new \DateTime('now', $contactTimezone);
+        $currentDateTime = $this->getCurrentDateTime($contactTimezone);
 
-        // Use the best default interaction hour
+        $firstOptimalToday = clone $currentDateTime;
+        $firstOptimalToday->setTime(self::DEFAULT_HOUR_START, 0);
         $lastOptimalToday = clone $currentDateTime;
-        $lastOptimalToday->setTime($this->bestDefaultHourEnd, 0);
+        $lastOptimalToday->setTime(self::DEFAULT_HOUR_END, 0);
 
         // Check if it's optimal now
-        if ($currentDateTime < $lastOptimalToday && $currentDateTime->format('H') >= $this->bestDefaultHourStart) {
+        if ($currentDateTime <= $lastOptimalToday && $currentDateTime >= $firstOptimalToday) {
             return $currentDateTime;
         }
 
         // Use the best default interaction hour
         $optimalDateTime = clone $currentDateTime;
-        $optimalDateTime->setTime(rand($this->bestDefaultHourStart, $this->bestDefaultHourEnd - 1), rand(0, 59));
+        $optimalDateTime->setTime(self::DEFAULT_HOUR_START, 0);
 
         // If the current time is past the optimal time range, move to the next day
-        if ($optimalDateTime < new \DateTime('now', $contactTimezone)) {
+        if ($optimalDateTime < $currentDateTime) {
             $optimalDateTime->modify('+1 day');
-            $optimalDateTime->setTime($this->bestDefaultHourStart, 0);
         }
 
         return $optimalDateTime;
+    }
+
+    protected function getCurrentDateTime(\DateTimeZone $timezone): \DateTime
+    {
+        return new \DateTime('now', $timezone);
     }
 
     private function getDefaultTimezone(): \DateTimeZone
