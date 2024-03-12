@@ -27,6 +27,7 @@
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
   "dependencies": {
     "grapesjs": "^0.17.29",
+    "grapesjs-custom-code": "^1.0.2",
     "grapesjs-mjml": "^0.5.8",
     "grapesjs-parser-postcss": "^0.1.1",
     "grapesjs-plugin-ckeditor5": "^0.0.33",
