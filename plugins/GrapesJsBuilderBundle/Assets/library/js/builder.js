@@ -32,7 +32,7 @@ function launchBuilderGrapesjs(formName) {
   const builder = new BuilderService(assetsConfig);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
-
+  Mautic.builder = builder;
   // Load and add assets
   AssetService.getAssetsXhr(function (result) {
     builder.editor.AssetManager.add(result.data);
