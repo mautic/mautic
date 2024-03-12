@@ -217,7 +217,9 @@ class UserType extends AbstractType
                 )
             );
 
-            $builder->add('isPublished', YesNoButtonGroupType::class);
+            $builder->add('isPublished', YesNoButtonGroupType::class, [
+                'label' => 'mautic.user.active',
+            ]);
 
             $builder->add('buttons', FormButtonsType::class);
         } else {

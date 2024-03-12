@@ -585,7 +585,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
                         if (!empty($fieldsToUpdateInMautic)) {
-                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdateInMautic));
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
                             $newMatchedFields = $matchedFields;
@@ -701,7 +701,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
-        $leadFields            = array_unique(array_values($config['leadFields']));
+        $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
 
         if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
@@ -720,7 +720,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $availableFields         = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$object]]]);
         $fieldsToUpdate[$object] = array_values(array_intersect(array_keys($availableFields[$object]), $fieldsToUpdateInCrm));
-        $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate[$object]));
+        $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdate[$object]));
 
         $progress      = false;
         $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
@@ -825,6 +825,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
+            }
+            if (!isset($config['leadFields']) || !is_iterable($config['leadFields'])) {
+                continue;
             }
             // Match that data with mapped lead fields
             foreach ($config['leadFields'] as $k => $v) {

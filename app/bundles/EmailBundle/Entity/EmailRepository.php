@@ -252,6 +252,12 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
+        $excludedListQb = $this->getExcludedListQuery((int) $emailId);
+
+        if ($excludedListQb) {
+            $q->andWhere(sprintf('l.id NOT IN (%s)', $excludedListQb->getSQL()));
+        }
+
         // Do not include leads which are not subscribed to the category set for email.
         $unsubscribeLeadsQb = $this->getCategoryUnsubscribedLeadsQuery((int) $emailId);
         $q->andWhere(sprintf('l.id NOT IN (%s)', $unsubscribeLeadsQb->getSQL()));
@@ -735,5 +741,29 @@ class EmailRepository extends CommonRepository
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
+    }
+
+    private function getExcludedListQuery(int $emailId): ?QueryBuilder
+    {
+        $connection = $this->getEntityManager()
+            ->getConnection();
+        $excludedListIds = $connection->createQueryBuilder()
+            ->select('eel.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_excluded', 'eel')
+            ->where('eel.email_id = :emailId')
+            ->setParameter('emailId', $emailId)
+            ->executeQuery()
+            ->fetchFirstColumn();
+
+        if (!$excludedListIds) {
+            return null;
+        }
+
+        $queryBuilder = $connection->createQueryBuilder();
+        $queryBuilder->select('ll.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where($queryBuilder->expr()->in('ll.leadlist_id', $excludedListIds));
+
+        return $queryBuilder;
     }
 }
