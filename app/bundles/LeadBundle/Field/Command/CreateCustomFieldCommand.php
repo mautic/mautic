@@ -67,14 +67,13 @@ EOT
 
     private function addAllMissingColumns(InputInterface $input, OutputInterface $output): int
     {
-        $hasNoErrors = Command::SUCCESS;
         while ($leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn()) {
             if (Command::FAILURE === $this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $input, $output)) {
-                $hasNoErrors = Command::FAILURE;
+                return Command::FAILURE;
             }
         }
 
-        return $hasNoErrors;
+        return Command::SUCCESS;
     }
 
     private function addColumn(int $leadFieldId, ?int $userId, InputInterface $input, OutputInterface $output): int
