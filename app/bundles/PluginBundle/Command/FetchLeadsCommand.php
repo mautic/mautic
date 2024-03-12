@@ -91,8 +91,11 @@ class FetchLeadsCommand extends Command
         if (!$interval) {
             $interval = '15 minutes';
         }
-        $startDate = !$startDate ? date('c', strtotime('-'.$interval)) : date('c', strtotime($startDate));
-        $endDate   = !$endDate ? date('c') : date('c', strtotime($endDate));
+        $startDateWithInterval = (new \DateTime('-'.$interval, new \DateTimeZone('UTC')))->format('c');
+        $endDateWithInterval   = (new \DateTime('NOW', new \DateTimeZone('UTC')))->format('c');
+
+        $startDate = !$startDate ? $startDateWithInterval : date('c', strtotime($startDate));
+        $endDate   = !$endDate ? $endDateWithInterval : date('c', strtotime($endDate));
 
         if (!$startDate || !$endDate) {
             $output->writeln(sprintf('<info>Invalid date rage given %s -> %s</info>', $startDate, $endDate));
