@@ -20,6 +20,8 @@ class Form extends FormEntity
      */
     private $id;
 
+    private ?string $language = null;
+
     /**
      * @var string
      */
@@ -153,6 +155,11 @@ class Form extends FormEntity
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->nullable()
+            ->build();
 
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
@@ -303,6 +310,7 @@ class Form extends FormEntity
                     'postActionProperty',
                     'noIndex',
                     'formAttributes',
+                    'language',
                 ]
             )
             ->build();
@@ -780,6 +788,19 @@ class Form extends FormEntity
     public function getFormAttributes()
     {
         return $this->formAttributes;
+    }
+
+    public function setLanguage(?string $language): self
+    {
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
     }
 
     public function isStandalone(): bool
