@@ -14,13 +14,41 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class StageListType extends AbstractType
 {
     /**
-     * @var Stage[]
+     * @var array<string,int>
      */
     private array $choices = [];
 
-    public function __construct(StageModel $model)
+    public function __construct(private StageModel $stageModel)
     {
-        $choices = $model->getRepository()->getEntities([
+        $this->stageModel = $stageModel;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'choices'           => $this->getStageChoices(),
+            'expanded'          => false,
+            'multiple'          => true,
+            'required'          => false,
+            'placeholder'       => 'mautic.core.form.chooseone',
+        ]);
+    }
+
+    public function getParent()
+    {
+        return ChoiceType::class;
+    }
+
+    /**
+     * @return array<string,int>
+     */
+    private function getStageChoices(): array
+    {
+        if ($this->choices) {
+            return $this->choices;
+        }
+
+        $stages = $this->stageModel->getRepository()->getEntities([
             'filter' => [
                 'force' => [
                     [
@@ -32,28 +60,14 @@ class StageListType extends AbstractType
             ],
         ]);
 
-        /** @var Stage $choice */
-        foreach ($choices as $choice) {
-            $this->choices[$choice->getName()] = $choice->getId();
+        /** @var Stage $stage */
+        foreach ($stages as $stage) {
+            $this->choices[$stage->getName()] = $stage->getId();
         }
 
         // sort by language
         ksort($this->choices);
-    }
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'choices'           => $this->choices,
-            'expanded'          => false,
-            'multiple'          => true,
-            'required'          => false,
-            'placeholder'       => 'mautic.core.form.chooseone',
-        ]);
-    }
-
-    public function getParent()
-    {
-        return ChoiceType::class;
+        return $this->choices;
     }
 }

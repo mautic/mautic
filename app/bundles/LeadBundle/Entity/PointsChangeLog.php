@@ -4,10 +4,12 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\PointBundle\Entity\Group;
 
 class PointsChangeLog
 {
+    public const TABLE_NAME = 'lead_points_change_log';
     /**
      * @var string
      */
@@ -19,7 +21,7 @@ class PointsChangeLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
@@ -54,7 +56,7 @@ class PointsChangeLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_points_change_log')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)
             ->addIndex(['date_added'], 'point_date_added');
 
@@ -62,7 +64,7 @@ class PointsChangeLog
 
         $builder->addLead(false, 'CASCADE', false, 'pointsChangeLog');
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('type', 'text')
             ->length(50)
@@ -236,11 +238,9 @@ class PointsChangeLog
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return PointsChangeLog
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -248,9 +248,7 @@ class PointsChangeLog
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

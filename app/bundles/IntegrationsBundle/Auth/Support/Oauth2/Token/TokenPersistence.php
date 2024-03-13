@@ -34,7 +34,7 @@ class TokenPersistence implements TokenPersistenceInterface
         return new IntegrationToken(
             empty($apiKeys['access_token']) ? null : $apiKeys['access_token'],
             empty($apiKeys['refresh_token']) ? null : $apiKeys['refresh_token'],
-            $apiKeys['expires_at'] ? $apiKeys['expires_at'] - time() : -1
+            $apiKeys['expires_at'] ?? null
         );
     }
 
@@ -74,7 +74,8 @@ class TokenPersistence implements TokenPersistenceInterface
 
         $apiKeys = $integration->getApiKeys();
 
-        unset($apiKeys['access_token']);
+        // Must delete both the access token and the expiration in order for the middleware to refresh
+        unset($apiKeys['access_token'], $apiKeys['expires_at']);
 
         $integration->setApiKeys($apiKeys);
 

@@ -471,7 +471,9 @@
                         for (var fieldKey in MauticFormValidations[formId]) {
                             if (!validator.validateField(theForm, fieldKey)) {
                                 formValid = false;
-                                firstInvalidField = fieldKey;
+                                if (!firstInvalidField) {
+                                    firstInvalidField = fieldKey;
+                                }
                             }
                         }
 
@@ -493,6 +495,15 @@
 
                         // Enable submit button after response is handled
                         validator.enableSubmitButton();
+
+                        // Focus on the first invalid field
+                        if (MauticFormValidations[formId] && MauticFormValidations[formId][firstInvalidField]) {
+                            const invalidField = MauticFormValidations[formId][firstInvalidField];
+                            const invalidElement = document.getElementsByName('mauticform[' + invalidField.name + ']')[0];
+                            if (invalidElement) {
+                                invalidElement.focus();
+                            }
+                        }
                     }
 
                     return formValid;

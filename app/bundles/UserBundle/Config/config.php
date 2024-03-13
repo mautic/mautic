@@ -248,6 +248,10 @@ return [
                     '%mautic.saml_idp_default_role%',
                 ],
             ],
+            'mautic.security.user_token_setter' => [
+                'class'     => \Mautic\UserBundle\Security\UserTokenSetter::class,
+                'arguments' => ['mautic.user.repository', 'security.token_storage'],
+            ],
             'mautic.user.model.user_token_service' => [
                 'class'     => \Mautic\UserBundle\Model\UserToken\UserTokenService::class,
                 'arguments' => [
