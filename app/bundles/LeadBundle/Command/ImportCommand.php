@@ -3,10 +3,12 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\ImportModel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,7 +25,8 @@ class ImportCommand extends Command
     public function __construct(
         private TranslatorInterface $translator,
         private ImportModel $importModel,
-        private ProcessSignalService $processSignalService
+        private ProcessSignalService $processSignalService,
+        private LoggerInterface $logger
     ) {
         parent::__construct();
     }
@@ -79,7 +82,7 @@ EOT
 
         try {
             $this->importModel->beginImport($import, $progress, $limit);
-        } catch (ImportFailedException) {
+        } catch (ImportFailedException $e) {
             $output->writeln('<error>'.$this->translator->trans(
                 'mautic.lead.import.failed',
                 [
@@ -87,14 +90,18 @@ EOT
                 ]
             ).'</error>');
 
+            $this->logError($import, $e->getFile(), $e->getLine(), $e->getTraceAsString());
+
             return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (ImportDelayedException) {
+        } catch (ImportDelayedException $e) {
             $output->writeln('<info>'.$this->translator->trans(
                 'mautic.lead.import.delayed',
                 [
                     '%reason%' => $import->getStatusInfo(),
                 ]
             ).'</info>');
+
+            $this->logError($import, $e->getFile(), $e->getLine(), $e->getTraceAsString());
 
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
@@ -115,4 +122,15 @@ EOT
     }
 
     protected static $defaultDescription = 'Imports data to Mautic';
+
+    private function logError(Import $import, string $file, int $line, string $traceAsString): void
+    {
+        $message = ' Import id: '.$import->getId();
+        $message .= ' Import Status: '.$import->getStatus();
+        $message .= ' Reason: '.$import->getStatusInfo();
+        $message .= ' File: '.$file.' Line: '.$line;
+        $message .= ' Trace: '.$traceAsString;
+
+        $this->logger->warning($message);
+    }
 }
