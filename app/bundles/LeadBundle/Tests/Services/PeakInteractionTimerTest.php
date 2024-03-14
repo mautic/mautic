@@ -3,8 +3,10 @@
 namespace Mautic\LeadBundle\Tests\Services;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
+use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -26,12 +28,16 @@ class TestablePeakInteractionTimer extends PeakInteractionTimer
 class PeakInteractionTimerTest extends TestCase
 {
     private MockObject|CoreParametersHelper $coreParametersHelperMock;
+    private MockObject|StatRepository $statRepositoryMock;
+    private MockObject|HitRepository $hitRepositoryMock;
 
     private string $defaultTimezone = 'UTC';
 
     protected function setUp(): void
     {
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $this->statRepositoryMock       = $this->createMock(StatRepository::class);
+        $this->hitRepositoryMock        = $this->createMock(HitRepository::class);
 
         // Set the expected default timezone
         $this->coreParametersHelperMock
@@ -51,8 +57,15 @@ class PeakInteractionTimerTest extends TestCase
         }
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
 
+        $this->statRepositoryMock
+            ->method('getLeadStats')
+            ->willReturn([]);
+        $this->hitRepositoryMock
+            ->method('getLeadHits')
+            ->willReturn([]);
+
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($contactTimezone));
@@ -93,7 +106,7 @@ class PeakInteractionTimerTest extends TestCase
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($contactTimezone));
