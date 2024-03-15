@@ -414,6 +414,20 @@ return [
                 'tag'   => 'validator.constraint_validator',
                 'alias' => 'segment_in_use',
             ],
+            'mautic.lead.validator.lead.list.campaign' => [
+                'class'     => \Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator::class,
+                'arguments' => [
+                    'mautic.lead.repository.lead_list',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.constraint.validator.lead.list.campaign' => [
+                'class'     => \Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaignsValidator::class,
+                'arguments' => [
+                    'mautic.lead.validator.lead.list.campaign',
+                ],
+                'tag'       => 'validator.constraint_validator',
+            ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [
