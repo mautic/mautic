@@ -12,9 +12,9 @@ class PeakInteractionTimer
     private const BEST_DEFAULT_HOUR_START = 9; // 9 AM
     private const BEST_DEFAULT_HOUR_END   = 12; // 12 PM
     private const MINUTES_START_OF_HOUR   = 0; // Start of the hour
-    private const BEST_DEFAULT_DAYS       = ['Tuesday', 'Monday', 'Thursday'];
+    private const BEST_DEFAULT_DAYS       = [2, 1, 4]; // Tuesday, Monday, Thursday
     private const HOUR_FORMAT             = 'G'; // 0 through 23
-    private const DAY_FORMAT              = 'l';
+    private const DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
     private const FETCH_EMAIL_READS_LIMIT = 25;
     private const FETCH_PAGE_HITS_LIMIT   = 25;
     private const MIN_INTERACTIONS        = 4;
@@ -72,7 +72,7 @@ class PeakInteractionTimer
 
     private function isDayAndTimeOptimal(\DateTimeInterface $dateTime): bool
     {
-        return in_array($dateTime->format(self::DAY_FORMAT), self::BEST_DEFAULT_DAYS, true) && $this->isTimeOptimal($dateTime);
+        return in_array((int) $dateTime->format(self::DAY_FORMAT), self::BEST_DEFAULT_DAYS, true) && $this->isTimeOptimal($dateTime);
     }
 
     private function getAdjustedDateTime(\DateTimeInterface $dateTime): \DateTimeInterface
@@ -89,7 +89,7 @@ class PeakInteractionTimer
     {
         $optimalDateTime = $this->getAdjustedDateTime($dateTime);
 
-        while (!in_array($optimalDateTime->format(self::DAY_FORMAT), self::BEST_DEFAULT_DAYS, true)) {
+        while (!in_array((int) $optimalDateTime->format(self::DAY_FORMAT), self::BEST_DEFAULT_DAYS, true)) {
             $optimalDateTime->modify('+1 day');
         }
 
