@@ -173,6 +173,8 @@ class CommonController extends AbstractController implements MauticController
             $parameters = $event->getVars();
         }
 
+        $parameters['mauticTemplate'] = $template;
+
         $parameters['mauticTemplateVars'] = $parameters;
 
         return $this->render($template, $parameters, $response);
@@ -511,7 +513,7 @@ class CommonController extends AbstractController implements MauticController
 
         $session = $request->getSession();
 
-        if (null === $name) {
+        if (empty($name)) {
             $name = InputHelper::clean($request->query->get('name'));
         }
         $name = 'mautic.'.$name;

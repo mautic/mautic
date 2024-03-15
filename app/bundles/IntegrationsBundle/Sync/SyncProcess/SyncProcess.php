@@ -65,6 +65,7 @@ class SyncProcess
         }
 
         if ($this->inputOptionsDAO->pushIsEnabled()) {
+            $this->syncDateHelper->setInternalSyncStartDateTime();
             $this->executeInternalSync();
         }
 

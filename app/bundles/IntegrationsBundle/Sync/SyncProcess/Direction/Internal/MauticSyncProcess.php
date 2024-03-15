@@ -43,10 +43,29 @@ class MauticSyncProcess
      */
     public function getSyncReport(int $syncIteration): ReportDAO
     {
-        $internalRequestDAO = new RequestDAO($this->mappingManualDAO->getIntegration(), $syncIteration, $this->inputOptionsDAO);
+        $internalRequestDAO     = new RequestDAO($this->mappingManualDAO->getIntegration(), $syncIteration, $this->inputOptionsDAO);
+        $mauticObjectTypes      = $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds() ?
+            $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectTypes() : [];
+        $hasMauticObjectIDs = 0 < count($mauticObjectTypes);
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectNames();
         foreach ($internalObjectsNames as $internalObjectName) {
+            if ($hasMauticObjectIDs) {
+                try {
+                    $internalRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor($internalObjectName);
+                } catch (ObjectNotFoundException) {
+                    DebugLogger::log(
+                        $this->mappingManualDAO->getIntegration(),
+                        sprintf(
+                            'Mautic to integration; skipping sync for the %s object because certain object IDs are specified for other object(s)',
+                            $internalObjectName
+                        ),
+                        __CLASS__.':'.__FUNCTION__
+                    );
+                    continue;
+                }
+            }
+
             $internalObjectFields = $this->mappingManualDAO->getInternalObjectFieldsToSyncToIntegration($internalObjectName);
             if (0 === count($internalObjectFields)) {
                 // No fields configured for a sync

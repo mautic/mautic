@@ -1220,6 +1220,43 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "ajitdev",
+      "name": "Ajit",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3738249?v=4",
+      "profile": "https://github.com/ajitdev",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "Esthertests",
+      "name": "Esthertests",
+      "avatar_url": "https://avatars.githubusercontent.com/u/156212312?v=4",
+      "profile": "https://github.com/Esthertests",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "magdalenaleonow",
+      "name": "magdalenaleonow",
+      "avatar_url": "https://avatars.githubusercontent.com/u/130159751?v=4",
+      "profile": "https://github.com/magdalenaleonow",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "nox1134",
+      "name": "Priyanshi Gaur",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95358802?v=4",
+      "profile": "https://github.com/nox1134",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

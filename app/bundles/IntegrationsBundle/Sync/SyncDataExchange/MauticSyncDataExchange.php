@@ -16,6 +16,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
+use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
@@ -36,7 +37,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         private MappingHelper $mappingHelper,
         private FullObjectReportBuilder $fullObjectReportBuilder,
         private PartialObjectReportBuilder $partialObjectReportBuilder,
-        private OrderExecutioner $orderExecutioner
+        private OrderExecutioner $orderExecutioner,
+        private SyncDateHelper $syncDateHelper
     ) {
     }
 
@@ -95,7 +97,12 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $object   = $this->fieldHelper->getFieldObjectName($changedObjectDAO->getMappedObject());
                 $objectId = $changedObjectDAO->getMappedObjectId();
 
-                $this->fieldChangeRepository->deleteEntitiesForObject((int) $objectId, $object, $changedObjectDAO->getIntegration());
+                $this->fieldChangeRepository->deleteEntitiesForObject(
+                    (int) $objectId,
+                    $object,
+                    $changedObjectDAO->getIntegration(),
+                    $this->syncDateHelper->getInternalSyncStartDateTime()
+                );
             } catch (ObjectNotSupportedException $exception) {
                 DebugLogger::log(
                     self::NAME,

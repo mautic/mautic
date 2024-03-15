@@ -9,10 +9,12 @@ use kamermans\OAuth2\Token\TokenInterface;
 class IntegrationTokenFactory implements TokenFactoryInterface
 {
     /**
-     * @param mixed[] $extraKeysToStore
+     * @param mixed[]  $extraKeysToStore Extra keys returned by the service during the token process that needs to be captured
+     * @param int|null $defaultExpiresIn Default time in seconds that tokens are good for if not given in the response
      */
     public function __construct(
-        private array $extraKeysToStore = []
+        private array $extraKeysToStore = [],
+        private ?int $defaultExpiresIn = null
     ) {
     }
 
@@ -20,7 +22,6 @@ class IntegrationTokenFactory implements TokenFactoryInterface
     {
         $accessToken  = null;
         $refreshToken = null;
-        $expiresAt    = null;
 
         // Read "access_token" attribute
         if (isset($data['access_token'])) {
@@ -39,18 +40,7 @@ class IntegrationTokenFactory implements TokenFactoryInterface
             $refreshToken = $previousToken->getRefreshToken();
         }
 
-        // Read the "expires_in" attribute
-        $expiresIn = isset($data['expires_in']) ? (int) $data['expires_in'] : null;
-
-        // Facebook unfortunately breaks the spec by using 'expires' instead of 'expires_in'
-        if (!$expiresIn && isset($data['expires'])) {
-            $expiresIn = (int) $data['expires'];
-        }
-
-        // Set the absolute expiration if a relative expiration was provided
-        if ($expiresIn) {
-            $expiresAt = time() + $expiresIn;
-        }
+        $expiresAt = $this->getExpiration($data);
 
         return new IntegrationToken($accessToken, $refreshToken, $expiresAt, $this->getExtraData($data));
     }
@@ -63,5 +53,33 @@ class IntegrationTokenFactory implements TokenFactoryInterface
         }
 
         return $extraData;
+    }
+
+    /**
+     * @param mixed[] $data
+     */
+    private function getExpiration(array $data): ?int
+    {
+        // Read the "expires_at" attribute
+        if (isset($data['expires_at'])) {
+            return (int) $data['expires_at'];
+        }
+
+        // Read the "expires_in" attribute
+        if (isset($data['expires_in'])) {
+            return time() + (int) $data['expires_in'];
+        }
+
+        // Facebook unfortunately breaks the spec by using 'expires' instead of 'expires_in'
+        if (isset($data['expires'])) {
+            return time() + (int) $data['expires'];
+        }
+
+        // Fallback to the default if set
+        if ($this->defaultExpiresIn) {
+            return time() + $this->defaultExpiresIn;
+        }
+
+        return null;
     }
 }

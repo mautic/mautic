@@ -84,7 +84,7 @@ class FacebookIntegration extends SocialIntegration
             return;
         }
 
-        $url    = $this->getApiUrl('v2.5/me');
+        $url    = $this->getApiUrl('v2.8/me');
         $fields = array_keys($this->getAvailableLeadFields());
 
         $parameters = [
