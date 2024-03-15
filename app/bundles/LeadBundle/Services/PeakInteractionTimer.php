@@ -41,9 +41,9 @@ class PeakInteractionTimer
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
         if (count($interactions) > self::MIN_INTERACTIONS) {
             $hours               = array_column($interactions, 'hourOfDay');
-            $medianHour          = $this->calculateMedian($hours);
-            $this->bestHourStart = ($medianHour + 23) % 24; // Calculate hour before
-            $this->bestHourEnd   = ($medianHour + 1) % 24; // Calculate hour after
+            $contactBestHour     = $this->calculateOptimal($hours);
+            $this->bestHourStart = ($contactBestHour + 23) % 24; // Calculate hour before
+            $this->bestHourEnd   = ($contactBestHour + 1) % 24;  // Calculate hour after
         }
 
         return $this->isTimeOptimal($currentDateTime)
@@ -169,24 +169,18 @@ class PeakInteractionTimer
         ]);
     }
 
-    private function calculateMedian(array $arr): int
+    private function calculateOptimal(array $elements): int
     {
-        sort($arr);
+        sort($elements);
 
-        $median = 0;
-        $count  = count($arr);
-
+        $count  = count($elements);
         if ($count > 0) {
-            $middleIndex = floor(($count - 1) / 2);
-            if ($count % 2) {
-                // Odd number of elements, middle value is the median
-                $median = $arr[$middleIndex];
-            } else {
-                // Even number of elements, calculate avg of the two middle values
-                $median = ($arr[$middleIndex] + $arr[$middleIndex + 1]) / 2;
-            }
+            $middleIndex = (int) floor(($count - 1) / 2);
+            $result      = $elements[$middleIndex];
+        } else {
+            throw \Exception('Not enough elements');
         }
 
-        return $median;
+        return $result;
     }
 }
