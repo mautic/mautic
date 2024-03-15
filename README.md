@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-132-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-133-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -235,6 +235,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ajitdev"><img src="https://avatars.githubusercontent.com/u/3738249?v=4?s=100" width="100px;" alt="Ajit"/><br /><sub><b>Ajit</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=ajitdev" title="Code">💻</a> <a href="https://github.com/mautic/mautic/issues?q=author%3Aajitdev" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Esthertests"><img src="https://avatars.githubusercontent.com/u/156212312?v=4?s=100" width="100px;" alt="Esthertests"/><br /><sub><b>Esthertests</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3AEsthertests" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/magdalenaleonow"><img src="https://avatars.githubusercontent.com/u/130159751?v=4?s=100" width="100px;" alt="magdalenaleonow"/><br /><sub><b>magdalenaleonow</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Amagdalenaleonow" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nox1134"><img src="https://avatars.githubusercontent.com/u/95358802?v=4?s=100" width="100px;" alt="Priyanshi Gaur"/><br /><sub><b>Priyanshi Gaur</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nox1134" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
