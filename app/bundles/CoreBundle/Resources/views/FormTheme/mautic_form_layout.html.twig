@@ -540,7 +540,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
                 {%- if help_html is same as(false) -%}
                     {{- help|trans(help_translation_parameters, translation_domain) -}}
                 {%- else -%}
-                    {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
+                    {{- help|trans(help_translation_parameters, translation_domain)|purify -}}
                 {%- endif -%}
         </p>
     {%- endif -%}
