@@ -238,7 +238,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nox1134"><img src="https://avatars.githubusercontent.com/u/95358802?v=4?s=100" width="100px;" alt="Priyanshi Gaur"/><br /><sub><b>Priyanshi Gaur</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nox1134" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/magician7"><img src="https://avatars.githubusercontent.com/u/2359284?v=4?s=100" width="100px;" alt="Damian"/><br /><sub><b>Damian</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Amagician7" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/magician7"><img src="https://avatars.githubusercontent.com/u/2359284?v=4?s=100" width="100px;" alt="Damian"/><br /><sub><b>Damian</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Amagician7" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/mautic/mautic/issues?q=author%3Amagician7" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
