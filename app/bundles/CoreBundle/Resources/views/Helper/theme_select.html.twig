@@ -27,7 +27,7 @@
       {% for themeKey, themeInfo in themes %}
           {% set isSelected = active is same as themeKey %}
             {% if not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features %}
-                {% if themeInfo.config.isVisibleInGUI is not defined or not themeInfo.config.isVisibleInGUI is same as(false) %}
+                {% if themeInfo.config.hide is not defined or not themeInfo.config.hide is same as(true) %}
                     {% if (themeInfo.dir ~ '/thumbnail_' ~ type ~ '.png') is file %}
                         {% set thumbnailName, hasThumbnail = 'thumbnail_' ~ type ~ '.png', true %}
                     {% else %}
