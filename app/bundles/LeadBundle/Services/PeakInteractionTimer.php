@@ -18,11 +18,14 @@ class PeakInteractionTimer
     private const FETCH_EMAIL_READS_LIMIT = 25;
     private const FETCH_PAGE_HITS_LIMIT   = 25;
     private const MIN_INTERACTIONS        = 4;
+    private const MAX_OPTIMAL_DAYS        = 3;
 
     private ?\DateTimeZone $defaultTimezone = null;
 
     private int $bestHourStart = self::BEST_DEFAULT_HOUR_START;
     private int $bestHourEnd   = self::BEST_DEFAULT_HOUR_END;
+    /** @var int[] */
+    private array $bestDays   = self::BEST_DEFAULT_DAYS;
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -34,16 +37,14 @@ class PeakInteractionTimer
     /**
      * Get the optimal time for a contact.
      */
-    public function getOptimalTime(Lead $contact): \DateTimeInterface
+    public function getOptimalTime(Lead $contact): \DateTime
     {
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
         if (count($interactions) > self::MIN_INTERACTIONS) {
-            $hours               = array_column($interactions, 'hourOfDay');
-            $contactBestHour     = $this->calculateOptimal($hours);
-            $this->bestHourStart = ($contactBestHour + 23) % 24; // Calculate hour before
-            $this->bestHourEnd   = ($contactBestHour + 1) % 24;  // Calculate hour after
+            $hours                                     = array_column($interactions, 'hourOfDay');
+            [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
         }
 
         return $this->isTimeOptimal($currentDateTime)
@@ -54,28 +55,36 @@ class PeakInteractionTimer
     /**
      * Get the optimal time and day for a contact.
      */
-    public function getOptimalTimeAndDay(Lead $contact): \DateTimeInterface
+    public function getOptimalTimeAndDay(Lead $contact): \DateTime
     {
         $currentDateTime = $this->getContactDateTime($contact);
+
+        $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
+        if (count($interactions) > self::MIN_INTERACTIONS) {
+            $hours                                     = array_column($interactions, 'hourOfDay');
+            $days                                      = array_column($interactions, 'dayOfWeek');
+            [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
+            $this->bestDays                            = $this->calculateOptimalDays($days);
+        }
 
         return $this->isDayAndTimeOptimal($currentDateTime)
             ? $currentDateTime
             : $this->findOptimalDateTime($currentDateTime);
     }
 
-    private function isTimeOptimal(\DateTimeInterface $dateTime): bool
+    private function isTimeOptimal(\DateTime $dateTime): bool
     {
         $hour = (int) $dateTime->format(self::HOUR_FORMAT);
 
         return $hour >= $this->bestHourStart && $hour < $this->bestHourEnd;
     }
 
-    private function isDayAndTimeOptimal(\DateTimeInterface $dateTime): bool
+    private function isDayAndTimeOptimal(\DateTime $dateTime): bool
     {
-        return in_array((int) $dateTime->format(self::DAY_FORMAT), self::BEST_DEFAULT_DAYS, true) && $this->isTimeOptimal($dateTime);
+        return in_array((int) $dateTime->format(self::DAY_FORMAT), $this->bestDays, true) && $this->isTimeOptimal($dateTime);
     }
 
-    private function getAdjustedDateTime(\DateTimeInterface $dateTime): \DateTimeInterface
+    private function getAdjustedDateTime(\DateTime $dateTime): \DateTime
     {
         $adjustedDateTime = clone $dateTime;
         $adjustedDateTime->setTime($this->bestHourStart, self::MINUTES_START_OF_HOUR);
@@ -85,11 +94,11 @@ class PeakInteractionTimer
             : $adjustedDateTime;
     }
 
-    private function findOptimalDateTime(\DateTimeInterface $dateTime): \DateTimeInterface
+    private function findOptimalDateTime(\DateTime $dateTime): \DateTime
     {
         $optimalDateTime = $this->getAdjustedDateTime($dateTime);
 
-        while (!in_array((int) $optimalDateTime->format(self::DAY_FORMAT), self::BEST_DEFAULT_DAYS, true)) {
+        while (!in_array((int) $optimalDateTime->format(self::DAY_FORMAT), $this->bestDays, true)) {
             $optimalDateTime->modify('+1 day');
         }
 
@@ -116,7 +125,7 @@ class PeakInteractionTimer
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     private function getContactInteractions(Lead $contact, \DateTimeZone $dateTimeZone): array
     {
@@ -133,7 +142,7 @@ class PeakInteractionTimer
                 'type'      => 'email.read',
                 'date'      => $readDate->format('Y-m-d H:i:s'),
                 'hourOfDay' => (int) $readDate->format(self::HOUR_FORMAT),
-                'dayOfWeek' => $readDate->format(self::DAY_FORMAT),
+                'dayOfWeek' => (int) $readDate->format(self::DAY_FORMAT),
                 'time'      => $readDate->format('H:i:s'),
             ];
         }
@@ -143,7 +152,8 @@ class PeakInteractionTimer
             $interactions[] = [
                 'type'      => 'page.hit',
                 'date'      => $hitDate->format('Y-m-d H:i:s'),
-                'dayOfWeek' => $hitDate->format('l'),
+                'hourOfDay' => (int) $hitDate->format(self::HOUR_FORMAT),
+                'dayOfWeek' => (int) $hitDate->format(self::DAY_FORMAT),
                 'time'      => $hitDate->format('H:i:s'),
             ];
         }
@@ -151,6 +161,9 @@ class PeakInteractionTimer
         return $interactions;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getLeadStats(int $leadId): array
     {
         return $this->statRepository->getLeadStats($leadId, [
@@ -161,6 +174,9 @@ class PeakInteractionTimer
         ]);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getLeadHits(int $leadId): array
     {
         return $this->hitRepository->getLeadHits($leadId, [
@@ -169,7 +185,14 @@ class PeakInteractionTimer
         ]);
     }
 
-    private function calculateOptimal(array $elements): int
+    /**
+     * Calculates the optimal time range based on an array of elements.
+     *
+     * @param int[] $elements Hours (0-23)
+     *
+     * @return int[] Hours (0-23)
+     */
+    private function calculateOptimalTime(array $elements): array
     {
         sort($elements);
 
@@ -178,9 +201,39 @@ class PeakInteractionTimer
             $middleIndex = (int) floor(($count - 1) / 2);
             $result      = $elements[$middleIndex];
         } else {
-            throw \Exception('Not enough elements');
+            throw new \Exception('Not enough elements');
         }
 
-        return $result;
+        $start = ($result + 23) % 24; // hour before
+        $end   = ($result + 1) % 24;   // hour after
+
+        // Return the start and end hours as an array
+        return [$start, $end];
+    }
+
+    /**
+     * Calculates the optimal days based on the frequency of elements.
+     *
+     * @param int[] $elements Days of the week (ISO 8601)
+     *
+     * @return int[] Days of the week (ISO 8601)
+     */
+    private function calculateOptimalDays(array $elements): array
+    {
+        if (0 === count($elements)) {
+            throw new \Exception('Not enough elements');
+        }
+
+        // Count the frequency of each element.
+        $frequency = array_count_values($elements);
+
+        // Sort frequencies in descending order.
+        arsort($frequency);
+
+        // Get the elements sorted by frequency.
+        $optimalDays = array_keys($frequency);
+
+        // Return the top elements up to the max optimal days limit.
+        return array_slice($optimalDays, 0, min(self::MAX_OPTIMAL_DAYS, count($optimalDays)));
     }
 }
