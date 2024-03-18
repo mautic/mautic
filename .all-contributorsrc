@@ -1257,6 +1257,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "magician7",
+      "name": "Damian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2359284?v=4",
+      "profile": "https://github.com/magician7",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
