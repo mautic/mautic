@@ -15,6 +15,7 @@ class PeakInteractionTimer
     private const BEST_DEFAULT_DAYS       = [2, 1, 4]; // Tuesday, Monday, Thursday
     private const HOUR_FORMAT             = 'G'; // 0 through 23
     private const DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
+    private const FETCH_INTERACTIONS_FROM = '-60 days';
     private const FETCH_EMAIL_READS_LIMIT = 25;
     private const FETCH_PAGE_HITS_LIMIT   = 25;
     private const MIN_INTERACTIONS        = 4;
@@ -129,33 +130,47 @@ class PeakInteractionTimer
      */
     private function getContactInteractions(Lead $contact, \DateTimeZone $dateTimeZone): array
     {
-        $interactions = [];
+        $interactions           = [];
+        $registeredInteractions = []; // Keep track of registered interactions to ensure one interaction type per hour
 
-        $emailReads = $this->getLeadStats($contact->getId());
-        $pageHits   = $this->getLeadHits($contact->getId());
+        $fetchInteractionsFromDate = $this->getCurrentDateTime($dateTimeZone)
+            ->modify(self::FETCH_INTERACTIONS_FROM);
+        $emailReads = $this->getLeadStats($contact->getId(), $fetchInteractionsFromDate);
+        $pageHits   = $this->getLeadHits($contact->getId(), $fetchInteractionsFromDate);
 
         foreach ($emailReads as $interaction) {
             /** @var \DateTime $readDate */
             $readDate = $interaction['dateRead'];
             $readDate->setTimezone($dateTimeZone);
-            $interactions[] = [
-                'type'      => 'email.read',
-                'date'      => $readDate->format('Y-m-d H:i:s'),
-                'hourOfDay' => (int) $readDate->format(self::HOUR_FORMAT),
-                'dayOfWeek' => (int) $readDate->format(self::DAY_FORMAT),
-                'time'      => $readDate->format('H:i:s'),
-            ];
+
+            $interactionKey = 'email.read:'.$readDate->format('Y-m-d_H');
+            if (!in_array($interactionKey, $registeredInteractions)) {
+                $interactions[] = [
+                    'type'      => 'email.read',
+                    'date'      => $readDate->format('Y-m-d H:i:s'),
+                    'hourOfDay' => (int) $readDate->format(self::HOUR_FORMAT),
+                    'dayOfWeek' => (int) $readDate->format(self::DAY_FORMAT),
+                    'time'      => $readDate->format('H:i:s'),
+                ];
+                $registeredInteractions[] = $interactionKey;
+            }
         }
 
         foreach ($pageHits as $interaction) {
             $hitDate        = $interaction['dateHit'];
-            $interactions[] = [
-                'type'      => 'page.hit',
-                'date'      => $hitDate->format('Y-m-d H:i:s'),
-                'hourOfDay' => (int) $hitDate->format(self::HOUR_FORMAT),
-                'dayOfWeek' => (int) $hitDate->format(self::DAY_FORMAT),
-                'time'      => $hitDate->format('H:i:s'),
-            ];
+            $hitDate->setTimezone($dateTimeZone);
+
+            $interactionKey = 'page.hit:'.$hitDate->format('Y-m-d_H');
+            if (!in_array($interactionKey, $registeredInteractions)) {
+                $interactions[] = [
+                    'type'      => 'page.hit',
+                    'date'      => $hitDate->format('Y-m-d H:i:s'),
+                    'hourOfDay' => (int) $hitDate->format(self::HOUR_FORMAT),
+                    'dayOfWeek' => (int) $hitDate->format(self::DAY_FORMAT),
+                    'time'      => $hitDate->format('H:i:s'),
+                ];
+                $registeredInteractions[] = $interactionKey;
+            }
         }
 
         return $interactions;
@@ -164,24 +179,26 @@ class PeakInteractionTimer
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function getLeadStats(int $leadId): array
+    private function getLeadStats(int $leadId, \DateTime $fromDate = null): array
     {
         return $this->statRepository->getLeadStats($leadId, [
             'order'        => ['timestamp', 'DESC'],
             'limit'        => self::FETCH_EMAIL_READS_LIMIT,
             'state'        => 'read',
             'basic_select' => true,
+            'fromDate'     => $fromDate,
         ]);
     }
 
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function getLeadHits(int $leadId): array
+    private function getLeadHits(int $leadId, \DateTime $fromDate = null): array
     {
         return $this->hitRepository->getLeadHits($leadId, [
-            'order' => ['timestamp', 'DESC'],
-            'limit' => self::FETCH_PAGE_HITS_LIMIT,
+            'order'        => ['timestamp', 'DESC'],
+            'limit'        => self::FETCH_PAGE_HITS_LIMIT,
+            'fromDate'     => $fromDate,
         ]);
     }
 
