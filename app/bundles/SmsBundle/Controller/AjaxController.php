@@ -24,7 +24,7 @@ class AjaxController extends CommonAjaxController
         $model = $this->getModel('sms');
 
         $id  = $request->get('id');
-        $ids = $request->get('ids');
+        $ids = (array) $request->get('ids');
 
         // Support for legacy calls
         if (!$ids && $id) {

@@ -13,6 +13,8 @@ return function (ContainerConfigurator $configurator): void {
         ->public();
 
     $excludes = [
+        'Stat/DTO/*',
+        'Stat/Interface/*',
     ];
 
     $services->load('Mautic\\SmsBundle\\', '../')

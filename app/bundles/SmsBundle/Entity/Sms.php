@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -81,11 +82,35 @@ class Sms extends FormEntity
      */
     private $pendingCount = 0;
 
+    /**
+     * @var int
+     */
+    private $deliveredCount = 0;
+
+    /**
+     * @var int
+     */
+    private $readCount = 0;
+
+    /**
+     * @var int
+     */
+    private $failedCount = 0;
+
+    /**
+     * @var array<int|string|array<int|string>>
+     */
+    private $properties = [];
+
     public function __clone()
     {
-        $this->id        = null;
-        $this->stats     = new ArrayCollection();
-        $this->sentCount = 0;
+        $this->id             = null;
+        $this->stats          = new ArrayCollection();
+        $this->sentCount      = 0;
+        $this->readCount      = 0;
+        $this->deliveredCount = 0;
+        $this->readCount      = 0;
+        $this->failedCount    = 0;
 
         parent::__clone();
     }
@@ -109,7 +134,7 @@ class Sms extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('sms_messages')
-            ->setCustomRepositoryClass(\Mautic\SmsBundle\Entity\SmsRepository::class);
+            ->setCustomRepositoryClass(SmsRepository::class);
 
         $builder->addIdColumns();
 
@@ -131,9 +156,23 @@ class Sms extends FormEntity
             ->columnName('sent_count')
             ->build();
 
+        $builder->createField('deliveredCount', Types::INTEGER)
+            ->columnName('delivered_count')
+            ->build();
+
+        $builder->createField('readCount', Types::INTEGER)
+            ->columnName('read_count')
+            ->build();
+
+        $builder->createField('failedCount', Types::INTEGER)
+            ->columnName('failed_count')
+            ->build();
+
+        $builder->addField('properties', Types::JSON);
+
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('sms_message_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -207,6 +246,10 @@ class Sms extends FormEntity
                     'publishUp',
                     'publishDown',
                     'sentCount',
+                    'deliveredCount',
+                    'readCount',
+                    'failedCount',
+                    'properties',
                 ]
             )
             ->build();
@@ -229,7 +272,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -277,7 +320,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\CategoryBundle\Entity\Category|null
      */
     public function getCategory()
     {
@@ -313,7 +356,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLanguage()
     {
@@ -332,7 +375,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -351,7 +394,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -370,7 +413,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getSentCount()
     {
@@ -388,7 +431,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getLists()
     {
@@ -416,7 +459,7 @@ class Sms extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getStats()
     {
@@ -458,5 +501,114 @@ class Sms extends FormEntity
     public function getPendingCount()
     {
         return $this->pendingCount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeliveredCount()
+    {
+        return $this->deliveredCount;
+    }
+
+    public function getDeliveredRatio(): float
+    {
+        if (!$this->deliveredCount) {
+            return 0.0;
+        }
+
+        return round($this->deliveredCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $deliveredCount
+     *
+     * @return Sms
+     */
+    public function setDeliveredCount($deliveredCount)
+    {
+        $this->isChanged('deliveredCount', $deliveredCount);
+        $this->deliveredCount = $deliveredCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReadCount()
+    {
+        return $this->readCount;
+    }
+
+    public function getReadRatio(): float
+    {
+        if (!$this->readCount) {
+            return 0.0;
+        }
+
+        return round($this->readCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $readCount
+     *
+     * @return Sms
+     */
+    public function setReadCount($readCount)
+    {
+        $this->isChanged('readCount', $readCount);
+        $this->readCount = $readCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFailedCount()
+    {
+        return $this->failedCount;
+    }
+
+    public function getFailedRatio(): float
+    {
+        if (!$this->failedCount) {
+            return 0.0;
+        }
+
+        return round($this->failedCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $failedCount
+     *
+     * @return Sms
+     */
+    public function setFailedCount($failedCount)
+    {
+        $this->isChanged('failedCount', $failedCount);
+        $this->failedCount = $failedCount;
+
+        return $this;
+    }
+
+    /**
+     * @return array<int|string|array<int|string>>
+     */
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @param array<int|string|array<int|string>> $properties
+     */
+    public function setProperties(array $properties): static
+    {
+        $this->isChanged('properties', $properties);
+        $this->properties = $properties;
+
+        return $this;
     }
 }

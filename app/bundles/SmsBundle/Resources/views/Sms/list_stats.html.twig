@@ -12,12 +12,5 @@
         </span>
     {% endif %}
 
-    <span class="mt-xs label label-warning has-click-event clickable-stat"
-          id="sent-count-{{ item.getId() }}"
-          data-toggle="tooltip"
-          title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
-        <a href="{{ path('mautic_contact_index',{'search' : 'mautic.lead.lead.searchcommand.sms_sent'|trans ~ ':' ~ item.getId()}) }}">
-            {{ 'mautic.sms.stat.sentcount'|trans({'%count%' : item.getSentCount(true)}) }}
-        </a>
-    </span>
+    {{- include('@MauticSms/Sms/list_stats_column.html.twig', { 'item' : item,  'availableStats' : availableStats }) -}}
 </td>
