@@ -33,6 +33,7 @@ return function (ContainerConfigurator $configurator): void {
         'Twig/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',
+        'Helper/ServiceDeprecator.php',
         'Cache/ResultCacheOptions.php',
     ];
 

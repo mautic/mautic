@@ -55,43 +55,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'helpers' => [
-            'mautic.api.helper.entity_result' => [
-                'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,
-            ],
-        ],
-        'other' => [
-            'mautic.api.oauth.event_listener' => [
-                'class'     => \Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.security',
-                    'translator',
-                ],
-                'tags' => [
-                    'kernel.event_listener',
-                    'kernel.event_listener',
-                ],
-                'tagArguments' => [
-                    [
-                        'event'  => 'fos_oauth_server.pre_authorization_process',
-                        'method' => 'onPreAuthorizationProcess',
-                    ],
-                    [
-                        'event'  => 'fos_oauth_server.post_authorization_process',
-                        'method' => 'onPostAuthorizationProcess',
-                    ],
-                ],
-            ],
-            'fos_oauth_server.security.authentication.listener.class' => \Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener::class,
-            'mautic.validator.oauthcallback'                          => [
-                'class' => \Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class,
-                'tag'   => 'validator.constraint_validator',
-            ],
-        ],
-    ],
-
     'parameters' => [
         'api_enabled'                       => false,
         'api_enable_basic_auth'             => false,
