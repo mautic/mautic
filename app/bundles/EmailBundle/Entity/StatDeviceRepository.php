@@ -10,12 +10,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class StatDeviceRepository extends CommonRepository
 {
-    /**
-     * @param \DateTime $fromDate
-     *
-     * @return array
-     */
-    public function getDeviceStats($emailIds, \DateTime $fromDate = null, \DateTime $toDate = null)
+    public function getDeviceStats($emailIds, \DateTime $fromDate = null, \DateTime $toDate = null): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -49,6 +44,6 @@ class StatDeviceRepository extends CommonRepository
             );
         }
 
-        return $qb->execute()->fetchAllAssociative();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

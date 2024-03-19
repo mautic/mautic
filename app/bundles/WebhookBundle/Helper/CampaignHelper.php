@@ -14,27 +14,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelper
 {
-    protected Client $client;
-    protected CompanyModel $companyModel;
-
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
      */
     private array $contactsValues = [];
 
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(Client $client, CompanyModel $companyModel, EventDispatcherInterface $dispatcher)
-    {
-        $this->client       = $client;
-        $this->companyModel = $companyModel;
-        $this->dispatcher   = $dispatcher;
+    public function __construct(
+        protected Client $client,
+        protected CompanyModel $companyModel,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
      * Prepares the neccessary data transformations and then makes the HTTP request.
      */
-    public function fireWebhook(array $config, Lead $contact)
+    public function fireWebhook(array $config, Lead $contact): void
     {
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
@@ -54,10 +49,8 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @return array
      */
-    private function getPayload(array $config, Lead $contact)
+    private function getPayload(array $config, Lead $contact): array
     {
         $payload = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
         $payload = array_flip(AbstractFormFieldHelper::parseList($payload));
@@ -67,10 +60,8 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @return array
      */
-    private function getHeaders(array $config, Lead $contact)
+    private function getHeaders(array $config, Lead $contact): array
     {
         $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
         $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
@@ -86,7 +77,7 @@ class CampaignHelper
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
      */
-    private function makeRequest($url, $method, $timeout, array $headers, array $payload)
+    private function makeRequest($url, $method, $timeout, array $headers, array $payload): void
     {
         switch ($method) {
             case 'get':
@@ -128,10 +119,8 @@ class CampaignHelper
 
     /**
      * Translates tokens to values.
-     *
-     * @return array
      */
-    private function getTokenValues(array $rawTokens, Lead $contact)
+    private function getTokenValues(array $rawTokens, Lead $contact): array
     {
         $values        = [];
         $contactValues = $this->getContactValues($contact);
@@ -159,10 +148,7 @@ class CampaignHelper
         return $this->contactsValues[$contact->getId()];
     }
 
-    /**
-     * @return string
-     */
-    private function ipAddressesToCsv(Collection $ipAddresses)
+    private function ipAddressesToCsv(Collection $ipAddresses): string
     {
         $addresses = [];
         foreach ($ipAddresses as $ipAddress) {

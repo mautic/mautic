@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\FormBundle\Tests\Controller;
+namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -58,6 +58,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Creating the form via API so it would create the submission table.
@@ -117,7 +118,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         );
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = self::$container->get('event_dispatcher');
+        $dispatcher = static::getContainer()->get('event_dispatcher');
 
         $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
 
@@ -125,7 +126,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($result, $event->getResult());
     }
 
-    public function valueProvider(): iterable
+    public static function valueProvider(): \Generator
     {
         yield [
             'test & test',
@@ -142,9 +143,9 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
+        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_test_form");
         }
     }

@@ -34,7 +34,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'tweets',
                 'path'            => '/tweets',
-                'controller'      => 'MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController',
+                'controller'      => \MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController::class,
             ],
         ],
         'public' => [
@@ -48,7 +48,7 @@ return [
     'services' => [
         'others' => [
             'mautic.social.helper.campaign' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper',
+                'class'     => \MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.page.model.trackable',
@@ -168,6 +168,13 @@ return [
                 'parent'   => 'mautic.core.channels',
                 'access'   => 'mauticSocial:monitoring:view',
                 'priority' => 0,
+                'checks'   => [
+                    'integration' => [
+                        'Twitter' => [
+                            'enabled' => true,
+                        ],
+                    ],
+                ],
             ],
             'mautic.social.tweets' => [
                 'route'    => 'mautic_tweet_index',

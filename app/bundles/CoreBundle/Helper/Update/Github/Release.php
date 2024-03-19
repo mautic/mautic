@@ -12,20 +12,14 @@ class Release
      */
     private $version;
 
-    /**
-     * @var string
-     */
-    private $downloadUrl;
+    private string $downloadUrl;
 
     /**
      * @var string
      */
     private $announcementUrl;
 
-    /**
-     * @var string
-     */
-    private $stability;
+    private string $stability;
 
     private Metadata $metadata;
 
@@ -36,7 +30,7 @@ class Release
     {
         $this->version         = $release['tag_name'];
         $this->downloadUrl     = $this->parseUpdatePackage($release['assets']);
-        $this->announcementUrl = $metadata->getAnnouncementUrl() ? $metadata->getAnnouncementUrl() : $release['html_url'];
+        $this->announcementUrl = $metadata->getAnnouncementUrl() ?: $release['html_url'];
         $this->stability       = $metadata->getStability();
         $this->metadata        = $metadata;
     }
@@ -72,7 +66,7 @@ class Release
     private function parseUpdatePackage(array $assets): string
     {
         foreach ($assets as $asset) {
-            if (false !== strpos($asset['name'], 'update.zip')) {
+            if (str_contains($asset['name'], 'update.zip')) {
                 return $asset['browser_download_url'];
             }
         }

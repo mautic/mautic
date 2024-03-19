@@ -10,10 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class GeneratedColumnsEvent extends Event
 {
-    /**
-     * @var GeneratedColumns
-     */
-    private $generatedColumns;
+    private \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns $generatedColumns;
 
     public function __construct()
     {

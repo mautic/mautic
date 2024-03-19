@@ -7,26 +7,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadChangeEvent extends Event
 {
-    /**
-     * @var Lead
-     */
-    private $oldLead;
-
-    private $oldTrackingId;
-
-    /**
-     * @var Lead
-     */
-    private $newLead;
-
-    private $newTrackingId;
-
-    public function __construct(Lead $oldLead, $oldTrackingId, Lead $newLead, $newTrackingId)
-    {
-        $this->oldLead       = $oldLead;
-        $this->oldTrackingId = $oldTrackingId;
-        $this->newLead       = $newLead;
-        $this->newTrackingId = $newTrackingId;
+    public function __construct(
+        private Lead $oldLead,
+        private $oldTrackingId,
+        private Lead $newLead,
+        private $newTrackingId
+    ) {
     }
 
     /**

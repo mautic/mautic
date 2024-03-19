@@ -11,9 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ThemeController.
- */
 class ThemeController extends FormController
 {
     /**
@@ -107,11 +104,9 @@ class ThemeController extends FormController
     /**
      * Download a theme.
      *
-     * @param string $themeName
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, $themeName)
+    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
     {
         $flashes = [];
         $error   = false;
@@ -120,6 +115,7 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
+        $themeName = $objectId;
         if (!$themeHelper->exists($themeName)) {
             $flashes[] = [
                 'type'    => 'error',
@@ -173,14 +169,13 @@ class ThemeController extends FormController
     /**
      * Deletes the theme.
      *
-     * @param string $themeName
-     *
      * @return Response
      */
-    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, $themeName)
+    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
     {
         $flashes = [];
 
+        $themeName = $objectId;
         if ('POST' === $request->getMethod()) {
             $flashes = $this->deleteTheme($themeHelper, $themeName);
         }
@@ -266,14 +261,12 @@ class ThemeController extends FormController
 
     /**
      * A helper method to keep the code DRY.
-     *
-     * @return array
      */
-    public function getIndexPostActionVars()
+    public function getIndexPostActionVars(): array
     {
         return [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),
-            'contentTemplate' => 'Mautic\CoreBundle\Controller\themeController::indexAction',
+            'contentTemplate' => 'Mautic\CoreBundle\Controller\ThemeController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_themes_index',
                 'mauticContent' => 'theme',

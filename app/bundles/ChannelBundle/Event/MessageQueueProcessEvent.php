@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class MessageQueueProcessEvent extends CommonEvent
 {
-    /**
-     * MessageQueueEvent constructor.
-     */
     public function __construct(MessageQueue $entity)
     {
         $this->entity = $entity;
@@ -23,10 +20,7 @@ class MessageQueueProcessEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkContext($channel)
+    public function checkContext($channel): bool
     {
         return $channel === $this->entity->getChannel();
     }

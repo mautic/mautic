@@ -43,6 +43,15 @@ final class IntegrationEvents
     public const INTEGRATION_CONFIG_AFTER_SAVE = 'mautic.integration.config_after_save';
 
     /**
+     * The mautic.integration.config_before_save event is dispatched prior to an integration's configuration is saved.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\ConfigAuthUrlEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_CONFIG_ON_GENERATE_AUTH_URL = 'mautic.integration.INTEGRATION_CONFIG_ON_GENERATE_AUTH_URL';
+
+    /**
      * The mautic.integration.keys_before_encryption event is dispatched prior to encrypting keys to be stored into the database.
      *
      * The event listener receives a Mautic\IntegrationsBundle\Event\KeysEncryptionEvent instance.
@@ -133,6 +142,51 @@ final class IntegrationEvents
     public const INTEGRATION_OBJECT_TOKEN_EVENT = 'mautic.integration.INTEGRATION_OBJECT_TOKEN_EVENT';
 
     /**
+     * This event is dispatched when a Mautic contact field changes are about to be stored to the sync_object_field_change_report table.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalContactEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES = 'mautic.integration.INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES';
+
+    /**
+     * This event is dispatched when a Mautic company field changes are about to be stored to the sync_object_field_change_report table.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalCompanyEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES = 'mautic.integration.INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES';
+
+    /**
+     * The mautic.integration.INTEGRATION_FIND_INTERNAL_RECORD event is dispatched when a list of Mautic internal object record by ID is requested.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_FIND_INTERNAL_RECORD = 'mautic.integration.INTEGRATION_FIND_INTERNAL_RECORD';
+
+    /**
+     * This event is dispatched when a Mautic contact field changes are about to be used in full object report builder.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalContactEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD = 'mautic.integration.INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD';
+
+    /**
+     * This event is dispatched when a Mautic company field changes are about to be used in full object report builder.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalCompanyEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD = 'mautic.integration.INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD';
+
+    /**
      * This event is dispatched when a batch of objects have synced from an integration to Mautic after the sync engine has processed everything
      * so that listeners can then act on mappings stored in the sync_object_mapping table.
      *
@@ -151,4 +205,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION = 'mautic.integration.INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION';
+
+    /**
+     * This event is dispatched when api keys is updated/inserted.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\KeysSaveEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_API_KEYS_BEFORE_SAVE = 'mautic.integration.INTEGRATION_API_KEYS_BEFORE_SAVE';
 }

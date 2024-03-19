@@ -20,21 +20,6 @@ class LeadSubscriber implements EventSubscriberInterface
     use ChannelTrait;
 
     /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var VideoModel
-     */
-    private $pageVideoModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var RouterInterface
      */
     private $router;
@@ -43,24 +28,18 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        PageModel $pageModel,
-        VideoModel $pageVideoModel,
-        TranslatorInterface $translator,
+        private PageModel $pageModel,
+        private VideoModel $pageVideoModel,
+        private TranslatorInterface $translator,
         RouterInterface $router,
         ModelFactory $modelFactory
     ) {
-        $this->pageModel      = $pageModel;
-        $this->pageVideoModel = $pageVideoModel;
-        $this->translator     = $translator;
         $this->router         = $router;
 
         $this->setModelFactory($modelFactory);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => [
@@ -75,13 +54,13 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'page.hit';
         $eventTypeName = $this->translator->trans('mautic.page.event.hit');
         $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('pageList', 'hitDetails');
+        $event->addSerializerGroup('pageList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
@@ -147,7 +126,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     ];
                 } else {
                     $eventLabel = [
-                        'label'      => (isset($hit['urlTitle'])) ? $hit['urlTitle'] : $hit['url'],
+                        'label'      => $hit['urlTitle'] ?? $hit['url'],
                         'href'       => $hit['url'],
                         'isExternal' => true,
                     ];
@@ -178,13 +157,13 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerateVideo(LeadTimelineEvent $event)
+    public function onTimelineGenerateVideo(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'page.videohit';
         $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
         $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('pageList', 'hitDetails');
+        $event->addSerializerGroup('pageList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
@@ -220,7 +199,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadChange(LeadChangeEvent $event)
+    public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->pageModel->getHitRepository()->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
@@ -229,7 +208,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->pageModel->getHitRepository()->updateLead(
             $event->getLoser()->getId(),

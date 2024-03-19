@@ -14,39 +14,23 @@ class BroadcastQuery
     use ContactLimiterTrait;
 
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
-
-    /**
      * @var \Doctrine\DBAL\Query\QueryBuilder
      */
     private $query;
 
-    /**
-     * BroadcastQuery constructor.
-     */
-    public function __construct(EntityManager $entityManager, SmsModel $smsModel)
-    {
-        $this->entityManager = $entityManager;
-        $this->smsModel      = $smsModel;
+    public function __construct(
+        private EntityManager $entityManager,
+        private SmsModel $smsModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter)
+    public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter): array
     {
         $query = $this->getBasicQuery($sms);
         $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
 
-        return $query->execute()->fetchAllAssociative();
+        return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -57,7 +41,7 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->execute()->fetchOne();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
@@ -85,7 +69,7 @@ class BroadcastQuery
         return $this->query;
     }
 
-    private function excludeStatsRecords(int $smsId)
+    private function excludeStatsRecords(int $smsId): void
     {
         // Do not include leads that have already received text message
         $statQb = $this->entityManager->getConnection()->createQueryBuilder();
@@ -101,7 +85,7 @@ class BroadcastQuery
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()));
     }
 
-    private function excludeDnc()
+    private function excludeDnc(): void
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->entityManager->getConnection()->createQueryBuilder();
@@ -116,7 +100,7 @@ class BroadcastQuery
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()));
     }
 
-    private function excludeQueue()
+    private function excludeQueue(): void
     {
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->entityManager->getConnection()->createQueryBuilder();

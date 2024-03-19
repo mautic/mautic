@@ -15,22 +15,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OwnerProvider
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var ObjectProvider
-     */
-    private $objectProvider;
-
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        ObjectProvider $objectProvider
+        private EventDispatcherInterface $dispatcher,
+        private ObjectProvider $objectProvider
     ) {
-        $this->dispatcher     = $dispatcher;
-        $this->objectProvider = $objectProvider;
     }
 
     /**
@@ -48,7 +36,7 @@ class OwnerProvider
 
         try {
             $object = $this->objectProvider->getObjectByName($objectName);
-        } catch (ObjectNotFoundException $e) {
+        } catch (ObjectNotFoundException) {
             // Throw this exception for BC.
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }

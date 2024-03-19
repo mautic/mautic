@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
 
 class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEncodingCanBeDecoded()
+    public function testEncodingCanBeDecoded(): void
     {
         $array = ['foo' => 'bar'];
 
@@ -17,7 +17,7 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\CoreBundle\Helper\Serializer::decode
      */
-    public function testObjectInArrayIsDetectedOrIgnored()
+    public function testObjectInArrayIsDetectedOrIgnored(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -26,14 +26,14 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
         ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array));
     }
 
-    public function testOnlyArraysCanBeDecodedToPreventObjectWakeupVulnerability()
+    public function testOnlyArraysCanBeDecodedToPreventObjectWakeupVulnerability(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         ClickthroughHelper::decodeArrayFromUrl(urlencode(base64_encode(serialize(new \stdClass()))));
     }
 
-    public function testEmptyStringDoesNotThrowException()
+    public function testEmptyStringDoesNotThrowException(): void
     {
         $array = [];
 

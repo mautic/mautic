@@ -4,18 +4,16 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class IpstackLookup extends AbstractRemoteDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public string $country_code = '';
+    public string $region_code  = '';
+    public string $metro_code   = '';
+
+    public function getAttribution(): string
     {
         return '<a href="https://ipstack.com/" target="_blank">ipstack.com</a> is a free lookup service that leverages GeoLite2 data created by MaxMind.';
     }
 
-    /**
-     * @return string
-     */
-    protected function getUrl()
+    protected function getUrl(): string
     {
         if (empty($this->auth)) {
             $this->logger->warning('FreeGeoIP has become IPStack and now requires an API key.');

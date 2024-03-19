@@ -37,7 +37,7 @@
 
                 {% set selected = (filter.values is defined and value in filter.values) ? ' selected' : '' %}
                 <option value="{{ value|escape('html_attr') }}"{{ selected }}>
-                    {{ (filter.translateLabels is not defined or filter.translateLabels is empty) ? label : label|trans }}
+                    {{ (filter.translateLabels is not defined or filter.translateLabels is empty) ? label|purify : label|trans }}
                 </option>
             {% endfor %}
         {% endif %}

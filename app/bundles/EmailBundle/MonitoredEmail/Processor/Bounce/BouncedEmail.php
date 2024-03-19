@@ -143,8 +143,6 @@ class BouncedEmail
     }
 
     /**
-     * @param string $originalTo
-     *
      * @return BouncedEmail
      */
     public function setBounceAddress($bounceAddress)
