@@ -54,16 +54,16 @@ label.list-group-item {
     }
 
     &:before {
-      --marker-size: 16px;
+      @marker-size: 16px;
       position: absolute;
       background: lightgray;
       border-radius: 50%;
       left: -35px;
-      width: var(--marker-size);
-      height: var(--marker-size);
+      width: @marker-size;
+      height: @marker-size;
       text-align: center;
-      line-height: calc(var(--marker-size) + 2px);
-      font-size: calc(var(--marker-size) - 5px);
+      line-height: calc(@marker-size + 2px);
+      font-size: calc(@marker-size - 5px);
       color: black;
       transition: @all;
     }
