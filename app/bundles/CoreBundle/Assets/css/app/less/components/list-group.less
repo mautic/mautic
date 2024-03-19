@@ -38,3 +38,44 @@ label.list-group-item {
     background-color: @list-group-hover-bg;
   }
 }
+
+.ds-list-group {
+  counter-reset: item;
+  list-style-type: none;
+  padding-inline-start: 35px;
+
+  > li {
+    counter-increment: item;
+    position: relative;
+    padding: @list-padding 0px;
+
+    &:not(:first-child) {
+      border-top: 1px solid @background-inverse-hover;
+    }
+
+    &:before {
+      --marker-size: 16px;
+      position: absolute;
+      background: lightgray;
+      border-radius: 50%;
+      left: -35px;
+      width: var(--marker-size);
+      height: var(--marker-size);
+      text-align: center;
+      line-height: calc(var(--marker-size) + 2px);
+      font-size: calc(var(--marker-size) - 5px);
+      color: black;
+      transition: @all;
+    }
+
+    &:hover:before {
+      transform: scale(1.2);
+    }
+  }
+}
+
+.ds-list-alphabet {
+  > li:before {
+    content: counter(item, upper-alpha);
+  }
+}
