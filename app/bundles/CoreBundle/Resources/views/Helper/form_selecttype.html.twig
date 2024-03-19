@@ -31,7 +31,9 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                {{ typeOneDifferences|trans|raw }}
+                                <ul class="ds-list-group ds-list-alphabet">
+                                    {{ typeOneDifferences|trans|raw }}
+                                </ul>
                             </div>
                             <div class="hidden-xs panel-footer text-center">
                                 <button class="btn btn-lg btn-default btn-nospin text-success" onclick="{{ typeOneOnClick }}">
@@ -54,7 +56,9 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                {{ typeTwoDifferences|trans|raw }}
+                                <ul class="ds-list-group ds-list-alphabet">
+                                    {{ typeTwoDifferences|trans|raw }}
+                                </ul>
                             </div>
                             <div class="hidden-xs panel-footer text-center">
                                 <button class="btn btn-lg btn-default btn-nospin text-primary" onclick="{{ typeTwoOnClick }}">
