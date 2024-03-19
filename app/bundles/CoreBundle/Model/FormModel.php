@@ -195,7 +195,7 @@ class FormModel extends AbstractCommonModel
                 case 'published':
                 case 'expired':
                 case 'pending':
-                    $event = $this->dispatchEvent('pre_unpublish', $entity);
+                    $this->dispatchEvent('pre_unpublish', $entity);
                     $entity->setIsPublished(false);
                     break;
             }
@@ -326,6 +326,8 @@ class FormModel extends AbstractCommonModel
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
+     *
+     * @return \Symfony\Component\Form\FormInterface<mixed>
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

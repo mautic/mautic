@@ -75,13 +75,6 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
         ],
-        'repositories' => [
-            'mautic.asset.repository.download' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\AssetBundle\Entity\Download::class,
-            ],
-        ],
     ],
 
     'parameters' => [

@@ -19,6 +19,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Point>
+ */
 class PointType extends AbstractType
 {
     public function __construct(
@@ -138,6 +141,9 @@ class PointType extends AbstractType
             [
                 'label' => 'mautic.point.form.repeat',
                 'data'  => $options['data']->getRepeatable() ?: false,
+                'attr'  => [
+                    'tooltip' => 'mautic.point.form.repeat.help',
+                ],
             ]
         );
 

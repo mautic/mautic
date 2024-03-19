@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Bundle;
 
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -33,7 +34,7 @@ abstract class PluginBundleBase extends Bundle
     public static function installPluginSchema(array $metadata, MauticFactory $factory, $installedSchema = null): void
     {
         if (null !== $installedSchema) {
-            // Schema exists so bail
+            // Schema already exists, so no need to proceed
             return;
         }
 
@@ -41,18 +42,31 @@ abstract class PluginBundleBase extends Bundle
         $schemaTool     = new SchemaTool($factory->getEntityManager());
         $installQueries = $schemaTool->getCreateSchemaSql($metadata);
 
-        $db->beginTransaction();
-        try {
-            foreach ($installQueries as $q) {
+        foreach ($installQueries as $q) {
+            // Check if the query is a DDL statement
+            if (self::isDDLStatement($q)) {
+                // Execute DDL statements outside of a transaction
                 $db->executeQuery($q);
+            } else {
+                // For non-DDL statements, use transactions
+                try {
+                    $db->beginTransaction();
+                    $db->executeQuery($q);
+                    $db->commit();
+                } catch (\Exception $e) {
+                    // Rollback only for non-DDL statements
+                    if ($db->isTransactionActive()) {
+                        $db->rollBack();
+                    }
+                    throw $e;
+                }
             }
-
-            $db->commit();
-        } catch (\Exception $e) {
-            $db->rollback();
-
-            throw $e;
         }
+    }
+
+    private static function isDDLStatement(string $query): bool|int
+    {
+        return preg_match('/^(CREATE|ALTER|DROP|RENAME|TRUNCATE|COMMENT)\s/i', $query);
     }
 
     /**
@@ -62,8 +76,12 @@ abstract class PluginBundleBase extends Bundle
      *
      * @deprecated To be removed in 5.0. Listen to PluginEvents::ON_PLUGIN_UPDATE instead
      */
-    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
-    {
+    public static function onPluginUpdate(
+        Plugin $plugin,
+        MauticFactory $factory,
+        $metadata = null,
+        Schema $installedSchema = null
+    ): void {
         // Not recommended although availalbe for simple schema changes - see updatePluginSchema docblock
         // self::updatePluginSchema($metadata, $installedSchema, $factory);
     }
@@ -80,10 +98,12 @@ abstract class PluginBundleBase extends Bundle
      */
     public static function updatePluginSchema(array $metadata, Schema $installedSchema, MauticFactory $factory): void
     {
-        $db         = $factory->getDatabase();
-        $schemaTool = new SchemaTool($factory->getEntityManager());
-        $toSchema   = $schemaTool->getSchemaFromMetadata($metadata);
-        $queries    = $installedSchema->getMigrateToSql($toSchema, $db->getDatabasePlatform());
+        $db               = $factory->getDatabase();
+        $schemaTool       = new SchemaTool($factory->getEntityManager());
+        $toSchema         = $schemaTool->getSchemaFromMetadata($metadata);
+        $comparator       = (new Comparator())->compareSchemas($installedSchema, $toSchema);
+        $databasePlatform = $db->getDatabasePlatform();
+        $queries          = $databasePlatform->getAlterSchemaSQL($comparator);
 
         $db->beginTransaction();
         try {

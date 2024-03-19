@@ -82,7 +82,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertSame($fields, $importEntity->getProperties()['fields']);
         Assert::assertSame(array_values($fields), $importEntity->getProperties()['headers']);
 
-        $this->runCommand(ImportCommand::COMMAND_NAME);
+        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
 
         $this->em->clear();
 
@@ -102,6 +102,9 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
         Assert::assertSame($expectedName, $contacts[0]->getFirstname());
         Assert::assertCount(2, $contacts);
+
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/view/'.$importEntity->getId());
+        Assert::assertStringContainsString('No failed rows found', $crawler->html(), 'No failed rows exist.');
     }
 
     private function setPhoneFieldIsRequired(bool $required): void

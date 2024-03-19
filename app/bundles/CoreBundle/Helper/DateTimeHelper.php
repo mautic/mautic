@@ -195,15 +195,15 @@ class DateTimeHelper
     /**
      * Gets a difference.
      *
-     * @param string     $compare
-     * @param bool|false $resetTime
+     * @param string|\DateTime $compare
+     * @param bool|false       $resetTime
      *
      * @return bool|\DateInterval|string
      */
     public function getDiff($compare = 'now', $format = null, $resetTime = false)
     {
         if ('now' == $compare) {
-            $compare = new \DateTime();
+            $compare = new \DateTime('now', $this->datetime->getTimezone());
         }
 
         $with = clone $this->datetime;

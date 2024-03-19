@@ -21,6 +21,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Report>
+ */
 class ReportType extends AbstractType
 {
     public function __construct(
@@ -385,7 +388,8 @@ class ReportType extends AbstractType
                     $data    = $event->getData();
                     $graphs  = $data['graphs'] ?? [];
                     $columns = $data['columns'] ?? [];
-                    $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
+                    $source  = $data['source'] ?? null;
+                    $formModifier($event->getForm(), $source, $columns, $graphs, $data);
                 }
             );
 

@@ -4,6 +4,11 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class IpinfodbLookup extends AbstractRemoteDataLookup
 {
+    public string $statusCode    = '';
+    public string $statusMessage = '';
+    public string $ipAddress     = '';
+    public string $countryCode   = '';
+
     public function getAttribution(): string
     {
         return '<a href="http://www.ipinfodb.com/" target="_blank">iPInfoDB</a> offers a free service (2 lookups per second) that leverages data from IP2Location. API key required.';

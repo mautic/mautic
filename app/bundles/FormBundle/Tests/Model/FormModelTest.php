@@ -648,6 +648,35 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }
 
+    public function testPopulateValuesWithLeadWithSuffixEMail(): void
+    {
+        $formHtml   = '<html>';
+        $form       = new Form();
+        $emailField = new Field();
+        $contact    = new Lead();
+
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('contact');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $contactCompanyData = [
+            'email' => 'john+test@doe.email',
+        ];
+
+        $this->contactTracker->method('getContact')
+            ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
+
+        $this->fieldHelper->expects($this->once())
+            ->method('populateField')
+            ->with($emailField, 'john+test@doe.email', 'form-', $formHtml);
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
     public function testPopulateValuesWithCompany(): void
     {
         $formHtml    = '<html>';

@@ -14,6 +14,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<LeadNote>
+ */
 class NoteType extends AbstractType
 {
     private \Mautic\CoreBundle\Helper\DateTimeHelper $dateHelper;

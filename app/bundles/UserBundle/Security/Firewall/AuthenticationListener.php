@@ -55,12 +55,12 @@ final class AuthenticationListener
             if ($authToken instanceof PluginToken) {
                 $response = $authToken->getResponse();
 
-                if ($authToken->isAuthenticated()) {
+                if (null !== $authToken->getUser()) {
                     $this->tokenStorage->setToken($authToken);
 
                     $this->setActivePermissionsOnAuthToken();
 
-                    if ('api' != $this->providerKey) {
+                    if ('api' !== $this->providerKey) {
                         $response = $this->onSuccess($request, $authToken, $response);
                     }
                 } elseif (empty($response)) {

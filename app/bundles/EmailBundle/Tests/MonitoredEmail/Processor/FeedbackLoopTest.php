@@ -18,11 +18,9 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that the message is processed appropriately
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::process
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts
      */
     public function testContactIsFoundFromMessage(): void
     {

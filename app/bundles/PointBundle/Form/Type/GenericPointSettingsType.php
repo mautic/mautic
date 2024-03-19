@@ -7,6 +7,9 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class GenericPointSettingsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

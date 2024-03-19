@@ -6,6 +6,9 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<LeadField|null, int|null>
+ */
 class FieldToOrderTransformer implements DataTransformerInterface
 {
     public function __construct(
@@ -16,9 +19,9 @@ class FieldToOrderTransformer implements DataTransformerInterface
     /**
      * Transforms an object to an integer (order).
      *
-     * @param LeadField|null $order
+     * @param int|null $order
      *
-     * @return string
+     * @return LeadField|null
      */
     public function transform($order)
     {
@@ -32,14 +35,14 @@ class FieldToOrderTransformer implements DataTransformerInterface
     /**
      * Transforms a integer to an object.
      *
-     * @param int $field
+     * @param LeadField|null $field
      *
-     * @return LeadField|null
+     * @return int|null
      */
     public function reverseTransform($field)
     {
         if (null === $field) {
-            return 0;
+            return null;
         }
 
         return $field->getOrder();

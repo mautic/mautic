@@ -6,6 +6,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ *
+ * @implements DataTransformerInterface<string|null, string>
  */
 class NullToEmptyTransformer implements DataTransformerInterface
 {
@@ -14,7 +16,7 @@ class NullToEmptyTransformer implements DataTransformerInterface
      *
      * @param string|null $value
      *
-     * @return string
+     * @return string|null
      */
     public function transform($value)
     {
@@ -24,7 +26,7 @@ class NullToEmptyTransformer implements DataTransformerInterface
     /**
      * Transforms a null to an empty string.
      *
-     * @param string $value
+     * @param string|null $value
      *
      * @return string
      */

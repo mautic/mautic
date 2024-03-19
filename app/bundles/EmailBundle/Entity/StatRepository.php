@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -266,7 +266,7 @@ class StatRepository extends CommonRepository
                     $q->andWhere(
                         $q->expr()->in('s.list_id', ':segmentIds')
                     );
-                    $q->setParameter('segmentIds', $listId, Connection::PARAM_INT_ARRAY);
+                    $q->setParameter('segmentIds', $listId, ArrayParameterType::INTEGER);
 
                     $q->addSelect('s.list_id')
                         ->groupBy('s.list_id');
@@ -443,9 +443,12 @@ class StatRepository extends CommonRepository
                 ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
         }
 
+        $timestampColumn = 's.date_sent';
+
         if (isset($options['state'])) {
             $state = $options['state'];
             if ('read' == $state) {
+                $timestampColumn = 's.date_read';
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 1)
                 );
@@ -455,7 +458,6 @@ class StatRepository extends CommonRepository
                 );
             }
         }
-        $state = 'sent';
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
@@ -470,7 +472,7 @@ class StatRepository extends CommonRepository
         if (isset($options['fromDate']) && $options['fromDate']) {
             $dt = new DateTimeHelper($options['fromDate']);
             $query->andWhere(
-                $query->expr()->gte('s.date_sent', $query->expr()->literal($dt->toUtcString()))
+                $query->expr()->gte($timestampColumn, $query->expr()->literal($dt->toUtcString()))
             );
         }
 
@@ -487,7 +489,7 @@ class StatRepository extends CommonRepository
             $query,
             $options,
             'storedSubject, e.subject',
-            's.date_'.$state,
+            $timestampColumn,
             ['openDetails'],
             ['dateRead', 'dateSent'],
             $timeToReadParser
@@ -655,7 +657,7 @@ class StatRepository extends CommonRepository
             ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('s.is_failed = 0')
             ->setParameter('email', $emailId)
-            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy('s.lead_id');
 
         $results = $query->executeQuery()->fetchAllAssociative();
@@ -700,7 +702,7 @@ class StatRepository extends CommonRepository
             )
             ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
             ->andWhere("{$pageHitsAlias}.lead_id in (:contacts)")
-            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
         // main query
@@ -721,7 +723,7 @@ class StatRepository extends CommonRepository
                 $subQueryAlias,
                 "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
             )->andWhere("{$leadAlias}.id in (:contacts)")
-            ->setParameter('contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->setParameter('contacts', $contacts, ArrayParameterType::INTEGER)
             ->groupBy("{$leadAlias}.id");
 
         $results = $queryBuilder->executeQuery()->fetchAllAssociative();

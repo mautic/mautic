@@ -30,9 +30,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -91,12 +93,13 @@ class ReportModel extends FormModel
         return 'report:reports';
     }
 
-    protected function getSession(): Session
+    protected function getSession(): SessionInterface
     {
-        $session = $this->requestStack->getSession();
-        \assert($session instanceof Session);
-
-        return $session;
+        try {
+            return $this->requestStack->getSession();
+        } catch (SessionNotFoundException) {
+            return new Session(); // in case of CLI
+        }
     }
 
     /**
@@ -724,6 +727,36 @@ class ReportModel extends FormModel
         }
 
         return $dependents;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getReportsIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $search = 'e.id';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.source', 'expr' => 'IN', 'value'=> ['emails', 'email.stats']],
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                if ($entityFilter['column'] == $search && $entityFilter['value'] == $emailId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return array_unique($dependents);
     }
 
     /**

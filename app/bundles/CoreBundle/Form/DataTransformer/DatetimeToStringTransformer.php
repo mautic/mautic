@@ -6,6 +6,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ *
+ * @implements DataTransformerInterface<string|null, \DateTime>
  */
 class DatetimeToStringTransformer implements DataTransformerInterface
 {
@@ -18,6 +20,8 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
+     * @param \DateTime|null $value
+     *
      * @return string
      */
     public function reverseTransform($value)
@@ -32,6 +36,8 @@ class DatetimeToStringTransformer implements DataTransformerInterface
     }
 
     /**
+     * @param string|null $value
+     *
      * @return \DateTime
      */
     public function transform($value)

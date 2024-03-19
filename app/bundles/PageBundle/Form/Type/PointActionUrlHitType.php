@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class PointActionUrlHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

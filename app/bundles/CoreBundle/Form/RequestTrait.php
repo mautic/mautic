@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Form\Type\HtmlType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -23,10 +24,10 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 trait RequestTrait
 {
     /**
-     * @param FormInterface<object> $form
-     * @param array<mixed>          $params
-     * @param array<mixed>          $masks
-     * @param array<mixed>          $fields
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $params
+     * @param array<mixed>         $masks
+     * @param array<mixed>         $fields
      *
      * @throws \Exception
      */
@@ -145,6 +146,9 @@ trait RequestTrait
                             $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
                             break;
                     }
+                    break;
+                case HtmlType::class:
+                    $masks[$name] = 'html';
                     break;
             }
         }

@@ -31,7 +31,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = self::$container->get('mautic.category.model.category');
+        $model      = static::getContainer()->get('mautic.category.model.category');
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -94,9 +94,9 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditLockCategory(): void
     {
         /** @var CategoryModel $categoryModel */
-        $categoryModel      = self::$container->get('mautic.category.model.category');
+        $categoryModel      = static::getContainer()->get('mautic.category.model.category');
         /** @var UserModel $userModel */
-        $userModel      = self::$container->get('mautic.user.model.user');
+        $userModel      = static::getContainer()->get('mautic.user.model.user');
         $user           = $userModel->getEntity(2);
 
         $category = new Category();

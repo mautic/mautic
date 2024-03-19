@@ -34,4 +34,20 @@ class ReferenceValueDAO implements \Stringable
     {
         return (string) $this->value;
     }
+
+    /** @return array<string, mixed> */
+    public function __serialize(): array
+    {
+        return [
+            'value' => $this->value,
+            'types' => $this->type,
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    public function __unserialize(array $data): void
+    {
+        $this->value = $data['value'] ?? null;
+        $this->type  = $data['type'] ?? null;
+    }
 }

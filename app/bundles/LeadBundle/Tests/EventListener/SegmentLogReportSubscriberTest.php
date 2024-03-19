@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -72,8 +74,15 @@ class SegmentLogReportSubscriberTest extends TestCase
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['from', 'andWhere', 'leftJoin', 'expr', 'setParameter', 'groupBy'])
-            ->addMethods(['or', 'isNotNull'])
             ->getMock();
+
+        $expressionBuilder = $this->createMock(ExpressionBuilder::class);
+        $expressionBuilder->expects($this->exactly(1))
+            ->method('or')
+            ->willReturn($this->createMock(CompositeExpression::class));
+        $expressionBuilder->expects($this->exactly(2))
+            ->method('isNotNull')
+            ->willReturn('');
 
         $mockQueryBuilder->expects($this->once())
             ->method('from')
@@ -89,19 +98,11 @@ class SegmentLogReportSubscriberTest extends TestCase
 
         $mockQueryBuilder->expects($this->exactly(3))
             ->method('expr')
-            ->willReturn($mockQueryBuilder);
+            ->willReturn($expressionBuilder);
 
         $mockQueryBuilder->expects($this->exactly(2))
             ->method('setParameter')
             ->willReturn($mockQueryBuilder);
-
-        $mockQueryBuilder->expects($this->exactly(1))
-            ->method('or')
-            ->willReturn($mockQueryBuilder);
-
-        $mockQueryBuilder->expects($this->exactly(2))
-            ->method('isNotNull')
-            ->willReturn('');
 
         $mockQueryBuilder->expects($this->exactly(1))
             ->method('groupBy')

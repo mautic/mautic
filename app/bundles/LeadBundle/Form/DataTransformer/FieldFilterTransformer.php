@@ -9,6 +9,9 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @implements DataTransformerInterface<mixed, array<mixed>|mixed>
+ */
 class FieldFilterTransformer implements DataTransformerInterface
 {
     /**

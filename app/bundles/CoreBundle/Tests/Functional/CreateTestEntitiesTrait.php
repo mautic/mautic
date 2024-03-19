@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
@@ -109,6 +110,7 @@ trait CreateTestEntitiesTrait
     {
         $email = new Email();
         $email->setName($name);
+        $email->setSubject('Test Subject');
         $email->setIsPublished(true);
 
         $this->em->persist($email);
@@ -135,5 +137,24 @@ trait CreateTestEntitiesTrait
         $listLead->setDateAdded(new \DateTime());
 
         $this->em->persist($listLead);
+    }
+
+    /**
+     * @param array<mixed> $properties
+     */
+    private function createLeadEventLogEntry(Lead $lead, string $bundle, string $object, string $action, int $objectId, array $properties = []): LeadEventLog
+    {
+        $listEventLog = new LeadEventLog();
+        $listEventLog->setLead($lead);
+        $listEventLog->setBundle($bundle);
+        $listEventLog->setObject($object);
+        $listEventLog->setAction($action);
+        $listEventLog->setObjectId($objectId);
+        $listEventLog->setProperties($properties);
+        $listEventLog->setDateAdded(new \DateTime());
+
+        $this->em->persist($listEventLog);
+
+        return $listEventLog;
     }
 }
