@@ -186,7 +186,7 @@ return [
                     'mautic.campaign.event_logger',
                     'mautic.campaign.scheduler.interval',
                     'mautic.campaign.scheduler.datetime',
-                    'mautic.campaign.scheduler.behavioral',
+                    'mautic.campaign.scheduler.optimized',
                     'mautic.campaign.event_collector',
                     'event_dispatcher',
                     'mautic.helper.core_parameters',

@@ -16,9 +16,9 @@ class PeakInteractionTimer
     private const HOUR_FORMAT             = 'G'; // 0 through 23
     private const DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
     private const FETCH_INTERACTIONS_FROM = '-60 days';
-    private const FETCH_EMAIL_READS_LIMIT = 25;
-    private const FETCH_PAGE_HITS_LIMIT   = 25;
-    private const MIN_INTERACTIONS        = 4;
+    private const FETCH_EMAIL_READS_LIMIT = 50;
+    private const FETCH_PAGE_HITS_LIMIT   = 50;
+    private const MIN_INTERACTIONS        = 5;
     private const MAX_OPTIMAL_DAYS        = 3;
 
     private ?\DateTimeZone $defaultTimezone = null;
@@ -40,6 +40,7 @@ class PeakInteractionTimer
      */
     public function getOptimalTime(Lead $contact): \DateTime
     {
+        $this->resetBias();
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
@@ -58,6 +59,7 @@ class PeakInteractionTimer
      */
     public function getOptimalTimeAndDay(Lead $contact): \DateTime
     {
+        $this->resetBias();
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
@@ -71,6 +73,13 @@ class PeakInteractionTimer
         return $this->isDayAndTimeOptimal($currentDateTime)
             ? $currentDateTime
             : $this->findOptimalDateTime($currentDateTime);
+    }
+
+    private function resetBias(): void
+    {
+        $this->bestHourStart = self::BEST_DEFAULT_HOUR_START;
+        $this->bestHourEnd   = self::BEST_DEFAULT_HOUR_END;
+        $this->bestDays      = self::BEST_DEFAULT_DAYS;
     }
 
     private function isTimeOptimal(\DateTime $dateTime): bool
