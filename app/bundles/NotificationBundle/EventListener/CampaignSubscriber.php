@@ -3,37 +3,60 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
+use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var string
+     */
+    public const EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
+
+    /**
+     * @var string
+     */
+    public const EVENT_ACTION_SEND_NOTIFICATION = 'notification.send_notification';
+
+    /**
+     * The maximum number of `include_player_ids` that can be sent within a single request.
+     *
+     * @var int
+     */
+    protected const MAX_PLAYER_IDS_PER_REQUEST = 2000;
+
     public function __construct(
         private IntegrationHelper $integrationHelper,
         private NotificationModel $notificationModel,
         private AbstractNotificationApi $notificationApi,
         private EventDispatcherInterface $dispatcher,
-        private DoNotContactModel $doNotContact
+        private DoNotContactModel $doNotContact,
+        private TranslatorInterface $translator
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD              => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD            => ['onCampaignBuild', 0],
+            NotificationEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignBatchAction', 0],
         ];
     }
 
@@ -49,11 +72,11 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if (in_array('mobile', $features)) {
             $event->addAction(
-                'notification.send_mobile_notification',
+                static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION,
                 [
                     'label'            => 'mautic.notification.campaign.send_mobile_notification',
                     'description'      => 'mautic.notification.campaign.send_mobile_notification.tooltip',
-                    'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'batchEventName'   => NotificationEvents::ON_CAMPAIGN_BATCH_ACTION,
                     'formType'         => MobileNotificationSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                     'formTheme'        => '@MauticNotification/FormTheme/NotificationSendList/_notificationsend_list_row.html.twig',
@@ -65,11 +88,11 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $event->addAction(
-            'notification.send_notification',
+            static::EVENT_ACTION_SEND_NOTIFICATION,
             [
                 'label'            => 'mautic.notification.campaign.send_notification',
                 'description'      => 'mautic.notification.campaign.send_notification.tooltip',
-                'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'batchEventName'   => NotificationEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'         => NotificationSendType::class,
                 'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                 'formTheme'        => '@MauticNotification/FormTheme/NotificationSendList/_notificationsend_list_row.html.twig',
@@ -80,65 +103,119 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @return CampaignExecutionEvent
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignBatchAction(PendingEvent $event): void
     {
-        $lead = $event->getLead();
-
-        if (DoNotContact::IS_CONTACTABLE !== $this->doNotContact->isContactable($lead, 'notification')) {
-            return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
+        if (!$event->checkContext(static::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {
+            return;
         }
 
-        $notificationId = (int) $event->getConfig()['notification'];
+        $notificationId = $event->getEvent()->getProperties()['notification'] ?? null;
+        $notification   = $notificationId ? $this->notificationModel->getEntity((int) $notificationId) : null;
 
-        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
-        $notification = $this->notificationModel->getEntity($notificationId);
+        if (!$notification) {
+            $event->passAllWithError($this->translator->trans('mautic.notification.campaign.failed.missing_entity'));
 
-        if ($notification->getId() !== $notificationId) {
-            return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
+            return;
         }
 
         if (!$notification->getIsPublished()) {
-            return $event->setFailed('mautic.notification.campaign.failed.unpublished');
+            $event->passAllWithError($this->translator->trans('mautic.notification.campaign.failed.unpublished'));
+
+            return;
         }
 
-        // If lead has subscribed on multiple devices, get all of them.
-        /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
-        $pushIDs = $lead->getPushIDs();
+        $event->setChannel('notification', $notification->getId());
 
-        $playerID = [];
+        if ($notification->getUrl()) {
+            $this->sendNotificationPerLead($notification, $event);
+        } else {
+            $this->sendNotificationsInBatches($notification, $event);
+        }
+    }
 
-        foreach ($pushIDs as $pushID) {
+    private function sendNotificationPerLead(Notification $notification, PendingEvent $event): void
+    {
+        foreach ($event->getPending() as $log) {
+            if (!$this->isLeadContactable($event, $log)) {
+                continue;
+            }
+
+            $playerIds = $this->getLeadPlayerIds($event, $log);
+
+            if (!$playerIds) {
+                continue;
+            }
+
+            $sendNotification = $this->buildNotificationToSend($notification, $log->getLead());
+            $response         = $this->notificationApi->sendNotification($playerIds, $sendNotification);
+            $this->processResponse($response, $event, $log, $notification, $sendNotification);
+        }
+    }
+
+    private function sendNotificationsInBatches(Notification $notification, PendingEvent $event): void
+    {
+        $batches       = $this->buildBatches($event, $notification);
+        $processedLogs = [];
+
+        foreach ($batches as $batch) {
+            $sendNotification = $batch['sendNotification'];
+            $playerIdsChunks  = array_chunk($batch['playerIds'], static::MAX_PLAYER_IDS_PER_REQUEST, true);
+
+            foreach ($playerIdsChunks as $playerIdsChunk) {
+                $playerIds = array_keys($playerIdsChunk);
+                $response  = $this->notificationApi->sendNotification($playerIds, $sendNotification);
+
+                foreach ($playerIdsChunk as $log) {
+                    if (!isset($processedLogs[$log->getId()])) {
+                        $processedLogs[$log->getId()] = $log;
+                        $this->processResponse($response, $event, $log, $notification, $sendNotification);
+                    }
+                }
+            }
+        }
+    }
+
+    private function isLeadContactable(PendingEvent $event, LeadEventLog $log): bool
+    {
+        $contactable = DoNotContact::IS_CONTACTABLE === $this->doNotContact->isContactable($log->getLead(), 'notification');
+
+        if (!$contactable) {
+            $event->passWithError($log, $this->translator->trans('mautic.notification.campaign.failed.not_contactable'));
+        }
+
+        return $contactable;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getLeadPlayerIds(PendingEvent $event, LeadEventLog $log): array
+    {
+        $playerIds = [];
+
+        foreach ($log->getLead()->getPushIDs() as $pushID) {
             // Skip non-mobile PushIDs if this is a mobile event
-            if ($event->checkContext('notification.send_mobile_notification') && false == $pushID->isMobile()) {
+            if ($event->checkContext(static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION) && !$pushID->isMobile()) {
                 continue;
             }
 
             // Skip mobile PushIDs if this is a non-mobile event
-            if ($event->checkContext('notification.send_notification') && true == $pushID->isMobile()) {
+            if ($event->checkContext(static::EVENT_ACTION_SEND_NOTIFICATION) && $pushID->isMobile()) {
                 continue;
             }
 
-            $playerID[] = $pushID->getPushID();
+            $playerIds[] = $pushID->getPushID();
         }
 
-        if (empty($playerID)) {
-            return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
+        if (!$playerIds) {
+            $event->passWithError($log, $this->translator->trans('mautic.notification.campaign.failed.not_subscribed'));
         }
 
-        if ($url = $notification->getUrl()) {
-            $url = $this->notificationApi->convertToTrackedUrl(
-                $url,
-                [
-                    'notification' => $notification->getId(),
-                    'lead'         => $lead->getId(),
-                ],
-                $notification
-            );
-        }
+        return $playerIds;
+    }
 
+    private function buildNotificationToSend(Notification $notification, Lead $lead): Notification
+    {
         /** @var TokenReplacementEvent $tokenEvent */
         $tokenEvent = $this->dispatcher->dispatch(
             new TokenReplacementEvent(
@@ -155,36 +232,83 @@ class CampaignSubscriber implements EventSubscriberInterface
             NotificationEvents::NOTIFICATION_ON_SEND
         );
 
+        if ($url = $notification->getUrl()) {
+            $url = $this->notificationApi->convertToTrackedUrl(
+                $url,
+                [
+                    'notification' => $notification->getId(),
+                    'lead'         => $lead->getId(),
+                ],
+                $notification
+            );
+        }
+
         // prevent rewrite notification entity
         $sendNotification = clone $notification;
         $sendNotification->setUrl($url);
         $sendNotification->setMessage($sendEvent->getMessage());
         $sendNotification->setHeading($sendEvent->getHeading());
 
-        $response = $this->notificationApi->sendNotification(
-            $playerID,
-            $sendNotification
-        );
+        return $sendNotification;
+    }
 
-        $event->setChannel('notification', $notification->getId());
+    private function processResponse(ResponseInterface $response, PendingEvent $event, LeadEventLog $log, Notification $notification, Notification $sendNotification): void
+    {
+        // if for some reason the call failed, tell mautic to try again
+        if (200 !== $response->getStatusCode()) {
+            $event->fail($log, sprintf('%s (%s)', (string) $response->getBody(), $response->getStatusCode()));
 
-        // If for some reason the call failed, tell mautic to try again by return false
-        if (200 !== $response->code) {
-            return $event->setResult(false);
+            return;
         }
 
-        $this->notificationModel->createStatEntry($notification, $lead, 'campaign.event', $event->getEvent()['id']);
-        $this->notificationModel->getRepository()->upCount($notificationId);
+        $this->notificationModel->createStatEntry($notification, $log->getLead(), 'campaign.event', $event->getEvent()->getId());
+        $this->notificationModel->getRepository()->upCount($notification->getId());
 
         $result = [
             'status'  => 'mautic.notification.timeline.status.delivered',
             'type'    => 'mautic.notification.notification',
             'id'      => $notification->getId(),
             'name'    => $notification->getName(),
-            'heading' => $sendEvent->getHeading(),
-            'content' => $sendEvent->getMessage(),
+            'heading' => $sendNotification->getHeading(),
+            'content' => $sendNotification->getMessage(),
         ];
+        $log->appendToMetadata($result);
+        $event->pass($log);
+    }
 
-        $event->setResult($result);
+    /**
+     * @return array<string,mixed[]>
+     */
+    private function buildBatches(PendingEvent $event, Notification $notification): array
+    {
+        $batches = [];
+
+        foreach ($event->getPending() as $log) {
+            if (!$this->isLeadContactable($event, $log)) {
+                continue;
+            }
+
+            $playerIds = $this->getLeadPlayerIds($event, $log);
+
+            if (!$playerIds) {
+                continue;
+            }
+
+            $sendNotification = $this->buildNotificationToSend($notification, $log->getLead());
+            $uniqueKey        = md5(sprintf('[%s][%s]', $sendNotification->getHeading(), $sendNotification->getMessage()));
+
+            if (!isset($batches[$uniqueKey])) {
+                $batches[$uniqueKey] = [
+                    'sendNotification' => $sendNotification,
+                    'playerIds'        => [],
+                ];
+            }
+
+            foreach ($playerIds as $playerId) {
+                $batches[$uniqueKey]['playerIds'][$playerId] = $log;
+            }
+        }
+
+        return $batches;
     }
 }
