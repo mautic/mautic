@@ -23,8 +23,15 @@ class ThemeListType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices'           => function (Options $options): array {
-                    $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
+                    $themes                     = $this->themeHelper->getInstalledThemes($options['feature'], false, true);
                     $themes['mautic_code_mode'] = 'Code Mode';
+
+                    // Hide themes that are marked as hidden
+                    foreach ($this->themeHelper->getInstalledThemes($options['feature'], true, true) as $themeKey => $themeInfo) {
+                        if (isset($themeInfo['config']['hide']) && true === $themeInfo['config']['hide']) {
+                            unset($themes[$themeKey]);
+                        }
+                    }
 
                     return array_flip($themes);
                 },
