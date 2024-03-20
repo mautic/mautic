@@ -189,6 +189,9 @@ Mautic.focusOnLoad = function () {
     if (mQuery('[data-conversion-rate-table]').length) {
         Mautic.focusLoadConversionRateTable();
     }
+    else {
+        Mautic.focusLoadViewCountTable();
+    }
 };
 
 Mautic.launchFocusBuilder = function (forceFetch) {
@@ -456,5 +459,22 @@ Mautic.focusLoadConversionRateTable = function() {
     Mautic.ajaxActionRequest('plugin:focus:getClickThroughCount', {focusId: focusId}, function(response){
         clickThrough = response.clickThrough;
         updateTotalClickThroughRate();
+    }, false, true, "GET");
+}
+
+Mautic.focusLoadViewCountTable = function() {
+    var $viewTable = mQuery('[data-view-table]');
+    var $focusTotalViewsCell = mQuery('[data-focus-total-views-cell]');
+    var $focusTotalUniqueViewsCell = mQuery('[data-focus-total-unique-views-cell]');
+    var focusId = $viewTable.data('entity-id');
+    var views = null;
+    var uniqueViews = null;
+
+    Mautic.ajaxActionRequest('plugin:focus:getViewsCount', {focusId: focusId}, function(response){
+        views = response.views;
+        uniqueViews = response.uniqueViews;
+
+        $focusTotalViewsCell.html(views);
+        $focusTotalUniqueViewsCell.html(uniqueViews);
     }, false, true, "GET");
 }
