@@ -45,21 +45,23 @@
             document.getElementById('mauticform{{ formName }}_' + messageType).innerHTML = message;
         }
 
-        setTimeout(function () {
-            if (headline.length) {
-                {% if 'bar' == style %}
-                headline[0].style.display = "inline-block";
-                {% else %}
-                headline[0].style.display = "block";
-                {% endif %}
-            }
-            if (tagline.length) {
-                tagline[0].style.display = "inherit";
-            }
+        if (messageType == 'error') {
+            setTimeout(function () {
+                if (headline.length) {
+                    {% if 'bar' == style %}
+                    headline[0].style.display = "inline-block";
+                    {% else %}
+                    headline[0].style.display = "block";
+                    {% endif %}
+                }
+                if (tagline.length) {
+                    tagline[0].style.display = "inherit";
+                }
 
-            innerForm[0].style.display = "inherit";
-            document.getElementById('mauticform{{ formName }}_' + messageType).innerHTML = '';
-        }, (messageType == 'error') ? 1500 : 5000);
+                innerForm[0].style.display = "inherit";
+                document.getElementById('mauticform{{ formName }}_' + messageType).innerHTML = '';
+            }, 1500);
+        }
     }
     if (typeof MauticFormCallback == 'undefined') {
         var MauticFormCallback = {};
