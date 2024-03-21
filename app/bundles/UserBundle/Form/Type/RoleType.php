@@ -55,7 +55,7 @@ class RoleType extends AbstractType
 
         // add a normal text field, but add your transformer to it
         $isAdmin = $options['data']->isAdmin();
-        $hidden = ($isAdmin) ? ' hide' : '';
+        $hidden  = ($isAdmin) ? ' hide' : '';
 
         $builder->add(
             'permissions',
@@ -84,7 +84,7 @@ class RoleType extends AbstractType
             'data_class'        => Role::class,
             'constraints'       => [new Valid()],
             'permissionsConfig' => [],
-            'isAdmin'           => false, 
+            'isAdmin'           => false,
         ]);
     }
 }
