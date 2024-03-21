@@ -222,6 +222,9 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->findThemeWithTemplate($template);
     }
 
+    /**
+     * @return array<array|string>
+     */
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
     {
         // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
