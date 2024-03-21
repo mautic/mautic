@@ -150,7 +150,7 @@ class Asset extends FormEntity
     /**
      * @var bool|null
      */
-    private $disallow = false;
+    private $disallow = true;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
