@@ -374,7 +374,9 @@ class MailHelper
             }
 
             try {
-                $this->mailer->send($this->message);
+                if (empty($this->fatal)) {
+                    $this->mailer->send($this->message);
+                }
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
@@ -1463,7 +1465,12 @@ class MailHelper
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
-
+        if ($event->getStopSending()) {
+            $this->logError($event->getStopSendingError());
+            // When a string is used for logging the error, fatal is not set
+            // and therefore mail sending is not stopped.
+            $this->fatal = true;
+        }
         unset($event);
     }
 
