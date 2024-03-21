@@ -170,6 +170,17 @@ Mautic.leadOnLoad = function (container, response) {
     });
 
     Mautic.lazyLoadContactStatsOnLeadLoad();
+
+    // Emails time graph - loaded via AJAX not to block loading a whole page
+    const graphDivs = mQuery('div[data-graph-url]');
+    if (graphDivs.length) {
+        graphDivs.each((index,item) => {
+            const graphUrl = mQuery(item).attr('data-graph-url');
+            mQuery(item).load(graphUrl, () => {
+                Mautic.renderCharts();
+            });
+        });
+    }
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
