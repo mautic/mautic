@@ -54,8 +54,8 @@ class EmailSendType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'mautic.email.send.emailtype.marketing'     => MailHelper::EMAIL_TYPE_MARKETING,
-                        'mautic.email.send.emailtype.transactional' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+                        'mautic.core.form.no'  => MailHelper::EMAIL_TYPE_MARKETING,
+                        'mautic.core.form.yes' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],

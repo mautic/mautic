@@ -248,7 +248,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'ignoreDNC'      => $email->getSendToDnc(),
         ];
 
-        // Determine if this email is transactional/marketing
+        // Determine if this email is Repeatable/Non Repeatable
         $pending         = $event->getPending();
         $contacts        = $event->getContacts();
         $contactIds      = $event->getContactIds();
