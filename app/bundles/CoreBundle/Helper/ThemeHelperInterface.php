@@ -84,7 +84,7 @@ interface ThemeHelperInterface
      * @param bool   $ignoreCache     true to get the fresh info
      * @param bool   $includeDirs     true to get the theme dir details
      *
-     * @return array<string[]>|string[]
+     * @return array<array|string>
      */
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true);
 

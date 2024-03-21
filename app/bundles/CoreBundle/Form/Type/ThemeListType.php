@@ -28,7 +28,7 @@ class ThemeListType extends AbstractType
 
                     // Hide themes that are marked as hidden
                     foreach ($this->themeHelper->getInstalledThemes($options['feature'], true, true) as $themeKey => $themeInfo) {
-                        if (isset($themeInfo['config']['hide']) && true === $themeInfo['config']['hide']) {
+                        if (in_array('hide', $themeInfo['config']) && true === $themeInfo['config']['hide']) {
                             unset($themes[$themeKey]);
                         }
                     }
