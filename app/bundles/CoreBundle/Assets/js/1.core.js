@@ -407,7 +407,8 @@ var Mautic = {
 
         if (mQuery(target).length) {
             var hasBtn = mQuery(target).hasClass('btn');
-            var hasIcon = mQuery(target).hasClass('fa');
+            var className = mQuery(target).attr('class');
+            var hasIcon = mQuery(target).hasClass('fa') || className.startsWith('ri-');
             var dontspin = mQuery(target).hasClass('btn-nospin');
 
             var i = (hasBtn && mQuery(target).find('i.fa').length) ? mQuery(target).find('i.fa') : target;
