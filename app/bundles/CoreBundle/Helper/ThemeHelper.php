@@ -223,7 +223,7 @@ class ThemeHelper implements ThemeHelperInterface
     }
 
     /**
-     * @return array<array|string>
+     * @return array<mixed>
      */
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
     {
