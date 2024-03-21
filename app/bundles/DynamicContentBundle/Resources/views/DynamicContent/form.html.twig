@@ -125,7 +125,7 @@
             {{ form_row(form.language) }}
             {{ form_row(form.translationParent) }}
             <div id="publishStatus">
-                {{ form_row(form.isPublished) }}
+                {{ form_row(form.isPublished, {'label': 'mautic.dynamicContent.available'}) }}
             </div>
             {% if form.updateSelect is not defined %}
                 {{ form_row(form.isCampaignBased) }}
