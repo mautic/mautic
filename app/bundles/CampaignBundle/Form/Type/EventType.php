@@ -57,7 +57,7 @@ class EventType extends AbstractType
                 'date'      => 'mautic.campaign.form.type.date',
             ];
 
-            if ('email.send' === $options['data']['type']) {
+            if (in_array($options['data']['type'], OptimizedScheduler::AVAILABLE_FOR_EVENTS)) {
                 $choices['optimized'] = 'mautic.campaign.form.type.optimized';
             }
 
