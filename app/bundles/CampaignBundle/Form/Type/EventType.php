@@ -290,7 +290,7 @@ class EventType extends AbstractType
             ]
         );
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $data        = $event->getData();
             $triggerMode = $data['triggerMode'] ?? 'immediate';
 
