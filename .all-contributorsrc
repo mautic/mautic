@@ -1248,6 +1248,25 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "nox1134",
+      "name": "Priyanshi Gaur",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95358802?v=4",
+      "profile": "https://github.com/nox1134",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "magician7",
+      "name": "Damian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2359284?v=4",
+      "profile": "https://github.com/magician7",
+      "contributions": [
+        "review",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
