@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -213,5 +214,14 @@ class EmailApiController extends CommonApiController
         return $this->handleView(
             $this->view(['success' => true], Response::HTTP_CREATED)
         );
+    }
+
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    {
+        if (isset($params['publicPreview']) && $entity instanceof Email) {
+            $entity->setPublicPreview(InputHelper::boolean($params['publicPreview']) ?? false);
+            unset($params['publicPreview']);
+        }
+        parent::prepareParametersFromRequest($form, $params, $entity, $masks, $fields);
     }
 }
