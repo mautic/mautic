@@ -139,32 +139,21 @@ export default (editor, opts = {}) => {
           '<div class="gjs-sm-properties" style="display: none;"></div></div>'
       );
       const traitsProps = traitsSector.find('.gjs-sm-properties');
-      const traits = $('.gjs-trt-traits');
+      traitsProps.append($('.gjs-trt-traits', '.gjs-traits-cs'));
+      $('.gjs-sm-sectors').before(traitsSector);
+      traitsSector.find('.gjs-sm-title').on('click', () => {
+        const traitStyle = traitsProps.get(0).style;
+        const hidden = traitStyle.display === 'none';
 
-      // we can only show the Settings, if something in the template is selected
-      // otherwise we're going to get an error about trying to append a non-existing node
-      if (traitsProps.length && traits.length) {
-        traitsProps.append(traits);
-
-        const sectors = $('.gjs-sm-sectors');
-
-        if (sectors.length) {
-          sectors.before(traitsSector);
-          traitsSector.find('.gjs-sm-title').on('click', () => {
-            const traitStyle = traitsProps.get(0).style;
-            const hidden = traitStyle.display === 'none';
-
-            if (hidden) {
-              traitStyle.display = 'block';
-            } else {
-              traitStyle.display = 'none';
-            }
-          });
-
-          // Open settings
-          traitsProps.get(0).style.display = 'block';
+        if (hidden) {
+          traitStyle.display = 'block';
+        } else {
+          traitStyle.display = 'none';
         }
-      }
+      });
+
+      // Open settings
+      traitsProps.get(0).style.display = 'block';
     }
 
     // Open the default panel
