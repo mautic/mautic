@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized as OptimizedScheduler;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -12,8 +13,9 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -54,6 +56,10 @@ class EventType extends AbstractType
                 'interval'  => 'mautic.campaign.form.type.interval',
                 'date'      => 'mautic.campaign.form.type.date',
             ];
+
+            if (in_array($options['data']['type'], OptimizedScheduler::AVAILABLE_FOR_EVENTS)) {
+                $choices['optimized'] = 'mautic.campaign.form.type.optimized';
+            }
 
             if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['anchorEventType']
                 && 'condition' != $options['data']['eventType']
@@ -214,6 +220,22 @@ class EventType extends AbstractType
                     'required'          => false,
                 ]
             );
+
+            $builder->add(
+                'triggerWindow',
+                ChoiceType::class,
+                [
+                    'label'    => false,
+                    'choices'  => [
+                        'mautic.campaign.form.type.trigger_window_day'   => OptimizedScheduler::OPTIMIZED_TIME,
+                        'mautic.campaign.form.type.trigger_window_week'  => OptimizedScheduler::OPTIMIZED_DAY_AND_TIME,
+                    ],
+                    'data'              => 0,
+                    'required'          => false,
+                    'expanded'          => true,
+                    'placeholder'       => false,
+                ]
+            );
         }
 
         if (!empty($options['settings']['formType'])) {
@@ -267,6 +289,17 @@ class EventType extends AbstractType
                 'mapped' => false,
             ]
         );
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
+            $data        = $event->getData();
+            $triggerMode = $data['triggerMode'] ?? 'immediate';
+
+            // Do not set any trigger window when optimized mode is not used
+            if ('optimized' !== $triggerMode) {
+                $data['triggerWindow'] = null;
+                $event->setData($data);
+            }
+        });
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 

@@ -30,6 +30,8 @@ class Event implements ChannelInterface
 
     public const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
+    public const TRIGGER_MODE_OPTIMIZED = 'optimized';
+
     public const CHANNEL_EMAIL = 'email';
 
     /**
@@ -101,6 +103,8 @@ class Event implements ChannelInterface
      * @var array|null
      */
     private $triggerRestrictedDaysOfWeek = [];
+
+    private ?int $triggerWindow;
 
     /**
      * @var string|null
@@ -242,6 +246,11 @@ class Event implements ChannelInterface
 
         $builder->createField('triggerRestrictedDaysOfWeek', 'array')
             ->columnName('trigger_restricted_dow')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerWindow', 'integer')
+            ->columnName('trigger_window')
             ->nullable()
             ->build();
 
@@ -816,6 +825,18 @@ class Event implements ChannelInterface
     {
         $this->isChanged('eventType', $eventType);
         $this->eventType = $eventType;
+
+        return $this;
+    }
+
+    public function getTriggerWindow(): ?int
+    {
+        return $this->triggerWindow;
+    }
+
+    public function setTriggerWindow(?int $triggerWindow): Event
+    {
+        $this->triggerWindow = $triggerWindow;
 
         return $this;
     }
