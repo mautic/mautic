@@ -16,7 +16,7 @@ trait AjaxLookupControllerTrait
     {
         $dataArray = [];
         $modelName = InputHelper::clean($request->query->get('searchKey'));
-        $search    = InputHelper::clean($request->query->get(str_replace('.', '_', $modelName)));
+        $search    = $request->query->get(str_replace('.', '_', $modelName));
         $limit     = (int) $request->query->get('limit', '0');
         $start     = (int) $request->query->get('start', '0');
 
