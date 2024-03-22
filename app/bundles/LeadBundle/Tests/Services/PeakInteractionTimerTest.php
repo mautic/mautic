@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Services;
 
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -9,6 +10,7 @@ use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\CacheItem;
 
 class TestablePeakInteractionTimer extends PeakInteractionTimer
 {
@@ -39,19 +41,72 @@ class PeakInteractionTimerTest extends TestCase
      */
     private $hitRepositoryMock;
 
-    private string $defaultTimezone = 'UTC';
+    /**
+     * @var MockObject|CacheProviderInterface
+     */
+    private $cacheProviderMock;
+
+    private string $defaultTimezone                       = 'UTC';
+    private int $peakInteractionTimerCacheTimeout         = 43800;
+    private int $peakInteractionTimerBestDefaultHourStart = 9;
+    private int $peakInteractionTimerBestDefaultHourEnd   = 12;
+    /** @var int[] */
+    private array $peakInteractionTimerBestDefaultDays        = [2, 1, 4];
+    private string $peakInteractionTimerFetchInteractionsFrom = '-60 days';
+    private int $peakInteractionTimerFetchLimit               = 50;
+    private int $peakInteractionTimerMinInteractions          = 5;
+    private int $peakInteractionTimerMaxOptimalDays           = 3;
 
     protected function setUp(): void
     {
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->statRepositoryMock       = $this->createMock(StatRepository::class);
         $this->hitRepositoryMock        = $this->createMock(HitRepository::class);
+        $this->cacheProviderMock        = $this->createMock(CacheProviderInterface::class);
 
-        // Set the expected default timezone
         $this->coreParametersHelperMock
             ->method('get')
-            ->with('default_timezone')
-            ->willReturn($this->defaultTimezone);
+            ->withConsecutive(
+                ['peak_interaction_timer_cache_timeout'],
+                ['peak_interaction_timer_best_default_hour_start'],
+                ['peak_interaction_timer_best_default_hour_end'],
+                ['peak_interaction_timer_best_default_days'],
+                ['peak_interaction_timer_fetch_interactions_from'],
+                ['peak_interaction_timer_fetch_limit'],
+                ['peak_interaction_timer_min_interactions'],
+                ['peak_interaction_timer_max_optimal_days'],
+                ['default_timezone'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->peakInteractionTimerCacheTimeout,
+                $this->peakInteractionTimerBestDefaultHourStart,
+                $this->peakInteractionTimerBestDefaultHourEnd,
+                $this->peakInteractionTimerBestDefaultDays,
+                $this->peakInteractionTimerFetchInteractionsFrom,
+                $this->peakInteractionTimerFetchLimit,
+                $this->peakInteractionTimerMinInteractions,
+                $this->peakInteractionTimerMaxOptimalDays,
+                $this->defaultTimezone,
+            );
+
+        $createCacheItem = \Closure::bind(
+            function ($key) {
+                $item        = new CacheItem();
+                $item->key   = $key;
+                $item->isHit = false;
+
+                return $item;
+            },
+            $this,
+            CacheItem::class
+        );
+        $this->cacheProviderMock->expects($this->atLeastOnce())
+            ->method('getItem')
+            ->withAnyParameters()
+            ->willReturn($createCacheItem('test'));
+        $this->cacheProviderMock->expects($this->atLeastOnce())
+            ->method('save')
+            ->willReturn(true);
     }
 
     /**
@@ -73,7 +128,7 @@ class PeakInteractionTimerTest extends TestCase
             ->willReturn([]);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($contactTimezone));
@@ -124,7 +179,7 @@ class PeakInteractionTimerTest extends TestCase
             ->willReturn([]);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($contactTimezone));
@@ -182,7 +237,7 @@ class PeakInteractionTimerTest extends TestCase
             ->willReturn($pageHits);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($this->defaultTimezone));
@@ -270,7 +325,7 @@ class PeakInteractionTimerTest extends TestCase
             ->willReturn($pageHits);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($this->defaultTimezone));

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Services;
 
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -9,30 +10,39 @@ use Mautic\PageBundle\Entity\HitRepository;
 
 class PeakInteractionTimer
 {
-    private const BEST_DEFAULT_HOUR_START = 9; // 9 AM
-    private const BEST_DEFAULT_HOUR_END   = 12; // 12 PM
     private const MINUTES_START_OF_HOUR   = 0; // Start of the hour
-    private const BEST_DEFAULT_DAYS       = [2, 1, 4]; // Tuesday, Monday, Thursday
     private const HOUR_FORMAT             = 'G'; // 0 through 23
     private const DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
-    private const FETCH_INTERACTIONS_FROM = '-60 days';
-    private const FETCH_EMAIL_READS_LIMIT = 50;
-    private const FETCH_PAGE_HITS_LIMIT   = 50;
-    private const MIN_INTERACTIONS        = 5;
-    private const MAX_OPTIMAL_DAYS        = 3;
 
     private ?\DateTimeZone $defaultTimezone = null;
 
-    private int $bestHourStart = self::BEST_DEFAULT_HOUR_START;
-    private int $bestHourEnd   = self::BEST_DEFAULT_HOUR_END;
+    private int $cacheTimeout;
+    private int $bestHourStart;
+    private int $bestDefaultHourStart;
+    private int $bestHourEnd;
+    private int $bestDefaultHourEnd;
     /** @var int[] */
-    private array $bestDays   = self::BEST_DEFAULT_DAYS;
+    private array $bestDays;
+    private array $bestDefaultDays;
+    private string $fetchInteractionsFrom;
+    private int $fetchLimit;
+    private int $minInteractions;
+    private int $maxOptimalDays;
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
         private StatRepository $statRepository,
-        private HitRepository $hitRepository
+        private HitRepository $hitRepository,
+        private CacheProviderInterface $cacheProvider
     ) {
+        $this->cacheTimeout          = $this->coreParametersHelper->get('peak_interaction_timer_cache_timeout');
+        $this->bestDefaultHourStart  = $this->coreParametersHelper->get('peak_interaction_timer_best_default_hour_start');
+        $this->bestDefaultHourEnd    = $this->coreParametersHelper->get('peak_interaction_timer_best_default_hour_end');
+        $this->bestDefaultDays       = $this->coreParametersHelper->get('peak_interaction_timer_best_default_days');
+        $this->fetchInteractionsFrom = $this->coreParametersHelper->get('peak_interaction_timer_fetch_interactions_from');
+        $this->fetchLimit            = $this->coreParametersHelper->get('peak_interaction_timer_fetch_limit');
+        $this->minInteractions       = $this->coreParametersHelper->get('peak_interaction_timer_min_interactions');
+        $this->maxOptimalDays        = $this->coreParametersHelper->get('peak_interaction_timer_max_optimal_days');
     }
 
     /**
@@ -44,7 +54,7 @@ class PeakInteractionTimer
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
-        if (count($interactions) > self::MIN_INTERACTIONS) {
+        if (count($interactions) > $this->minInteractions) {
             $hours                                     = array_column($interactions, 'hourOfDay');
             [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
         }
@@ -63,7 +73,7 @@ class PeakInteractionTimer
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
-        if (count($interactions) > self::MIN_INTERACTIONS) {
+        if (count($interactions) > $this->minInteractions) {
             $hours                                     = array_column($interactions, 'hourOfDay');
             $days                                      = array_column($interactions, 'dayOfWeek');
             [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
@@ -77,9 +87,9 @@ class PeakInteractionTimer
 
     private function resetBias(): void
     {
-        $this->bestHourStart = self::BEST_DEFAULT_HOUR_START;
-        $this->bestHourEnd   = self::BEST_DEFAULT_HOUR_END;
-        $this->bestDays      = self::BEST_DEFAULT_DAYS;
+        $this->bestHourStart = $this->bestDefaultHourStart;
+        $this->bestHourEnd   = $this->bestDefaultHourEnd;
+        $this->bestDays      = $this->bestDefaultDays;
     }
 
     private function isTimeOptimal(\DateTime $dateTime): bool
@@ -139,44 +149,50 @@ class PeakInteractionTimer
      */
     private function getContactInteractions(Lead $contact, \DateTimeZone $dateTimeZone): array
     {
+        $cacheItem    = $this->cacheProvider->getItem('contact.interactions.'.$contact->getId());
+        if ($cacheItem->isHit()) {
+            $interactions = $cacheItem->get();
+        } else {
+            $fetchInteractionsFromDate = $this->getCurrentDateTime($dateTimeZone)
+                ->modify($this->fetchInteractionsFrom);
+            $emailReads = $this->getLeadStats($contact->getId(), $fetchInteractionsFromDate);
+            $pageHits   = $this->getLeadHits($contact->getId(), $fetchInteractionsFromDate);
+
+            $emailReadInteractions = $this->processInteractions($emailReads, 'email.read', $dateTimeZone);
+            $pageHitInteractions   = $this->processInteractions($pageHits, 'page.hit', $dateTimeZone);
+            $interactions          = array_merge($emailReadInteractions, $pageHitInteractions);
+
+            $cacheItem->set($interactions);
+            $cacheItem->expiresAfter($this->cacheTimeout * 60);
+            $this->cacheProvider->save($cacheItem);
+        }
+
+        return $interactions;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $interactionsData
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function processInteractions(array $interactionsData, string $type, \DateTimeZone $dateTimeZone): array
+    {
         $interactions           = [];
         $registeredInteractions = []; // Keep track of registered interactions to ensure one interaction type per hour
 
-        $fetchInteractionsFromDate = $this->getCurrentDateTime($dateTimeZone)
-            ->modify(self::FETCH_INTERACTIONS_FROM);
-        $emailReads = $this->getLeadStats($contact->getId(), $fetchInteractionsFromDate);
-        $pageHits   = $this->getLeadHits($contact->getId(), $fetchInteractionsFromDate);
+        foreach ($interactionsData as $interaction) {
+            $dateKey         = 'email.read' === $type ? 'dateRead' : 'dateHit';
+            $interactionDate = $interaction[$dateKey];
+            $interactionDate->setTimezone($dateTimeZone);
 
-        foreach ($emailReads as $interaction) {
-            /** @var \DateTime $readDate */
-            $readDate = $interaction['dateRead'];
-            $readDate->setTimezone($dateTimeZone);
-
-            $interactionKey = 'email.read:'.$readDate->format('Y-m-d_H');
+            $interactionKey = $type.':'.$interactionDate->format('Y-m-d_H');
             if (!in_array($interactionKey, $registeredInteractions)) {
                 $interactions[] = [
-                    'type'      => 'email.read',
-                    'date'      => $readDate->format('Y-m-d H:i:s'),
-                    'hourOfDay' => (int) $readDate->format(self::HOUR_FORMAT),
-                    'dayOfWeek' => (int) $readDate->format(self::DAY_FORMAT),
-                    'time'      => $readDate->format('H:i:s'),
-                ];
-                $registeredInteractions[] = $interactionKey;
-            }
-        }
-
-        foreach ($pageHits as $interaction) {
-            $hitDate        = $interaction['dateHit'];
-            $hitDate->setTimezone($dateTimeZone);
-
-            $interactionKey = 'page.hit:'.$hitDate->format('Y-m-d_H');
-            if (!in_array($interactionKey, $registeredInteractions)) {
-                $interactions[] = [
-                    'type'      => 'page.hit',
-                    'date'      => $hitDate->format('Y-m-d H:i:s'),
-                    'hourOfDay' => (int) $hitDate->format(self::HOUR_FORMAT),
-                    'dayOfWeek' => (int) $hitDate->format(self::DAY_FORMAT),
-                    'time'      => $hitDate->format('H:i:s'),
+                    'type'      => $type,
+                    'date'      => $interactionDate->format('Y-m-d H:i:s'),
+                    'hourOfDay' => (int) $interactionDate->format(self::HOUR_FORMAT),
+                    'dayOfWeek' => (int) $interactionDate->format(self::DAY_FORMAT),
+                    'time'      => $interactionDate->format('H:i:s'),
                 ];
                 $registeredInteractions[] = $interactionKey;
             }
@@ -192,7 +208,7 @@ class PeakInteractionTimer
     {
         return $this->statRepository->getLeadStats($leadId, [
             'order'        => ['timestamp', 'DESC'],
-            'limit'        => self::FETCH_EMAIL_READS_LIMIT,
+            'limit'        => $this->fetchLimit,
             'state'        => 'read',
             'basic_select' => true,
             'fromDate'     => $fromDate,
@@ -206,7 +222,7 @@ class PeakInteractionTimer
     {
         return $this->hitRepository->getLeadHits($leadId, [
             'order'        => ['timestamp', 'DESC'],
-            'limit'        => self::FETCH_PAGE_HITS_LIMIT,
+            'limit'        => $this->fetchLimit,
             'fromDate'     => $fromDate,
         ]);
     }
@@ -227,7 +243,7 @@ class PeakInteractionTimer
             $middleIndex = (int) floor(($count - 1) / 2);
             $result      = $elements[$middleIndex];
         } else {
-            throw new \Exception('Not enough elements');
+            throw new \Exception('Not enough elements to calculate optimal time');
         }
 
         $start = ($result + 23) % 24; // hour before
@@ -247,7 +263,7 @@ class PeakInteractionTimer
     private function calculateOptimalDays(array $elements): array
     {
         if (0 === count($elements)) {
-            throw new \Exception('Not enough elements');
+            throw new \Exception('Not enough elements to calculate optimal days');
         }
 
         // Count the frequency of each element.
@@ -260,6 +276,6 @@ class PeakInteractionTimer
         $optimalDays = array_keys($frequency);
 
         // Return the top elements up to the max optimal days limit.
-        return array_slice($optimalDays, 0, min(self::MAX_OPTIMAL_DAYS, count($optimalDays)));
+        return array_slice($optimalDays, 0, min($this->maxOptimalDays, count($optimalDays)));
     }
 }
