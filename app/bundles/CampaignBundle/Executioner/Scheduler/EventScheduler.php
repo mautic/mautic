@@ -13,8 +13,8 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Exception\IntervalNotConfiguredException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
-use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
-use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime as DateTimeScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval as IntervalScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized as OptimizedScheduler;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -26,8 +26,8 @@ class EventScheduler
     public function __construct(
         private LoggerInterface $logger,
         private EventLogger $eventLogger,
-        private Interval $intervalScheduler,
-        private DateTime $dateTimeScheduler,
+        private IntervalScheduler $intervalScheduler,
+        private DateTimeScheduler $dateTimeScheduler,
         private OptimizedScheduler $optimizedScheduler,
         private EventCollector $collector,
         private EventDispatcherInterface $dispatcher,
