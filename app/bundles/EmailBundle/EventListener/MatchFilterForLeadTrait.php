@@ -22,6 +22,10 @@ trait MatchFilterForLeadTrait
             $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
+            if ('leadlist' === $data['type']) {
+                return $this->isContactSegmentRelationshipValid((int) $lead['id'], $data['operator'], $data['filter']);
+            }
+
             if ($isCompanyField) {
                 if (empty($primaryCompany)) {
                     continue;
@@ -190,5 +194,23 @@ trait MatchFilterForLeadTrait
         }
 
         return $retFlag;
+    }
+
+    /**
+     * Duplicate method. Needs refactoring.
+     *
+     * @see \Mautic\LeadBundle\EventListener\DynamicContentSubscriber::isContactSegmentRelationshipValid
+     *
+     * @param string $operator empty, !empty, in, !in
+     */
+    private function isContactSegmentRelationshipValid(int $contactId, string $operator, array $segmentIds = null): bool
+    {
+        return match ($operator) {
+            OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId),
+            OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId),
+            OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds),
+            OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds),
+            default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+        };
     }
 }
