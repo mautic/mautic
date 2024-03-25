@@ -3,6 +3,7 @@
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -36,6 +37,26 @@ class Group extends FormEntity
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
         ]));
+    }
+
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
+    {
+        $metadata->setGroupPrefix('pointGroup')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                ]
+            )
+            ->addProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                ]
+            )
+            ->build();
     }
 
     public function getId(): ?int
