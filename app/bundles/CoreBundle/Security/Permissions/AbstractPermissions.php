@@ -196,7 +196,7 @@ abstract class AbstractPermissions
         if (!isset($userPermissions[$name])) {
             // the user doesn't have implicit access
             return false;
-        } elseif ($this->permissions[$name]['full'] & $userPermissions[$name]) {
+        } elseif (isset($this->permissions[$name]['full']) && $this->permissions[$name]['full'] & $userPermissions[$name]) {
             return true;
         } else {
             // otherwise test for specific level
@@ -272,7 +272,7 @@ abstract class AbstractPermissions
             if (in_array('full', $perms)) {
                 if (1 === count($perms)) {
                     // full is the only permission so count as 1
-                    if (!empty($data[$level]) && in_array('full', $data[$level])) {
+                    if (!empty($data[$level]) && !in_array('full', $data[$level])) {
                         ++$totalGranted;
                     }
                 } else {
@@ -300,6 +300,31 @@ abstract class AbstractPermissions
      */
     public function parseForJavascript(array &$perms): void
     {
+    }
+
+    /**
+     * @param array<int|string> $permissions
+     */
+    protected function addCustomPermission(string $level, array $permissions): void
+    {
+        $this->permissions[$level] = $permissions;
+    }
+
+    /**
+     * Adds a custom permission to the form builder, i.e. config only bundles.
+     *
+     * @param array<string> $choices
+     * @param array<string> $data
+     */
+    protected function addCustomFormFields(string $bundle, string $level, FormBuilderInterface &$builder, string $label, array $choices, array $data): void
+    {
+        $builder->add("$bundle:$level", PermissionListType::class, [
+            'choices' => $choices,
+            'label'   => $label,
+            'data'    => (!empty($data[$level]) ? $data[$level] : []),
+            'bundle'  => $bundle,
+            'level'   => $level,
+        ]);
     }
 
     /**

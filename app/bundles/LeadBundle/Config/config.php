@@ -577,8 +577,6 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'router',
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.repository.company_lead',
                 ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
