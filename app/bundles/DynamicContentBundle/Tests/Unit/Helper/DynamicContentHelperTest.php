@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\DynamicContentBundle\Tests\Helper;
+namespace Mautic\DynamicContentBundle\Tests\Unit\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -51,7 +51,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             $this->mockModel,
             $this->realTimeExecutioner,
             $this->mockDispatcher,
-            $this->leadModel
+            $this->leadModel,
         );
     }
 
@@ -94,13 +94,13 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                     ],
                 ]
             )
-            ->willReturnOnConsecutiveCalls(true, false);
+            ->willReturnOnConsecutiveCalls(['some entity'], []);
 
         // Only get published
-        $this->assertTrue($this->helper->getDwcsBySlotName('test', true));
+        $this->assertCount(1, $this->helper->getDwcsBySlotName('test', true));
 
         // Get all
-        $this->assertFalse($this->helper->getDwcsBySlotName('secondtest'));
+        $this->assertCount(0, $this->helper->getDwcsBySlotName('secondtest'));
     }
 
     public function testGetDynamicContentSlotForLeadWithListenerFindingMatch(): void

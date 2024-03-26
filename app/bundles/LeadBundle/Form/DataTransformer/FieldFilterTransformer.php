@@ -42,20 +42,20 @@ class FieldFilterTransformer implements DataTransformerInterface
             return [];
         }
 
-        foreach ($rawFilters as $k => $f) {
+        foreach ($rawFilters as $key => $filter) {
             if (!empty($this->default)) {
-                $rawFilters[$k] = array_merge($this->default, $rawFilters[$k]);
+                $rawFilters[$key] = array_merge($this->default, $rawFilters[$key]);
             }
-            if ('datetime' === $f['type']) {
-                $bcFilter = $f['filter'] ?? '';
-                $filter   = $f['properties']['filter'] ?? $bcFilter;
+            if ('datetime' === $filter['type']) {
+                $bcFilter = $filter['filter'] ?? '';
+                $filter   = $filter['properties']['filter'] ?? $bcFilter;
                 if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
                     continue;
                 }
 
                 $dt = new DateTimeHelper($filter, 'Y-m-d H:i');
 
-                $rawFilters[$k]['properties']['filter'] = $dt->toLocalString();
+                $rawFilters[$key]['properties']['filter'] = $dt->toLocalString();
             }
         }
 

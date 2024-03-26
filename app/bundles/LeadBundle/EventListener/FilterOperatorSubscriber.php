@@ -84,6 +84,20 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
+        $event->addChoice(
+            'lead',
+            'leadlist',
+            [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
+                'properties' => [
+                    'type' => 'leadlist',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ]
+        );
+
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
         if (!$event->isForSegmentation()) {
             return;
@@ -128,15 +142,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
-                'object'     => 'lead',
-            ],
-            'leadlist' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
-                'properties' => [
-                    'type' => 'leadlist',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
-                ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
             ],
             'campaign' => [

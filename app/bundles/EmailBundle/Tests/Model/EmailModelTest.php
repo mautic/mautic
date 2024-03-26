@@ -62,14 +62,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     public const SEGMENT_B = 'segment B';
 
     /**
-     * @var Connection|LeadDeviceRepository
+     * @var MockObject|LeadDeviceRepository
      */
     private MockObject $leadDeviceRepository;
-
-    /**
-     * @var Connection|MockObject
-     */
-    private MockObject $connection;
 
     /**
      * @var MockObject&IpLookupHelper
@@ -244,7 +239,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
-        $this->connection               = $this->createMock(Connection::class);
         $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->leadDeviceRepository     = $this->createMock(LeadDeviceRepository::class);
 
@@ -266,7 +260,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
-            $this->connection,
             $this->entityManager,
             $this->eventDispatcher,
             $this->createMock(UrlGeneratorInterface::class),
@@ -680,7 +673,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
-            $this->connection,
             $this->entityManager,
             $this->eventDispatcher,
             $this->createMock(UrlGeneratorInterface::class),
