@@ -156,22 +156,24 @@ class CommonController extends AbstractController implements MauticController
         $parameters = $args['viewParameters'] ?? [];
         $template   = $args['contentTemplate'];
 
+        $code     = $args['responseCode'] ?? 200;
+        $response = new Response('', $code);
+
         if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
             $event = $this->dispatcher->dispatch(
                 new CustomTemplateEvent($request, $template, $parameters),
                 CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
             );
 
-            $template   = $event->getTemplate();
-            $parameters = $event->getVars();
+            $template                = $event->getTemplate();
+            $parameters              = $event->getVars();
+            $args['viewParameters']  = $parameters;
+            $args['contentTemplate'] = $template;
         }
 
         if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
             return $this->ajaxAction($request, $args);
         }
-
-        $code     = $args['responseCode'] ?? 200;
-        $response = new Response('', $code);
 
         $parameters['mauticTemplateVars'] = $parameters;
 
