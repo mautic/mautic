@@ -19,7 +19,11 @@
 		<!-- tabs controls -->
 		<ul class="bg-auto nav nav-tabs pr-md pl-md">
 			<li class="active"><a href="#details-container" role="tab" data-toggle="tab">{% trans %}mautic.core.details{% endtrans %}</a></li>
-			<li class=""><a href="#permissions-container" role="tab" data-toggle="tab">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
+			{% if form.vars.data.isAdmin %}
+                {# If isAdmin is true, hide the Permissions tab #}
+            {% else %}
+                <li class=""><a href="#permissions-container" role="tab" data-toggle="tab">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
+            {% endif %}
 		</ul>
 		<!--/ tabs controls -->
 
@@ -44,9 +48,9 @@
 				</div>
 			</div>
 
-            {% set hidePerms = form.isAdmin.vars.data %}
-			<div class="tab-pane fade bdr-w-0" id="permissions-container">
-				<div id="rolePermissions"{% if hidePerms %}class="hide"{% endif %}>
+            {% set hidePerms = form.vars.data.isAdmin %}
+			<div class="tab-pane fade bdr-w-0{% if hidePerms %} hide{% endif %}" id="permissions-container">
+				<div id="rolePermissions">
 					<!-- start: box layout -->
 					<div class="box-layout">
 						<!-- step container -->
