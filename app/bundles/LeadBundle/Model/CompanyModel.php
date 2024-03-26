@@ -517,6 +517,66 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * Get a list of companies with names only.
+     *
+     * @param string         $type
+     * @param mixed[]|string $filter
+     * @param int            $limit
+     * @param int            $start
+     */
+    public function getSimpleLookupResults($type, $filter = '', $limit = 10, $start = 0, $exclude = ''): array
+    {
+        $results = [];
+        $valueColumn = 'id';
+        $onlyNames = true;
+        switch ($type) {
+            case 'companyfield':
+            case 'lead.company':
+                if ('lead.company' === $type) {
+                    $column    = 'companyname';
+                    $filterVal = $filter;
+                } else {
+                    if (is_array($filter)) {
+                        $column    = $filter[0];
+                        $filterVal = $filter[1];
+                    } else {
+                        $column = $filter;
+                    }
+                }
+
+                $expr      = new ExpressionBuilder($this->em->getConnection());
+                $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
+
+                // Exclude company if $exclude is provided
+                if ($exclude !== '') {
+                    $composite = $expr->and(
+                        $composite,
+                        $expr->neq('comp.id', $exclude)
+                    );
+                }
+
+                // Validate owner permissions
+                if (!$this->security->isGranted('lead:leads:viewother')) {
+                    $composite->with(
+                        $expr->or(
+                            $expr->and(
+                                $expr->isNull('comp.owner_id'),
+                                $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                            ),
+                            $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                        )
+                    );
+                }
+
+                $results = $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column, $valueColumn, $onlyNames);
+
+                break;
+        }
+
+        return $results;
+    }
+
+    /**
      * Get list of entities for autopopulate fields.
      *
      * @param string         $type
