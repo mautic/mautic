@@ -314,4 +314,25 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'monthly_to_monthly' => [SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_FR, '1', SchedulerEnum::UNIT_MONTHLY, SchedulerEnum::DAY_SU, '-1'],
         ];
     }
+
+    public function testDescriptionIsNotEscaped(): void
+    {
+        $report = new Report();
+        $report->setName('HTML Test');
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource('email');
+        static::getContainer()->get('mautic.report.model.report')->saveEntity($report);
+
+        // Check the details page
+        $this->client->request('GET', '/s/reports/'.$report->getId());
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+
+        // Check the list
+        $this->client->request('GET', '/s/reports');
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+    }
 }

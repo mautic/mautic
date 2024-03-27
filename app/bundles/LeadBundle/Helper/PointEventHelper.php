@@ -2,6 +2,9 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+/**
+ * @deprecated It will be removed in Mautic 6.0
+ */
 class PointEventHelper
 {
     public static function changeLists($event, $factory, $lead): bool

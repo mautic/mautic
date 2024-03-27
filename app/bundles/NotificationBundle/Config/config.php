@@ -11,6 +11,7 @@ return [
                     'mautic.notification.api',
                     'event_dispatcher',
                     'mautic.lead.model.dnc',
+                    'translator',
                 ],
             ],
         ],

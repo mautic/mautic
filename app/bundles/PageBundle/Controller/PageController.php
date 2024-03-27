@@ -596,7 +596,7 @@ class PageController extends FormController
 
             // set the lookup values
             $parent = $entity->getTranslationParent();
-            if ($parent && isset($form['translationParent_lookup'])) {
+            if ($parent instanceof Page && isset($form['translationParent_lookup'])) {
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
             }
 

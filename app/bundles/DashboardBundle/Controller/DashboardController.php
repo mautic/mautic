@@ -70,6 +70,8 @@ class DashboardController extends AbstractFormController
         $model->populateWidgetsContent($widgets, $filter);
         $releaseMetadata = ThisRelease::getMetadata();
 
+        $model->populateWidgetPreviews($widgets);
+
         return $this->delegateView([
             'viewParameters' => [
                 'security'      => $this->security,

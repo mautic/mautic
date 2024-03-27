@@ -420,6 +420,23 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
+            $builder->create(
+                'excludedLists',
+                LeadListType::class,
+                [
+                    'label'      => 'mautic.email.form.excluded_list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'multiple'   => true,
+                    'expanded'   => false,
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+
+        $builder->add(
             'language',
             LocaleType::class,
             [
