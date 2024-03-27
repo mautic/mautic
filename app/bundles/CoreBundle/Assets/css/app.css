@@ -1703,6 +1703,17 @@ label.list-group-item:focus {
 .ds-list-alphabet > li:before {
   content: counter(item, upper-alpha);
 }
+.ds-list-check > li:before {
+  content: "\EB7B";
+  font-family: 'remixicon';
+}
+.ds-list-none {
+  padding-inline-start: 0;
+}
+.ds-list-bullet {
+  list-style-type: disc;
+  padding-inline-start: 18px;
+}
 .caret {
   margin-top: -1px;
 }
