@@ -27,7 +27,7 @@ final class FormFieldExtension extends AbstractExtension
     public function cleanInputAttributes(string $value): string
     {
         // Remove any HTML tags
-        $value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
+        $value = htmlspecialchars($value, ENT_SUBSTITUTE, 'UTF-8', false);
         // Remove any attribute starting with "on" or javascript used in href, src, value, data, etc.
         preg_match('/(on[A-Za-z]*\s*=|javascript:)/i', $value, $result);
         if (!empty($result)) {
