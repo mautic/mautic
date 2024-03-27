@@ -13,7 +13,7 @@
     {% if not n.isRead %}
         <span class="pull-right is-unread text-danger"><i class="fa fa-asterisk"></i></span>
     {% endif %}
-    <div class="media-body">
+    <div class="media-body notification">
         {% if n.header %}
             <div class="media-heading fw-sb mb-0 text-primary">{{ format(n.header) }}</div>
         {% endif %}
