@@ -90,7 +90,7 @@ return [
     'menu' => [
         'main' => [
             'mautic.campaign.menu.index' => [
-                'iconClass' => 'fa-clock-o',
+                'iconClass' => 'ri-megaphone-fill',
                 'route'     => 'mautic_campaign_index',
                 'access'    => 'campaign:campaigns:view',
                 'priority'  => 50,

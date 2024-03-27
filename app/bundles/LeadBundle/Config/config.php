@@ -285,19 +285,19 @@ return [
         'main' => [
             'items' => [
                 'mautic.lead.leads' => [
-                    'iconClass' => 'fa-user',
+                    'iconClass' => 'ri-user-6-fill',
                     'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
                     'route'     => 'mautic_contact_index',
                     'priority'  => 80,
                 ],
                 'mautic.companies.menu.index' => [
                     'route'     => 'mautic_company_index',
-                    'iconClass' => 'fa-building-o',
+                    'iconClass' => 'ri-building-2-fill',
                     'access'    => ['lead:leads:viewother'],
                     'priority'  => 75,
                 ],
                 'mautic.lead.list.menu.index' => [
-                    'iconClass' => 'fa-pie-chart',
+                    'iconClass' => 'ri-pie-chart-fill',
                     'access'    => ['lead:lists:viewown', 'lead:lists:viewother'],
                     'route'     => 'mautic_segment_index',
                     'priority'  => 70,
@@ -309,7 +309,7 @@ return [
             'items'    => [
                 'mautic.lead.field.menu.index' => [
                     'id'        => 'mautic_lead_field',
-                    'iconClass' => 'fa-list',
+                    'iconClass' => 'ri-input-field',
                     'route'     => 'mautic_contactfield_index',
                     'access'    => 'lead:fields:full',
                 ],

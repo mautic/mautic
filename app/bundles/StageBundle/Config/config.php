@@ -36,7 +36,7 @@ return [
         'main' => [
             'mautic.stages.menu.index' => [
                 'route'     => 'mautic_stage_index',
-                'iconClass' => 'fa-tachometer',
+                'iconClass' => 'ri-barricade-fill flip-vertically',
                 'access'    => ['stage:stages:view'],
                 'priority'  => 25,
             ],

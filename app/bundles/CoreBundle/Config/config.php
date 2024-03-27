@@ -107,19 +107,19 @@ return [
         'main' => [
             'mautic.core.components' => [
                 'id'        => 'mautic_components_root',
-                'iconClass' => 'fa-puzzle-piece',
+                'iconClass' => 'ri-puzzle-fill',
                 'priority'  => 60,
             ],
             'mautic.core.channels' => [
                 'id'        => 'mautic_channels_root',
-                'iconClass' => 'fa-rss',
+                'iconClass' => 'ri-rss-fill',
                 'priority'  => 40,
             ],
         ],
         'admin' => [
             'mautic.theme.menu.index' => [
                 'route'     => 'mautic_themes_index',
-                'iconClass' => 'fa-newspaper-o',
+                'iconClass' => 'ri-palette-fill',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
             ],

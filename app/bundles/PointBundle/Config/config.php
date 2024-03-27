@@ -70,7 +70,7 @@ return [
         'main' => [
             'mautic.points.menu.root' => [
                 'id'        => 'mautic_points_root',
-                'iconClass' => 'fa-calculator',
+                'iconClass' => 'ri-focus-2-fill',
                 'access'    => ['point:points:view', 'point:triggers:view', 'point:groups:view'],
                 'priority'  => 30,
                 'children'  => [
