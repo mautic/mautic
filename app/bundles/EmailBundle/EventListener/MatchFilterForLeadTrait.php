@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
  */
 trait MatchFilterForLeadTrait
 {
-    protected function matchFilterForLead(array $filter, array $lead): bool
+    protected function matchFilterForLead(array $filter, array $lead, bool $extendedFiltersPassed = false)
     {
         if (empty($lead['id'])) {
             // Lead in generated for preview with faked data
@@ -24,10 +24,6 @@ trait MatchFilterForLeadTrait
 
             if ($isCompanyField) {
                 if (empty($primaryCompany)) {
-                    continue;
-                }
-            } else {
-                if (!array_key_exists($data['field'], $lead)) {
                     continue;
                 }
             }
@@ -57,6 +53,11 @@ trait MatchFilterForLeadTrait
              */
             if (null === $groups[$groupNum]) {
                 $groups[$groupNum] = false;
+            }
+
+            if (!array_key_exists($data['field'], $lead)) {
+                $groups[$groupNum] = $extendedFiltersPassed;
+                continue;
             }
 
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
