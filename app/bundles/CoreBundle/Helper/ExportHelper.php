@@ -23,6 +23,11 @@ class ExportHelper
 
     public const EXPORT_TYPE_CSV   = 'csv';
 
+    /**
+     * @var array<int, string>
+     */
+    private array $headerRow = [];
+
     public function __construct(
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
@@ -118,6 +123,19 @@ class ExportHelper
         return $response;
     }
 
+    /**
+     * @param array<int, string> $headerRow
+     */
+    public function setHeaderRow(array $headerRow): void
+    {
+        $this->headerRow = $headerRow;
+    }
+
+    private function addHeaderToSheet(Spreadsheet $spreadsheet): void
+    {
+        $spreadsheet->getActiveSheet()->fromArray($this->headerRow);
+    }
+
     private function getSpreadsheetGeneric(\Iterator $data, string $filename): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
@@ -126,9 +144,12 @@ class ExportHelper
 
         $rowCount = 2;
         foreach ($data as $key => $row) {
+            // Build the header row if defined
             if (0 === $key) {
-                // Build the header row from keys in the current row.
-                $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
+                if (empty($this->headerRow)) {
+                    $this->setHeaderRow(array_keys($row));
+                }
+                $this->addHeaderToSheet($spreadsheet);
             }
 
             $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");

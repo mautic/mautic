@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,9 +50,8 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->getName(), $functionForUseSummary);
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
         parent::setUp();
-        $this->campaignModel                                           = static::getContainer()->get('mautic.model.factory')->getModel('campaign');
-        $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
-        $this->configParams['delete_campaign_event_log_in_background'] = false;
+        $this->campaignModel      = static::getContainer()->get('mautic.model.factory')->getModel('campaign');
+        $this->campaignLeadsLabel = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
     }
 
     public function testCampaignContactCountThroughStatsWithSummary(): void
@@ -315,5 +318,90 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->em->flush();
 
         return $leadEventLog;
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function createCampaignWithEmail(): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test campaign');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Create email
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        // Create email events
+        $event = new Event();
+        $event->setName('Send email');
+        $event->setType('email.send');
+        $event->setEventType('action');
+        $event->setChannel('email');
+        $event->setChannelId($email->getId());
+        $event->setCampaign($campaign);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        // Add events to campaign
+        $campaign->addEvent(0, $event);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    private function addLeadsFromCountry(Campaign $campaign, int $leadCount, string $country): void
+    {
+        for ($i = 0; $i < $leadCount; ++$i) {
+            $lead = new Lead();
+            $lead->setCountry($country);
+            $this->em->persist($lead);
+            $this->em->flush();
+
+            $campaignLead = new CampaignLead();
+            $campaignLead->setLead($lead);
+            $campaignLead->setCampaign($campaign);
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($i, $campaignLead);
+        }
+
+        $this->em->flush();
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testGetData(): void
+    {
+        $campaign = $this->createCampaignWithEmail();
+        $this->addLeadsFromCountry($campaign, 4, 'Finland');
+
+        $this->client->request(Request::METHOD_GET, 's/campaign/countries-stats/preview/'.$campaign->getId());
+        $clientResponse = $this->client->getResponse();
+
+        $contentDom      = new \DOMDocument();
+        $responseContent = $clientResponse->getContent();
+        $contentDom->loadHTML($responseContent);
+        $crawler             = new Crawler($contentDom);
+        $crawlerTable        = $crawler->filter('table')->first();
+        $crawlerTableHeaders = $crawlerTable->filter('thead tr td');
+        $crawlerTableValues  = $crawlerTable->filter('tbody tr td');
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame('Country', $crawlerTableHeaders->eq(0)->text());
+        $this->assertSame('Contacts', $crawlerTableHeaders->eq(1)->text());
+        $this->assertSame('Finland', $crawlerTableValues->eq(0)->text());
+        $this->assertSame('4', $crawlerTableValues->eq(1)->text());
     }
 }
