@@ -22,12 +22,14 @@ return [
                 'iconClass'       => 'fa-cogs',
                 'id'              => 'mautic_config_index',
                 'access'          => 'admin',
+                'priority' => 16,
             ],
             'mautic.sysinfo.menu.index' => [
                 'route'     => 'mautic_sysinfo_index',
                 'iconClass' => 'fa-life-ring',
                 'id'        => 'mautic_sysinfo_index',
                 'access'    => 'admin',
+                'priority' => 04,
                 'checks'    => [
                     'parameters' => [
                         'sysinfo_disabled' => false,

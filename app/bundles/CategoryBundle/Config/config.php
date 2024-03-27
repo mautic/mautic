@@ -43,6 +43,7 @@ return [
                 'access'    => 'category:categories:view',
                 'iconClass' => 'fa-folder',
                 'id'        => 'mautic_category_index',
+                'priority'  => 20,
             ],
         ],
     ],

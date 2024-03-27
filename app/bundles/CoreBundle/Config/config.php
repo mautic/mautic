@@ -122,6 +122,12 @@ return [
                 'iconClass' => 'fa-newspaper-o',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
+                'priority'  => 18,
+            ],
+            'mautic.core.integrations' => [
+                'id'        => 'mautic_integrations_root',
+                'iconClass' => 'ri-plug-fill',
+                'priority'  => 15,
             ],
         ],
         'extra' => [

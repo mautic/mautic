@@ -312,6 +312,7 @@ return [
                     'iconClass' => 'fa-list',
                     'route'     => 'mautic_contactfield_index',
                     'access'    => 'lead:fields:full',
+                    'priority'  => 19,
                 ],
             ],
         ],

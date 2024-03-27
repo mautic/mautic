@@ -49,9 +49,9 @@ return [
             'items'    => [
                 'mautic.plugin.plugins' => [
                     'id'        => 'mautic_plugin_root',
-                    'iconClass' => 'fa-plus-circle',
                     'access'    => 'plugin:plugins:manage',
                     'route'     => 'mautic_plugin_index',
+                    'parent'   => 'mautic.core.integrations',
                 ],
             ],
         ],
