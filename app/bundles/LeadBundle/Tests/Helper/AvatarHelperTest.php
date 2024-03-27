@@ -99,6 +99,6 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn('');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
 
-        $this->assertSame('http://localhost/images/avatar.png', $avatar, 'Default image image should be returned');
+        $this->assertSame('http://localhost/images/avatar.svg', $avatar, 'Default image image should be returned');
     }
 }
