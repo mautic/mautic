@@ -83,11 +83,11 @@ class WidgetType extends AbstractType
             [
                 'label'   => 'mautic.dashboard.widget.form.height',
                 'choices' => [
-                    '215px' => '215',
-                    '330px' => '330',
-                    '445px' => '445',
-                    '560px' => '560',
-                    '675px' => '675',
+                    'mautic.dashboard.widget.size.extra_small' => '215',
+                    'mautic.dashboard.widget.size.small'       => '330',
+                    'mautic.dashboard.widget.size.medium'      => '445',
+                    'mautic.dashboard.widget.size.large'       => '560',
+                    'mautic.dashboard.widget.size.extra_large' => '675',
                 ],
                 'empty_data'        => '330',
                 'label_attr'        => ['class' => 'control-label'],
