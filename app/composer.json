@@ -49,7 +49,7 @@
     "symfony/expression-language": "~4.4.0",
     "symfony/framework-bundle": "~4.4.0",
     "symfony/monolog-bundle": "~3.5.0",
-    "symfony/security-bundle": "~4.4.40",
+    "symfony/security-bundle": "~4.4.0",
     "symfony/twig-bundle": "~4.4.0",
     "symfony/doctrine-bridge": "~4.4.0",
     "symfony/monolog-bridge": "~4.4.0",
