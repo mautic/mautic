@@ -45,23 +45,6 @@ export default class DynamicContentDomComponents {
           });
         }
       },
-      // @todo: show the store items default content on the canvas
-      // updated(property, value, prevValue) {
-      //   console.log('Local hook: model.updated', {
-      //     property,
-      //     value,
-      //     prevValue,
-      //   });
-      // },
-      // Dynamic Content component detection
-      isComponent(el) {
-        if (el.getAttribute && el.getAttribute('data-slot') === 'dynamicContent') {
-          return {
-            type: 'dynamic-content',
-          };
-        }
-        return false;
-      },
     };
 
     const view = {
@@ -97,6 +80,18 @@ export default class DynamicContentDomComponents {
 
     // add the Dynamic Content component
     dc.addType('dynamic-content', {
+      // Dynamic Content component detection
+      isComponent: (el) => {
+        if (
+          typeof el.getAttribute !== 'undefined' &&
+          el.getAttribute('data-slot') === 'dynamicContent'
+        ) {
+          return {
+            type: 'dynamic-content',
+          };
+        }
+        return false;
+      },
       model,
       view,
     });
