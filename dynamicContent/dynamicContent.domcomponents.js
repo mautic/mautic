@@ -14,7 +14,7 @@ export default class DynamicContentDomComponents {
       defaults: {
         name: 'Dynamic Content',
         tagName,
-        draggable: '[data-gjs-type=cell],[data-gjs-type=mj-column]',
+        draggable: '[data-gjs-type="cell"],[data-gjs-type="mj-column"]',
         droppable: false,
         editable: false,
         stylable: false,
