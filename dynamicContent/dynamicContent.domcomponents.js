@@ -68,6 +68,14 @@ export default class DynamicContentDomComponents {
         // open the editor in the popup
         this.em.get('Commands').run('preset-mautic:dynamic-content-open', { target });
       },
+      // @todo: show the store items default content on the canvas
+      // updated(property, value, prevValue) {
+      //   console.log('Local hook: model.updated', {
+      //     property,
+      //     value,
+      //     prevValue,
+      //   });
+      // },
       // does not work: gets removed when Sorting (by grapesjs)
       // removed() {
       //   // Delete dynamic-content on Mautic side
