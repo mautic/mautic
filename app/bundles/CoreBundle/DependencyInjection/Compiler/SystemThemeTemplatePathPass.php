@@ -70,6 +70,8 @@ class SystemThemeTemplatePathPass implements CompilerPassInterface
 
     /**
      * Get the bundle template paths for registration.
+     *
+     * @return array<string, array<int, string>>
      */
     private function getBundleTemplatePaths(ContainerBuilder $container): array
     {
