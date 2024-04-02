@@ -34,7 +34,7 @@
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div class="text-muted">{{ item.getDescription() }}</div>
+                        <div class="text-muted">{{ item.getDescription()|purify }}</div>
                     </div>
                     <div class="col-xs-2 text-right">
                         {{- include(

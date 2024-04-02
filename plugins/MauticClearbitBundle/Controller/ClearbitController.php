@@ -157,10 +157,10 @@ class ClearbitController extends FormController
             /** @var Lead $lead */
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess(
-                        'lead:leads:editown',
-                        'lead:leads:editother',
-                        $lead->getPermissionUser()
-                    )
+                    'lead:leads:editown',
+                    'lead:leads:editother',
+                    $lead->getPermissionUser()
+                )
                     && $lead->getEmail()
                 ) {
                     $lookupEmails[$lead->getId()] = $lead->getEmail();
@@ -236,10 +236,10 @@ class ClearbitController extends FormController
                             $lookupHelper->lookupContact($lead, $notify);
                         } catch (\Exception $ex) {
                             $this->addFlashMessage(
-                                    $ex->getMessage(),
-                                    [],
-                                    'error'
-                                );
+                                $ex->getMessage(),
+                                [],
+                                'error'
+                            );
                             --$count;
                         }
                     }
@@ -247,11 +247,11 @@ class ClearbitController extends FormController
 
                 if ($count) {
                     $this->addFlashMessage(
-                            'mautic.lead.batch_leads_affected',
-                            [
-                                '%count%'     => $count,
-                            ]
-                        );
+                        'mautic.lead.batch_leads_affected',
+                        [
+                            '%count%'     => $count,
+                        ]
+                    );
                 }
 
                 return new JsonResponse(

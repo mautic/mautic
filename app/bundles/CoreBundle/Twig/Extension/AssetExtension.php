@@ -10,17 +10,9 @@ use Twig\TwigFunction;
 
 class AssetExtension extends AbstractExtension
 {
-    /**
-     * @var AssetsHelper
-     */
-    protected $assetsHelper;
-
-    /**
-     * AssetExtension constructor.
-     */
-    public function __construct(AssetsHelper $assetsHelper)
-    {
-        $this->assetsHelper = $assetsHelper;
+    public function __construct(
+        protected AssetsHelper $assetsHelper
+    ) {
     }
 
     /**
@@ -34,6 +26,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('includeStylesheet', [$this, 'includeStylesheet'], ['is_safe' => ['all']]),
             new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
             new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('getOverridableUrl', [$this, 'getOverridableUrl'], ['is_safe' => ['html']]),
             new TwigFunction('addAssetScript', [$this, 'addScript'], ['is_safe' => ['html']]),
             new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
             new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
@@ -41,6 +34,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
             new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
             new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
+            new TwigFunction('assetAddCustomDeclaration', [$this, 'addCustomDeclaration']),
             new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
             new TwigFunction('assetGetBaseUrl', [$this, 'getBaseUrl'], ['is_safe' => ['html']]),
             new TwigFunction('assetMakeLinks', [$this, 'makeLinks'], ['is_safe' => ['html']]),
@@ -129,6 +123,15 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }
 
+    /**
+     * @param string     $path
+     * @param bool|false $absolute
+     */
+    public function getOverridableUrl($path, $absolute = false): string
+    {
+        return $this->assetsHelper->getOverridableUrl($path, $absolute);
+    }
+
     public function getImagesPath(): string
     {
         return $this->assetsHelper->getImagesPath();
@@ -139,9 +142,18 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->getAssetPrefix($includeEndingslash);
     }
 
-    public function addScriptDeclaration(string $script, string $location = 'head'): AssetsHelper
+    public function addScriptDeclaration(string $script, string $location = 'head'): string
     {
-        return $this->assetsHelper->addScriptDeclaration($script, $location);
+        $this->assetsHelper->addScriptDeclaration($script, $location);
+
+        return '';
+    }
+
+    public function addCustomDeclaration(string $script, string $location): string
+    {
+        $this->assetsHelper->addCustomDeclaration($script, $location);
+
+        return '';
     }
 
     /**

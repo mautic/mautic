@@ -6,57 +6,51 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ChannelBundle\Model\ChannelActionModel;
 use Mautic\ChannelBundle\Model\FrequencyActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
-    /**
-     * @var ChannelActionModel
-     */
-    private $channelActionModel;
-
-    /**
-     * @var FrequencyActionModel
-     */
-    private $frequencyActionModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
     public function __construct(
-        CorePermissions $security,
+        private ChannelActionModel $channelActionModel,
+        private FrequencyActionModel $frequencyActionModel,
+        private LeadModel $contactModel,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
         UserHelper $userHelper,
-        ChannelActionModel $channelActionModel,
-        FrequencyActionModel $frequencyActionModel,
-        LeadModel $leadModel,
-        ManagerRegistry $doctrine
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
     ) {
-        $this->channelActionModel   = $channelActionModel;
-        $this->frequencyActionModel = $frequencyActionModel;
-        $this->contactModel         = $leadModel;
-        parent::__construct($security, $userHelper, $doctrine);
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * Execute the batch action.
-     *
-     * @return JsonResponse
      */
-    public function setAction(Request $request)
+    public function setAction(Request $request): JsonResponse
     {
         $params = $request->get('contact_channels', []);
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $subscribedChannels = isset($params['subscribed_channels']) ? $params['subscribed_channels'] : [];
-            $preferredChannel   = isset($params['preferred_channel']) ? $params['preferred_channel'] : null;
+            $subscribedChannels = $params['subscribed_channels'] ?? [];
+            $preferredChannel   = $params['preferred_channel'] ?? null;
 
             $this->channelActionModel->update($ids, $subscribedChannels);
             $this->frequencyActionModel->update($ids, $params, $preferredChannel);
@@ -76,10 +70,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * View for batch action.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');
 

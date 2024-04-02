@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
@@ -15,26 +15,17 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use Symfony\Component\Mailer\Transport\NullTransport;
 
 class BounceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the transport interface processes the message appropriately
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::updateStat()
-     * @covers  \Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface::processBounce()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testProcessorInterfaceProcessesMessage()
+    public function testProcessorInterfaceProcessesMessage(): void
     {
-        $transport     = new TestTransport(new \Swift_Events_SimpleEventDispatcher());
-        $contactFinder = $this->getMockBuilder(ContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transport     = new TestTransport();
+        $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
                 function ($email, $bounceAddress) {
@@ -59,27 +50,19 @@ class BounceTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $statRepo = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $statRepo->expects($this->once())
+        $emailStatModel = $this->createMock(EmailStatModel::class);
+        $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadModel = $this->createMock(LeadModel::class);
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $logger = $this->createMock(Logger::class);
 
         $doNotContact = $this->createMock(DoNotContact::class);
 
-        $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger, $doNotContact);
+        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
 
         $message = new Message();
         $this->assertTrue($bouncer->process($message));
@@ -87,20 +70,11 @@ class BounceTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @testdox Test that the message is processed appropriately
-     *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::process()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::updateStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
-    public function testContactIsFoundFromMessageAndDncRecordAdded()
+    public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
-        $transport     = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher());
-        $contactFinder = $this->getMockBuilder(ContactFinder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transport     = new NullTransport();
+        $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
                 function ($email, $bounceAddress) {
@@ -125,27 +99,19 @@ class BounceTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $statRepo = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $statRepo->expects($this->once())
+        $emailStatModel = $this->createMock(EmailStatModel::class);
+        $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadModel = $this->createMock(LeadModel::class);
 
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(Translator::class);
 
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $logger = $this->createMock(Logger::class);
 
         $doNotContact = $this->createMock(DoNotContact::class);
 
-        $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger, $doNotContact);
+        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
 
         $message            = new Message();
         $message->to        = ['contact+bounce_123abc@test.com' => null];

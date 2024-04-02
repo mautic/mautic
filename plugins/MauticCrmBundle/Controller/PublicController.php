@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
-use function assert;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
@@ -10,12 +9,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class class PublicController extends CommonController.
- */
 class PublicController extends CommonController
 {
-    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper)
+    public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper): Response
     {
         $content = $request->getContent();
         if (!empty($content)) {
@@ -27,7 +23,7 @@ class PublicController extends CommonController
         $integration = 'Hubspot';
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
-        assert($integrationObject instanceof HubspotIntegration);
+        \assert($integrationObject instanceof HubspotIntegration);
 
         foreach ($data as $info) {
             $object = explode('.', $info['subscriptionType']);

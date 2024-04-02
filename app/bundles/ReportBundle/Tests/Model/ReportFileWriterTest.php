@@ -14,7 +14,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 
 class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testWriteReportData()
+    public function testWriteReportData(): void
     {
         $csvExporter = $this->getMockBuilder(CsvExporter::class)
             ->disableOriginalConstructor()
@@ -25,8 +25,10 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $handler = 'Handler';
+        $report  = new Report();
 
-        $report    = new Report();
+        $report->setName('Report A');
+
         $scheduler = new Scheduler($report, new \DateTime());
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
@@ -48,19 +50,17 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $csvExporter->expects($this->once())
             ->method('export')
-            ->with($reportDataResult, $handler, 1)
-            ->willReturn($handler);
+            ->with($reportDataResult, $handler, 1);
 
         $exportHandler->expects($this->once())
-            ->method('closeHandler')
-            ->willReturn($handler);
+            ->method('closeHandler');
 
         $reportFileWriter = new ReportFileWriter($csvExporter, $exportHandler);
 
         $reportFileWriter->writeReportData($scheduler, $reportDataResult, $reportExportOptions);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $csvExporter = $this->getMockBuilder(CsvExporter::class)
             ->disableOriginalConstructor()
@@ -72,6 +72,8 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
+
+        $report->setName('Report A');
 
         $exportHandler->expects($this->once())
             ->method('removeFile');
@@ -81,7 +83,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
         $reportFileWriter->clear($scheduler);
     }
 
-    public function testGetFilePath()
+    public function testGetFilePath(): void
     {
         $csvExporter = $this->getMockBuilder(CsvExporter::class)
             ->disableOriginalConstructor()
@@ -93,6 +95,8 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
+
+        $report->setName('Report A');
 
         $exportHandler->expects($this->once())
             ->method('getPath');

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
-use DateTime;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
@@ -15,22 +14,16 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
+    private \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
 
     /**
      * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
@@ -103,7 +96,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return iterable<array<mixed>>
      */
-    public function stringProvider(): iterable
+    public static function stringProvider(): iterable
     {
         // string
         yield ['random string', 'random string'];
@@ -122,8 +115,8 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
         // date object
         yield [
-            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
-            DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
+            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
+            \DateTime::createFromFormat('Y-m-d H:i:s', 'now', new \DateTimeZone('UTC')),
         ];
     }
 }

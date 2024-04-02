@@ -10,22 +10,12 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CsvExporter.
- */
 class ExcelExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
-    {
-        $this->formatterHelper      = $formatterHelper;
-        $this->translator           = $translator;
+    public function __construct(
+        protected FormatterHelper $formatterHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -33,7 +23,7 @@ class ExcelExporter
      *
      * @throws \Exception
      */
-    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output')
+    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output'): void
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
@@ -54,7 +44,7 @@ class ExcelExporter
             $headersRow = $reportDataResult->getHeaders();
             $this->putHeader($headersRow, $objPHPExcelSheet);
 
-            //build the data rows
+            // build the data rows
             foreach ($reportData as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
@@ -63,14 +53,14 @@ class ExcelExporter
                     $row[]     = $formatted;
                 }
 
-                //write the row
+                // write the row
                 $rowCount = $count + 2;
                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-                //free memory
+                // free memory
                 unset($row, $reportData['data'][$count]);
             }
 
-            //Add totals to export
+            // Add totals to export
             $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
             if (!empty($totalsRow)) {
                 $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);

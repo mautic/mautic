@@ -2,14 +2,18 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\PointBundle\Form\Type\GroupListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class PointActionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'points',
@@ -19,7 +23,7 @@ class PointActionType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'scale'       => 0,
-                'data'        => (isset($options['data']['points'])) ? $options['data']['points'] : 0,
+                'data'        => $options['data']['points'] ?? 0,
                 'constraints' => [
                     new NotEqualTo(
                         [
@@ -30,6 +34,18 @@ class PointActionType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add('group', GroupListType::class, [
+            'label'            => 'mautic.lead.campaign.event.point_group',
+            'label_attr'       => ['class' => 'control-label'],
+            'attr'             => [
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.lead.campaign.event.point_group.help',
+            ],
+            'required'         => false,
+            'by_reference'     => false,
+            'return_entity'    => false,
+        ]);
     }
 
     /**

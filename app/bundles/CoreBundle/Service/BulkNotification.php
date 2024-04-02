@@ -4,25 +4,19 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Service;
 
-use DateTime;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\UserBundle\Entity\User;
 
 final class BulkNotification implements BulkNotificationInterface
 {
     /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
      * @var mixed[]
      */
-    private $notifications = [];
+    private array $notifications = [];
 
-    public function __construct(NotificationModel $notificationModel)
-    {
-        $this->notificationModel = $notificationModel;
+    public function __construct(
+        private NotificationModel $notificationModel
+    ) {
     }
 
     public function addNotification(
@@ -31,7 +25,7 @@ final class BulkNotification implements BulkNotificationInterface
         string $type = null,
         string $header = null,
         string $iconClass = null,
-        DateTime $datetime = null,
+        \DateTime $datetime = null,
         User $user = null
     ): void {
         if (isset($this->notifications[$deduplicateValue])) {
@@ -49,9 +43,9 @@ final class BulkNotification implements BulkNotificationInterface
     }
 
     /**
-     * @param DateTime|null $deduplicateDateTimeFrom If last 24 hours for deduplication does not fit, change it here
+     * @param \DateTime|null $deduplicateDateTimeFrom If last 24 hours for deduplication does not fit, change it here
      */
-    public function flush(DateTime $deduplicateDateTimeFrom = null): void
+    public function flush(\DateTime $deduplicateDateTimeFrom = null): void
     {
         foreach ($this->notifications as $deduplicateValue => $data) {
             $this->notificationModel->addNotification(

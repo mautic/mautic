@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use function assert;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -23,26 +22,6 @@ abstract class MonitorTwitterBaseCommand extends Command
      * @var TwitterIntegration
      */
     protected $twitter;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var TwitterCommandHelper
-     */
-    private $twitterCommandHelper;
 
     /**
      * @var InputInterface
@@ -70,17 +49,12 @@ abstract class MonitorTwitterBaseCommand extends Command
     protected $queryCount = 100;
 
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        IntegrationHelper $integrationHelper,
-        TwitterCommandHelper $twitterCommandHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected Translator $translator,
+        protected IntegrationHelper $integrationHelper,
+        private TwitterCommandHelper $twitterCommandHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->integrationHelper    = $integrationHelper;
-        $this->twitterCommandHelper = $twitterCommandHelper;
-
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
 
         parent::__construct();
@@ -156,16 +130,16 @@ abstract class MonitorTwitterBaseCommand extends Command
         if (false === $twitterIntegration || false === $twitterIntegration->getIntegrationSettings()->getIsPublished()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.published'));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
-        assert($twitterIntegration instanceof TwitterIntegration);
+        \assert($twitterIntegration instanceof TwitterIntegration);
         $this->twitter = $twitterIntegration;
 
         if (!$this->twitter->isAuthorized()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.configured'));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         // get the mid from the cli
@@ -174,7 +148,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         if (!$mid) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.mid.empty'));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $this->twitterCommandHelper->setOutput($output);
@@ -184,7 +158,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         if (!$monitor || !$monitor->getId()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.monitor.does.not.exist', ['%id%' => $mid]));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         // process the monitor
@@ -195,7 +169,7 @@ abstract class MonitorTwitterBaseCommand extends Command
             SocialEvents::MONITOR_POST_PROCESS
         );
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**

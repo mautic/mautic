@@ -48,8 +48,6 @@ return [
             ],
             'mautic.install.fixture.grape_js' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
             ],
         ],
         'other' => [
@@ -93,7 +91,7 @@ return [
                     'translator',
                     'kernel',
                     'validator',
-                    'security.password_encoder',
+                    'security.password_hasher',
                     'mautic.doctrine.loader.mautic_fixtures_loader',
                 ],
             ],

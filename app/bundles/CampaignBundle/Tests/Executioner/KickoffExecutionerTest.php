@@ -25,22 +25,22 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|KickoffContactFinder
      */
-    private $kickoffContactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $kickoffContactFinder;
 
     /**
      * @var MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|EventExecutioner
      */
-    private $executioner;
+    private \PHPUnit\Framework\MockObject\MockObject $executioner;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     protected function setUp(): void
     {
@@ -65,7 +65,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
-    public function testEventsAreScheduledAndExecuted()
+    public function testEventsAreScheduledAndExecuted(): void
     {
         $this->kickoffContactFinder->expects($this->once())
             ->method('getContactCount')
@@ -109,7 +109,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->scheduler->expects($this->exactly(4))
             ->method('validateAndScheduleEventForContacts')
             ->willReturnCallback(
-                function () use (&$callbackCounter) {
+                function () use (&$callbackCounter): void {
                     ++$callbackCounter;
                     if (in_array($callbackCounter, [3, 4])) {
                         throw new NotSchedulableException();

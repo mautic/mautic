@@ -19,14 +19,14 @@ final class DetailControllerTest extends MauticMysqlTestCase
     public function testMarketplaceDetailPage(string $requestedPackage, int $responseCode, string $foundPackageName, string $foundPackageDesc, string $latestVersion = ''): void
     {
         /** @var MockHandler $handlerStack */
-        $handlerStack = self::$container->get(MockHandler::class);
+        $handlerStack = static::getContainer()->get(MockHandler::class);
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/detail.json')) // Getting package detail from Packagist API.
         );
 
         /** @var Allowlist $allowlist */
-        $allowlist = self::$container->get('marketplace.service.allowlist');
+        $allowlist = static::getContainer()->get('marketplace.service.allowlist');
         $allowlist->clearCache();
 
         $this->client->request('GET', "s/marketplace/detail/{$requestedPackage}");
@@ -42,7 +42,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
     /**
      * @return iterable<array<string|int>>
      */
-    public function dataProvider(): iterable
+    public static function dataProvider(): iterable
     {
         // Package that do not exist in the allowlist.
         yield [

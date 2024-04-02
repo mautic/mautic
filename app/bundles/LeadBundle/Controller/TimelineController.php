@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,8 +31,8 @@ class TimelineController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
         } else {
@@ -77,8 +78,8 @@ class TimelineController extends CommonController
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.plugin.timeline.filters', $filters);
         } else {
@@ -141,8 +142,8 @@ class TimelineController extends CommonController
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.plugin.timeline.'.$leadId.'.filters', $filters);
         } else {
@@ -189,7 +190,7 @@ class TimelineController extends CommonController
     /**
      * @return array|Response
      */
-    public function batchExportAction(Request $request, DateHelper $dateHelper, $leadId)
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
     {
         if (empty($leadId)) {
             return $this->accessDenied();
@@ -206,8 +207,8 @@ class TimelineController extends CommonController
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
-                'includeEvents' => InputHelper::clean($request->request->get('includeEvents')) ?? [],
-                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents')) ?? [],
+                'includeEvents' => InputHelper::clean($request->request->get('includeEvents') ?? []),
+                'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents') ?? []),
             ];
             $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
         } else {
@@ -221,15 +222,15 @@ class TimelineController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper) {
-            $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+        $resultsCallback = function ($event) use ($dateHelper): array {
+            $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];
             }
 
             return [
                 'eventName'      => $eventLabel,
-                'eventType'      => isset($event['eventType']) ? $event['eventType'] : '',
+                'eventType'      => $event['eventType'] ?? '',
                 'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
@@ -265,6 +266,6 @@ class TimelineController extends CommonController
             ++$loop;
         }
 
-        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline');
+        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline', $exportHelper);
     }
 }

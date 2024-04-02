@@ -12,28 +12,15 @@ use Mautic\PageBundle\Model\PageModel;
 
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var SubmissionModel
-     */
-    private $submissionModel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(PageModel $pageModel, SubmissionModel $submissionModel)
-    {
-        $this->pageModel       = $pageModel;
-        $this->submissionModel = $submissionModel;
+    public function __construct(
+        private PageModel $pageModel,
+        private SubmissionModel $submissionModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        $importResults = function ($results) {
+        $importResults = function ($results): void {
             foreach ($results as $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());
@@ -54,7 +41,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                             $submission->$setter($entity);
                             unset($rows[$col]);
                         } else {
-                            //the rest are custom field values
+                            // the rest are custom field values
                             break;
                         }
                     }
@@ -74,9 +61,6 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $importResults($results2);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 9;

@@ -12,6 +12,7 @@ return [
                     'mautic.sms.model.sms',
                     'mautic.helper.integration',
                     'mautic.lead.model.dnc',
+                    'mautic.helper.core_parameters',
                 ],
                 'alias' => 'sms_helper',
             ],
@@ -100,18 +101,6 @@ return [
                 ],
             ],
         ],
-        'models' => [
-            'mautic.sms.model.sms' => [
-                'class'     => 'Mautic\SmsBundle\Model\SmsModel',
-                'arguments' => [
-                    'mautic.page.model.trackable',
-                    'mautic.lead.model.lead',
-                    'mautic.channel.model.queue',
-                    'mautic.sms.transport_chain',
-                    'mautic.helper.cache_storage',
-                ],
-            ],
-        ],
         'integrations' => [
             'mautic.integration.twilio' => [
                 'class'     => \Mautic\SmsBundle\Integration\TwilioIntegration::class,
@@ -132,15 +121,6 @@ return [
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
-                ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.sms.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\SmsBundle\Entity\Stat::class,
                 ],
             ],
         ],
@@ -179,7 +159,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'smses',
                 'path'            => '/smses',
-                'controller'      => 'Mautic\SmsBundle\Controller\Api\SmsApiController',
+                'controller'      => \Mautic\SmsBundle\Controller\Api\SmsApiController::class,
             ],
             'mautic_api_smses_send' => [
                 'path'       => '/smses/{id}/contact/{contactId}/send',
@@ -207,12 +187,13 @@ return [
         ],
     ],
     'parameters' => [
-        'sms_enabled'              => false,
-        'sms_username'             => null,
-        'sms_password'             => null,
-        'sms_sending_phone_number' => null,
-        'sms_frequency_number'     => 0,
-        'sms_frequency_time'       => 'DAY',
-        'sms_transport'            => 'mautic.sms.twilio.transport',
+        'sms_enabled'                                                      => false,
+        'sms_username'                                                     => null,
+        'sms_password'                                                     => null,
+        'sms_messaging_service_sid'                                        => null,
+        'sms_frequency_number'                                             => 0,
+        'sms_frequency_time'                                               => 'DAY',
+        'sms_transport'                                                    => 'mautic.sms.twilio.transport',
+        \Mautic\SmsBundle\Form\Type\ConfigType::SMS_DISABLE_TRACKABLE_URLS => false,
     ],
 ];

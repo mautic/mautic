@@ -54,7 +54,7 @@
 
         <div class="code-editor {% if not isCodeMode %}hide{% endif %}">
             <div id="customHtmlContainer"></div>
-            <i class="text-muted">{{ 'mautic.core.code.mode.token.dropdown.hint'|trans|raw }}</i>
+            <i class="text-muted">{{ 'mautic.core.code.mode.token.dropdown.hint'|trans|purify }}</i>
         </div>
         <div class="builder-toolbar {% if isCodeMode %}hide{% endif %}">
             <div class="panel panel-default">

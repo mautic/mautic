@@ -11,14 +11,9 @@ use MauticPlugin\MauticFocusBundle\FocusEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class class PublicController extends CommonController.
- */
 class PublicController extends CommonController
 {
     /**
-     * @param $id
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function generateAction($id)
@@ -35,7 +30,7 @@ class PublicController extends CommonController
                 return new Response('', 200, ['Content-Type' => 'application/javascript']);
             }
 
-            $content  = $model->generateJavascript($focus, false, (MAUTIC_ENV == 'dev'));
+            $content  = $model->generateJavascript($focus, false, MAUTIC_ENV == 'dev');
 
             return new Response($content, 200, ['Content-Type' => 'application/javascript']);
         } else {

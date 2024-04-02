@@ -10,6 +10,7 @@ use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
@@ -27,53 +28,51 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    use MockedConnectionTrait;
     /**
      * @var MockObject|Connection
      */
-    private $connectionMock;
+    private MockObject $connectionMock;
 
     /**
      * @var MockObject|CompanyReportData
      */
-    private $companyReportDataMock;
+    private MockObject $companyReportDataMock;
 
     /**
      * @var MockObject|StatRepository
      */
-    private $statRepository;
+    private MockObject $statRepository;
 
     /**
      * @var MockObject&GeneratedColumnsProviderInterface
      */
-    private $generatedColumnsProvider;
+    private MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Report
      */
-    private $report;
+    private MockObject $report;
 
-    /**
-     * @var ChannelListHelper
-     */
-    private $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private QueryBuilder $queryBuilder;
 
     private ReportSubscriber $subscriber;
 
     /**
      * @var MockObject|FieldsBuilder
      */
-    private $fieldsBuilderMock;
+    private MockObject $fieldsBuilderMock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->connectionMock           = $this->createMock(Connection::class);
+        $this->connectionMock           = $this->getMockedConnection();
         $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
         $this->statRepository           = $this->createMock(StatRepository::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
@@ -159,9 +158,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->once())
+        $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($this->connectionMock));
+            ->willReturnOnConsecutiveCalls(
+                new QueryBuilder($this->connectionMock),
+                new QueryBuilder($this->connectionMock)
+            );
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -192,9 +194,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getFilters')
             ->willReturn([]);
 
-        $this->connectionMock->expects($this->once())
+        $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($this->connectionMock));
+            ->willReturnOnConsecutiveCalls(
+                new QueryBuilder($this->connectionMock),
+                new QueryBuilder($this->connectionMock)
+            );
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -269,7 +274,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnReportBuilderWithEmailSentContext(): void
     {
         $translatorMock     = $this->createMock(TranslatorInterface::class);
-        $reportHelper       = new ReportHelper();
+        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
             ->expects($this->any())

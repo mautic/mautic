@@ -22,7 +22,7 @@ class ConfigFormTest extends KernelTestCase
         self::bootKernel();
     }
 
-    public function testConfigForm()
+    public function testConfigForm(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
@@ -37,7 +37,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testOauth()
+    public function testOauth(): void
     {
         $plugins    = $this->getIntegrationObject()->getIntegrationObjects();
         $url        = 'https://test.com';
@@ -61,7 +61,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function testAmendLeadDataBeforeMauticPopulate()
+    public function testAmendLeadDataBeforeMauticPopulate(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
         $object  = 'company';
@@ -81,7 +81,7 @@ class ConfigFormTest extends KernelTestCase
 
     public function getIntegrationObject()
     {
-        //create an integration object
+        // create an integration object
         $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
         $bundleHelper         = $this->getMockBuilder(BundleHelper::class)->disableOriginalConstructor()->getMock();
         $pluginModel          = $this->getMockBuilder(PluginModel::class)->disableOriginalConstructor()->getMock();
@@ -97,8 +97,8 @@ class ConfigFormTest extends KernelTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registeredPluginBundles = self::$container->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = self::$container->getParameter('mautic.bundles');
+        $registeredPluginBundles = static::getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = static::getContainer()->getParameter('mautic.bundles');
         $bundleHelper->expects($this->any())->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
 
         $bundleHelper->expects($this->any())->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));
@@ -117,11 +117,11 @@ class ConfigFormTest extends KernelTestCase
                 ->method('getRepository')
                 ->will(
                     $this->returnValueMap(
-                            [
-                                [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
-                                [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
-                                [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
-                            ]
+                        [
+                            [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
+                            [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
+                            [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                        ]
                     )
                 );
 
@@ -133,14 +133,11 @@ class ConfigFormTest extends KernelTestCase
             $coreParametersHelper,
             $twig,
             $pluginModel
-            );
+        );
 
         return $integrationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();

@@ -8,7 +8,6 @@ use libphonenumber\PhoneNumberUtil;
 class PhoneNumberHelper
 {
     /**
-     * @param     $number
      * @param int $format
      *
      * @return string
@@ -21,12 +20,7 @@ class PhoneNumberHelper
         return $phoneUtil->format($phoneNumber, $format);
     }
 
-    /**
-     * @param $number
-     *
-     * @return array
-     */
-    public function getFormattedNumberList($number)
+    public function getFormattedNumberList($number): array
     {
         return array_unique(
             [
@@ -42,22 +36,12 @@ class PhoneNumberHelper
         );
     }
 
-    /**
-     * @param $number
-     *
-     * @return string
-     */
-    public function formatNumericalInternational($number)
+    public function formatNumericalInternational($number): ?string
     {
         return preg_replace('/[^0-9]/', '', $this->format($number, PhoneNumberFormat::INTERNATIONAL));
     }
 
-    /**
-     * @param $number
-     *
-     * @return string
-     */
-    public function formatNumericalNational($number)
+    public function formatNumericalNational($number): ?string
     {
         return preg_replace('/[^0-9]/', '', $this->format($number, PhoneNumberFormat::NATIONAL));
     }
@@ -65,10 +49,8 @@ class PhoneNumberHelper
     /**
      * @param string $number
      * @param string $delimiter
-     *
-     * @return string
      */
-    public function formatDelimitedNational($number, $delimiter = '-')
+    public function formatDelimitedNational($number, $delimiter = '-'): ?string
     {
         $national = $this->format($number, PhoneNumberFormat::NATIONAL);
         $national = str_replace([') ', '-'], $delimiter, $national);

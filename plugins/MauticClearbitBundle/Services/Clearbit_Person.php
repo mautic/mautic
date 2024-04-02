@@ -8,6 +8,7 @@ namespace MauticPlugin\MauticClearbitBundle\Services;
 class Clearbit_Person extends Clearbit_Base
 {
     protected $_resourceUri = '/people/find';
+
     protected $_baseUri     = 'https://person.clearbit.com/';
 
     public function lookupByEmail($search)

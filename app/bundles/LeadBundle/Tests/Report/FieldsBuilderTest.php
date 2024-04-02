@@ -11,7 +11,7 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetLeadColumns()
+    public function testGetLeadColumns(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -27,7 +27,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 
         $leadModel = $this->createMock(LeadModel::class);
 
-        $fieldModel->expects($this->exactly(2)) //We have 2 asserts
+        $fieldModel->expects($this->exactly(2)) // We have 2 asserts
             ->method('getLeadFields')
             ->with()
             ->willReturn($this->getFields());
@@ -48,6 +48,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'label'          => 'mautic.lead.report.date_identified',
                 'type'           => 'datetime',
                 'groupByFormula' => 'DATE(l.date_identified)',
+            ],
+            'l.date_added' => [
+                'label'          => 'mautic.core.date.added',
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(l.date_added)',
             ],
             'l.points' => [
                 'label' => 'mautic.lead.points',
@@ -98,7 +103,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    public function testGetLeadFilter()
+    public function testGetLeadFilter(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -186,6 +191,11 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'type'           => 'datetime',
                 'groupByFormula' => 'DATE(l.date_identified)',
             ],
+            'l.date_added' => [
+                'label'          => 'mautic.core.date.added',
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(l.date_added)',
+            ],
             'l.points' => [
                 'label' => 'mautic.lead.points',
                 'type'  => 'int',
@@ -268,7 +278,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    public function testGetCompanyColumns()
+    public function testGetCompanyColumns(): void
     {
         $fieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
@@ -282,7 +292,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fieldModel->expects($this->exactly(2)) //We have 2 asserts
+        $fieldModel->expects($this->exactly(2)) // We have 2 asserts
         ->method('getCompanyFields')
             ->with()
             ->willReturn($this->getFields());

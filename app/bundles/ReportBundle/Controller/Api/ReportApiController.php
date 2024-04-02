@@ -2,14 +2,23 @@
 
 namespace Mautic\ReportBundle\Controller\Api;
 
-use DateTimeImmutable;
-use DateTimeZone;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Report>
@@ -19,11 +28,11 @@ class ReportApiController extends CommonApiController
     /**
      * @var ReportModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $reportModel = $this->getModel('report');
+        $reportModel = $modelFactory->getModel('report');
         \assert($reportModel instanceof ReportModel);
 
         $this->model            = $reportModel;
@@ -32,7 +41,7 @@ class ReportApiController extends CommonApiController
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -42,7 +51,7 @@ class ReportApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getReportAction(Request $request, $id)
+    public function getEntityAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -57,27 +66,33 @@ class ReportApiController extends CommonApiController
             unset($reportData[$key]);
         }
 
+        // Include report metadata
+        $reportData[$this->entityNameOne] = $entity;
+
         return $this->handleView(
             $this->view($reportData, Response::HTTP_OK)
         );
     }
 
+    public function getReportAction(Request $request, int $id): Response
+    {
+        return $this->getEntityAction($request, $id);
+    }
+
     /**
      * This method is careful to add new options from the request to keep BC.
      * It originally loaded all rows without any filter or pagination applied.
-     *
-     * @return array
      */
-    private function getOptionsFromRequest(Request $request)
+    private function getOptionsFromRequest(Request $request): array
     {
         $options = ['paginate'=> false, 'ignoreGraphData' => true];
 
         if ($request->query->has('dateFrom')) {
-            $options['dateFrom'] = new DateTimeImmutable($request->query->get('dateFrom'), new DateTimeZone('UTC'));
+            $options['dateFrom'] = new \DateTimeImmutable($request->query->get('dateFrom'), new \DateTimeZone('UTC'));
         }
 
         if ($request->query->has('dateTo')) {
-            $options['dateTo']   = new DateTimeImmutable($request->query->get('dateTo'), new DateTimeZone('UTC'));
+            $options['dateTo']   = new \DateTimeImmutable($request->query->get('dateTo'), new \DateTimeZone('UTC'));
         }
 
         if ($request->query->has('page')) {

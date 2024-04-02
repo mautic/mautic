@@ -9,9 +9,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AuthController.
- */
 class AuthController extends FormController
 {
     /**
@@ -28,7 +25,7 @@ class AuthController extends FormController
         $integrationHelper = $this->factory->getHelper('integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
-        //check to see if the service exists
+        // check to see if the service exists
         if (!$integrationObject) {
             $session->set('mautic.integration.postauth.message', ['mautic.integration.notfound', ['%name%' => $integration], 'error']);
             if ($isAjax) {
@@ -50,7 +47,7 @@ class AuthController extends FormController
             }
         }
 
-        //check for error
+        // check for error
         if ($error) {
             $type    = 'error';
             $message = 'mautic.integration.error.oauthfail';
@@ -72,12 +69,7 @@ class AuthController extends FormController
         return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
     }
 
-    /**
-     * @param $integration
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function authStatusAction(Request $request, $integration)
+    public function authStatusAction(Request $request, $integration): \Symfony\Component\HttpFoundation\Response
     {
         $postAuthTemplate = '@MauticPlugin/Auth/postauth.html.twig';
 
@@ -103,12 +95,7 @@ class AuthController extends FormController
         return $this->render($postAuthTemplate, ['message' => $message, 'alert' => $alert, 'data' => $userData]);
     }
 
-    /**
-     * @param $integration
-     *
-     * @return RedirectResponse
-     */
-    public function authUserAction($integration)
+    public function authUserAction($integration): RedirectResponse
     {
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');

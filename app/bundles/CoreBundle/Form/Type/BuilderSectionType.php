@@ -9,11 +9,11 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class BuilderSectionType.
+ * @extends AbstractType<mixed>
  */
 class BuilderSectionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Content - Background Color
         $builder->add(

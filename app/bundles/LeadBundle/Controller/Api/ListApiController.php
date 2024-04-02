@@ -2,14 +2,26 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<LeadList>
@@ -21,11 +33,11 @@ class ListApiController extends CommonApiController
     /**
      * @var ListModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $listModel = $this->getModel('lead.list');
+        $listModel = $modelFactory->getModel('lead.list');
         \assert($listModel instanceof ListModel);
 
         $this->model            = $listModel;
@@ -34,7 +46,7 @@ class ListApiController extends CommonApiController
         $this->entityNameMulti  = 'lists';
         $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress', 'categoryList'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -216,10 +228,10 @@ class ListApiController extends CommonApiController
     protected function checkEntityAccess($entity, $action = 'view')
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
-            return $this->security->isGranted('lead:leads:viewown');
+            return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         } elseif ('delete' == $action) {
             return $this->factory->getSecurity()->hasEntityAccess(
-                true, 'lead:lists:deleteother', $entity->getCreatedBy()
+                true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );
         }
 

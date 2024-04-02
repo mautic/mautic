@@ -8,40 +8,23 @@ use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class EmailValidator.
- */
 class EmailValidator
 {
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * EmailValidator constructor.
-     */
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
-    {
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        protected TranslatorInterface $translator,
+        protected EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**
      * Validate that an email is the correct format, doesn't have invalid characters, a MX record is associated with the domain, and
      * leverage integrations to validate.
      *
-     * @param $address
      * @param bool $doDnsCheck
      *
      * @throws InvalidEmailException
      */
-    public function validate($address, $doDnsCheck = false)
+    public function validate($address, $doDnsCheck = false): void
     {
         if (!$this->isValidFormat($address)) {
             throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_format', ['%email%' => $address ?: '?']));
@@ -61,19 +44,15 @@ class EmailValidator
     /**
      * Validates that email is in an acceptable format.
      *
-     * @param $address
-     *
      * @returns bool
      */
-    public function isValidFormat($address)
+    public function isValidFormat($address): bool
     {
         return !empty($address) && filter_var($address, FILTER_VALIDATE_EMAIL);
     }
 
     /**
      * Validates that email does not have invalid characters.
-     *
-     * @param $address
      *
      * @returns bool
      */
@@ -87,13 +66,11 @@ class EmailValidator
     /**
      * Validates if the domain of an email.
      *
-     * @param $address
-     *
      * @returns bool
      */
-    public function hasValidDomain($address)
+    public function hasValidDomain($address): bool
     {
-        list($user, $domain) = explode('@', $address);
+        [$user, $domain] = explode('@', $address);
 
         return checkdnsrr($domain, 'MX');
     }
@@ -101,11 +78,9 @@ class EmailValidator
     /**
      * Validate using 3rd party integrations.
      *
-     * @param $address
-     *
      * @throws InvalidEmailException
      */
-    public function doPluginValidation($address)
+    public function doPluginValidation($address): void
     {
         $event = $this->dispatcher->dispatch(
             new EmailValidationEvent($address),

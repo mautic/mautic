@@ -67,6 +67,7 @@
                             {{ include('@MauticLead/Field/properties_select.html.twig', {
                                 'form': form.properties,
                                 'selectTemplate': selectTemplate,
+                                'type': 'select',
                             }) }}
                         {% elseif 'lookup' == type %}
                             {{ include('@MauticLead/Field/properties_select.html.twig', {
@@ -105,6 +106,14 @@
                 <div class="col-md-6">{{ form_row(form.isPubliclyUpdatable) }}</div>
             </div>
             <div class="row">
+                <div class="col-md-6">{{ form_row(form.isIndex) }}</div>
+                <div class="col-md-6">
+                    {% if form.charLengthLimit is defined %}
+                        {{ form_row(form.charLengthLimit) }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-6">{{ form_row(form.isUniqueIdentifer) }}</div>
             </div>
             <div class="row unique-identifier-warning" style="{% if not form.isUniqueIdentifer.vars.data %}display:none;{% endif %}">
@@ -131,16 +140,19 @@
       {{ include('@MauticLead/Field/properties_number.html.twig') }}
       {{ include('@MauticLead/Field/properties_boolean.html.twig') }}
       {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
           'selectTemplate': selectTemplate,
           'type': 'select',
       }) }}
 
       {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
           'selectTemplate': selectTemplate,
           'type': 'multiselect',
       }) }}
 
       {{ include('@MauticLead/Field/properties_select.html.twig', {
+          'form': null,
           'selectTemplate': selectTemplate,
           'type': 'lookup',
       }) }}

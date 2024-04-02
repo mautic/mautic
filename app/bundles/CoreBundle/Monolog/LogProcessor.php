@@ -13,10 +13,8 @@ class LogProcessor
      */
     public function __invoke(array $record): array
     {
-        $record['extra'] = [
-            'hostname' => gethostname(),
-            'pid'      => getmypid(),
-        ];
+        $record['extra']['hostname'] = gethostname();
+        $record['extra']['pid']      = getmypid();
 
         return $record;
     }

@@ -22,7 +22,7 @@ class PublicController extends FormController
      * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
      * @param User|null $user      User object; defaults to current user
      */
-    public function addNewNotification($message, $header, $iconClass, User $user)
+    public function addNewNotification($message, $header, $iconClass, User $user): void
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');
@@ -105,18 +105,18 @@ class PublicController extends FormController
 
             if (array_key_exists('contactInfo', $result)) {
                 if (array_key_exists(
-                        'familyName',
-                        $result['contactInfo']
-                    )
+                    'familyName',
+                    $result['contactInfo']
+                )
                     && empty($currFields['lastname']['value'])
                 ) {
                     $data['lastname'] = $result['contactInfo']['familyName'];
                 }
 
                 if (array_key_exists(
-                        'givenName',
-                        $result['contactInfo']
-                    )
+                    'givenName',
+                    $result['contactInfo']
+                )
                     && empty($currFields['firstname']['value'])
                 ) {
                     $data['firstname'] = $result['contactInfo']['givenName'];
@@ -193,6 +193,7 @@ class PublicController extends FormController
             if ($notify && (!isset($lead->imported) || !$lead->imported)) {
                 /** @var UserModel $userModel */
                 $userModel = $this->getModel('user');
+
                 if ($user = $userModel->getEntity($notify)) {
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
@@ -231,11 +232,9 @@ class PublicController extends FormController
     /**
      * This is only called internally.
      *
-     * @return Response
-     *
      * @throws \InvalidArgumentException
      */
-    private function compcallbackAction(LoggerInterface $mauticLogger, $result, $validatedRequest)
+    private function compcallbackAction(LoggerInterface $mauticLogger, $result, $validatedRequest): Response
     {
         $notify = $validatedRequest['notify'];
 
@@ -327,9 +326,9 @@ class PublicController extends FormController
             }
 
             if (array_key_exists(
-                    'approxEmployees',
-                    $org
-                )
+                'approxEmployees',
+                $org
+            )
                 && empty($currFields['companynumber_of_employees']['value'])
             ) {
                 $data['companynumber_of_employees'] = $org['approxEmployees'];

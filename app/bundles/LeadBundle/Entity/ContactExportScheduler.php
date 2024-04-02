@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Entity;
 
-use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -18,12 +17,16 @@ class ContactExportScheduler
 
     private ?User $user = null; // Created by
 
-    private DateTimeImmutable $scheduledDateTime;
+    private \DateTimeImmutable $scheduledDateTime;
 
-    /** @var array<mixed> */
+    /**
+     * @var array<mixed>
+     */
     private array $data = [];
 
-    /** @var array<mixed> */
+    /**
+     * @var array<mixed>
+     */
     private array $changes = [];
 
     /**
@@ -74,12 +77,12 @@ class ContactExportScheduler
         return $this;
     }
 
-    public function getScheduledDateTime(): ?DateTimeImmutable
+    public function getScheduledDateTime(): ?\DateTimeImmutable
     {
         return $this->scheduledDateTime;
     }
 
-    public function setScheduledDateTime(DateTimeImmutable $scheduledDateTime): self
+    public function setScheduledDateTime(\DateTimeImmutable $scheduledDateTime): self
     {
         $this->scheduledDateTime = $scheduledDateTime;
         $this->addChange('scheduledDateTime', $scheduledDateTime);

@@ -20,7 +20,7 @@ jobs:
       is-prerelease: ${{ steps.is-prerelease.outputs.is-prerelease }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       # Our build script needs access to all previous tags, so we add fetch-depth: 0
       with:
         fetch-depth: 0
@@ -107,13 +107,13 @@ jobs:
         asset_content_type: application/zip
 
     - name: Store full package artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.get-mautic-version.outputs.version }}.zip
         path: ./build/packages/${{ steps.get-mautic-version.outputs.version }}.zip
 
     - name: Store update package artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.get-mautic-version.outputs.version }}-update.zip
         path: ./build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip
@@ -135,7 +135,7 @@ jobs:
 
     steps:
     # We need this so we can get the local.php override file
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
@@ -154,13 +154,13 @@ jobs:
       run: |
         unzip -q ${{ needs.release.outputs.mautic-version }}.zip -d ./mautic-testing
         mkdir -p ./mautic-testing/var/logs
-        cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
+        cp ./.github/ci-files/local.php ./mautic-testing/config/local.php
         cd ./mautic-testing
         php bin/console mautic:install --force http://localhost
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: install-logs
         path: ./mautic-testing/var/logs/*
@@ -182,7 +182,7 @@ jobs:
 
     steps:
       # We need this so we can get the local.php override file
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Get tag name and minimum Mautic version
       run: |
@@ -202,7 +202,11 @@ jobs:
         curl -sSL https://github.com/mautic/mautic/releases/download/${{ env.MAUTIC_MINIMUM_VERSION }}/${{ env.MAUTIC_MINIMUM_VERSION }}.zip -o ${{ env.MAUTIC_MINIMUM_VERSION }}.zip
         unzip -q ${{ env.MAUTIC_MINIMUM_VERSION }}.zip -d ./mautic-testing
         mkdir -p ./mautic-testing/var/logs
-        cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
+        if [[ "$(jq -r '.version | .[0:1]' ./mautic-testing/app/release_metadata.json)" == "4" ]]; then
+            cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
+        else
+            cp ./.github/ci-files/local.php ./mautic-testing/config/local.php
+        fi
         cd ./mautic-testing
         php bin/console mautic:install --force http://localhost
     
@@ -222,7 +226,7 @@ jobs:
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: update-logs
         path: ./mautic-testing/var/logs/*
@@ -235,7 +239,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2

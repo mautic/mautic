@@ -12,19 +12,11 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistence implements TokenPersistenceInterface
 {
-    /**
-     * @var IntegrationsHelper
-     */
-    private $integrationsHelper;
+    private ?\Mautic\PluginBundle\Entity\Integration $integration = null;
 
-    /**
-     * @var Integration|null
-     */
-    private $integration;
-
-    public function __construct(IntegrationsHelper $integrationsHelper)
-    {
-        $this->integrationsHelper = $integrationsHelper;
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    ) {
     }
 
     /**
@@ -37,12 +29,12 @@ class TokenPersistence implements TokenPersistenceInterface
     public function restoreToken(TokenInterface $token): TokenInterface
     {
         $apiKeys               = $this->getIntegration()->getApiKeys();
-        $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
+        $apiKeys['expires_at'] ??= null;
 
         return new IntegrationToken(
             empty($apiKeys['access_token']) ? null : $apiKeys['access_token'],
             empty($apiKeys['refresh_token']) ? null : $apiKeys['refresh_token'],
-            $apiKeys['expires_at'] ? $apiKeys['expires_at'] - time() : -1
+            $apiKeys['expires_at'] ?? null
         );
     }
 
@@ -82,7 +74,8 @@ class TokenPersistence implements TokenPersistenceInterface
 
         $apiKeys = $integration->getApiKeys();
 
-        unset($apiKeys['access_token']);
+        // Must delete both the access token and the expiration in order for the middleware to refresh
+        unset($apiKeys['access_token'], $apiKeys['expires_at']);
 
         $integration->setApiKeys($apiKeys);
 

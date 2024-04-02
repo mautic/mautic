@@ -693,7 +693,7 @@ Mautic.leadfieldOnLoad = function (container) {
     if (mQuery(container + ' .leadfield-list').length) {
         var bodyOverflow = {};
         mQuery(container + ' .leadfield-list tbody').sortable({
-            handle: '.fa-ellipsis-v',
+            handle: '.ri-draggable',
             helper: function(e, ui) {
                 ui.children().each(function() {
                     mQuery(this).width(mQuery(this).width());
@@ -834,7 +834,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             html = mQuery('#field-templates .default_template_text').html();
             tempType = 'text';
 
-            if (selectedVal == 'number' || selectedVal == 'tel' || selectedVal == 'url' || selectedVal == 'email') {
+            if (html != undefined && (selectedVal == 'number' || selectedVal == 'tel' || selectedVal == 'url' || selectedVal == 'email')) {
                 var replace = 'type="text"';
                 var regex = new RegExp(replace, "g");
                 html = html.replace(regex, 'type="' + selectedVal + '"');
@@ -1149,6 +1149,15 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
     });
 };
 
+Mautic.removeTagFromLead = function (el, leadId, tagId) {
+    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+
+    Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
+        mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });
+    });
+
+};
+
 Mautic.toggleLiveLeadListUpdate = function () {
     if (typeof MauticVars.moderatedIntervals['leadListLiveUpdate'] == 'undefined') {
         Mautic.setModeratedInterval('leadListLiveUpdate', 'updateLeadList', 5000);
@@ -1264,10 +1273,10 @@ Mautic.getLeadEmailContent = function (el) {
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
 
-        if (Mautic.getActiveBuilderName() === 'legacy') {
+        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
             mQuery(bodyEl).froalaEditor('html.set', response.body);
         } else {
-            mQuery(bodyEl).ckeditorGet().setData(response.body);
+            ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
         }
 
         mQuery(bodyEl).val(response.body);
@@ -1539,7 +1548,7 @@ Mautic.listOnLoad = function(container, response) {
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
     let jsPlumbData = null;
-    
+
     if (segmentDependenciesTab.length) {
         mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
             if (!mQuery(e.target).attr('id') === 'segment-dependencies') {

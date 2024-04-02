@@ -13,11 +13,9 @@ use Recurr\Rule;
 class SchedulerMonthBuilder implements BuilderInterface
 {
     /**
-     * @return Rule
-     *
      * @throws InvalidSchedulerException
      */
-    public function build(Rule $rule, SchedulerInterface $scheduler)
+    public function build(Rule $rule, SchedulerInterface $scheduler): Rule
     {
         try {
             $frequency = $scheduler->getScheduleMonthFrequency();
@@ -35,9 +33,7 @@ class SchedulerMonthBuilder implements BuilderInterface
             }
 
             $rule->setByDay($days);
-        } catch (InvalidArgument $e) {
-            throw new InvalidSchedulerException();
-        } catch (InvalidRRule $e) {
+        } catch (InvalidArgument|InvalidRRule) {
             throw new InvalidSchedulerException();
         }
 

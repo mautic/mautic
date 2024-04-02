@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
@@ -69,7 +69,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         if (!$event->operatorIsOneOf(
             'neq',
             'notLike',
-            'notBetween', //Used only for date with week combination (NOT EQUAL [this week, next week, last week])
+            'notBetween', // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             'notIn'
         )) {
             return;
@@ -78,7 +78,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         $leadsTableAlias = $event->getLeadsTableAlias();
 
         $event->addExpression(
-            $event->getQueryBuilder()->expr()->orX(
+            $event->getQueryBuilder()->expr()->or(
                 $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
                 $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
                     $leadsTableAlias.'.'.$event->getFilter()->getField(),
@@ -105,7 +105,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $expressions[] = $event->getQueryBuilder()->expr()->$operator($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
         }
 
-        $event->addExpression($event->getQueryBuilder()->expr()->andX($expressions));
+        $event->addExpression($event->getQueryBuilder()->expr()->and(...$expressions));
         $event->stopPropagation();
     }
 
@@ -121,9 +121,9 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'lt',
             'lte',
             'in',
-            'between', //Used only for date with week combination (EQUAL [this week, next week, last week])
+            'between', // Used only for date with week combination (EQUAL [this week, next week, last week])
             'regexp',
-            'notRegexp' //Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            'notRegexp' // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
         )) {
             return;
         }

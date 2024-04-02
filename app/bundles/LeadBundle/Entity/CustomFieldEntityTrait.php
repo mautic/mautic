@@ -3,9 +3,9 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 
 trait CustomFieldEntityTrait
 {
@@ -32,8 +32,6 @@ trait CustomFieldEntityTrait
     protected $eventData = [];
 
     /**
-     * @param $name
-     *
      * @return bool
      */
     public function __get($name)
@@ -42,9 +40,6 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * @param $name
-     * @param $value
-     *
      * @return $this
      */
     public function __set($name, $value)
@@ -54,14 +49,13 @@ trait CustomFieldEntityTrait
 
     /**
      * @param string $name
-     * @param        $arguments
      *
      * @return mixed
      */
     public function __call($name, $arguments)
     {
-        $isSetter = 0 === strpos($name, 'set');
-        $isGetter = 0 === strpos($name, 'get');
+        $isSetter = str_starts_with($name, 'set');
+        $isGetter = str_starts_with($name, 'get');
 
         if (($isSetter && array_key_exists(0, $arguments)) || $isGetter) {
             $fieldRequested = mb_strtolower(mb_substr($name, 3));
@@ -75,10 +69,7 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
-    /**
-     * @param $fields
-     */
-    public function setFields($fields)
+    public function setFields($fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
     }
@@ -105,8 +96,6 @@ trait CustomFieldEntityTrait
     /**
      * Add an updated field to persist to the DB and to note changes.
      *
-     * @param        $alias
-     * @param        $value
      * @param string $oldValue
      *
      * @return $this
@@ -256,26 +245,17 @@ trait CustomFieldEntityTrait
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function hasFields()
+    public function hasFields(): bool
     {
         return !empty($this->fields);
     }
 
-    /**
-     * @param $key
-     */
     public function getEventData($key)
     {
-        return (isset($this->eventData[$key])) ? $this->eventData[$key] : null;
+        return $this->eventData[$key] ?? null;
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function setEventData($key, $value)
@@ -297,7 +277,7 @@ trait CustomFieldEntityTrait
 
             $builder->addNamedField(
                 $fieldProperty,
-                FieldModel::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
+                SchemaDefinition::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
                 $field,
                 true
             );

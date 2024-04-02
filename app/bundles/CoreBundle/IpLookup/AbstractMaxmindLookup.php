@@ -19,6 +19,10 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
      */
     protected function getHeaders()
     {
+        if (!$this->auth) {
+            throw new \InvalidArgumentException('Maxmind Authentication key canot be empty.');
+        }
+
         return ['Authorization' => 'Basic '.base64_encode($this->auth)];
     }
 
@@ -29,24 +33,16 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
     {
         $url = 'https://geoip.maxmind.com/geoip/v2.1/';
 
-        switch ($this->getName()) {
-            case 'maxmind_country':
-                $url .= 'country';
-                break;
-            case 'maxmind_precision':
-                $url .= 'city';
-                break;
-            case 'maxmind_omni':
-                $url .= 'insights';
-                break;
-        }
+        match ($this->getName()) {
+            'maxmind_country'   => $url .= 'country',
+            'maxmind_precision' => $url .= 'city',
+            'maxmind_omni'      => $url .= 'insights',
+            default             => $url."/{$this->ip}",
+        };
 
         return $url."/{$this->ip}";
     }
 
-    /**
-     * @param $response
-     */
     protected function parseResponse($response)
     {
         $data = json_decode($response);

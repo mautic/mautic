@@ -2,7 +2,6 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
-use Exception;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
@@ -15,11 +14,9 @@ class StatsDAO
     /**
      * @var YearStat[]
      */
-    private $years = [];
+    private array $years = [];
 
     /**
-     * @param $year
-     *
      * @return YearStat
      */
     public function getYear($year)
@@ -44,9 +41,9 @@ class StatsDAO
     /**
      * @return MonthStat[]
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getMonths()
+    public function getMonths(): array
     {
         $flattenedMonths = [];
         foreach ($this->years as $yearStats) {
@@ -64,9 +61,9 @@ class StatsDAO
     /**
      * @return WeekStat[]
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getWeeks()
+    public function getWeeks(): array
     {
         $flattenedWeeks = [];
 
@@ -88,9 +85,9 @@ class StatsDAO
     /**
      * @return DayStat[]
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getDays()
+    public function getDays(): array
     {
         $flattenedDays = [];
 
@@ -111,9 +108,9 @@ class StatsDAO
     /**
      * @return HourStat[]
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function getHours()
+    public function getHours(): array
     {
         $flattenedHours = [];
 

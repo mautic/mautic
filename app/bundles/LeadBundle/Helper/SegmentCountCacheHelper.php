@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Helper;
 
-use Exception;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 
 class SegmentCountCacheHelper
 {
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
-
-    public function __construct(CacheStorageHelper $cacheStorageHelper)
-    {
-        $this->cacheStorageHelper = $cacheStorageHelper;
+    public function __construct(
+        private CacheStorageHelper $cacheStorageHelper
+    ) {
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getSegmentContactCount(int $segmentId): int
     {
@@ -28,7 +22,7 @@ class SegmentCountCacheHelper
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function setSegmentContactCount(int $segmentId, int $count): void
     {
@@ -48,7 +42,7 @@ class SegmentCountCacheHelper
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function incrementSegmentContactCount(int $segmentId): void
     {
@@ -57,7 +51,7 @@ class SegmentCountCacheHelper
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function decrementSegmentContactCount(int $segmentId): void
     {

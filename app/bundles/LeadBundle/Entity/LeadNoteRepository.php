@@ -26,10 +26,6 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
-     * @param $filter
-     * @param $noteTypes
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -60,21 +56,15 @@ class LeadNoteRepository extends CommonRepository
         return $results[0]['note_count'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'n';
     }
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -87,17 +77,14 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
         $string                  = $filter->string;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.note.searchcommand.type'):
@@ -145,9 +132,9 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return array<string, string[]>
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.lead.note.searchcommand.type' => [
@@ -163,16 +150,13 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $this->_em->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'lead_notes')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 }
