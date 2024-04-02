@@ -10,24 +10,16 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class TrackingPixelSendType.
+ * @extends AbstractType<array<mixed>>
  */
 class TrackingPixelSendType extends AbstractType
 {
-    /**
-     * @var TrackingHelper
-     */
-    protected $trackingHelper;
-
-    /**
-     * TrackingPixelSendType constructor.
-     */
-    public function __construct(TrackingHelper $trackingHelper)
-    {
-        $this->trackingHelper = $trackingHelper;
+    public function __construct(
+        protected TrackingHelper $trackingHelper
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $trackingServices = $this->trackingHelper->getEnabledServices();
 

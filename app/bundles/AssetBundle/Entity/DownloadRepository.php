@@ -16,10 +16,8 @@ class DownloadRepository extends CommonRepository
 
     /**
      * Determine if the download is a unique download.
-     *
-     * @return bool
      */
-    public function isUniqueDownload($assetId, $trackingId)
+    public function isUniqueDownload($assetId, $trackingId): bool
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -118,12 +116,10 @@ class DownloadRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHttpStatuses($query)
+    public function getHttpStatuses($query): array
     {
         $query->select('ad.code as status, count(ad.code) as count')
             ->groupBy('ad.code')
@@ -141,11 +137,9 @@ class DownloadRepository extends CommonRepository
     }
 
     /**
-     * @param \DateTime $fromDate
-     *
-     * @return mixed
+     * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
+    public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, a.source_id as id, p.title as name, p.hits as total')
@@ -183,11 +177,9 @@ class DownloadRepository extends CommonRepository
      * Get download count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as an asset download tracking ID and thus assumed happened in the same session.
      *
-     * @param \DateTime $fromDate
-     *
-     * @return mixed
+     * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null)
+    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null): array
     {
         // link email to page hit tracking id to download tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -221,7 +213,7 @@ class DownloadRepository extends CommonRepository
         return $downloads;
     }
 
-    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId)
+    public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
@@ -240,7 +232,7 @@ class DownloadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')

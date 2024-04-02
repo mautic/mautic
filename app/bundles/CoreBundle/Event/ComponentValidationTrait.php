@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 
 trait ComponentValidationTrait
 {
-    private function verifyComponent(array $keys, array $component, array $callbacks = [])
+    private function verifyComponent(array $keys, array $component, array $callbacks = []): void
     {
         foreach ($keys as $k) {
             if (is_array($k)) {
@@ -19,11 +19,9 @@ trait ComponentValidationTrait
             }
         }
 
-        if ($callbacks) {
-            foreach ($callbacks as $m) {
-                if (isset($component[$m]) && !is_callable($component[$m])) {
-                    throw new BadConfigurationException($component[$m].' is not callable.');
-                }
+        foreach ($callbacks as $m) {
+            if (isset($component[$m]) && !is_callable($component[$m])) {
+                throw new BadConfigurationException($component[$m].' is not callable.');
             }
         }
     }

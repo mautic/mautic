@@ -8,10 +8,10 @@ $standalone = 0;
 $task       = getVar('task');
 
 define('IN_CLI', 'cli' === php_sapi_name());
-define('MAUTIC_ROOT', (IN_CLI || $standalone || empty($task)) ? __DIR__ : dirname(__DIR__));
+define('MAUTIC_ROOT', (IN_CLI || empty($task)) ? __DIR__ : dirname(__DIR__));
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT.'/app');
 
-if ($standalone || IN_CLI) {
+if (IN_CLI) {
     if (!file_exists(__DIR__.'/upgrade')) {
         mkdir(__DIR__.'/upgrade');
     }
@@ -63,7 +63,7 @@ if (isset($_COOKIE['mautic_session_name'])) {
     setcookie($newSessionName, $sessionValue, 0, '/', '', false, true);
 
     unset($_COOKIE['mautic_session_name']);
-    setcookie('mautic_session_name', null, -1);
+    setcookie('mautic_session_name', '', -1);
 }
 
 // Fetch the update state out of the request if applicable
@@ -95,7 +95,7 @@ $cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParamete
 
 setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
 $query    = '';
-$maxCount = (!empty($standalone)) ? 25 : 5;
+$maxCount = 5;
 
 switch ($task) {
     case '':
@@ -178,21 +178,23 @@ function get_local_config()
         // Used in paths.php
         $root = MAUTIC_APP_ROOT;
 
-        /** @var array $paths */
+        /** @var array<string> $paths */
+        $paths = [];
         include MAUTIC_APP_ROOT.'/config/paths.php';
 
         // Include local config to get cache_path
         $localConfig = str_replace('%kernel.project_dir%', MAUTIC_ROOT, $paths['local_config']);
 
-        /** @var array $parameters */
+        /** @var array<string, mixed> $parameters */
+        $parameters = [];
         include $localConfig;
 
         $localParameters = $parameters;
 
-        //check for parameter overrides
-        if (file_exists(MAUTIC_APP_ROOT.'/config/parameters_local.php')) {
-            /** @var $parameters */
-            include MAUTIC_APP_ROOT.'/config/parameters_local.php';
+        // check for parameter overrides
+        if (file_exists(MAUTIC_APP_ROOT.'/../config/parameters_local.php')) {
+            /** @var array<string, mixed> $parameters */
+            include MAUTIC_APP_ROOT.'/../config/parameters_local.php';
             $localParameters = array_merge($localParameters, $parameters);
         }
 
@@ -215,7 +217,7 @@ function get_local_config()
  * CLI suite.  So we'll go with Option B in this instance and just nuke the entire production cache and let Symfony rebuild it on the next
  * application cycle.
  *
- * @return array
+ * @return bool
  */
 function clear_mautic_cache()
 {
@@ -238,40 +240,6 @@ function clear_mautic_cache()
 }
 
 /**
- * @param $command
- *
- * @return array
- *
- * @throws Exception
- */
-function run_symfony_command($command, array $args)
-{
-    static $application;
-
-    require_once MAUTIC_APP_ROOT.'/autoload.php';
-    require_once MAUTIC_APP_ROOT.'/AppKernel.php';
-
-    $args = array_merge(
-        ['console', $command],
-        $args
-    );
-
-    if (null == $application) {
-        $kernel      = new \AppKernel('prod', true);
-        $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
-        $application->setAutoExit(false);
-    }
-
-    $input    = new \Symfony\Component\Console\Input\ArgvInput($args);
-    $output   = new \Symfony\Component\Console\Output\NullOutput();
-    $exitCode = $application->run($input, $output);
-
-    unset($input, $output);
-
-    return 0 === $exitCode;
-}
-
-/**
  * Copy a folder.
  *
  * This function is based on \Joomla\Filesystem\Folder:copy()
@@ -279,11 +247,11 @@ function run_symfony_command($command, array $args)
  * @param string $src  The path to the source folder
  * @param string $dest The path to the destination folder
  *
- * @return array|string|bool True on success, a single error message on a "boot" fail, or an array of errors from the recursive operation
+ * @return array<string>|string|bool True on success, a single error message on a "boot" fail, or an array of errors from the recursive operation
  */
 function copy_directory($src, $dest)
 {
-    @set_time_limit(ini_get('max_execution_time'));
+    @set_time_limit((int) ini_get('max_execution_time'));
     $errorLog = [];
 
     // Eliminate trailing directory separators, if any
@@ -363,9 +331,10 @@ function getVar($name, $default = '', $filter = FILTER_SANITIZE_STRING)
  * A typical update package will only include changed files in the bundles.  However, in this script we will assume that all of
  * the bundle resources are included here and recursively iterate over the bundles in batches to update the filesystem.
  *
- * @param int $maxCount
+ * @param array<mixed> $status
+ * @param int          $maxCount
  *
- * @return array
+ * @return array<mixed>
  */
 function move_mautic_bundles(array $status, $maxCount = 5)
 {
@@ -509,7 +478,9 @@ function move_mautic_bundles(array $status, $maxCount = 5)
  * The "core" files are broken into groups for purposes of the update script: bundles, vendor, and everything else.  This step
  * will take care of the everything else.
  *
- * @return array
+ * @param array<mixed> $status
+ *
+ * @return array<mixed>
  */
 function move_mautic_core(array $status)
 {
@@ -584,9 +555,10 @@ function move_mautic_core(array $status)
  * between releases.  Therefore, this step will recursively iterate over the vendors in batches to remove each package completely
  * and replace it with the new version.
  *
- * @param int $maxCount
+ * @param array<mixed> $status
+ * @param int          $maxCount
  *
- * @return array
+ * @return array<mixed>
  */
 function move_mautic_vendors(array $status, $maxCount = 5)
 {
@@ -775,8 +747,8 @@ function move_mautic_vendors(array $status, $maxCount = 5)
 /**
  * Copy files from the directory.
  *
- * @param string $dir
- * @param array  &$errorLog
+ * @param string        $dir
+ * @param array<string> &$errorLog
  *
  * @return bool
  */
@@ -807,13 +779,11 @@ function copy_files($dir, &$errorLog)
 /**
  * Copy directories.
  *
- * @param string $dir
- * @param array  &$errorLog
- * @param bool   $createDest
- *
- * @return bool|void
+ * @param string        $dir
+ * @param array<string> &$errorLog
+ * @param bool          $createDest
  */
-function copy_directories($dir, &$errorLog, $createDest = true)
+function copy_directories($dir, &$errorLog, $createDest = true): bool
 {
     // Ensure the destination directory exists
     $exists = file_exists(MAUTIC_ROOT.$dir);
@@ -854,12 +824,16 @@ function copy_directories($dir, &$errorLog, $createDest = true)
             }
         }
     }
+
+    return true;
 }
 
 /**
  * Processes the error log for each step.
+ *
+ * @param array<string> $errorLog
  */
-function process_error_log(array $errorLog)
+function process_error_log(array $errorLog): void
 {
     // If there were any errors, add them to the error log
     if (count($errorLog)) {
@@ -945,7 +919,9 @@ function recursive_remove_directory($directory)
  * While packaging updates, the script will generate a list of deleted files in comparison to the previous version.  In this step,
  * we will process that list to remove files which are no longer included in the application.
  *
- * @return array
+ * @param array<mixed> $status
+ *
+ * @return array<mixed>
  */
 function remove_mautic_deleted_files(array $status)
 {
@@ -997,6 +973,8 @@ function remove_mautic_deleted_files(array $status)
 }
 
 /**
+ * @param array<mixed> $state
+ *
  * @return string
  */
 function get_state_param(array $state)
@@ -1006,8 +984,10 @@ function get_state_param(array $state)
 
 /**
  * Send the response back to the main application.
+ *
+ * @param array<mixed> $status
  */
-function send_response(array $status)
+function send_response(array $status): void
 {
     header('Content-Type: application/json; charset=utf-8');
 
@@ -1015,34 +995,9 @@ function send_response(array $status)
 }
 
 /**
- * Crap means of not having issues with.
- */
-function make_request($url, $method = 'GET', $data = null)
-{
-    $method  = strtoupper($method);
-    $ch      = curl_init();
-    $timeout = 15;
-    if ($data && 'POST' == $method) {
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    }
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-    curl_setopt($ch, CURLOPT_CAINFO, MAUTIC_ROOT.'/vendor/joomla/http/src/Transport/cacert.pem');
-    $data = curl_exec($ch);
-    curl_close($ch);
-
-    return $data;
-}
-
-/**
  * Wrap content in some HTML.
- *
- * @param $content
  */
-function html_body($content)
+function html_body(string $content): void
 {
     $html = <<<HTML
 <!DOCTYPE html>

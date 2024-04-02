@@ -19,32 +19,29 @@ class UserSummaryNotificationHelperTest extends TestCase
     /**
      * @var Writer|MockObject
      */
-    private $writer;
+    private \PHPUnit\Framework\MockObject\MockObject $writer;
 
     /**
      * @var UserHelper|MockObject
      */
-    private $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var OwnerProvider|MockObject
      */
-    private $ownerProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $ownerProvider;
 
     /**
      * @var RouteHelper|MockObject
      */
-    private $routeHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $routeHelper;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var UserSummaryNotificationHelper
-     */
-    private $helper;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper $helper;
 
     protected function setUp(): void
     {

@@ -7,11 +7,6 @@ use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 class MailboxContainer
 {
     /**
-     * @var ConfigAccessor
-     */
-    protected $config;
-
-    /**
      * @var array
      */
     protected $criteria = [];
@@ -26,15 +21,12 @@ class MailboxContainer
      */
     protected $messages = [];
 
-    /**
-     * MailboxAccessor constructor.
-     */
-    public function __construct(ConfigAccessor $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        protected ConfigAccessor $config
+    ) {
     }
 
-    public function addCriteria($criteria, $mailbox)
+    public function addCriteria($criteria, $mailbox): void
     {
         if (!isset($this->criteria[$criteria])) {
             $this->criteria[$criteria] = [];
@@ -46,7 +38,7 @@ class MailboxContainer
     /**
      * Keep the messages in this mailbox as unseen.
      */
-    public function keepAsUnseen()
+    public function keepAsUnseen(): void
     {
         $this->markAsSeen = false;
     }

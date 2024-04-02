@@ -10,22 +10,20 @@ use Predis\Client;
 use Predis\Response\ErrorInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 class RedisSentinelSessionHandler extends AbstractSessionHandler
 {
     /**
      * @var Client Redis client
      */
-    private $redis;
+    private \Predis\Client $redis;
 
-    /**
-     * @var array
-     */
-    private $redisConfiguration;
-
-    public function __construct(array $redisConfiguration, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->redisConfiguration = $redisConfiguration;
-
+    public function __construct(
+        private array $redisConfiguration,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $redisOptions = PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'session:'.$coreParametersHelper->get('db_name').':');
 
         $redisOptions['primaryOnly'] = $coreParametersHelper->get('redis_primary_only');
@@ -40,7 +38,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     protected function doWrite(string $sessionId, string $data): bool
     {
-        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
+        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
         $result     = $this->redis->setEx($sessionId, $expireTime, $data);
 
         return $result && !$result instanceof ErrorInterface;
@@ -65,7 +63,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     public function updateTimestamp($sessionId, $data): bool
     {
-        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
+        $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1_209_600;
 
         return (bool) $this->redis->expire($sessionId, $expireTime);
     }

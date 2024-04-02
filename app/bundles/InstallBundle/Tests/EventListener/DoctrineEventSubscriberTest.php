@@ -22,7 +22,7 @@ class DoctrineEventSubscriberTest extends TestCase
     /**
      * @var MockObject&EntityManagerInterface
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     protected function setUp(): void
     {

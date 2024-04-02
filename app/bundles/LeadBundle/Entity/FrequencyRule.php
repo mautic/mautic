@@ -7,13 +7,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-/**
- * Class FrequencyRule.
- */
 class FrequencyRule extends CommonEntity
 {
     public const TIME_DAY   = 'DAY';
+
     public const TIME_WEEK  = 'WEEK';
+
     public const TIME_MONTH = 'MONTH';
 
     /**
@@ -61,13 +60,14 @@ class FrequencyRule extends CommonEntity
      */
     private $pauseToDate;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_frequencyrules')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\FrequencyRuleRepository')
-            ->addIndex(['channel'], 'channel_frequency');
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class)
+            ->addIndex(['channel'], 'channel_frequency')
+            ->addIndex(['lead_id', 'date_added'], 'idx_frequency_date_added');
 
         $builder->addId();
 
@@ -104,7 +104,7 @@ class FrequencyRule extends CommonEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('frequencyRules')
                  ->addListProperties(
@@ -281,8 +281,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseFromDate
-     *
      * @return FrequencyRule
      */
     public function setPauseFromDate(\DateTime $pauseFromDate = null)
@@ -303,8 +301,6 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $pauseToDate
-     *
      * @return FrequencyRule
      */
     public function setPauseToDate(\DateTime $pauseToDate = null)

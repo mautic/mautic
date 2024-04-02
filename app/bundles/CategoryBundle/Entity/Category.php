@@ -9,9 +9,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Category.
- */
 class Category extends FormEntity
 {
     /**
@@ -44,12 +41,12 @@ class Category extends FormEntity
      */
     private $bundle;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('categories')
-            ->setCustomRepositoryClass('Mautic\CategoryBundle\Entity\CategoryRepository')
+            ->setCustomRepositoryClass(\Mautic\CategoryBundle\Entity\CategoryRepository::class)
             ->addIndex(['alias'], 'category_alias_search');
 
         $builder->addIdColumns('title');
@@ -66,7 +63,7 @@ class Category extends FormEntity
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'title',
@@ -90,7 +87,7 @@ class Category extends FormEntity
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('category')
             ->addListProperties(
@@ -199,13 +196,9 @@ class Category extends FormEntity
     }
 
     /**
-     * Set color.
-     *
      * @param string $color
-     *
-     * @return Category
      */
-    public function setColor($color)
+    public function setColor($color): void
     {
         $this->isChanged('color', $color);
         $this->color = $color;
@@ -225,10 +218,8 @@ class Category extends FormEntity
      * Set bundle.
      *
      * @param string $bundle
-     *
-     * @return Category
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): void
     {
         $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;

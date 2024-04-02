@@ -182,9 +182,9 @@
                 {% for keyLabel, options in mauticChoices %}
                   {% if options is iterable %}
                     <optgroup label="{{ keyLabel }}">
-                        {% for o, keyValue in options %}
+                        {% for optionLabel, keyValue in options %}
                           <option value="{{ keyValue|e }}" {% if keyValue == child.vars.data %}selected{% set selected = true %}{% elseif selected is defined and selected is empty and '-1' == keyValue %}selected{% endif %}>
-                              {{- o -}}
+                              {{- optionLabel|trans -}}
                           </option>
                         {% endfor %}
                     </optgroup>

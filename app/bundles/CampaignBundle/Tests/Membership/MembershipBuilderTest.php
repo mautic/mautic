@@ -20,27 +20,24 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MembershipManager|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $manager;
+    private \PHPUnit\Framework\MockObject\MockObject $manager;
 
     /**
      * @var CampaignMemberRepository|MockObject
      */
-    private $campaignMemberRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignMemberRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var MembershipBuilder
-     */
-    private $membershipBuilder;
+    private \Mautic\CampaignBundle\Membership\MembershipBuilder $membershipBuilder;
 
     protected function setUp(): void
     {

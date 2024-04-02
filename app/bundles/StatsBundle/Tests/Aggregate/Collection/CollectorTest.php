@@ -7,25 +7,21 @@ use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
 use Mautic\StatsBundle\StatEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CollectorTest extends TestCase
 {
-    /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $eventDispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
         $this->eventDispatcher = new EventDispatcher();
     }
 
-    public function testEventIsDispatched()
+    public function testEventIsDispatched(): void
     {
         $this->eventDispatcher->addListener(
             StatEvents::AGGREGATE_STAT_REQUEST,
-            function (AggregateStatRequestEvent $event) {
+            function (AggregateStatRequestEvent $event): void {
                 $statCollection = $event->getStatCollection();
 
                 $statCollection->addStat(2018, 12, 7, 1, 100);

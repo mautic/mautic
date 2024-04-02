@@ -28,7 +28,7 @@ trait DynamicContentTrait
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $data = $event->getData();
                 /** @var Email $entity */
                 $entity = $event->getForm()->getData();

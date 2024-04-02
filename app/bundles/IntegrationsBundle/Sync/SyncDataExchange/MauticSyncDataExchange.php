@@ -16,6 +16,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
+use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
@@ -25,53 +26,20 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\Parti
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     public const NAME           = 'mautic';
+
     public const OBJECT_CONTACT = 'lead'; // kept as lead for BC
+
     public const OBJECT_COMPANY = 'company';
 
-    /**
-     * @var FieldChangeRepository
-     */
-    private $fieldChangeRepository;
-
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
-
-    /**
-     * @var MappingHelper
-     */
-    private $mappingHelper;
-
-    /**
-     * @var FullObjectReportBuilder
-     */
-    private $fullObjectReportBuilder;
-
-    /**
-     * @var PartialObjectReportBuilder
-     */
-    private $partialObjectReportBuilder;
-
-    /**
-     * @var OrderExecutioner
-     */
-    private $orderExecutioner;
-
     public function __construct(
-        FieldChangeRepository $fieldChangeRepository,
-        FieldHelper $fieldHelper,
-        MappingHelper $mappingHelper,
-        FullObjectReportBuilder $fullObjectReportBuilder,
-        PartialObjectReportBuilder $partialObjectReportBuilder,
-        OrderExecutioner $orderExecutioner
+        private FieldChangeRepository $fieldChangeRepository,
+        private FieldHelper $fieldHelper,
+        private MappingHelper $mappingHelper,
+        private FullObjectReportBuilder $fullObjectReportBuilder,
+        private PartialObjectReportBuilder $partialObjectReportBuilder,
+        private OrderExecutioner $orderExecutioner,
+        private SyncDateHelper $syncDateHelper
     ) {
-        $this->fieldChangeRepository      = $fieldChangeRepository;
-        $this->fieldHelper                = $fieldHelper;
-        $this->mappingHelper              = $mappingHelper;
-        $this->fullObjectReportBuilder    = $fullObjectReportBuilder;
-        $this->partialObjectReportBuilder = $partialObjectReportBuilder;
-        $this->orderExecutioner           = $orderExecutioner;
     }
 
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO
@@ -129,12 +97,17 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $object   = $this->fieldHelper->getFieldObjectName($changedObjectDAO->getMappedObject());
                 $objectId = $changedObjectDAO->getMappedObjectId();
 
-                $this->fieldChangeRepository->deleteEntitiesForObject((int) $objectId, $object, $changedObjectDAO->getIntegration());
+                $this->fieldChangeRepository->deleteEntitiesForObject(
+                    (int) $objectId,
+                    $object,
+                    $changedObjectDAO->getIntegration(),
+                    $this->syncDateHelper->getInternalSyncStartDateTime()
+                );
             } catch (ObjectNotSupportedException $exception) {
                 DebugLogger::log(
                     self::NAME,
                     $exception->getMessage(),
-                    __CLASS__.':'.__FUNCTION__
+                    self::class.':'.__FUNCTION__
                 );
             }
         }

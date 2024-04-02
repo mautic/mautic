@@ -532,3 +532,16 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         {%- endif -%}
     {%- endfor -%}
 {%- endblock attributes -%}
+
+{% block form_help -%}
+    {%- if help is not empty -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
+        <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+                {%- if help_html is same as(false) -%}
+                    {{- help|trans(help_translation_parameters, translation_domain) -}}
+                {%- else -%}
+                    {{- help|trans(help_translation_parameters, translation_domain)|purify -}}
+                {%- endif -%}
+        </p>
+    {%- endif -%}
+{%- endblock form_help %}

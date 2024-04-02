@@ -18,21 +18,12 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    protected RealTimeExecutioner $realTimeExecutioner;
-    protected EventDispatcherInterface $dispatcher;
-    protected DynamicContentModel $dynamicContentModel;
-    protected LeadModel $leadModel;
-
     public function __construct(
-        DynamicContentModel $dynamicContentModel,
-        RealTimeExecutioner $realTimeExecutioner,
-        EventDispatcherInterface $dispatcher,
-        LeadModel $leadModel
+        protected DynamicContentModel $dynamicContentModel,
+        protected RealTimeExecutioner $realTimeExecutioner,
+        protected EventDispatcherInterface $dispatcher,
+        protected LeadModel $leadModel
     ) {
-        $this->dynamicContentModel = $dynamicContentModel;
-        $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->dispatcher          = $dispatcher;
-        $this->leadModel           = $leadModel;
     }
 
     /**
@@ -122,10 +113,8 @@ class DynamicContentHelper
     /**
      * @param string    $content
      * @param Lead|null $lead
-     *
-     * @return array
      */
-    public function findDwcTokens($content, $lead)
+    public function findDwcTokens($content, $lead): array
     {
         preg_match_all('/{dwc=(.*?)}/', $content, $matches);
 
@@ -173,9 +162,10 @@ class DynamicContentHelper
             $dwc     = $translation;
             $content = $dwc->getContent();
         }
-        $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+        $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+        $tokenEvent->setStat($stat);
         $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();
@@ -217,18 +207,14 @@ class DynamicContentHelper
 
     /**
      * @param Lead $lead
-     *
-     * @return array
      */
-    public function convertLeadToArray($lead)
+    public function convertLeadToArray($lead): array
     {
         return array_merge(
             $lead->getProfileFields(),
             [
                 'tags' => array_map(
-                    function (Tag $v) {
-                        return $v->getId();
-                    },
+                    fn (Tag $v) => $v->getId(),
                     $lead->getTags()->toArray()
                 ),
             ]

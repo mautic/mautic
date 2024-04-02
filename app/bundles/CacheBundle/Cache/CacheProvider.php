@@ -14,29 +14,16 @@ use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class CacheProvider provides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
+ * Povides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
  */
 final class CacheProvider implements CacheProviderInterface
 {
-    /**
-     * @var Psr16Cache|null
-     */
-    private $psr16;
+    private ?\Symfony\Component\Cache\Psr16Cache $psr16 = null;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContainerInterface $container)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->container            = $container;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private ContainerInterface $container
+    ) {
     }
 
     public function getCacheAdapter(): TagAwareAdapterInterface

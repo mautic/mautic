@@ -12,12 +12,9 @@ class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|ClassMetadataInfo
      */
-    private $classMetadataInfo;
+    private \PHPUnit\Framework\MockObject\MockObject $classMetadataInfo;
 
-    /**
-     * @var ClassMetadataBuilder
-     */
-    private $classMetadataBuilder;
+    private \Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder $classMetadataBuilder;
 
     protected function setUp(): void
     {
@@ -27,7 +24,7 @@ class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->classMetadataBuilder = new ClassMetadataBuilder($this->classMetadataInfo);
     }
 
-    public function testAddNullableFieldWithoutColumnName()
+    public function testAddNullableFieldWithoutColumnName(): void
     {
         $this->classMetadataInfo->expects($this->once())
             ->method('mapField')
@@ -41,7 +38,7 @@ class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->classMetadataBuilder->addNullableField('column_name');
     }
 
-    public function testAddNullableFieldWithColumnName()
+    public function testAddNullableFieldWithColumnName(): void
     {
         $this->classMetadataInfo->expects($this->once())
             ->method('mapField')

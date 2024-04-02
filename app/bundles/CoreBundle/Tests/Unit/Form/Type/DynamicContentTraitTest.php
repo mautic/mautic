@@ -17,27 +17,27 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&FormBuilderInterface<FormBuilderInterface>
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
     /**
      * @var MockObject&FormEvent
      */
-    private $formEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $formEvent;
 
     /**
      * @var MockObject&FormInterface<FormInterface>
      */
-    private $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
     /**
      * @var MockObject (use DynamicContentEntityTrait)
      */
-    private $entity;
+    private \PHPUnit\Framework\MockObject\MockObject $entity;
 
     /**
      * @var MockObject (use DynamicContentTrait)
      */
-    private $trait;
+    private \PHPUnit\Framework\MockObject\MockObject $trait;
 
     protected function setUp(): void
     {
@@ -126,7 +126,7 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
      */
     private function invokeMethod(object $object, string $methodName, array $args = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new \ReflectionClass($object::class);
         $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 
