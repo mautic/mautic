@@ -375,7 +375,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @dataProvider dateFieldProvider
      */
-    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
+    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = 'like'): void
     {
         $segment = $this->saveSegment(
             'Date Segment',

@@ -47,7 +47,19 @@ final class SegmentDateValidator extends ConstraintValidator
 
                 foreach ($formats as $fmt) {
                     $dateTime = \DateTime::createFromFormat($fmt, $parameterValue);
+
                     if (false !== $dateTime) {
+                        // Exclude = and != for dates
+                        if (in_array($filter['operator'] ?? '', ['=', 'equals', '!=', 'not equal'])) {
+                            $this->context->addViolation($this->translator->trans(
+                                'mautic.lead.segment.date_operator',
+                                ['%operator%' => $filter['operator']],
+                                'validators')
+                            );
+
+                            return;
+                        }
+
                         break;
                     }
                 }
