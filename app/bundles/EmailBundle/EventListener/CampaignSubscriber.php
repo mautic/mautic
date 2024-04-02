@@ -245,7 +245,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'customHeaders'  => [
                 'X-EMAIL-ID' => $emailId,
             ],
-            'ignoreDNC'      => MailHelper::EMAIL_TYPE_TRANSACTIONAL === $type,
+            'ignoreDNC'      => $email->getSendToDnc(),
         ];
 
         // Determine if this email is transactional/marketing
@@ -276,18 +276,20 @@ class CampaignSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $categories = $this->leadModel->getUnsubscribedLeadCategoriesIds($contact);
-            if ($emailCategory && !empty($categories) && in_array($emailCategory, $categories)) {
-                // Pass with a note to the UI because no use retrying
-                $event->passWithError(
-                    $pending->get($logId),
-                    $this->translator->trans(
-                        'mautic.email.contact_has_unsubscribed_from_category',
-                        ['%contact%' => $contact->getPrimaryIdentifier(), '%category%' => $emailCategory]
-                    )
-                );
-                unset($contactIds[$contact->getId()]);
-                continue;
+            if (!$options['ignoreDNC']) {
+                $categories = $this->leadModel->getUnsubscribedLeadCategoriesIds($contact);
+                if ($emailCategory && !empty($categories) && in_array($emailCategory, $categories)) {
+                    // Pass with a note to the UI because no use retrying
+                    $event->passWithError(
+                        $pending->get($logId),
+                        $this->translator->trans(
+                            'mautic.email.contact_has_unsubscribed_from_category',
+                            ['%contact%' => $contact->getPrimaryIdentifier(), '%category%' => $emailCategory]
+                        )
+                    );
+                    unset($contactIds[$contact->getId()]);
+                    continue;
+                }
             }
 
             $credentialArray[$logId] = $leadCredentials;

@@ -291,13 +291,38 @@ Mautic.disabledEmailAction = function(opener, origin) {
         opener = window;
     }
     var email = opener.mQuery(origin);
-    if (email.length == 0) return;
+    if (email.length == 0){
+        mQuery('#email_send_to_dnc_status').addClass('hide');
+        return;
+    }
     var emailId = email.val();
     var disabled = emailId === '' || emailId === null;
 
     opener.mQuery('[id$=_editEmailButton]').prop('disabled', disabled);
     opener.mQuery('[id$=_previewEmailButton]').prop('disabled', disabled);
+    if (!disabled) {
+        Mautic.setEmailSendToDncStatus(emailId);
+    } else {
+        mQuery('#email_send_to_dnc_status').addClass('hide');
+    }
 };
+
+Mautic.setEmailSendToDncStatus = function (emailId) {
+    const dnc_status = mQuery('#email_send_to_dnc_status');
+    if (emailId && dnc_status.length > 0) {
+        Mautic.ajaxActionRequest('email:getEmailSendToDncStatus', {id: emailId}, function(response) {
+            if (typeof response.sendToDncStatus != "undefined") {
+                dnc_status.removeClass('hide')
+                dnc_status.find('span.dnc-status-text')
+                    .removeClass('label-danger label-primary')
+                    .addClass(response.sendToDncStatus ? 'label-danger' : 'label-primary')
+                    .text(response.sendToDncText);
+            } else {
+                dnc_status.addClass('hide');
+            }
+        }, false, false, "GET");
+    }
+}
 
 Mautic.initEmailDynamicContent = function() {
     if (mQuery('#dynamic-content-container').length) {
@@ -776,4 +801,24 @@ Mautic.loadEmailUsages = function($el) {
 
 Mautic.setSendToDncOnModelLoad = function(el) {
     mQuery(el).trigger('change');
+};
+
+Mautic.showSendToDncConfirmation = function (el) {
+    const element = mQuery(el);
+
+    if (element.val() === '1' && element.prop('checked')) {
+        Mautic.showConfirmation(element);
+    }
+};
+
+Mautic.setSendToDncToNo = function(el) {
+    Mautic.dismissConfirmation();
+    const noButton   = mQuery(el).parent('.btn-yes').siblings('.btn-no').children('input');
+    const noButtonId = mQuery(noButton).attr('id');
+
+    if (noButtonId !== undefined) {
+        mQuery('#' + noButtonId).trigger('click');
+        mQuery(el).parent('.btn-yes').removeClass('active');
+        mQuery(el).parent('.btn-yes').siblings('.btn-no').addClass('active');
+    }
 };

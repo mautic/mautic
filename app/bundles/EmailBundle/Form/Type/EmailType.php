@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
@@ -47,7 +48,8 @@ class EmailType extends AbstractType
         private EntityManagerInterface $em,
         private StageModel $stageModel,
         private CoreParametersHelper $coreParametersHelper,
-        private ThemeHelperInterface $themeHelper
+        private ThemeHelperInterface $themeHelper,
+        private CorePermissions $corePermissions
     ) {
     }
 
@@ -156,6 +158,27 @@ class EmailType extends AbstractType
                         ['%value%' => $this->translator->trans($this->getGlobalMailerIsOwner() ? 'mautic.core.yes' : 'mautic.core.no')]
                     ),
                 ],
+            ]
+        );
+
+        $builder->add(
+            'sendToDnc',
+            YesNoButtonGroupType::class,
+            [
+                'label'    => 'mautic.email.send.dnc.label',
+                'attr'     => [
+                    'onchange'               => 'Mautic.showSendToDncConfirmation(mQuery(this))',
+                    'data-toggle'            => 'confirmation',
+                    'data-message'           => $this->translator->trans('mautic.email.send.dnc.confirmation'),
+                    'data-confirm-text'      => $this->translator->trans('mautic.email.send.dnc.confirmation.confirm.text'),
+                    'data-confirm-callback'  => 'dismissConfirmation',
+                    'data-cancel-text'       => $this->translator->trans('mautic.email.send.dnc.confirmation.cancel.text'),
+                    'data-cancel-callback'   => 'setSendToDncToNo',
+                    'data-confirm-btn-class' => 'btn btn-success',
+                    'tooltip'                => 'mautic.email.send.dnc.tooltip',
+                    'readonly'               => !$this->corePermissions->isGranted('email:emails:sendtodnc'),
+                ],
+                'required' => false,
             ]
         );
 

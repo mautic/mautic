@@ -1300,8 +1300,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
         $emailType           = ArrayHelper::getValue('email_type', $options, '');
-        $isMarketing         = (in_array($emailType, [MailHelper::EMAIL_TYPE_MARKETING]) || !empty($listId));
-        $emailAttempts       = ArrayHelper::getValue('email_attempts', $options, 3);
         $emailPriority       = ArrayHelper::getValue('email_priority', $options, MessageQueue::PRIORITY_NORMAL);
         $messageQueue        = ArrayHelper::getValue('resend_message_queue', $options);
         $returnErrorMessages = ArrayHelper::getValue('return_errors', $options, false);
@@ -1352,7 +1350,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         // Process frequency rules for email
-        if ($isMarketing && count($sendTo)) {
+        if (!$email->getSendToDnc() && count($sendTo)) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
             $this->messageQueueModel->processFrequencyRules(
@@ -1360,7 +1358,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 'email',
                 $email->getId(),
                 $campaignEventId,
-                $emailAttempts,
+                ArrayHelper::getValue('email_attempts', $options, 3),
                 $emailPriority,
                 $messageQueue
             );

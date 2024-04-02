@@ -434,3 +434,7 @@
     line-height: 250px;
     font-size: 24px;
 }
+.label.dnc-status-text {
+    padding: 10px;
+    font-size: 18px;
+}

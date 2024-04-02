@@ -180,7 +180,7 @@ class EmailSendType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'with_email_types' => true,
+                'with_email_types' => false,
             ]
         );
 

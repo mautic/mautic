@@ -94,6 +94,11 @@
                                 <div class="col-md-6">
                                     {{ form_row(form.useOwnerAsMailer) }}
                                 </div>
+                                {% if form.sendToDnc is defined %}
+                                    <div class="col-md-6">
+                                        {{ form_row(form.sendToDnc) }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <br/>
                             <div class="row hidden" id="custom-html-row">

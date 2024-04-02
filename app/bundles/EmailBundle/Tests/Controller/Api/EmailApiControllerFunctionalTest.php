@@ -15,6 +15,9 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
 
@@ -26,6 +29,14 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['mailer_from_name']       = 'Mautic Admin';
         $this->configParams['default_signature_text'] = 'Best regards, |FROM_NAME|';
+
+        if ('testCreateEmailWithoutSendToDncPermission' === $this->getName()) {
+            $this->clientServer = [
+                'PHP_AUTH_USER' => 'sales',
+                'PHP_AUTH_PW'   => 'mautic',
+            ];
+        }
+
         parent::setUp();
         $this->loadFixtures([LoadCategoryData::class]);
         $this->setUpMailer();
@@ -194,12 +205,14 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($segmentAId, $response['email']['lists'][0]['id']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
         $this->assertFalse($response['email']['publicPreview']);
+        $this->assertFalse($response['email']['sendToDnc']);
 
         // Edit PATCH:
         $patchPayload = [
             'name'          => 'API email renamed',
             'lists'         => [$segmentBId],
             'publicPreview' => true,
+            'sendToDnc'     => true,
         ];
         $this->client->request('PATCH', "/api/emails/{$emailId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
@@ -207,6 +220,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertSame($emailId, $response['email']['id']);
+        $this->assertTrue($response['email']['sendToDnc']);
         $this->assertEquals('API email renamed', $response['email']['name']);
         $this->assertEquals($payload['subject'], $response['email']['subject']);
         $this->assertCount(1, $response['email']['lists']);
@@ -234,6 +248,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['emailType'], $response['email']['emailType']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
         $this->assertEquals($payload['publicPreview'], $response['email']['publicPreview']);
+        $this->assertFalse($response['email']['sendToDnc']);
 
         // Get:
         $this->client->request('GET', "/api/emails/{$emailId}");
@@ -290,6 +305,23 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
         $this->assertSame('Email Stat with tracking hash tracking_hash_123 was not found', $responseData['errors'][0]['message']);
+    }
+
+    public function testCreateEmailWithoutSendToDncPermission(): void
+    {
+        $user       = $this->getUser($this->clientServer['PHP_AUTH_USER']);
+        $permission = ['email:emails' => ['create']];
+        $this->setPermission($user->getRole(), $permission);
+        $payload = [
+            'name'       => 'API email',
+            'subject'    => 'Email created via API test',
+            'customHtml' => '<h1>Email content created by an API test</h1>',
+            'sendToDnc'  => true,
+        ];
+        $this->client->request('POST', '/api/emails/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertFalse($response['email']['sendToDnc']); //it will not change as sales user does not have permission to change sendToDnc
     }
 
     public function testReplyAction(): void
@@ -575,5 +607,27 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
 
         return $email;
+    }
+
+    private function getUser(string $userName): ?User
+    {
+        $repository = $this->em->getRepository(User::class);
+        $user       = $repository->findOneBy(['username' => $userName]);
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    /**
+     * @param array<string, string[]> $permissions
+     */
+    private function setPermission(Role $role, array $permissions): void
+    {
+        $roleModel = self::$container->get('mautic.user.model.role');
+        $roleModel->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+        $this->em->flush();
     }
 }

@@ -339,4 +339,22 @@ class AjaxController extends CommonAjaxController
             'usagesHtml'  => $usagesHtml,
         ]);
     }
+
+    public function getEmailSendToDncStatusAction(Request $request): JsonResponse
+    {
+        $dataArray = [];
+
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model    = $this->getModel('email');
+        $objectId = $request->get('id');
+
+        if ($objectId && $entity = $model->getEntity($objectId)) {
+            $yesText                         =  $this->translator->trans('mautic.core.form.yes');
+            $noText                          = $this->translator->trans('mautic.core.form.no');
+            $dataArray['sendToDncText']      = $entity->getSendToDnc() ? $yesText : $noText;
+            $dataArray['sendToDncStatus']    = $entity->getSendToDnc();
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

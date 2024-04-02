@@ -224,4 +224,29 @@ class EmailApiController extends CommonApiController
         }
         parent::prepareParametersFromRequest($form, $params, $entity, $masks, $fields);
     }
+
+    /**
+     * Processes API Form.
+     *
+     * @param Email        $entity
+     * @param mixed[]|null $parameters
+     * @param string       $method
+     *
+     * @return mixed
+     */
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    {
+        if (array_key_exists('sendToDnc', $parameters) &&
+            !$this->security->isGranted('email:emails:sendtodnc')) {
+            // do not save user defined value for sendToDnc if user do not have permission
+            unset($parameters['sendToDnc']);
+        }
+
+        if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
+            // use default value, incase of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
+            $parameters['sendToDnc'] = false;
+        }
+
+        return parent::processForm($request, $entity, $parameters, $method);
+    }
 }
