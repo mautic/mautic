@@ -79,14 +79,14 @@ final class NotificationEvents
     public const NOTIFICATION_POST_DELETE = 'mautic.notification_post_delete';
 
     /**
-     * The mautic.notification.on_campaign_trigger_action event is fired when the campaign action triggers.
+     * The mautic.notification.on_batch_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\PendingEvent
      *
      * @var string
      */
-    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.notification.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_BATCH_ACTION = 'mautic.notification.on_batch_trigger_action';
 
     /**
      * The mautic.notification.on_campaign_trigger_condition event is fired when the campaign condition triggers.
