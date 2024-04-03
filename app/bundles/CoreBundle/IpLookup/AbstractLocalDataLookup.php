@@ -57,8 +57,23 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     {
         $package   = $this->getRemoteDateStoreDownloadUrl();
 
+        // try {
+        //     $data = $this->client->get($package);
+        // } catch (\Exception $exception) {
+        //     $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
+        // }
+
         try {
             $data = $this->client->get($package);
+            // check if response is 200 before storing value in $data
+            if ($data->getStatusCode() === 200)
+            {
+                $data = $data;
+            }
+            else
+            {
+                return false;
+            }
         } catch (\Exception $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }
