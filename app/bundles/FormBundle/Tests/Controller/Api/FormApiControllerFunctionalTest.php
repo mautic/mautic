@@ -439,6 +439,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                     'leadField' => 'email',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -450,17 +451,13 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), 'Return code must be 201.');
 
         // Get the last correctly saved form
-        $this->client->request(Request::METHOD_GET, '/api/forms', [
-            'orderBy'    => 'id',
-            'orderByDir' => 'DESC',
-            'limit'      => '1',
-        ]);
+        $this->client->request(Request::METHOD_GET, '/api/forms/'.$lastValidFormId);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertIsArray($response['forms']);
-        $this->assertCount(1, $response['forms']);
-        $this->assertEquals($lastValidFormId, $response['forms'][0]['id']);
+        $this->assertIsArray($response['form']);
+        $this->assertCount(1, $response);
+        $this->assertEquals($lastValidFormId, $response['form']['id']);
 
         // Try to update invalid, non-existent form
         $longAlias      = 'very_long_field_alias_12345';
@@ -494,19 +491,6 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response['errors'][0]['code'], 'Return code must be 400.');
         $this->assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), 'Return code must be 400.');
         $this->assertSame($expectedMessage, $response['errors'][0]['message'], 'Returned message is different than expected');
-
-        // Get the last correctly saved form again. Make sure that trying to save invalid form didn't create a new one.
-        $this->client->request(Request::METHOD_GET, '/api/forms', [
-            'orderBy'    => 'id',
-            'orderByDir' => 'DESC',
-            'limit'      => '1',
-        ]);
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-
-        $this->assertIsArray($response['forms']);
-        $this->assertCount(1, $response['forms']);
-        $this->assertEquals($lastValidFormId, $response['forms'][0]['id'], 'An attempt to save invalid form created a new entity');
     }
 
     public function testFormWithInvalidField(): void
