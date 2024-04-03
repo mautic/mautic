@@ -26,12 +26,15 @@ function launchBuilderGrapesjs(formName) {
   mQuery('body').css('overflow-y', 'hidden');
   mQuery('.builder-panel').css('padding', 0);
   mQuery('.builder-panel').css('display', 'block');
-  mQuery('.builder').addClass('builder-active').removeClass('hide');
+  const $builder = mQuery('.builder');
+  $builder.addClass('builder-active').removeClass('hide');
 
   const assetsConfig = AssetService.getAssetsConfig();
   const builder = new BuilderService(assetsConfig);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+  $builder.trigger('builder:show', [builder.editor])
+  builder.editor.trigger('show');
 
   // Load and add assets
   AssetService.getAssetsXhr(function (result) {

@@ -87,6 +87,14 @@ export default class BuilderService {
         data: { filename: response.getFilename() },
       });
     });
+
+    const triggerBuilderHide = () => {
+      mQuery('.builder').trigger('builder:hide', [this.editor]);
+      this.editor.trigger('hide');
+    };
+    this.editor.on('run:mautic-editor-page-html-close', triggerBuilderHide);
+    this.editor.on('run:mautic-editor-email-html-close', triggerBuilderHide);
+    this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
   }
 
   /**
