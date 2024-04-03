@@ -273,4 +273,11 @@ class ThemeController extends FormController
             ],
         ];
     }
+
+    public function overridePathAction(): Response
+    {
+        return $this->delegateView([
+            'contentTemplate' => '@MauticCore/Override/index.html.twig',
+        ]);
+    }
 }

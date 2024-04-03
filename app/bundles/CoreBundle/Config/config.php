@@ -34,6 +34,10 @@ return [
                 'path'       => '/themes/{objectAction}/{objectId}',
                 'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
             ],
+            'mautic_themes_system_override_path_action' => [
+                'path'       => '/override-path',
+                'controller' => 'Mautic\CoreBundle\Controller\ThemeController::overridePathAction',
+            ],
         ],
         'public' => [
             'mautic_js' => [
