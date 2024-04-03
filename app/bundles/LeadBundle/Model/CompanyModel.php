@@ -519,22 +519,18 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Get a list of companies with names only.
      *
-     * @param string         $type
      * @param mixed[]|string $filter
-     * @param int            $limit
-     * @param int            $start
-     * @param string         $exclude
      * 
-     * @return array[]
+     * @return string[]
      */
-    public function getSimpleLookupResults($type, $filter = '', $limit = 10, $start = 0, $exclude = ''): array
+    public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, string $exclude = ''): array
     {
         $results = [];
         $valueColumn = 'id';
         $onlyNames = true;
-        switch ($type) {
-            case 'companyfield':
-            case 'lead.company':
+        if (!in_array($type, ['companyfield', 'lead.company']) {
+            return [];
+        }
                 if ('lead.company' === $type) {
                     $column    = 'companyname';
                     $filterVal = $filter;

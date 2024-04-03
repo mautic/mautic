@@ -217,7 +217,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         // Check if the method exists in the model
-        $methodName = isset($this->options['model_lookup_method']) ? $this->options['model_lookup_method'] : null;
+        $methodName = $this->options['model_lookup_method'] ?? null;
         if ($methodName && method_exists($model, $methodName)) {
             $choices = call_user_func_array([$model, $this->options['model_lookup_method']], $args);
         } elseif (isset($this->options['repo_lookup_method'])) {

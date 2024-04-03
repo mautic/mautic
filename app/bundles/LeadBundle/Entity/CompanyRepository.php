@@ -427,8 +427,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             else comp.companyname
             end
             as label';
-        }
-        else {
+        } else {
             $labelExpression = $prefix.' companyname as label';
         }
 
