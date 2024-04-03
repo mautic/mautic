@@ -523,7 +523,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * 
      * @return string[]
      */
-    public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, string $exclude = ''): array
+    public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, ?string $exclude = ''): array
     {
         $results = [];
         $valueColumn = 'id';
