@@ -89,12 +89,18 @@ export default class BuilderService {
     });
 
     const triggerBuilderHide = () => {
+      // trigger hide event on DOM element
       mQuery('.builder').trigger('builder:hide', [this.editor]);
+      // trigger hide event on editor instance
       this.editor.trigger('hide');
     };
     this.editor.on('run:mautic-editor-page-html-close', triggerBuilderHide);
     this.editor.on('run:mautic-editor-email-html-close', triggerBuilderHide);
     this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
+
+    // add offset to flashes container for better UI visibility when builder is on
+    this.editor.on('show', () => mQuery('#flashes').addClass('alert-offset'));
+    this.editor.on('hide', () => mQuery('#flashes').removeClass('alert-offset'));
   }
 
   /**
