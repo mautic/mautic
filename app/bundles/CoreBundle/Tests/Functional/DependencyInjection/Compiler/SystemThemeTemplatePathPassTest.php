@@ -34,8 +34,6 @@ class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
         if ($fileSystem->exists($path)) {
             $fileSystem->remove($path);
         }
-
-        parent::tearDown();
     }
 
     private function getOverridePath(): string
