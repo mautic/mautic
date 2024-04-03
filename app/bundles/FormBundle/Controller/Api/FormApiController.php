@@ -147,7 +147,8 @@ class FormApiController extends CommonApiController
         // Set timestamps
         $this->model->setTimestamps($entity, true, false);
 
-        $this->model->getRepository()->beginTransaction();
+        $connection = $this->doctrine->getConnection();
+        $connection->beginTransaction();
 
         if (!$entity->getId()) {
             $isNew = true;
@@ -278,9 +279,9 @@ class FormApiController extends CommonApiController
                 $this->model->setActions($entity, $actions);
             }
 
-            $this->model->getRepository()->commit();
+            $connection->commit();
         } catch (InvalidArgumentException $e) {
-            $this->model->getRepository()->rollback();
+            $connection->rollback();
 
             return $this->returnError($e->getMessage(), $e->getCode());
         }
