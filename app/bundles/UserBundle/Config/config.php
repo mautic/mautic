@@ -11,14 +11,11 @@ return [
             'mautic.user.users' => [
                 'access'    => 'user:users:view',
                 'route'     => 'mautic_user_index',
-
-                'parent'   => 'mautic.user_management',
+                'parent'    => 'mautic.user_management',
             ],
             'mautic.user.roles' => [
                 'access'    => 'user:roles:view',
                 'route'     => 'mautic_role_index',
-
-
                 'parent'   => 'mautic.user_management',
             ],
         ],

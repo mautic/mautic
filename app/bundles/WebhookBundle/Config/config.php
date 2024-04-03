@@ -33,7 +33,7 @@ return [
                     'id'        => 'mautic_webhook_root',
                     'access'    => ['webhook:webhooks:viewown', 'webhook:webhooks:viewother'],
                     'route'     => 'mautic_webhook_index',
-                    'parent'   => 'mautic.core.integrations',
+                    'parent'    => 'mautic.core.integrations',
                 ],
             ],
         ],

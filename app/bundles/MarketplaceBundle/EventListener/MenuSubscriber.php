@@ -39,7 +39,7 @@ final class MenuSubscriber implements EventSubscriberInterface
                         'id'        => 'marketplace',
                         'route'     => RouteProvider::ROUTE_LIST,
                         'access'    => MarketplacePermissions::CAN_VIEW_PACKAGES,
-                        'parent'   => 'mautic.core.integrations',
+                        'parent'    => 'mautic.core.integrations',
                     ],
                 ],
             ]

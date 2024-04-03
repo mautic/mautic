@@ -51,7 +51,7 @@ return [
                     'id'        => 'mautic_plugin_root',
                     'access'    => 'plugin:plugins:manage',
                     'route'     => 'mautic_plugin_index',
-                    'parent'   => 'mautic.core.integrations',
+                    'parent'    => 'mautic.core.integrations',
                 ],
             ],
         ],
