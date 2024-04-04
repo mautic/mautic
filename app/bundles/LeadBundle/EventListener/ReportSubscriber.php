@@ -25,17 +25,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_LEADS                     = 'leads';
+
     public const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
+
     public const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
+
     public const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
+
     public const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
+
     public const CONTEXT_COMPANIES                 = 'companies';
 
     public const GROUP_CONTACTS = 'contacts';
 
-    private $leadContexts = [
+    /**
+     * @var string[]
+     */
+    private array $leadContexts = [
         self::CONTEXT_LEADS,
         self::CONTEXT_LEAD_POINT_LOG,
         self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
@@ -43,85 +53,30 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
-    private $companyContexts = [self::CONTEXT_COMPANIES];
 
     /**
-     * @var LeadModel
+     * @var string[]
      */
-    private $leadModel;
+    private array $companyContexts = [self::CONTEXT_COMPANIES];
 
-    /**
-     * @var StageModel
-     */
-    private $stageModel;
+    private ?array $channels = null;
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
-
-    /**
-     * @var EventCollector
-     */
-    private $eventCollector;
-
-    /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
-     * @var array
-     */
-    private $channels;
-
-    /**
-     * @var array
-     */
-    private $channelActions;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-    private FieldModel $fieldModel;
+    private ?array $channelActions = null;
 
     public function __construct(
-        LeadModel $leadModel,
-        FieldModel $fieldModel,
-        StageModel $stageModel,
-        CampaignModel $campaignModel,
-        EventCollector $eventCollector,
-        CompanyModel $companyModel,
-        CompanyReportData $companyReportData,
-        FieldsBuilder $fieldsBuilder,
-        Translator $translator
+        private LeadModel $leadModel,
+        private FieldModel $fieldModel,
+        private StageModel $stageModel,
+        private CampaignModel $campaignModel,
+        private EventCollector $eventCollector,
+        private CompanyModel $companyModel,
+        private CompanyReportData $companyReportData,
+        private FieldsBuilder $fieldsBuilder,
+        private Translator $translator
     ) {
-        $this->fieldModel        = $fieldModel;
-        $this->leadModel         = $leadModel;
-        $this->stageModel        = $stageModel;
-        $this->campaignModel     = $campaignModel;
-        $this->eventCollector    = $eventCollector;
-        $this->companyModel      = $companyModel;
-        $this->companyReportData = $companyReportData;
-        $this->fieldsBuilder     = $fieldsBuilder;
-        $this->translator        = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -135,7 +90,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
             return;
@@ -238,7 +193,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
             return;
@@ -422,7 +377,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         if (!$event->checkContext([
             self::CONTEXT_LEADS,
@@ -504,17 +459,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     $data  = $outerQb->executeQuery()->fetchAllAssociative();
 
                     foreach ($data as $row) {
-                        switch ($groupBy) {
-                            case 'actions':
-                                $label = $this->channelActions[$row['slice']];
-                                break;
-                            case 'channels':
-                                $label = $this->channels[$row['slice']];
-                                break;
-
-                            default:
-                                $label = (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'];
-                        }
+                        $label = match ($groupBy) {
+                            'actions'  => $this->channelActions[$row['slice']],
+                            'channels' => $this->channels[$row['slice']],
+                            default    => (empty($row['slice'])) ? $this->translator->trans('mautic.core.none') : $row['slice'],
+                        };
                         $chart->setDataset($label, $row['total_attribution']);
                     }
 
@@ -733,7 +682,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addColumns($fields);
     }
 
-    private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
+    private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $pointColumns = [
             'lp.id' => [
@@ -789,7 +738,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
     }
 
-    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters)
+    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $frequencyColumns = [
             'lf.frequency_number' => [
@@ -833,7 +782,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @param string $type
      */
-    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type)
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type): void
     {
         $attributionColumns = [
             'log.campaign_id' => [
@@ -956,7 +905,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
 

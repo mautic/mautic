@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 
 class SchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNoEmailsProvided()
+    public function testNoEmailsProvided(): void
     {
         $sendScheduleMock = $this->getMockBuilder(SendSchedule::class)
             ->disableOriginalConstructor()

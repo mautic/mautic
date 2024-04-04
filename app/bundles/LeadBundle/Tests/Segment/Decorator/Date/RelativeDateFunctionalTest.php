@@ -45,7 +45,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         ]);
     }
 
-    public function testSegmentCountIsCorrectForToday()
+    public function testSegmentCountIsCorrectForToday(): void
     {
         $name = 'Today';
         $lead = $this->createLead($name, 'midnight today', '+10 seconds');
@@ -53,7 +53,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForTomorrow()
+    public function testSegmentCountIsCorrectForTomorrow(): void
     {
         $name = 'Tomorrow';
         $lead = $this->createLead($name, 'midnight tomorrow', '+10 seconds');
@@ -61,7 +61,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForYesterday()
+    public function testSegmentCountIsCorrectForYesterday(): void
     {
         $name = 'Yesterday';
         $lead = $this->createLead($name, 'midnight today', '-10 seconds');
@@ -69,7 +69,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForWeekLast()
+    public function testSegmentCountIsCorrectForWeekLast(): void
     {
         $name = 'Last week';
         $lead = $this->createLead($name, 'midnight monday last week', '+2 days');
@@ -77,7 +77,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForWeekNext()
+    public function testSegmentCountIsCorrectForWeekNext(): void
     {
         $name = 'Next week';
         $lead = $this->createLead($name, 'midnight monday next week', '+2 days');
@@ -85,7 +85,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForWeekThis()
+    public function testSegmentCountIsCorrectForWeekThis(): void
     {
         $name = 'This week';
         $lead = $this->createLead($name, 'midnight monday this week', '+2 days');
@@ -93,7 +93,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForMonthLast()
+    public function testSegmentCountIsCorrectForMonthLast(): void
     {
         $name = 'Last month';
         $lead = $this->createLead($name, 'midnight first day of last month', '+2 days');
@@ -101,7 +101,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForMonthNext()
+    public function testSegmentCountIsCorrectForMonthNext(): void
     {
         $name = 'Next month';
         $lead = $this->createLead($name, 'midnight first day of next month', '+2 days');
@@ -109,7 +109,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForMonthThis()
+    public function testSegmentCountIsCorrectForMonthThis(): void
     {
         $name = 'This month';
         $lead = $this->createLead($name, 'midnight first day of this month', '+2 days');
@@ -117,7 +117,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForYearLast()
+    public function testSegmentCountIsCorrectForYearLast(): void
     {
         $name = 'Last year';
         $lead = $this->createLead($name, 'midnight first day of last year', '+2 days');
@@ -125,7 +125,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForYearNext()
+    public function testSegmentCountIsCorrectForYearNext(): void
     {
         $name = 'Next year';
         $lead = $this->createLead($name, 'midnight first day of next year', '+2 days');
@@ -133,7 +133,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForRelativePlus()
+    public function testSegmentCountIsCorrectForRelativePlus(): void
     {
         $name = 'Relative plus';
         $lead = $this->createLead($name, 'now', '+5 days');
@@ -141,7 +141,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    public function testSegmentCountIsCorrectForRelativeMinus()
+    public function testSegmentCountIsCorrectForRelativeMinus(): void
     {
         $name = 'Relative minus';
         $lead = $this->createLead($name, 'now', '-4 days');
@@ -152,7 +152,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
     private function checkSegmentResult(string $name, Lead $lead): void
     {
         /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = self::$container->get('mautic.lead.model.lead_segment_service');
+        $contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
 
         $alias = strtolower(InputHelper::alphanum($name, false, '-'));
 
@@ -176,7 +176,7 @@ class RelativeDateFunctionalTest extends MauticMysqlTestCase
     private function createLead(string $name, string $initialTime, string $dateModifier): Lead
     {
         /** @var LeadRepository $leadRepository */
-        $leadRepository = self::$container->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
+        $leadRepository = static::getContainer()->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
 
         $date = new \DateTime($initialTime, new \DateTimeZone('UTC'));
         $date->modify($dateModifier);

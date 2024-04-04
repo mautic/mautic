@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -18,6 +19,7 @@ class LeadEventLogRepository extends CommonRepository
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+    public const LOG_DELETE_BATCH_SIZE = 5000;
 
     public function getEntities(array $args = [])
     {
@@ -46,10 +48,7 @@ class LeadEventLogRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'll';
     }
@@ -103,7 +102,7 @@ class LeadEventLogRepository extends CommonRepository
                         $query->expr()->eq('ll.is_scheduled', ':scheduled'),
                         $query->expr()->and(
                             $query->expr()->eq('ll.is_scheduled', 0),
-                            $query->expr()->isNull('ll.date_triggered', 0)
+                            $query->expr()->isNull('ll.date_triggered')
                         )
                     )
                 );
@@ -131,12 +130,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Get a lead's upcoming events.
-     *
-     * @param array $options
-     *
-     * @return array
      */
-    public function getUpcomingEvents(array $options = null)
+    public function getUpcomingEvents(array $options = null): array
     {
         $leadIps = [];
 
@@ -319,7 +314,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->_em->getConnection()->createQueryBuilder()
@@ -353,10 +348,7 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChartQuery($options)
+    public function getChartQuery($options): array
     {
         $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);
 
@@ -444,11 +436,9 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @return ArrayCollection
-     *
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function getScheduledByIds(array $ids)
+    public function getScheduledByIds(array $ids): ArrayCollection
     {
         $this->getReplicaConnection();
         $q = $this->createQueryBuilder('o');
@@ -461,7 +451,9 @@ class LeadEventLogRepository extends CommonRepository
                 $q->expr()->andX(
                     $q->expr()->in('o.id', $ids),
                     $q->expr()->eq('o.isScheduled', 1),
-                    $q->expr()->eq('c.isPublished', 1)
+                    $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->isNull('c.deleted'),
+                    $q->expr()->isNull('e.deleted')
                 )
             );
 
@@ -470,10 +462,8 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * @param int $campaignId
-     *
-     * @return array
      */
-    public function getScheduledCounts($campaignId, \DateTime $date, ContactLimiter $limiter)
+    public function getScheduledCounts($campaignId, \DateTime $date, ContactLimiter $limiter): array
     {
         $now = clone $date;
         $now->setTimezone(new \DateTimeZone('UTC'));
@@ -509,10 +499,7 @@ class LeadEventLogRepository extends CommonRepository
         return $events;
     }
 
-    /**
-     * @return array
-     */
-    public function getDatesExecuted($eventId, array $contactIds)
+    public function getDatesExecuted($eventId, array $contactIds): array
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
@@ -554,10 +541,8 @@ class LeadEventLogRepository extends CommonRepository
      * @param int $contactId
      * @param int $campaignId
      * @param int $rotation
-     *
-     * @return bool
      */
-    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation)
+    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation): bool
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.rotation')
@@ -584,7 +569,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function unscheduleEvents(Lead $campaignMember, $message)
+    public function unscheduleEvents(Lead $campaignMember, $message): void
     {
         $contactId  = $campaignMember->getLead()->getId();
         $campaignId = $campaignMember->getCampaign()->getId();
@@ -629,18 +614,28 @@ SQL;
             ->executeStatement();
     }
 
-    /**
-     * Removes logs by event_id.
-     * It uses batch processing for removing
-     * large quantities of records.
-     *
-     * @param int $eventId
-     */
-    public function removeEventLogs($eventId)
+    public function removeEventLogsByCampaignId(int $campaignId): void
     {
-        $conn = $this->_em->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
-            'event_id' => (int) $eventId,
-        ]);
+        $table_name    = $this->getTableName();
+        $sql           = "DELETE FROM {$table_name} WHERE campaign_id = (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $conn          = $this->getEntityManager()->getConnection();
+        $deleteEntries = true;
+        while ($deleteEntries) {
+            $deleteEntries = $conn->executeQuery($sql, [$campaignId], [Types::INTEGER])->rowCount();
+        }
+    }
+
+    /**
+     * @param string[] $eventIds
+     */
+    public function removeEventLogs(array $eventIds): void
+    {
+        $table_name    = $this->getTableName();
+        $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $conn          = $this->getEntityManager()->getConnection();
+        $deleteEntries = true;
+        while ($deleteEntries) {
+            $deleteEntries = $conn->executeQuery($sql, [$eventIds], [ArrayParameterType::INTEGER])->rowCount();
+        }
     }
 }

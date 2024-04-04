@@ -4,9 +4,6 @@ namespace Mautic\PointBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class EventHelper.
- */
 class EventHelper
 {
     /**

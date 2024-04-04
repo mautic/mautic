@@ -9,10 +9,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
  */
 trait MatchFilterForLeadTrait
 {
-    /**
-     * @return bool
-     */
-    protected function matchFilterForLead(array $filter, array $lead)
+    protected function matchFilterForLead(array $filter, array $lead): bool
     {
         if (empty($lead['id'])) {
             // Lead in generated for preview with faked data
@@ -22,7 +19,7 @@ trait MatchFilterForLeadTrait
         $groupNum = 0;
 
         foreach ($filter as $data) {
-            $isCompanyField = (0 === strpos((string) $data['field'], 'company') && 'company' !== $data['field']);
+            $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
             if ($isCompanyField) {
@@ -160,14 +157,14 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                     break;
                 case 'startsWith':
-                    $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, strlen($filterVal));
+                    $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
                     break;
                 case 'endsWith':
                     $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
                     $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
                     break;
                 case 'contains':
-                    $groups[$groupNum] = false !== strpos((string) $leadVal, (string) $filterVal);
+                    $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
                     break;
             }
         }

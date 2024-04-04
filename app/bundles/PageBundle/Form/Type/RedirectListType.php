@@ -2,33 +2,24 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class RedirectListType.
+ * @extends AbstractType<array<mixed>>
  */
 class RedirectListType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $choices = $this->coreParametersHelper->get('redirect_list_types');
-        $choices = (null === $choices) ? [] : array_flip($choices);
+        $choices = [
+            'mautic.page.form.redirecttype.permanent'     => 301,
+            'mautic.page.form.redirecttype.temporary'     => 302,
+            'mautic.page.form.redirecttype.303_temporary' => 303,
+            'mautic.page.form.redirecttype.307_temporary' => 307,
+            'mautic.page.form.redirecttype.308_permanent' => 308,
+        ];
 
         $resolver->setDefaults([
             'choices'     => $choices,

@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Company;
 
 class CompanyTest extends \PHPUnit\Framework\TestCase
 {
-    public function testChangingPropertiesHydratesFieldChanges()
+    public function testChangingPropertiesHydratesFieldChanges(): void
     {
         $email    = 'foo@bar.com';
         $company  = new Company();

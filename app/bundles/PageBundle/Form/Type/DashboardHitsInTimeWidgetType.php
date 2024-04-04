@@ -7,11 +7,11 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class DashboardHitsInTimeWidgetType.
+ * @extends AbstractType<array<mixed>>
  */
 class DashboardHitsInTimeWidgetType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('flag', ChoiceType::class, [
                 'label'   => 'mautic.page.visit.flag.filter',

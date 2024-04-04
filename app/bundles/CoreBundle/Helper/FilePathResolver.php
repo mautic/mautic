@@ -9,24 +9,18 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePathResolver
 {
-    private $filesystem;
-
-    private $inputHelper;
-
-    public function __construct(Filesystem $filesystem, InputHelper $inputHelper)
-    {
-        $this->filesystem  = $filesystem;
-        $this->inputHelper = $inputHelper;
+    public function __construct(
+        private Filesystem $filesystem,
+        private InputHelper $inputHelper
+    ) {
     }
 
     /**
      * @param string $uploadDir
      *
-     * @return string
-     *
      * @throws FilePathException
      */
-    public function getUniqueFileName($uploadDir, UploadedFile $file)
+    public function getUniqueFileName($uploadDir, UploadedFile $file): string
     {
         $inputHelper       = $this->inputHelper;
         $fullName          = $file->getClientOriginalName();
@@ -55,14 +49,14 @@ class FilePathResolver
      *
      * @throws FilePathException
      */
-    public function createDirectory($directory)
+    public function createDirectory($directory): void
     {
         if ($this->filesystem->exists($directory)) {
             return;
         }
         try {
             $this->filesystem->mkdir($directory);
-        } catch (IOException $e) {
+        } catch (IOException) {
             throw new FilePathException('Could not create directory');
         }
     }
@@ -70,14 +64,14 @@ class FilePathResolver
     /**
      * @param string $path
      */
-    public function delete($path)
+    public function delete($path): void
     {
         if (!$this->filesystem->exists($path)) {
             return;
         }
         try {
             $this->filesystem->remove($path);
-        } catch (IOException $e) {
+        } catch (IOException) {
         }
     }
 
@@ -90,18 +84,13 @@ class FilePathResolver
      * @param string $uploadDir
      * @param string $fileName
      * @param string $ext
-     *
-     * @return string
      */
-    private function getFilePath($uploadDir, $fileName, $ext)
+    private function getFilePath($uploadDir, $fileName, $ext): string
     {
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName.$ext;
     }
 
-    /**
-     * @return string
-     */
-    private function getFileExtension(UploadedFile $file)
+    private function getFileExtension(UploadedFile $file): string
     {
         $ext = $file->getClientOriginalExtension();
 

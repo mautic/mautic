@@ -6,14 +6,14 @@ use Mautic\LeadBundle\Entity\Tag;
 
 class TagTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSetTagByConstructor()
+    public function testSetTagByConstructor(): void
     {
         $entity = new Tag('tagA');
 
         $this->assertSame('tagA', $entity->getTag());
     }
 
-    public function testSetTagBySetter()
+    public function testSetTagBySetter(): void
     {
         $entity = new Tag();
         $entity->setTag('tagA');
@@ -38,7 +38,7 @@ class TagTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testDisabledValidation()
+    public function testDisabledValidation(): void
     {
         $sampleTags = [
             'hello world'      => 'hello world',

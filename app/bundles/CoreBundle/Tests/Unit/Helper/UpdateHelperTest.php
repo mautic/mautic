@@ -26,47 +26,44 @@ class UpdateHelperTest extends TestCase
     /**
      * @var PathsHelper|MockObject
      */
-    private $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     /**
      * @var Logger|MockObject
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var Client|MockObject
      */
-    private $client;
+    private \PHPUnit\Framework\MockObject\MockObject $client;
 
     /**
      * @var ResponseInterface|MockObject
      */
-    private $response;
+    private \PHPUnit\Framework\MockObject\MockObject $response;
 
     /**
      * @var StreamInterface|MockObject
      */
-    private $streamBody;
+    private \PHPUnit\Framework\MockObject\MockObject $streamBody;
 
     /**
      * @var ReleaseParser|MockObject
      */
-    private $releaseParser;
+    private \PHPUnit\Framework\MockObject\MockObject $releaseParser;
 
     /**
      * @var PreUpdateCheckHelper|MockObject
      */
-    private $preUpdateCheckHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $preUpdateCheckHelper;
 
-    /**
-     * @var UpdateHelper
-     */
-    private $helper;
+    private \Mautic\CoreBundle\Helper\UpdateHelper $helper;
 
     protected function setUp(): void
     {
@@ -358,7 +355,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options) {
+                function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new \Exception('something bad happened');
@@ -410,7 +407,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options) {
+                function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
@@ -460,7 +457,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options) {
+                function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, null);
