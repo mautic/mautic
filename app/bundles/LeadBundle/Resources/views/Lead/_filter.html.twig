@@ -1,0 +1,37 @@
+{% if isIndex %}
+    {% set toolbarButtons = [
+        {
+            'attr': {
+            'class': 'hidden-xs btn btn-default btn-sm btn-nospin',
+            'href': 'javascript: void(0)',
+            'onclick': 'Mautic.toggleLiveLeadListUpdate();',
+            'id': 'liveModeButton',
+            'data-toggle': false,
+            'data-max-id': maxLeadId,
+        },
+            'tooltip': 'mautic.lead.lead.live_update'|trans,
+            'iconClass': 'fa fa-bolt',
+        }
+    ] %}
+    {% if 'list' == indexMode %}
+        {% set toolbarButtons = toolbarButtons|merge([{
+            'attr': {
+                'class': 'hidden-xs btn btn-default btn-sm btn-nospin'~(anonymousShowing ? ' btn-primary' : ''),
+                'href': 'javascript: void(0)',
+                'onclick': 'Mautic.toggleAnonymousLeads();',
+                'id': 'anonymousLeadButton',
+                'data-anonymous': 'mautic.lead.lead.searchcommand.isanonymous'|trans,
+            },
+            'tooltip': 'mautic.lead.lead.anonymous_leads'|trans,
+            'iconClass': 'fa fa-user-secret',
+        }]) %}
+    {% endif %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue': searchValue|default(''),
+            'searchHelp': 'mautic.lead.lead.help.searchcommands',
+            'action': currentRoute,
+            'customButtons': toolbarButtons,
+        }) }}
+        <div class="page-list">
+{% endif %}

@@ -67,6 +67,8 @@ class ConfigController extends FormController
                 if ($isWritable && $isValid = $this->isFormValid($form)) {
                     // Bind request to the form
                     $post     = $request->request;
+
+                    /** @var mixed[] $formData */
                     $formData = $form->getData();
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
@@ -245,7 +247,7 @@ class ConfigController extends FormController
 
                 $cacheHelper->refreshConfig();
                 $success = 1;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
         }
 
@@ -263,9 +265,9 @@ class ConfigController extends FormController
         // Import the current local configuration, $parameters is defined in this file
 
         $parameters = [];
-        /** @var array $parameters */
         include $localConfigFile;
 
+        /** @var mixed[] $parameters */
         $localParams = $parameters;
 
         foreach ($forms as &$form) {

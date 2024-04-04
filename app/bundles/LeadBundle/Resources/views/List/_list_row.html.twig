@@ -16,9 +16,9 @@
         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                 'item': item,
                 'templateButtons': {
-                    'edit': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),
-                    'clone': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),
-                    'delete': securityHasEntityAccess(true, permissions['lead:lists:deleteother'], item.createdBy),
+                    'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\\Security\\\Permissions\\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], item.createdBy),
+                    'clone': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')] and securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], item.createdBy),
+                    'delete': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OTHER')], item.createdBy),
                 },
                 'routeBase': 'segment',
                 'langVar': 'lead.list',

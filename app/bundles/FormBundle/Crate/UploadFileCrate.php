@@ -10,14 +10,11 @@ class UploadFileCrate implements \Iterator
     /**
      * @var array|FileFieldCrate[]
      */
-    private $fileFieldCrate = [];
+    private array $fileFieldCrate = [];
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
-    public function addFile(UploadedFile $file, Field $field)
+    public function addFile(UploadedFile $file, Field $field): void
     {
         $this->fileFieldCrate[] = new FileFieldCrate($file, $field);
     }

@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageSubscriberTest extends TestCase
 {
-    public function testGetTokensWhenCalledReturnsValidTokens()
+    public function testGetTokensWhenCalledReturnsValidTokens(): void
     {
         $translator       = $this->createMock(Translator::class);
         $pageBuilderEvent = new PageBuilderEvent($translator);

@@ -12,12 +12,14 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
      */
-    private $coreParamsHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParamsHelperMock;
 
     private $badFilePath = 'bad_list.json';
+
     private $badData     = 'bad data';
 
     private $goodFilePath = 'good_list.json';
+
     private $goodData     = '{
                                 "exclusions": [
                                     {
@@ -55,7 +57,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
     /**
      * Test trying to load the list when the list file path hasn't been configured.
      */
-    public function testListPathNotConfigured()
+    public function testListPathNotConfigured(): void
     {
         $coreParamsHelperMock = $this->coreParamsHelperMock;
         $coreParamsHelperMock->method('get')
@@ -71,7 +73,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
     /**
      * Test trying to load the list when the list file path hasn't been configured.
      */
-    public function testListFileNotDownloaded()
+    public function testListFileNotDownloaded(): void
     {
         $coreParamsHelperMock = $this->coreParamsHelperMock;
         $coreParamsHelperMock->method('get')
@@ -87,7 +89,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
     /**
      * Test loading a Do Not Sell List file that is not properly formatted.
      */
-    public function testFileWithBadData()
+    public function testFileWithBadData(): void
     {
         $coreParamsHelperMock = $this->coreParamsHelperMock;
         $coreParamsHelperMock->method('get')
@@ -104,7 +106,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
     /**
      * Test loading the Do Not Sell List file when everything goes right.
      */
-    public function testSuccessfulFileLoad()
+    public function testSuccessfulFileLoad(): void
     {
         $coreParamsHelperMock = $this->coreParamsHelperMock;
         $coreParamsHelperMock->method('get')

@@ -2,39 +2,34 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 
 trait FormErrorMessagesTrait
 {
     /**
      * @param array<mixed> $formErrors
-     *
-     * @return string
      */
-    public function getFormErrorMessage(array $formErrors)
+    public function getFormErrorMessage(array $formErrors): string
     {
         $msg = '';
 
-        if ($formErrors) {
-            foreach ($formErrors as $key => $error) {
-                if (!$error) {
-                    continue;
-                }
+        foreach ($formErrors as $key => $error) {
+            if (!$error) {
+                continue;
+            }
 
-                if ($msg) {
-                    $msg .= ', ';
-                }
+            if ($msg) {
+                $msg .= ', ';
+            }
 
-                if (is_string($key)) {
-                    $msg .= $key.': ';
-                }
+            if (is_string($key)) {
+                $msg .= $key.': ';
+            }
 
-                if (is_array($error)) {
-                    $msg .= $this->getFormErrorMessage($error);
-                } else {
-                    $msg .= $error;
-                }
+            if (is_array($error)) {
+                $msg .= $this->getFormErrorMessage($error);
+            } else {
+                $msg .= $error;
             }
         }
 
@@ -42,7 +37,7 @@ trait FormErrorMessagesTrait
     }
 
     /**
-     * @param FormInterface<object> $form
+     * @param FormInterface<mixed> $form
      *
      * @return array<array<string|null>>
      */
@@ -62,9 +57,11 @@ trait FormErrorMessagesTrait
     }
 
     /**
+     * @param FormInterface<mixed> $form
+     *
      * @return array<string|null>
      */
-    public function getFormErrorCodes(Form $form): array
+    public function getFormErrorCodes(FormInterface $form): array
     {
         $codes = [];
 
@@ -77,7 +74,7 @@ trait FormErrorMessagesTrait
     }
 
     /**
-     * @param FormInterface<object> $form
+     * @param FormInterface<mixed> $form
      */
     public function getFormErrorForBuilder(FormInterface $form): ?string
     {

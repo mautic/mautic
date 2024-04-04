@@ -10,31 +10,13 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 class DateRelativeInterval implements FilterDecoratorInterface
 {
     /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
-
-    /**
-     * @var string
-     */
-    private $originalValue;
-
-    /**
-     * @var DateOptionParameters
-     */
-    private $dateOptionParameters;
-
-    /**
      * @param string $originalValue
      */
     public function __construct(
-        DateDecorator $dateDecorator,
-        $originalValue,
-        DateOptionParameters $dateOptionParameters
+        private DateDecorator $dateDecorator,
+        private $originalValue,
+        private DateOptionParameters $dateOptionParameters
     ) {
-        $this->dateDecorator        = $dateDecorator;
-        $this->originalValue        = $originalValue;
-        $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**
@@ -45,10 +27,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
         return $this->dateDecorator->getField($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return $this->dateDecorator->getTable($contactSegmentFilterCrate);
     }
@@ -81,7 +60,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
     /**
      * @return array|bool|float|string|null
      */
-    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         $date = $this->dateOptionParameters->getDefaultDate();
         $date->modify($this->originalValue);
@@ -95,18 +74,12 @@ class DateRelativeInterval implements FilterDecoratorInterface
         return $date->toLocalString($format);
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate): string|bool
     {
         return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
     }

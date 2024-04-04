@@ -19,39 +19,15 @@ class IntegrationsHelper
     /**
      * @var IntegrationInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
-    /**
-     * @var IntegrationRepository
-     */
-    private $integrationRepository;
+    private array $decryptedIntegrationConfigurations = [];
 
-    /**
-     * @var EncryptionService
-     */
-    private $encryptionService;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var array
-     */
-    private $decryptedIntegrationConfigurations = [];
-
-    /**
-     * IntegrationsHelper constructor.
-     */
     public function __construct(
-        IntegrationRepository $integrationRepository,
-        EncryptionService $encryptionService,
-        EventDispatcherInterface $eventDispatcher
+        private IntegrationRepository $integrationRepository,
+        private EncryptionService $encryptionService,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->integrationRepository = $integrationRepository;
-        $this->encryptionService     = $encryptionService;
-        $this->eventDispatcher       = $eventDispatcher;
     }
 
     public function addIntegration(IntegrationInterface $integration): void
@@ -97,15 +73,13 @@ class IntegrationsHelper
     }
 
     /**
-     * @return Integration
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegrationConfiguration(IntegrationInterface $integration)
+    public function getIntegrationConfiguration(IntegrationInterface $integration): Integration
     {
         if (!$integration->hasIntegrationConfiguration()) {
             /** @var Integration $configuration */
-            $configuration = $this->integrationRepository->findOneBy(['name' => $integration->getName()]);
+            $configuration = $this->integrationRepository->findOneByName($integration->getName());
 
             if (!$configuration) {
                 throw new IntegrationNotFoundException("{$integration->getName()} doesn't exist in the database");

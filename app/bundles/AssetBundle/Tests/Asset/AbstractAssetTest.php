@@ -12,9 +12,13 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 abstract class AbstractAssetTest extends MauticMysqlTestCase
 {
     protected Asset $asset;
+
     protected string $expectedMimeType;
+
     protected string $expectedContentDisposition;
+
     protected string $expectedPngContent;
+
     protected string $csvPath;
 
     protected function setUp(): void
@@ -79,7 +83,7 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
      */
     protected function generateCsv(): void
     {
-        $uploadDir  = self::$container->get('mautic.helper.core_parameters')->get('upload_dir') ?? sys_get_temp_dir();
+        $uploadDir  = static::getContainer()->get('mautic.helper.core_parameters')->get('upload_dir') ?? sys_get_temp_dir();
         $tmpFile    = tempnam($uploadDir, 'mautic_asset_test_');
         $file       = fopen($tmpFile, 'w');
 

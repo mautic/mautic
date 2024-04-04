@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -33,7 +34,7 @@ class FormApiController extends CommonApiController
     /**
      * @var FormModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(
         CorePermissions $security,
@@ -126,9 +127,6 @@ class FormApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $fieldModel = $this->getModel('form.field');
@@ -286,7 +284,7 @@ class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @return FormInterface
+     * @return FormInterface<mixed>
      */
     protected function createActionEntityForm(Action $entity, array $action)
     {
@@ -313,7 +311,7 @@ class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @return FormInterface
+     * @return FormInterface<mixed>
      */
     protected function createFieldEntityForm($entity)
     {
@@ -329,5 +327,20 @@ class FormApiController extends CommonApiController
                 'allow_extra_fields' => true,
             ]
         );
+    }
+
+    /**
+     * @param CommonEntity $entity
+     * @param array<mixed> $parameters
+     *
+     * @return mixed
+     */
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    {
+        if (!isset($parameters['postAction'])) {
+            $parameters['postAction'] = 'return';
+        }
+
+        return parent::processForm($request, $entity, $parameters, $method);
     }
 }
