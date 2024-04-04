@@ -83,9 +83,6 @@ jobs:
       # composer install cache - https://github.com/ramsey/composer-install
       uses: "ramsey/composer-install@v2"
 
-    - name: Add a template for test to complete
-      run: mkdir -p themes/system/CoreBundle/Resources/views/Override/ && cp .github/ci-files/CoreBundle-Override-index.html.twig  themes/system/CoreBundle/Resources/views/Override/index.html.twig
-
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         rm -rf var/cache

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
@@ -12,16 +13,22 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        // Create a twig file
+        $this->createOverrideFile();
+
+        // Clear the cache
+        /** @var CacheHelper $cacheHelper */
+        $cacheHelper = self::getContainer()->get('mautic.helper.cache');
+        $cacheHelper->nukeCache();
+
+        parent::setUp();
+    }
+
     public function testUserProfilePageOverrideFromSystemThemDirectory(): void
     {
-        if (!file_exists($this->getOverridePath())) {
-            $this->markTestSkipped(sprintf('The `%s` file is missing. Please copy the file from the following location: `%s`.',
-                'themes/system/CoreBundle/Resources/views/Override/index.twig.html',
-                '.github/ci-files/CoreBundle-Override-index.html.twig'
-            ));
-        }
-
-        $this->client->request(Request::METHOD_GET, '/s/override-path');
+        $this->client->request(Request::METHOD_GET, '/s/account');
 
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertStringContainsString('Override test', $this->client->getResponse()->getContent(), 'Page has not override.');
@@ -41,6 +48,14 @@ class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
         /** @var PathsHelper $pathsHelper */
         $pathsHelper  = static::getContainer()->get('mautic.helper.paths');
 
-        return $pathsHelper->getThemesPath().'/system/CoreBundle/Resources/views/Override';
+        return $pathsHelper->getThemesPath().'/system/UserBundle/Resources/views/Profile';
+    }
+
+    private function createOverrideFile(): void
+    {
+        $fs      = new Filesystem();
+        $content = "{% extends '@MauticCore/Default/content.html.twig' %} {% block headerTitle %}Override test{% endblock %} {% block content %}Override test{% endblock %}";
+
+        $fs->dumpFile($this->getOverridePath().'/index.html.twig', $content);
     }
 }
