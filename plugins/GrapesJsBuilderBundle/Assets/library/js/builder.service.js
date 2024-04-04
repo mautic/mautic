@@ -7,6 +7,7 @@ import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor5';
+import StorageService from "./storage.service";
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
@@ -24,6 +25,8 @@ export default class BuilderService {
   uploadPath;
 
   deletePath;
+
+  storageService;
 
   /**
    * @param {*} assets
@@ -132,6 +135,7 @@ export default class BuilderService {
       this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
     }
 
+    this.storageService = new StorageService(this.editor, object);
     this.overrideCustomRteDisable();
     this.setListeners();
   }
