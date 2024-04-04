@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -326,5 +327,20 @@ class FormApiController extends CommonApiController
                 'allow_extra_fields' => true,
             ]
         );
+    }
+
+    /**
+     * @param CommonEntity $entity
+     * @param array<mixed> $parameters
+     *
+     * @return mixed
+     */
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    {
+        if (!isset($parameters['postAction'])) {
+            $parameters['postAction'] = 'return';
+        }
+
+        return parent::processForm($request, $entity, $parameters, $method);
     }
 }
