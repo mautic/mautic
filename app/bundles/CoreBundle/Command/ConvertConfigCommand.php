@@ -13,13 +13,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConvertConfigCommand extends Command
 {
-    private PathsHelper $pathsHelper;
-
-    public function __construct(PathsHelper $pathsHelper)
-    {
+    public function __construct(
+        private PathsHelper $pathsHelper
+    ) {
         parent::__construct();
-
-        $this->pathsHelper = $pathsHelper;
     }
 
     protected function configure()
@@ -111,5 +108,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Converts theme config to JSON from PHP';
 }

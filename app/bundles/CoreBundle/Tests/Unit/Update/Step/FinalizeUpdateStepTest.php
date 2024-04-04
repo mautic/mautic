@@ -14,27 +14,24 @@ class FinalizeUpdateStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     /**
      * @var MockObject|Session
      */
-    private $session;
+    private \PHPUnit\Framework\MockObject\MockObject $session;
 
     /**
      * @var MockObject|AppVersion
      */
-    private $appVersion;
+    private \PHPUnit\Framework\MockObject\MockObject $appVersion;
 
-    /**
-     * @var FinalizeUpdateStep
-     */
-    private $step;
+    private \Mautic\CoreBundle\Update\Step\FinalizeUpdateStep $step;
 
     protected function setUp(): void
     {
@@ -48,7 +45,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->session, $this->appVersion);
     }
 
-    public function testFinalizationCleansUpFiles()
+    public function testFinalizationCleansUpFiles(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');
@@ -87,7 +84,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
 
-    public function testFinalizationWithPostUpgradeMessage()
+    public function testFinalizationWithPostUpgradeMessage(): void
     {
         file_put_contents(__DIR__.'/resources/upgrade.php', '');
         file_put_contents(__DIR__.'/resources/lastUpdateCheck.txt', '');

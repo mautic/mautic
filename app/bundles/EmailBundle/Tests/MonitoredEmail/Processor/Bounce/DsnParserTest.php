@@ -14,10 +14,10 @@ class DsnParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that a BouncedEmail is returned from a dsn report
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse
      */
-    public function testBouncedEmailIsReturnedFromParsedDsnReport()
+    public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
         $message->dsnReport = <<<'DSN'
@@ -40,10 +40,10 @@ DSN;
     /**
      * @testdox Test a Postfix BouncedEmail is returned from a dsn report
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse
      */
-    public function testPostfixBouncedEmailIsReturnedFromParsedDsnReport()
+    public function testPostfixBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
         $message->dsnReport = <<<'DSN'
@@ -69,9 +69,9 @@ DSN;
     /**
      * @testdox Test that an exception is thrown if a bounce cannot be found in a dsn report
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
      */
-    public function testBounceNotFoundFromBadDsnReport()
+    public function testBounceNotFoundFromBadDsnReport(): void
     {
         $this->expectException(BounceNotFound::class);
 

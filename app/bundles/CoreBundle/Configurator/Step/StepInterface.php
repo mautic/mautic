@@ -2,11 +2,6 @@
 
 namespace Mautic\CoreBundle\Configurator\Step;
 
-/**
- * StepInterface.
- *
- * @author Marc Weistroff <marc.weistroff@sensio.com>
- */
 interface StepInterface
 {
     /**

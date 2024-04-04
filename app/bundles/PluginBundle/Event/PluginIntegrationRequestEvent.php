@@ -7,41 +7,24 @@ use Psr\Http\Message\ResponseInterface;
 
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    private $url;
+    private ?\Psr\Http\Message\ResponseInterface $response = null;
 
     /**
-     * @var array
+     * @param mixed[] $parameters
+     * @param string  $method
+     * @param mixed[] $settings
+     * @param string  $authType
      */
-    private $parameters;
-
-    private $headers;
-
-    /**
-     * @var string
-     */
-    private $method;
-
-    /**
-     * @var array
-     */
-    private $settings;
-
-    /**
-     * @var string
-     */
-    private $authType;
-
-    private $response;
-
-    public function __construct(UnifiedIntegrationInterface $integration, $url, $parameters, $headers, $method, $settings, $authType)
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private $url,
+        private $parameters,
+        private $headers,
+        private $method,
+        private $settings,
+        private $authType
+    ) {
         $this->integration = $integration;
-        $this->url         = $url;
-        $this->parameters  = $parameters;
-        $this->headers     = $headers;
-        $this->method      = $method;
-        $this->settings    = $settings;
-        $this->authType    = $authType;
     }
 
     /**
@@ -60,7 +43,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->parameters;
     }
 
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
@@ -89,7 +72,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->authType;
     }
 
-    public function setResponse(ResponseInterface $response)
+    public function setResponse(ResponseInterface $response): void
     {
         $this->response = $response;
     }
@@ -107,7 +90,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->headers;
     }
 
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): void
     {
         $this->headers = $headers;
     }

@@ -8,19 +8,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class ReportWidgetType extends AbstractType
 {
-    /**
-     * @var ReportModel
-     */
-    protected $model;
-
-    public function __construct(ReportModel $reportModel)
-    {
-        $this->model = $reportModel;
+    public function __construct(
+        protected ReportModel $model
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
         if ($reports = $this->model->getReportsWithGraphs()) {

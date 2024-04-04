@@ -6,10 +6,8 @@ trait DateRangeUnitTrait
 {
     /**
      * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty.
-     *
-     * @return string
      */
-    public function getTimeUnitFromDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
+    public function getTimeUnitFromDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): string
     {
         $dayDiff = $dateTo->diff($dateFrom)->format('%a');
         $unit    = 'd';

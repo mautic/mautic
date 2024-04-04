@@ -17,9 +17,10 @@ use Mautic\EmailBundle\Stats\Helper\SentHelper;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\StatsBundle\Aggregate\Collector;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SentHelperTest extends \PHPUnit\Framework\TestCase
+class SentHelperTest extends TestCase
 {
     private Collector $collector;
 
@@ -30,27 +31,27 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var MockObject|GeneratedColumnsProviderInterface
      */
-    private $generatedColumnsProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|UserHelper
      */
-    private $userHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelperMock;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     /**
      * @var MockObject|Result
      */
-    private $result;
+    private \PHPUnit\Framework\MockObject\MockObject $result;
 
     private GeneratedColumns $generatedColumns;
 
@@ -94,7 +95,7 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->generatedColumns);
 
         $this->queryBuilder->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($this->result);
 
         $this->queryBuilder->expects($this->once())
@@ -138,7 +139,7 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->generatedColumns);
 
         $this->queryBuilder->expects($this->once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($this->result);
 
         $this->queryBuilder->expects($this->once())
