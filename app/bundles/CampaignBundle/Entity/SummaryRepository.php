@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Entity;
 
-use DateTime;
-use DateTimeInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
-use PDO;
 
 /**
  * @extends CommonRepository<Summary>
@@ -28,8 +25,8 @@ class SummaryRepository extends CommonRepository
      */
     public function getCampaignLogCounts(
         int $campaignId,
-        DateTimeInterface $dateFrom = null,
-        DateTimeInterface $dateTo = null
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null
     ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select(
@@ -48,11 +45,11 @@ class SummaryRepository extends CommonRepository
 
         if ($dateFrom && $dateTo) {
             $q->andWhere('cs.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), PDO::PARAM_INT);
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         // Group by event id
@@ -70,7 +67,7 @@ class SummaryRepository extends CommonRepository
     /**
      * Get the oldest triggered time for back-filling historical data.
      */
-    public function getOldestTriggeredDate(): ?DateTimeInterface
+    public function getOldestTriggeredDate(): ?\DateTimeInterface
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cs.date_triggered')
@@ -78,9 +75,9 @@ class SummaryRepository extends CommonRepository
             ->orderBy('cs.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAllAssociative();
+        $results = $qb->executeQuery()->fetchAllAssociative();
 
-        return isset($results[0]['date_triggered']) ? new DateTime($results[0]['date_triggered']) : null;
+        return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
     }
 
     /**
@@ -89,8 +86,8 @@ class SummaryRepository extends CommonRepository
      * @throws \Doctrine\DBAL\Exception
      */
     public function summarize(
-        DateTimeInterface $dateFrom,
-        DateTimeInterface $dateTo,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo,
         int $campaignId = null,
         int $eventId = null
     ): void {
@@ -99,7 +96,7 @@ class SummaryRepository extends CommonRepository
         $intervalInSeconds= 3600;
 
         $dateFromStartWithZeroMinutes = $dateFromTsActual - ($dateFromTsActual % $intervalInSeconds);
-        $numberOfIntervals            = ceil((($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds));
+        $numberOfIntervals            = ceil(($dateToTsActual - $dateFromStartWithZeroMinutes) / $intervalInSeconds);
 
         for ($interval = 0; $interval < $numberOfIntervals; ++$interval) {
             $dateFromTs = date('Y-m-d H:i:s', $dateFromStartWithZeroMinutes + ($interval * $intervalInSeconds));

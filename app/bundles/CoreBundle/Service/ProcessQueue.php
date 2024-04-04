@@ -4,35 +4,31 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Service;
 
-use SplObjectStorage;
-use SplQueue;
 use Symfony\Component\Process\Process;
 
 final class ProcessQueue
 {
-    private int $processLimit;
+    /**
+     * @var \SplQueue<Process>
+     */
+    private \SplQueue $pending;
 
     /**
-     * @var SplQueue<Process>
+     * @var \SplObjectStorage<Process,Process>
      */
-    private SplQueue $pending;
+    private \SplObjectStorage $processing;
 
     /**
-     * @var SplObjectStorage<Process,Process>
+     * @var \SplObjectStorage<Process,Process>
      */
-    private SplObjectStorage $processing;
+    private \SplObjectStorage $processed;
 
-    /**
-     * @var SplObjectStorage<Process,Process>
-     */
-    private SplObjectStorage $processed;
-
-    public function __construct(int $processLimit = 10)
-    {
-        $this->pending      = new SplQueue();
-        $this->processing   = new SplObjectStorage();
-        $this->processed    = new SplObjectStorage();
-        $this->processLimit = $processLimit;
+    public function __construct(
+        private int $processLimit = 10
+    ) {
+        $this->pending      = new \SplQueue();
+        $this->processing   = new \SplObjectStorage();
+        $this->processed    = new \SplObjectStorage();
     }
 
     /**
@@ -81,9 +77,9 @@ final class ProcessQueue
     }
 
     /**
-     * @return SplObjectStorage<Process,Process>
+     * @return \SplObjectStorage<Process,Process>
      */
-    public function getProcessed(): SplObjectStorage
+    public function getProcessed(): \SplObjectStorage
     {
         return $this->processed;
     }

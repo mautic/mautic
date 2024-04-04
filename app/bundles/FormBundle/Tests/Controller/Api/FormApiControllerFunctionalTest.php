@@ -83,6 +83,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         ],
         'actions' => [
         ],
+        'postAction'  => 'return',
     ];
 
     public function testFormWorkflow(): void
@@ -100,6 +101,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                     'leadField' => 'email',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Create:
@@ -288,13 +290,13 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            '`email`'       => 'john@doe.test',
-            '`number`'      => 123.0,
-            '`company`'     => 'Doe Corp',
-            '`phone`'       => '+420444555666',
-            '`country`'     => 'Czech Republic',
-            '`multiselect`' => 'two',
-            '`state`'       => 'Plzeňský kraj',
+            'email'       => 'john@doe.test',
+            'number'      => 123.0,
+            'company'     => 'Doe Corp',
+            'phone'       => '+420444555666',
+            'country'     => 'Czech Republic',
+            'multiselect' => 'two',
+            'state'       => 'Plzeňský kraj',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
@@ -341,7 +343,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_NOT_FOUND, $response['errors'][0]['code']);
     }
 
-    public function testFormWithChangeTagsAction()
+    public function testFormWithChangeTagsAction(): void
     {
         // Create tag:
         $tag1Payload = ['tag' => 'add this'];
@@ -382,6 +384,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                     ],
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Create form with lead.changetags action:

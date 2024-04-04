@@ -2,38 +2,33 @@
 
 namespace Mautic\LeadBundle\Event;
 
-use DateTime;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class ListChangeEvent.
- */
 class ListChangeEvent extends Event
 {
-    private $lead;
-    private $leads;
-    private $list;
-    private $added;
-    private ?DateTime $date;
+    private ?Lead $lead;
 
     /**
-     * ListChangeEvent constructor.
-     *
-     * @param      $leads
-     * @param bool $added
+     * @var Lead[]|null
      */
-    public function __construct($leads, LeadList $list, $added = true, DateTime $date = null)
-    {
+    private ?array $leads = null;
+
+    /**
+     * @param Lead[]|Lead $leads
+     */
+    public function __construct(
+        Lead|array $leads,
+        private LeadList $list,
+        private bool $added = true,
+        private ?\DateTime $date = null
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
             $this->lead = $leads;
         }
-        $this->list  = $list;
-        $this->added = $added;
-        $this->date  = $date;
     }
 
     /**
@@ -64,23 +59,17 @@ class ListChangeEvent extends Event
         return $this->leads;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return $this->added;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
         return !$this->added;
     }
 
-    public function getDate(): ?DateTime
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }

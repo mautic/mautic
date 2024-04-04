@@ -2,41 +2,23 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use RuntimeException;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractFormController extends CommonController
 {
-    protected $permissionBase;
-
-    protected ?CorePermissions $security;
-
-    protected UserHelper $userHelper;
-
-    public function __construct(CorePermissions $security, UserHelper $userHelper, ManagerRegistry $managerRegistry)
-    {
-        $this->security   = $security;
-        $this->userHelper = $userHelper;
-
-        parent::__construct($managerRegistry);
-    }
+    protected ?string $permissionBase = null;
 
     /**
-     * @param $id
-     * @param $modelName
-     *
      * @return mixed
      */
-    public function unlockAction(Request $request, $id, $modelName)
+    public function unlockAction(Request $request, $objectId, $objectModel)
     {
-        $model                = $this->getModel($modelName);
-        $entity               = $model->getEntity($id);
+        $model                = $this->getModel($objectModel);
+        $entity               = $model->getEntity($objectId);
         $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
@@ -140,14 +122,12 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Checks to see if the form was cancelled.
-     *
-     * @return bool
      */
-    protected function isFormCancelled(FormInterface $form)
+    protected function isFormCancelled(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         $formData = $request->request->get($form->getName());
@@ -157,14 +137,12 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Checks to see if the form was applied or saved.
-     *
-     * @return bool
      */
-    protected function isFormApplied(FormInterface $form)
+    protected function isFormApplied(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         $formData = $request->request->get($form->getName());
@@ -174,19 +152,15 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Binds form data, checks validity, and determines cancel request.
-     *
-     * @param array $data
-     *
-     * @return bool
      */
-    protected function isFormValid(FormInterface $form)
+    protected function isFormValid(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
-        //bind request to the form
+        // bind request to the form
         $form->handleRequest($request);
 
         return $form->isSubmitted() && $form->isValid();
@@ -222,12 +196,12 @@ abstract class AbstractFormController extends CommonController
             }
         }
 
-        return $this->userHelper->getUser()->isAdmin();
+        return $this->user->isAdmin();
     }
 
-    protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
+    protected function copyErrorsRecursively(FormInterface $copyFrom, FormInterface $copyTo)
     {
-        /** @var $error FormError */
+        /** @var FormError $error */
         foreach ($copyFrom->getErrors() as $error) {
             $copyTo->addError($error);
         }
@@ -249,7 +223,7 @@ abstract class AbstractFormController extends CommonController
     {
         $request = $this->getCurrentRequest();
         if (null === $request) {
-            throw new RuntimeException('Request is required.');
+            throw new \RuntimeException('Request is required.');
         }
 
         if (empty($request->server->get('HTTP_REFERER'))) {
@@ -261,11 +235,11 @@ abstract class AbstractFormController extends CommonController
 
         $urlMatcher  = explode('/s/', $returnUrl);
         $actionRoute = $this->get('router')->match('/s/'.$urlMatcher[1]);
-        $objAction   = isset($actionRoute['objectAction']) ? $actionRoute['objectAction'] : 'index';
+        $objAction   = $actionRoute['objectAction'] ?? 'index';
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 
         $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
-        $vars['contentTemplate'] = isset($vars['contentTemplate']) ? $vars['contentTemplate'] : $defaultContentTemplate;
+        $vars['contentTemplate'] ??= $defaultContentTemplate;
 
         $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
 

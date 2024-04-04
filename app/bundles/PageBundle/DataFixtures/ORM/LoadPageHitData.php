@@ -12,17 +12,12 @@ use Mautic\PageBundle\Model\PageModel;
 
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    public function __construct(PageModel $pageModel)
-    {
-        $this->pageModel = $pageModel;
+    public function __construct(
+        private PageModel $pageModel
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $hits = CsvHelper::csv_to_array(__DIR__.'/fakepagehitdata.csv');
 
@@ -47,9 +42,6 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 8;

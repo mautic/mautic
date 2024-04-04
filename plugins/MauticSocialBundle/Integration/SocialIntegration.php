@@ -32,11 +32,6 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     protected TranslatorInterface $translator;
 
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -54,10 +49,8 @@ abstract class SocialIntegration extends AbstractIntegration
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
         DoNotContact $doNotContact,
-        IntegrationHelper $integrationHelper
+        protected IntegrationHelper $integrationHelper
     ) {
-        $this->integrationHelper = $integrationHelper;
-
         parent::__construct(
             $eventDispatcher,
             $cacheStorageHelper,
@@ -83,7 +76,7 @@ abstract class SocialIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $name     = strtolower($this->getName());
@@ -92,15 +85,13 @@ abstract class SocialIntegration extends AbstractIntegration
                 $builder->add('shareButton', $formType, [
                     'label'    => 'mautic.integration.form.sharebutton',
                     'required' => false,
-                    'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : [],
+                    'data'     => $data['shareButton'] ?? [],
                 ]);
             }
         }
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $settings
      *
      * @return array
@@ -115,7 +106,7 @@ abstract class SocialIntegration extends AbstractIntegration
             if (empty($available) || !is_array($available)) {
                 return [];
             }
-            //create social profile fields
+            // create social profile fields
             $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex();
 
             foreach ($available as $field => $details) {
@@ -177,25 +168,18 @@ abstract class SocialIntegration extends AbstractIntegration
         return $fields;
     }
 
-    /**
-     * @param array $settings
-     */
     public function getFormCompanyFields($settings = [])
     {
         $settings['feature_settings']['objects'] = ['Company'];
+
+        return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType()
     {
         return 'oauth2';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredKeyFields()
     {
         return [
@@ -225,8 +209,6 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $data
      * @param bool   $postAuthorization
      *
@@ -243,8 +225,6 @@ abstract class SocialIntegration extends AbstractIntegration
 
     /**
      * Returns notes specific to sections of the integration form (if applicable).
-     *
-     * @param $section
      *
      * @return array<mixed>
      */
@@ -265,8 +245,6 @@ abstract class SocialIntegration extends AbstractIntegration
 
     /**
      * Get the access token from session or socialCache.
-     *
-     * @param $socialCache
      *
      * @return array|mixed|null
      */

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +32,7 @@ class TagController extends FormController
         \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
         $session = $request->getSession();
 
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted([
             'tagManager:tagManager:view',
             'tagManager:tagManager:edit',
@@ -45,7 +46,7 @@ class TagController extends FormController
 
         $this->setListFilters();
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.tagmanager.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -55,7 +56,7 @@ class TagController extends FormController
         $search = $request->get('search', $session->get('mautic.tags.filter', ''));
         $session->set('mautic.tags.filter', $search);
 
-        //do some default filtering
+        // do some default filtering
         $orderBy    = $session->get('mautic.tags.orderby', 'lt.tag');
         $orderByDir = $session->get('mautic.tags.orderbydir', 'ASC');
 
@@ -87,7 +88,7 @@ class TagController extends FormController
         $count = count($items);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -110,10 +111,10 @@ class TagController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.tagmanager.page', $page);
 
-        $tagIds    = array_keys($items->getIterator()->getArrayCopy());
+        $tagIds    = array_keys(iterator_to_array($items->getIterator(), true));
         $tagsCount = (!empty($tagIds)) ? $model->getRepository()->countByLeads($tagIds) : [];
 
         $parameters = [
@@ -150,17 +151,17 @@ class TagController extends FormController
             return $this->accessDenied();
         }
 
-        //retrieve the entity
+        // retrieve the entity
         $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
         $model = $this->getModel('tagmanager.tag');
         \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
-        //set the return URL for post actions
+        // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
         $action    = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'new']);
 
-        //get the user form factory
+        // get the user form factory
         $form = $model->createForm($tag, $this->formFactory, $action);
 
         // Check for a submitted form and process it
@@ -168,7 +169,7 @@ class TagController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $found = $model->getRepository()->countOccurrences($tag->getTag());
                     if (0 !== $found) {
                         $valid = false;
@@ -195,7 +196,10 @@ class TagController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            /** @var SubmitButton $saveSubmitButton */
+            $saveSubmitButton = $form->get('buttons')->get('save');
+
+            if ($cancelled || ($valid && $saveSubmitButton->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
@@ -246,9 +250,9 @@ class TagController extends FormController
                 $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException $exception) {
+        } catch (AccessDeniedException) {
             return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -276,10 +280,10 @@ class TagController extends FormController
         /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
 
-        /** @var FormInterface<FormInterface> $form */
+        /** @var FormInterface<FormInterface<Tag>> $form */
         $form = $tagModel->createForm($tag, $this->formFactory, $action);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
@@ -303,7 +307,7 @@ class TagController extends FormController
                             ]),
                         ]);
                     } else {
-                        //form is valid so process the data
+                        // form is valid so process the data
                         $tagModel->saveEntity($tag, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         $this->addFlashMessage('mautic.core.notice.updated', [
@@ -391,18 +395,16 @@ class TagController extends FormController
      * Get variables for POST action.
      *
      * @param int|null $objectId
-     *
-     * @return array
      */
-    private function getPostActionVars(Request $request, $objectId = null)
+    private function getPostActionVars(Request $request, $objectId = null): array
     {
-        //set the return URL
+        // set the return URL
         if ($objectId) {
             $returnUrl       = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
             $contentTemplate = 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::viewAction';
         } else {
-            //set the page we came from
+            // set the page we came from
             $page            = $request->getSession()->get('mautic.tagmanager.page', 1);
             $returnUrl       = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
             $viewParameters  = ['page' => $page];
@@ -423,8 +425,6 @@ class TagController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @param $objectId
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
@@ -435,10 +435,10 @@ class TagController extends FormController
 
         $tag = $model->getEntity($objectId);
 
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
         if (null === $tag) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
 
             return $this->postActionRedirect([
@@ -477,8 +477,6 @@ class TagController extends FormController
 
     /**
      * Deletes a tags.
-     *
-     * @param $objectId
      *
      * @return Response
      */
@@ -597,7 +595,7 @@ class TagController extends FormController
             if (!empty($deleteIds)) {
                 try {
                     $entities = $model->deleteEntities($deleteIds);
-                } catch (ForeignKeyConstraintViolationException $exception) {
+                } catch (ForeignKeyConstraintViolationException) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',
@@ -618,7 +616,7 @@ class TagController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [

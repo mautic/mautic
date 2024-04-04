@@ -20,26 +20,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ApplyUpdatesCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private StepProvider $stepProvider;
-    private CoreParametersHelper $coreParametersHelper;
-
     public function __construct(
-        TranslatorInterface $translator,
-        StepProvider $stepProvider,
-        CoreParametersHelper $coreParametersHelper
+        private TranslatorInterface $translator,
+        private StepProvider $stepProvider,
+        private CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct();
-
-        $this->translator           = $translator;
-        $this->stepProvider         = $stepProvider;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     protected function configure()
     {
         $this->setName('mautic:update:apply')
-            ->setDescription('Updates the Mautic application')
             ->setDefinition(
                 [
                     new InputOption(
@@ -75,6 +66,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var array<string, mixed> $options */
         $options = $input->getOptions();
 
         // Start a progress bar, don't give a max number of steps because it is conditional
@@ -82,12 +74,14 @@ EOT
         $progressBar->setFormat('Step %current% [%bar%] <info>%message%</info>');
 
         // Define this just in case
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', (isset($options['env'])) ? $options['env'] : 'prod');
+        if (!defined('MAUTIC_ENV')) {
+            define('MAUTIC_ENV', $options['env'] ?? 'prod');
+        }
 
         if (true === $this->coreParametersHelper->get('composer_updates', false)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         try {
@@ -109,7 +103,7 @@ EOT
             );
         }
 
-        return 1;
+        return \Symfony\Component\Console\Command\Command::FAILURE;
     }
 
     /**
@@ -145,4 +139,6 @@ EOT
 
         return 0;
     }
+
+    protected static $defaultDescription = 'Updates the Mautic application';
 }

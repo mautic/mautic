@@ -19,9 +19,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PluginController.
- */
 class PluginController extends FormController
 {
     /**
@@ -93,12 +90,10 @@ class PluginController extends FormController
             ];
         }
 
-        //sort by name
+        // sort by name
         uksort(
             $integrations,
-            function ($a, $b) {
-                return strnatcasecmp($a, $b);
-            }
+            fn ($a, $b): int => strnatcasecmp($a, $b)
         );
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -250,7 +245,7 @@ class PluginController extends FormController
                             }
                         }
                     } else {
-                        //make sure they aren't overwritten because of API connection issues
+                        // make sure they aren't overwritten because of API connection issues
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
@@ -271,7 +266,7 @@ class PluginController extends FormController
                     }
 
                     if ($authorize) {
-                        //redirect to the oauth URL
+                        // redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
                         $event = $this->dispatcher->dispatch(
                             new PluginIntegrationAuthRedirectEvent(
@@ -329,7 +324,7 @@ class PluginController extends FormController
             if ('custom' === $section) {
                 $formNotes[$section] = $integrationObject->getFormNotes($section);
             } else {
-                list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+                [$specialInstructions, $alertType] = $integrationObject->getFormNotes($section);
 
                 if (!empty($specialInstructions)) {
                     $formNotes[$section] = [
@@ -363,8 +358,6 @@ class PluginController extends FormController
     }
 
     /**
-     * @param $name
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function infoAction($name)

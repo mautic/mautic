@@ -58,7 +58,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'pages',
                 'path'            => '/pages',
-                'controller'      => 'Mautic\PageBundle\Controller\Api\PageApiController',
+                'controller'      => \Mautic\PageBundle\Controller\Api\PageApiController::class,
             ],
         ],
         'catchall' => [
@@ -90,81 +90,6 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.page.model.page' => [
-                'class'     => \Mautic\PageBundle\Model\PageModel::class,
-                'arguments' => [
-                    'mautic.helper.cookie',
-                    'mautic.helper.ip_lookup',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.field',
-                    'mautic.page.model.redirect',
-                    'mautic.page.model.trackable',
-                    'mautic.queue.service',
-                    'mautic.lead.model.company',
-                    'mautic.tracker.device',
-                    'mautic.tracker.contact',
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.helper.contact_request_helper',
-                ],
-                'methodCalls' => [
-                    'setCatInUrl' => [
-                        '%mautic.cat_in_page_url%',
-                    ],
-                ],
-            ],
-            'mautic.page.model.redirect' => [
-                'class'     => 'Mautic\PageBundle\Model\RedirectModel',
-                'arguments' => [
-                    'mautic.helper.url',
-                ],
-            ],
-            'mautic.page.model.trackable' => [
-                'class'     => \Mautic\PageBundle\Model\TrackableModel::class,
-                'arguments' => [
-                    'mautic.page.model.redirect',
-                    'mautic.lead.repository.field',
-                ],
-            ],
-            'mautic.page.model.video' => [
-                'class'     => 'Mautic\PageBundle\Model\VideoModel',
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.tracker.contact',
-                ],
-            ],
-            'mautic.page.model.tracking.404' => [
-                'class'     => \Mautic\PageBundle\Model\Tracking404Model::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.tracker.contact',
-                    'mautic.page.model.page',
-                ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.page.repository.hit' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Hit::class,
-                ],
-            ],
-            'mautic.page.repository.page' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Page::class,
-                ],
-            ],
-            'mautic.page.repository.redirect' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\PageBundle\Entity\Redirect::class,
-                ],
-            ],
-        ],
         'fixtures' => [
             'mautic.page.fixture.page_category' => [
                 'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
@@ -184,11 +109,11 @@ return [
         ],
         'other' => [
             'mautic.page.helper.token' => [
-                'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
+                'class'     => \Mautic\PageBundle\Helper\TokenHelper::class,
                 'arguments' => 'mautic.page.model.page',
             ],
             'mautic.page.helper.tracking' => [
-                'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
+                'class'     => \Mautic\PageBundle\Helper\TrackingHelper::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',

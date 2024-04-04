@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class ConstantContactApi extends EmailMarketingApi
 {
-    private $version = 'v2';
+    private string $version = 'v2';
 
     protected function request($endpoint, $parameters = [], $method = 'GET', $query = [])
     {
@@ -41,8 +41,6 @@ class ConstantContactApi extends EmailMarketingApi
     }
 
     /**
-     * @param       $email
-     * @param       $listId
      * @param array $fields
      * @param array $config
      *

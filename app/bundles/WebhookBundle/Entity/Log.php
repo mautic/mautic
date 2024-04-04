@@ -6,9 +6,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Log.
- */
 class Log
 {
     /**
@@ -32,16 +29,13 @@ class Log
     private $dateAdded;
 
     /**
-     * @var float
+     * @var float|null
      */
     private $runtime;
 
-    /**
-     * @var string
-     */
-    private $note;
+    private ?string $note = null;
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')
@@ -128,24 +122,17 @@ class Log
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getNote()
+    public function getNote(): ?string
     {
         return $this->note;
     }
 
     /**
      * Strips tags and keeps first 191 characters so it would fit in the varchar 191 limit.
-     *
-     * @param string $note
-     *
-     * @return Log
      */
-    public function setNote($note)
+    public function setNote(?string $note): self
     {
-        $this->note = substr(strip_tags(iconv('UTF-8', 'UTF-8//IGNORE', $note)), 0, 190);
+        $this->note = $note ? substr(strip_tags(iconv('UTF-8', 'UTF-8//IGNORE', $note)), 0, 190) : $note;
 
         return $this;
     }

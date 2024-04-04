@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
-use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
@@ -17,45 +15,21 @@ class InputOptionsDAO
      */
     private $integration;
 
-    /**
-     * @var bool
-     */
-    private $firstTimeSync;
+    private bool $firstTimeSync;
 
-    /**
-     * @var bool
-     */
-    private $disablePush;
+    private bool $disablePush;
 
-    /**
-     * @var bool
-     */
-    private $disablePull;
+    private bool $disablePull;
 
-    /**
-     * @var bool
-     */
-    private $disableActivityPush;
+    private bool $disableActivityPush;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $mauticObjectIds;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $mauticObjectIds;
 
-    /**
-     * @var ObjectIdsDAO|null
-     */
-    private $integrationObjectIds;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO $integrationObjectIds;
 
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $startDateTime;
+    private ?\DateTimeInterface $startDateTime;
 
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $endDateTime;
+    private ?\DateTimeInterface $endDateTime;
 
     private array $options;
 
@@ -128,12 +102,12 @@ class InputOptionsDAO
         return $this->integrationObjectIds;
     }
 
-    public function getStartDateTime(): ?DateTimeInterface
+    public function getStartDateTime(): ?\DateTimeInterface
     {
         return $this->startDateTime;
     }
 
-    public function getEndDateTime(): ?DateTimeInterface
+    public function getEndDateTime(): ?\DateTimeInterface
     {
         return $this->endDateTime;
     }
@@ -146,18 +120,18 @@ class InputOptionsDAO
     /**
      * @throws InvalidValueException
      */
-    private function validateDateTime(array $input, string $optionName): ?DateTimeInterface
+    private function validateDateTime(array $input, string $optionName): ?\DateTimeInterface
     {
         if (empty($input[$optionName])) {
             return null;
         }
 
-        if ($input[$optionName] instanceof DateTimeInterface) {
+        if ($input[$optionName] instanceof \DateTimeInterface) {
             return $input[$optionName];
         } else {
             try {
-                return is_string($input[$optionName]) ? new DateTimeImmutable($input[$optionName], new DateTimeZone('UTC')) : null;
-            } catch (\Throwable $e) {
+                return is_string($input[$optionName]) ? new \DateTimeImmutable($input[$optionName], new \DateTimeZone('UTC')) : null;
+            } catch (\Throwable) {
                 throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
             }
         }

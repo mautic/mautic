@@ -3,9 +3,9 @@
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -25,36 +25,17 @@ class FormSubscriber implements EventSubscriberInterface
 {
     private MailHelper $mailer;
 
-    private AuditLogModel $auditLogModel;
-
-    private IpLookupHelper $ipLookupHelper;
-
-    private CoreParametersHelper $coreParametersHelper;
-
-    private TranslatorInterface $translator;
-
-    private RouterInterface $router;
-
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->auditLogModel        = $auditLogModel;
-        $this->mailer               = $mailer->getMailer();
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
-        $this->router               = $router;
+        $this->mailer = $mailer->getMailer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
@@ -70,7 +51,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onFormPostSave(Events\FormEvent $event)
+    public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         if ($details = $event->getChanges()) {
@@ -89,7 +70,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onFormDelete(Events\FormEvent $event)
+    public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         $log  = [
@@ -106,7 +87,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a simple email form.
      */
-    public function onFormBuilder(Events\FormBuilderEvent $event)
+    public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addSubmitAction('form.email', [
             'group'              => 'mautic.email.actions',
@@ -115,7 +96,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'           => SubmitActionEmailType::class,
             'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
-                'message' => 'html',
+                'message' => 'raw',
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
@@ -203,7 +184,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFormSubmitActionRepost(Events\SubmissionEvent $event)
+    public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {
             return;
@@ -233,11 +214,11 @@ class FormSubscriber implements EventSubscriberInterface
             $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
 
             // Use the cleaned value by default - but if set to not save result, get from post
-            $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+            $value               = $results[$field['alias']] ?? $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form
-            $payload[$key]       = htmlspecialchars_decode($value, ENT_QUOTES);
+            $payload[$key]       = html_entity_decode(htmlspecialchars_decode($value, ENT_QUOTES), ENT_QUOTES);
         }
 
         $event->setPostSubmitPayload($payload);
@@ -247,8 +228,8 @@ class FormSubscriber implements EventSubscriberInterface
         ];
 
         if (!empty($config['authorization_header'])) {
-            if (false !== strpos($config['authorization_header'], ':')) {
-                list($key, $value) = explode(':', $config['authorization_header']);
+            if (str_contains($config['authorization_header'], ':')) {
+                [$key, $value] = explode(':', $config['authorization_header']);
             } else {
                 $key   = 'Authorization';
                 $value = $config['authorization_header'];
@@ -269,7 +250,7 @@ class FormSubscriber implements EventSubscriberInterface
             if ($redirect = $this->parseResponse($response, $matchedFields)) {
                 $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
-        } catch (ServerException $exception) {
+        } catch (ClientException|ServerException $exception) {
             $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {
@@ -350,7 +331,6 @@ class FormSubscriber implements EventSubscriberInterface
                 $formViolations = $body['violations'];
 
                 // Ensure the violations match up to Mautic's
-                $violations = [];
                 foreach ($formViolations as $field => $violation) {
                     if (isset($matchedFields[$field])) {
                         $violations[$matchedFields[$field]] = $violation;
@@ -377,12 +357,7 @@ class FormSubscriber implements EventSubscriberInterface
         return $redirect;
     }
 
-    /**
-     * @param $post
-     *
-     * @return string
-     */
-    private function postToHtml($post)
+    private function postToHtml($post): string
     {
         $output = '<table>';
         foreach ($post as $key => $row) {
@@ -399,8 +374,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $emailString
-     *
      * @return array<string, null>
      */
     private function getEmailsFromString($emailString): array
@@ -416,11 +389,6 @@ class FormSubscriber implements EventSubscriberInterface
     private function setMailer(array $config, array $tokens, array $to, Lead $lead = null, bool $internalSend = true): void
     {
         $this->mailer->reset();
-
-        // ingore queue
-        if ('file' == $this->coreParametersHelper->get('mailer_spool_type') && $config['immediately']) {
-            $this->mailer = $this->mailer->getSampleMailer();
-        }
 
         if (count($to)) {
             $this->mailer->setTo($to);

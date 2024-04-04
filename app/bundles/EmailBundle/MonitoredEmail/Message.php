@@ -5,32 +5,49 @@ namespace Mautic\EmailBundle\MonitoredEmail;
 class Message
 {
     public $id;
+
     public $date;
+
     public $subject;
 
     public $fromName;
+
     public $fromAddress;
 
     public $to = [];
+
     public $toString;
+
     public $cc         = [];
+
     public $replyTo    = [];
+
     public $inReplyTo  = false;
+
     public $returnPath = false;
+
     public $references = [];
 
-    public $textPlain;
+    public string $textPlain = '';
+
     public $textHtml;
-    public $dsnReport;
-    public $dsnMessage;
+
+    public string $dsnReport  = '';
+
+    public string $dsnMessage = '';
+
     public $fblReport;
+
     public $fblMessage;
+
     public $xHeaders = [];
 
-    /** @var Attachment[] */
+    /**
+     * @var Attachment[]
+     */
     protected $attachments = [];
 
-    public function addAttachment(Attachment $attachment)
+    public function addAttachment(Attachment $attachment): void
     {
         $this->attachments[$attachment->id] = $attachment;
     }
@@ -48,14 +65,12 @@ class Message
      *
      * @return array attachmentId => link placeholder
      */
-    public function getInternalLinksPlaceholders()
+    public function getInternalLinksPlaceholders(): array
     {
         return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : [];
     }
 
     /**
-     * @param $baseUri
-     *
      * @return mixed
      */
     public function replaceInternalLinks($baseUri)

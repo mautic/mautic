@@ -13,12 +13,9 @@ class TrackableRepository extends CommonRepository
     /**
      * Find redirects that are trackable.
      *
-     * @param $channel
-     * @param $channelId
-     *
-     * @return mixed
+     * @return mixed[]
      */
-    public function findByChannel($channel, $channelId)
+    public function findByChannel($channel, $channelId): array
     {
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tableAlias = $this->getTableAlias();
@@ -34,16 +31,12 @@ class TrackableRepository extends CommonRepository
             )
             ->setParameter('channel', $channel)
             ->orderBy('r.url')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 
     /**
      * Get a Trackable by Redirect URL.
-     *
-     * @param $url
-     * @param $channel
-     * @param $channelId
      *
      * @return array
      */
@@ -71,9 +64,6 @@ class TrackableRepository extends CommonRepository
     /**
      * Get an array of Trackable entities by Redirect URLs.
      *
-     * @param $channel
-     * @param $channelId
-     *
      * @return array
      */
     public function findByUrls(array $urls, $channel, $channelId)
@@ -98,13 +88,10 @@ class TrackableRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param      $redirectId
-     * @param      $channel
-     * @param      $channelId
      * @param int  $increaseBy
      * @param bool $unique
      */
-    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false)
+    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -123,15 +110,12 @@ class TrackableRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
      * Get hit count.
      *
-     * @param $channel
-     * @param $channelIds
-     * @param $listId
      * @param bool   $combined
      * @param string $countColumn
      *
@@ -206,10 +190,7 @@ class TrackableRepository extends CommonRepository
         return (isset($results[0])) ? $results[0]['click_count'] : 0;
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 't';
     }

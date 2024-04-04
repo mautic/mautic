@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class EventRepository extends CommonRepository
 {
     /**
-     * @param $type
-     *
      * @return array
      */
     public function getEntitiesByEventType($type)

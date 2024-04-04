@@ -13,7 +13,6 @@
 {% endblock %}
 
 {% block content %}
-  {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
   {{ includeStylesheet('plugins/MauticFocusBundle/Assets/css/focus.css') }}
   {{ form_start(form) }}
     <!-- start: box layout -->
@@ -49,7 +48,7 @@
             <div class="website-preview">
 
                 <!-- Form to get preview URL -->
-                <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3 mt-lg">
+                <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3">
                     <div class="row">
                         <div class="mautibot-image col-xs-3 text-center">
                             <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}"/>
@@ -163,6 +162,7 @@
                         <div class="hidden-focus-type-notice">
                             {{ form_row(form.properties.stop_after_conversion) }}
                         </div>
+                        {{ form_row(form.properties.stop_after_close) }}
                     </div>
                 </div>
                 <!-- end focus type -->
@@ -356,7 +356,7 @@
                             <div class="focus-hide visible-focus-type-form">
                                 <div class="col-sm-12" id="focusFormAlert" data-hide-on='{"focus_html_mode_0":"checked"}'>
                                     <div class="alert alert-info">
-                                        {{ 'mautic.focus.form_token.instructions'|trans|raw }}
+                                        {{ 'mautic.focus.form_token.instructions'|trans|purify }}
                                     </div>
                                 </div>
                                 {{ form_row(form.form) }}
@@ -380,4 +380,5 @@
     </div>
 
   {{ form_end(form) }}
+{{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
 {% endblock %}

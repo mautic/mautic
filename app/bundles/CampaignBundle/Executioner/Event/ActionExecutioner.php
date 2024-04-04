@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
-use function assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -17,35 +16,20 @@ class ActionExecutioner implements EventInterface
 {
     public const TYPE = 'action';
 
-    /**
-     * @var ActionDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
-
-    /**
-     * ActionExecutioner constructor.
-     */
-    public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
-    {
-        $this->dispatcher         = $dispatcher;
-        $this->eventLogger        = $eventLogger;
+    public function __construct(
+        private ActionDispatcher $dispatcher,
+        private EventLogger $eventLogger
+    ) {
     }
 
     /**
-     * @return EvaluatedContacts
-     *
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
     {
-        assert($config instanceof ActionAccessor);
+        \assert($config instanceof ActionAccessor);
 
         /** @var LeadEventLog $firstLog */
         if (!$firstLog = $logs->first()) {
@@ -61,7 +45,6 @@ class ActionExecutioner implements EventInterface
         // Execute to process the batch of contacts
         $pendingEvent = $this->dispatcher->dispatchEvent($config, $event, $logs);
 
-        /** @var ArrayCollection $contacts */
         $passed = $this->eventLogger->extractContactsFromLogs($pendingEvent->getSuccessful());
         $failed = $this->eventLogger->extractContactsFromLogs($pendingEvent->getFailures());
 

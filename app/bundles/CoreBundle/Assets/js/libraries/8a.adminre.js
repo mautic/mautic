@@ -218,7 +218,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             Scrollbar: function (elem) {
-                $(".no-touch "+elem).each(function (index, value) {
+                $(".no-touchevents "+elem).each(function (index, value) {
                     $(value).slimScroll({
                         size: "6px",
                         distance: "0px",

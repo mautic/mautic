@@ -5,20 +5,23 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 class Cache
 {
     /**
-     * @var int
+     * @var mixed
      */
     private $id;
 
     /**
-     * @var string
+     * @var mixed
      */
     private $data;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $lifetime;
 
@@ -27,7 +30,7 @@ class Cache
      */
     private $time;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('cache_items');

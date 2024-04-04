@@ -11,32 +11,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(TranslatorInterface $translator, RouterInterface $router, EntityManager $em)
-    {
-        $this->translator = $translator;
-        $this->router     = $router;
-        $this->em         = $em;
+    public function __construct(
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private EntityManager $em
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -46,7 +28,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addSmsEvents($event, 'sent');
         $this->addSmsEvents($event, 'failed');
@@ -66,7 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         /** @var \Mautic\SmsBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository('MauticSmsBundle:Stat');
+        $statRepository        = $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
         $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
@@ -87,7 +69,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'label'      => $label,
                         'href'       => $this->router->generate('mautic_sms_action', ['objectAction'=>'view', 'objectId' => $stat['sms_id']]),
                     ];
-                if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
+                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 }
 

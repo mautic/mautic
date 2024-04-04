@@ -75,9 +75,11 @@ class ListControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertStringContainsString('MySeg', $response->getContent());
-        //Make sure that contact grid is not loaded synchronously
+        // Make sure that contact grid is not loaded synchronously
         self::assertStringNotContainsString('Kane', $response->getContent());
         self::assertStringNotContainsString('Jacques', $response->getContent());
+        // Make sure the data-target-url is not an absolute URL
+        self::assertStringContainsString(sprintf('data-target-url="/s/segment/view/%s/contact/1"', $segment->getId()), $response->getContent());
     }
 
     public function testSegmentContactGrid(): void

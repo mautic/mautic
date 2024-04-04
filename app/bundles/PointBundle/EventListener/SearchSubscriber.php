@@ -12,42 +12,15 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
-    private $pointModel;
-
-    /**
-     * @var TriggerModel
-     */
-    private $pointTriggerModel;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
     public function __construct(
-        PointModel $pointModel,
-        TriggerModel $pointTriggerModel,
-        CorePermissions $security,
-        Environment $twig
+        private PointModel $pointModel,
+        private TriggerModel $pointTriggerModel,
+        private CorePermissions $security,
+        private Environment $twig
     ) {
-        $this->pointModel        = $pointModel;
-        $this->pointTriggerModel = $pointTriggerModel;
-        $this->security          = $security;
-        $this->twig              = $twig;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -55,7 +28,7 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         if ($this->security->isGranted('point:points:view')) {
             $str = $event->getSearchString();
@@ -136,7 +109,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         $security = $this->security;
         if ($security->isGranted('point:points:view')) {

@@ -17,22 +17,19 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var MockObject|PropertiesAccessor
      */
-    private $propertiesAccessor;
+    private \PHPUnit\Framework\MockObject\MockObject $propertiesAccessor;
 
     /**
      * @var MockObject&FormBuilderInterface<string|FormBuilderInterface>
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var FormFieldConditionType
-     */
-    private $form;
+    private \Mautic\FormBundle\Form\Type\FormFieldConditionType $form;
 
     protected function setUp(): void
     {
@@ -72,34 +69,34 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                         'required' => false,
                     ],
                     ],
+                [
+                    'any',
+                    YesNoButtonGroupType::class,
                     [
-                        'any',
-                        YesNoButtonGroupType::class,
-                        [
-                            'label' => 'mautic.form.field.form.condition.any_value',
-                            'attr'  => [
-                                'data-show-on' => '{"formfield_conditions_expr": "in"}',
-                            ],
-                            'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
+                        'label' => 'mautic.form.field.form.condition.any_value',
+                        'attr'  => [
+                            'data-show-on' => '{"formfield_conditions_expr": "in"}',
                         ],
+                        'data' => false,
                     ],
+                ],
+                [
+                    'expr',
+                    ChoiceType::class,
                     [
-                        'expr',
-                        ChoiceType::class,
-                        [
-                            'choices'  => [
-                                'mautic.core.operator.in'    => 'in',
-                                'mautic.core.operator.notin' => 'notIn',
-                            ],
-                            'label'       => false,
-                            'placeholder' => false,
-                            'attr'        => [
-                                'class' => 'form-control',
-                            ],
-                            'required' => false,
+                        'choices'  => [
+                            'mautic.core.operator.in'    => 'in',
+                            'mautic.core.operator.notin' => 'notIn',
                         ],
-                    ]
-                );
+                        'label'       => false,
+                        'placeholder' => false,
+                        'attr'        => [
+                            'class' => 'form-control',
+                        ],
+                        'required' => false,
+                    ],
+                ]
+            );
 
         $this->form->buildForm($this->formBuilder, $options);
     }

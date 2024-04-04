@@ -4,30 +4,24 @@ namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
-/**
- * Class TagRepository.
- */
 class TagRepository extends BaseTagRepository
 {
     /**
-     * @return array
+     * @return string[][]
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['lt.tag', 'ASC'],
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'lt';
     }
 
-    public function countOccurrences($tag)
+    public function countOccurrences($tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -36,15 +30,11 @@ class TagRepository extends BaseTagRepository
             ->where('lt.tag = :tag')
             ->setParameter('tag', $tag);
 
-        $result = $q->execute()->fetchAllAssociative();
-
-        return count($result);
+        return $q->executeQuery()->rowCount();
     }
 
     /**
      * Get a count of leads that belong to the tag.
-     *
-     * @param $tagIds
      *
      * @return array
      */
@@ -55,7 +45,7 @@ class TagRepository extends BaseTagRepository
         $q->select('count(ltx.lead_id) as thecount, ltx.tag_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
 
-        $returnArray = (is_array($tagIds));
+        $returnArray = is_array($tagIds);
 
         if (!$returnArray) {
             $tagIds = [$tagIds];
@@ -66,7 +56,7 @@ class TagRepository extends BaseTagRepository
         )
             ->groupBy('ltx.tag_id');
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

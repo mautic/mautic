@@ -31,7 +31,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'categories',
                 'path'            => '/categories',
-                'controller'      => 'Mautic\CategoryBundle\Controller\Api\CategoryApiController',
+                'controller'      => \Mautic\CategoryBundle\Controller\Api\CategoryApiController::class,
             ],
         ],
     ],
@@ -43,23 +43,6 @@ return [
                 'access'    => 'category:categories:view',
                 'iconClass' => 'fa-folder',
                 'id'        => 'mautic_category_index',
-            ],
-        ],
-    ],
-
-    'services' => [
-        'models' => [
-            'mautic.category.model.category' => [
-                'class'     => 'Mautic\CategoryBundle\Model\CategoryModel',
-                'arguments' => [
-                    'request_stack',
-                ],
-            ],
-            'mautic.category.model.contact.action' => [
-                'class'     => \Mautic\CategoryBundle\Model\ContactActionModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                ],
             ],
         ],
     ],

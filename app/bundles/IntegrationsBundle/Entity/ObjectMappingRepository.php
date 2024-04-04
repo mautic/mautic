@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -16,15 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ObjectMappingRepository extends CommonRepository
 {
-    /**
-     * @param $integration
-     * @param $integrationObjectName
-     * @param $integrationObjectId
-     * @param $internalObjectName
-     *
-     * @return array|null
-     */
-    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName)
+    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName): ?array
     {
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName);
     }
@@ -38,11 +28,6 @@ class ObjectMappingRepository extends CommonRepository
     }
 
     /**
-     * @param $integration
-     * @param $internalObjectName
-     * @param $internalObjectId
-     * @param $integrationObjectName
-     *
      * @return array|null
      */
     public function getIntegrationObject($integration, $internalObjectName, $internalObjectId, $integrationObjectName)
@@ -63,7 +48,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('integrationObjectName', $integrationObjectName);
 
-        $result = $qb->execute()->fetchAssociative();
+        $result = $qb->executeQuery()->fetchAssociative();
 
         return $result ?: null;
     }
@@ -74,10 +59,8 @@ class ObjectMappingRepository extends CommonRepository
      * @param mixed  $oldObjectId
      * @param string $newObjectName
      * @param mixed  $newObjectId
-     *
-     * @return int
      */
-    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId)
+    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -97,7 +80,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('oldObjectName', $oldObjectName)
             ->setParameter('oldObjectId', $oldObjectId);
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     public function updateInternalObjectId(int $internalObjectId, int $id): int
@@ -110,16 +93,16 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('id', $id);
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     /**
      * This method allows inserting a new record when an ORM way is not possible.
      * For example, when coping with \Doctrine\DBAL\Exception\RetryableException.
      */
-    public function insert(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, int $internalObjectId, DateTimeInterface $createdAt = null): int
+    public function insert(string $integration, string $integrationObjectName, string $integrationObjectId, string $internalObjectName, int $internalObjectId, \DateTimeInterface $createdAt = null): int
     {
-        $createdAt = $createdAt ?: new DateTimeImmutable();
+        $createdAt = $createdAt ?: new \DateTimeImmutable();
         $qb        = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb->insert(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
@@ -143,12 +126,10 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('isDeleted', [], Types::BOOLEAN)
             ->setParameter('internalStorage', [], Types::JSON);
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     /**
-     * @param $integration
-     * @param $objectName
      * @param string[]|string $objectIds
      *
      * @return \Doctrine\DBAL\Driver\Statement|int
@@ -169,14 +150,14 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('objectName', $objectName);
 
         if (is_array($objectIds)) {
-            $qb->setParameter('objectId', $objectIds, Connection::PARAM_STR_ARRAY);
+            $qb->setParameter('objectId', $objectIds, ArrayParameterType::STRING);
             $qb->andWhere($qb->expr()->in('m.integration_object_id', ':objectId'));
         } else {
             $qb->setParameter('objectId', $objectIds);
             $qb->andWhere($qb->expr()->eq('m.integration_object_id', ':objectId'));
         }
 
-        return $qb->execute();
+        return $qb->executeStatement();
     }
 
     public function deleteEntitiesForObject(int $internalObjectId, string $internalObject): void

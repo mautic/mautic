@@ -57,7 +57,7 @@ abstract class AbstractFormFieldHelper
         $this->setTranslationKeyPrefix();
     }
 
-    public function setTranslator(Translator $translator)
+    public function setTranslator(Translator $translator): void
     {
         $this->translator = $translator;
     }
@@ -156,9 +156,6 @@ abstract class AbstractFormFieldHelper
     }
 
     /**
-     * @param $format
-     * @param $choices
-     *
      * @return mixed[]|string
      */
     public static function formatList($format, $choices)
@@ -260,7 +257,7 @@ abstract class AbstractFormFieldHelper
         foreach ($parsers as $parser) {
             try {
                 $list = $parser->parse($list);
-            } catch (FormatNotSupportedException $exception) {
+            } catch (FormatNotSupportedException) {
                 continue;
             }
         }

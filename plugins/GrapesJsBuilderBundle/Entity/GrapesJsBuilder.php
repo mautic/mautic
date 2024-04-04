@@ -17,16 +17,16 @@ class GrapesJsBuilder
     protected $id;
 
     /**
-     * @var Email
+     * @var Email|null
      */
     protected $email;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $customMjml;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('bundle_grapesjsbuilder')
@@ -36,7 +36,7 @@ class GrapesJsBuilder
 
         $builder->createManyToOne(
             'email',
-            'Mautic\EmailBundle\Entity\Email'
+            \Mautic\EmailBundle\Entity\Email::class
         )->addJoinColumn('email_id', 'id', true, false, 'CASCADE')->build();
     }
 

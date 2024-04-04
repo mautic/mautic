@@ -2,16 +2,29 @@
 
 namespace Mautic\FormBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Entity\CommonEntity;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Form>
@@ -21,11 +34,23 @@ class FormApiController extends CommonApiController
     /**
      * @var FormModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    public function initialize(ControllerEvent $event)
-    {
-        $formModel = $this->getModel('form');
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
+        $formModel = $modelFactory->getModel('form');
         \assert($formModel instanceof FormModel);
 
         $this->model            = $formModel;
@@ -39,7 +64,7 @@ class FormApiController extends CommonApiController
             'message' => 'html',
         ];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -102,9 +127,6 @@ class FormApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $fieldModel = $this->getModel('form.field');
@@ -146,8 +168,10 @@ class FormApiController extends CommonApiController
                 if (empty($fieldParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
+                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity();
                 } else {
+                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
                     $requestFieldIds[] = $fieldParams['id'];
                 }
@@ -165,12 +189,11 @@ class FormApiController extends CommonApiController
                     return $this->returnError($msg, Response::HTTP_NOT_FOUND);
                 }
 
-                /** @var array{formId: ?int, alias?: string, label: string} $fieldEntityArray */
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
 
                 if (!empty($fieldParams['alias'])) {
-                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], '', 25);
+                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
 
                     if (!in_array($fieldParams['alias'], $aliases)) {
                         $fieldEntityArray['alias'] = $fieldParams['alias'];
@@ -178,7 +201,7 @@ class FormApiController extends CommonApiController
                 }
 
                 if (empty($fieldEntityArray['alias'])) {
-                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'] ?? '', $aliases);
                 }
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
@@ -261,9 +284,7 @@ class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @param $entity
-     *
-     * @return FormInterface
+     * @return FormInterface<mixed>
      */
     protected function createActionEntityForm(Action $entity, array $action)
     {
@@ -290,9 +311,7 @@ class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @param $entity
-     *
-     * @return FormInterface
+     * @return FormInterface<mixed>
      */
     protected function createFieldEntityForm($entity)
     {
@@ -308,5 +327,20 @@ class FormApiController extends CommonApiController
                 'allow_extra_fields' => true,
             ]
         );
+    }
+
+    /**
+     * @param CommonEntity $entity
+     * @param array<mixed> $parameters
+     *
+     * @return mixed
+     */
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    {
+        if (!isset($parameters['postAction'])) {
+            $parameters['postAction'] = 'return';
+        }
+
+        return parent::processForm($request, $entity, $parameters, $method);
     }
 }

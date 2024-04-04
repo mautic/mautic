@@ -2,8 +2,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use Doctrine\DBAL\Exception;
-use PDO;
+use Doctrine\DBAL\Exception as DBALException;
 
 /**
  * @extends CommonRepository<IpAddress>
@@ -12,10 +11,8 @@ class IpAddressRepository extends CommonRepository
 {
     /**
      * Count how many unique IP addresses is there.
-     *
-     * @return int
      */
-    public function countIpAddresses()
+    public function countIpAddresses(): int
     {
         $q = $this->createQueryBuilder('i');
         $q->select('COUNT(DISTINCT i.id) as unique');
@@ -33,7 +30,7 @@ class IpAddressRepository extends CommonRepository
      *
      * @return array<int, array<int>>
      *
-     * @throws Exception
+     * @throws DBALException
      */
     public function getUnusedIpAddressesIds(int $limit): array
     {
@@ -86,8 +83,8 @@ class IpAddressRepository extends CommonRepository
             LIMIT :limit
 SQL;
 
-        $params = [':limit' => $limit];
-        $types  = [':limit' => PDO::PARAM_INT];
+        $params = ['limit' => $limit];
+        $types  = ['limit' => \PDO::PARAM_INT];
 
         return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
     }
@@ -95,7 +92,7 @@ SQL;
     /**
      * @param array<int, array<int>> $ids
      *
-     * @throws Exception
+     * @throws DBALException
      */
     public function deleteUnusedIpAddresses(array $ids): int
     {
@@ -106,5 +103,17 @@ SQL;
 SQL;
 
         return $this->_em->getConnection()->executeStatement($deleteSql);
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function anonymizeAllIpAddress(): int
+    {
+        $table_name        = $this->getTableName();
+        $sql               = "UPDATE {$table_name} SET ip_address = '*.*.*.*', ip_details = 'N;' WHERE ip_address != '*.*.*.*'";
+        $conn              = $this->getEntityManager()->getConnection();
+
+        return $conn->executeQuery($sql)->rowCount();
     }
 }

@@ -10,39 +10,36 @@ class UploadFileCrate implements \Iterator
     /**
      * @var array|FileFieldCrate[]
      */
-    private $fileFieldCrate = [];
+    private array $fileFieldCrate = [];
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
-    public function addFile(UploadedFile $file, Field $field)
+    public function addFile(UploadedFile $file, Field $field): void
     {
         $this->fileFieldCrate[] = new FileFieldCrate($file, $field);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->fileFieldCrate[$this->position];
     }
 
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->fileFieldCrate[$this->position]);
     }

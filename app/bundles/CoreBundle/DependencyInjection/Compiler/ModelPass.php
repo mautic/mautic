@@ -2,7 +2,9 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -10,49 +12,26 @@ class ModelPass implements CompilerPassInterface
 {
     public const TAG = 'mautic.model';
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
+        $modelServices = [];
         foreach ($container->findTaggedServiceIds(self::TAG) as $id => $tags) {
-            $definition = $container->findDefinition($id);
+            $modelServices[$id] = new Reference($id);
 
-            $modelClass = $definition->getClass();
-            $reflected  = new \ReflectionClass($modelClass);
+            // because aliases are not tagged we need to inject them too.
+            // @see https://github.com/symfony/symfony/issues/17256
+            foreach ($container->getAliases() as $aliasId => $alias) {
+                $aliasedId = (string) $alias;
+                if ($aliasedId !== $id) {
+                    continue;
+                }
 
-            if ($reflected->hasMethod('setEntityManager')) {
-                $definition->addMethodCall('setEntityManager', [new Reference('doctrine.orm.entity_manager')]);
-            }
-
-            if ($reflected->hasMethod('setSecurity')) {
-                $definition->addMethodCall('setSecurity', [new Reference('mautic.security')]);
-            }
-
-            if ($reflected->hasMethod('setDispatcher')) {
-                $definition->addMethodCall('setDispatcher', [new Reference('event_dispatcher')]);
-            }
-
-            if ($reflected->hasMethod('setTranslator')) {
-                $definition->addMethodCall('setTranslator', [new Reference('translator')]);
-            }
-
-            if ($reflected->hasMethod('setUserHelper')) {
-                $definition->addMethodCall('setUserHelper', [new Reference('mautic.helper.user')]);
-            }
-
-            if ($reflected->hasMethod('setCoreParametersHelper')) {
-                $definition->addMethodCall('setCoreParametersHelper', [new Reference('mautic.helper.core_parameters')]);
-            }
-
-            if ($reflected->hasMethod('setRouter')) {
-                $definition->addMethodCall('setRouter', [new Reference('router')]);
-            }
-
-            if ($reflected->hasMethod('setLogger')) {
-                $definition->addMethodCall('setLogger', [new Reference('monolog.logger.mautic')]);
-            }
-
-            if ($reflected->hasMethod('setSession')) {
-                $definition->addMethodCall('setSession', [new Reference('session')]);
+                $modelServices[$aliasId] = new Reference($aliasedId);
             }
         }
+
+        $myService = $container->findDefinition(ModelFactory::class);
+
+        $myService->addArgument(ServiceLocatorTagPass::register($container, $modelServices));
     }
 }

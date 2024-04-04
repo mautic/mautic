@@ -15,12 +15,9 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&FormBuilderInterface<FormBuilderInterface>
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    /**
-     * @var DynamicListType
-     */
-    private $form;
+    private \Mautic\CoreBundle\Form\Type\DynamicListType $form;
 
     protected function setUp(): void
     {
@@ -63,7 +60,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
                 FormEvents::PRE_SUBMIT,
                 $this->callback(function ($formModifier) {
                     $formEvent = $this->createMock(FormEvent::class);
-                    $data = [['content' => 'dynamic slot content']];
+                    $data      = [['content' => 'dynamic slot content']];
 
                     $formEvent->expects($this->once())
                         ->method('getData')

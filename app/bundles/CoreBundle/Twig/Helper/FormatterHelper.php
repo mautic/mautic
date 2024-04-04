@@ -8,19 +8,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormatterHelper
 {
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    public const FLOAT_PRECISION = 4;
 
-    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
-    {
-        $this->dateHelper = $dateHelper;
-        $this->translator = $translator;
+    public function __construct(
+        private DateHelper $dateHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -35,14 +28,14 @@ final class FormatterHelper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val) && 'bool' !== $type) {
+        if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;
         }
 
         switch ($type) {
             case 'array':
                 if (!is_array($val)) {
-                    //assume that it's serialized
+                    // assume that it's serialized
                     $unserialized = Serializer::decode($val);
                     if ($unserialized) {
                         $val = $unserialized;
@@ -79,7 +72,10 @@ final class FormatterHelper
                 $string = ($textOnly) ? $val : '<a href="mailto:'.$val.'">'.$val.'</a>';
                 break;
             case 'int':
-                $string = (int) $val;
+                $string = strval((int) $val);
+                break;
+            case 'float':
+                $string = number_format((float) $val, FormatterHelper::FLOAT_PRECISION);
                 break;
             case 'html':
                 $string = InputHelper::strict_html($val);
@@ -129,10 +125,8 @@ final class FormatterHelper
     /**
      * @param string                $delimeter
      * @param array<string, string> $array
-     *
-     * @return string
      */
-    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />'): string
     {
         $pairs = [];
         foreach ($array as $key => $value) {
@@ -150,7 +144,7 @@ final class FormatterHelper
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray($csv, $type = null)
+    public function simpleCsvToArray($csv, $type = null): array
     {
         if (!$csv) {
             return [];
@@ -182,10 +176,7 @@ final class FormatterHelper
         return $string;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'formatter';
     }

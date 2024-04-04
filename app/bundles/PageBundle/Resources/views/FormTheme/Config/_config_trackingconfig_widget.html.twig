@@ -5,7 +5,7 @@
     </div>
     <div class="panel-body">
         <div class="form-group">
-            <p>{{ 'mautic.config.tab.pagetracking.info'|trans }}</p>
+            <p>{{ 'mautic.config.tab.pagetracking.info'|trans|purify }}</p>
             <pre>&lt;script&gt;
     (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
         w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
@@ -18,7 +18,12 @@
         <div class="row">
             {% for name, f in form.children %}
                 {% if name in ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url', 'do_not_track_404_anonymous'] %}
-                    <div class="col-md-6">{{ form_row(f) }}</div>
+                    <div class="col-md-6">
+                        {{ form_row(f) }}
+                        {% if name == 'anonymize_ip' %}
+                            <div class="anonymize_ip_address hide text-danger">{{ 'mautic.page.config.form.anonymize_ip.warning'|trans }}</div>
+                        {% endif %}
+                    </div>
                 {% endif %}
             {% endfor %}
         </div>

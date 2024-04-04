@@ -3,29 +3,23 @@
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class PointActionHelper.
- */
 class PointActionHelper
 {
     /**
      * @param MauticFactory $factory
-     * @param               $eventDetails
-     * @param               $action
-     *
-     * @return bool
      */
-    public static function validatePageHit($factory, $eventDetails, $action)
+    public static function validatePageHit($factory, $eventDetails, $action): bool
     {
         $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel               = $factory->getModel('page');
-            list($parent, $children) = $pageHit->getVariants();
-            //use the parent (self or configured parent)
+            [$parent, $children]     = $pageHit->getVariants();
+            // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;
@@ -37,7 +31,7 @@ class PointActionHelper
         }
 
         if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
-            //no points change
+            // no points change
             return false;
         }
 
@@ -46,23 +40,19 @@ class PointActionHelper
 
     /**
      * @param MauticFactory $factory
-     * @param               $eventDetails
-     * @param               $action
-     *
-     * @return bool
      */
-    public static function validateUrlHit($factory, $eventDetails, $action)
+    public static function validateUrlHit($factory, $eventDetails, $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();
         $limitToUrl   = html_entity_decode(trim($action['properties']['page_url']));
 
         if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
-            //no points change
+            // no points change
             return false;
         }
 
-        $hitRepository = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $hitRepository = $factory->getEntityManager()->getRepository(\Mautic\PageBundle\Entity\Hit::class);
         $lead          = $eventDetails->getLead();
         $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 
@@ -75,7 +65,13 @@ class PointActionHelper
             }
         }
         $now       = new \DateTime();
-        $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+
+        if ($action['properties']['returns_within'] || $action['properties']['returns_after']) {
+            // get the latest hit only when it's needed
+            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+        } else {
+            $latestHit = null;
+        }
 
         if ($action['properties']['accumulative_time']) {
             if (!isset($hitStats)) {
@@ -103,14 +99,14 @@ class PointActionHelper
             }
         }
         if ($action['properties']['returns_within']) {
-            if ($now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
+            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
                 $changePoints['returns_within'] = true;
             } else {
                 $changePoints['returns_within'] = false;
             }
         }
         if ($action['properties']['returns_after']) {
-            if ($now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
+            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
                 $changePoints['returns_after'] = true;
             } else {
                 $changePoints['returns_after'] = false;

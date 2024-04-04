@@ -41,40 +41,7 @@ return [
             ],
         ],
         'sync'         => [],
-        'integrations' => [
-            // Basic definitions with name, display name and icon
-            'mautic.integration.grapesjsbuilder' => [
-                'class' => \MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration::class,
-                'tags'  => [
-                    'mautic.integration',
-                    'mautic.basic_integration',
-                ],
-            ],
-            // Provides the form types to use for the configuration UI
-            'grapesjsbuilder.integration.configuration' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\ConfigSupport::class,
-                'tags'      => [
-                    'mautic.config_integration',
-                ],
-            ],
-            // Tells Mautic what themes it should support when enabled
-            'grapesjsbuilder.integration.builder' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport::class,
-                'tags'      => [
-                    'mautic.builder_integration',
-                ],
-            ],
-        ],
-        'models'  => [
-            'grapesjsbuilder.model' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.email.model.email',
-                ],
-            ],
-        ],
-        'helpers' => [
+        'helpers'      => [
             'grapesjsbuilder.helper.filemanager' => [
                 'class'     => \MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
                 'arguments' => [

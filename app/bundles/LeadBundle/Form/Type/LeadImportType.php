@@ -11,9 +11,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class LeadImportType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'file',
@@ -58,7 +61,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.delimiter',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.delimiter.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -72,7 +76,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.enclosure',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.enclosure.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -86,7 +91,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.escape',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.escape.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,

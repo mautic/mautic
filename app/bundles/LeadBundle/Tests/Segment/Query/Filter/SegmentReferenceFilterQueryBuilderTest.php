@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
@@ -27,39 +28,33 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    use MockedConnectionTrait;
 
     /**
      * @var MockObject|RandomParameterName
      */
-    private $randomParameterMock;
+    private MockObject $randomParameterMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
      */
-    private $connectionMock;
+    private MockObject $connectionMock;
 
-    /**
-     * @var SegmentReferenceFilterQueryBuilder
-     */
-    private $queryBuilder;
+    private SegmentReferenceFilterQueryBuilder $queryBuilder;
 
-    /**
-     * @var LeadList
-     */
-    private $segment;
+    private LeadList $segment;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
-        $this->connectionMock      = $this->createMock(Connection::class);
+        $this->connectionMock      = $this->getMockedConnection();
 
         $this->queryBuilder        = new SegmentReferenceFilterQueryBuilder(
             $this->randomParameterMock,
@@ -68,9 +63,6 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
             $this->createMock(ContactSegmentFilterFactory::class),
             $this->dispatcherMock
         );
-
-        $this->connectionMock->method('quote')
-            ->willReturnArgument(0);
 
         $this->segment = $this->createNewSegment();
     }
@@ -88,8 +80,8 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
      */
     public function dataApplyQuery(): iterable
     {
-        yield ['eq', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT null FROM __PREFIX__leads queryAlias WHERE (l.id = queryAlias.id) AND (EXISTS(SELECT null FROM __PREFIX__lead_lists_leads para1 WHERE (queryAlias.id = para1.lead_id) AND ((para1.leadlist_id = %s) AND ((para1.manually_added = 1) OR (para1.manually_removed = ''))))))"];
-        yield ['neq', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT null FROM __PREFIX__leads queryAlias WHERE (l.id = queryAlias.id) AND (EXISTS(SELECT null FROM __PREFIX__lead_lists_leads para1 WHERE (queryAlias.id = para1.lead_id) AND ((para1.leadlist_id = %s) AND ((para1.manually_added = 1) OR (para1.manually_removed = ''))))))"];
+        yield ['eq', "SELECT 1 FROM <prefix>leads l WHERE EXISTS(SELECT null FROM <prefix>leads queryAlias WHERE (l.id = queryAlias.id) AND (EXISTS(SELECT null FROM <prefix>lead_lists_leads para1 WHERE (queryAlias.id = para1.lead_id) AND ((para1.leadlist_id = %s) AND ((para1.manually_added = 1) OR (para1.manually_removed = ''))))))"];
+        yield ['neq', "SELECT 1 FROM <prefix>leads l WHERE EXISTS(SELECT null FROM <prefix>leads queryAlias WHERE (l.id = queryAlias.id) AND (EXISTS(SELECT null FROM <prefix>lead_lists_leads para1 WHERE (queryAlias.id = para1.lead_id) AND ((para1.leadlist_id = %s) AND ((para1.manually_added = 1) OR (para1.manually_removed = ''))))))"];
     }
 
     /**
@@ -97,8 +89,7 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
      */
     public function testApplyQuery(string $operator, string $expectedQuery): void
     {
-        $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
-        $queryBuilder  = new QueryBuilder($this->connectionMock);
+        $queryBuilder = new QueryBuilder($this->connectionMock);
         $queryBuilder->select('1');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -109,6 +100,7 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
+        $expectedQuery = str_replace('<prefix>', MAUTIC_TABLE_PREFIX, $expectedQuery);
         Assert::assertSame(sprintf($expectedQuery, $this->segment->getId()), $queryBuilder->getDebugOutput());
     }
 

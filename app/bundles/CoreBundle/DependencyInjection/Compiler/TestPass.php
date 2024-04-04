@@ -17,5 +17,9 @@ final class TestPass implements CompilerPassInterface
         $definition->setPublic(true)
             ->setFactory([\Mautic\CoreBundle\Test\Guzzle\ClientFactory::class, 'stub'])
             ->addArgument(new Reference(\GuzzleHttp\Handler\MockHandler::class));
+
+        $container->removeAlias(\Symfony\Contracts\HttpClient\HttpClientInterface::class);
+        $container->register(\Symfony\Component\HttpClient\MockHttpClient::class, \Symfony\Component\HttpClient\MockHttpClient::class)->setAutowired(true)->setPublic(true);
+        $container->setAlias(\Symfony\Contracts\HttpClient\HttpClientInterface::class, \Symfony\Component\HttpClient\MockHttpClient::class);
     }
 }

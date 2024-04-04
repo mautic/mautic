@@ -3,40 +3,38 @@
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 /**
  * Help generate SQL statements to format column data.
- *
- * Class AbstractFormat
  */
 abstract class AbstractFormatter
 {
-    protected $db;
-    protected $platform;
-    protected $name;
+    protected \Doctrine\DBAL\Platforms\AbstractPlatform $platform;
+
+    protected string $name;
 
     /**
      * @return AbstractFormatter
      */
     public static function createFormatter(Connection $db)
     {
-        $name  = $db->getDatabasePlatform()->getName();
+        $name  = DatabasePlatform::getDatabasePlatform($db->getDatabasePlatform());
         $class = '\Mautic\CoreBundle\Doctrine\QueryFormatter\\'.ucfirst($name).'Formatter';
 
         return new $class($db);
     }
 
-    public function __construct(Connection $db)
-    {
-        $this->db       = $db;
+    public function __construct(
+        protected Connection $db
+    ) {
         $this->platform = $this->db->getDatabasePlatform();
-        $this->name     = $this->platform->getName();
+        $this->name     = DatabasePlatform::getDatabasePlatform($this->platform);
     }
 
     /**
      * Format field to datetime.
      *
-     * @param        $field
      * @param string $format
      *
      * @return mixed
@@ -46,7 +44,6 @@ abstract class AbstractFormatter
     /**
      * Format field to date.
      *
-     * @param        $field
      * @param string $format
      *
      * @return mixed
@@ -56,7 +53,6 @@ abstract class AbstractFormatter
     /**
      * Format field to time.
      *
-     * @param        $field
      * @param string $format
      *
      * @return mixed
@@ -65,8 +61,6 @@ abstract class AbstractFormatter
 
     /**
      * Format field to a numeric.
-     *
-     * @param $field
      *
      * @return mixed
      */

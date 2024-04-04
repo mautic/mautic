@@ -4,31 +4,30 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\IpAddressModel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModelTest extends \PHPUnit\Framework\TestCase
+class IpAddressModelTest extends TestCase
 {
     /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     * @var EntityManager|MockObject
      */
-    private $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var IpAddressModel
-     */
-    private $ipAddressModel;
+    private \Mautic\LeadBundle\Model\IpAddressModel $ipAddressModel;
 
     protected function setUp(): void
     {
@@ -105,7 +104,7 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn('1.2.3.999');
 
         $queryBuilder->expects($this->once())
-            ->method('execute');
+            ->method('executeStatement');
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')
@@ -149,8 +148,8 @@ class IpAddressModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn('1.2.3.4');
 
         $queryBuilder->expects($this->once())
-            ->method('execute')
-            ->willThrowException(new UniqueConstraintViolationException('', $this->createMock(DriverException::class)));
+            ->method('executeStatement')
+            ->willThrowException(new UniqueConstraintViolationException($this->createMock(DriverException::class), null));
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')

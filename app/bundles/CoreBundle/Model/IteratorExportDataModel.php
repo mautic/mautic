@@ -6,30 +6,33 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 
 class IteratorExportDataModel implements \Iterator
 {
-    private $position;
-    private $model;
-    private $args;
+    private int $position;
+
     private $callback;
-    private $total;
+
+    private int $total;
+
     private $data;
+
     private $totalResult;
-    private bool $skipOrdering;
 
     /**
      * @param AbstractCommonModel<T> $model
      * @param array<mixed>           $args
+     *
      * @template T of object
      */
-    public function __construct(AbstractCommonModel $model, array $args, callable $callback, bool $skipOrdering = false)
-    {
-        $this->model        = $model;
-        $this->args         = $args;
+    public function __construct(
+        private AbstractCommonModel $model,
+        private array $args,
+        callable $callback,
+        private bool $skipOrdering = false
+    ) {
         $this->callback     = $callback;
         $this->position     = 0;
         $this->total        = 0;
         $this->totalResult  = 0;
         $this->data         = 0;
-        $this->skipOrdering = $skipOrdering;
     }
 
     /**
@@ -41,7 +44,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->data[$this->position];
     }
@@ -70,7 +73,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->position;
     }
@@ -85,7 +88,7 @@ class IteratorExportDataModel implements \Iterator
      *
      * @since 5.0.0
      */
-    public function valid()
+    public function valid(): bool
     {
         if ($this->position <= $this->totalResult && !is_null($this->data)) {
             return true;

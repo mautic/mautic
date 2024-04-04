@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**
@@ -72,9 +69,6 @@ class TokenHelper
     }
 
     /**
-     * @param $alias
-     * @param $defaultValue
-     *
      * @return mixed
      */
     private static function getTokenValue(array $lead, $alias, $defaultValue)
@@ -84,7 +78,7 @@ class TokenHelper
             $value = $lead[$alias];
         } elseif (!empty($lead['companies'])) {
             foreach ($lead['companies'] as $company) {
-                if (1 === (int) $company['is_primary'] && $company[$alias]) {
+                if (isset($company['is_primary'], $company[$alias]) && 1 === (int) $company['is_primary']) {
                     $value = $company[$alias];
                     break;
                 }
@@ -127,12 +121,7 @@ class TokenHelper
         }
     }
 
-    /**
-     * @param $match
-     *
-     * @return string
-     */
-    private static function getTokenDefaultValue($match)
+    private static function getTokenDefaultValue($match): string
     {
         $fallbackCheck = explode('|', $match);
         if (!isset($fallbackCheck[1])) {
@@ -142,12 +131,7 @@ class TokenHelper
         return $fallbackCheck[1];
     }
 
-    /**
-     * @param $match
-     *
-     * @return mixed
-     */
-    private static function getFieldAlias($match)
+    private static function getFieldAlias($match): string
     {
         $fallbackCheck = explode('|', $match);
 

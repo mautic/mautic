@@ -21,20 +21,18 @@ class Tag
     private $tag;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
-    /**
-     * @param string $tag
-     * @param bool   $clean
-     */
-    public function __construct($tag = null, $clean = true)
+    public ?int $deletedId;
+
+    public function __construct(string $tag = null, bool $clean = true)
     {
-        $this->tag = $clean ? $this->validateTag($tag) : $tag;
+        $this->tag = $clean && $tag ? $this->validateTag($tag) : $tag;
     }
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('lead_tags')
@@ -46,7 +44,7 @@ class Tag
         $builder->addNamedField('description', Types::TEXT, 'description', true);
     }
 
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('tag')
             ->addListProperties(
@@ -76,11 +74,9 @@ class Tag
     }
 
     /**
-     * @param string $tag
-     *
      * @return Tag
      */
-    public function setTag($tag)
+    public function setTag(string $tag)
     {
         $this->tag = $this->validateTag($tag);
 
@@ -107,13 +103,8 @@ class Tag
         return $this;
     }
 
-    /**
-     * @param string $tag
-     *
-     * @return Tag
-     */
-    protected function validateTag($tag)
+    private function validateTag(string $tag): string
     {
-        return InputHelper::string(trim($tag));
+        return InputHelper::string(trim((string) $tag));
     }
 }

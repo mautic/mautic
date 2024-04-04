@@ -10,11 +10,17 @@ use PHPUnit\Framework\TestCase;
 
 class MatchFilterForLeadTraitTest extends TestCase
 {
-    private $lead = [
+    /**
+     * @var mixed[]
+     */
+    private array $lead = [
         'id'     => 1,
         'custom' => 'my custom text',
     ];
 
+    /**
+     * @var mixed[]
+     */
     private $filter = [
         0 => [
             'display' => null,
@@ -25,10 +31,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         ],
     ];
 
-    /**
-     * @var MatchFilterForLeadTraitTestable
-     */
-    private $matchFilterForLeadTrait;
+    private \Mautic\EmailBundle\Tests\EventListener\MatchFilterForLeadTraitTestable $matchFilterForLeadTrait;
 
     protected function setUp(): void
     {
@@ -45,6 +48,15 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->lead['custom'] = 'another text';
 
         self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+    }
+
+    public function testDWCContactWithRegex(): void
+    {
+        $this->lead['custom']        = '04249';
+        $this->filter[0]['operator'] = 'regexp';
+        $this->filter[0]['filter']   = '(13357|04249|20363)';
+
+        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
     public function testDWCContactEndWidth(): void
@@ -74,7 +86,7 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @dataProvider dateMatchTestProvider
      */
-    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect)
+    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect): void
     {
         $filters = [
             [
@@ -96,7 +108,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertEquals($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
     }
 
-    public function dateMatchTestProvider(): iterable
+    public static function dateMatchTestProvider(): iterable
     {
         $date = '2021-05-01';
 

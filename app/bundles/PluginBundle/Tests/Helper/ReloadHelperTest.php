@@ -15,32 +15,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $factoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $factoryMock;
 
-    /**
-     * @var ReloadHelper
-     */
-    private $helper;
+    private \Mautic\PluginBundle\Helper\ReloadHelper $helper;
 
-    /**
-     * @var array
-     */
-    private $sampleAllPlugins = [];
+    private array $sampleAllPlugins = [];
 
-    /**
-     * @var array
-     */
-    private $sampleMetaData = [];
+    private array $sampleMetaData = [];
 
-    /**
-     * @var array
-     */
-    private $sampleSchemas = [];
+    private array $sampleSchemas = [];
 
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -52,7 +40,6 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->sampleMetaData = [
             'MauticPlugin\MauticZapierBundle' => [$this->createMock(ClassMetadata::class)],
-            'MauticPlugin\MauticCitrixBundle' => [$this->createMock(ClassMetadata::class)],
         ];
 
         $sampleSchema = $this->createMock(Schema::class);
@@ -61,7 +48,6 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->sampleSchemas = [
             'MauticPlugin\MauticZapierBundle' => $sampleSchema,
-            'MauticPlugin\MauticCitrixBundle' => $sampleSchema,
         ];
 
         $this->sampleAllPlugins = [
@@ -71,7 +57,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
                 'bundle'            => 'MauticZapierBundle',
                 'namespace'         => 'MauticPlugin\MauticZapierBundle',
                 'symfonyBundleName' => 'MauticZapierBundle',
-                'bundleClass'       => 'Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub',
+                'bundleClass'       => \Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub::class,
                 'permissionClasses' => [],
                 'relative'          => 'plugins/MauticZapierBundle',
                 'directory'         => '/Users/jan/dev/mautic/plugins/MauticZapierBundle',
@@ -82,35 +68,10 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
                     'author'      => 'Mautic',
                 ],
             ],
-            'MauticCitrixBundle' => [
-                'isPlugin'          => true,
-                'base'              => 'MauticCitrix',
-                'bundle'            => 'MauticCitrixBundle',
-                'namespace'         => 'MauticPlugin\MauticCitrixBundle',
-                'symfonyBundleName' => 'MauticCitrixBundle',
-                'bundleClass'       => 'Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub',
-                'permissionClasses' => [],
-                'relative'          => 'plugins/MauticCitrixBundle',
-                'directory'         => '/Users/jan/dev/mautic/plugins/MauticCitrixBundle',
-                'config'            => [
-                    'name'        => 'Citrix',
-                    'description' => 'Enables integration with Mautic supported Citrix collaboration products.',
-                    'version'     => '1.0',
-                    'author'      => 'Mautic',
-                    'routes'      => [
-                        'public' => [
-                            'mautic_citrix_proxy' => [
-                                'path'       => '/citrix/proxy',
-                                'controller' => 'MauticPlugin\MauticCitrixBundle\Controller\PublicController::proxyAction',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
         ];
     }
 
-    public function testDisableMissingPlugins()
+    public function testDisableMissingPlugins(): void
     {
         $sampleInstalledPlugins = [
             'MauticZapierBundle'  => $this->createSampleZapierPlugin(),
@@ -124,13 +85,12 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($disabledPlugins['MauticHappierBundle']->isMissing());
     }
 
-    public function testEnableFoundPlugins()
+    public function testEnableFoundPlugins(): void
     {
         $zapierPlugin = $this->createSampleZapierPlugin();
         $zapierPlugin->setIsMissing(true);
         $sampleInstalledPlugins = [
             'MauticZapierBundle' => $zapierPlugin,
-            'MauticCitrixBundle' => $this->createSampleCitrixPlugin(),
         ];
 
         $enabledPlugins = $this->helper->enableFoundPlugins($this->sampleAllPlugins, $sampleInstalledPlugins);
@@ -140,13 +100,12 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($enabledPlugins['MauticZapierBundle']->isMissing());
     }
 
-    public function testUpdatePlugins()
+    public function testUpdatePlugins(): void
     {
         $this->sampleAllPlugins['MauticZapierBundle']['config']['version']     = '1.0.1';
         $this->sampleAllPlugins['MauticZapierBundle']['config']['description'] = 'Updated description';
         $sampleInstalledPlugins                                                = [
             'MauticZapierBundle'  => $this->createSampleZapierPlugin(),
-            'MauticCitrixBundle'  => $this->createSampleCitrixPlugin(),
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),
         ];
         $plugin = $this->createSampleZapierPlugin();
@@ -162,10 +121,9 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Updated description', $updatedPlugins['MauticZapierBundle']->getDescription());
     }
 
-    public function testInstallPlugins()
+    public function testInstallPlugins(): void
     {
         $sampleInstalledPlugins = [
-            'MauticCitrixBundle'  => $this->createSampleCitrixPlugin(),
             'MauticHappierBundle' => $this->createSampleHappierPlugin(),
         ];
         $event = new PluginInstallEvent($this->createSampleZapierPlugin());
@@ -189,19 +147,6 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $plugin->setDescription('Zapier lets you connect Mautic with 1100+ other apps');
         $plugin->isMissing(false);
         $plugin->setBundle('MauticZapierBundle');
-        $plugin->setVersion('1.0');
-        $plugin->setAuthor('Mautic');
-
-        return $plugin;
-    }
-
-    private function createSampleCitrixPlugin()
-    {
-        $plugin = new Plugin();
-        $plugin->setName('Citrix');
-        $plugin->setDescription('Enables integration with Mautic supported Citrix collaboration products.');
-        $plugin->isMissing(false);
-        $plugin->setBundle('MauticCitrixBundle');
         $plugin->setVersion('1.0');
         $plugin->setAuthor('Mautic');
 

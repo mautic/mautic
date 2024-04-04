@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use Doctrine\DBAL\Cache\ArrayStatement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -120,8 +120,11 @@ class EmailRepositoryTest extends TestCase
      */
     private function mockExcludedListIds(array $excludedListIds): void
     {
+        $resultMock = $this->createMock(Result::class);
+        $resultMock->method('fetchAllAssociative')
+            ->willReturn(array_map(fn (int $id) => [$id], $excludedListIds));
         $this->connection->method('executeQuery')
-            ->willReturn(new ArrayStatement(array_map(fn (int $id) => [$id], $excludedListIds)));
+            ->willReturn($resultMock);
     }
 
     private function replaceQueryPrefix(string $query): string

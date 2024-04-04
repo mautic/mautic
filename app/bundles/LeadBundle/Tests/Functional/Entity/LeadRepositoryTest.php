@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -24,7 +22,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     /**
      * @return array<int, array<string, array<string, bool>>>
      */
-    public function joinIpAddressesProvider(): array
+    public static function joinIpAddressesProvider(): array
     {
         return [
             ['' => []],
@@ -41,10 +39,8 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     public function testSaveIpAddressToContacts($args): void
     {
         $contactRepo = $this->em->getRepository(Lead::class);
-        \assert($contactRepo instanceof LeadRepository);
 
         $ipRepo = $this->em->getRepository(IpAddress::class);
-        \assert($ipRepo instanceof IpAddressRepository);
 
         $ip      = new IpAddress('127.0.0.1');
         $contact = new Lead();
@@ -75,9 +71,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         $finalQueries = array_filter(
             $queries['default'],
-            function (array $query) {
-                return false !== strpos($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)');
-            }
+            fn (array $query) => str_contains($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)')
         );
 
         foreach ($finalQueries as $query) {

@@ -9,19 +9,15 @@ use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     /**
      * Count how many visitors are currently viewing a page.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function viewingVisitorsAction(EntityManagerInterface $entityManager)
+    public function viewingVisitorsAction(EntityManagerInterface $entityManager): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -36,10 +32,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Returns HTML of a new widget based on its values.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory)
+    public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory): JsonResponse
     {
         $data      = $request->request->all()['widget'] ?? [];
         $dataArray = ['success' => 0];
@@ -63,10 +57,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Saves the new ordering of dashboard widgets.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function updateWidgetOrderingAction(Request $request)
+    public function updateWidgetOrderingAction(Request $request): JsonResponse
     {
         $data           = $request->request->all()['ordering'] ?? [];
         $dashboardModel = $this->getModel('dashboard');
@@ -80,10 +72,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Deletes the entity.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): JsonResponse
     {
         $objectId  = $request->request->get('widget');
         $dataArray = ['success' => 0];

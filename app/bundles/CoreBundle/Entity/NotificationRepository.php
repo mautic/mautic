@@ -2,29 +2,17 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use DateTime;
-
 /**
  * @extends CommonRepository<Notification>
  */
 class NotificationRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'n';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function getDefaultOrder()
+    public function getDefaultOrder(): array
     {
         return [
             ['n.dateAdded', 'DESC'],
@@ -33,10 +21,8 @@ class NotificationRepository extends CommonRepository
 
     /**
      * Mark user notifications as read.
-     *
-     * @param $userId
      */
-    public function markAllReadForUser($userId)
+    public function markAllReadForUser($userId): void
     {
         $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], ['user_id' => (int) $userId]);
     }
@@ -44,13 +30,9 @@ class NotificationRepository extends CommonRepository
     /**
      * Clear notifications for a user.
      *
-     * @param      $userId
-     * @param null $id     Clears all if empty
-     * @param null $limit  Clears a set number
-     *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
-    public function clearNotificationsForUser($userId, $id = null, $limit = null)
+    public function clearNotificationsForUser($userId, $id = null, $limit = null): void
     {
         if (!empty($id)) {
             $this->getEntityManager()->getConnection()->update(
@@ -77,7 +59,7 @@ class NotificationRepository extends CommonRepository
                     $qb->getSQL()." LIMIT $limit"
                 );
             } else {
-                $qb->execute();
+                $qb->executeStatement();
             }
         }
     }
@@ -102,11 +84,8 @@ class NotificationRepository extends CommonRepository
     /**
      * Fetch notifications for this user.
      *
-     * @param      $userId
-     * @param null $afterId
+
      * @param bool $includeRead
-     * @param null $type
-     * @param null $limit
      *
      * @return array
      */
@@ -147,7 +126,7 @@ class NotificationRepository extends CommonRepository
         return $qb->getQuery()->getArrayResult();
     }
 
-    public function isDuplicate(int $userId, string $deduplicate, DateTime $from): bool
+    public function isDuplicate(int $userId, string $deduplicate, \DateTime $from): bool
     {
         $qb = $this->getEntityManager()
             ->getConnection()
@@ -158,12 +137,12 @@ class NotificationRepository extends CommonRepository
             ->where('user_id = :userId')
             ->andWhere('deduplicate = :deduplicate')
             ->andWhere('date_added >= :from')
-            ->setParameter(':userId', $userId)
-            ->setParameter(':deduplicate', $deduplicate)
-            ->setParameter(':from', $from->format('Y-m-d H:i:s'))
+            ->setParameter('userId', $userId)
+            ->setParameter('deduplicate', $deduplicate)
+            ->setParameter('from', $from->format('Y-m-d H:i:s'))
             ->setMaxResults(1);
 
-        return (bool) $qb->execute()
+        return (bool) $qb->executeQuery()
             ->fetchOne();
     }
 }

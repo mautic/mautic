@@ -8,14 +8,14 @@ use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PublicController extends FormController
 {
     /**
      * Generates a new password for the user and emails it to them.
      */
-    public function passwordResetAction(Request $request)
+    public function passwordResetAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         /** @var UserModel $model */
         $model = $this->getModel('user');
@@ -24,10 +24,10 @@ class PublicController extends FormController
         $action = $this->generateUrl('mautic_user_passwordreset');
         $form   = $this->formFactory->create(PasswordResetType::class, $data, ['action' => $action]);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
@@ -36,7 +36,7 @@ class PublicController extends FormController
                         $model->sendResetEmail($user);
                     }
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset');
-                } catch (\Exception $exception) {
+                } catch (\Exception) {
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
                 }
 
@@ -55,7 +55,7 @@ class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(Request $request, UserPasswordEncoderInterface $encoder): mixed
+    public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): mixed
     {
         /** @var \Mautic\UserBundle\Model\UserModel $model */
         $model = $this->getModel('user');
@@ -69,10 +69,10 @@ class PublicController extends FormController
             $request->getSession()->set('resetToken', $token);
         }
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
-                //find the user
+                // find the user
                 $data = $form->getData();
                 /** @var User $user */
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
@@ -86,7 +86,7 @@ class PublicController extends FormController
                         $resetToken = $request->getSession()->get('resetToken');
 
                         if ($model->confirmResetToken($user, $resetToken)) {
-                            $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);
+                            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
 

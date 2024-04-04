@@ -15,9 +15,13 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     public const PRIORITY = 900;
 
     protected bool $enableHSTS;
+
     protected bool $includeDubDomains;
+
     protected bool $preload;
+
     protected int $expireTime;
+
     protected HttpKernelInterface $app;
 
     public function __construct(HttpKernelInterface $app)
@@ -34,7 +38,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     {
         $response = $this->app->handle($request, $type, $catch);
 
-        //Do not include the header in the sub-request response
+        // Do not include the header in the sub-request response
         if (self::MASTER_REQUEST !== $type) {
             return $response;
         }

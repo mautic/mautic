@@ -2,19 +2,29 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\Controller\FetchCommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
  * @extends FetchCommonApiController<LeadEventLog>
@@ -38,11 +48,21 @@ class EventLogApiController extends FetchCommonApiController
     /**
      * @var EventLogModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    public function initialize(ControllerEvent $event)
-    {
-        $campaignEventLogModel = $this->getModel('campaign.event_log');
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory,
+    ) {
+        $campaignEventLogModel = $modelFactory->getModel('campaign.event_log');
         \assert($campaignEventLogModel instanceof EventLogModel);
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
@@ -58,30 +78,27 @@ class EventLogApiController extends FetchCommonApiController
         // Only include the id of the parent
         $this->addExclusionStrategy(new FieldInclusionStrategy(['id'], 1, 'parent'));
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * @return Response
      */
-    public function getEntitiesAction(Request $request)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper)
     {
         $this->serializerGroups[self::LOG_SERIALIZATION] = 'campaignEventStandaloneLogDetails';
         $this->serializerGroups[]                        = 'campaignEventStandaloneList';
         $this->serializerGroups[]                        = 'leadBasicList';
 
-        return parent::getEntitiesAction($request);
+        return parent::getEntitiesAction($request, $userHelper);
     }
 
     /**
      * Get a list of events.
      *
-     * @param      $contactId
-     * @param null $campaignId
-     *
      * @return Response
      */
-    public function getContactEventsAction(Request $request, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -125,13 +142,10 @@ class EventLogApiController extends FetchCommonApiController
             'campaign_id' => $campaignId,
         ];
 
-        return $this->getEntitiesAction($request);
+        return $this->getEntitiesAction($request, $userHelper);
     }
 
     /**
-     * @param $eventId
-     * @param $contactId
-     *
      * @return Response
      */
     public function editContactEventAction(Request $request, $eventId, $contactId)
@@ -163,7 +177,7 @@ class EventLogApiController extends FetchCommonApiController
         if (is_string($result)) {
             return $this->returnError($result, Response::HTTP_CONFLICT);
         } else {
-            list($log, $created) = $result;
+            [$log, $created] = $result;
         }
 
         $event->addContactLog($log);
@@ -229,7 +243,7 @@ class EventLogApiController extends FetchCommonApiController
             if (is_string($result)) {
                 $errors[$key] = $this->returnError($result, Response::HTTP_CONFLICT);
             } else {
-                list($log, $created) = $result;
+                [$log, $created] = $result;
                 $event->addContactLog($log);
             }
         }
@@ -249,17 +263,13 @@ class EventLogApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * @param null $data
-     * @param null $statusCode
-     */
     protected function view($data = null, ?int $statusCode = null, array $headers = []): View
     {
         if ($this->campaign) {
             $data['campaign'] = $this->campaign;
 
             if ($this->contact) {
-                list($data['membership'], $ignore) = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
+                [$data['membership'], $ignore] = $this->prepareEntitiesForView($this->campaign->getContactMembership($this->contact));
             }
         }
 

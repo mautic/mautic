@@ -4,15 +4,9 @@ namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
 class StatDAO
 {
-    /**
-     * @var array
-     */
-    private $stats = [];
+    private array $stats = [];
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function addStat($key, $value)
@@ -27,8 +21,6 @@ class StatDAO
     }
 
     /**
-     * @param $key
-     *
      * @return mixed
      */
     public function getStat($key)

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -14,17 +14,14 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var Connection|MockObject
      */
-    private $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
-     * @var MockObject&Result<mixed>
+     * @var MockObject&Result
      */
-    private $result;
+    private \PHPUnit\Framework\MockObject\MockObject $result;
 
-    /**
-     * @var VersionProvider
-     */
-    private $provider;
+    private \Mautic\CoreBundle\Doctrine\Provider\VersionProvider $provider;
 
     protected function setUp(): void
     {
@@ -35,7 +32,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider             = new VersionProvider($this->connection);
     }
 
-    public function testGetVersionForMySql()
+    public function testGetVersionForMySql(): void
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -53,7 +50,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isMySql());
     }
 
-    public function testGetVersionForMariaDb()
+    public function testGetVersionForMariaDb(): void
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')

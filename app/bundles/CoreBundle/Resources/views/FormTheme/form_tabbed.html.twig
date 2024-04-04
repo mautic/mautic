@@ -1,5 +1,5 @@
 {% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
-{% extends "MauticCoreBundle:FormTheme:form.html.twig" %}
+{% extends "@MauticCore/FormTheme/form.html.twig" %}
 {% set hasRightColumn = block('rightFormContent') is defined %}
 {% block mainFormContent %}
     {{ form_start(form) }}

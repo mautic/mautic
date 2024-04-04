@@ -2,55 +2,37 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Swift_Mime_SimpleMessage;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
 
-class SmtpTransport implements \Swift_Transport
+class SmtpTransport implements TransportInterface
 {
-    public Swift_Mime_SimpleMessage $sentMessage;
+    /**
+     * @var array<string, mixed>
+     */
+    private $transports = []; // @phpstan-ignore-line
 
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public Email $sentMessage;
+
+    public function __construct()
     {
-        $this->sentMessage = clone $message;
+        $this->transports['main'] = $this;
     }
 
-    /**
-     * Test if this Transport mechanism has started.
-     *
-     * @return bool
-     */
-    public function isStarted()
+    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
     {
-        return true;
+        if ($message instanceof Email) {
+            $this->sentMessage = clone $message;
+        }
+
+        return null;
     }
 
-    /**
-     * Start this Transport mechanism.
-     */
-    public function start()
+    public function __toString(): string
     {
-        return true;
-    }
-
-    /**
-     * Stop this Transport mechanism.
-     */
-    public function stop()
-    {
-        return true;
-    }
-
-    /**
-     * Register a plugin in the Transport.
-     */
-    public function registerPlugin(\Swift_Events_EventListener $plugin)
-    {
-    }
-
-    /**
-     * @return bool
-     */
-    public function ping()
-    {
-        return true;
+        return 'null://';
     }
 }

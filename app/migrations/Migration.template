@@ -2,27 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Mautic\Migrations;
+namespace <namespace>;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
-final class Version<version> extends PreUpAssertionMigration
+final class <className> extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
         // Please add an assertion for every SQL you define in the `up()` method.
         // The order does matter!
-
         // E.g.:
         /*
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->hasTable("{$this->prefix}table_name");
-        }, sprintf('Table %s already exists', "{$this->prefix}table_name"));
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->hasTable("{$this->prefix}table_name"),
+            "Table {$this->prefix}table_name already exists"
+        );
 
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable("{$this->prefix}table_name")->hasIndex('index_name');
-        }, sprintf('Index %s already exists', 'index_name'));
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->getTable("{$this->prefix}table_name")->hasIndex('index_name'),
+            'Index index_name already exists'
+        );
         */
     }
 

@@ -13,7 +13,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::html
      */
-    public function testHtmlFilter()
+    public function testHtmlFilter(): void
     {
         $outlookXML = '<!--[if gte mso 9]><xml>
  <o:OfficeDocumentSettings>
@@ -61,7 +61,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::email
      */
-    public function testEmailFilterRemovesDoublePeriods()
+    public function testEmailFilterRemovesDoublePeriods(): void
     {
         $clean = InputHelper::email('john..doe@email.com');
 
@@ -73,7 +73,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::email
      */
-    public function testEmailFilterRemovesWhitespace()
+    public function testEmailFilterRemovesWhitespace(): void
     {
         $clean = InputHelper::email('    john.doe@email.com  ');
 
@@ -85,7 +85,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::cleanArray
      */
-    public function testCleanArrayWithEmptyValue()
+    public function testCleanArrayWithEmptyValue(): void
     {
         $this->assertEquals([], InputHelper::cleanArray(null));
     }
@@ -95,7 +95,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::cleanArray
      */
-    public function testCleanArrayWithStringValue()
+    public function testCleanArrayWithStringValue(): void
     {
         $this->assertEquals(['kuk'], InputHelper::cleanArray('kuk'));
     }
@@ -105,7 +105,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::cleanArray
      */
-    public function testCleanArrayWithJS()
+    public function testCleanArrayWithJS(): void
     {
         $this->assertEquals(
             ['&#60;script&#62;console.log(&#34;log me&#34;);&#60;/script&#62;'],
@@ -118,7 +118,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
      */
-    public function testFilename()
+    public function testFilename(): void
     {
         $this->assertSame(
             '29nidji__dsfjhro85t784_fff.r.txt',
@@ -131,7 +131,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
      */
-    public function testFilenameWithChangingDir()
+    public function testFilenameWithChangingDir(): void
     {
         $this->assertSame(
             '29nidji__dsfjhro85t784_fff..r',
@@ -144,7 +144,7 @@ class InputHelperTest extends TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
      */
-    public function testFilenameWithExtension()
+    public function testFilenameWithExtension(): void
     {
         $this->assertSame(
             '29nidji__dsfjhro85t784.txt',
@@ -152,7 +152,7 @@ class InputHelperTest extends TestCase
         );
     }
 
-    public function testTransliterate()
+    public function testTransliterate(): void
     {
         $tests = [
             'custom test' => 'custom test',
@@ -174,7 +174,7 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
-    public function urlProvider(): iterable
+    public static function urlProvider(): iterable
     {
         // valid URL is reconstructed as expected
         yield ['https://www.mautic.org/somewhere/something?foo=bar#abc123', 'https://www.mautic.org/somewhere/something?foo=bar#abc123'];
@@ -220,6 +220,52 @@ class InputHelperTest extends TestCase
     }
 
     /**
+     * @dataProvider filenameProvider
+     */
+    public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
+    {
+        $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
+
+        Assert::assertEquals($cleanedUrl, $outputFilename);
+    }
+
+    /**
+     * @return iterable<array<string>>
+     */
+    public static function filenameProvider(): iterable
+    {
+        yield [
+            'dirname',
+            'dirname',
+        ];
+
+        yield [
+            'file.png',
+            'file.png',
+        ];
+
+        yield [
+            'dirname with space',
+            'dirname-with-space',
+        ];
+
+        yield [
+            'filename with space.png',
+            'filename-with-space.png',
+        ];
+
+        yield [
+            'directory with čšťĺé',
+            'directory-with-cstle',
+        ];
+
+        yield [
+            'filename with čšťĺé.png',
+            'filename-with-cstle.png',
+        ];
+    }
+
+    /**
      * @dataProvider minifyHTMLProvider
      */
     public function testMinifyHTML(string $html, string $expected): void
@@ -230,7 +276,7 @@ class InputHelperTest extends TestCase
     /**
      * @return array<array<string>>
      */
-    public function minifyHTMLProvider(): array
+    public static function minifyHTMLProvider(): array
     {
         return [
             // Test with a simple HTML string with no whitespace
@@ -250,6 +296,36 @@ class InputHelperTest extends TestCase
             // Test with an HTML string with multiple same tag but with different attributes
             ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
             [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
+        ];
+    }
+
+    /**
+     * @dataProvider underscoreProvider
+     */
+    public function testUndersore(mixed $provided, mixed $expected): void
+    {
+        $this->assertSame($expected, InputHelper::_($provided));
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function underscoreProvider(): array
+    {
+        return [
+            ['hello', 'hello'],
+            [null, null],
+            [false, ''],
+            [true, '1'],
+            [0, '0'],
+            [10, '10'],
+            [[null], [null]],
+            [[0], ['0']],
+            [[false], ['']],
+            [[true], ['1']],
+            [[null, 'hello'], [null, 'hello']],
+            [[null, 3], [null, '3']],
+            [[[null]], [[null]]],
         ];
     }
 }
