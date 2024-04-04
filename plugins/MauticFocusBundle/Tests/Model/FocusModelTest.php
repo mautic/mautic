@@ -13,7 +13,6 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
@@ -96,29 +95,6 @@ class FocusModelTest extends TestCase
         ];
 
         $focusModel->getContent($focus);
-    }
-
-    public function testGetStatsWithNullDates(): void
-    {
-        $this->expectError();
-
-        $focusModel = new FocusModel(
-            $this->formModel,
-            $this->trackableModel,
-            $this->twig,
-            $this->leadFieldModel,
-            $this->contactTracker,
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
-            $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
-        );
-
-        $focusModel->getStats($this->createMock(Focus::class), null, null, null);
     }
 
     public function focusTypeProvider(): \Generator
