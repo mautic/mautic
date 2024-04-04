@@ -267,7 +267,7 @@ if (!isset($previewUrl)) {
                         if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
                         }
-                        echo "<option value=\"$value\">$label</option>\n";
+                        echo "<option value=\"$label\">$value</option>\n";
                     endif;
                 endforeach;
             endif;

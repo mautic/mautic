@@ -1415,13 +1415,11 @@ class MailHelper
             $this->setPlainText($plainText);
         }
 
-        $BCcontent  = $email->getContent();
+        $template   = $email->getTemplate();
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
-        if (empty($customHtml) && !empty($BCcontent)) {
-            $template = $email->getTemplate();
+        if (empty($customHtml) && $template) {
             if (empty($slots)) {
-                $template = $email->getTemplate();
                 $slots    = $this->factory->getTheme($template)->getSlots('email');
             }
 
@@ -1515,6 +1513,7 @@ class MailHelper
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
             }
+            $headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click';
         }
 
         return $headers;

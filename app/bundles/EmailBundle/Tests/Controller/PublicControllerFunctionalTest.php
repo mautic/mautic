@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -73,10 +75,24 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
+    public function testOneClickUnsubscribeAction(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('POST', '/email/unsubscribe/'.$stat->getTrackingHash(), [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertEquals(1, $dncCollection->count());
+        $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
+    }
+
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function getStat(Form $form = null): Stat
+    protected function getStat(Form $form = null, Lead $lead = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';
@@ -92,11 +108,21 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = new Stat();
         $stat->setTrackingHash($trackingHash);
         $stat->setEmailAddress('john@doe.email');
+        $stat->setLead($lead);
         $stat->setDateSent(new \DateTime());
         $stat->setEmail($email);
         $this->em->persist($stat);
 
         return $stat;
+    }
+
+    protected function createLead(): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail('john@doe.email');
+        $this->em->persist($lead);
+
+        return $lead;
     }
 
     /**

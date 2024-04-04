@@ -55,6 +55,7 @@
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
     <ini name="error_reporting" value="E_ALL" />
+    <ini name="date.timezone" value="UTC" />
   </php>
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />

@@ -153,13 +153,9 @@ class CompanyController extends FormController
         $companiesRepo  = $model->getCompanyLeadRepository();
         $contacts       = $companiesRepo->getCompanyLeads($objectId);
 
-        $leadsIds = 'ids:';
-        foreach ($contacts as $contact) {
-            $leadsIds .= $contact['lead_id'].',';
-        }
-        $leadsIds = substr($leadsIds, 0, -1);
+        $leadIds = array_column($contacts, 'lead_id');
 
-        $data = $this->getCompanyContacts($objectId, $page, $leadsIds);
+        $data = $this->getCompanyContacts($objectId, $page, $leadIds);
 
         return $this->delegateView(
             [
@@ -577,15 +573,11 @@ class CompanyController extends FormController
         $companiesRepo  = $model->getCompanyLeadRepository();
         $contacts       = $companiesRepo->getCompanyLeads($objectId);
 
-        $leadsIds = 'ids:';
-        foreach ($contacts as $contact) {
-            $leadsIds .= $contact['lead_id'].',';
-        }
-        $leadsIds = substr($leadsIds, 0, -1);
+        $leadIds = array_column($contacts, 'lead_id');
 
         $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
 
-        $contacts = $this->getCompanyContacts($objectId, null, $leadsIds);
+        $contacts = $this->getCompanyContacts($objectId, null, $leadIds);
 
         return $this->delegateView(
             [
@@ -608,13 +600,13 @@ class CompanyController extends FormController
     /**
      * Get company's contacts for company view.
      *
-     * @param int    $companyId
-     * @param int    $page
-     * @param string $leadsIds  filter to get only company's contacts
+     * @param int        $companyId
+     * @param int        $page
+     * @param array<int> $leadIds   filter to get only company's contacts
      *
      * @return array
      */
-    public function getCompanyContacts($companyId, $page = 0, $leadsIds = '')
+    public function getCompanyContacts($companyId, $page = 0, $leadIds = [])
     {
         $this->setListFilters();
 
@@ -628,14 +620,21 @@ class CompanyController extends FormController
             $start = 0;
         }
 
-        //do some default filtering
+        //do some default sorting
         $orderBy    = $session->get('mautic.company.'.$companyId.'.contacts.orderby', 'l.last_active');
         $orderByDir = $session->get('mautic.company.'.$companyId.'.contacts.orderbydir', 'DESC');
+
+        // filter by company contacts
+        $filter = [
+          'force' => [
+            ['column' => 'l.id', 'expr' => 'in', 'value' => $leadIds],
+          ],
+        ];
 
         $results = $model->getEntities([
             'start'          => $start,
             'limit'          => $limit,
-            'filter'         => ['string' => $leadsIds],
+            'filter'         => $filter,
             'orderBy'        => $orderBy,
             'orderByDir'     => $orderByDir,
             'withTotalCount' => true,

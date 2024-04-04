@@ -63,7 +63,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $bundleFilter = $input->getOption('bundle');
-        $files        = $this->languageHelper->getLanguageFiles([$bundleFilter]);
+        $files        = $this->languageHelper->getLanguageFiles($bundleFilter ? [$bundleFilter] : []);
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
@@ -106,7 +106,7 @@ EOT
                     }
 
                     $promise = $transifex->getApiConnector()->createPromise(
-                        $resources->uploadContent($alias, $content)
+                        $resources->uploadContent($alias, $content, true)
                     );
                     $promise->setFilePath($file);
                     $promises->enqueue($promise);

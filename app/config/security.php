@@ -54,7 +54,7 @@ $firewalls = [
         'http_basic'         => true,
     ],
     'main' => [
-        'pattern'       => '^/s/',
+        'pattern'       => '^/(s/|elfinder|efconnect)',
         'light_saml_sp' => [
             'provider'        => 'user_provider',
             'success_handler' => 'mautic.security.authentication_handler',
@@ -125,8 +125,6 @@ $container->loadFromExtension(
         'firewalls'      => $firewalls,
         'access_control' => [
             ['path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY'],
-            ['path' => '^/efconnect', 'roles' => 'IS_AUTHENTICATED_FULLY'],
-            ['path' => '^/elfinder', 'roles' => 'IS_AUTHENTICATED_FULLY'],
         ],
     ]
 );
