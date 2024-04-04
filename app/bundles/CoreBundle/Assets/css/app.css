@@ -1499,6 +1499,10 @@ blockquote > p:after {
 .ck.ck-balloon-panel.ck-balloon-panel_caret_se.ck-balloon-panel_visible {
   z-index: 99999 !important;
 }
+.ck-body-wrapper {
+  position: fixed;
+  z-index: 99999;
+}
 a.media {
   display: block;
 }
@@ -4824,4 +4828,10 @@ ul.media-list.media-list-feed div.media-object {
   float: right;
   position: relative;
   right: 10px;
+}
+.ui-sortable-handle {
+  cursor: grab;
+}
+.ui-sortable-handle:active {
+  cursor: grabbing;
 }

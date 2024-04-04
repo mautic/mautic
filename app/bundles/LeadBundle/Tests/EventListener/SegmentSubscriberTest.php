@@ -9,24 +9,61 @@ use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
+class SegmentSubscriberTest extends TestCase
 {
+    /**
+     * @var IpLookupHelper&MockObject
+     */
+    private MockObject $ipLookupHelper;
+
+    /**
+     * @var AuditLogModel&MockObject
+     */
+    private MockObject $auditLogModel;
+
+    /**
+     * @var ListModel&MockObject
+     */
+    private MockObject $listModel;
+
+    /**
+     * @var TranslatorInterface&MockObject
+     */
+    private MockObject $translator;
+
+    /**
+     * @var SegmentUsedInCampaignsValidator&MockObject
+     */
+    private MockObject $segmentUsedInCampaignsValidator;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->ipLookupHelper                  = $this->createMock(IpLookupHelper::class);
+        $this->auditLogModel                   = $this->createMock(AuditLogModel::class);
+        $this->listModel                       = $this->createMock(ListModel::class);
+        $this->segmentUsedInCampaignsValidator = $this->createMock(SegmentUsedInCampaignsValidator::class);
+        $this->translator                      = $this->createMock(TranslatorInterface::class);
+    }
+
     public function testGetSubscribedEvents(): void
     {
-        $ipLookupHelper   = $this->createMock(IpLookupHelper::class);
-        $auditLogModel    = $this->createMock(AuditLogModel::class);
-        $listModel        = $this->createMock(ListModel::class);
-        $translatorModel  = $this->createMock(TranslatorInterface::class);
-
-        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
+        $subscriber  = new SegmentSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->listModel, $this->segmentUsedInCampaignsValidator, $this->translator);
 
         $this->assertEquals(
             [
-                LeadEvents::LIST_PRE_UNPUBLISH => ['onSegmentPreUnpublish', 0],
                 LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
                 LeadEvents::LIST_POST_DELETE   => ['onSegmentDelete', 0],
+                LeadEvents::LIST_PRE_UNPUBLISH => [
+                    ['validateSegmentFilters', 0],
+                    ['validateSegmentsUsedInCampaigns', 0],
+                ],
             ],
             $subscriber->getSubscribedEvents()
         );
@@ -52,20 +89,15 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
             'ipAddress' => $ip,
         ];
 
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
-        $ipLookupHelper->expects($this->once())
+        $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
             ->will($this->returnValue($ip));
 
-        $auditLogModel = $this->createMock(AuditLogModel::class);
-        $auditLogModel->expects($this->once())
+        $this->auditLogModel->expects($this->once())
             ->method('writeToLog')
             ->with($log);
 
-        $listModel        = $this->createMock(ListModel::class);
-        $translatorModel  = $this->createMock(TranslatorInterface::class);
-
-        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
+        $subscriber  = new SegmentSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->listModel, $this->segmentUsedInCampaignsValidator, $this->translator);
 
         $segment            = $this->createMock(LeadList::class);
         $segment->deletedId = $segmentId;
@@ -111,10 +143,7 @@ class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $listModel        = $this->createMock(ListModel::class);
-        $translatorModel  = $this->createMock(TranslatorInterface::class);
-
-        $subscriber     = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $listModel, $translatorModel);
+        $subscriber  = new SegmentSubscriber($ipLookupHelper, $auditLogModel, $this->listModel, $this->segmentUsedInCampaignsValidator, $this->translator);
 
         $segment = $this->createMock(LeadList::class);
         $segment->expects($this->once())

@@ -802,4 +802,13 @@ final class LeadEvents
      * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
      */
     public const POST_CONTACT_EXPORT_SEND_EMAIL = 'mautic.post_contact_export_send_email';
+
+    /**
+     * The mautic.lead_on_segments_change event is thrown to change lead's segments.
+     *
+     * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
+     *
+     * @var string
+     */
+    public const LEAD_ON_SEGMENTS_CHANGE = 'mautic.lead_on_segments_change';
 }

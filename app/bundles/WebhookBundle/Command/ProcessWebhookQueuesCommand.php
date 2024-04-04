@@ -32,6 +32,20 @@ class ProcessWebhookQueuesCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Process payload for a specific webhook.  If not specified, all webhooks will be processed.',
                 null
+            )
+            ->addOption(
+                '--min-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Sets the minimum webhook queue ID to process (so called range mode).',
+                null
+            )
+            ->addOption(
+                '--max-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Sets the maximum webhook queue ID to process (so called range mode).',
+                null
             );
     }
 
@@ -44,11 +58,14 @@ class ProcessWebhookQueuesCommand extends Command
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
-        $id = $input->getOption('webhook-id');
+        $id    = $input->getOption('webhook-id');
+        $minId = (int) $input->getOption('min-id');
+        $maxId = (int) $input->getOption('max-id');
 
         if ($id) {
-            $webhook  = $this->webhookModel->getEntity($id);
-            $webhooks = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $webhook        = $this->webhookModel->getEntity($id);
+            $webhooks       = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $queueRangeMode = $minId && $maxId;
         } else {
             // make sure we only get published webhook entities
             $webhooks = $this->webhookModel->getEntities(
@@ -75,7 +92,23 @@ class ProcessWebhookQueuesCommand extends Command
         $output->writeLn('<info>Processing Webhooks</info>');
 
         try {
-            $this->webhookModel->processWebhooks($webhooks);
+            if ($queueRangeMode) {
+                $webhookLimit = $this->webhookModel->getWebhookLimit();
+
+                if (1 > $webhookLimit) {
+                    throw new \InvalidArgumentException('`webhook limit` parameter must be greater than zero.');
+                }
+
+                for (; $minId <= $maxId; $minId += $webhookLimit) {
+                    $this->webhookModel
+                        ->setMinQueueId($minId)
+                        ->setMaxQueueId(min($minId + $webhookLimit - 1, $maxId));
+
+                    $this->webhookModel->processWebhook(current($webhooks));
+                }
+            } else {
+                $this->webhookModel->processWebhooks($webhooks);
+            }
         } catch (\Exception $e) {
             $output->writeLn('<error>'.$e->getMessage().'</error>');
             $output->writeLn('<error>'.$e->getTraceAsString().'</error>');

@@ -539,8 +539,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $alias = $this->getTableAlias();
 
         return (new SegmentQueryBuilder($this->getEntityManager()->getConnection()))
-            ->from(MAUTIC_TABLE_PREFIX.'leads', $alias)
-            ->leftJoin($alias, MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = '.$alias.'.owner_id');
+            ->from(MAUTIC_TABLE_PREFIX.'leads', $alias);
     }
 
     /**
@@ -736,6 +735,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner', [], null, 'en_US'):
+                $q->leftJoin($this->getTableAlias(), MAUTIC_TABLE_PREFIX.'users', 'u', "u.id = {$this->getTableAlias()}.owner_id");
                 $expr = $q->expr()->or(
                     $q->expr()->$likeExpr('u.first_name', ':'.$unique),
                     $q->expr()->$likeExpr('u.last_name', ':'.$unique)

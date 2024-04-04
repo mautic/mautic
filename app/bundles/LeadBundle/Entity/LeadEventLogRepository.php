@@ -133,7 +133,7 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (!empty($options['search'])) {
-            $qb->andWhere($qb->expr()->like($alias.'.properties', $qb->expr()->literal('%'.$options['search'].'%')));
+            $qb->andWhere($qb->expr()->like('LOWER('.$alias.'.properties)', $qb->expr()->literal('%'.strtolower($options['search']).'%')));
         }
 
         return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', [], ['date_added']);
