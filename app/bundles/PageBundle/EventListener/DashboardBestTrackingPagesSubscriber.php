@@ -25,14 +25,11 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
         ],
     ];
 
-    protected PageModel $pageModel;
-
     /**
      * DashboardSubscriber constructor.
      */
-    public function __construct(PageModel $pageModel)
+    public function __construct(protected PageModel $pageModel)
     {
-        $this->pageModel = $pageModel;
     }
 
     /**
