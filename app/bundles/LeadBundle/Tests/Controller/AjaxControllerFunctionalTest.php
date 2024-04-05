@@ -47,6 +47,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
 
+        $this->client->restart();
         // Let's remove the member now.
         $payload = [
             'action'         => 'lead:toggleLeadCampaign',
