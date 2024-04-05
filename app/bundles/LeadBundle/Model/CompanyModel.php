@@ -520,14 +520,13 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * Get a list of companies with names only.
      *
      * @param mixed[]|string $filter
-     * 
+     *
      * @return string[]
      */
     public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, ?string $exclude = ''): array
     {
-        $results = [];
         $valueColumn = 'id';
-        $onlyNames = true;
+        $onlyNames   = true;
         if (!in_array($type, ['companyfield', 'lead.company'])) {
             return [];
         }
@@ -547,7 +546,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
 
         // Exclude company if $exclude is provided
-        if ($exclude !== '') {
+        if ('' !== $exclude) {
             $composite = $expr->and(
                 $composite,
                 $expr->neq('comp.id', $exclude)
@@ -567,9 +566,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
         }
 
-        $results = $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column, $valueColumn, $onlyNames);
-
-        return $results;
+        return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column, $valueColumn, $onlyNames);
     }
 
     /**
