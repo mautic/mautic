@@ -5615,7 +5615,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "c97d81b647a17f3fee852c3b3ebd0929f7d908a9"
+                "reference": "3e7a938c18f6adbf4dec4f29e0f9be362c55f40a"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5710,9 +5710,6 @@
                 "theofidry/psysh-bundle": "~4.4.0",
                 "tightenco/collect": "^8.16.0",
                 "twilio/sdk": "^5.25"
-            },
-            "conflict": {
-                "psr/simple-cache": ">=3.0.0"
             },
             "type": "mautic-core",
             "extra": {
@@ -10182,16 +10179,16 @@
         },
         {
             "name": "symfony/flex",
-            "version": "v1.21.6",
+            "version": "v1.18.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/flex.git",
-                "reference": "06b58a5e5b4c6528fb12e0fac5fea0db3f1e7ae8"
+                "reference": "130851b90c1ea615ac5be6fce827971f4f55afbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/flex/zipball/06b58a5e5b4c6528fb12e0fac5fea0db3f1e7ae8",
-                "reference": "06b58a5e5b4c6528fb12e0fac5fea0db3f1e7ae8",
+                "url": "https://api.github.com/repos/symfony/flex/zipball/130851b90c1ea615ac5be6fce827971f4f55afbf",
+                "reference": "130851b90c1ea615ac5be6fce827971f4f55afbf",
                 "shasum": ""
             },
             "require": {
@@ -10227,7 +10224,7 @@
             "description": "Composer plugin for Symfony",
             "support": {
                 "issues": "https://github.com/symfony/flex/issues",
-                "source": "https://github.com/symfony/flex/tree/v1.21.6"
+                "source": "https://github.com/symfony/flex/tree/v1.18.6"
             },
             "funding": [
                 {
@@ -10243,7 +10240,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-03-02T08:16:37+00:00"
+            "time": "2022-04-15T08:20:34+00:00"
         },
         {
             "name": "symfony/form",
@@ -17424,5 +17421,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
