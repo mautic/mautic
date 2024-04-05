@@ -38,7 +38,7 @@
     "symfony/event-dispatcher": "~4.4.0",
     "symfony/finder": "~4.4.0",
     "symfony/http-foundation": "~4.4.0",
-    "symfony/http-kernel": "~4.4.0",
+    "symfony/http-kernel": "~4.4.51",
     "symfony/filesystem": "~4.4.0",
     "symfony/routing": "~4.4.0",
     "symfony/security-core": "~4.4.0",
