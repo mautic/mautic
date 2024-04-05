@@ -129,7 +129,8 @@
     "allow-plugins": {
       "composer/installers": true,
       "composer/package-versions-deprecated": true,
-      "symfony/flex": true
+      "symfony/flex": true,
+      "php-http/discovery": true
     }
   },
   "extra": {

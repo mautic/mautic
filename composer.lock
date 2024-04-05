@@ -12739,16 +12739,16 @@
         },
         {
             "name": "symfony/security-bundle",
-            "version": "v4.4.41",
+            "version": "v4.4.44",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-bundle.git",
-                "reference": "6549321a5abecccb311a697b6cb508a3c325ed18"
+                "reference": "d2a6bf4aeb75e75d3faacf9bec286e0de58394b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/6549321a5abecccb311a697b6cb508a3c325ed18",
-                "reference": "6549321a5abecccb311a697b6cb508a3c325ed18",
+                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/d2a6bf4aeb75e75d3faacf9bec286e0de58394b6",
+                "reference": "d2a6bf4aeb75e75d3faacf9bec286e0de58394b6",
                 "shasum": ""
             },
             "require": {
@@ -12815,7 +12815,7 @@
             "description": "Provides a tight integration of the Security component into the Symfony full-stack framework",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security-bundle/tree/v4.4.41"
+                "source": "https://github.com/symfony/security-bundle/tree/v4.4.44"
             },
             "funding": [
                 {
@@ -12831,7 +12831,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-04-12T15:19:55+00:00"
+            "time": "2022-07-20T09:59:04+00:00"
         },
         {
             "name": "symfony/service-contracts",
