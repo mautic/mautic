@@ -22,8 +22,7 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^4.0",
-    "php-http/message-factory": "^1.1"
+    "mautic/core-lib": "^4.0"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.19.2",
@@ -130,8 +129,7 @@
     "allow-plugins": {
       "composer/installers": true,
       "composer/package-versions-deprecated": true,
-      "symfony/flex": true,
-      "php-http/discovery": true
+      "symfony/flex": true
     }
   },
   "extra": {
