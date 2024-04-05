@@ -5,23 +5,21 @@ export default class StorageService {
     constructor(editor, mode) {
         this.editor = editor;
         this.mode = mode;
-        this.restoreMessage = null;
+        this.maxStorageItems = 10;
         this.init();
     }
 
     init() {
-        this.initStorageKey();
-        const storage = this.getStorage();
+        this.storageKey = 'gjs-storage';
+        this.restoreMessage = null;
+        const entityId = this.mode === 'page' ? this.getPageId() : this.getEmailId();
+        this.stackItemId = `gjs-${this.mode}-${Mautic.builderTheme}-${entityId}`;
+        const storageItem = this.getStorageItemById(this.stackItemId);
         const editorContent = this.getEditorContent();
-        if (storage && editorContent !== storage.content) {
-            this.displayRestoreMessage(storage);
+        if (storageItem && editorContent !== storageItem.content) {
+            this.displayRestoreMessage(storageItem);
         }
         this.editor.on("update", () => this.handleUpdate());
-    }
-
-    initStorageKey() {
-        const entityId = this.mode === 'page' ? this.getPageId() : this.getEmailId();
-        this.key = `gjs-${this.mode}-${Mautic.builderTheme}-${entityId}`
     }
 
     displayRestoreMessage(storedContent) {
@@ -83,15 +81,15 @@ export default class StorageService {
         if (!this.restoreMessage) {
             const editorContent = this.getEditorContent();
             const dateTime = new Date().toISOString();
-            const contentWithDateTime = { content: editorContent, date: dateTime };
-            this.saveStorage(contentWithDateTime);
+            const contentWithDateTime = { id: this.stackItemId, content: editorContent, date: dateTime };
+            this.saveStorageItem(contentWithDateTime);
         }
     }
 
     load() {
-        const storage = this.getStorage();
-        if (storage) {
-            this.editor.setComponents(storage.content);
+        const storageItem = this.getStorageItemById(this.stackItemId);
+        if (storageItem) {
+            this.editor.setComponents(storageItem.content);
         }
     }
 
@@ -105,13 +103,34 @@ export default class StorageService {
         return content;
     }
 
-    getStorage() {
-        const contentData = localStorage.getItem(this.key);
-        return contentData ? JSON.parse(contentData) : null;
+    getStackItemId() {
+        const entityId = this.mode === 'page' ? this.getPageId() : this.getEmailId();
+        return `gjs-${this.mode}-${Mautic.builderTheme}-${entityId}`;
     }
 
-    saveStorage(storage) {
-        localStorage.setItem(this.key, JSON.stringify(storage));
+    saveStorageItem(item) {
+        const stack = JSON.parse(localStorage.getItem(this.storageKey)) || [];
+        const index = stack.findIndex(existingItem => existingItem.id === item.id);
+        if (index !== -1) {
+            // If the item already exists, update it
+            stack[index] = item;
+        } else {
+            // If the item doesn't exist, push it to the stack
+            if (stack.length >= this.maxStorageItems) {
+                // Ensure that the stack does not exceed the maximum allowed number of items
+                // to prevent web storage from exceeding its 10MiB per domain limit
+                stack.pop(); // Remove the oldest item
+            }
+            stack.push(item);
+        }
+
+        stack.sort((a, b) => new Date(b.date) - new Date(a.date));
+        localStorage.setItem(this.storageKey, JSON.stringify(stack));
+    }
+
+    getStorageItemById(id) {
+        const stack = JSON.parse(localStorage.getItem(this.storageKey)) || [];
+        return stack.find(item => item.id === id);
     }
 
     formatDateTime(dateTime) {
