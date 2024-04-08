@@ -24,7 +24,7 @@ export default (editor, opts = {}) => {
   } else {
     // Add Dynamic Content block only for email modes
     const dcb = new DynamicContentBlocks(editor, opts);
-    dcb.addDynamciContentBlock();
+    dcb.addDynamicContentBlock();
   }
 
   // Add icon to mj-hero

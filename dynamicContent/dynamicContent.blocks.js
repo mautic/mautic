@@ -11,7 +11,7 @@ export default class DynamicContentBlocks {
     this.blockManager = this.editor.BlockManager;
   }
 
-  addDynamciContentBlock() {
+  addDynamicContentBlock() {
     this.blockManager.add('dynamic-content', {
       label: Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel'),
       activate: true,
