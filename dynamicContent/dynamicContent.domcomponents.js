@@ -79,8 +79,10 @@ export default class DynamicContentDomComponents {
         const dcService = new DynamicContentService(editor);
         const decId = DynamicContentService.getDataParamDecid(el.model);
         const dcItem = dcService.getStoreItem(decId);
-        this.el.innerHTML = dcItem.content;
-        dcService.logger.debug('DC: Updated view', dcItem);
+        if (typeof dcItem !== 'undefined') {
+          this.el.innerHTML = dcItem.content;
+          dcService.logger.debug('DC: Updated view', dcItem);
+        }
       },
       // open the dynamic content modal if the editor is added or double clicked
       onActive() {
