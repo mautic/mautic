@@ -25,26 +25,23 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      */
     public const MARIADB_MINIMUM_VERSION = '10.2.6';
 
-    private ?\Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns $generatedColumns = null;
+    private GeneratedColumns $generatedColumns;
 
     public function __construct(
         private VersionProviderInterface $versionProvider,
         private EventDispatcherInterface $dispatcher
     ) {
+        $this->generatedColumns = new GeneratedColumns();
     }
 
     public function getGeneratedColumns(): GeneratedColumns
     {
-        if (null !== $this->generatedColumns) {
-            return $this->generatedColumns;
-        }
-
-        if ($this->generatedColumnsAreSupported()) {
-            $event = new GeneratedColumnsEvent();
-            $this->dispatcher->dispatch($event, CoreEvents::ON_GENERATED_COLUMNS_BUILD);
+        if ($this->generatedColumnsAreSupported()
+            && 0 === $this->generatedColumns->count()
+            && $this->dispatcher->hasListeners(CoreEvents::ON_GENERATED_COLUMNS_BUILD)
+        ) {
+            $event                  = $this->dispatcher->dispatch(new GeneratedColumnsEvent(), CoreEvents::ON_GENERATED_COLUMNS_BUILD);
             $this->generatedColumns = $event->getGeneratedColumns();
-        } else {
-            $this->generatedColumns = new GeneratedColumns();
         }
 
         return $this->generatedColumns;

@@ -951,6 +951,7 @@ class CampaignController extends AbstractStandardFormController
                 break;
             case 'new':
             case 'edit':
+                $session                = $this->getCurrentRequest()->getSession();
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
@@ -958,6 +959,7 @@ class CampaignController extends AbstractStandardFormController
                         'campaignEvents'  => $this->campaignEvents,
                         'campaignSources' => $this->campaignSources,
                         'deletedEvents'   => $this->deletedEvents,
+                        'hasEventClone'   => $session->has('mautic.campaign.events.clone.storage'),
                     ]
                 );
                 break;
