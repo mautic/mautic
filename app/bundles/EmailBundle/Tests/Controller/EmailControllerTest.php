@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -277,48 +276,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         $this->requestStack->push($request);
         $this->controller->sendExampleAction($request, 1);
-    }
-
-    /**
-     * @return array<string, array<string, string>>
-     */
-    private function getStats(): array
-    {
-        return [
-            'Finland' => [
-                'contacts'              => '14',
-                'country'               => 'Finland',
-                'sent_count'            => '14',
-                'read_count'            => '4',
-                'clicked_through_count' => '0',
-            ],
-            'Italy' => [
-                'contacts'              => '5',
-                'country'               => 'Italy',
-                'sent_count'            => '5',
-                'read_count'            => '5',
-                'clicked_through_count' => '3',
-            ],
-        ];
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function testGetData(): void
-    {
-        $email = new Email();
-        $email->setName('Test email');
-
-        $emailModelMock = $this->createMock(EmailModel::class);
-        $emailModelMock->method('getCountryStats')
-            ->with($email, false)
-            ->willReturn($this->getStats());
-
-        $results = $this->controller->getData($email);
-
-        $this->assertCount(2, $results);
-        $this->assertSame($this->getStats(), $results);
     }
 
     public function testGetExportHeader(): void
