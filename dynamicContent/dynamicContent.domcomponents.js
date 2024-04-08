@@ -10,20 +10,23 @@ export default class DynamicContentDomComponents {
     const tagName = ContentService.isMjmlMode(editor) ? 'mj-text' : 'div';
     const baseType = dc.getType(baseTypeName);
     const baseModel = baseType.model;
-    const model = {
-      defaults: {
-        name: 'Dynamic Content',
-        tagName,
-        draggable: '[data-gjs-type="cell"],[data-gjs-type="mj-column"]',
-        droppable: false,
-        editable: false,
-        stylable: false,
-        propagate: ['droppable', 'editable'],
-        attributes: {
-          'data-gjs-type': 'dynamic-content', // Type for GrapesJS
-          'data-slot': 'dynamicContent', // used to find the DC component on the canvas for e.g. token transformation
-        },
+
+    const dynamicContentModel = {
+      name: 'Dynamic Content',
+      tagName,
+      draggable: '[data-gjs-type=cell],[data-gjs-type=mj-column]',
+      droppable: false,
+      editable: false,
+      stylable: false,
+      propagate: ['droppable', 'editable'],
+      attributes: {
+        'data-gjs-type': 'dynamic-content', // Type for GrapesJS
+        'data-slot': 'dynamicContent', // used to find the DC component on the canvas for e.g. token transformation
       },
+    };
+
+    const model = {
+      defaults: { ...baseModel.prototype.defaults, ...dynamicContentModel },
       /**
        * Initilize the component
        */
