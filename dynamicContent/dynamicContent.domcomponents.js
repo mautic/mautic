@@ -19,6 +19,7 @@ export default class DynamicContentDomComponents {
       editable: false,
       stylable: false,
       propagate: ['droppable', 'editable'],
+      style: baseModel.prototype.defaults['style-default'],
       attributes: {
         'data-gjs-type': 'dynamic-content', // Type for GrapesJS
         'data-slot': 'dynamicContent', // used to find the DC component on the canvas for e.g. token transformation

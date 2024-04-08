@@ -22,7 +22,6 @@ export default class DynamicContentBlocks {
       content: {
         type: 'dynamic-content',
         content: '{dynamiccontent="Dynamic Content"}',
-        style: { padding: '10px' },
         activeOnRender: 1,
       },
     });
