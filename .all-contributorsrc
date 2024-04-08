@@ -1200,7 +1200,8 @@
       "contributions": [
         "code",
         "a11y",
-        "doc"
+        "doc",
+        "bug"
       ]
     },
     {
