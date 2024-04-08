@@ -1203,7 +1203,8 @@
         "doc",
         "bug",
         "review",
-        "userTesting"
+        "userTesting",
+        "design"
       ]
     },
     {
