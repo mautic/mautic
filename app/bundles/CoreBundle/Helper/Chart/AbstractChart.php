@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\ColorHelper;
 
@@ -82,13 +81,6 @@ abstract class AbstractChart
     {
         return $this->unit;
     }
-
-    /**
-     * Doctrine's Connetion object.
-     *
-     * @var Connection
-     */
-    protected $connection;
 
     /**
      * Create a DateInterval time unit.
@@ -254,54 +246,40 @@ abstract class AbstractChart
         }
     }
 
-    /**
-     * @param int|null $companyId
-     * @param string   $fromAlias
-     */
-    public function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't'): void
-    {
-        if (!$companyId) {
-            return;
-        }
+  /**
+   * @param int|null $companyId
+   * @param string   $fromAlias
+   */
+  public function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't'): void
+  {
+      if ($companyId) {
+          $sb = $q->expr()->andX(
+              $q->expr()->eq('cl.company_id', ':companyId'),
+              $q->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
+          );
 
-        $sb = $this->connection->createQueryBuilder();
+          $q->andWhere(
+              sprintf('EXISTS (SELECT null FROM %scompanies_leads cl WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
+          )->setParameter('companyId', $companyId);
+      }
+  }
 
-        $sb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
-            ->where(
-                $sb->expr()->and(
-                    $sb->expr()->eq('cl.company_id', ':companyId'),
-                    $sb->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
-                )
-            );
+ /**
+  * @param int|null $segmentId
+  * @param string   $fromAlias
+  */
+ public function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't'): void
+ {
+     if ($segmentId) {
+         $sb = $q->expr()->andX(
+             $q->expr()->eq('lll.leadlist_id', ':segmentId'),
+             $q->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
+             $q->expr()->eq('lll.manually_removed', 0)
+         );
 
-        $q->andWhere(
-            sprintf('EXISTS (%s)', $sb->getSql())
-        )->setParameter('companyId', $companyId);
-    }
-
-    /**
-     * @param int|null $segmentId
-     * @param string   $fromAlias
-     */
-    public function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't'): void
-    {
-        if ($segmentId) {
-            $sb = $this->connection->createQueryBuilder();
-
-            $sb->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
-                ->where(
-                    $sb->expr()->and(
-                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
-                        $sb->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', 0)
-                    )
-                );
-
-            $q->andWhere(
-                sprintf('EXISTS (%s)', $sb->getSql())
-            )->setParameter('segmentId', $segmentId);
-        }
-    }
+         $q->andWhere(
+             sprintf('EXISTS (SELECT null FROM %slead_lists_leads lll WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
+         )->setParameter('segmentId', $segmentId);
+     }
+ }
 }
