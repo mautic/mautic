@@ -783,6 +783,7 @@ class StatRepository extends CommonRepository
 
         // main query
         $queryBuilder->addSelect(
+            "{$leadAlias}.country AS `country`",
             "COUNT({$statsAlias}.id) AS `sent_count`",
             "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
             "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
@@ -801,15 +802,13 @@ class StatRepository extends CommonRepository
 
         switch ($sourceType) {
             case 'campaign':
-                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
-                    ->andWhere("{$statsAlias}.source_id in (:events)")
+                $queryBuilder->andWhere("{$statsAlias}.source_id in (:events)")
                     ->andWhere("{$statsAlias}.source = :source")
                     ->setParameter('events', $entityIds, ArrayParameterType::INTEGER)
                     ->setParameter('source', 'campaign.event');
                 break;
             case 'email':
-                $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
-                    ->andWhere("{$statsAlias}.email_id in (:emails)")
+                $queryBuilder->andWhere("{$statsAlias}.email_id in (:emails)")
                     ->setParameter('emails', $entityIds, ArrayParameterType::INTEGER);
         }
 
