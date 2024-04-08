@@ -55,28 +55,21 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     public function downloadRemoteDataStore()
     {
-        $package   = $this->getRemoteDateStoreDownloadUrl();
+		$package   = $this->getRemoteDateStoreDownloadUrl();
 
-        // try {
-        //     $data = $this->client->get($package);
-        // } catch (\Exception $exception) {
-        //     $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
-        // }
+		if (empty($package)) {
+			$this->logger->error('Failed to fetch remote IP data: Invalid or inactive MaxMind license key');
 
-        try {
-            $data = $this->client->get($package);
-            // check if response is 200 before storing value in $data
-            if ($data->getStatusCode() === 200)
-            {
-                $data = $data;
-            }
-            else
-            {
-                return false;
-            }
-        } catch (\Exception $exception) {
-            $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
-        }
+			return false;
+		}
+
+		try {
+			$data = $this->client->get($package, [
+				RequestOptions::ALLOW_REDIRECTS => true,
+			]);
+		} catch (\Exception $exception) {
+			$this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
+		}
 
         $tempTarget        = $this->cacheDir.'/'.basename($package);
         $tempExt           = strtolower(pathinfo($package, PATHINFO_EXTENSION));
