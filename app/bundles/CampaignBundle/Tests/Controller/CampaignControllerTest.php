@@ -56,6 +56,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
             $this->createMock(EventCollector::class),
             $this->dateHelper,
             $this->createMock(ManagerRegistry::class),
+            // @phpstan-ignore-next-line
             $this->createMock(MauticFactory::class),
             $this->createMock(ModelFactory::class),
             $helperUserMock,
