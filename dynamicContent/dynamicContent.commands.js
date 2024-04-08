@@ -19,7 +19,8 @@ export default class DynamicContentCommands {
   // eslint-disable-next-line class-methods-use-this
   stopDynamicContentPopup() {
     // Destroy Dynamic Content editors and write the contents to the textarea
-    const { logger } = this;
+    // eslint-disable-next-line prefer-destructuring
+    const logger = this.logger;
     // eslint-disable-next-line no-undef
     if (typeof ckEditors !== 'undefined' && ckEditors.size > 0) {
       // eslint-disable-next-line no-undef
