@@ -75,9 +75,10 @@ export default class DynamicContentDomComponents {
         dblclick: 'onActive',
       },
       // replace token with human readable view
-      onRender(el) {
+      // eslint-disable-next-line no-shadow
+      onRender({ editor, model }) {
         const dcService = new DynamicContentService(editor);
-        const decId = DynamicContentService.getDataParamDecid(el.model);
+        const decId = DynamicContentService.getDataParamDecid(model);
         const dcItem = dcService.getStoreItem(decId);
         if (typeof dcItem !== 'undefined') {
           this.el.innerHTML = dcItem.content;
