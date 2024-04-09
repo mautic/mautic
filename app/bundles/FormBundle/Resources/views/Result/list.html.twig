@@ -30,7 +30,7 @@
           'href': path('mautic_form_export', {'objectId': form.id, 'format': 'html'}),
       },
       'btnText': 'mautic.form.result.export.html'|trans,
-      'iconClass': 'fa fa-file-code-o',
+      'iconClass': 'ri-file-code-line',
       'primary': true,
   }]) %}
 
@@ -41,7 +41,7 @@
           'href': path('mautic_form_export', {'objectId': form.id, 'format': 'csv'}),
       },
       'btnText': 'mautic.form.result.export.csv'|trans,
-      'iconClass': 'fa fa-file-text-o',
+      'iconClass': 'ri-file-text-line',
       'primary': true,
   }]) %}
 
@@ -54,7 +54,7 @@
               'href': path('mautic_form_export', {'objectId': form.id, 'format': 'xlsx'}),
           },
           'btnText': 'mautic.form.result.export.xlsx'|trans,
-          'iconClass': 'fa fa-file-excel-o',
+          'iconClass': 'ri-file-excel-line',
           'primary': true,
       }]) %}
   {% endif %}
@@ -65,7 +65,7 @@
           'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}),
           'data-toggle': 'ajax',
       },
-      'iconClass': 'fa fa-remove',
+      'iconClass': 'ri-close-line',
       'btnText': 'mautic.core.form.close'|trans,
   }]) %}
 
