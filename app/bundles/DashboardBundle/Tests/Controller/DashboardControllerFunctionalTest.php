@@ -6,7 +6,9 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
@@ -102,6 +104,58 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
             ['B', 'Admin User', '1 minute'],
             ['A', 'Admin User', '3 seconds'],
             ['D', 'Admin User', 'Less than 1 second'],
+        ], $tableArray);
+    }
+
+    public function testBestTrackingPagesWidget(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy([]);
+
+        $lead = new Lead();
+        $this->em->persist($lead);
+
+        $hit = new Hit();
+        $hit->setLead($lead);
+        $hit->setUrlTitle('A');
+        $hit->setUrl('http://example.com/a');
+        $hit->setDateHit(new \DateTime('-1 day'));
+        $hit->setTrackingId('xxx');
+        $hit->setCode(200);
+        $this->em->persist($hit);
+
+        // Create a new widget
+        $widget = new Widget();
+        $widget->setName('Best Tracking Pages');
+        $widget->setType('best.tracking.pages');
+        $widget->setWidth(100);
+        $widget->setHeight(300);
+        $widget->setCreatedBy($user);
+        $this->em->persist($widget);
+
+        $this->em->flush();
+        $this->em->detach($widget);
+
+        // Send a request to the widget
+        $this->client->request('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()), [], [], [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+        ]);
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $content = $response->getContent();
+        $this->assertJson($content);
+
+        $data = json_decode($content, true);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('success', $data);
+        $this->assertSame(1, $data['success']);
+        $this->assertArrayHasKey('widgetHtml', $data);
+
+        $tableArray = $this->widgetHtmlWithTableToArray($data['widgetHtml']);
+
+        $this->assertSame([
+            ['A', '1'],
         ], $tableArray);
     }
 
