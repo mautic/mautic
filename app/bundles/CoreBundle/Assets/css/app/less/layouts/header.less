@@ -113,10 +113,22 @@
           // -------------------------
           > img,
           > .img-wrapper {
+            --width: 30px;
+            border-radius: 100%;
+            width: var(--width);
+            height: var(--width);
             display: inline-block;
-            .square(@input-height-base);
             margin-top: -11px;
             margin-bottom: -11px;
+          }
+
+          > .user-info {
+            top: -6px;
+            position: relative;
+
+            > .text {
+              line-height: 14px;
+            }
           }
 
           // badge & label
