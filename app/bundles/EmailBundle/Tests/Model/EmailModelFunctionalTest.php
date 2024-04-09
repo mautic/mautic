@@ -300,22 +300,22 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(3, $results);
         $this->assertSame([
             [
+                'country'               => '',
                 'sent_count'            => '1',
                 'read_count'            => '1',
                 'clicked_through_count' => '1',
-                'country'               => '',
             ],
             [
+                'country'               => 'Italy',
                 'sent_count'            => '3',
                 'read_count'            => '2',
                 'clicked_through_count' => '1',
-                'country'               => 'Italy',
             ],
             [
+                'country'               => 'Poland',
                 'sent_count'            => '2',
                 'read_count'            => '2',
                 'clicked_through_count' => '1',
-                'country'               => 'Poland',
             ],
         ], $results);
     }
