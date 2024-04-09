@@ -1708,6 +1708,7 @@ label.list-group-item:focus {
 .dropdown-menu > li > a [class*=" ri-"] {
   font-size: 1.25em;
   vertical-align: -0.05em;
+  line-height: 0;
   padding-right: 3px;
 }
 .dropdown-menu > li > a:hover,
@@ -4660,7 +4661,7 @@ label.required:after {
   left: 0px;
   width: 24px;
   height: 34px;
-  padding: 0 0 0 24px;
+  padding: 0 0 0 32px;
   margin: 12px 0 0 5px;
   z-index: 1;
   -webkit-transition: all 0.5s ease;
