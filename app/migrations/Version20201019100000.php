@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -20,7 +13,7 @@ final class Version20201019100000 extends AbstractMauticMigration
     /**
      * @var string
      */
-    protected static $tableName = 'emails_draft';
+    protected static string $tableName = 'emails_draft';
 
     /**
      * @throws SkipMigration
@@ -53,7 +46,7 @@ final class Version20201019100000 extends AbstractMauticMigration
                       `public_preview` tinyint(1) DEFAULT 1 NOT NULL,
                       PRIMARY KEY (`id`),
                       UNIQUE KEY `%s` (`email_id`),
-                      CONSTRAINT `%s` FOREIGN KEY (`email_id`) REFERENCES `%s` (`id`) ON DELETE CASCADE
+                      CONSTRAINT `%s` FOREIGN KEY (`email_id`) REFERENCES `%s` (`id`)
                     )DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC;',
                 $this->getPrefixedTableName(),
                 $idDataType,
