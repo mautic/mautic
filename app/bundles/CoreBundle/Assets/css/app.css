@@ -1338,7 +1338,7 @@ blockquote > p:after {
 }
 .btn [class^="ri-"],
 .btn [class*=" ri-"] {
-  font-size: 1.25em;
+  font-size: 12px;
   vertical-align: -0.05em;
 }
 .btn > .caret {
@@ -1713,6 +1713,7 @@ label.list-group-item:focus {
 .dropdown-menu > li > a [class*=" ri-"] {
   font-size: 1.25em;
   vertical-align: -0.05em;
+  line-height: 0;
   padding-right: 3px;
 }
 .dropdown-menu > li > a:hover,
