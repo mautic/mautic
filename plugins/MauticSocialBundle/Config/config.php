@@ -168,6 +168,13 @@ return [
                 'parent'   => 'mautic.core.channels',
                 'access'   => 'mauticSocial:monitoring:view',
                 'priority' => 0,
+                'checks'   => [
+                    'integration' => [
+                        'Twitter' => [
+                            'enabled' => true,
+                        ],
+                    ],
+                ],
             ],
             'mautic.social.tweets' => [
                 'route'    => 'mautic_tweet_index',

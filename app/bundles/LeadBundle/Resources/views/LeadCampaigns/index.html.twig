@@ -5,6 +5,7 @@
 #}
 {% set leadId = lead.id %}
 {% set leadName = lead.primaryIdentifier %}
+{% if campaigns is not empty %}
 <ul class="list-group">
     {% for c in campaigns %}
         {% set switch = c.inCampaign ? 'fa-toggle-on' : 'fa-toggle-off' %}
@@ -16,3 +17,6 @@
     </li>
     {% endfor %}
 </ul>
+{% else %}
+    {{ 'mautic.campaign.lead.notfound'|trans }}
+{% endif %}
