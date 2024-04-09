@@ -1199,7 +1199,8 @@
       "profile": "https://github.com/andersonjeccel",
       "contributions": [
         "code",
-        "a11y"
+        "a11y",
+        "doc"
       ]
     },
     {
@@ -1266,6 +1267,15 @@
       "contributions": [
         "review",
         "bug"
+      ]
+    },
+    {
+      "login": "markusVJH",
+      "name": "Markus Heinilä",
+      "avatar_url": "https://avatars.githubusercontent.com/u/121946942?v=4",
+      "profile": "https://github.com/markusVJH",
+      "contributions": [
+        "review"
       ]
     }
   ],
