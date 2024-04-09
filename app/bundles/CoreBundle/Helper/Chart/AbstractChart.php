@@ -253,7 +253,7 @@ abstract class AbstractChart
   public function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't'): void
   {
       if ($companyId) {
-          $sb = $q->expr()->andX(
+          $sb = $q->expr()->and(
               $q->expr()->eq('cl.company_id', ':companyId'),
               $q->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
           );
@@ -271,7 +271,7 @@ abstract class AbstractChart
  public function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't'): void
  {
      if ($segmentId) {
-         $sb = $q->expr()->andX(
+         $sb = $q->expr()->and(
              $q->expr()->eq('lll.leadlist_id', ':segmentId'),
              $q->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
              $q->expr()->eq('lll.manually_removed', 0)
