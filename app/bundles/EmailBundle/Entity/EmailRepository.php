@@ -47,11 +47,14 @@ class EmailRepository extends CommonRepository
     public const REDIRECT_PREFIX      = 'pr';
 
     /**
-     * Get an array of do not email.
+     * * Get an array of do not email.
      *
-     * @param array $leadIds
+     * @param array      $leadIds
+     * @param int[]|null $reasons
+     *
+     * @throws Exception
      */
-    public function getDoNotEmailList($leadIds = []): array
+    public function getDoNotEmailList($leadIds = [], ?array $reasons = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')
@@ -59,6 +62,12 @@ class EmailRepository extends CommonRepository
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
             ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
+
+        if (null !== $reasons) {
+            $q->andWhere(
+                $q->expr()->in('dnc.reason', ':reasons')
+            )->setParameter('reasons', $reasons, Connection::PARAM_INT_ARRAY);
+        }
 
         if ($leadIds) {
             $q->andWhere(
@@ -225,6 +234,10 @@ class EmailRepository extends CommonRepository
                 )
             );
 
+        if ($emailIdOrOptions instanceof EmailPendingQueryOptions && $emailIdOrOptions->isSentToDnc()) {
+            $dncQb->andWhere($dncQb->expr()->eq('dnc.reason', DoNotContact::BOUNCED));
+        }
+
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $mqQb->select('mq.lead_id')
@@ -355,6 +368,7 @@ class EmailRepository extends CommonRepository
             (new EmailPendingQueryOptions($email->getId()))
                 ->setVariantIds($email->getRelatedEntityIds())
                 ->setSegmentMembershipViaJoin(true)
+                ->setSentToDnc($email->getSendToDnc())
         );
 
         $pq->select('DISTINCT l.id');
@@ -395,20 +409,18 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
+        bool $sendToDnc = false,
     ) {
         $q = $this->getEmailPendingQuery(
-            $emailId,
-            $variantIds,
-            $listIds,
-            $countOnly,
-            $limit,
-            $minContactId,
-            $maxContactId,
-            $countWithMaxMin,
-            null,
-            $maxThreads,
-            $threadId,
-            $sendStopDate
+            (new EmailPendingQueryOptions($emailId))
+                ->setVariantIds($variantIds)
+                ->setListIds($listIds)
+                ->setCountOnly($countOnly)
+                ->setLimit($limit)
+                ->setMinContactId($minContactId)
+                ->setMaxContactId($maxContactId)
+                ->setCountWithMaxMin($countWithMaxMin)
+                ->setSentToDnc($sendToDnc)
         );
 
         if (!$q instanceof QueryBuilder) {
