@@ -182,19 +182,38 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > img,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .img-wrapper {
-  --width: 30px;
+  --width: 28px;
   border-radius: 100%;
   width: var(--width);
   height: var(--width);
   display: inline-block;
-  margin-top: -10px;
-  margin-bottom: -10px;
+  margin-top: -8px;
+  margin-bottom: -8px;
 }
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .user-info {
-  transform: translateY(-25%);
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user .info {
+  transform: translateY(-6%);
   position: relative;
+  transition: transform 0.3s ease;
 }
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .user-info > .text {
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user .info > .position {
+  opacity: 0;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user:hover .info {
+  transform: translateY(-20%);
+}
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+  }
+  to {
+    transform: translateY(-5px);
+  }
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user:hover .info > .position {
+  display: flex;
+  animation: fadeIn 0.5s ease-in-out forwards, slideDown 0.5s ease-in-out forwards;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user > .text {
   line-height: 14px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .badge,
