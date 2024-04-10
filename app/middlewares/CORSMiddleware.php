@@ -104,7 +104,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
         // Check the domains using shell wildcard patterns
         $validCorsDomainFilter = function ($validCorsDomain) use ($origin) {
-            if ($origin === null) {
+            if (null === $origin) {
                 return false;
             }
 
