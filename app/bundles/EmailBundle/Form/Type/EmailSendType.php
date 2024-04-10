@@ -149,7 +149,6 @@ class EmailSendType extends AbstractType
                         'attr'     => [
                             'class'        => 'form-control',
                             'tooltip'      => 'mautic.channel.message.send.priority.tooltip',
-                            'data-show-on' => '{"campaignevent_properties_email_type_0":"checked"}',
                         ],
                         'data'        => $data,
                         'placeholder' => false,
@@ -165,7 +164,6 @@ class EmailSendType extends AbstractType
                         'attr'  => [
                             'class'        => 'form-control',
                             'tooltip'      => 'mautic.channel.message.send.attempts.tooltip',
-                            'data-show-on' => '{"campaignevent_properties_email_type_0":"checked"}',
                         ],
                         'data'       => $data,
                         'empty_data' => 0,

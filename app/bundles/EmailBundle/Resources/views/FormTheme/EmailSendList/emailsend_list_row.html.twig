@@ -1,38 +1,43 @@
 {% block emailsend_list_row %}
-  <div class="row">
-      <div class="col-xs-6">
-          {{ form_row(form.email) }}
-      </div>
-      {% if form.email_type is defined %}
-          <div class="col-xs-6">
-              {{ form_row(form.email_type) }}
-          </div>
-      {% endif %}
-      <div class="col-xs-6 hide" id="email_send_to_dnc_status">
-        <label class="control-label" data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="{{ 'mautic.email.send.dnc.tooltip.info'|trans }}">
+<div class="row">
+    <div class="col-xs-12">
+        {{ form_row(form.email) }}
+    </div>
+</div>
+<div class="row">
+    {% if form.email_type is defined %}
+    <div class="col-xs-6">
+        {{ form_row(form.email_type) }}
+    </div>
+    {% endif %}
+    <div class="col-xs-6 hide" id="email_send_to_dnc_status">
+        <label class="control-label" data-toggle="tooltip" data-container="body" data-placement="top"
+            data-original-title="{{ 'mautic.email.send.dnc.tooltip.info'|trans }}">
             {{ 'mautic.email.send.dnc.label'|trans }}
             <i class="fa fa-question-circle"></i>
         </label>
         <span class="dnc-status-text label"></span>
     </div>
-      {% if form.priority is defined %}
-          <div id="priority" class="col-xs-6 queue_hide">
-              {{ form_row(form.priority) }}
-          </div>
-      {% endif %}
-      {% if form.attempts is defined %}
-          <div id="attempts" class="col-xs-6 queue_hide">
-              {{ form_row(form.attempts) }}
-          </div>
-      {% endif %}
-  </div>
-  <div class="row">
-      <div class="col-xs-12 mt-lg">
-          <div class="mt-3">
-              {{ form_row(form.newEmailButton) }}
-              {{ form_row(form.editEmailButton) }}
-              {{ form_row(form.previewEmailButton) }}
-          </div>
-      </div>
-  </div>
+</div>
+<div class="row">
+    {% if form.priority is defined %}
+    <div id="priority" class="col-xs-6 queue_hide">
+        {{ form_row(form.priority) }}
+    </div>
+    {% endif %}
+    {% if form.attempts is defined %}
+    <div id="attempts" class="col-xs-6 queue_hide">
+        {{ form_row(form.attempts) }}
+    </div>
+    {% endif %}
+</div>
+<div class="row">
+    <div class="col-xs-12 mt-lg">
+        <div class="mt-3">
+            {{ form_row(form.newEmailButton) }}
+            {{ form_row(form.editEmailButton) }}
+            {{ form_row(form.previewEmailButton) }}
+        </div>
+    </div>
+</div>
 {% endblock %}

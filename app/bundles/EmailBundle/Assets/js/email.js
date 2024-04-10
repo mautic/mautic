@@ -303,7 +303,7 @@ Mautic.disabledEmailAction = function(opener, origin) {
     if (!disabled) {
         Mautic.setEmailSendToDncStatus(emailId);
     } else {
-        mQuery('#email_send_to_dnc_status').addClass('hide');
+        mQuery('#email_send_to_dnc_status, .queue_hide').addClass('hide');
     }
 };
 
@@ -317,8 +317,11 @@ Mautic.setEmailSendToDncStatus = function (emailId) {
                     .removeClass('label-danger label-primary')
                     .addClass(response.sendToDncStatus ? 'label-danger' : 'label-primary')
                     .text(response.sendToDncText);
+
+                mQuery('.queue_hide').toggleClass('hide', response.sendToDncStatus);
             } else {
                 dnc_status.addClass('hide');
+                mQuery('.queue_hide').addClass('hide');
             }
         }, false, false, "GET");
     }
