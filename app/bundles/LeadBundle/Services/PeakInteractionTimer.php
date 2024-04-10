@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\HitRepository;
 
@@ -34,6 +37,7 @@ class PeakInteractionTimer
         private CoreParametersHelper $coreParametersHelper,
         private StatRepository $statRepository,
         private HitRepository $hitRepository,
+        private SubmissionRepository $submissionRepository,
         private CacheProviderInterface $cacheProvider
     ) {
         $this->cacheTimeout          = $this->coreParametersHelper->get('peak_interaction_timer_cache_timeout');
@@ -156,12 +160,14 @@ class PeakInteractionTimer
         } else {
             $fetchInteractionsFromDate = $this->getCurrentDateTime($dateTimeZone)
                 ->modify($this->fetchInteractionsFrom);
-            $emailReads = $this->getLeadStats($contact->getId(), $fetchInteractionsFromDate);
-            $pageHits   = $this->getLeadHits($contact->getId(), $fetchInteractionsFromDate);
+            $emailReads      = $this->getLeadStats($contact->getId(), $fetchInteractionsFromDate);
+            $pageHits        = $this->getLeadHits($contact->getId(), $fetchInteractionsFromDate);
+            $formSubmissions = $this->getFormSubmissions($contact->getId(), $fetchInteractionsFromDate);
 
             $emailReadInteractions = $this->processInteractions($emailReads, 'email.read', $dateTimeZone);
             $pageHitInteractions   = $this->processInteractions($pageHits, 'page.hit', $dateTimeZone);
-            $interactions          = array_merge($emailReadInteractions, $pageHitInteractions);
+            $formInteractions      = $this->processInteractions($formSubmissions, 'form.submit', $dateTimeZone);
+            $interactions          = array_merge($emailReadInteractions, $pageHitInteractions, $formInteractions);
 
             $cacheItem->set($interactions);
             $cacheItem->expiresAfter($this->cacheTimeout * 60);
@@ -175,6 +181,8 @@ class PeakInteractionTimer
      * @param array<int, array<string, mixed>> $interactionsData
      *
      * @return array<int, array<string, mixed>>
+     *
+     * @throws \Exception
      */
     private function processInteractions(array $interactionsData, string $type, \DateTimeZone $dateTimeZone): array
     {
@@ -182,7 +190,12 @@ class PeakInteractionTimer
         $registeredInteractions = []; // Keep track of registered interactions to ensure one interaction type per hour
 
         foreach ($interactionsData as $interaction) {
-            $dateKey         = 'email.read' === $type ? 'dateRead' : 'dateHit';
+            $dateKey = match ($type) {
+                'email.read'  => 'dateRead',
+                'page.hit'    => 'dateHit',
+                'form.submit' => 'dateSubmitted',
+                default       => throw new \Exception('Unhandled interaction type: '.$type),
+            };
             $interactionDate = $interaction[$dateKey];
             $interactionDate->setTimezone($dateTimeZone);
 
@@ -229,6 +242,19 @@ class PeakInteractionTimer
     }
 
     /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getFormSubmissions(int $leadId, \DateTime $fromDate = null): array
+    {
+        return $this->submissionRepository->getSubmissions([
+            'leadId'       => $leadId,
+            'order'        => ['timestamp', 'DESC'],
+            'limit'        => $this->fetchLimit,
+            'fromDate'     => $fromDate,
+        ]);
+    }
+
+    /**
      * Calculates the optimal time range based on an array of elements.
      *
      * @param int[] $elements Hours (0-23)
@@ -260,6 +286,8 @@ class PeakInteractionTimer
      * @param int[] $elements Days of the week (ISO 8601)
      *
      * @return int[] Days of the week (ISO 8601)
+     *
+     * @throws \Exception
      */
     private function calculateOptimalDays(array $elements): array
     {

@@ -971,11 +971,11 @@ return [
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
         'contact_allow_multiple_companies'                                                      => true,
-        'peak_interaction_timer_cache_timeout'                                                  => 43800,
+        'peak_interaction_timer_cache_timeout'                                                  => 43800, // in minutes ~ 1 month
         'peak_interaction_timer_best_default_hour_start'                                        => 9, // 9 AM
         'peak_interaction_timer_best_default_hour_end'                                          => 12, // 12 PM
         'peak_interaction_timer_best_default_days'                                              => [2, 1, 4], // Tuesday, Monday, Thursday
-        'peak_interaction_timer_fetch_interactions_from'                                        => '-60 days',
+        'peak_interaction_timer_fetch_interactions_from'                                        => '-180 days',
         'peak_interaction_timer_fetch_limit'                                                    => 50,
         'peak_interaction_timer_min_interactions'                                               => 5,
         'peak_interaction_timer_max_optimal_days'                                               => 3,

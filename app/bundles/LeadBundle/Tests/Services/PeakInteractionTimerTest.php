@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Services;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -42,6 +45,11 @@ class PeakInteractionTimerTest extends TestCase
     private $hitRepositoryMock;
 
     /**
+     * @var MockObject|SubmissionRepository
+     */
+    private $submissionRepositoryMock;
+
+    /**
      * @var MockObject|CacheProviderInterface
      */
     private $cacheProviderMock;
@@ -62,6 +70,7 @@ class PeakInteractionTimerTest extends TestCase
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->statRepositoryMock       = $this->createMock(StatRepository::class);
         $this->hitRepositoryMock        = $this->createMock(HitRepository::class);
+        $this->submissionRepositoryMock = $this->createMock(SubmissionRepository::class);
         $this->cacheProviderMock        = $this->createMock(CacheProviderInterface::class);
 
         $this->coreParametersHelperMock
@@ -126,9 +135,12 @@ class PeakInteractionTimerTest extends TestCase
         $this->hitRepositoryMock
             ->method('getLeadHits')
             ->willReturn([]);
+        $this->submissionRepositoryMock
+            ->method('getSubmissions')
+            ->willReturn([]);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->submissionRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($contactTimezone));
@@ -177,9 +189,12 @@ class PeakInteractionTimerTest extends TestCase
         $this->hitRepositoryMock
             ->method('getLeadHits')
             ->willReturn([]);
+        $this->submissionRepositoryMock
+            ->method('getSubmissions')
+            ->willReturn([]);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->submissionRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($contactTimezone));
@@ -222,10 +237,11 @@ class PeakInteractionTimerTest extends TestCase
     /**
      * @param array<int, array<string, string|\DateTime|\DateInterval>> $emailReads
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
+     * @param array<int, array<string, string|\DateTime>>               $formSubmissions
      *
      * @dataProvider getOptimalTimeDataProvider
      */
-    public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits): void
+    public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createMock(Lead::class);
 
@@ -235,9 +251,12 @@ class PeakInteractionTimerTest extends TestCase
         $this->hitRepositoryMock
             ->method('getLeadHits')
             ->willReturn($pageHits);
+        $this->submissionRepositoryMock
+            ->method('getSubmissions')
+            ->willReturn($formSubmissions);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->submissionRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($this->defaultTimezone));
@@ -279,17 +298,22 @@ class PeakInteractionTimerTest extends TestCase
             PeakInteractionTimerTest::getPageHitData('2023-09-26 14:30:17'),
             PeakInteractionTimerTest::getPageHitData('2023-09-29 18:10:58'),
         ];
-        // Previously defined email reads and page views should result in the following preferences:
+
+        $formSubmissions = [
+            PeakInteractionTimerTest::getFormSubmissionData('2023-09-05 14:13:22'),
+        ];
+
+        // Previously defined interactions should result in the following preferences:
         // Optimal time for interactions: 13 - 16
 
         // If current time is optimal then return the same datetime
-        yield ['2023-10-01 14:22:33', '2023-10-01 14:22:33', $emailReads, $pageHits];
+        yield ['2023-10-01 14:22:33', '2023-10-01 14:22:33', $emailReads, $pageHits, $formSubmissions];
 
         // If current time is before the optimal window, then schedule at first optimal hour
-        yield ['2023-10-01 10:22:11', '2023-10-01 13:00:00', $emailReads, $pageHits];
+        yield ['2023-10-01 10:22:11', '2023-10-01 13:00:00', $emailReads, $pageHits, $formSubmissions];
 
         // If current time is after the optimal window, then schedule on the next day
-        yield ['2023-10-01 16:02:22', '2023-10-02 13:00:00', $emailReads, $pageHits];
+        yield ['2023-10-01 16:02:22', '2023-10-02 13:00:00', $emailReads, $pageHits, $formSubmissions];
 
         // Add multiple page hits within 1 hour
         // Activity within an hour should be counted as 1 interaction and not change the optimal time (13 - 16)
@@ -304,16 +328,17 @@ class PeakInteractionTimerTest extends TestCase
             PeakInteractionTimerTest::getPageHitData('2023-09-29 18:45:12'),
             PeakInteractionTimerTest::getPageHitData('2023-09-29 18:48:12'),
             PeakInteractionTimerTest::getPageHitData('2023-09-29 18:55:12'),
-        ])];
+        ]), $formSubmissions];
     }
 
     /**
      * @param array<int, array<string, string|\DateTime|\DateInterval>> $emailReads
      * @param array<int, array<string, string|\DateTime|null>>          $pageHits
+     * @param array<int, array<string, string|\DateTime>>               $formSubmissions
      *
      * @dataProvider getOptimalTimeAndDayDataProvider
      */
-    public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits): void
+    public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
         $contactMock = $this->createMock(Lead::class);
 
@@ -323,9 +348,12 @@ class PeakInteractionTimerTest extends TestCase
         $this->hitRepositoryMock
             ->method('getLeadHits')
             ->willReturn($pageHits);
+        $this->submissionRepositoryMock
+            ->method('getSubmissions')
+            ->willReturn($formSubmissions);
 
         // Create an instance of the testable PeakInteractionTimer
-        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->cacheProviderMock);
+        $testableTimer = new TestablePeakInteractionTimer($this->coreParametersHelperMock, $this->statRepositoryMock, $this->hitRepositoryMock, $this->submissionRepositoryMock, $this->cacheProviderMock);
 
         // Set the current time to a fixed value for testing
         $fixedCurrentTime = new \DateTime($currentDate, new \DateTimeZone($this->defaultTimezone));
@@ -367,18 +395,23 @@ class PeakInteractionTimerTest extends TestCase
             PeakInteractionTimerTest::getPageHitData('2023-09-26 14:30:17'),
             PeakInteractionTimerTest::getPageHitData('2023-09-29 18:10:58'),
         ];
-        // Previously defined email reads and page views should result in the following preferences:
+
+        $formSubmissions = [
+            PeakInteractionTimerTest::getFormSubmissionData('2023-09-17 14:46:41'),
+        ];
+
+        // Previously defined interactions should result in the following preferences:
         // Optimal time for interactions: 13 - 16
         // Optimal days for interactions: Sunday, Thursday, Friday
 
         // If current time and day is optimal then return the same datetime
-        yield ['2023-10-07 14:22:33', '2023-10-07 14:22:33', $emailReads, $pageHits];
+        yield ['2023-10-07 14:22:33', '2023-10-07 14:22:33', $emailReads, $pageHits, $formSubmissions];
 
         // If current time and day is before the optimal window, then schedule at first optimal hour
-        yield ['2023-10-01 10:22:11', '2023-10-03 13:00:00', $emailReads, $pageHits];
+        yield ['2023-10-01 10:22:11', '2023-10-03 13:00:00', $emailReads, $pageHits, $formSubmissions];
 
         // If current time is after the optimal window, then schedule on the next optimal day
-        yield ['2023-10-08 16:02:22', '2023-10-10 13:00:00', $emailReads, $pageHits];
+        yield ['2023-10-08 16:02:22', '2023-10-10 13:00:00', $emailReads, $pageHits, $formSubmissions];
     }
 
     /**
@@ -428,6 +461,23 @@ class PeakInteractionTimerTest extends TestCase
             'deviceBrand'  => '',
             'deviceModel'  => '',
             'lead_id'      => '84',
+        ];
+    }
+
+    /**
+     * @return array<string, string|\DateTime>
+     */
+    private static function getFormSubmissionData(string $dateHit): array
+    {
+        $dateHitObj = new \DateTime($dateHit);
+
+        return [
+            'id'            => '153',
+            'name'          => 'carbonara',
+            'form_id'       => '8',
+            'page_id'       => '11',
+            'dateSubmitted' => $dateHitObj,
+            'lead_id'       => '84',
         ];
     }
 }
