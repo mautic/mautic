@@ -1,0 +1,38 @@
+{% block message_send_row %}
+<div class="row">
+    <div class="col-xs-12 pr-0">
+        {{ form_row(form.marketingMessage) }}
+        {% if form.newMarketingMessageButton is defined or form.editMessageButton is defined %}
+        <div class="mb-lg d-flex">
+            {% if form.newMarketingMessageButton is defined %}
+                {{ form_row(form.newMarketingMessageButton) }}
+            {% endif %}
+            {% if form.editMessageButton is defined %}
+                {{ form_row(form.editMessageButton) }}
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 hide" id="marketing_message_send_to_dnc_status">
+        <span class="control-label d-block" data-toggle="tooltip" data-container="body" data-placement="top"
+            data-original-title="{{ 'mautic.email.send.dnc.tooltip.info'|trans }}">
+            {{ 'mautic.email.send.dnc.label'|trans }}
+            <i class="ri-question-line"></i>
+        </span>
+        <span class="dnc-status-text label"></span>
+    </div>
+</div>
+
+<script>
+    mQuery(document).ready(function() {
+        const messageId = mQuery("#campaignevent_properties_marketingMessage").val();
+        console.log(messageId);
+        if (!messageId) return;
+
+        Mautic.setMarketingMessageSendToDncStatus(messageId);
+    });
+</script>
+{% endblock %}

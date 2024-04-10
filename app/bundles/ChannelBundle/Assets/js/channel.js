@@ -27,3 +27,38 @@ Mautic.cancelQueuedMessageEvent = function (channelId) {
         }, false
     );
 };
+
+Mautic.setMarketingMessageSendToDncStatus = function (messageId) {
+    Mautic.setSendToDncStatus(
+        messageId,
+        'marketing_message_send_to_dnc_status',
+        'channel:getMarketingMessageSendToDncStatus'
+    )
+};
+
+Mautic.setMarketingMessageEmailChannelSendToDncStatus = function (emailId) {
+    Mautic.setSendToDncStatus(
+        emailId,
+        'marketing_message_email_channel_send_to_dnc_status',
+        'email:getEmailSendToDncStatus'
+    )
+};
+
+Mautic.setSendToDncStatus = function (id, selector, action) {
+    const statusElement = mQuery('#'+selector);
+    if (id && statusElement.length > 0) {
+        Mautic.ajaxActionRequest(action, {id: id}, function(response) {
+            if (typeof response.sendToDncStatus != "undefined") {
+                statusElement.removeClass('hide')
+                statusElement.find('span.dnc-status-text')
+                    .removeClass('label-danger label-primary')
+                    .addClass(response.sendToDncStatus ? 'label-danger' : 'label-primary')
+                    .text(response.sendToDncText);
+            } else {
+                statusElement.addClass('hide');
+            }
+        }, false, false, "GET");
+    } else {
+        statusElement.addClass('hide');
+    }
+}
