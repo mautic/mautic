@@ -33,9 +33,10 @@ class EmailSendType extends AbstractType
                 'label'      => 'mautic.email.send.selectemails',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.choose.emails_descr',
-                    'onchange' => 'Mautic.disabledEmailAction(window, this)',
+                    'class'                => 'form-control',
+                    'tooltip'              => 'mautic.email.choose.emails_descr',
+                    'onchange'             => 'Mautic.disabledEmailAction(window, this)',
+                    'data-onload-callback' => 'setSendToDncOnModelLoad',
                 ],
                 'multiple'    => false,
                 'required'    => true,

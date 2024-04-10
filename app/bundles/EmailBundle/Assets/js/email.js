@@ -773,3 +773,7 @@ Mautic.loadEmailUsages = function($el) {
         $el.html(usagesHtml);
     }, false, true, "GET");
 };
+
+Mautic.setSendToDncOnModelLoad = function(el) {
+    mQuery(el).trigger('change');
+};
