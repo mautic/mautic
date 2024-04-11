@@ -234,11 +234,7 @@ abstract class AbstractChart
         return $color;
     }
 
-    /**
-     * @param int|null $campaignId
-     * @param string   $fromAlias
-     */
-    public function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
+    public function addCampaignFilter(QueryBuilder $q, ?int $campaignId, string $fromAlias = 't'): void
     {
         if ($campaignId) {
             $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = clel.lead_id')
@@ -246,11 +242,7 @@ abstract class AbstractChart
         }
     }
 
-  /**
-   * @param int|null $companyId
-   * @param string   $fromAlias
-   */
-  public function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't'): void
+  public function addCompanyFilter(QueryBuilder $q, ?int $companyId = null, string $fromAlias = 't'): void
   {
       if ($companyId) {
           $sb = $q->expr()->and(
@@ -264,11 +256,7 @@ abstract class AbstractChart
       }
   }
 
- /**
-  * @param int|null $segmentId
-  * @param string   $fromAlias
-  */
- public function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't'): void
+ public function addSegmentFilter(QueryBuilder $q, ?int $segmentId = null, string $fromAlias = 't'): void
  {
      if ($segmentId) {
          $sb = $q->expr()->and(
