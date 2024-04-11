@@ -38,7 +38,7 @@ class ListType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
 
         $builder->add(

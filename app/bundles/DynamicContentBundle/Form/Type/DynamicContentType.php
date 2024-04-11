@@ -87,7 +87,7 @@ class DynamicContentType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'description' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('dynamicContent.dynamicContent', $options));
 
         $builder->add(

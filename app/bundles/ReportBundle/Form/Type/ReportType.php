@@ -38,7 +38,7 @@ class ReportType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
 
         // Only add these fields if we're in edit mode

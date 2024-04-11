@@ -28,7 +28,7 @@ class NoteType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['text' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['text' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.note', $options));
 
         $builder->add(

@@ -35,7 +35,7 @@ class TriggerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
         $builder->add(

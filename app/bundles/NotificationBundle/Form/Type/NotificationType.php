@@ -25,7 +25,7 @@ class NotificationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'description' => 'strict_html']));
         $builder->addEventSubscriber(new FormExitSubscriber('notification.notification', $options));
 
         $builder->add(
