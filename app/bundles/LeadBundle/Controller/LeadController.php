@@ -259,7 +259,11 @@ class LeadController extends FormController
         ) {
             return $this->accessDenied();
         }
+<<<<<<< HEAD
         /** @var LeadModel $model */
+=======
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+>>>>>>> 2cc4af975f (Merge pull request from GHSA-qjx3-2g35-6hv8)
         $model = $this->getModel('lead.lead');
 
         // Get the quick add form
