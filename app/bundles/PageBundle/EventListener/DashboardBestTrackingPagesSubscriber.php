@@ -12,14 +12,14 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
     /**
      * Define the name of the bundle/category of the widget(s).
      */
-    protected $bundle = 'page';
+    protected string $bundle = 'page';
 
     /**
      * Define the widget(s).
      *
      * @var array<string,array<string, string>>
      */
-    protected $types = [
+    protected array $types = [
         'best.tracking.pages' => [
             'formAlias' => DashboardBestTrackingPagesType::class,
         ],
@@ -47,7 +47,7 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($pages) {
                     foreach ($pages as $page) {
-                        $row     = [
+                        $row = [
                             [
                                 'value'     => $page['url_title'],
                                 'type'      => 'link',

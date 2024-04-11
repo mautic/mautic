@@ -424,9 +424,8 @@ class Widget extends FormEntity
     /**
      * Count the limit from the widget height.
      *
-     * @return int
      */
-    public function getLimitCalcByWeight()
+    public function getLimitCalcByWeight(): int
     {
         $params = $this->getParams();
 

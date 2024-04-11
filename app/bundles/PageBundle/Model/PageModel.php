@@ -930,18 +930,17 @@ class PageModel extends FormModel
     /**
      * Get a list of popular (by hits) tracking pages.
      *
-     * @param int               $limit
      * @param array<int|string> $filters
      *
      * @return array<array<int|string>>
      */
-    public function getPopularTrackedPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [])
+    public function getPopularTrackedPages(int $limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, array $filters = []): array
     {
         $companyId  = $filters['companyId'] ?? null;
         $campaignId = $filters['campaignId'] ?? null;
         $segmentId  = $filters['segmentId'] ?? null;
 
-        $q          = $this->em->getConnection()->createQueryBuilder();
+        $q = $this->em->getConnection()->createQueryBuilder();
         // IF NULL in select statement is 3 times faster like where condition
         $q->select('t.url_title, t.url, IFNULL(t.page_id AND t.email_id  AND t.redirect_id AND t.CODE = 200, COUNT(t.id)) AS hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
