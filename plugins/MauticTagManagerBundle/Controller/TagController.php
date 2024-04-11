@@ -238,6 +238,10 @@ class TagController extends FormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
+        if (!$this->security->isGranted('tagManager:tagManager:edit')) {
+            return $this->accessDenied();
+        }
+
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {

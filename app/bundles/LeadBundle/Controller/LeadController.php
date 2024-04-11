@@ -231,6 +231,27 @@ class LeadController extends FormController
 
     public function quickAddAction(Request $request): Response
     {
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (
+            !$permissions['lead:leads:viewown']
+            && !$permissions['lead:leads:viewother']
+            && !$permissions['lead:leads:create']
+            && !$permissions['lead:leads:editown']
+            && !$permissions['lead:leads:editother']
+        ) {
+            return $this->accessDenied();
+        }
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
@@ -1838,6 +1859,10 @@ class LeadController extends FormController
      */
     public function batchOwnersAction(Request $request, $objectId = 0)
     {
+        if (!$this->security->isGranted('user:users:view')) {
+            return $this->accessDenied();
+        }
+
         if ('POST' == $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
