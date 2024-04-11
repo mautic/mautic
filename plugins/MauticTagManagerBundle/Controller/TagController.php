@@ -231,6 +231,10 @@ class TagController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
+        if (!$this->get('mautic.security')->isGranted('tagManager:tagManager:edit')) {
+            return $this->accessDenied();
+        }
+
         $postActionVars = $this->getPostActionVars($objectId);
 
         try {
