@@ -423,7 +423,6 @@ class Widget extends FormEntity
 
     /**
      * Count the limit from the widget height.
-     *
      */
     public function getLimitCalcByWeight(): int
     {
