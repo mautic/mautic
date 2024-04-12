@@ -37,7 +37,7 @@ class MergeRecord
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('contact_merge_records')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\MergeRecordRepository::class)
+            ->setCustomRepositoryClass(MergeRecordRepository::class)
             ->addIndex(['date_added'], 'contact_merge_date_added')
             ->addIndex(['merged_id'], 'contact_merge_ids');
 

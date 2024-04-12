@@ -48,7 +48,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed               $log
          * @param string|array<mixed> $context
          * @param bool                $backtrace
          */
@@ -89,9 +88,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
         }
 
-        /**
-         * @return mixed
-         */
         public function getDebugLogger()
         {
             return $this->debugLogger;
@@ -335,8 +331,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $displayErrors
-         *
          * @return ErrorHandler
          */
         public function setDisplayErrors($displayErrors)
@@ -371,8 +365,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $mainLogger
-         *
          * @return ErrorHandler
          */
         public function setMainLogger($mainLogger)

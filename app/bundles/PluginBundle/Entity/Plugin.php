@@ -156,25 +156,16 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         return $this->bundle;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIntegrations()
     {
         return $this->integrations;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
     public function setDescription($description): void
     {
         $this->description = $description;
@@ -202,49 +193,31 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         return $this->secondaryDescription;
     }
 
-    /**
-     * @return mixed
-     */
     public function getVersion()
     {
         return $this->version;
     }
 
-    /**
-     * @param mixed $version
-     */
     public function setVersion($version): void
     {
         $this->version = $version;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIsMissing()
     {
         return $this->isMissing;
     }
 
-    /**
-     * @param mixed $isMissing
-     */
     public function setIsMissing($isMissing): void
     {
         $this->isMissing = $isMissing;
     }
 
-    /**
-     * @return mixed
-     */
     public function getAuthor()
     {
         return $this->author;
     }
 
-    /**
-     * @param mixed $author
-     */
     public function setAuthor($author): void
     {
         $this->author = $author;

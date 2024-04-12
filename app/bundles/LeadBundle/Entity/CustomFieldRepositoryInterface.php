@@ -33,8 +33,6 @@ interface CustomFieldRepositoryInterface
 
     /**
      * Requires table alias.
-     *
-     * @return mixed
      */
     public function getTableAlias();
 }

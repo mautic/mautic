@@ -54,7 +54,6 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * @param string $queryPartName
-     * @param mixed  $value
      *
      * @return $this
      */
@@ -448,8 +447,6 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @return mixed
-     *
      * @noinspection PhpPassByRefInspection
      */
     private function &parentProperty(string $property)
@@ -459,11 +456,6 @@ class QueryBuilder extends BaseQueryBuilder
         }, $this, parent::class)();
     }
 
-    /**
-     * @param mixed ...$arguments
-     *
-     * @return mixed
-     */
     private function parentMethod(string $method, ...$arguments)
     {
         return \Closure::bind(function () use ($method, $arguments) {

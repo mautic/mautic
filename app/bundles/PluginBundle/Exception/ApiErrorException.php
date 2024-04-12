@@ -8,7 +8,7 @@ class ApiErrorException extends \Exception
 {
     private $contactId;
 
-    private ?\Mautic\LeadBundle\Entity\Lead $contact = null;
+    private ?Lead $contact = null;
 
     /**
      * @param string $message
@@ -19,17 +19,12 @@ class ApiErrorException extends \Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return mixed
-     */
     public function getContactId()
     {
         return $this->contactId;
     }
 
     /**
-     * @param mixed $contactId
-     *
      * @return ApiErrorException
      */
     public function setContactId($contactId)

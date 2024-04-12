@@ -84,17 +84,12 @@ class Log
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getStatusCode()
     {
         return $this->statusCode;
     }
 
     /**
-     * @param mixed $statusCode
-     *
      * @return Log
      */
     public function setStatusCode($statusCode)

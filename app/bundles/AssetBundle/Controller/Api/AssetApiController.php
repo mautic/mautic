@@ -69,8 +69,6 @@ class AssetApiController extends CommonApiController
 
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
-     *
-     * @return mixed
      */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {

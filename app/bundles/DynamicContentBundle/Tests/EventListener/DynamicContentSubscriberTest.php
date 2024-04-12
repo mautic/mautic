@@ -27,60 +27,60 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|TrackableModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $trackableModel;
+    private MockObject $trackableModel;
 
     /**
      * @var MockObject|PageTokenHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pageTokenHelper;
+    private MockObject $pageTokenHelper;
 
     /**
      * @var MockObject|AssetTokenHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $assetTokenHelper;
+    private MockObject $assetTokenHelper;
 
     /**
      * @var MockObject|FormTokenHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formTokenHelper;
+    private MockObject $formTokenHelper;
 
     /**
      * @var MockObject|FocusTokenHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $focusTokenHelper;
+    private MockObject $focusTokenHelper;
 
     /**
      * @var MockObject|AuditLogModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+    private MockObject $auditLogModel;
 
     /**
      * @var MockObject|LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject|DynamicContentHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dynamicContentHelper;
+    private MockObject $dynamicContentHelper;
 
     /**
      * @var MockObject|DynamicContentModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dynamicContentModel;
+    private MockObject $dynamicContentModel;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private \PHPUnit\Framework\MockObject\MockObject $security;
+    private MockObject $security;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
     private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
 
-    private \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber $subscriber;
+    private DynamicContentSubscriber $subscriber;
     /**
      * @var CompanyModel|(CompanyModel&MockObject)|MockObject
      */

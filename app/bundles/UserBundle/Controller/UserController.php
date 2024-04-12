@@ -24,7 +24,7 @@ class UserController extends FormController
      *
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
@@ -105,7 +105,7 @@ class UserController extends FormController
     /**
      * Generate's form and processes new post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher)
     {
@@ -113,7 +113,7 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
+        /** @var UserModel $model */
         $model = $this->getModel('user.user');
 
         // retrieve the user entity
@@ -211,7 +211,7 @@ class UserController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordHasherInterface $hasher, $objectId, $ignorePost = false)
     {
@@ -222,7 +222,7 @@ class UserController extends FormController
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
 
-        /** @var \Mautic\CoreBundle\Model\AuditLogModel $auditLogModel */
+        /** @var AuditLogModel $auditLogModel */
         $auditLogModel      = $this->getModel('core.auditlog');
         $auditLogRepository = $auditLogModel->getRepository();
         $userActivity       = $auditLogRepository->getLogsForUser($user);

@@ -92,7 +92,6 @@ class ButtonExtension extends AbstractExtension
      * @param array<string,string> $query
      * @param array<string,string> $editAttr
      * @param array<string,string> $routeVars
-     * @param mixed                $item
      */
     public function addButtonsFromTemplate(
         array $templateButtons,

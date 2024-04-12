@@ -190,7 +190,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -287,8 +287,6 @@ class ListModel extends FormModel
 
     /**
      * Get a list of global lead lists.
-     *
-     * @return mixed
      */
     public function getGlobalLists()
     {
@@ -297,8 +295,6 @@ class ListModel extends FormModel
 
     /**
      * Get a list of preference center lead lists.
-     *
-     * @return mixed
      */
     public function getPreferenceCenterLists()
     {
@@ -537,7 +533,7 @@ class ListModel extends FormModel
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         } else {
             $leadId = $lead->getId();
         }

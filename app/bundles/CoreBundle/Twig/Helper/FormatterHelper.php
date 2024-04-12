@@ -19,7 +19,6 @@ final class FormatterHelper
     /**
      * Format a string.
      *
-     * @param mixed  $val
      * @param string $type
      * @param bool   $textOnly
      * @param int    $round
@@ -97,7 +96,6 @@ final class FormatterHelper
      * Internally, the method uses conversion to json
      * instead of simple implode to cover multidimensional arrays.
      *
-     * @param mixed  $array
      * @param string $delimiter
      *
      * @return string
@@ -139,7 +137,6 @@ final class FormatterHelper
     /**
      * Takes a simple csv list like 1,2,3,4 and returns as an array.
      *
-     * @param mixed       $csv
      * @param string|null $type
      *
      * @return array<string, string>|array<int, string>
@@ -162,8 +159,6 @@ final class FormatterHelper
 
     /**
      * Takes a string and returns a normalized representation of it.
-     *
-     * @param mixed $string
      */
     public function normalizeStringValue($string): string
     {

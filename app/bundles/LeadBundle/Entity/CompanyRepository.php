@@ -95,13 +95,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param mixed[] $args
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
-            ->from(\Mautic\LeadBundle\Entity\Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(Company::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         return $q;
     }
@@ -380,8 +380,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param int $limit
      * @param int $offset
-     *
-     * @return mixed
      */
     public function getMostCompanies($query, $limit = 10, $offset = 0)
     {

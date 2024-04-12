@@ -20,8 +20,6 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
     /**
      * @dataProvider provider
-     *
-     * @param mixed $value
      */
     public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {

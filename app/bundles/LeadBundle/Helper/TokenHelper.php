@@ -68,9 +68,6 @@ class TokenHelper
         return empty($tokens["{{$alias}}"]) ? $default : $tokens["{{$alias}}"];
     }
 
-    /**
-     * @return mixed
-     */
     private static function getTokenValue(array $lead, $alias, $defaultValue)
     {
         $value = '';
@@ -140,8 +137,6 @@ class TokenHelper
 
     /**
      * @param string $parameter
-     *
-     * @return mixed
      */
     private static function getParameter($parameter)
     {

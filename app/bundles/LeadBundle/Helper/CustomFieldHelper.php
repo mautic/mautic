@@ -19,9 +19,6 @@ class CustomFieldHelper
      * Fixes value type for specific field types.
      *
      * @param string $type
-     * @param mixed  $value
-     *
-     * @return mixed
      */
     public static function fixValueType($type, $value)
     {

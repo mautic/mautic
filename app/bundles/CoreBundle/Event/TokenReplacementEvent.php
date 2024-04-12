@@ -28,7 +28,6 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param CommonEntity|string|null $content
      * @param Lead|mixed[]|null        $lead
-     * @param mixed                    $passthrough
      */
     public function __construct(
         $content,

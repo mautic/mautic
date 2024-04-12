@@ -185,8 +185,6 @@ class CorePermissions
      * @param bool            $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
      *                                             exception will be thrown
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException
      */
     public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)

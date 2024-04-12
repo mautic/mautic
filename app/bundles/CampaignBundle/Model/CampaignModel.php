@@ -513,8 +513,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param mixed $form
-     *
      * @return array
      */
     public function getCampaignsByForm($form)
@@ -528,8 +526,6 @@ class CampaignModel extends CommonFormModel
      * Gets the campaigns a specific lead is part of.
      *
      * @param bool $forList
-     *
-     * @return mixed
      */
     public function getLeadCampaigns(Lead $lead = null, $forList = false)
     {
@@ -595,8 +591,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Get details of leads in a campaign.
-     *
-     * @return mixed
      */
     public function getLeadDetails($campaign, $leads = null)
     {
@@ -614,8 +608,6 @@ class CampaignModel extends CommonFormModel
      *
      * @param Campaign $campaign
      * @param array    $event
-     *
-     * @return mixed
      */
     public function getCampaignLeads($campaign, $event = null)
     {

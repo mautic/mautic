@@ -169,12 +169,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $variantReadCount = 0;
 
     /**
-     * @var \Mautic\FormBundle\Entity\Form|null
+     * @var Form|null
      */
     private $unsubscribeForm;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page|null
+     * @var Page|null
      */
     private $preferenceCenter;
 
@@ -462,9 +462,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getName()
     {
         return $this->name;
@@ -480,17 +477,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * @param mixed $description
-     *
      * @return Email
      */
     public function setDescription($description)
@@ -515,9 +507,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCategory()
     {
         return $this->category;
@@ -572,9 +561,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getReadCount($includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getReadCount') : $this->readCount;
@@ -595,9 +581,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->isCloned;
     }
 
-    /**
-     * @return mixed
-     */
     public function getRevision()
     {
         return $this->revision;
@@ -613,9 +596,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSessionId()
     {
         return $this->sessionId;
@@ -631,9 +611,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSubject()
     {
         return $this->subject;
@@ -670,17 +647,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getFromAddress()
     {
         return $this->fromAddress;
     }
 
     /**
-     * @param mixed $fromAddress
-     *
      * @return Email
      */
     public function setFromAddress($fromAddress)
@@ -691,17 +663,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getFromName()
     {
         return $this->fromName;
     }
 
     /**
-     * @param mixed $fromName
-     *
      * @return Email
      */
     public function setFromName($fromName)
@@ -712,17 +679,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getReplyToAddress()
     {
         return $this->replyToAddress;
     }
 
     /**
-     * @param mixed $replyToAddress
-     *
      * @return Email
      */
     public function setReplyToAddress($replyToAddress)
@@ -733,17 +695,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getBccAddress()
     {
         return $this->bccAddress;
     }
 
     /**
-     * @param mixed $bccAddress
-     *
      * @return Email
      */
     public function setBccAddress($bccAddress)
@@ -754,9 +711,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getTemplate()
     {
         return $this->template;
@@ -773,9 +727,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPublishDown()
     {
         return $this->publishDown;
@@ -792,9 +743,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPublishUp()
     {
         return $this->publishUp;
@@ -813,8 +761,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param bool $includeVariants
-     *
-     * @return mixed
      */
     public function getSentCount($includeVariants = false)
     {
@@ -831,9 +777,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getVariantSentCount($includeVariants = false)
     {
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantSentCount') : $this->variantSentCount;
@@ -911,9 +854,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->excludedLists->removeElement($excludedList);
     }
 
-    /**
-     * @return mixed
-     */
     public function getPlainText()
     {
         return $this->plainText;
@@ -929,9 +869,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getVariantReadCount()
     {
         return $this->variantReadCount;
@@ -947,17 +884,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getStats()
     {
         return $this->stats;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCustomHtml()
     {
         return $this->customHtml;
@@ -973,9 +904,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getUnsubscribeForm()
     {
         return $this->unsubscribeForm;
@@ -991,9 +919,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPreferenceCenter()
     {
         return $this->preferenceCenter;
@@ -1009,17 +934,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getEmailType()
     {
         return $this->emailType;
     }
 
     /**
-     * @param mixed $emailType
-     *
      * @return Email
      */
     public function setEmailType($emailType)
@@ -1052,7 +972,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Get assetAttachments.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getAssetAttachments()
     {

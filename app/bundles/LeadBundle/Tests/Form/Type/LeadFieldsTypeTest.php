@@ -14,9 +14,9 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $fieldModel;
 
-    private \Mautic\LeadBundle\Form\Type\LeadFieldsType $form;
+    private LeadFieldsType $form;
 
     protected function setUp(): void
     {
@@ -58,18 +58,18 @@ final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame(
                         [
                             'Core' => [
-                              'Contact field 1 label'  => 'contact_field_1',
-                              'mautic.lead.field.tags' => 'tags',
+                                'Contact field 1 label'  => 'contact_field_1',
+                                'mautic.lead.field.tags' => 'tags',
                             ],
                             'Company' => [
-                              'Company field 1 label' => 'company_field_1',
+                                'Company field 1 label' => 'company_field_1',
                             ],
                             'UTM' => [
-                              'mautic.lead.field.utmcampaign' => 'utm_campaign',
-                              'mautic.lead.field.utmcontent'  => 'utm_content',
-                              'mautic.lead.field.utmmedium'   => 'utm_medium',
-                              'mautic.lead.field.umtsource'   => 'utm_source',
-                              'mautic.lead.field.utmterm'     => 'utm_term',
+                                'mautic.lead.field.utmcampaign' => 'utm_campaign',
+                                'mautic.lead.field.utmcontent'  => 'utm_content',
+                                'mautic.lead.field.utmmedium'   => 'utm_medium',
+                                'mautic.lead.field.umtsource'   => 'utm_source',
+                                'mautic.lead.field.utmterm'     => 'utm_term',
                             ],
                         ],
                         $choices

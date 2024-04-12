@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    private ?\Psr\Http\Message\ResponseInterface $response = null;
+    private ?ResponseInterface $response = null;
 
     /**
      * @param mixed[] $parameters
@@ -27,9 +27,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         $this->integration = $integration;
     }
 
-    /**
-     * @return mixed
-     */
     public function getUrl()
     {
         return $this->url;
@@ -82,9 +79,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->response;
     }
 
-    /**
-     * @return mixed
-     */
     public function getHeaders()
     {
         return $this->headers;

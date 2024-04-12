@@ -8,7 +8,7 @@ use Mautic\PageBundle\Entity\Page;
 
 class PageHitEvent extends CommonEvent
 {
-    protected ?\Mautic\PageBundle\Entity\Page $page = null;
+    protected ?Page $page = null;
 
     /**
      * @param mixed[] $clickthroughData
@@ -47,8 +47,6 @@ class PageHitEvent extends CommonEvent
 
     /**
      * Get HTML code.
-     *
-     * @return mixed
      */
     public function getCode()
     {
@@ -63,9 +61,6 @@ class PageHitEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @return mixed
-     */
     public function getClickthroughData()
     {
         return $this->clickthroughData;

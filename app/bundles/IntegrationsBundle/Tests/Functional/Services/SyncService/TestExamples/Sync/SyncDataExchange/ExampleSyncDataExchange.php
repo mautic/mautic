@@ -234,9 +234,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         return $this->payload;
     }
 
-    /**
-     * @return mixed
-     */
     private function getReportPayload($object, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, array $mappedFields)
     {
         // Query integration's API for objects changed between $fromDateTime and $toDateTime with the requested fields in $mappedFields if that's

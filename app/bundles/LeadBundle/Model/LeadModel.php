@@ -851,8 +851,6 @@ class LeadModel extends FormModel
      * @param bool $forLists
      * @param bool $arrayHydration
      * @param bool $isPublic
-     *
-     * @return mixed
      */
     public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
@@ -1516,7 +1514,7 @@ class LeadModel extends FormModel
     {
         // known "synonym" fields expected
         $synonyms = ['useragent'  => 'user_agent',
-                     'remotehost' => 'remote_host', ];
+            'remotehost'          => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {

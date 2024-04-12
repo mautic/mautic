@@ -14,7 +14,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
 
     public const FALSE_BOOLEAN_VALUE = 'false';
 
-    private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {
@@ -28,9 +28,6 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
         return $this->valueNormalizer->normalizeForMautic($encodedValueDAO->getType(), $value);
     }
 
-    /**
-     * @param mixed $var
-     */
     public function encodeVariable($var): EncodedValueDAO
     {
         if (is_null($var)) {

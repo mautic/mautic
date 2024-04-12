@@ -51,13 +51,12 @@ class MessageQueueModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\MessageQueue::class);
+        return $this->em->getRepository(MessageQueue::class);
     }
 
     /**
      * @param int    $attempts
      * @param int    $priority
-     * @param mixed  $messageQueue
      * @param string $statTableName
      * @param string $statContactColumn
      * @param string $statSentColumn
@@ -157,7 +156,7 @@ class MessageQueueModel extends FormModel
             $messageQueue->setDatePublished(new \DateTime());
             $messageQueue->setMaxAttempts($maxAttempts);
             $messageQueue->setLead(
-                ($lead instanceof Lead) ? $lead : $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId)
+                ($lead instanceof Lead) ? $lead : $this->em->getReference(Lead::class, $leadId)
             );
             $messageQueue->setPriority($priority);
             $messageQueue->setScheduledDate($scheduledDate);

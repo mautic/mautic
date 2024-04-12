@@ -190,8 +190,6 @@ class ClientController extends AbstractStandardFormController
     }
 
     /**
-     * @param mixed $objectId
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function newAction(Request $request, $objectId = 0)

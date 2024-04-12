@@ -70,7 +70,7 @@ class Monitoring extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitoring')
-            ->setCustomRepositoryClass(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)
+            ->setCustomRepositoryClass(MonitoringRepository::class)
             ->addLifecycleEvent('cleanMonitorData', 'preUpdate')
             ->addLifecycleEvent('cleanMonitorData', 'prePersist');
 
@@ -105,9 +105,6 @@ class Monitoring extends FormEntity
         ));
     }
 
-    /**
-     * @return mixed
-     */
     public function getCategory()
     {
         return $this->category;

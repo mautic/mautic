@@ -25,9 +25,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getLocation()
     {
         return $this->location;
@@ -94,9 +91,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function getItem()
     {
         return $this->item;

@@ -238,8 +238,6 @@ class Mailbox
 
     /**
      * Returns if this is a Gmail connection.
-     *
-     * @return mixed
      */
     public function isGmail()
     {
@@ -290,8 +288,6 @@ class Mailbox
      * Get settings.
      *
      * @param string $mailbox
-     *
-     * @return mixed
      *
      * @throws MailboxException
      */
@@ -932,8 +928,7 @@ class Mailbox
                     case TYPEMULTIPART:
                         if (
                             'report' != $subtype
-                            ||
-                            empty($params['report-type'])
+                            || empty($params['report-type'])
                         ) {
                             break;
                         }

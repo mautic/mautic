@@ -8,7 +8,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class NotificationArrayTransformer implements DataTransformerInterface
 {
-    /** {@inheritdoc} */
     public function transform($value)
     {
         /** Notification $value */
@@ -34,7 +33,6 @@ class NotificationArrayTransformer implements DataTransformerInterface
         return $array;
     }
 
-    /** {@inheritdoc} */
     public function reverseTransform($value)
     {
         if (!is_array($value)) {

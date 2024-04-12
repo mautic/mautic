@@ -65,17 +65,11 @@ class ChannelBroadcastEvent extends Event
         $this->id      = $channelId;
     }
 
-    /**
-     * @return mixed
-     */
     public function getChannel()
     {
         return $this->channel;
     }
 
-    /**
-     * @return mixed
-     */
     public function getId()
     {
         return $this->id;

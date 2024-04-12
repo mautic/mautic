@@ -60,8 +60,6 @@ class CommonEvent extends Event
 
     /**
      * Gets changes to original entity.
-     *
-     * @return mixed
      */
     public function getChanges()
     {

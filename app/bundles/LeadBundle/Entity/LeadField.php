@@ -640,8 +640,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
     /**
      * Set the unique identifer state of the field.
      *
-     * @param mixed $isUniqueIdentifer
-     *
      * @return LeadField
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
@@ -667,8 +665,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
 
     /**
      * Wrapper for incorrectly spelled setIsUniqueIdentifer.
-     *
-     * @param mixed $isUniqueIdentifier
      *
      * @return LeadField
      */
@@ -737,33 +733,21 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
         return $this->getIsListable();
     }
 
-    /**
-     * @return mixed
-     */
     public function getGroup()
     {
         return $this->group;
     }
 
-    /**
-     * @param mixed $group
-     */
     public function setGroup($group): void
     {
         $this->group = $group;
     }
 
-    /**
-     * @return mixed
-     */
     public function getIsPubliclyUpdatable()
     {
         return $this->isPubliclyUpdatable;
     }
 
-    /**
-     * @param mixed $isPubliclyUpdatable
-     */
     public function setIsPubliclyUpdatable($isPubliclyUpdatable): void
     {
         $this->isPubliclyUpdatable = (bool) $isPubliclyUpdatable;

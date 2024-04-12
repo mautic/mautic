@@ -14,9 +14,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class DynamicContentApiController extends CommonController
 {
-    /**
-     * @return mixed
-     */
     public function processAction(Request $request, $objectAlias)
     {
         // Don't store a visitor with this request

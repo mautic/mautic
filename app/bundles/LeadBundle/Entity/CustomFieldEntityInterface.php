@@ -6,28 +6,17 @@ interface CustomFieldEntityInterface
 {
     /**
      * @param mixed[] $fields
-     *
-     * @return mixed
      */
     public function setFields($fields);
 
-    /**
-     * @return mixed
-     */
     public function getFields();
 
     /**
      * @param string $alias
-     * @param mixed  $value
      * @param string $oldValue
-     *
-     * @return mixed
      */
     public function addUpdatedField($alias, $value, $oldValue = '');
 
-    /**
-     * @return mixed
-     */
     public function getUpdatedFields();
 
     /**
@@ -35,8 +24,6 @@ interface CustomFieldEntityInterface
      *
      * @param string      $field alias
      * @param string|null $group
-     *
-     * @return mixed
      */
     public function getFieldValue($field, $group = null);
 
@@ -52,8 +39,6 @@ interface CustomFieldEntityInterface
 
     /**
      * Get flat array of profile fields without groups.
-     *
-     * @return mixed
      */
     public function getProfileFields();
 }

@@ -20,8 +20,6 @@ class RouteLoader extends Loader
     /**
      * Load each bundles routing.php file.
      *
-     * @param mixed $resource
-     *
      * @return RouteCollection
      *
      * @throws \RuntimeException
@@ -88,9 +86,6 @@ class RouteLoader extends Loader
         return $collection;
     }
 
-    /**
-     * @param mixed $resource
-     */
     public function supports($resource, $type = null): bool
     {
         return 'mautic' === $type;

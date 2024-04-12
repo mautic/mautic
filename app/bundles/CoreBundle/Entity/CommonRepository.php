@@ -73,8 +73,6 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param string $alias
      * @param object $entity
-     *
-     * @return mixed
      */
     public function checkUniqueAlias($alias, $entity = null)
     {
@@ -135,8 +133,6 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param class-string $className
-     *
-     * @return mixed
      *
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
@@ -214,9 +210,6 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @param mixed $entity
-     */
     public function detachEntity($entity): void
     {
         $this->getEntityManager()->detach($entity);
@@ -519,8 +512,6 @@ class CommonRepository extends ServiceEntityRepository
      * @param bool        $setNowParameter
      * @param bool        $setTrueParameter
      * @param bool        $allowNullForPublishedUp Allow entities without a published up date
-     *
-     * @return mixed
      */
     public function getPublishedByDateExpression(
         $q,
@@ -1077,8 +1068,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param object                     $filter
+     * @param QueryBuilder $q
+     * @param object       $filter
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns): array
     {
@@ -1228,7 +1219,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder $q
      */
     protected function buildClauses($q, array $args): bool
     {
@@ -1357,7 +1348,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
     protected function buildSelectClause($q, array $args)
     {
@@ -1541,8 +1532,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $query
-     * @param array                                          $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
+     * @param QueryBuilder|DbalQueryBuilder $query
+     * @param array                         $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
     protected function buildWhereClauseFromArray($query, array $clauses, $expr = null)
     {
@@ -1666,9 +1657,6 @@ class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    /**
-     * @return mixed
-     */
     protected function getIdsExpr(&$q, $filter)
     {
         if ($ids = array_map('intval', explode(',', $filter->string))) {

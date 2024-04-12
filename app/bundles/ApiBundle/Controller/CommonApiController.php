@@ -356,8 +356,6 @@ class CommonApiController extends FetchCommonApiController
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
      * @param string $action
-     *
-     * @return mixed
      */
     protected function prePopulateForm(&$entity, $parameters, $action = 'edit')
     {
@@ -365,8 +363,6 @@ class CommonApiController extends FetchCommonApiController
 
     /**
      * Give the controller an opportunity to process the entity before persisting.
-     *
-     * @return mixed
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -378,8 +374,6 @@ class CommonApiController extends FetchCommonApiController
      * @param mixed[] $parameters
      * @param object  $entity
      * @param string  $action
-     *
-     * @return mixed
      */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
@@ -420,8 +414,6 @@ class CommonApiController extends FetchCommonApiController
      *
      * @param array<mixed>|null $parameters
      * @param string            $method
-     *
-     * @return mixed
      */
     protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
     {
@@ -457,11 +449,11 @@ class CommonApiController extends FetchCommonApiController
         // Check if user has access to publish
         if (
             (
-                array_key_exists('isPublished', $parameters) ||
-                array_key_exists('publishUp', $parameters) ||
-                array_key_exists('publishDown', $parameters)
-            ) &&
-            $this->security->checkPermissionExists($this->permissionBase.':publish')) {
+                array_key_exists('isPublished', $parameters)
+                || array_key_exists('publishUp', $parameters)
+                || array_key_exists('publishDown', $parameters)
+            )
+            && $this->security->checkPermissionExists($this->permissionBase.':publish')) {
             if ($this->security->checkPermissionExists($this->permissionBase.':publishown')) {
                 if (!$this->checkEntityAccess($entity, 'publish')) {
                     if ('new' === $action) {

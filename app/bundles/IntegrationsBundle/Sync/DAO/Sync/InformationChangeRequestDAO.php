@@ -15,7 +15,6 @@ class InformationChangeRequestDAO
     /**
      * @param string $integration
      * @param string $objectName
-     * @param mixed  $objectId
      * @param string $field
      */
     public function __construct(
@@ -32,9 +31,6 @@ class InformationChangeRequestDAO
         return $this->integration;
     }
 
-    /**
-     * @return mixed
-     */
     public function getObjectId()
     {
         return $this->objectId;

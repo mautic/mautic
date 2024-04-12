@@ -16,7 +16,7 @@ class ReportDAO
 
     private array $remappedObjects = [];
 
-    private \Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO $relationsDAO;
+    private RelationsDAO $relationsDAO;
 
     /**
      * @param string $integration
@@ -50,10 +50,8 @@ class ReportDAO
     }
 
     /**
-     * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
-     * @param mixed  $newObjectId
      */
     public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {

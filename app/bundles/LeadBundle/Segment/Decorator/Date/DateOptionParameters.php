@@ -9,16 +9,13 @@ class DateOptionParameters
 {
     private bool $hasTimePart;
 
-    /**
-     * @var mixed
-     */
     private $timeframe;
 
     private bool $requiresBetween;
 
     private bool $shouldUseLastDayOfRange;
 
-    private \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
+    private DateTimeHelper $dateTimeHelper;
 
     public function __construct(
         ContactSegmentFilterCrate $leadSegmentFilterCrate,

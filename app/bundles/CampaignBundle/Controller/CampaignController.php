@@ -28,7 +28,6 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -37,7 +36,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -128,7 +126,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction(Request $request)
     {
@@ -190,7 +188,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes the entity.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction(Request $request, $objectId)
     {
@@ -210,7 +208,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, $page = null)
     {
@@ -330,7 +328,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
@@ -452,7 +450,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * View a specific campaign.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {
@@ -1056,9 +1054,6 @@ class CampaignController extends AbstractStandardFormController
         $this->getCurrentRequest()->getSession()->set('mautic.campaign.'.$sessionId.'.events.canvassettings', $canvasSettings);
     }
 
-    /**
-     * @return mixed
-     */
     protected function getSessionCanvasSettings($sessionId)
     {
         return $this->getCurrentRequest()->getSession()->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
@@ -1140,10 +1135,10 @@ class CampaignController extends AbstractStandardFormController
 
         // rewrite stats data from parent condition if exist
         foreach ($events as &$event) {
-            if (!empty($event['decisionPath']) &&
-                !empty($event['parent_id']) &&
-                isset($events[$event['parent_id']]) &&
-                'condition' !== $event['eventType']) {
+            if (!empty($event['decisionPath'])
+                && !empty($event['parent_id'])
+                && isset($events[$event['parent_id']])
+                && 'condition' !== $event['eventType']) {
                 $parentEvent                 = $events[$event['parent_id']];
                 $event['percent']            = $parentEvent['percent'];
                 $event['yesPercent']         = $parentEvent['yesPercent'];

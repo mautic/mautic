@@ -14,9 +14,6 @@ class EmailAddressValidator extends ConstraintValidator
     ) {
     }
 
-    /**
-     * @param mixed $value
-     */
     public function validate($value, Constraint $constraint): void
     {
         if (!empty($value)) {

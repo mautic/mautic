@@ -11,22 +11,16 @@ interface VariantEntityInterface
 {
     /**
      * Get translation parent.
-     *
-     * @return mixed
      */
     public function getVariantParent();
 
     /**
      * Set entity this is a translation of.
-     *
-     * @return mixed
      */
     public function setVariantParent(VariantEntityInterface $parent = null);
 
     /**
      * Set this entity as a main content (remove translation parent).
-     *
-     * @return mixed
      */
     public function removeVariantParent();
 
@@ -39,22 +33,16 @@ interface VariantEntityInterface
 
     /**
      * Add entity to $translationChildren.
-     *
-     * @return mixed
      */
     public function addVariantChild(VariantEntityInterface $child);
 
     /**
      * Remove entity from $translationChildren.
-     *
-     * @return mixed
      */
     public function removeVariantChild(VariantEntityInterface $child);
 
     /**
      * Get settings array for the variant.
-     *
-     * @return mixed
      */
     public function getVariantSettings();
 

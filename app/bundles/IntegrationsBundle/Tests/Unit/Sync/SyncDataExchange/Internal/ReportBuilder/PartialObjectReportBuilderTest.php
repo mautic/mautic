@@ -35,29 +35,29 @@ class PartialObjectReportBuilderTest extends TestCase
     /**
      * @var FieldChangeRepository|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
+    private MockObject $fieldChangeRepository;
 
     /**
      * @var FieldHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    private MockObject $fieldHelper;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var FieldBuilder|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
+    private MockObject $fieldBuilder;
 
     /**
      * @var ObjectProvider|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $objectProvider;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder $reportBuilder;
+    private PartialObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {

@@ -16,9 +16,9 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
+    private DateHelper $dateHelper;
 
-    private \Mautic\CoreBundle\Twig\Helper\FormatterHelper $formatterHelper;
+    private FormatterHelper $formatterHelper;
 
     /**
      * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
@@ -83,9 +83,6 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider stringProvider
-     *
-     * @param mixed $input
-     * @param mixed $expected
      */
     public function testNormalizeStringValue($input, $expected): void
     {

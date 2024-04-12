@@ -36,8 +36,9 @@ return (new PhpCsFixer\Config())
         'header_comment'        => [
             'header' => '',
         ],
-        'Mautic/no_table_prefix_definition_in_tests' => true,
-        'multiline_whitespace_before_semicolons'     => true,
+        'Mautic/no_table_prefix_definition_in_tests'       => true,
+        'multiline_whitespace_before_semicolons'           => true,
+        'nullable_type_declaration_for_default_null_value' => false, // Enforces potential BC breaks. Enable for Mautic 6.
     ])
     ->registerCustomFixers([new Mautic\CodingStandards\PhpCSFixer\NoTablePrefixDefinitionInTestsFixer()])
     ->setFinder($finder);

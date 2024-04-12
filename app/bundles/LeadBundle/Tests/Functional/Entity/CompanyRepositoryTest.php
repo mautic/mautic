@@ -165,9 +165,6 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->transport = $transport;
     }
 
-    /**
-     * @param mixed $value
-     */
     private function setPrivateProperty(MailHelper $object, string $property, $value): void
     {
         $reflector = new \ReflectionProperty($object::class, $property);

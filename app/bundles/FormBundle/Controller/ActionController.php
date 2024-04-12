@@ -38,9 +38,9 @@ class ActionController extends CommonFormController
         }
 
         // ajax only for form fields
-        if (!$actionType ||
-            !$request->isXmlHttpRequest() ||
-            !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
+        if (!$actionType
+            || !$request->isXmlHttpRequest()
+            || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->modalAccessDenied();
         }
@@ -162,9 +162,9 @@ class ActionController extends CommonFormController
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             // ajax only for form fields
-            if (!$actionType ||
-                !$request->isXmlHttpRequest() ||
-                !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
+            if (!$actionType
+                || !$request->isXmlHttpRequest()
+                || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
             ) {
                 return $this->modalAccessDenied();
             }
@@ -285,8 +285,8 @@ class ActionController extends CommonFormController
         $delete  = $session->get('mautic.form.'.$formId.'.actions.deleted', []);
 
         // ajax only for form fields
-        if (!$request->isXmlHttpRequest() ||
-            !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }
