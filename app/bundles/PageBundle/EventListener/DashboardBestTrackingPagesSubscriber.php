@@ -47,21 +47,19 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
                 $items = [];
                 $pages = $this->pageModel->getPopularTrackedPages($widget->getLimitCalcByWeight(), $params['dateFrom'], $params['dateTo'], $params);
                 // Build table rows with links
-                if ($pages) {
-                    foreach ($pages as $page) {
-                        $row = [
-                            [
-                                'value'     => $page['url_title'],
-                                'type'      => 'link',
-                                'external'  => true,
-                                'link'      => $page['url'],
-                            ],
-                            [
-                                'value' => $page['hits'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($pages as $page) {
+                    $row = [
+                        [
+                            'value'     => $page['url_title'],
+                            'type'      => 'link',
+                            'external'  => true,
+                            'link'      => $page['url'],
+                        ],
+                        [
+                            'value' => $page['hits'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
                 $event->setTemplateData([
                     'headItems' => [
