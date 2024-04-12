@@ -729,11 +729,12 @@ body > #app-wrapper {
   padding-top: 20px;
 }
 .app-sidebar .nav-sidebar .sidebar-minimizer > .direction:after {
-  font-family: 'FontAwesome';
-  content: '\f053';
+  font-family: 'remixicon';
+  font-size: 18px;
+  content: '\EA64';
 }
 .app-sidebar .nav-sidebar .sidebar-minimizer.active .direction:after {
-  content: '\f054';
+  content: '\EA6E';
 }
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {
@@ -4834,4 +4835,7 @@ ul.media-list.media-list-feed div.media-object {
 }
 .ui-sortable-handle:active {
   cursor: grabbing;
+}
+.flip-vertically {
+  transform: scaleY(-1);
 }
