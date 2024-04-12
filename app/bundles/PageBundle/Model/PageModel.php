@@ -801,6 +801,41 @@ class PageModel extends FormModel
     }
 
     /**
+     * @deprecated method not usefully and not use anymore
+     *
+     * Get data for pie chart showing new vs returning leads.
+     * Returning leads are even leads who visit 2 different page once.
+     *
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param array     $filters
+     * @param bool      $canViewOthers
+     */
+    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
+    {
+        $chart              = new PieChart();
+        $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $filters['lead_id'] = [
+            'expression' => 'isNull',
+        ];
+        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($allQ);
+            $this->limitQueryToCreator($returnQ);
+        }
+
+        $all       = $query->fetchCount($allQ);
+        $returning = $query->fetchCount($returnQ);
+        $unique    = $all - $returning;
+        $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
+        $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+
+        return $chart->render();
+    }
+
+    /**
      * Get data for pie chart showing new vs returning leads.
      * Returning leads are even leads who visits 2 different page once.
      *
