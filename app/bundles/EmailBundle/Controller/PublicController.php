@@ -111,7 +111,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
     {
         $stat                  = $model->getEmailStatus($idHash);
         $message               = '';
