@@ -212,6 +212,7 @@ return [
                     'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.order_executioner',
+                    'mautic.integrations.helper.sync_date',
                 ],
             ],
             'mautic.integrations.sync.integration_process.object_change_generator' => [
@@ -287,6 +288,7 @@ return [
                     'mautic.integrations.sync.notification.handler_container',
                     'mautic.integrations.helper.sync_integrations',
                     'mautic.integrations.helper.config_integrations',
+                    'translator',
                 ],
             ],
             'mautic.integrations.sync.notification.writer' => [

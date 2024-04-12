@@ -28,6 +28,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
@@ -245,8 +246,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 new EventDispatcher()
             );
         $routerMock = $this->createMock(Router::class);
-        $factoryMock->method('getRouter')
-            ->willReturn($routerMock);
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
@@ -254,7 +253,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelper->method('get')->will($this->returnValueMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -363,8 +362,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $factoryMock->method('getDispatcher')
             ->willReturn($mockDispatcher);
         $routerMock = $this->createMock(Router::class);
-        $factoryMock->method('getRouter')
-            ->willReturn($routerMock);
 
         $copyRepoMock   = $this->createMock(CopyRepository::class);
         $emailModelMock = $this->createMock(EmailModel::class);
@@ -378,7 +375,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock])
             ->onlyMethods([])
             ->getMock();
 
@@ -445,14 +442,12 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 new EventDispatcher()
             );
         $routerMock = $this->createMock(Router::class);
-        $factoryMock->method('getRouter')
-            ->willReturn($routerMock);
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -547,11 +542,10 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $factoryMock->method('getLogger')->willReturn(new NullLogger());
         $factoryMock->method('getDispatcher')->willReturn(new EventDispatcher());
         $routerMock = $this->createMock(Router::class);
-        $factoryMock->method('getRouter')->willReturn($routerMock);
 
         /** @var MockObject&MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
-            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper])
+            ->setConstructorArgs([$factoryMock, $mailer, $this->fromEmaiHelper, $this->coreParametersHelper, $this->mailbox, $this->loggerMock, $this->mailHashHelper, $routerMock])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
 
@@ -637,6 +631,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&LoggerInterface $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
+        /** @var MockObject&RouterInterface $router */
+        $router = $this->createMock(RouterInterface::class);
+
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -646,7 +643,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             );
 
         $mailer         = new Mailer(new BatchTransport());
-        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper);
+        $mailHelper     = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router);
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(TranslatorInterface::class);
         $model          = new SendEmailToContact($mailHelper, $this->statHelper, $dncModel, $translator);

@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -222,7 +223,7 @@ class FormSubscriber implements EventSubscriberInterface
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form
-            $payload[$key]       = htmlspecialchars_decode($value, ENT_QUOTES);
+            $payload[$key]       = html_entity_decode(htmlspecialchars_decode($value, ENT_QUOTES), ENT_QUOTES);
         }
 
         $event->setPostSubmitPayload($payload);
@@ -254,7 +255,7 @@ class FormSubscriber implements EventSubscriberInterface
             if ($redirect = $this->parseResponse($response, $matchedFields)) {
                 $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
-        } catch (ServerException $exception) {
+        } catch (ClientException|ServerException $exception) {
             $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {
