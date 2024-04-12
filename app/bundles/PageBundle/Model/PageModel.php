@@ -804,7 +804,7 @@ class PageModel extends FormModel
      * Get data for pie chart showing new vs returning leads.
      * Returning leads are even leads who visits 2 different page once.
      *
-     * @return array<int|string>
+     * @return array<string, array<int|string>>
      */
     public function getUniqueVsReturningPieChartData(\DateTime $dateFrom, \DateTime $dateTo, bool $canViewOthers = true): array
     {
