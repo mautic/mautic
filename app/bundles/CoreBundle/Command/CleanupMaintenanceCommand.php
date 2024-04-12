@@ -46,8 +46,8 @@ class CleanupMaintenanceCommand extends ModeratedCommand
                         'Purge records older than this number of days. Defaults to 365.',
                         365
                     ),
-                    new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Perfroms a dry run. Shows no. of affected rows. Won\'t actually delete anything.'),
-                    new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Deletes records of inactive users to fullfill GDPR requirements.'),
+                    new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Performs a dry run. Shows no. of affected rows. Won\'t actually delete anything.'),
+                    new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Deletes records of inactive users to fulfill GDPR requirements.'),
                 ]
             )
             ->setHelp(
