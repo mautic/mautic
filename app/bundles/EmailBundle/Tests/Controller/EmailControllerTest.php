@@ -33,67 +33,64 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Translator
      */
-    private $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
     /**
      * @var MockObject|Session
      */
-    private $sessionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
 
     /**
      * @var MockObject|ModelFactory<EmailModel>
      */
-    private $modelFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|Container
      */
-    private $containerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
 
     /**
      * @var MockObject|Router
      */
-    private $routerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $routerMock;
 
     /**
      * @var MockObject|EmailModel
      */
-    private $modelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelMock;
 
     /**
      * @var MockObject|Email
      */
-    private $emailMock;
+    private \PHPUnit\Framework\MockObject\MockObject $emailMock;
 
     /**
      * @var MockObject|FlashBag
      */
-    private $flashBagMock;
+    private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
 
-    /**
-     * @var EmailController
-     */
-    private $controller;
+    private \Mautic\EmailBundle\Controller\EmailController $controller;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private $corePermissionsMock;
+    private \PHPUnit\Framework\MockObject\MockObject $corePermissionsMock;
 
     /**
      * @var MockObject|FormFactory
      */
-    private $formFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formFactoryMock;
 
     /**
      * @var MockObject|Form
      */
-    private $formMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formMock;
 
     /**
      * @var MockObject|Environment
      */
-    private $twigMock;
+    private \PHPUnit\Framework\MockObject\MockObject $twigMock;
 
     private RequestStack $requestStack;
 
@@ -255,7 +252,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->formFactoryMock->expects($this->once())
             ->method('create')
-            ->with('Mautic\EmailBundle\Form\Type\ExampleSendType',
+            ->with(\Mautic\EmailBundle\Form\Type\ExampleSendType::class,
                 [
                     'emails' => [
                         'list' => [

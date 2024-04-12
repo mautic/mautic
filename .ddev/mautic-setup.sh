@@ -8,8 +8,9 @@ setup_mautic() {
     printf "Installing Mautic Composer dependencies...\n"
     composer install
 
-    cp ./.ddev/local.config.php.dist ./app/config/local.php
+    cp ./.ddev/local.config.php.dist ./config/local.php
     cp ./.ddev/.env.test.local ./.env.test.local
+    cp ./.ddev/.env.local.dist ./.env.local
 
     printf "Installing Mautic...\n"
     php bin/console mautic:install "${MAUTIC_URL}"
@@ -20,7 +21,7 @@ setup_mautic() {
 
     tput setaf 2
     printf "All done! Here's some useful information:\n"
-    printf "🔒 The default login is admin/mautic\n"
+    printf "🔒 The default login is admin / Maut1cR0cks!\n"
     printf "🌐 To open the Mautic instance, go to ${MAUTIC_URL} in your browser.\n"
     printf "🌐 To open PHPMyAdmin for managing the database, go to ${PHPMYADMIN_URL} in your browser.\n"
     printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to ${MAILHOG_URL} in your browser.\n"

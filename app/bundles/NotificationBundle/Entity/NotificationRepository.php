@@ -22,7 +22,7 @@ class NotificationRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'e.id');
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 
@@ -55,12 +55,10 @@ class NotificationRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -101,9 +99,9 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -120,17 +118,14 @@ class NotificationRepository extends CommonRepository
     /**
      * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -141,7 +136,7 @@ class NotificationRepository extends CommonRepository
      * @param string $type
      * @param int    $increaseBy
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1)
+    public function upCount($id, $type = 'sent', $increaseBy = 1): void
     {
         try {
             $q = $this->_em->getConnection()->createQueryBuilder();
@@ -150,8 +145,8 @@ class NotificationRepository extends CommonRepository
                 ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
                 ->where('id = '.(int) $id);
 
-            $q->execute();
-        } catch (\Exception $exception) {
+            $q->executeStatement();
+        } catch (\Exception) {
             // not important
         }
     }

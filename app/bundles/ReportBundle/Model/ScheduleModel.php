@@ -14,23 +14,13 @@ class ScheduleModel
     /**
      * @var SchedulerRepository
      */
-    private $schedulerRepository;
+    private \Doctrine\ORM\EntityRepository $schedulerRepository;
 
-    /**
-     * @var SchedulerPlanner
-     */
-    private $schedulerPlanner;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(EntityManager $entityManager, SchedulerPlanner $schedulerPlanner)
-    {
-        $this->entityManager       = $entityManager;
+    public function __construct(
+        private EntityManager $entityManager,
+        private SchedulerPlanner $schedulerPlanner
+    ) {
         $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
-        $this->schedulerPlanner    = $schedulerPlanner;
     }
 
     /**
@@ -41,7 +31,7 @@ class ScheduleModel
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
     }
 
-    public function reportWasScheduled(Report $report)
+    public function reportWasScheduled(Report $report): void
     {
         $this->schedulerPlanner->computeScheduler($report);
     }

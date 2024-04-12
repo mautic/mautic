@@ -3,7 +3,9 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\UserBundle\Exception\WeakPasswordException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,6 +14,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SecurityController extends CommonController implements EventSubscriberInterface
 {
@@ -20,7 +23,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $controller = $event->getRequest()->attributes->get('_controller');
         \assert(is_string($controller));
 
-        if (false === strpos($controller, self::class)) {
+        if (!str_contains($controller, self::class)) {
             return;
         }
 
@@ -41,7 +44,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper)
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): \Symfony\Component\HttpFoundation\Response
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -73,7 +76,11 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {
-            if ($error instanceof Exception\BadCredentialsException) {
+            if ($error instanceof WeakPasswordException) {
+                $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
+
+                return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
+            } elseif ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
@@ -81,7 +88,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $msg = $error->getMessage();
             }
 
-            $this->addFlashMessage($msg, [], 'error', null, false);
+            $this->addFlashMessage($msg, [], FlashBag::LEVEL_ERROR, null, false);
         }
         $request->query->set('tmpl', 'login');
 
@@ -105,26 +112,22 @@ class SecurityController extends CommonController implements EventSubscriberInte
     /**
      * Do nothing.
      */
-    public function loginCheckAction()
+    public function loginCheckAction(): void
     {
     }
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginAction($integration)
+    public function ssoLoginAction($integration): RedirectResponse
     {
         return new RedirectResponse($this->generateUrl('login'));
     }
 
     /**
      * The plugin should be handling this in it's listener.
-     *
-     * @return RedirectResponse
      */
-    public function ssoLoginCheckAction($integration)
+    public function ssoLoginCheckAction($integration): RedirectResponse
     {
         // The plugin should be handling this in it's listener
 

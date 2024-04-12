@@ -6,9 +6,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 
-/**
- * Class LeadNoteEvent.
- */
 class LeadNoteEvent extends CommonEvent
 {
     /**
@@ -33,7 +30,7 @@ class LeadNoteEvent extends CommonEvent
     /**
      * Sets the LeadNote entity.
      */
-    public function setLeadNote(LeadNote $note)
+    public function setLeadNote(LeadNote $note): void
     {
         $this->entity = $note;
     }

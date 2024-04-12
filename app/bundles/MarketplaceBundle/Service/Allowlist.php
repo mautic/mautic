@@ -14,18 +14,15 @@ use Mautic\MarketplaceBundle\Exception\ApiException;
  */
 class Allowlist
 {
-    private Config $config;
-    private CacheProvider $cache;
-    private ClientInterface $httpClient;
     private ?DTOAllowlist $allowlist = null;
 
     private const MARKETPLACE_ALLOWLIST_CACHE_KEY = 'marketplace_allowlist';
 
-    public function __construct(Config $config, CacheProvider $cache, ClientInterface $httpClient)
-    {
-        $this->config     = $config;
-        $this->cache      = $cache;
-        $this->httpClient = $httpClient;
+    public function __construct(
+        private Config $config,
+        private CacheProvider $cache,
+        private ClientInterface $httpClient
+    ) {
     }
 
     public function getAllowList(): ?DTOAllowlist

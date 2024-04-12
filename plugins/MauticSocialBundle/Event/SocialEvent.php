@@ -5,9 +5,6 @@ namespace MauticPlugin\MauticSocialBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-/**
- * Class SocialEvent.
- */
 class SocialEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class SocialEvent extends CommonEvent
     /**
      * Sets the Monitoring entity.
      */
-    public function setMonitoring(Monitoring $monitoring)
+    public function setMonitoring(Monitoring $monitoring): void
     {
         $this->entity = $monitoring;
     }

@@ -8,19 +8,18 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
-    private $segmentModel;
-
-    private $translator;
-
-    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
-    {
-        $this->segmentModel = $segmentModel;
-        $this->translator   = $translator;
+    public function __construct(
+        private ListModel $segmentModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $lists                                                       = $this->segmentModel->getUserLists();
         $segments                                                    = [];

@@ -23,7 +23,7 @@
           {
               'attr': {
                   'class': 'btn btn-default btn-nospin',
-                  'href': 'javascript:void()',
+                  'href': 'javascript:void(0)',
                   'onclick': "Mautic.saveDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"');",
                   'data-toggle': '',
               },
@@ -33,7 +33,7 @@
           {
               'attr': {
                   'class': 'btn btn-default btn-nospin',
-                  'href': 'javascript:void()',
+                  'href': 'javascript:void(0)',
                   'onclick': "Mautic.exportDashboardLayout('"~'mautic.dashboard.confirmation_layout_name'|trans~"', '"~path('mautic_dashboard_action', {'objectAction': 'export'})~"');",
                   'data-toggle': '',
               },
@@ -74,6 +74,7 @@
           {% for widget in widgets %}
               <div class="card-flex widget" data-widget-id="{{ widget.id }}" style="width: {{ widget.width|default(100) }}%; height: {{ widget.height|default(300) }}px">
                   <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                  {{ include('@MauticDashboard/Dashboard/widget.html.twig', {'widget': widget}) }}
               </div>
           {% endfor %}
       </div>

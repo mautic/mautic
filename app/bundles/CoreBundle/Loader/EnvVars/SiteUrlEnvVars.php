@@ -32,7 +32,7 @@ class SiteUrlEnvVars implements EnvVarsInterface
             $path = str_replace(['index.php'], '', $parts['path']);
 
             // Check and remove trailing slash to prevent double // in Symfony cli generated URLs
-            if ('/' == substr($path, -1)) {
+            if (str_ends_with($path, '/')) {
                 $path = substr($path, 0, -1);
             }
 

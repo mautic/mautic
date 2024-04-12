@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 
 class ReportSchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testOnReportSave()
+    public function testOnReportSave(): void
     {
         $report = new Report();
         $event  = new ReportEvent($report);

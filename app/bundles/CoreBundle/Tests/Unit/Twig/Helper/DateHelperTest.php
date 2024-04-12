@@ -11,12 +11,9 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var DateHelper
-     */
-    private $helper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $helper;
 
     /**
      * @var string
@@ -26,7 +23,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     public static function setUpBeforeClass(): void
     {

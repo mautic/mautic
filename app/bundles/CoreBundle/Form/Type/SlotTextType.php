@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SlotTextType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'content',

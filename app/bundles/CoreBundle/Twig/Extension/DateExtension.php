@@ -10,16 +10,11 @@ use Twig\TwigFunction;
 
 class DateExtension extends AbstractExtension
 {
-    protected DateHelper $dateHelper;
-
-    public function __construct(DateHelper $dateHelper)
-    {
-        $this->dateHelper = $dateHelper;
+    public function __construct(
+        protected DateHelper $dateHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

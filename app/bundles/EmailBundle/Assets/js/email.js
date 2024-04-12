@@ -87,6 +87,15 @@ Mautic.emailOnLoad = function (container, response) {
            Mautic.loadEmailDeliveredStat(mQuery(el));
         });
     }
+
+    var $loadEmailUsage = mQuery('[data-fetch-email-usages]');
+    if ($loadEmailUsage.length) {
+        $loadEmailUsage.each(function(i, el) {
+           Mautic.loadEmailUsages(mQuery(el));
+        });
+    }
+
+    Mautic.initMailerIsOwnerGlobalCheck();
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -511,6 +520,30 @@ Mautic.updateDynamicContentDropdown = function () {
     mQuery('button[data-cmd="dynamicContent"]').next().find('ul').html(options.join(''));
 };
 
+Mautic.initMailerIsOwnerGlobalCheck = function() {
+    let radioSelector = '.mailer-is-owner-local';
+    Mautic.toggleMailerIsOwnerWarningMessage(radioSelector);
+    mQuery(radioSelector).on('change', function() {
+        Mautic.toggleMailerIsOwnerWarningMessage(radioSelector);
+    });
+}
+
+Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
+    let checkedRadio = mQuery(radioSelector+':checked');
+    let globalMailerIsOwnerValue = checkedRadio.attr('data-global-mailer-is-onwer') ? '1' : '0';
+    let warningMessageId = 'mailer-is-owner-waring';
+    
+    mQuery('#'+warningMessageId).remove();
+
+    if (checkedRadio.val() !== globalMailerIsOwnerValue) {
+        let warning = mQuery('<div/>');
+        warning.attr('id', warningMessageId);
+        warning.html(checkedRadio.attr('data-warning'));
+        warning.addClass('alert alert-warning mt-md');
+        checkedRadio.closest('.form-group').append(warning);
+    }
+}
+
 Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
@@ -791,6 +824,13 @@ Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
     }
 };
 
+Mautic.copySubjectToName = function(elemSubject) {
+    let elemName = mQuery("#emailform_name");
+    if (elemName.val() === "") {
+        elemName.val(elemSubject.val());
+    }
+};
+
 Mautic.loadEmailDeliveredStat = function($el) {
     var emailId = $el.data('email-stat-delivered-for');
     Mautic.ajaxActionRequest('email:getEmailDeliveredCount', {id: emailId}, function(response){
@@ -798,5 +838,13 @@ Mautic.loadEmailDeliveredStat = function($el) {
             var delivered = response.delivered;
             $el.html(delivered);
         }
+    }, false, true, "GET");
+};
+
+Mautic.loadEmailUsages = function($el) {
+    var emailId = $el.data('fetch-email-usages');
+    Mautic.ajaxActionRequest('email:getEmailUsages', {id: emailId}, function(response){
+        var usagesHtml = response.usagesHtml;
+        $el.html(usagesHtml);
     }, false, true, "GET");
 };
