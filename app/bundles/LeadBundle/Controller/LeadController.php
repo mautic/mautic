@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -300,7 +300,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, $objectId)
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -427,8 +427,9 @@ class LeadController extends FormController
                     //    ]
                     // )->getContent(),
                 ],
-                'contentTemplate' => '@MauticLead/Lead/lead.html.twig',
-                'passthroughVars' => [
+                'allowMultipleCompanies' => $coreParametersHelper->get('contact_allow_multiple_companies'),
+                'contentTemplate'        => '@MauticLead/Lead/lead.html.twig',
+                'passthroughVars'        => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
                     'route'         => $this->generateUrl(
@@ -485,6 +486,10 @@ class LeadController extends FormController
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
+
+                        if (!is_array($companies)) {
+                            $companies = [$companies];
+                        }
                     }
 
                     $model->setFieldValues($lead, $data, true);
@@ -692,6 +697,10 @@ class LeadController extends FormController
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
+
+                        if (!is_array($companies)) {
+                            $companies = [$companies];
+                        }
                     }
                     $model->setFieldValues($lead, $data, true);
 
@@ -1404,7 +1413,6 @@ class LeadController extends FormController
                     if (!empty($bodyCheck)) {
                         $mailer = $mailHelper->getMailer();
 
-                        // To lead
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
@@ -1423,15 +1431,12 @@ class LeadController extends FormController
                         // Set Content
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
-
-                        // Set lead
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-
                         $mailer->setSubject($email['subject']);
 
                         // Ensure safe emoji for notification
-                        $subject = EmojiHelper::toHtml($email['subject']);
+                        $subject = $email['subject'];
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
                             $this->addFlashMessage(

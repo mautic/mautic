@@ -33,7 +33,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
-        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://';
+        $this->configParams['messenger_dsn_email'] = 'testEmailSendToContactSync' === $this->getName() ? 'sync://' : 'in-memory://default';
 
         parent::setUp();
     }
@@ -884,5 +884,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         foreach ($logs as $log) {
             $this->assertEquals($scoresMap[$log->getGroup()->getId()], $log->getDelta());
         }
+    }
+
+    public function testMultipleCompanyFeature(): void
+    {
+        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
+        self::assertSame('multiple', $multiple);
     }
 }

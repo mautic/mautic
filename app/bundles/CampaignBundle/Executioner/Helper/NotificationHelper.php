@@ -62,11 +62,6 @@ class NotificationHelper
 
         $campaign = $event->getCampaign();
 
-        // Campaign is already unpublished, do not trigger further notification/email
-        if (!$campaign->isPublished()) {
-            return;
-        }
-
         $this->notificationModel->addNotification(
             $campaign->getName().' / '.$event->getName(),
             'error',
@@ -76,7 +71,11 @@ class NotificationHelper
                 [
                     '%campaign%' => '<a href="'.$this->router->generate(
                         'mautic_campaign_action',
-                        ['objectAction' => 'view', 'objectId' => $campaign->getId()]
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $campaign->getId(),
+                        ],
+                        UrlGeneratorInterface::ABSOLUTE_URL
                     ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
                     '%event%' => $event->getName(),
                 ]

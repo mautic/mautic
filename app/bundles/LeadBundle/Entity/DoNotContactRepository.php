@@ -137,10 +137,18 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param array $contacts Array of contacts to filter by
+     * @param string|null    $channel
+     * @param string[]|int[] $contacts Array of contact IDs to filter by
+     *
+     * @return mixed[]
      */
     public function getChannelList($channel, array $contacts = null): array
     {
+        // If no contacts are sent then stop querying for all of the DNC records as it leads to the out of memory error.
+        if (is_array($contacts) && empty($contacts)) {
+            return [];
+        }
+
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id');
@@ -149,8 +157,8 @@ class DoNotContactRepository extends CommonRepository
             $q->select('dnc.channel, dnc.reason, l.id as lead_id');
         } else {
             $q->select('l.id, dnc.reason')
-              ->where('dnc.channel = :channel')
-              ->setParameter('channel', $channel);
+                ->where('dnc.channel = :channel')
+                ->setParameter('channel', $channel);
         }
 
         if ($contacts) {

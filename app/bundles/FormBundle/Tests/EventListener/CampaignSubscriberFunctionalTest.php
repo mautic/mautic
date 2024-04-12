@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\FormBundle\Tests\Controller;
+namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -58,6 +58,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         // Creating the form via API so it would create the submission table.
@@ -125,7 +126,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($result, $event->getResult());
     }
 
-    public static function valueProvider(): iterable
+    public static function valueProvider(): \Generator
     {
         yield [
             'test & test',

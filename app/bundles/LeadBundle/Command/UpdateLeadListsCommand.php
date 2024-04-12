@@ -58,6 +58,13 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Measure timing of build with output to CLI .',
                 false
+            )
+            ->addOption(
+                'exclude',
+                'd',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude a specific segment from being rebuilt. Otherwise, all segments will be rebuilt.',
+                []
             );
 
         parent::configure();
@@ -70,6 +77,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $max                   = $input->getOption('max-contacts');
         $enableTimeMeasurement = (bool) $input->getOption('timing');
         $output                = ($input->getOption('quiet')) ? new NullOutput() : $output;
+        $excludeSegments       = $input->getOption('exclude');
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
@@ -90,11 +98,22 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
             $this->rebuildSegment($list, $batch, $max, $output);
         } else {
-            $leadLists = $this->listModel->getEntities(
-                [
-                    'iterable_mode' => true,
-                ]
-            );
+            $filter = [
+                'iterable_mode' => true,
+            ];
+
+            if (is_array($excludeSegments) && count($excludeSegments) > 0) {
+                $filter['filter'] = [
+                    'force' => [
+                        [
+                            'expr'   => 'notIn',
+                            'column' => $this->listModel->getRepository()->getTableAlias().'.id',
+                            'value'  => $excludeSegments,
+                        ],
+                    ],
+                ];
+            }
+            $leadLists = $this->listModel->getEntities($filter);
 
             foreach ($leadLists as $leadList) {
                 $startTimeForSingleSegment = time();

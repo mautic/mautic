@@ -22,7 +22,7 @@ class ConfigType extends AbstractType
     {
         $testButton = [
             'action' => 'messenger:sendTestMessage',
-            'label'  => $this->translator->trans('mautic.messenger.config.dns.send_test_message'),
+            'label'  => $this->translator->trans('mautic.messenger.config.dsn.send_test_message'),
         ];
 
         $builder->add(

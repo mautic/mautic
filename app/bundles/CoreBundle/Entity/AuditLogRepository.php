@@ -2,9 +2,11 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * @extends CommonRepository<AuditLog>
@@ -227,5 +229,34 @@ class AuditLogRepository extends CommonRepository
             ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');
 
         return $this->getTimelineResults($qb, $options, 'ip.ip_address', 'ip.date_added', [], ['date_added']);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getLogsForUser(User $user, int $limit = 15): array
+    {
+        $query = $this->createQueryBuilder('al')
+            ->select('al.userName, al.userId, al.bundle, al.object,
+            al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
+            ->where('al.bundle = \'user\'')
+            ->andWhere('al.userId = :user_id')
+            ->setParameter('user_id', $user->getId())
+            ->orderBy('al.dateAdded', 'DESC')
+            ->setMaxResults($limit);
+
+        return $query->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function anonymizeAllIpAddress(): int
+    {
+        $table_name = $this->getTableName();
+        $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
+        $conn       = $this->getEntityManager()->getConnection();
+
+        return $conn->executeQuery($sql)->rowCount();
     }
 }
