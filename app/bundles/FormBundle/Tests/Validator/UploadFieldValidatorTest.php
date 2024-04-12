@@ -19,7 +19,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
-    public function testNoFilesGiven()
+    public function testNoFilesGiven(): void
     {
         $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
             ->disableOriginalConstructor()
@@ -54,7 +54,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
-    public function testValidationFailed()
+    public function testValidationFailed(): void
     {
         $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
             ->disableOriginalConstructor()
@@ -104,7 +104,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
-    public function testFileIsValid()
+    public function testFileIsValid(): void
     {
         $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
             ->disableOriginalConstructor()

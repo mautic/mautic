@@ -16,48 +16,21 @@ use Symfony\Component\Routing\Router;
 
 class FieldBuilder
 {
-    /**
-     * @var ValueNormalizer
-     */
-    private $valueNormalizer;
+    private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
 
-    /**
-     * @var Router
-     */
-    private $router;
+    private ?array $mauticObject = null;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO $requestObject = null;
 
-    /**
-     * @var ContactObjectHelper
-     */
-    private $contactObjectHelper;
-
-    /**
-     * @var array
-     */
-    private $mauticObject;
-
-    /**
-     * @var RequestObjectDAO
-     */
-    private $requestObject;
-
-    public function __construct(Router $router, FieldHelper $fieldHelper, ContactObjectHelper $contactObjectHelper)
-    {
+    public function __construct(
+        private Router $router,
+        private FieldHelper $fieldHelper,
+        private ContactObjectHelper $contactObjectHelper
+    ) {
         $this->valueNormalizer = new ValueNormalizer();
-
-        $this->router              = $router;
-        $this->fieldHelper         = $fieldHelper;
-        $this->contactObjectHelper = $contactObjectHelper;
     }
 
     /**
-     * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
     public function buildObjectField(
@@ -66,7 +39,7 @@ class FieldBuilder
         RequestObjectDAO $requestObject,
         string $integration,
         string $defaultState = ReportFieldDAO::FIELD_CHANGED
-    ) {
+    ): ReportFieldDAO {
         $this->mauticObject  = $mauticObject;
         $this->requestObject = $requestObject;
 
@@ -81,7 +54,7 @@ class FieldBuilder
         }
 
         // Special handling of DNC fields
-        if (0 === strpos($field, 'mautic_internal_dnc_')) {
+        if (str_starts_with($field, 'mautic_internal_dnc_')) {
             return $this->addDoNotContactField($field);
         }
 
@@ -93,10 +66,7 @@ class FieldBuilder
         return $this->addCustomField($field, $defaultState);
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function addContactIdField(string $field)
+    private function addContactIdField(string $field): ReportFieldDAO
     {
         $normalizedValue = new NormalizedValueDAO(
             NormalizedValueDAO::INT_TYPE,
@@ -106,10 +76,7 @@ class FieldBuilder
         return new ReportFieldDAO($field, $normalizedValue);
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function createOwnerIdReportFieldDAO(string $field, int $ownerId)
+    private function createOwnerIdReportFieldDAO(string $field, int $ownerId): ReportFieldDAO
     {
         return new ReportFieldDAO(
             $field,
@@ -120,10 +87,7 @@ class FieldBuilder
         );
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function addDoNotContactField(string $field)
+    private function addDoNotContactField(string $field): ReportFieldDAO
     {
         $channel = str_replace('mautic_internal_dnc_', '', $field);
 
@@ -135,10 +99,7 @@ class FieldBuilder
         return new ReportFieldDAO($field, $normalizedValue);
     }
 
-    /**
-     * @return ReportFieldDAO
-     */
-    private function addContactTimelineField(string $integration, string $field)
+    private function addContactTimelineField(string $integration, string $field): ReportFieldDAO
     {
         $normalizedValue = new NormalizedValueDAO(
             NormalizedValueDAO::URL_TYPE,
@@ -156,11 +117,9 @@ class FieldBuilder
     }
 
     /**
-     * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
-    private function addCustomField(string $field, string $defaultState)
+    private function addCustomField(string $field, string $defaultState): ReportFieldDAO
     {
         // The rest should be Mautic custom fields and if not, just ignore
         $mauticFields = $this->fieldHelper->getFieldList($this->requestObject->getObject());

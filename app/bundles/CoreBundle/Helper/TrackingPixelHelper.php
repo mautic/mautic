@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TrackingPixelHelper
 {
-    public static function sendResponse(Request $request)
+    public static function sendResponse(Request $request): void
     {
         $response = self::getResponse($request);
         $response->send();
@@ -61,10 +61,7 @@ class TrackingPixelHelper
         return $response;
     }
 
-    /**
-     * @return string
-     */
-    public static function getImage()
+    public static function getImage(): string
     {
         return base64_decode('R0lGODlhAQABAJAAAP8AAAAAACH5BAUQAAAALAAAAAABAAEAAAICBAEAOw==');
     }

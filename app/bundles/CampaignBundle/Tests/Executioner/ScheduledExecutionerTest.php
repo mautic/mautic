@@ -21,27 +21,27 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadEventLogRepository
      */
-    private $repository;
+    private \PHPUnit\Framework\MockObject\MockObject $repository;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
-    private $executioner;
+    private \PHPUnit\Framework\MockObject\MockObject $executioner;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
-    private $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|ScheduledContactFinder
      */
-    private $contactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $contactFinder;
 
     protected function setUp(): void
     {
@@ -66,7 +66,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testNoEventsResultInEmptyResults()
+    public function testNoEventsResultInEmptyResults(): void
     {
         $this->repository->expects($this->once())
             ->method('getScheduledCounts')
@@ -85,7 +85,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
-    public function testEventsAreExecuted()
+    public function testEventsAreExecuted(): void
     {
         $this->repository->expects($this->once())
             ->method('getScheduledCounts')
@@ -149,7 +149,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(4, $counter->getTotalEvaluated());
     }
 
-    public function testEventsAreExecutedInQuietMode()
+    public function testEventsAreExecutedInQuietMode(): void
     {
         $this->repository->expects($this->once())
             ->method('getScheduledCounts')
@@ -213,7 +213,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(4, $counter->getTotalEvaluated());
     }
 
-    public function testSpecificEventsAreExecuted()
+    public function testSpecificEventsAreExecuted(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -271,7 +271,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $counter->getTotalEvaluated());
     }
 
-    public function testEventsAreScheduled()
+    public function testEventsAreScheduled(): void
     {
         $this->repository->expects($this->once())
             ->method('getScheduledCounts')
@@ -335,7 +335,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $counter->getTotalScheduled());
     }
 
-    public function testSpecificEventsAreScheduled()
+    public function testSpecificEventsAreScheduled(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();
@@ -407,7 +407,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $counter->getTotalScheduled());
     }
 
-    public function testSpecificEventsWithUnpublishedCamapign()
+    public function testSpecificEventsWithUnpublishedCamapign(): void
     {
         $campaign = $this->getMockBuilder(Campaign::class)
             ->getMock();

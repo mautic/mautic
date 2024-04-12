@@ -31,7 +31,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'categories',
                 'path'            => '/categories',
-                'controller'      => 'Mautic\CategoryBundle\Controller\Api\CategoryApiController',
+                'controller'      => \Mautic\CategoryBundle\Controller\Api\CategoryApiController::class,
             ],
         ],
     ],

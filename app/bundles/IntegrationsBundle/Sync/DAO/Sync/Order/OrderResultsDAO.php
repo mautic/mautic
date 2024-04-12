@@ -13,22 +13,22 @@ class OrderResultsDAO
     /**
      * @var ObjectMapping[][]
      */
-    private $newObjectMappings = [];
+    private array $newObjectMappings = [];
 
     /**
      * @var ObjectMapping[][]
      */
-    private $updatedObjectMappings = [];
+    private array $updatedObjectMappings = [];
 
     /**
      * @var RemappedObjectDAO[][]
      */
-    private $remappedObjects = [];
+    private array $remappedObjects = [];
 
     /**
      * @var ObjectChangeDAO[][]
      */
-    private $deletedObjects = [];
+    private array $deletedObjects = [];
 
     /**
      * @param ObjectMapping[]     $newObjectMappings

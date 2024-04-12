@@ -168,7 +168,7 @@ class Field
         $this->form = null;
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -215,7 +215,7 @@ class Field
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('form')
             ->addProperties(
@@ -251,7 +251,7 @@ class Field
      * @param string $prop
      * @param mixed  $val
      */
-    private function isChanged($prop, $val)
+    private function isChanged($prop, $val): void
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = [$this->$prop, $val];
@@ -712,7 +712,7 @@ class Field
     /**
      * @param mixed $sessionId
      */
-    public function setSessionId($sessionId)
+    public function setSessionId($sessionId): void
     {
         $this->sessionId = $sessionId;
     }
@@ -732,7 +732,7 @@ class Field
      *
      * @param mixed $leadField
      */
-    public function setLeadField($leadField)
+    public function setLeadField($leadField): void
     {
         $this->leadField = $leadField;
     }
@@ -748,7 +748,7 @@ class Field
     /**
      * @param mixed $saveResult
      */
-    public function setSaveResult($saveResult)
+    public function setSaveResult($saveResult): void
     {
         $this->saveResult = $saveResult;
     }
@@ -764,7 +764,7 @@ class Field
     /**
      * @param mixed $isAutoFill
      */
-    public function setIsAutoFill($isAutoFill)
+    public function setIsAutoFill($isAutoFill): void
     {
         $this->isAutoFill = $isAutoFill;
     }
@@ -780,7 +780,7 @@ class Field
     /**
      * @param bool $showWhenValueExists
      */
-    public function setShowWhenValueExists($showWhenValueExists)
+    public function setShowWhenValueExists($showWhenValueExists): void
     {
         $this->showWhenValueExists = $showWhenValueExists;
     }
@@ -796,7 +796,7 @@ class Field
     /**
      * @param int $showAfterXSubmissions
      */
-    public function setShowAfterXSubmissions($showAfterXSubmissions)
+    public function setShowAfterXSubmissions($showAfterXSubmissions): void
     {
         $this->showAfterXSubmissions = $showAfterXSubmissions;
     }
@@ -805,12 +805,8 @@ class Field
      * Decide if the field should be displayed based on thr progressive profiling conditions.
      *
      * @param array|null $submissions
-     * @param Lead       $lead
-     * @param Form       $form
-     *
-     * @return bool
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null)
+    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null): bool
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {
@@ -856,10 +852,8 @@ class Field
      * Was field displayed.
      *
      * @param mixed[] $data
-     *
-     * @return bool
      */
-    public function showForConditionalField(array $data)
+    public function showForConditionalField(array $data): bool
     {
         if (!$parentField = $this->findParentFieldInForm()) {
             return true;
@@ -893,18 +887,12 @@ class Field
         return false;
     }
 
-    /**
-     * @return bool
-     */
-    public function isCaptchaType()
+    public function isCaptchaType(): bool
     {
         return 'captcha' === $this->type;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFileType()
+    public function isFileType(): bool
     {
         return 'file' === $this->type;
     }
@@ -928,7 +916,7 @@ class Field
     /**
      * @param bool $alwaysDisplay
      */
-    public function setAlwaysDisplay($alwaysDisplay)
+    public function setAlwaysDisplay($alwaysDisplay): void
     {
         $this->alwaysDisplay = $alwaysDisplay;
     }

@@ -9,8 +9,10 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class DsnTransformerFactory
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private EscapeTransformer $escapeTransformer)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private EscapeTransformer $escapeTransformer
+    ) {
     }
 
     public function create(string $configKey, bool $allowEmpty): DsnTransformer

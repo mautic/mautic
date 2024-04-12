@@ -3,6 +3,7 @@
 namespace Mautic\InstallBundle\Configurator\Form;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -11,19 +12,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class UserStepType extends AbstractType
 {
-    private SessionInterface $session;
-
-    public function __construct(SessionInterface $session)
-    {
-        $this->session = $session;
+    public function __construct(
+        private SessionInterface $session
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $storedData = $this->session->get('mautic.installer.user', new \stdClass());
 
@@ -137,6 +136,9 @@ class UserStepType extends AbstractType
                             'minMessage' => 'mautic.install.password.minlength',
                         ]
                     ),
+                    new NotWeak([
+                        'message' => 'mautic.user.user.password.weak',
+                    ]),
                 ],
             ]
         );
@@ -168,9 +170,6 @@ class UserStepType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'install_user_step';

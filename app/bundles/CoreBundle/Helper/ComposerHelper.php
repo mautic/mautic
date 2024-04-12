@@ -16,13 +16,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ComposerHelper
 {
-    private KernelInterface $kernel;
-    private LoggerInterface $logger;
-
-    public function __construct(KernelInterface $kernel, LoggerInterface $logger)
-    {
-        $this->kernel = $kernel;
-        $this->logger = $logger;
+    public function __construct(
+        private KernelInterface $kernel,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
