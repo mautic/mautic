@@ -54,7 +54,7 @@ class Notification
      */
     protected $deduplicate;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -116,7 +116,7 @@ class Notification
         return $this->user;
     }
 
-    public function setUser(User $user)
+    public function setUser(User $user): void
     {
         $this->user = $user;
     }
@@ -132,7 +132,7 @@ class Notification
     /**
      * @param string|null $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -148,7 +148,7 @@ class Notification
     /**
      * @param string|null $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
     }
@@ -164,7 +164,7 @@ class Notification
     /**
      * @param \DateTime|null $dateAdded
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }
@@ -180,7 +180,7 @@ class Notification
     /**
      * @param string|null $iconClass
      */
-    public function setIconClass($iconClass)
+    public function setIconClass($iconClass): void
     {
         $this->iconClass = $iconClass;
     }
@@ -196,7 +196,7 @@ class Notification
     /**
      * @param bool|null $isRead
      */
-    public function setIsRead($isRead)
+    public function setIsRead($isRead): void
     {
         $this->isRead = (bool) $isRead;
     }
@@ -212,7 +212,7 @@ class Notification
     /**
      * @param string|null $header
      */
-    public function setHeader($header)
+    public function setHeader($header): void
     {
         $this->header = $header;
     }

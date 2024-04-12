@@ -31,7 +31,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait EntityFieldsBuildFormTrait
 {
-    private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead')
+    /**
+     * @return array<string, 'html'|'raw'>
+     */
+    private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead'): array
     {
         $cleaningRules = [];
         $fieldValues   = [];
@@ -55,7 +58,7 @@ trait EntityFieldsBuildFormTrait
 
             try {
                 $type = FieldAliasToFqcnMap::getFqcn($type);
-            } catch (FieldNotFoundException $e) {
+            } catch (FieldNotFoundException) {
             }
 
             if ($field['isUniqueIdentifer']) {
@@ -63,10 +66,9 @@ trait EntityFieldsBuildFormTrait
             }
 
             if ($isObject) {
-                $value = (isset($fieldValues[$group][$alias]['value'])) ?
-                    $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
+                $value = $fieldValues[$group][$alias]['value'] ?? $field['defaultValue'];
             } else {
-                $value = (isset($fieldValues[$alias])) ? $fieldValues[$alias] : '';
+                $value = $fieldValues[$alias] ?? '';
             }
 
             $constraints = [];
@@ -77,6 +79,10 @@ trait EntityFieldsBuildFormTrait
             } elseif (!empty($options['ignore_required_constraints'])) {
                 $required            = false;
                 $field['isRequired'] = false;
+            }
+
+            if ($field['charLengthLimit'] > 0) {
+                $constraints[] = new Length(['max' => $field['charLengthLimit']]);
             }
 
             switch ($type) {
@@ -131,7 +137,7 @@ trait EntityFieldsBuildFormTrait
                         if ($value) {
                             try {
                                 $dtHelper = new DateTimeHelper($value, null, 'local');
-                            } catch (\Exception $e) {
+                            } catch (\Exception) {
                                 // Rather return empty value than break the page
                                 $value = null;
                             }
@@ -155,7 +161,7 @@ trait EntityFieldsBuildFormTrait
 
                         $builder->addEventListener(
                             FormEvents::PRE_SUBMIT,
-                            function (FormEvent $event) use ($alias, $type) {
+                            function (FormEvent $event) use ($alias, $type): void {
                                 $data = $event->getData();
 
                                 if (!empty($data[$alias])) {
@@ -268,6 +274,9 @@ trait EntityFieldsBuildFormTrait
                             if (!empty($properties['allowHtml'])) {
                                 $cleaningRules[$field['alias']] = 'html';
                             }
+                            break;
+                        case HtmlType::class:
+                            $cleaningRules[$field['alias']] = 'html';
                             break;
                     }
 

@@ -20,22 +20,17 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Form>
+ */
 class FormType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    public function __construct(CorePermissions $security)
-    {
-        $this->security = $security;
+    public function __construct(
+        private CorePermissions $security
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
@@ -117,7 +112,7 @@ class FormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
-                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+                'data'  => $options['data']->getNoIndex() ?: false,
             ]
         );
 
@@ -132,7 +127,7 @@ class FormType extends AbstractType
                     'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
                     'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
                 ],
-                'data'  => $options['data']->getProgressiveProfilingLimit() ? $options['data']->getProgressiveProfilingLimit() : '',
+                'data'  => $options['data']->getProgressiveProfilingLimit() ?: '',
             ]
         );
 
@@ -143,7 +138,7 @@ class FormType extends AbstractType
 
         $builder->add('renderStyle', YesNoButtonGroupType::class, [
             'label'      => 'mautic.form.form.renderstyle',
-            'data'       => (null === $options['data']->getRenderStyle()) ? true : $options['data']->getRenderStyle(),
+            'data'       => $options['data']->getRenderStyle() ?? true,
             'attr'       => [
                 'tooltip' => 'mautic.form.form.renderstyle.tooltip',
             ],
@@ -154,9 +149,9 @@ class FormType extends AbstractType
 
         $builder->add('postAction', ChoiceType::class, [
             'choices' => [
-                'mautic.form.form.postaction.return'   => 'return',
-                'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.message'  => 'message',
+                'mautic.form.form.postaction.redirect' => 'redirect',
+                'mautic.form.form.postaction.return'   => 'return',
             ],
             'label'             => 'mautic.form.form.postaction',
             'label_attr'        => ['class' => 'control-label'],
@@ -173,7 +168,10 @@ class FormType extends AbstractType
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
+            'attr'       => [
+                'class'         => 'form-control',
+                 'data-hide-on' => '{"mauticform_postAction":"return"}',
+            ],
             'required'   => $required,
         ]);
 
@@ -189,10 +187,7 @@ class FormType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'        => Form::class,
@@ -203,9 +198,6 @@ class FormType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'mauticform';

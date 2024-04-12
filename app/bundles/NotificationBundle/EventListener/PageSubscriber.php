@@ -10,33 +10,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    public function __construct(AssetsHelper $assetsHelper, IntegrationHelper $integrationHelper)
-    {
-        $this->assetsHelper      = $assetsHelper;
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        private AssetsHelper $assetsHelper,
+        private IntegrationHelper $integrationHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
         ];
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings          = $integrationObject->getIntegrationSettings();

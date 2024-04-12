@@ -53,8 +53,8 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Login newly created non-admin user
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
@@ -76,14 +76,14 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Login newly created admin user
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
+        Assert::assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', $clientResponse->getContent());
     }
 
     public function testRoleUpdateByApiThroughNonAdminUserGivesSuccessResponse(): void
@@ -97,14 +97,44 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $this->loginUser($user->getUsername());
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->loginUser($user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'mautic');
 
         $this->client->request(Request::METHOD_PATCH, "/api/users/{$user->getId()}/edit", ['role' => $role->getId()]);
         $clientResponse = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('"username":"'.$user->getUsername().'"', $clientResponse->getContent());
+        Assert::assertStringContainsString('"username":"'.$user->getUserIdentifier().'"', $clientResponse->getContent());
+    }
+
+    /**
+     * @dataProvider passwordProvider
+     */
+    public function testUserPasswordPolicy(int $responseCode, string $password): void
+    {
+        $userPayload = [
+            'username'      => 'lorem_ipsum',
+            'firstName'     => 'lorem',
+            'lastName'      => 'ipsum',
+            'email'         => 'loremipsum@example.com',
+            'plainPassword' => ['password' => $password, 'confirm' => $password],
+            'role'          => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/users/new', $userPayload);
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame($responseCode, $clientResponse->getStatusCode());
+    }
+
+    /**
+     * @return iterable<array<int, mixed>>
+     */
+    public function passwordProvider(): iterable
+    {
+        yield [Response::HTTP_BAD_REQUEST, 'aaa'];
+        yield [Response::HTTP_BAD_REQUEST, 'qwerty'];
+        yield [Response::HTTP_BAD_REQUEST, 'qwerty123'];
+        yield [Response::HTTP_CREATED, 'Qwertee@123'];
     }
 
     private function createRole(bool $isAdmin = false): Role
@@ -135,7 +165,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', null));
         $user->setRole($role);
         $this->em->persist($user);

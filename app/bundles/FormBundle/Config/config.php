@@ -53,7 +53,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'forms',
                 'path'            => '/forms',
-                'controller'      => 'Mautic\FormBundle\Controller\Api\FormApiController',
+                'controller'      => \Mautic\FormBundle\Controller\Api\FormApiController::class,
             ],
             'mautic_api_formresults' => [
                 'path'       => '/forms/{formId}/submissions',
@@ -166,18 +166,6 @@ return [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
                 ],
-            ],
-        ],
-        'repositories' => [
-            'mautic.form.repository.form' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\FormBundle\Entity\Form::class,
-            ],
-            'mautic.form.repository.submission' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\FormBundle\Entity\Submission::class,
             ],
         ],
         'other' => [

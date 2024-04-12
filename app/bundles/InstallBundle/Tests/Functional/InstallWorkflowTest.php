@@ -33,7 +33,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->localConfigPath    = self::$container->get('kernel')->getLocalConfigFile();
+        $this->localConfigPath    = static::getContainer()->get('kernel')->getLocalConfigFile();
         $this->defaultMemoryLimit = ini_get('memory_limit');
 
         if (file_exists($this->localConfigPath)) {
@@ -87,15 +87,17 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form         = $submitButton->form();
 
         $form['install_user_step[username]']->setValue('admin');
-        $form['install_user_step[password]']->setValue('mautic');
+        $form['install_user_step[password]']->setValue('maut!cR000cks');
         $form['install_user_step[firstname]']->setValue('admin');
         $form['install_user_step[lastname]']->setValue('mautic');
         $form['install_user_step[email]']->setValue('mautic@example.com');
 
         $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $heading = $crawler->filter('.panel-body.text-center h5');
+        Assert::assertCount(1, $heading, $this->client->getResponse()->getContent());
 
-        $successText = $crawler->filter('.panel-body.text-center h5')->text();
+        $successText = $heading->text();
         Assert::assertStringContainsString('Mautic is installed', $successText);
 
         // Assert that the fixtures were loaded
@@ -109,7 +111,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
     public function testInstallRequirementsAndRecommendations(): void
     {
         $limit                 = FileHelper::convertPHPSizeToBytes(CheckStep::RECOMMENDED_MEMORY_LIMIT);
-        $expectedMemoryMessage = self::$container->get('translator')->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
+        $expectedMemoryMessage = static::getContainer()->get('translator')->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
 
         // set the memory limit lower than the recommended value.
         ini_set('memory_limit', (string) ($limit - 1));

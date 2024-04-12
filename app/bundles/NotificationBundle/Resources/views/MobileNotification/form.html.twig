@@ -32,10 +32,10 @@
                   <ul class="bg-auto nav nav-tabs pr-md pl-md">
                       <li class="active"><a href="#notification-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
                       <li><a href="#data-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.data'|trans }}</a></li>
-                      {% if 'ios' in integrationSettings.platforms %}
+                      {% if integrationSettings.platforms is defined and 'ios' in integrationSettings.platforms %}
                           <li><a href="#ios-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.ios'|trans }}</a></li>
                       {% endif %}
-                      {% if 'android' in integrationSettings.platforms %}
+                      {% if integrationSettings.platforms is defined and 'android' in integrationSettings.platforms %}
                           <li><a href="#android-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.android'|trans }}</a></li>
                       {% endif %}
                   </ul>
@@ -58,7 +58,9 @@
                               <div class="col-md-6">{{ form_row(form.mobileSettings.additional_data) }}</div>
                           </div>
                       </div>
-                      {{ form_widget(form.mobileSettings, {'integrationSettings': integrationSettings}) }}
+                      {% if form.mobileSettings.ios_sound is defined or form.mobileSettings.android_sound is defined  %}
+                        {{ form_widget(form.mobileSettings, {'integrationSettings': integrationSettings}) }}
+                      {% endif %}
                   </div>
                   <!--/ tabs content -->
 

@@ -12,17 +12,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FullContactIntegration extends AbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'FullContact';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
@@ -30,10 +28,11 @@ class FullContactIntegration extends AbstractIntegration
     /**
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
+
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         // Do not rename field. fullcontact.js depends on it
         return [
@@ -46,7 +45,7 @@ class FullContactIntegration extends AbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -82,7 +81,7 @@ class FullContactIntegration extends AbstractIntegration
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.fullcontact.auto_update',
-                    'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+                    'data'  => isset($data['auto_update']) && (bool) $data['auto_update'],
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.fullcontact.auto_update.tooltip',
                     ],
@@ -91,16 +90,14 @@ class FullContactIntegration extends AbstractIntegration
         }
     }
 
-    public function shouldAutoUpdate()
+    public function shouldAutoUpdate(): bool
     {
         $featureSettings = $this->getKeys();
 
-        return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+        return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string|array
      */
     public function getFormNotes($section)

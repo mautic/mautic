@@ -7,20 +7,12 @@ namespace Mautic\CoreBundle\Entity;
  */
 class NotificationRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'n';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function getDefaultOrder()
+    public function getDefaultOrder(): array
     {
         return [
             ['n.dateAdded', 'DESC'],
@@ -30,7 +22,7 @@ class NotificationRepository extends CommonRepository
     /**
      * Mark user notifications as read.
      */
-    public function markAllReadForUser($userId)
+    public function markAllReadForUser($userId): void
     {
         $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], ['user_id' => (int) $userId]);
     }
@@ -38,12 +30,9 @@ class NotificationRepository extends CommonRepository
     /**
      * Clear notifications for a user.
      *
-     * @param null $id    Clears all if empty
-     * @param null $limit Clears a set number
-     *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
-    public function clearNotificationsForUser($userId, $id = null, $limit = null)
+    public function clearNotificationsForUser($userId, $id = null, $limit = null): void
     {
         if (!empty($id)) {
             $this->getEntityManager()->getConnection()->update(
@@ -95,10 +84,8 @@ class NotificationRepository extends CommonRepository
     /**
      * Fetch notifications for this user.
      *
-     * @param null $afterId
+
      * @param bool $includeRead
-     * @param null $type
-     * @param null $limit
      *
      * @return array
      */
