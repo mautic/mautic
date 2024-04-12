@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
+use Mautic\LeadBundle\Validator\Constraints\SegmentUsedInCampaigns;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -89,7 +90,8 @@ class LeadList extends FormEntity
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist');
+            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist')
+            ->addIndex(['alias'], 'lead_list_alias');
 
         $builder->addIdColumns();
 
@@ -139,6 +141,7 @@ class LeadList extends FormEntity
             'message' => 'mautic.lead.list.alias.unique',
         ]));
 
+        $metadata->addConstraint(new SegmentUsedInCampaigns());
         $metadata->addConstraint(new SegmentInUse());
     }
 
@@ -389,8 +392,17 @@ class LeadList extends FormEntity
     {
         return array_map(
             function (array $filter): array {
-                $filter['filter']  = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
-                $filter['display'] = $filter['properties']['display'] ?? $filter['display'] ?? null;
+                if (isset($filter['properties']) && $filter['properties'] && array_key_exists('filter', $filter['properties'])) {
+                    $filter['filter'] = $filter['properties']['filter'];
+                } else {
+                    $filter['filter'] = $filter['filter'] ?? null;
+                }
+
+                if (isset($filter['properties']) && $filter['properties'] && array_key_exists('display', $filter['properties'])) {
+                    $filter['display'] = $filter['properties']['display'];
+                } else {
+                    $filter['display'] = $filter['display'] ?? null;
+                }
 
                 return $filter;
             },

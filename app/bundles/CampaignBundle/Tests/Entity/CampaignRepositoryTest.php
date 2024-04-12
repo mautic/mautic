@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
@@ -30,8 +30,7 @@ class CampaignRepositoryTest extends TestCase
 
         $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['select', 'from', 'where', 'setParameter', 'andWhere'])
-            ->addMethods(['getQuery'])
+            ->onlyMethods(['select', 'from', 'where', 'setParameter', 'andWhere', 'getQuery', 'getRootAliases'])
             ->getMock();
 
         $this->repository = $this->configureRepository(Campaign::class);
@@ -73,6 +72,9 @@ class CampaignRepositoryTest extends TestCase
             ->method('setParameter')
             ->with('id', $id)
             ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->method('getRootAliases')
+            ->willReturn(['e']);
 
         $this->queryBuilder->expects(self::once())
             ->method('andWhere')

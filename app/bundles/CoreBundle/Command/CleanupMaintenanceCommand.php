@@ -5,7 +5,9 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,18 +21,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CleanupMaintenanceCommand extends ModeratedCommand
 {
+    public const NAME                    = 'mautic:maintenance:cleanup';
+
     public function __construct(
         private TranslatorInterface $translator,
         private EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper
+        private CoreParametersHelper $coreParametersHelper,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('mautic:maintenance:cleanup')
+        $this->setName(self::NAME)
             ->setDefinition(
                 [
                     new InputOption(
@@ -82,9 +88,8 @@ EOT
         if (!$this->checkRunStatus($input, $output)) {
             return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
-
         $daysOld       = $input->getOption('days-old');
-        $dryRun        = $input->getOption('dry-run');
+        $dryRun        = (bool) $input->getOption('dry-run');
         $noInteraction = $input->getOption('no-interaction');
         $gdpr          = $input->getOption('gdpr');
 
@@ -94,7 +99,7 @@ EOT
         }
 
         if (!empty($gdpr)) {
-            // Override threshold to delete records of inactive users
+            // Override threshold to delete records of inactive users, default 3 years
             $daysOld = $this->coreParametersHelper->get('mautic.gdpr_user_purge_threshold', 1095);
         }
 
@@ -136,10 +141,37 @@ EOT
                 $output->writeln($query);
             }
         }
+        // store to audit log
+        $this->storeToAuditLog($stats, $dryRun, $input->getOptions());
 
         $this->completeRun();
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
+    }
+
+    /**
+     * @param array<int|string>                                   $stats
+     * @param array<string|bool|int|float|array<int|string>|null> $options
+     */
+    protected function storeToAuditLog(array $stats, bool $dryRun, array $options): void
+    {
+        $notEmptyStats = array_filter($stats);
+        if (!$dryRun && count($notEmptyStats)) {
+            $log = [
+                'userName'  => 'system',
+                'userId'    => 0,
+                'bundle'    => 'core',
+                'object'    => 'maintenance',
+                'objectId'  => 0,
+                'action'    => 'cleanup',
+                'details'   => [
+                    'options' => array_filter($options),
+                    'stats'   => $notEmptyStats,
+                ],
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ];
+            $this->auditLogModel->writeToLog($log);
+        }
     }
 
     protected static $defaultDescription = 'Updates the Mautic application';

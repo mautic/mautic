@@ -86,7 +86,7 @@ class SortableListType extends AbstractType
                 'option_notblank'     => true,
                 'constraint_callback' => false,
                 'remove_icon'         => 'fa fa-times',
-                'sortable'            => 'fa fa-ellipsis-v handle',
+                'sortable'            => 'ri-draggable handle',
                 'with_labels'         => false,
                 'entry_type'          => TextType::class,
                 'add_value_button'    => 'mautic.core.form.list.additem',

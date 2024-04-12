@@ -34,4 +34,17 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.campaign.repository.event', \Mautic\CampaignBundle\Entity\EventRepository::class);
     $services->alias('mautic.campaign.repository.lead_event_log', \Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
     $services->alias('mautic.campaign.repository.summary', \Mautic\CampaignBundle\Entity\SummaryRepository::class);
+    $services->alias('mautic.campaign.executioner.inactive', \Mautic\CampaignBundle\Executioner\InactiveExecutioner::class);
+    $services->alias('mautic.campaign.executioner.scheduled', \Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class);
+    $services->set(\Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
+
+    if ('test' === $_ENV['APP_ENV']) {
+        $services->set(\Mautic\CampaignBundle\Executioner\TestInactiveExecutioner::class)
+            ->decorate(\Mautic\CampaignBundle\Executioner\InactiveExecutioner::class)
+            ->tag('kernel.reset', ['method' => 'reset']);
+
+        $services->set(\Mautic\CampaignBundle\Executioner\TestScheduledExecutioner::class)
+            ->decorate(\Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)
+            ->tag('kernel.reset', ['method' => 'reset']);
+    }
 };

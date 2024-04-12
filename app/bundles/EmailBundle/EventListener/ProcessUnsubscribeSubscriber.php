@@ -61,7 +61,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
             if ($existing) {
                 if (!str_contains($existing, $unsubscribeEmail)) {
-                    $updatedHeader = $unsubscribeEmail.', '.$existing;
+                    $updatedHeader = $existing.', '.$unsubscribeEmail;
                 } else {
                     $updatedHeader = $existing;
                 }

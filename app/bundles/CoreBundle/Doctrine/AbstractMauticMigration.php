@@ -42,7 +42,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform()->getName();
+        $platform = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
 
         // Abort the migration if the platform is unsupported
         $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
@@ -69,7 +69,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     {
         $this->container     = $container;
         $this->prefix        = $container->getParameter('mautic.db_table_prefix');
-        $this->platform      = $this->connection->getDatabasePlatform()->getName();
+        $this->platform      = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
     }
 
     /**
@@ -83,7 +83,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         static $tables = [];
 
         if (empty($schemaManager)) {
-            $schemaManager = $this->connection->getSchemaManager();
+            $schemaManager = $this->connection->createSchemaManager();
         }
 
         // Prepend prefix
