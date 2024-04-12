@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
+    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): JsonResponse
     {
         $dataArray = [
             'success' => 0,

@@ -19,7 +19,7 @@ class StageCountCache
 
     public function getStageContactCount(int $stageId): int
     {
-        return (int) $this->cacheProvider->getCacheAdapter()->get($this->generateCacheKey($stageId), function (ItemInterface $item) use ($stageId) {
+        return (int) $this->cacheProvider->getCacheAdapter()->get($this->generateCacheKey($stageId), function (ItemInterface $item) use ($stageId): int {
             $item->expiresAfter(self::EXPIRATION);
 
             return $this->stageModel->getRepository()->getContactCount($stageId);
