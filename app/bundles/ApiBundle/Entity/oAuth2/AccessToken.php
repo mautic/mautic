@@ -24,7 +24,7 @@ class AccessToken extends BaseAccessToken
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('user', \Mautic\UserBundle\Entity\User::class)
             ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
             ->build();
 

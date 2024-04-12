@@ -11,13 +11,12 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
-    public function __construct(private BundleHelper $bundleHelper, private PathsHelper $pathsHelper)
-    {
+    public function __construct(
+        private BundleHelper $bundleHelper,
+        private PathsHelper $pathsHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load($resource, $locale, $domain = 'messages')
     {
         $bundles   = $this->bundleHelper->getMauticBundles(true);
@@ -77,7 +76,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      *
      * @throws \Exception
      */
-    private function loadTranslations($catalogue, $locale, $file)
+    private function loadTranslations($catalogue, $locale, $file): void
     {
         $iniFile  = $file->getRealpath();
         $content  = file_get_contents($iniFile);

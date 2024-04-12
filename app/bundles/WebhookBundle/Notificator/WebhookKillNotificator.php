@@ -14,8 +14,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WebhookKillNotificator
 {
-    public function __construct(private TranslatorInterface $translator, private Router $router, private NotificationModel $notificationModel, private EntityManager $entityManager, private MailHelper $mailer, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private Router $router,
+        private NotificationModel $notificationModel,
+        private EntityManager $entityManager,
+        private MailHelper $mailer,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
@@ -40,12 +46,12 @@ class WebhookKillNotificator
         );
 
         /** @var User $owner */
-        $owner = $toUser = $this->entityManager->getReference(\Mautic\UserBundle\Entity\User::class, $webhook->getCreatedBy());
+        $owner = $toUser = $this->entityManager->getReference(User::class, $webhook->getCreatedBy());
 
         $ccToUser = null;
 
         if (null !== $webhook->getModifiedBy() && $webhook->getCreatedBy() !== $webhook->getModifiedBy()) {
-            $modifiedBy = $this->entityManager->getReference(\Mautic\UserBundle\Entity\User::class, $webhook->getModifiedBy());
+            $modifiedBy = $this->entityManager->getReference(User::class, $webhook->getModifiedBy());
 
             $toUser   = $modifiedBy; // Send notification to modifier
             $ccToUser = $owner; // And cc e-mail to owner
@@ -69,7 +75,7 @@ class WebhookKillNotificator
         if ($sendToAuthor) {
             $mailer->setTo($toUser->getEmail());
             if ($ccToUser) {
-                $mailer->setCc($ccToUser->getEmail());
+                $mailer->setCc([$ccToUser->getEmail() => null]);
             }
         } else {
             $emailAddresses = array_map('trim', explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));

@@ -8,13 +8,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PointBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -43,7 +41,7 @@ class PointBuilderEvent extends Event
      *
      * @throws InvalidArgumentException
      */
-    public function addAction($key, array $action)
+    public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
@@ -68,10 +66,8 @@ class PointBuilderEvent extends Event
      */
     public function getActions()
     {
-        uasort($this->actions, function ($a, $b): int {
-            return strnatcasecmp(
-                $a['label'], $b['label']);
-        });
+        uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
+            $a['label'], $b['label']));
 
         return $this->actions;
     }
@@ -106,7 +102,7 @@ class PointBuilderEvent extends Event
     /**
      * @throws InvalidArgumentException
      */
-    private function verifyComponent(array $keys, array $methods, array $component)
+    private function verifyComponent(array $keys, array $methods, array $component): void
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {

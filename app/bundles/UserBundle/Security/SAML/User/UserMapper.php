@@ -12,8 +12,9 @@ class UserMapper implements UsernameMapperInterface
     /**
      * @param array<string, mixed> $attributes
      */
-    public function __construct(private array $attributes)
-    {
+    public function __construct(
+        private array $attributes
+    ) {
     }
 
     public function getUser(Response $response): User
@@ -31,12 +32,9 @@ class UserMapper implements UsernameMapperInterface
     {
         $user = $this->getUser($response);
 
-        return $user->getUsername();
+        return $user->getUserIdentifier();
     }
 
-    /**
-     * @return string|null
-     */
     private function setValuesFromAssertion(Assertion $assertion, User $user): void
     {
         $attributes = $this->extractAttributes($assertion);

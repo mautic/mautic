@@ -35,7 +35,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
                     $builder->add('list_settings', $formType, [
                         'label'     => false,
                         'form_area' => $formArea,
-                        'data'      => (isset($data['list_settings'])) ? $data['list_settings'] : [],
+                        'data'      => $data['list_settings'] ?? [],
                     ]);
                 }
             }

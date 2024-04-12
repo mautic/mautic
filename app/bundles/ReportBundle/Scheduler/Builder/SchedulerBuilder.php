@@ -12,8 +12,9 @@ use Recurr\Transformer\ArrayTransformer;
 
 class SchedulerBuilder
 {
-    public function __construct(private SchedulerTemplateFactory $schedulerTemplateFactory)
-    {
+    public function __construct(
+        private SchedulerTemplateFactory $schedulerTemplateFactory
+    ) {
     }
 
     /**
@@ -30,7 +31,7 @@ class SchedulerBuilder
     /**
      * @param int $count
      *
-     * @return \Recurr\Recurrence[]|\Recurr\RecurrenceCollection
+     * @return \Recurr\RecurrenceCollection
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException
@@ -56,7 +57,7 @@ class SchedulerBuilder
             $transformer    = new ArrayTransformer();
 
             return $transformer->transform($finalScheduler);
-        } catch (InvalidWeekday $e) {
+        } catch (InvalidWeekday) {
             throw new InvalidSchedulerException();
         }
     }

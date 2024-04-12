@@ -16,8 +16,12 @@ class MenuBuilder
      */
     private $dispatcher;
 
-    public function __construct(private FactoryInterface $factory, private MatcherInterface $matcher, EventDispatcherInterface $dispatcher, private MenuHelper $menuHelper)
-    {
+    public function __construct(
+        private FactoryInterface $factory,
+        private MatcherInterface $matcher,
+        EventDispatcherInterface $dispatcher,
+        private MenuHelper $menuHelper
+    ) {
         $this->dispatcher = $dispatcher;
     }
 
@@ -60,7 +64,7 @@ class MenuBuilder
                     return $current_child;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // do nothing
         }
 

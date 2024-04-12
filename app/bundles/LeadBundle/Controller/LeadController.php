@@ -4,11 +4,14 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
@@ -16,9 +19,12 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
+use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Form\Type\DncType;
 use Mautic\LeadBundle\Form\Type\EmailType;
 use Mautic\LeadBundle\Form\Type\MergeType;
@@ -35,6 +41,7 @@ use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -229,10 +236,7 @@ class LeadController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|Response
-     */
-    public function quickAddAction(Request $request)
+    public function quickAddAction(Request $request): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -262,6 +266,7 @@ class LeadController extends FormController
                     ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
+                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
 
@@ -295,28 +300,12 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, $objectId)
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
-        $model->getRepository()->refetchEntity($lead);
-
-        // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
-                'lead:leads:create',
-                'lead:leads:editown',
-                'lead:leads:editother',
-                'lead:leads:deleteown',
-                'lead:leads:deleteother',
-            ],
-            'RETURN_ARRAY'
-        );
 
         if (null === $lead) {
             // get the page we came from
@@ -344,6 +333,23 @@ class LeadController extends FormController
                 ]
             );
         }
+
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $model->getRepository()->refetchEntity($lead);
+
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+              'lead:leads:viewown',
+              'lead:leads:viewother',
+              'lead:leads:create',
+              'lead:leads:editown',
+              'lead:leads:editother',
+              'lead:leads:deleteown',
+              'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
 
         if (!$this->security->hasEntityAccess(
             'lead:leads:viewown',
@@ -412,6 +418,7 @@ class LeadController extends FormController
                     'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => end($dnc),
                     'doNotContactSms'   => end($dncSms),
+                    'pointGroups'       => $pointGroupModel->getEntities(),
                     // 'leadNotes'         => $this->forward(
                     //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
                     //    [
@@ -420,8 +427,9 @@ class LeadController extends FormController
                     //    ]
                     // )->getContent(),
                 ],
-                'contentTemplate' => '@MauticLead/Lead/lead.html.twig',
-                'passthroughVars' => [
+                'allowMultipleCompanies' => $coreParametersHelper->get('contact_allow_multiple_companies'),
+                'contentTemplate'        => '@MauticLead/Lead/lead.html.twig',
+                'passthroughVars'        => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
                     'route'         => $this->generateUrl(
@@ -478,6 +486,10 @@ class LeadController extends FormController
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
+
+                        if (!is_array($companies)) {
+                            $companies = [$companies];
+                        }
                     }
 
                     $model->setFieldValues($lead, $data, true);
@@ -685,6 +697,10 @@ class LeadController extends FormController
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
+
+                        if (!is_array($companies)) {
+                            $companies = [$companies];
+                        }
                     }
                     $model->setFieldValues($lead, $data, true);
 
@@ -939,7 +955,7 @@ class LeadController extends FormController
                     // Both leads are good so now we merge them
                     try {
                         $mainLead = $contactMerger->merge($mainLead, $secLead);
-                    } catch (SameContactException $exception) {
+                    } catch (SameContactException) {
                     }
                 }
             }
@@ -1211,10 +1227,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a list.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($objectId)
+    public function listAction($objectId): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -1251,10 +1265,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a company.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function companyAction($objectId)
+    public function companyAction($objectId): Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -1294,10 +1306,8 @@ class LeadController extends FormController
 
     /**
      * Add/remove lead from a campaign.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function campaignAction($objectId)
+    public function campaignAction($objectId): Response
     {
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
@@ -1403,17 +1413,15 @@ class LeadController extends FormController
                     if (!empty($bodyCheck)) {
                         $mailer = $mailHelper->getMailer();
 
-                        // To lead
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            $addresses = explode(',', $email[EmailType::REPLY_TO_ADDRESS]);
-
-                            $mailer->setReplyTo($addresses);
+                            // The reply to address must be set into an email entity in order to take an effect. Otherwise it's overridden.
+                            $emailEntity = new Email();
+                            $emailEntity->setSubject($email['subject']);
+                            $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
+                            $mailer->setEmail($emailEntity);
                         }
-
-                        // From user
-                        $user = $userHelper->getUser();
 
                         $mailer->setFrom(
                             $email['from'],
@@ -1423,15 +1431,12 @@ class LeadController extends FormController
                         // Set Content
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
-
-                        // Set lead
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-
                         $mailer->setSubject($email['subject']);
 
                         // Ensure safe emoji for notification
-                        $subject = EmojiHelper::toHtml($email['subject']);
+                        $subject = $email['subject'];
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
                             $this->addFlashMessage(
@@ -2009,9 +2014,7 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $iterator = new IteratorExportDataModel($model, $args, function ($contact) use ($exportHelper) {
-            return $exportHelper->parseLeadToExport($contact);
-        });
+        $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
 
         return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
     }
@@ -2069,7 +2072,7 @@ class LeadController extends FormController
 
         try {
             return $model->getExportFileToDownload($fileName);
-        } catch (FileNotFoundException $exception) {
+        } catch (FileNotFoundException) {
             return $this->notFound();
         }
     }
@@ -2124,6 +2127,114 @@ class LeadController extends FormController
                     'emailStats' => $model->getLeadEmailStats($lead),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/lead_stats.html.twig',
+            ]
+        );
+    }
+
+    public function contactGroupPointsAction(
+        Request $request,
+        LeadModel $model,
+        PointGroupModel $pointGroupModel,
+        IpLookupHelper $ipLookupHelper,
+        int $objectId): Response
+    {
+        $lead  = $model->getEntity($objectId);
+        if (null === $lead
+            || !$this->security->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getPermissionUser()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $pointGroups = $pointGroupModel->getEntities();
+        $fields      = [];
+        foreach ($pointGroups as $group) {
+            $fields[] = ContactGroupPointsType::getFieldKey($group->getId());
+        }
+
+        $initData = [];
+        foreach ($lead->getGroupScores() as $score) {
+            $initData[ContactGroupPointsType::getFieldKey($score->getGroup()->getId())] = $score->getScore();
+        }
+
+        $form = $this->formFactory->create(ContactGroupPointsType::class, $initData, [
+            'action' => $this->generateUrl('mautic_contact_action', [
+                'objectAction' => 'contactGroupPoints',
+                'objectId'     => $objectId,
+            ]),
+            'point_groups' => $pointGroups,
+        ]);
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            if (!$this->isFormCancelled($form)) {
+                if ($this->isFormValid($form)) {
+                    $leadUpdated = false;
+                    $postData    = $form->getData();
+                    foreach ($pointGroups as $group) {
+                        $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
+                        $oldScore = $initData[$scoreKey] ?? null;
+                        $newScore = $postData[$scoreKey];
+                        if (!is_null($oldScore) && is_null($newScore)) {
+                            // set 0 when the new score is not present, but the record exists
+                            $newScore = 0;
+                        }
+
+                        if (!is_null($newScore) && $newScore !== $oldScore) {
+                            $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
+                            $delta = $newScore - ($oldScore ?? 0);
+
+                            // add a lead point change log
+                            $log = new PointsChangeLog();
+                            $log->setDelta($delta);
+                            $log->setLead($lead);
+                            $log->setType('manual');
+                            $log->setEventName($this->translator->trans('mautic.point.event.manual_change'));
+                            $log->setActionName('');
+                            $log->setIpAddress($ipLookupHelper->getIpAddress());
+                            $log->setDateAdded(new \DateTime());
+                            $log->setGroup($group);
+                            $lead->addPointsChangeLog($log);
+                            $leadUpdated = true;
+                        }
+                    }
+
+                    if ($leadUpdated) {
+                        $model->saveEntity($lead);
+                    }
+
+                    return $this->postActionRedirect(
+                        [
+                            'returnUrl' => $this->generateUrl('mautic_contact_action', [
+                                'objectId'     => $lead->getId(),
+                                'objectAction' => 'view',
+                            ]),
+                            'viewParameters'  => [
+                                'objectId'     => $lead->getId(),
+                                'objectAction' => 'view',
+                            ],
+                            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::viewAction',
+                            'passthroughVars' => [
+                                'closeModal' => 1,
+                            ],
+                        ]
+                    );
+                }
+            }
+        }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => array_merge(
+                    [
+                        'fields' => $fields,
+                        'form'   => $form->createView(),
+                        'lead'   => $lead,
+                    ],
+                ),
+                'contentTemplate' => '@MauticLead/Lead/group_points.html.twig',
             ]
         );
     }

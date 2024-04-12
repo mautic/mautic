@@ -17,32 +17,17 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class MailchimpType extends AbstractType
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /** @var PluginModel */
-    private $pluginModel;
-
-    /**
-     * @var SessionInterface
-     */
-    protected $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, SessionInterface $session, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->integrationHelper    = $integrationHelper;
-        $this->pluginModel          = $pluginModel;
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private IntegrationHelper $integrationHelper,
+        private PluginModel $pluginModel,
+        protected SessionInterface $session,
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -129,7 +114,7 @@ class MailchimpType extends AbstractType
                     $page   = 1;
                 }
 
-                list($specialInstructions) = $mailchimp->getFormNotes('leadfield_match');
+                [$specialInstructions] = $mailchimp->getFormNotes('leadfield_match');
                 $form->add('leadFields', FieldsType::class, [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
@@ -172,9 +157,6 @@ class MailchimpType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['form_area']);

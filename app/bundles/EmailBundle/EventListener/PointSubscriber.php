@@ -18,11 +18,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PointModel $pointModel, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private PointModel $pointModel,
+        private EntityManager $entityManager
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
@@ -37,7 +39,7 @@ class PointSubscriber implements EventSubscriberInterface
         $action = [
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.open',
-            'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
+            'callback' => [\Mautic\EmailBundle\Helper\PointEventHelper::class, 'validateEmail'],
             'formType' => EmailOpenType::class,
         ];
 
@@ -46,7 +48,7 @@ class PointSubscriber implements EventSubscriberInterface
         $action = [
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.send',
-            'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
+            'callback' => [\Mautic\EmailBundle\Helper\PointEventHelper::class, 'validateEmail'],
             'formType' => EmailOpenType::class,
         ];
 
@@ -58,7 +60,7 @@ class PointSubscriber implements EventSubscriberInterface
         $sendEvent = [
             'group'           => 'mautic.email.point.trigger',
             'label'           => 'mautic.email.point.trigger.sendemail',
-            'callback'        => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'],
+            'callback'        => [\Mautic\EmailBundle\Helper\PointEventHelper::class, 'sendEmail'],
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
             'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',

@@ -118,9 +118,6 @@ class CalculatorHelper
         return (new \DateTime(self::getWeekDateString($date)))->format($labelFormat);
     }
 
-    /**
-     * @param string $day
-     */
     public static function getWeekDateString($date): string
     {
         if (!preg_match('/^([0-9]{4})-([0-9]{2})$/', $date, $matches)) {

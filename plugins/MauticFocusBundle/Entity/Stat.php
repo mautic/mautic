@@ -10,7 +10,9 @@ class Stat
 {
     // Used for querying stats
     public const TYPE_FORM         = 'submission';
+
     public const TYPE_CLICK        = 'click';
+
     public const TYPE_NOTIFICATION = 'view';
 
     /**
@@ -48,7 +50,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('focus_stats')
-            ->setCustomRepositoryClass('MauticPlugin\MauticFocusBundle\Entity\StatRepository')
+            ->setCustomRepositoryClass(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)
             ->addIndex(['type'], 'focus_type')
             ->addIndex(['type', 'type_id'], 'focus_type_id')
             ->addIndex(['date_added'], 'focus_date_added');

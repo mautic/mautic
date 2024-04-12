@@ -30,7 +30,7 @@ class Remover
      *
      * @throws ContactAlreadyRemovedFromCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isExit)
+    public function updateExistingMembership(CampaignMember $campaignMember, $isExit): void
     {
         if ($isExit) {
             // Contact was removed by the change campaign action or a segment

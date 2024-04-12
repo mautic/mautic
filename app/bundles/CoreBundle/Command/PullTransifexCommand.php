@@ -64,7 +64,7 @@ EOT
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
-        } catch (InvalidConfigurationException $e) {
+        } catch (InvalidConfigurationException) {
             $output->writeln($this->translator->trans('mautic.core.command.transifex_no_credentials'));
 
             return \Symfony\Component\Console\Command\Command::FAILURE;
@@ -145,5 +145,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetches translations for Mautic from Transifex';
 }

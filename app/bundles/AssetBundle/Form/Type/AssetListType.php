@@ -9,15 +9,18 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class AssetListType extends AbstractType
 {
-    public function __construct(private CorePermissions $corePermissions, private AssetModel $assetModel, private UserHelper $userHelper)
-    {
+    public function __construct(
+        private CorePermissions $corePermissions,
+        private AssetModel $assetModel,
+        private UserHelper $userHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -29,9 +32,6 @@ class AssetListType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

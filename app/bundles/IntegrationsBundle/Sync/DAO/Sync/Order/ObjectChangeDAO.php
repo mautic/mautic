@@ -12,17 +12,14 @@ class ObjectChangeDAO
     /**
      * @var FieldDAO[]
      */
-    private $fields = [];
+    private array $fields = [];
 
-    /**
-     * @var ObjectMapping
-     */
-    private $objectMapping;
+    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
 
     /**
      * @var FieldDAO[]
      */
-    private $fieldsByState = [
+    private array $fieldsByState = [
         ReportFieldDAO::FIELD_CHANGED   => [],
         ReportFieldDAO::FIELD_UNCHANGED => [],
         ReportFieldDAO::FIELD_REQUIRED  => [],
@@ -36,8 +33,14 @@ class ObjectChangeDAO
      * @param mixed              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
-    public function __construct(private $integration, private $object, private $objectId, private $mappedObject, private $mappedId, private ?\DateTimeInterface $changeDateTime = null)
-    {
+    public function __construct(
+        private $integration,
+        private $object,
+        private $objectId,
+        private $mappedObject,
+        private $mappedId,
+        private ?\DateTimeInterface $changeDateTime = null
+    ) {
     }
 
     public function getIntegration(): string
@@ -110,11 +113,7 @@ class ObjectChangeDAO
      */
     public function getField($name)
     {
-        if (isset($this->fields[$name])) {
-            return $this->fields[$name];
-        }
-
-        return null;
+        return $this->fields[$name] ?? null;
     }
 
     /**
@@ -168,8 +167,6 @@ class ObjectChangeDAO
     }
 
     /**
-     * @param \DateTimeInterface $changeDateTime
-     *
      * @return ObjectChangeDAO
      */
     public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null)

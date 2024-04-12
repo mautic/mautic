@@ -5,6 +5,7 @@ namespace Mautic\DashboardBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -14,12 +15,11 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
-use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -33,6 +33,7 @@ class DashboardModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         private PathsHelper $pathsHelper,
+        private WidgetDetailEventFactory $widgetEventFactory,
         private Filesystem $filesystem,
         private RequestStack $requestStack,
         EntityManagerInterface $em,
@@ -51,9 +52,6 @@ class DashboardModel extends FormModel
         return $this->em->getRepository(Widget::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'dashboard:widgets';
@@ -61,10 +59,8 @@ class DashboardModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Widget
     {
         if (null === $id) {
             return new Widget();
@@ -109,9 +105,7 @@ class DashboardModel extends FormModel
             'name'        => $name,
             'description' => $this->generateDescription(),
             'widgets'     => array_map(
-                function ($widget) {
-                    return $widget->toArray();
-                },
+                fn ($widget) => $widget->toArray(),
                 $this->getWidgets(true)
             ),
         ];
@@ -144,6 +138,20 @@ class DashboardModel extends FormModel
                 '%date%' => (new \DateTime())->format('Y-m-d H:i:s'),
             ]
         );
+    }
+
+    /**
+     * Fill widgets with their empty content.
+     *
+     * @param array<mixed> $widgets
+     */
+    public function populateWidgetPreviews(&$widgets): void
+    {
+        if (count($widgets)) {
+            foreach ($widgets as &$widget) {
+                $this->populateWidgetPreview($widget);
+            }
+        }
     }
 
     /**
@@ -183,14 +191,22 @@ class DashboardModel extends FormModel
     }
 
     /**
+     * Populate widget preview.
+     */
+    public function populateWidgetPreview(Widget $widget): void
+    {
+        $event = $this->widgetEventFactory->create($widget);
+
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD);
+    }
+
+    /**
      * Load widget content from the onWidgetDetailGenerate event.
      *
      * @param array $filter
      */
     public function populateWidgetContent(Widget $widget, $filter = []): void
     {
-        $cacheDir = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-
         if (null === $widget->getCacheTimeout() || -1 === $widget->getCacheTimeout()) {
             $widget->setCacheTimeout($this->coreParametersHelper->get('cached_data_timeout'));
         }
@@ -213,11 +229,10 @@ class DashboardModel extends FormModel
 
         $widget->setParams($resultParams);
 
-        $event = new WidgetDetailEvent($this->translator);
-        $event->setWidget($widget);
-        $event->setCacheDir($cacheDir, $this->userHelper->getUser()->getId());
-        $event->setSecurity($this->security);
-        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE);
+        $this->dispatcher->dispatch(
+            $this->widgetEventFactory->create($widget),
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
+        );
     }
 
     /**
@@ -232,17 +247,15 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Widget      $entity
      * @param string|null $action
      * @param array       $options
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface<mixed>
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
@@ -260,6 +273,8 @@ class DashboardModel extends FormModel
      *
      * @param object $entity
      * @param bool   $unlock
+     *
+     * @throws \Exception
      */
     public function saveEntity($entity, $unlock = true): void
     {

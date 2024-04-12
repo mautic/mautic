@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class EmailToUserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -45,7 +48,7 @@ class EmailToUserType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.action.send.email.to.owner',
-                'data'  => isset($options['data']['to_owner']) ? $options['data']['to_owner'] : false,
+                'data'  => $options['data']['to_owner'] ?? false,
             ]
         );
 

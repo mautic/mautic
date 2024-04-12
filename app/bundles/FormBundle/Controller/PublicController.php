@@ -16,10 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
 {
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
@@ -34,11 +31,11 @@ class PublicController extends CommonFormController
         $post          = $request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $request->server->all();
-        $return        = (isset($post['return'])) ? $post['return'] : false;
+        $return        = $post['return'] ?? false;
 
         if (empty($return)) {
             // try to get it from the HTTP_REFERER
-            $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
+            $return = $server['HTTP_REFERER'] ?? false;
         }
 
         if (!empty($return)) {
@@ -236,10 +233,8 @@ class PublicController extends CommonFormController
 
     /**
      * Displays a message.
-     *
-     * @return Response
      */
-    public function messageAction(Request $request)
+    public function messageAction(Request $request): Response
     {
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);
@@ -300,7 +295,8 @@ class PublicController extends CommonFormController
                 $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
             }
 
-            $template = $form->getTemplate();
+            // Use form specific template or system-wide default theme
+            $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
             if (!empty($template)) {
                 $theme = $this->factory->getTheme($template);
                 if ($theme->getTheme() != $template) {

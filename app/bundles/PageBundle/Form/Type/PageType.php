@@ -29,6 +29,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Page>
+ */
 class PageType extends AbstractType
 {
     private ?\Mautic\UserBundle\Entity\User $user;
@@ -49,9 +52,6 @@ class PageType extends AbstractType
         $this->user         = $userHelper->getUser();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url', 'headScript' => 'html', 'footerScript' => 'html']));
@@ -108,7 +108,7 @@ class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.form.preference_center',
-                'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
+                'data'  => $options['data']->isPreferenceCenter() ?: false,
                 'attr'  => [
                     'tooltip' => 'mautic.page.form.preference_center.tooltip',
                 ],
@@ -120,7 +120,7 @@ class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.no_index',
-                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+                'data'  => $options['data']->getNoIndex() ?: false,
             ]
         );
 
@@ -220,8 +220,9 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.headscript',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => '8',
+                    'class'   => 'form-control',
+                    'rows'    => '8',
+                    'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
             ]
@@ -234,8 +235,9 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.footerscript',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => '8',
+                    'class'   => 'form-control',
+                    'rows'    => '8',
+                    'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
             ]
@@ -331,9 +333,6 @@ class PageType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

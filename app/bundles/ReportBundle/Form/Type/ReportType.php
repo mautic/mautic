@@ -21,15 +21,16 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Report>
+ */
 class ReportType extends AbstractType
 {
-    public function __construct(private ReportModel $reportModel)
-    {
+    public function __construct(
+        private ReportModel $reportModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -385,9 +386,10 @@ class ReportType extends AbstractType
                 FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier): void {
                     $data    = $event->getData();
-                    $graphs  = (isset($data['graphs'])) ? $data['graphs'] : [];
-                    $columns = (isset($data['columns'])) ? $data['columns'] : [];
-                    $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
+                    $graphs  = $data['graphs'] ?? [];
+                    $columns = $data['columns'] ?? [];
+                    $source  = $data['source'] ?? null;
+                    $formModifier($event->getForm(), $source, $columns, $graphs, $data);
                 }
             );
 

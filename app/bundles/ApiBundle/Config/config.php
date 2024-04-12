@@ -63,7 +63,7 @@ return [
         ],
         'other' => [
             'mautic.api.oauth.event_listener' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\PreAuthorizationEventListener',
+                'class'     => \Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.security',
@@ -84,9 +84,9 @@ return [
                     ],
                 ],
             ],
-            'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
+            'fos_oauth_server.security.authentication.listener.class' => \Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener::class,
             'mautic.validator.oauthcallback'                          => [
-                'class' => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
+                'class' => \Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class,
                 'tag'   => 'validator.constraint_validator',
             ],
         ],

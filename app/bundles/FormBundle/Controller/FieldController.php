@@ -28,8 +28,24 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FieldController extends CommonFormController
 {
-    public function __construct(private FormModel $formModel, private FieldModel $formFieldModel, FormFieldHelper $fieldHelper, FormFactoryInterface $formFactory, private MappedObjectCollectorInterface $mappedObjectCollector, private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        private FormModel $formModel,
+        private FieldModel $formFieldModel,
+        FormFieldHelper $fieldHelper,
+        FormFactoryInterface $formFactory,
+        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 
@@ -63,7 +79,7 @@ class FieldController extends CommonFormController
         }
 
         $customComponents = $this->formModel->getCustomComponents();
-        $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
+        $customParams     = $customComponents['fields'][$fieldType] ?? false;
         // ajax only for form fields
         if (!$fieldType ||
             !$request->isXmlHttpRequest() ||
@@ -276,7 +292,7 @@ class FieldController extends CommonFormController
 
             $viewParams       = ['type' => $fieldType];
             $customComponents = $this->formModel->getCustomComponents();
-            $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
+            $customParams     = $customComponents['fields'][$fieldType] ?? false;
 
             if ($cancelled || $valid) {
                 $closeModal = true;
@@ -405,7 +421,7 @@ class FieldController extends CommonFormController
         $formModel = $this->getModel('form.form');
         \assert($formModel instanceof FormModel);
         $customComponents = $this->formModel->getCustomComponents();
-        $customParams     = (isset($customComponents['fields'][$formField['type']])) ? $customComponents['fields'][$formField['type']] : false;
+        $customParams     = $customComponents['fields'][$formField['type']] ?? false;
 
         $formFieldModel = $this->getModel('form.field');
         \assert($formFieldModel instanceof FieldModel);

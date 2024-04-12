@@ -13,26 +13,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class StatSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FocusModel
-     */
-    private $model;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(FocusModel $model, RequestStack $requestStack)
-    {
-        $this->model        = $model;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private FocusModel $model,
+        private RequestStack $requestStack
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_HIT    => ['onPageHit', 0],

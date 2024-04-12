@@ -7,14 +7,12 @@ use Psr\Log\LoggerInterface;
 
 class DateTime implements ScheduleModeInterface
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime): \DateTimeInterface
     {
         $triggerDate = $event->getTriggerDate();
 

@@ -4,20 +4,37 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 
 class CompanyObjectHelper implements ObjectHelperInterface
 {
-    public function __construct(private CompanyModel $model, private CompanyRepository $repository, private Connection $connection)
-    {
+    /**
+     * @var string[]|null
+     */
+    private ?array $uniqueIdentifierFields = null;
+
+    /**
+     * @var array<string,Company>
+     */
+    private array $companiesCreated = [];
+
+    public function __construct(
+        private CompanyModel $model,
+        private CompanyRepository $repository,
+        private Connection $connection,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+    ) {
     }
 
     /**
@@ -29,15 +46,14 @@ class CompanyObjectHelper implements ObjectHelperInterface
     {
         $objectMappings = [];
         foreach ($objects as $object) {
-            $company = new Company();
             $fields  = $object->getFields();
+            $company = $this->getCompanyEntity($fields);
 
             foreach ($fields as $field) {
                 $company->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
             }
 
             $this->model->saveEntity($company);
-            $this->repository->detachEntity($company);
 
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
@@ -45,7 +61,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                     'Created company ID %d',
                     $company->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             $objectMapping = new ObjectMapping();
@@ -57,6 +73,14 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 ->setInternalObjectId($company->getId());
             $objectMappings[] = $objectMapping;
         }
+
+        // Detach to free RAM after all companies are processed in case there are duplicates in the same batch
+        foreach ($this->companiesCreated as $company) {
+            $this->repository->detachEntity($company);
+        }
+
+        // Reset companies created for the next batch
+        $this->companiesCreated = [];
 
         return $objectMappings;
     }
@@ -83,7 +107,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 count($companies),
                 implode(', ', $ids)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         foreach ($companies as $company) {
@@ -104,7 +128,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                     'Updated company ID %d',
                     $company->getId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             // Integration name and ID are stored in the change's mappedObject/mappedObjectId
@@ -192,7 +216,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->from(MAUTIC_TABLE_PREFIX.'companies', 'c');
         $qb->where('c.owner_id IS NOT NULL');
         $qb->andWhere('c.id IN (:objectIds)');
-        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+        $qb->setParameter('objectIds', $objectIds, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
@@ -205,5 +229,44 @@ class CompanyObjectHelper implements ObjectHelperInterface
     public function setFieldValues(Company $company): void
     {
         $this->model->setFieldValues($company, []);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getUniqueIdentifierFields(): array
+    {
+        if (null === $this->uniqueIdentifierFields) {
+            $uniqueIdentifierFields       = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => MauticSyncDataExchange::OBJECT_COMPANY]);
+            $this->uniqueIdentifierFields = array_keys($uniqueIdentifierFields);
+        }
+
+        return $this->uniqueIdentifierFields;
+    }
+
+    /**
+     * @param FieldDAO[] $fields
+     */
+    private function getCompanyEntity(array $fields): Company
+    {
+        $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+
+        // Create a key based on the concatenation of unique identifier values
+        $companyKey = '';
+        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
+            if (isset($fields[$uniqueIdentifierField])) {
+                $companyKey .= strtolower($fields[$uniqueIdentifierField]->getValue()->getNormalizedValue());
+            }
+        }
+
+        // Check if a company with matching values was created in the same batch as another
+        if (!empty($companyKey) && isset($this->companiesCreated[$companyKey])) {
+            return $this->companiesCreated[$companyKey];
+        }
+
+        // Create a new company but ensure a unique key
+        $companyKey = $companyKey ?: uniqid();
+
+        return $this->companiesCreated[$companyKey] = new Company();
     }
 }

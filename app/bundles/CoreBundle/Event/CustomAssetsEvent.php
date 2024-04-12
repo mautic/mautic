@@ -7,8 +7,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomAssetsEvent extends Event
 {
-    public function __construct(protected AssetsHelper $assetsHelper)
-    {
+    public function __construct(
+        protected AssetsHelper $assetsHelper
+    ) {
     }
 
     /**
@@ -27,7 +28,6 @@ class CustomAssetsEvent extends Event
     /**
      * @param string $location
      * @param bool   $async
-     * @param null   $name
      * @param string $context
      */
     public function addScript($script, $location = 'head', $async = false, $name = null, $context = AssetsHelper::CONTEXT_APP)

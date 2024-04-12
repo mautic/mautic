@@ -41,8 +41,17 @@ class InstallService
 
     public const FINAL_STEP = 3;
 
-    public function __construct(private Configurator $configurator, private CacheHelper $cacheHelper, protected PathsHelper $pathsHelper, private EntityManager $entityManager, private TranslatorInterface $translator, private KernelInterface $kernel, private ValidatorInterface $validator, private UserPasswordHasher $hasher, private FixturesLoaderInterface $fixturesLoader)
-    {
+    public function __construct(
+        private Configurator $configurator,
+        private CacheHelper $cacheHelper,
+        protected PathsHelper $pathsHelper,
+        private EntityManager $entityManager,
+        private TranslatorInterface $translator,
+        private KernelInterface $kernel,
+        private ValidatorInterface $validator,
+        private UserPasswordHasher $hasher,
+        private FixturesLoaderInterface $fixturesLoader
+    ) {
     }
 
     /**
@@ -173,7 +182,7 @@ class InstallService
         $messages = [];
         try {
             $this->configurator->write();
-        } catch (\RuntimeException $exception) {
+        } catch (\RuntimeException) {
             $messages = [
                 'error' => $this->translator->trans(
                     'mautic.installer.error.writing.configuration',
@@ -369,7 +378,7 @@ class InstallService
         try {
             /** @var User $existingUser */
             $existingUser = $entityManager->getRepository(User::class)->find(1);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $existingUser = null;
         }
 

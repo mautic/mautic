@@ -31,16 +31,25 @@ class DashboardSubscriber implements EventSubscriberInterface
      */
     protected $permissions = [];
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE   => ['onWidgetListGenerate', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE   => ['onWidgetFormGenerate', 0],
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD => ['onWidgetDetailPreLoad', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => ['onWidgetDetailGenerate', 0],
         ];
+    }
+
+    /**
+     * Generates widget preview without data.
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function onWidgetDetailPreLoad(WidgetDetailEvent $event): void
+    {
+        $event->setTemplate('@MauticCore/Helper/chart.html.twig');
+        $event->stopPropagation();
     }
 
     /**

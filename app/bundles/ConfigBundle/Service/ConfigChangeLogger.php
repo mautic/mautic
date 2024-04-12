@@ -16,7 +16,7 @@ class ConfigChangeLogger
      *
      * @var string[]
      */
-    private $filterKeys = [
+    private array $filterKeys = [
         'transifex_password',
         'mailer_is_owner',
     ];
@@ -26,8 +26,10 @@ class ConfigChangeLogger
      */
     private ?array $originalNormData = null;
 
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
     /**
@@ -46,7 +48,7 @@ class ConfigChangeLogger
      *
      * @see Form::getNormData()
      */
-    public function log(array $postNormData)
+    public function log(array $postNormData): void
     {
         if (null === $this->originalNormData) {
             throw new \RuntimeException('Set original normalized data at first');
@@ -85,10 +87,8 @@ class ConfigChangeLogger
     /**
      * Some form data (AssetBundle) has 'parameters' inside array too.
      * Normalize all.
-     *
-     * @return array
      */
-    private function normalizeData(array $data)
+    private function normalizeData(array $data): array
     {
         $key = 'parameters';
 
@@ -111,9 +111,7 @@ class ConfigChangeLogger
     {
         $keys = $this->filterKeys;
 
-        return array_filter($data, function ($key) use ($keys): bool {
-            return !in_array($key, $keys);
-        },
+        return array_filter($data, fn ($key): bool => !in_array($key, $keys),
             ARRAY_FILTER_USE_KEY);
     }
 }

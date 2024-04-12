@@ -111,7 +111,7 @@ class Configurator
      *
      * @return StepInterface[]
      */
-    private function getSortedSteps()
+    private function getSortedSteps(): array
     {
         $sortedSteps = [];
         krsort($this->steps);

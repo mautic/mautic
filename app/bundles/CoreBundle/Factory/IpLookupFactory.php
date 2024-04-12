@@ -8,13 +8,15 @@ use Psr\Log\LoggerInterface;
 
 class IpLookupFactory
 {
-    public function __construct(protected array $lookupServices, protected ?LoggerInterface $logger = null, protected ?Client $client = null, protected ?string $cacheDir = null)
-    {
+    public function __construct(
+        protected array $lookupServices,
+        protected ?LoggerInterface $logger = null,
+        protected ?Client $client = null,
+        protected ?string $cacheDir = null
+    ) {
     }
 
     /**
-     * @param null $auth
-     *
      * @return AbstractLookup|null
      */
     public function getService($service, $auth = null, array $ipLookupConfig = [])

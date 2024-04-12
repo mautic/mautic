@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_GROUP_SCORE = 'group.score';
+
     public const GROUP_PREFIX        = 'pl';
+
     public const GROUP_SCORE_PREFIX  = 'ls';
 
     public const GROUP_COLUMNS = [
@@ -41,14 +43,12 @@ class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_GROUP_SCORE,
     ];
 
-    public function __construct(private FieldsBuilder $fieldsBuilder)
-    {
+    public function __construct(
+        private FieldsBuilder $fieldsBuilder
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', -10],

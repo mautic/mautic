@@ -12,10 +12,7 @@ class FormSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD            => ['onFormBuild', 0],
@@ -35,9 +32,6 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    /**
-     * @return mixed
-     */
     public function onFormSubmitActionTriggered(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('plugin.leadpush')) {

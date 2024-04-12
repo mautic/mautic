@@ -10,8 +10,12 @@ use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
-    public function __construct(private FieldModel $fieldModel, private ListModel $listModel, private UserModel $userModel, private LeadModel $leadModel)
-    {
+    public function __construct(
+        private FieldModel $fieldModel,
+        private ListModel $listModel,
+        private UserModel $userModel,
+        private LeadModel $leadModel
+    ) {
     }
 
     /**
@@ -29,10 +33,8 @@ class FieldsBuilder
     /**
      * @param string $prefix
      * @param string $segmentPrefix
-     *
-     * @return array
      */
-    public function getLeadFilter($prefix, $segmentPrefix)
+    public function getLeadFilter($prefix, $segmentPrefix): array
     {
         $filters = $this->getLeadFieldsColumns($prefix);
 
@@ -120,6 +122,11 @@ class FieldsBuilder
                 'type'           => 'datetime',
                 'groupByFormula' => 'DATE(l.date_identified)',
             ],
+            'l.date_added' => [
+                'label'          => 'mautic.core.date.added',
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(l.date_added)',
+            ],
             'l.points' => [
                 'label' => 'mautic.lead.points',
                 'type'  => 'int',
@@ -185,32 +192,16 @@ class FieldsBuilder
 
         $columns = [];
         foreach ($fields as $field) {
-            switch ($field->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
+            $type = match ($field->getType()) {
+                'boolean'  => 'bool',
+                'date'     => 'date',
+                'datetime' => 'datetime',
+                'time'     => 'time',
+                'url'      => 'url',
+                'email'    => 'email',
+                'number'   => 'float',
+                default    => 'string',
+            };
             $columns[$prefix.$field->getAlias()] = [
                 'label' => $field->getLabel(),
                 'type'  => $type,

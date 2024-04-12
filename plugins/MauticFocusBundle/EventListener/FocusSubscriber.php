@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -24,76 +26,26 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FocusSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var TrackableModel
-     */
-    private $trackableModel;
-
-    /**
-     * @var PageTokenHelper
-     */
-    private $pageTokenHelper;
-
-    /**
-     * @var AssetTokenHelper
-     */
-    private $assetTokenHelper;
-
-    /**
-     * @var FocusModel
-     */
-    private $focusModel;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
-        RouterInterface $router,
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        FocusModel $focusModel,
-        RequestStack $requestStack
+        private RouterInterface $router,
+        private IpLookupHelper $ipHelper,
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private FocusModel $focusModel,
+        private RequestStack $requestStack
     ) {
-        $this->router           = $router;
-        $this->ipHelper         = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->focusModel       = $focusModel;
-        $this->requestStack     = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST          => ['onKernelRequest', 0],
             FocusEvents::POST_SAVE         => ['onFocusPostSave', 0],
             FocusEvents::POST_DELETE       => ['onFocusDelete', 0],
             FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            ReportEvents::REPORT_ON_BUILD  => ['onReportBuild', -10],
         ];
     }
 
@@ -157,6 +109,19 @@ class FocusSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
+    public function onReportBuild(ReportBuilderEvent $event): void
+    {
+        $tables = $event->getTables();
+
+        if (!isset($tables['audit.log']['columns']['al.bundle']['list'])) {
+            return;
+        }
+
+        $tables['audit.log']['columns']['al.object']['list']['focus'] = 'focus';
+
+        $event->addTable('audit.log', $tables['audit.log']);
+    }
+
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
@@ -174,7 +139,7 @@ class FocusSubscriber implements EventSubscriberInterface
                 $tokens = array_merge($tokens, TokenHelper::findLeadTokens($content, $lead->getProfileFields()));
             }
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'focus',

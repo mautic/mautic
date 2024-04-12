@@ -17,18 +17,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class EntityLookupType extends AbstractType
 {
     /**
      * @var EntityLookupChoiceLoader[]
      */
-    private $choiceLoaders;
+    private ?array $choiceLoaders = null;
 
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private ModelFactory $modelFactory, private TranslatorInterface $translator, private Connection $connection, private RouterInterface $router)
-    {
+    public function __construct(
+        private ModelFactory $modelFactory,
+        private TranslatorInterface $translator,
+        private Connection $connection,
+        private RouterInterface $router
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -52,9 +59,6 @@ class EntityLookupType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['model', 'ajax_lookup_action']);

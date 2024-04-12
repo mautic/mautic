@@ -15,16 +15,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
+
     public const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
-    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository)
-    {
+    public function __construct(
+        private Connection $db,
+        private CompanyReportData $companyReportData,
+        private StatRepository $statRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],

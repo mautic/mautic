@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 
 class StatDevice
 {
+    public const TABLE_NAME = 'email_stats_devices';
     /**
      * @var string
      */
@@ -39,13 +40,13 @@ class StatDevice
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stats_devices')
-            ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatDeviceRepository::class)
             ->addIndex(['date_opened'], 'date_opened_search');
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', \Mautic\LeadBundle\Entity\LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
             ->build();
 

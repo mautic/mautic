@@ -13,10 +13,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CategoryListType extends AbstractType
 {
-    public function __construct(private EntityManager $em, private TranslatorInterface $translator, private CategoryModel $model, private RouterInterface $router)
-    {
+    public function __construct(
+        private EntityManager $em,
+        private TranslatorInterface $translator,
+        private CategoryModel $model,
+        private RouterInterface $router
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -30,7 +37,7 @@ class CategoryListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices' => function (Options $options): array {
                 $createNew  = $this->translator->trans('mautic.category.createnew');
                 $categories = $this->model->getLookupResults($options['bundle'], '', 0);
                 $choices    = [];

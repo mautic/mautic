@@ -11,13 +11,15 @@ class MenuHelper
 {
     /**
      * Stores items that are assigned to another parent outside it's bundle.
-     *
-     * @var array
      */
-    private $orphans = [];
+    private array $orphans = [];
 
-    public function __construct(protected CorePermissions $security, protected RequestStack $requestStack, private CoreParametersHelper $coreParametersHelper, protected IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        protected CorePermissions $security,
+        protected RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
+        protected IntegrationHelper $integrationHelper
+    ) {
     }
 
     /**
@@ -121,7 +123,7 @@ class MenuHelper
      */
     public function resetOrphans($type = 'main')
     {
-        $orphans              = (isset($this->orphans[$type])) ? $this->orphans[$type] : [];
+        $orphans              = $this->orphans[$type] ?? [];
         $this->orphans[$type] = [];
 
         return $orphans;
@@ -137,7 +139,7 @@ class MenuHelper
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
-                $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
+                $priority = $items['priority'] ?? 9999;
                 foreach ($this->orphans[$type][$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = [];
@@ -175,7 +177,7 @@ class MenuHelper
     public function sortByPriority(&$menuItems, $defaultPriority = 9999): void
     {
         foreach ($menuItems as &$items) {
-            $parentPriority = (isset($items['priority'])) ? $items['priority'] : $defaultPriority;
+            $parentPriority = $items['priority'] ?? $defaultPriority;
             if (isset($items['children'])) {
                 $this->sortByPriority($items['children'], $parentPriority);
             }
@@ -187,11 +189,7 @@ class MenuHelper
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
 
-                if ($ap == $bp) {
-                    return 0;
-                }
-
-                return ($ap > $bp) ? -1 : 1;
+                return $bp <=> $ap;
             }
         );
     }
@@ -263,12 +261,10 @@ class MenuHelper
      */
     protected function handleAccessCheck($accessLevel)
     {
-        switch ($accessLevel) {
-            case 'admin':
-                return $this->security->isAdmin();
-            default:
-                return $this->security->isGranted($accessLevel, 'MATCH_ONE');
-        }
+        return match ($accessLevel) {
+            'admin' => $this->security->isAdmin(),
+            default => $this->security->isGranted($accessLevel, 'MATCH_ONE'),
+        };
     }
 
     /**

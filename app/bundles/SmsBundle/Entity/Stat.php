@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 class Stat
 {
+    public const TABLE_NAME = 'sms_message_stats';
+
     /**
      * @var string
      */
@@ -76,8 +78,8 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('sms_message_stats')
-            ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\StatRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(\Mautic\SmsBundle\Entity\StatRepository::class)
             ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
             ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_sms_source_search')
@@ -92,7 +94,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 

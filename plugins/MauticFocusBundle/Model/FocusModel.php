@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -37,37 +38,12 @@ use Twig\Environment;
  */
 class FocusModel extends FormModel
 {
-    /**
-     * @var \Mautic\FormBundle\Model\FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
     public function __construct(
-        \Mautic\FormBundle\Model\FormModel $formModel,
-        TrackableModel $trackableModel,
-        Environment $twig,
-        FieldModel $leadFieldModel,
-        ContactTracker $contactTracker,
+        protected \Mautic\FormBundle\Model\FormModel $formModel,
+        protected TrackableModel $trackableModel,
+        protected Environment $twig,
+        protected FieldModel $leadFieldModel,
+        protected ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -77,42 +53,29 @@ class FocusModel extends FormModel
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->formModel      = $formModel;
-        $this->trackableModel = $trackableModel;
-        $this->twig           = $twig;
         $this->dispatcher     = $dispatcher;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->contactTracker = $contactTracker;
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return string
-     */
-    public function getActionRouteBase()
+    public function getActionRouteBase(): string
     {
         return 'focus';
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'focus:items';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -126,8 +89,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
      */
     public function getRepository()
@@ -136,8 +97,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \MauticPlugin\MauticFocusBundle\Entity\StatRepository
      */
     public function getStatRepository()
@@ -146,13 +105,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int|null $id
-     *
-     * @return Focus|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Focus
     {
         if (null === $id) {
             return new Focus();
@@ -162,8 +117,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Focus      $entity
      * @param bool|false $unlock
      */
@@ -179,9 +132,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @return string
+     * @return string|string[]
      */
-    public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
+    public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false): array|string
     {
         // If cached is not an array, rebuild to support the new format
         $cached = $focus->getCache() ? json_decode($focus->getCache(), true) : [];
@@ -306,10 +259,8 @@ class FocusModel extends FormModel
 
     /**
      * Get whether the color is light or dark.
-     *
-     * @return bool
      */
-    public static function isLightColor($hex, $level = 200)
+    public static function isLightColor($hex, $level = 200): bool
     {
         $hex = str_replace('#', '', $hex);
         $r   = hexdec(substr($hex, 0, 2));
@@ -324,9 +275,9 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param mixed                                         $type
-     * @param mixed                                         $data
-     * @param array<int|string|array<int|string>>|Lead|null $lead
+     * @param mixed                                                    $type
+     * @param mixed                                                    $data
+     * @param array<int|string|array<int|string>>|Lead|Submission|null $lead
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
     {
@@ -348,15 +299,12 @@ class FocusModel extends FormModel
 
         switch ($type) {
             case Stat::TYPE_FORM:
-                /** @var \Mautic\FormBundle\Entity\Submission $data */
+            case Stat::TYPE_CLICK:
+                /** @var \Mautic\PageBundle\Entity\Hit|Submission $data */
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
                 $typeId = null;
-                break;
-            case Stat::TYPE_CLICK:
-                /** @var \Mautic\PageBundle\Entity\Hit $data */
-                $typeId = $data->getId();
                 break;
         }
 
@@ -373,13 +321,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return Event|void|null
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -417,12 +361,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param null $dateFormat
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true)
+    public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);

@@ -23,7 +23,7 @@ class DynamicContentRepository extends CommonRepository
             ->select('e')
             ->from(DynamicContent::class, 'e', 'e.id');
 
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 
@@ -37,12 +37,12 @@ class DynamicContentRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -81,9 +81,9 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -107,9 +107,6 @@ class DynamicContentRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'e';

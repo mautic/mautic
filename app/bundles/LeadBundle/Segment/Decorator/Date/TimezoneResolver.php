@@ -7,8 +7,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class TimezoneResolver
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**

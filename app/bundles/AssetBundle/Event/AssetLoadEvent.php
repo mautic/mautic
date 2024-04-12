@@ -7,8 +7,10 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 class AssetLoadEvent extends CommonEvent
 {
-    public function __construct(Download $download, protected bool $unique)
-    {
+    public function __construct(
+        Download $download,
+        protected bool $unique
+    ) {
         $this->entity = $download;
     }
 

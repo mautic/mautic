@@ -8,18 +8,16 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class MiddlewareCacheWarmer implements CacheWarmerInterface
 {
-    /**
-     * @var string
-     */
-    private $cacheFile;
+    private ?string $cacheFile = null;
 
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]
      */
     private \SplPriorityQueue $specs;
 
-    public function __construct(private string $env)
-    {
+    public function __construct(
+        private string $env
+    ) {
         $this->specs     = new \SplPriorityQueue();
     }
 
@@ -101,7 +99,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
             $priority   = $reflection->getConstant('PRIORITY');
 
             $this->specs->insert($reflection, $priority);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             /* If there's an error getting the kernel class, it's
              * an invalid middleware. If it's invalid, don't push
              * it to the stack

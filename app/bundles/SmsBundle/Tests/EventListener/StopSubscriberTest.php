@@ -13,14 +13,14 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|DoNotContact
      */
-    private $doNotContactModel;
+    private \PHPUnit\Framework\MockObject\MockObject $doNotContactModel;
 
     protected function setUp(): void
     {
         $this->doNotContactModel = $this->createMock(DoNotContactModel::class);
     }
 
-    public function testLeadAddedToDNC()
+    public function testLeadAddedToDNC(): void
     {
         $lead = new Lead();
         $lead->setId(1);

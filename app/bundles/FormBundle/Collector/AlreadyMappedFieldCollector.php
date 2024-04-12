@@ -13,8 +13,9 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 {
     private const EXPIRATION_IN_SECONDS = 18000;
 
-    public function __construct(private CacheProviderInterface $cacheProvider)
-    {
+    public function __construct(
+        private CacheProviderInterface $cacheProvider
+    ) {
     }
 
     public function getFields(string $formId, string $object): array
@@ -26,7 +27,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 
     public function addField(string $formId, string $object, string $fieldKey): void
     {
-        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey) {
+        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey): array {
             if (!in_array($fieldKey, $fields, true)) {
                 $fields[] = $fieldKey;
             }

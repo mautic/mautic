@@ -13,8 +13,10 @@ use Twilio\Exceptions\ConfigurationException;
 
 class TwilioCallback implements CallbackInterface
 {
-    public function __construct(private ContactHelper $contactHelper, private Configuration $configuration)
-    {
+    public function __construct(
+        private ContactHelper $contactHelper,
+        private Configuration $configuration
+    ) {
     }
 
     public function getTransportName(): string
@@ -23,11 +25,9 @@ class TwilioCallback implements CallbackInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\ArrayCollection
-     *
      * @throws NumberNotFoundException
      */
-    public function getContacts(Request $request)
+    public function getContacts(Request $request): \Doctrine\Common\Collections\ArrayCollection
     {
         $this->validateRequest($request->request);
 
@@ -43,11 +43,11 @@ class TwilioCallback implements CallbackInterface
         return trim($request->get('Body'));
     }
 
-    private function validateRequest(InputBag $request)
+    private function validateRequest(InputBag $request): void
     {
         try {
             $accountSid = $this->configuration->getAccountSid();
-        } catch (ConfigurationException $exception) {
+        } catch (ConfigurationException) {
             // Not published or not configured
             throw new NotFoundHttpException();
         }

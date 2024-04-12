@@ -13,15 +13,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldNotification
 {
-    public function __construct(private NotificationModel $notificationModel, private UserModel $userModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private NotificationModel $notificationModel,
+        private UserModel $userModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function customFieldWasCreated(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -34,11 +37,28 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
+    public function customFieldWasUpdated(LeadField $leadField, ?int $userId): void
+    {
+        try {
+            $user = $this->getUser($userId);
+        } catch (NoUserException) {
+            return;
+        }
+
+        $message = $this->translator->trans(
+            'mautic.lead.field.notification.updated_message',
+            ['%label%' => $leadField->getLabel()]
+        );
+        $header  = $this->translator->trans('mautic.lead.field.notification.updated_header');
+
+        $this->addToNotificationCenter($user, $message, $header);
+    }
+
     public function customFieldLimitWasHit(LeadField $leadField, ?int $userId): void
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 
@@ -55,7 +75,7 @@ class CustomFieldNotification
     {
         try {
             $user = $this->getUser($userId);
-        } catch (NoUserException $e) {
+        } catch (NoUserException) {
             return;
         }
 

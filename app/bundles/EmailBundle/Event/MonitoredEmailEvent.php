@@ -7,13 +7,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MonitoredEmailEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $folders = [];
+    private array $folders = [];
 
-    public function __construct(private FormBuilderInterface $formBuilder, private array $data)
-    {
+    public function __construct(
+        private FormBuilderInterface $formBuilder,
+        private array $data
+    ) {
     }
 
     /**
@@ -50,7 +49,7 @@ class MonitoredEmailEvent extends Event
     {
         $keyName = $bundleKey.'_'.$folderKey;
 
-        return (isset($this->data[$keyName])) ? $this->data[$keyName] : $default;
+        return $this->data[$keyName] ?? $default;
     }
 
     /**

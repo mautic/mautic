@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    public function sendHookTestAction(Request $request, Client $client)
+    public function sendHookTestAction(Request $request, Client $client): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $url = InputHelper::url($request->request->get('url'));
 

@@ -17,15 +17,17 @@ class SyncIntegrationsHelper
     /**
      * @var SyncInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     /**
      * @var array<int,string>|null
      */
-    private $enabled;
+    private ?array $enabled = null;
 
-    public function __construct(private IntegrationsHelper $integrationsHelper, private ObjectProvider $objectProvider)
-    {
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper,
+        private ObjectProvider $objectProvider
+    ) {
     }
 
     public function addIntegration(SyncInterface $integration): void
@@ -66,7 +68,7 @@ class SyncIntegrationsHelper
                 if ($integrationConfiguration->getIsPublished()) {
                     $this->enabled[] = $name;
                 }
-            } catch (IntegrationNotFoundException $exception) {
+            } catch (IntegrationNotFoundException) {
                 // Just ignore as the plugin hasn't been installed yet
             }
         }
@@ -110,7 +112,7 @@ class SyncIntegrationsHelper
                         return true;
                     }
                 }
-            } catch (ObjectNotFoundException $exception) {
+            } catch (ObjectNotFoundException) {
                 // Object is not supported so just continue
             }
         }

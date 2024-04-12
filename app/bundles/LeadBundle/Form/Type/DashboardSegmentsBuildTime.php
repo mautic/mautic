@@ -7,10 +7,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DashboardSegmentsBuildTime extends AbstractType
 {
-    public function __construct(private ListModel $segmentModel)
-    {
+    public function __construct(
+        private ListModel $segmentModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

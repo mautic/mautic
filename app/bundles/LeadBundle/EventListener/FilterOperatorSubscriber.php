@@ -19,8 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private OperatorOptions $operatorOptions, private LeadFieldRepository $leadFieldRepository, private TypeOperatorProviderInterface $typeOperatorProvider, private FieldChoicesProviderInterface $fieldChoicesProvider, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private OperatorOptions $operatorOptions,
+        private LeadFieldRepository $leadFieldRepository,
+        private TypeOperatorProviderInterface $typeOperatorProvider,
+        private FieldChoicesProviderInterface $fieldChoicesProvider,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -59,7 +64,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             } else {
                 try {
                     $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
-                } catch (ChoicesNotFoundException $e) {
+                } catch (ChoicesNotFoundException) {
                     // That's fine. Not all fields should have choices.
                 }
             }

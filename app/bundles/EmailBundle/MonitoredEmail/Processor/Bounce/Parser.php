@@ -7,8 +7,9 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 
 class Parser
 {
-    public function __construct(private Message $message)
-    {
+    public function __construct(
+        private Message $message
+    ) {
     }
 
     /**
@@ -16,7 +17,7 @@ class Parser
      */
     public function getFailedRecipients()
     {
-        return (isset($this->message->xHeaders['x-failed-recipients'])) ? $this->message->xHeaders['x-failed-recipients'] : null;
+        return $this->message->xHeaders['x-failed-recipients'] ?? null;
     }
 
     /**
@@ -41,7 +42,7 @@ class Parser
         $dsnParser = new DsnParser();
         try {
             $bounce = $dsnParser->getBounce($this->message);
-        } catch (BounceNotFound $exception) {
+        } catch (BounceNotFound) {
             // DSN report wasn't found so try parsing the body itself
             $bodyParser = new BodyParser();
             $bounce     = $bodyParser->getBounce($this->message, $this->getFailedRecipients());

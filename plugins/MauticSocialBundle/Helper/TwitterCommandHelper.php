@@ -16,55 +16,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TwitterCommandHelper
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
-    /**
-     * @var FieldModel
-     */
-    private $fieldModel;
+    private int $updatedLeads = 0;
 
-    /**
-     * @var MonitoringModel
-     */
-    private $monitoringModel;
+    private int $newLeads = 0;
 
-    /**
-     * @var PostCountModel
-     */
-    private $postCountModel;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @var int
-     */
-    private $updatedLeads = 0;
-
-    /**
-     * @var int
-     */
-    private $newLeads = 0;
-
-    /**
-     * @var array
-     */
-    private $manipulatedLeads = [];
+    private array $manipulatedLeads = [];
 
     /**
      * @var string
@@ -72,37 +30,24 @@ class TwitterCommandHelper
     private $twitterHandleField;
 
     public function __construct(
-        LeadModel $leadModel,
-        FieldModel $fieldModel,
-        MonitoringModel $monitoringModel,
-        PostCountModel $postCountModel,
-        Translator $translator,
-        EntityManagerInterface $em,
+        private LeadModel $leadModel,
+        private FieldModel $fieldModel,
+        private MonitoringModel $monitoringModel,
+        private PostCountModel $postCountModel,
+        private Translator $translator,
+        private EntityManagerInterface $em,
         CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadModel       = $leadModel;
-        $this->fieldModel      = $fieldModel;
-        $this->monitoringModel = $monitoringModel;
-        $this->postCountModel  = $postCountModel;
-        $this->translator      = $translator;
-        $this->em              = $em;
-
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
         $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');
     }
 
-    /**
-     * @return int
-     */
-    public function getNewLeadsCount()
+    public function getNewLeadsCount(): int
     {
         return $this->newLeads;
     }
 
-    /**
-     * @return int
-     */
-    public function getUpdatedLeadsCount()
+    public function getUpdatedLeadsCount(): int
     {
         return $this->updatedLeads;
     }
@@ -126,12 +71,10 @@ class TwitterCommandHelper
      */
     private function output($message, $newLine = true): void
     {
-        if ($this->output instanceof OutputInterface) {
-            if ($newLine) {
-                $this->output->writeln($message);
-            } else {
-                $this->output->write($message);
-            }
+        if ($newLine) {
+            $this->output->writeln($message);
+        } else {
+            $this->output->write($message);
         }
     }
 
@@ -140,10 +83,8 @@ class TwitterCommandHelper
      *
      * @param array      $statusList
      * @param Monitoring $monitor
-     *
-     * @return int
      */
-    public function createLeadsFromStatuses($statusList, $monitor)
+    public function createLeadsFromStatuses($statusList, $monitor): int
     {
         $leadField = $this->fieldModel->getRepository()->findOneBy(['alias' => $this->twitterHandleField]);
 
@@ -181,7 +122,7 @@ class TwitterCommandHelper
 
             // Split the twitter user's name into its parts if we're matching to contacts by name
             if ($monitorProperties['checknames'] && $status['user']['name'] && str_contains($status['user']['name'], ' ')) {
-                list($firstName, $lastName) = $this->splitName($status['user']['name']);
+                [$firstName, $lastName] = $this->splitName($status['user']['name']);
 
                 if (!empty($firstName) && !empty($lastName)) {
                     $usersByName['firstnames'][] = $expr->literal($firstName);
@@ -294,7 +235,7 @@ class TwitterCommandHelper
                     $leadEntity = new Lead();
                     $leadEntity->setNewlyCreated(true);
 
-                    list($firstName, $lastName) = $this->splitName($status['user']['name']);
+                    [$firstName, $lastName] = $this->splitName($status['user']['name']);
 
                     // build new lead fields
                     $fields = [
@@ -364,10 +305,8 @@ class TwitterCommandHelper
      * Get monitor record entity.
      *
      * @param int $mid
-     *
-     * @return \MauticPlugin\MauticSocialBundle\Entity\Monitoring
      */
-    public function getMonitor($mid)
+    public function getMonitor($mid): ?Monitoring
     {
         return $this->monitoringModel->getEntity($mid);
     }

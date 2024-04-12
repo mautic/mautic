@@ -12,8 +12,9 @@ use Mautic\PageBundle\Model\PageModel;
 
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
-    public function __construct(private PageModel $pageModel)
-    {
+    public function __construct(
+        private PageModel $pageModel
+    ) {
     }
 
     public function load(ObjectManager $manager): void
@@ -41,9 +42,6 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 8;

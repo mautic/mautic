@@ -9,8 +9,6 @@ class FileProperties
     /**
      * @param string $filename
      *
-     * @return int
-     *
      * @throws FileInvalidException
      */
     public function getFileSize($filename): int|bool

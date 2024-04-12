@@ -19,33 +19,9 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
 {
-    /**
-     * @var ReportDAO
-     */
-    private $syncReport;
-
-    /**
-     * @var MappingManualDAO
-     */
-    private $mappingManual;
-
-    /**
-     * @var ReportObjectDAO
-     */
-    private $internalObject;
-
-    /**
-     * @var ReportObjectDAO
-     */
-    private $integrationObject;
-
-    /**
-     * @var ObjectChangeDAO
-     */
-    private $objectChange;
-
-    public function __construct(private ValueHelper $valueHelper)
-    {
+    public function __construct(
+        private ValueHelper $valueHelper
+    ) {
     }
 
     /**
@@ -60,13 +36,8 @@ class ObjectChangeGenerator
         ReportObjectDAO $internalObject,
         ReportObjectDAO $integrationObject
     ) {
-        $this->syncReport        = $syncReport;
-        $this->mappingManual     = $mappingManual;
-        $this->internalObject    = $internalObject;
-        $this->integrationObject = $integrationObject;
-
-        $this->objectChange = new ObjectChangeDAO(
-            $this->mappingManual->getIntegration(),
+        $objectChange = new ObjectChangeDAO(
+            $mappingManual->getIntegration(),
             $integrationObject->getObject(),
             $integrationObject->getObjectId(),
             $internalObject->getObject(),
@@ -75,7 +46,7 @@ class ObjectChangeGenerator
 
         if ($integrationObject->getObjectId()) {
             DebugLogger::log(
-                $this->mappingManual->getIntegration(),
+                $mappingManual->getIntegration(),
                 sprintf(
                     "Mautic to integration; found a match between the integration %s:%s object and Mautic's %s:%s object",
                     $integrationObject->getObject(),
@@ -83,46 +54,67 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         } else {
             DebugLogger::log(
-                $this->mappingManual->getIntegration(),
+                $mappingManual->getIntegration(),
                 sprintf(
                     'Mautic to integration: no match found for %s:%s',
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
         }
 
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
-            $this->addFieldToObjectChange($fieldMappingDAO);
+            $this->addFieldToObjectChange($fieldMappingDAO, $syncReport, $mappingManual, $internalObject, $integrationObject, $objectChange);
         }
 
         // Set the change date/time from the object so that we can update last sync date based on this
-        $this->objectChange->setChangeDateTime($internalObject->getChangeDateTime());
+        $objectChange->setChangeDateTime($internalObject->getChangeDateTime());
 
-        return $this->objectChange;
+        return $objectChange;
     }
 
     /**
      * @throws ObjectNotFoundException
      */
-    private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO): void
-    {
-        try {
-            $fieldState = $this->internalObject->getField($fieldMappingDAO->getInternalField())->getState();
+    private function addFieldToObjectChange(
+        FieldMappingDAO $fieldMappingDAO,
+        ReportDAO $syncReport,
+        MappingManualDAO $mappingManual,
+        ReportObjectDAO $internalObject,
+        ReportObjectDAO $integrationObject,
+        ObjectChangeDAO $objectChange
+    ): void {
+        // Skip adding fields for the push process that should sync to Mautic only.
+        if (ObjectMappingDAO::SYNC_TO_MAUTIC === $fieldMappingDAO->getSyncDirection()) {
+            DebugLogger::log(
+                $mappingManual->getIntegration(),
+                sprintf(
+                    "Mautic to integration; the %s object's field %s was skipped because it's configured to sync to Mautic",
+                    $integrationObject->getObject(),
+                    $fieldMappingDAO->getIntegrationField()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
 
-            $internalInformationChangeRequest = $this->syncReport->getInformationChangeRequest(
-                $this->internalObject->getObject(),
-                $this->internalObject->getObjectId(),
+            return;
+        }
+
+        try {
+            $fieldState = $internalObject->getField($fieldMappingDAO->getInternalField())->getState();
+
+            $internalInformationChangeRequest = $syncReport->getInformationChangeRequest(
+                $internalObject->getObject(),
+                $internalObject->getObjectId(),
                 $fieldMappingDAO->getInternalField()
             );
-        } catch (FieldNotFoundException $e) {
+        } catch (FieldNotFoundException) {
             return;
         }
 
@@ -132,49 +124,28 @@ class ObjectChangeGenerator
                 $fieldState,
                 $fieldMappingDAO->getSyncDirection()
             );
-        } catch (InvalidValueException $e) {
+        } catch (InvalidValueException) {
             return; // Field has to be skipped
         }
 
         // Note: bidirectional conflicts were handled by Internal\ObjectChangeGenerator
-        $this->objectChange->addField(
+        $objectChange->addField(
             new FieldDAO($fieldMappingDAO->getIntegrationField(), $newValue),
             $fieldState
         );
 
-        /*
-         * Below here is just debug logging
-         */
-
-        // ObjectMappingDAO::SYNC_TO_MAUTIC
-        if (ObjectMappingDAO::SYNC_TO_MAUTIC === $fieldMappingDAO->getSyncDirection()) {
-            DebugLogger::log(
-                $this->mappingManual->getIntegration(),
-                sprintf(
-                    "Mautic to integration; the %s object's %s field %s was added to the list of %s fields",
-                    $this->integrationObject->getObject(),
-                    $fieldState,
-                    $fieldMappingDAO->getIntegrationField(),
-                    $fieldState
-                ),
-                __CLASS__.':'.__FUNCTION__
-            );
-
-            return;
-        }
-
         // ObjectMappingDAO::SYNC_TO_INTEGRATION
         // ObjectMappingDAO::SYNC_BIDIRECTIONALLY
         DebugLogger::log(
-            $this->mappingManual->getIntegration(),
+            $mappingManual->getIntegration(),
             sprintf(
                 "Mautic to integration; syncing %s object's %s field %s with a value of %s",
-                $this->integrationObject->getObject(),
+                $integrationObject->getObject(),
                 $fieldState,
                 $fieldMappingDAO->getIntegrationField(),
                 var_export($newValue->getNormalizedValue(), true)
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
     }
 }

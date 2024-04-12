@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -66,9 +67,7 @@ class TagRepository extends CommonRepository
      */
     public function removeMinusFromTags(array $tags): array
     {
-        return array_map(function ($val) {
-            return (str_starts_with($val, '-')) ? substr($val, 1) : $val;
-        }, $tags);
+        return array_map(fn ($val) => (str_starts_with($val, '-')) ? substr($val, 1) : $val, $tags);
     }
 
     /**
@@ -91,7 +90,7 @@ class TagRepository extends CommonRepository
                     $q->expr()->eq('l.id', ':leadId')
                 )
             )
-            ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+            ->setParameter('tags', $tags, ArrayParameterType::STRING)
             ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->executeQuery()->fetchOne();

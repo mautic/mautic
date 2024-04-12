@@ -8,9 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ApiPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -23,9 +20,6 @@ class ApiPermissions extends AbstractPermissions
         $this->addStandardPermissions('clients', false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'api';
@@ -50,9 +44,6 @@ class ApiPermissions extends AbstractPermissions
         $this->addStandardFormFields('api', 'clients', $builder, $data, false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getValue($name, $perm)
     {
         // ensure api is enabled system wide
@@ -63,17 +54,11 @@ class ApiPermissions extends AbstractPermissions
         return parent::getValue($name, $perm);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEnabled(): bool
     {
         return !empty($this->params['api_enabled']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getSynonym($name, $level)
     {
         if ('access' == $name && 'granted' == $level) {

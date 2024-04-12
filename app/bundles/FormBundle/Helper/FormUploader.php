@@ -12,14 +12,16 @@ use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
 {
-    public function __construct(private FileUploader $fileUploader, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
      * @throws FileUploadException
      */
-    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission)
+    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission): void
     {
         $uploadedFiles = [];
         $result        = $submission->getResults();
@@ -37,7 +39,7 @@ class FormUploader
                 $uploadedFiles[] =$uploadedFile;
             }
             $submission->setResults($result);
-        } catch (FileUploadException $e) {
+        } catch (FileUploadException) {
             foreach ($uploadedFiles as $filePath) {
                 $this->fileUploader->delete($filePath);
             }

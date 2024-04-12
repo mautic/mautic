@@ -16,10 +16,12 @@ final class FieldValidator implements FieldValidatorInterface
     /**
      * @var mixed[]
      */
-    private $fieldSchemaData = [];
+    private array $fieldSchemaData = [];
 
-    public function __construct(private LeadFieldRepository $leadFieldRepository, private BulkNotification $bulkNotification)
-    {
+    public function __construct(
+        private LeadFieldRepository $leadFieldRepository,
+        private BulkNotification $bulkNotification
+    ) {
     }
 
     /**
@@ -33,7 +35,7 @@ final class FieldValidator implements FieldValidatorInterface
 
                 try {
                     $schema = $this->getFieldSchema($objectName, $fieldName);
-                } catch (FieldSchemaNotFoundException $e) {
+                } catch (FieldSchemaNotFoundException) {
                     continue;
                 }
 
@@ -86,21 +88,15 @@ final class FieldValidator implements FieldValidatorInterface
      */
     private function isFieldTypeValid(array $schemaDefinition, NormalizedValueDAO $field): bool
     {
-        switch ($schemaDefinition['type']) {
-            case 'date':
-            case 'datetime':
-            case 'time':
-            case 'boolean':
-                return $field->getType() === $schemaDefinition['type'];
-            case 'float':
-                return in_array($field->getType(), [
-                    NormalizedValueDAO::DOUBLE_TYPE,
-                    NormalizedValueDAO::FLOAT_TYPE,
-                    NormalizedValueDAO::INT_TYPE,
-                ]);
-            default:
-                return true;
-        }
+        return match ($schemaDefinition['type']) {
+            'date', 'datetime', 'time', 'boolean' => $field->getType() === $schemaDefinition['type'],
+            'float' => in_array($field->getType(), [
+                NormalizedValueDAO::DOUBLE_TYPE,
+                NormalizedValueDAO::FLOAT_TYPE,
+                NormalizedValueDAO::INT_TYPE,
+            ]),
+            default => true,
+        };
     }
 
     /**

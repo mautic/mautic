@@ -13,14 +13,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AssetsHelper $assetsHelper, private TranslatorInterface $translator, private RequestStack $requestStack, private RouterInterface $router)
-    {
+    public function __construct(
+        private AssetsHelper $assetsHelper,
+        private TranslatorInterface $translator,
+        private RequestStack $requestStack,
+        private RouterInterface $router
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 200],

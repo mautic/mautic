@@ -7,8 +7,8 @@ use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
@@ -20,8 +20,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Reply implements ProcessorInterface
 {
-    public function __construct(private StatRepository $statRepo, private ContactFinder $contactFinder, private LeadModel $leadModel, private EventDispatcherInterface $dispatcher, private LoggerInterface $logger, private ContactTracker $contactTracker, private EmailAddressHelper $addressHelper)
-    {
+    public function __construct(
+        private EmailStatModel $emailStatModel,
+        private ContactFinder $contactFinder,
+        private LeadModel $leadModel,
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private ContactTracker $contactTracker,
+        private EmailAddressHelper $addressHelper
+    ) {
     }
 
     public function process(Message $message): void
@@ -31,7 +38,7 @@ class Reply implements ProcessorInterface
         try {
             $parser       = new Parser($message);
             $repliedEmail = $parser->parse();
-        } catch (ReplyNotFound $exception) {
+        } catch (ReplyNotFound) {
             // No hash found so bail as we won't consider this a reply
             $this->logger->debug('MONITORED EMAIL: No hash ID found in the email body');
 
@@ -64,17 +71,17 @@ class Reply implements ProcessorInterface
         if (null !== $stat->getLead()) {
             $this->leadModel->getRepository()->detachEntity($stat->getLead());
         }
-        $this->statRepo->detachEntity($stat);
+        $this->emailStatModel->getRepository()->detachEntity($stat);
     }
 
     /**
      * @param string $trackingHash
      * @param string $messageId
      */
-    public function createReplyByHash($trackingHash, $messageId)
+    public function createReplyByHash($trackingHash, $messageId): void
     {
         /** @var Stat|null $stat */
-        $stat = $this->statRepo->findOneBy(['trackingHash' => $trackingHash]);
+        $stat = $this->emailStatModel->getRepository()->findOneBy(['trackingHash' => $trackingHash]);
 
         if (null === $stat) {
             throw new EntityNotFoundException("Email Stat with tracking hash {$trackingHash} was not found");
@@ -101,15 +108,13 @@ class Reply implements ProcessorInterface
     protected function createReply(Stat $stat, $messageId)
     {
         $replies = $stat->getReplies()->filter(
-            function (EmailReply $reply) use ($messageId): bool {
-                return $reply->getMessageId() === $messageId;
-            }
+            fn (EmailReply $reply): bool => $reply->getMessageId() === $messageId
         );
 
         if (!$replies->count()) {
             $emailReply = new EmailReply($stat, $messageId);
             $stat->addReply($emailReply);
-            $this->statRepo->saveEntity($stat);
+            $this->emailStatModel->saveEntity($stat);
         }
     }
 

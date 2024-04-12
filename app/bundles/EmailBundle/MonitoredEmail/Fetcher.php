@@ -11,23 +11,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {
-    /**
-     * @var array
-     */
-    private $mailboxes;
+    private ?array $mailboxes = null;
 
     /**
      * @var array
      */
     private $log = [];
 
-    /**
-     * @var int
-     */
-    private $processedMessageCounter = 0;
+    private int $processedMessageCounter = 0;
 
-    public function __construct(private Mailbox $imapHelper, private EventDispatcherInterface $dispatcher, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private Mailbox $imapHelper,
+        private EventDispatcherInterface $dispatcher,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -103,10 +100,8 @@ class Fetcher
     /**
      * @param int  $limit
      * @param bool $markAsSeen
-     *
-     * @return array
      */
-    private function getMessages(array $mailIds, $limit, $markAsSeen)
+    private function getMessages(array $mailIds, $limit, $markAsSeen): array
     {
         if (!count($mailIds)) {
             return [];

@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SmsPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -22,9 +19,6 @@ class SmsPermissions extends AbstractPermissions
         return 'sms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('sms', 'categories', $builder, $data);

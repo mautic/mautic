@@ -13,10 +13,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],

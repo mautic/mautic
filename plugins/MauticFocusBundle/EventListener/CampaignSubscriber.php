@@ -14,26 +14,13 @@ use Symfony\Component\Routing\RouterInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TrackingHelper
-     */
-    private $trackingHelper;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(TrackingHelper $trackingHelper, RouterInterface $router)
-    {
-        $this->trackingHelper = $trackingHelper;
-        $this->router         = $router;
+    public function __construct(
+        private TrackingHelper $trackingHelper,
+        private RouterInterface $router
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],

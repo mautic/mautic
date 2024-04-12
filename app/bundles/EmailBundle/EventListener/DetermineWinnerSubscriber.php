@@ -13,14 +13,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private EntityManagerInterface $em, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER         => ['onDetermineOpenRateWinner', 0],

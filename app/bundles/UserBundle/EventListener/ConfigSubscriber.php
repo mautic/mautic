@@ -11,16 +11,16 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    private $fileFields = [
+    /**
+     * @var string[]
+     */
+    private array $fileFields = [
         'saml_idp_metadata',
         'saml_idp_own_certificate',
         'saml_idp_own_private_key',
     ];
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
@@ -92,10 +92,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($data, 'userconfig');
     }
 
-    /**
-     * @return bool
-     */
-    private function validateXml($content)
+    private function validateXml($content): bool
     {
         $valid = true;
 

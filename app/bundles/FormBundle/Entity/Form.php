@@ -53,7 +53,7 @@ class Form extends FormEntity
     /**
      * @var string
      */
-    private $postAction = 'return';
+    private $postAction = 'message';
 
     /**
      * @var string|null
@@ -99,7 +99,7 @@ class Form extends FormEntity
      * @var Collection<int, Submission>
      */
     #[ORM\OneToMany(targetEntity: \Mautic\FormBundle\Entity\Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
+    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
     private \Doctrine\Common\Collections\Collection $submissions;
 
     /**
@@ -148,7 +148,7 @@ class Form extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('forms')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FormRepository');
+            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\FormRepository::class);
 
         $builder->addIdColumns();
 
@@ -436,11 +436,12 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostActionProperty()
+    public function getPostActionProperty(): ?string
     {
+        if ('return' === $this->getPostAction()) {
+            return null;
+        }
+
         return $this->postActionProperty;
     }
 
@@ -548,13 +549,11 @@ class Form extends FormEntity
     {
         return array_filter(
             array_map(
-                function (Field $field): array {
-                    return [
-                        'formFieldId'  => $field->getId(),
-                        'mappedObject' => $field->getMappedObject(),
-                        'mappedField'  => $field->getMappedField(),
-                    ];
-                },
+                fn (Field $field): array => [
+                    'formFieldId'  => $field->getId(),
+                    'mappedObject' => $field->getMappedObject(),
+                    'mappedField'  => $field->getMappedField(),
+                ],
                 $this->getFields()->getValues()
             ),
             fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
@@ -573,9 +572,7 @@ class Form extends FormEntity
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        function (Field $field) {
-                            return $field->getMappedObject();
-                        }
+                        fn (Field $field) => $field->getMappedObject()
                     )->toArray()
                 )
             )

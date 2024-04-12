@@ -13,7 +13,7 @@ class ContentTypeTest extends TestCase
     /**
      * @var mixed|\PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
     protected function setUp(): void
     {

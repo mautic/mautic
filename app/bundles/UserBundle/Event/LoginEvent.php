@@ -7,8 +7,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LoginEvent extends Event
 {
-    public function __construct(private User $user)
-    {
+    public function __construct(
+        private User $user
+    ) {
     }
 
     /**

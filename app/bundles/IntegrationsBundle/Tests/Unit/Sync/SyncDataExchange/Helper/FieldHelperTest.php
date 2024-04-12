@@ -21,37 +21,31 @@ class FieldHelperTest extends TestCase
     /**
      * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $fieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
 
     /**
      * @var VariableExpresserHelperInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $variableExpresserHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $variableExpresserHelper;
 
     /**
      * @var ChannelListHelper
      */
-    private $channelListHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $channelListHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    private $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     /**
      * @var MauticSyncFieldsLoadEvent|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $mauticSyncFieldsLoadEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $mauticSyncFieldsLoadEvent;
 
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper $fieldHelper;
 
     protected function setUp(): void
     {

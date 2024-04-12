@@ -107,7 +107,7 @@ class Notification extends FormEntity
     private $mobile = false;
 
     /**
-     * @var array
+     * @var ?array
      */
     private $mobileSettings;
 
@@ -140,7 +140,7 @@ class Notification extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('push_notifications')
-            ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\NotificationRepository');
+            ->setCustomRepositoryClass(\Mautic\NotificationBundle\Entity\NotificationRepository::class);
 
         $builder->addIdColumns();
 
@@ -184,7 +184,7 @@ class Notification extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToMany('lists', \Mautic\LeadBundle\Entity\LeadList::class)
             ->setJoinTable('push_notification_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -633,7 +633,7 @@ class Notification extends FormEntity
      */
     public function getMobileSettings()
     {
-        return $this->mobileSettings;
+        return $this->mobileSettings ?? [];
     }
 
     /**

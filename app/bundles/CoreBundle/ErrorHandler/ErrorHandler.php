@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
+    use Mautic\CoreBundle\Exception\MessageOnlyErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
     use Symfony\Component\ErrorHandler\Debug;
@@ -170,7 +171,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             $content = $this->generateResponse($error, $inTemplate);
 
-            $message = isset($error['logMessage']) ? $error['logMessage'] : $error['message'];
+            $message = $error['logMessage'] ?? $error['message'];
             $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
 
             if ($returnContent) {
@@ -238,8 +239,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public static function prepareExceptionForOutput($exception)
         {
-            $inline     = null;
-            $logMessage = null;
+            $inline             = null;
+            $logMessage         = null;
 
             if (!$exception instanceof \Exception && !$exception instanceof FlattenException) {
                 if ($exception instanceof \Throwable) {
@@ -251,8 +252,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             $showExceptionMessage = false;
+            $showExceptionDetails = false;
             if ($exception instanceof ErrorHandlerException) {
                 $showExceptionMessage = $exception->showMessage();
+                $showExceptionDetails = true;
                 $message              = $exception->getMessage();
 
                 if ($previous = $exception->getPrevious()) {
@@ -260,11 +263,15 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     $logMessage = $exception->getMessage();
 
                     if ('dev' === self::$environment) {
-                        $message = '<strong>'.get_class($exception).':</strong> '.$exception->getMessage();
+                        $message = '<strong>'.$exception::class.':</strong> '.$exception->getMessage();
                     }
                 }
             } elseif ($exception instanceof DatabaseConnectionException) {
                 $showExceptionMessage = true;
+            }
+
+            if ($exception instanceof MessageOnlyErrorHandlerException) {
+                $showExceptionDetails = false;
             }
 
             $type = ($exception instanceof \ErrorException) ? $exception->getSeverity() : E_ERROR;
@@ -290,7 +297,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $trace             = $exception->getTrace();
             $context           = (method_exists($exception, 'getContext')) ? $exception->getContext() : [];
 
-            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'previous']);
+            return compact(['inline', 'type', 'message', 'logMessage', 'line', 'file', 'trace', 'context', 'showExceptionMessage', 'showExceptionDetails', 'previous']);
         }
 
         /**
@@ -377,7 +384,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param array $context
-         * @param null  $debugTrace
          */
         protected function log($logLevel, $message, $context = [], $debugTrace = null)
         {
@@ -424,9 +430,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     // Renumber backtrace items.
                     $error['trace'] = preg_replace_callback(
                         '/^#(\d+)/m',
-                        function ($matches): string {
-                            return '#'.($matches[1] + 1).'&nbsp;&nbsp;';
-                        },
+                        fn ($matches): string => '#'.($matches[1] + 1).'&nbsp;&nbsp;',
                         $error['trace']
                     );
                 }
@@ -468,13 +472,19 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             if ('dev' == self::$environment || $this->displayErrors) {
                 $error['file']          = str_replace(self::$root, '', $error['file']);
-                $errorMessage           = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
+                $errorMessage           = $error['logMessage'] ?? $error['message'];
                 $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                if (empty($error['showExceptionMessage'])) {
+                if (empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
                     unset($error);
                     $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
                     $error['submessage'] = 'System administrators, check server logs for errors.';
+                }
+                if (!empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
+                    unset($error['file']);
+                    unset($error['trace']);
+                    unset($error['context']);
+                    unset($error['line']);
                 }
             }
 
@@ -493,7 +503,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 $assetPrefix = $paths['asset_prefix'];
                 if (!empty($assetPrefix)) {
-                    if ('/' == substr($assetPrefix, -1)) {
+                    if (str_ends_with($assetPrefix, '/')) {
                         $assetPrefix = substr($assetPrefix, 0, -1);
                     }
                 }
@@ -507,9 +517,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
-                $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
-                    return realpath(__DIR__.'/../../../../');
-                }));
+                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn () => realpath(__DIR__.'/../../../../')));
 
                 if ($loader->exists('custom_offline.html.twig')) {
                     $content = $twig->render('custom_offline.html.twig', ['error' => $error]);
@@ -528,33 +536,15 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $content;
         }
 
-        /**
-         * @return string
-         */
-        private function getErrorName($bit)
+        private function getErrorName($bit): string
         {
-            switch ($bit) {
-                case E_PARSE:
-                    return 'Parse Error';
-
-                case E_ERROR:
-                case E_USER_ERROR:
-                case E_CORE_ERROR:
-                case E_RECOVERABLE_ERROR:
-                    return 'Error';
-
-                case E_WARNING:
-                case E_USER_WARNING:
-                case E_CORE_WARNING:
-                    return 'Warning';
-
-                case E_DEPRECATED:
-                case E_USER_DEPRECATED:
-                    return 'Deprecation';
-
-                default:
-                    return 'Notice';
-            }
+            return match ($bit) {
+                E_PARSE => 'Parse Error',
+                E_ERROR, E_USER_ERROR, E_CORE_ERROR, E_RECOVERABLE_ERROR => 'Error',
+                E_WARNING, E_USER_WARNING, E_CORE_WARNING => 'Warning',
+                E_DEPRECATED, E_USER_DEPRECATED => 'Deprecation',
+                default => 'Notice',
+            };
         }
     }
 }

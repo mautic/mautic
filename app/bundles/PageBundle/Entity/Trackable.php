@@ -38,10 +38,10 @@ class Trackable
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('channel_url_trackables')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\TrackableRepository')
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\TrackableRepository::class)
             ->addIndex(['channel', 'channel_id'], 'channel_url_trackable_search');
 
-        $builder->createManyToOne('redirect', 'Mautic\PageBundle\Entity\Redirect')
+        $builder->createManyToOne('redirect', \Mautic\PageBundle\Entity\Redirect::class)
             ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')
             ->cascadePersist()
             ->inversedBy('trackables')

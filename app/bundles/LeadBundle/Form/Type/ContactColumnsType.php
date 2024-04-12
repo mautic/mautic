@@ -7,15 +7,16 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ContactColumnsType extends AbstractType
 {
-    public function __construct(private ContactColumnsDictionary $columnsDictionary)
-    {
+    public function __construct(
+        private ContactColumnsDictionary $columnsDictionary
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -34,7 +35,7 @@ class ContactColumnsType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string
      */
     public function getParent()
     {

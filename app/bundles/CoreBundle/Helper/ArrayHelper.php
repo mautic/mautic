@@ -43,25 +43,26 @@ class ArrayHelper
      */
     public static function select(array $keys, array $origin): array
     {
-        return array_filter($origin, function ($value, $key) use ($keys): bool {
-            return in_array($key, $keys, true);
-        }, ARRAY_FILTER_USE_BOTH);
+        return array_filter($origin, fn ($value, $key): bool => in_array($key, $keys, true), ARRAY_FILTER_USE_BOTH);
     }
 
     /**
      * Sum between two array.
+     *
+     * @param mixed[] $a1
+     * @param mixed[] $b2
+     *
+     * @return mixed[]
      */
-    public static function sum(array $a1, array $b2)
+    public static function sum(array $a1, array $b2): array
     {
         return self::sumOrSub($a1, $b2);
     }
 
     /**
      * SUBSTRACT between two array.
-     *
-     * @return array
      */
-    public static function sub(array $a1, array $b2)
+    public static function sub(array $a1, array $b2): array
     {
         return self::sumOrSub($a1, $b2, true);
     }
@@ -77,9 +78,7 @@ class ArrayHelper
     {
         return array_filter(
             $array,
-            function ($value): bool {
-                return !is_null($value) && '' !== $value;
-            }
+            fn ($value): bool => !is_null($value) && '' !== $value
         );
     }
 

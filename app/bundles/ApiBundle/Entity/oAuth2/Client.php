@@ -103,7 +103,7 @@ class Client extends BaseClient
             ->columnName('allowed_grant_types')
             ->build();
 
-        $builder->createManyToOne('role', 'Mautic\UserBundle\Entity\Role')
+        $builder->createManyToOne('role', \Mautic\UserBundle\Entity\Role::class)
             ->addJoinColumn('role_id', 'id', true, false)
             ->cascadePersist()
             ->build();
@@ -172,9 +172,6 @@ class Client extends BaseClient
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRedirectUris(array $redirectUris): void
     {
         $this->isChanged('redirectUris', $redirectUris);

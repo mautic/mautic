@@ -28,8 +28,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
+
     private bool $kickoffOnly  = false;
+
     private bool $inactiveOnly = false;
+
     private bool $scheduleOnly = false;
 
     /**
@@ -37,15 +40,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected $output;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    /**
-     * @var Campaign
-     */
-    private $campaign;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
     public function __construct(
         private CampaignRepository $campaignRepository,
@@ -145,6 +142,13 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set batch size of contacts to process per round. Defaults to 100.',
                 100
+            )
+            ->addOption(
+                'exclude',
+                'd',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude a specific campaign from being triggered. Otherwise, all campaigns will be triggered.',
+                []
             );
 
         parent::configure();
@@ -161,14 +165,15 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->scheduleOnly = $input->getOption('scheduled-only');
         $this->inactiveOnly = $input->getOption('inactive-only');
 
-        $batchLimit    = $input->getOption('batch-limit');
-        $campaignLimit = $input->getOption('campaign-limit');
-        $contactMinId  = $input->getOption('min-contact-id');
-        $contactMaxId  = $input->getOption('max-contact-id');
-        $contactId     = $input->getOption('contact-id');
-        $contactIds    = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
-        $threadId      = $input->getOption('thread-id');
-        $maxThreads    = $input->getOption('max-threads');
+        $batchLimit       = $input->getOption('batch-limit');
+        $campaignLimit    = $input->getOption('campaign-limit');
+        $contactMinId     = $input->getOption('min-contact-id');
+        $contactMaxId     = $input->getOption('max-contact-id');
+        $contactId        = $input->getOption('contact-id');
+        $contactIds       = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
+        $threadId         = $input->getOption('thread-id');
+        $maxThreads       = $input->getOption('max-threads');
+        $excludeCampaigns = $input->getOption('exclude');
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
@@ -203,12 +208,29 @@ class TriggerCampaignCommand extends ModeratedCommand
         }
 
         // All published campaigns
-        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
-        $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
+        $filter = [
+            'iterable_mode' => true,
+            'orderBy'       => 'c.dateAdded',
+            'orderByDir'    => 'DESC',
+        ];
 
-        while (false !== ($next = $campaigns->next())) {
-            // Key is ID and not 0
-            $campaign = reset($next);
+        // exclude excluded campaigns
+        if (is_array($excludeCampaigns) && count($excludeCampaigns) > 0) {
+            $filter['filter'] = [
+                'force' => [
+                    [
+                        'expr'   => 'notIn',
+                        'column' => $this->campaignRepository->getTableAlias().'.id',
+                        'value'  => $excludeCampaigns,
+                    ],
+                ],
+            ];
+        }
+
+        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
+        $campaigns = $this->campaignRepository->getEntities($filter);
+
+        foreach ($campaigns as $campaign) {
             $this->triggerCampaign($campaign);
             if ($this->limiter->hasCampaignLimit()) {
                 $this->limiter->resetCampaignLimitRemaining();
@@ -241,7 +263,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @throws \Exception
      */
-    private function triggerCampaign(Campaign $campaign)
+    private function triggerCampaign(Campaign $campaign): void
     {
         if (!$campaign->isPublished()) {
             return;
@@ -356,5 +378,6 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+
     protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

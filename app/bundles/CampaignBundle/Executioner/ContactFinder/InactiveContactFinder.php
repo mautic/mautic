@@ -15,12 +15,15 @@ use Psr\Log\LoggerInterface;
 class InactiveContactFinder
 {
     /**
-     * @var ArrayCollection
+     * @var array<string, \DateTimeInterface>|null
      */
-    private $campaignMemberDatesAdded;
+    private ?array $campaignMemberDatesAdded = null;
 
-    public function __construct(private LeadRepository $leadRepository, private CampaignLeadRepository $campaignLeadRepository, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LeadRepository $leadRepository,
+        private CampaignLeadRepository $campaignLeadRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
@@ -68,19 +71,17 @@ class InactiveContactFinder
     }
 
     /**
-     * @return ArrayCollection
+     * @return array<string, \DateTimeInterface>|null
      */
-    public function getDatesAdded()
+    public function getDatesAdded(): ?array
     {
         return $this->campaignMemberDatesAdded;
     }
 
     /**
      * @param int $campaignId
-     *
-     * @return int
      */
-    public function getContactCount($campaignId, array $decisionEvents, ContactLimiter $limiter)
+    public function getContactCount($campaignId, array $decisionEvents, ContactLimiter $limiter): int
     {
         return $this->campaignLeadRepository->getInactiveContactCount($campaignId, $decisionEvents, $limiter);
     }

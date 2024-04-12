@@ -22,8 +22,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventScheduler
 {
-    public function __construct(private LoggerInterface $logger, private EventLogger $eventLogger, private Interval $intervalScheduler, private DateTime $dateTimeScheduler, private EventCollector $collector, private EventDispatcherInterface $dispatcher, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private EventLogger $eventLogger,
+        private Interval $intervalScheduler,
+        private DateTime $dateTimeScheduler,
+        private EventCollector $collector,
+        private EventDispatcherInterface $dispatcher,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact): void
@@ -99,7 +106,7 @@ class EventScheduler
     {
         try {
             $this->reschedule($log, $this->getRescheduleDate($log));
-        } catch (IntervalNotConfiguredException $e) {
+        } catch (IntervalNotConfiguredException) {
             // Do not reschedule if an interval was not configured.
         }
     }
@@ -113,7 +120,7 @@ class EventScheduler
         foreach ($logs as $log) {
             try {
                 $this->reschedule($log, $this->getRescheduleDate($log));
-            } catch (IntervalNotConfiguredException $e) {
+            } catch (IntervalNotConfiguredException) {
                 // Do not reschedule if an interval was not configured.
             }
         }
@@ -126,11 +133,9 @@ class EventScheduler
     }
 
     /**
-     * @return \DateTimeInterface
-     *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null): \DateTimeInterface
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();
@@ -205,13 +210,7 @@ class EventScheduler
 
         uasort(
             $eventExecutionDates,
-            function (\DateTimeInterface $a, \DateTimeInterface $b): int {
-                if ($a === $b) {
-                    return 0;
-                }
-
-                return $a < $b ? -1 : 1;
-            }
+            fn (\DateTimeInterface $a, \DateTimeInterface $b): int => $a <=> $b
         );
 
         return $eventExecutionDates;
@@ -253,7 +252,7 @@ class EventScheduler
     /**
      * @throws NotSchedulableException
      */
-    public function validateAndScheduleEventForContacts(Event $event, \DateTimeInterface $executionDateTime, ArrayCollection $contacts, \DateTimeInterface $comparedFromDateTime)
+    public function validateAndScheduleEventForContacts(Event $event, \DateTimeInterface $executionDateTime, ArrayCollection $contacts, \DateTimeInterface $comparedFromDateTime): void
     {
         if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
             $this->logger->debug(
@@ -367,7 +366,7 @@ class EventScheduler
 
         try {
             return $rescheduleDate->add(new \DateInterval($defaultIntervalString));
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // Bad interval
             throw new IntervalNotConfiguredException("'{$defaultIntervalString}' is not valid interval string for campaign_time_wait_on_event_false config key.");
         }

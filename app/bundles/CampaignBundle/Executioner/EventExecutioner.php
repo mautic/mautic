@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
@@ -24,10 +23,7 @@ use Psr\Log\LoggerInterface;
 
 class EventExecutioner
 {
-    /**
-     * @var Responses
-     */
-    private $responses;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Responses $responses = null;
 
     private \DateTimeInterface $executionDate;
 
@@ -40,7 +36,6 @@ class EventExecutioner
         private LoggerInterface $logger,
         private EventScheduler $scheduler,
         private RemovedContactTracker $removedContactTracker,
-        private LeadRepository $leadRepository
     ) {
         // Be sure that all events are compared using the exact same \DateTime
         $this->executionDate = new \DateTime();
@@ -109,7 +104,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeLogs(Event $event, ArrayCollection $logs, Counter $counter = null)
+    public function executeLogs(Event $event, ArrayCollection $logs, Counter $counter = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId());
 
@@ -167,9 +162,7 @@ class EventExecutioner
         $executeThese = $this->scheduleEvents($events, $contacts, $childrenCounter, $isInactive);
 
         // Execute non jump-to events normally
-        $otherEvents = $executeThese->filter(function (Event $event): bool {
-            return CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType();
-        });
+        $otherEvents = $executeThese->filter(fn (Event $event): bool => CampaignActionJumpToEventSubscriber::EVENT_NAME !== $event->getType());
 
         if ($otherEvents->count()) {
             foreach ($otherEvents as $event) {
@@ -178,9 +171,7 @@ class EventExecutioner
         }
 
         // Now execute jump to events
-        $jumpEvents = $executeThese->filter(function (Event $event): bool {
-            return CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType();
-        });
+        $jumpEvents = $executeThese->filter(fn (Event $event): bool => CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType());
         if ($jumpEvents->count()) {
             $jumpLogs = [];
 
@@ -189,12 +180,6 @@ class EventExecutioner
                 $config         = $this->collector->getEventConfig($event);
                 $jumpLogs[$key] = $this->eventLogger->fetchRotationAndGenerateLogsFromContacts($event, $config, $contacts, $isInactive);
             }
-
-            // Increment the campaign rotation for the given contacts and current campaign
-            $this->leadRepository->incrementCampaignRotationForContacts(
-                $contacts->getKeys(),
-                $jumpEvents->first()->getCampaign()->getId()
-            );
 
             // Process the jump to events
             foreach ($jumpLogs as $key => $logs) {
@@ -212,8 +197,10 @@ class EventExecutioner
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
 
         // Save updated log entries and clear from memory
-        $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
+        if (!$logs->isEmpty()) {
+            $this->eventLogger->persistCollection($logs)
+                ->clearCollection($logs);
+        }
     }
 
     /**
@@ -223,16 +210,17 @@ class EventExecutioner
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
+        if (!$logs->isEmpty()) {
+            foreach ($logs as $log) {
+                $failedLog = new FailedLeadEventLog();
+                $failedLog->setLog($log)
+                    ->setReason($reason);
+            }
 
-        foreach ($logs as $log) {
-            $failedLog = new FailedLeadEventLog();
-            $failedLog->setLog($log)
-                ->setReason($reason);
+            // Save updated log entries and clear from memory
+            $this->eventLogger->persistCollection($logs)
+                ->clearCollection($logs);
         }
-
-        // Save updated log entries and clear from memory
-        $this->eventLogger->persistCollection($logs)
-            ->clear();
     }
 
     /**
@@ -254,7 +242,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clear();
+            ->clearCollection($logs);
     }
 
     /**

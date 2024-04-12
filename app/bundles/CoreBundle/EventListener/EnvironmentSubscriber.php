@@ -9,14 +9,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class EnvironmentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [

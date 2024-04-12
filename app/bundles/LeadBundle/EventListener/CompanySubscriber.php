@@ -10,14 +10,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CompanySubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],

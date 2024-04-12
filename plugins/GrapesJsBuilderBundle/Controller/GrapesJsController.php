@@ -162,7 +162,7 @@ class GrapesJsController extends CommonController
                 $slotConfig = [];
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
             $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }
 
@@ -201,7 +201,7 @@ class GrapesJsController extends CommonController
                 $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
 
             if ('slideshow' == $slotConfig['type']) {
                 if (isset($content[$slot])) {
@@ -239,9 +239,7 @@ class GrapesJsController extends CommonController
                 // Order slides
                 usort(
                     $options['slides'],
-                    function ($a, $b) {
-                        return strcmp($a['order'], $b['order']);
-                    }
+                    fn ($a, $b): int => strcmp($a['order'], $b['order'])
                 );
 
                 $options['slot']   = $slot;

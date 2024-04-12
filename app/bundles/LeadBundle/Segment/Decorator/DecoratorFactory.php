@@ -12,8 +12,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DecoratorFactory
 {
-    public function __construct(private ContactSegmentFilterDictionary $contactSegmentFilterDictionary, private BaseDecorator $baseDecorator, private CustomMappedDecorator $customMappedDecorator, private DateOptionFactory $dateOptionFactory, private CompanyDecorator $companyDecorator, private EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
+        private BaseDecorator $baseDecorator,
+        private CustomMappedDecorator $customMappedDecorator,
+        private DateOptionFactory $dateOptionFactory,
+        private CompanyDecorator $companyDecorator,
+        private EventDispatcherInterface $eventDispatcher
+    ) {
     }
 
     /**
@@ -44,7 +50,7 @@ class DecoratorFactory
             $this->contactSegmentFilterDictionary->getFilter($originalField);
 
             return $this->customMappedDecorator;
-        } catch (FilterNotFoundException $e) {
+        } catch (FilterNotFoundException) {
             if ($contactSegmentFilterCrate->isCompanyType()) {
                 return $this->companyDecorator;
             }

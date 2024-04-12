@@ -19,13 +19,11 @@ abstract class AbstractEventAccessor
         'channelIdField',
     ];
 
-    /**
-     * @var array
-     */
-    private $extraProperties = [];
+    private array $extraProperties = [];
 
-    public function __construct(protected array $config)
-    {
+    public function __construct(
+        protected array $config
+    ) {
         $this->filterExtraProperties();
     }
 
@@ -125,7 +123,7 @@ abstract class AbstractEventAccessor
      */
     protected function getProperty($property, $default = null)
     {
-        return (isset($this->config[$property])) ? $this->config[$property] : $default;
+        return $this->config[$property] ?? $default;
     }
 
     /**

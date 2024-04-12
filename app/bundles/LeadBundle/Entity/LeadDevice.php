@@ -73,7 +73,7 @@ class LeadDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_devices')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadDeviceRepository')
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class)
             ->addIndex(['date_added'], 'date_added_search')
             ->addIndex(['device'], 'device_search')
             ->addIndex(['device_os_name'], 'device_os_name_search')

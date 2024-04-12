@@ -20,10 +20,8 @@ class RestrictionHelper
 
     /**
      * Remove fields that are restricted.
-     *
-     * @return array
      */
-    public static function applyRestrictions(array $configParameters, array $restrictedParameters, $restrictedParentKey = null)
+    public static function applyRestrictions(array $configParameters, array $restrictedParameters, $restrictedParentKey = null): array
     {
         if ($restrictedParentKey) {
             if (!isset($restrictedParameters[$restrictedParentKey])) {

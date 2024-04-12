@@ -19,8 +19,10 @@ class DeduplicateCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate';
 
-    public function __construct(private ContactDeduper $contactDeduper, private ParameterBagInterface $params)
-    {
+    public function __construct(
+        private ContactDeduper $contactDeduper,
+        private ParameterBagInterface $params
+    ) {
         parent::__construct();
     }
 
@@ -144,5 +146,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Merge contacts based on same unique identifiers';
 }

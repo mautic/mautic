@@ -20,7 +20,7 @@ trait VariantModelTrait
         // let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
 
-        list($parent, $children) = $entity->getVariants();
+        [$parent, $children] = $entity->getVariants();
 
         $save = [];
 
@@ -83,7 +83,7 @@ trait VariantModelTrait
         if (!$isVariant && $entity instanceof TranslationEntityInterface) {
             // Translations could be assigned to a variant and thus applicable to be reset
             if ($translationParent = $entity->getTranslationParent()) {
-                $isVariant = $translationParent->isVariant();
+                $isVariant = $translationParent->isVariant(); /** @phpstan-ignore-line @todo for M6, extend the TranslationEntityInterface from The VariantEntityInterface */
             }
         }
 

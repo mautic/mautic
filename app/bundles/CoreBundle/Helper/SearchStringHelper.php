@@ -5,7 +5,9 @@ namespace Mautic\CoreBundle\Helper;
 class SearchStringHelper
 {
     public const COMMAND_NEGATE  = 0;
+
     public const COMMAND_POSIT   = 1;
+
     public const COMMAND_NEUTRAL = 2;
 
     /**
@@ -33,9 +35,6 @@ class SearchStringHelper
         'parenthesis' => ')',
     ];
 
-    /**
-     * SearchStringHelper constructor.
-     */
     public function __construct(array $needsParsing = null, array $needsClosing = null, array $closingChars = null)
     {
         if (null !== $needsParsing) {

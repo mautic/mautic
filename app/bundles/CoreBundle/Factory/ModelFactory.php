@@ -11,8 +11,9 @@ use Psr\Container\ContainerInterface;
  */
 class ModelFactory
 {
-    public function __construct(private ContainerInterface $container)
-    {
+    public function __construct(
+        private ContainerInterface $container
+    ) {
     }
 
     /**
@@ -56,7 +57,7 @@ class ModelFactory
             $this->getModel($modelNameKey);
 
             return true;
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
     }

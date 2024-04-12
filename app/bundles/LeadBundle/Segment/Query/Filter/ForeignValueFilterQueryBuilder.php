@@ -15,7 +15,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.foreign.value';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias  = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator   = $filter->getOperator();

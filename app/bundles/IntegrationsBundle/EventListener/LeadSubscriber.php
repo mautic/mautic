@@ -26,8 +26,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FieldChangeRepository $fieldChangeRepo, private ObjectMappingRepository $objectMappingRepository, private VariableExpresserHelperInterface $variableExpressor, private SyncIntegrationsHelper $syncIntegrationsHelper, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private FieldChangeRepository $fieldChangeRepo,
+        private ObjectMappingRepository $objectMappingRepository,
+        private VariableExpresserHelperInterface $variableExpressor,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -166,7 +171,7 @@ class LeadSubscriber implements EventSubscriberInterface
         foreach ($this->syncIntegrationsHelper->getEnabledIntegrations() as $integrationName) {
             try {
                 $this->dispatchBeforeFieldChangesEvent($integrationName, $object);
-            } catch (InvalidValueException $e) {
+            } catch (InvalidValueException) {
                 continue; // Do not record changes for object and integration that has an invalid value.
             }
 

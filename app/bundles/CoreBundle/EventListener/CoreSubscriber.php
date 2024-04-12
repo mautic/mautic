@@ -29,14 +29,21 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private BundleHelper $bundleHelper, private MenuHelper $menuHelper, private UserHelper $userHelper, private AssetsHelper $assetsHelper, private CoreParametersHelper $coreParametersHelper, private AuthorizationCheckerInterface $securityContext, private UserModel $userModel, private EventDispatcherInterface $dispatcher, private RequestStack $requestStack, private FormRepository $formRepository)
-    {
+    public function __construct(
+        private BundleHelper $bundleHelper,
+        private MenuHelper $menuHelper,
+        private UserHelper $userHelper,
+        private AssetsHelper $assetsHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private AuthorizationCheckerInterface $securityContext,
+        private UserModel $userModel,
+        private EventDispatcherInterface $dispatcher,
+        private RequestStack $requestStack,
+        private FormRepository $formRepository
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => [
@@ -128,7 +135,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onBuildRoute(RouteEvent $event)
+    public function onBuildRoute(RouteEvent $event): void
     {
         $type       = $event->getType();
         $bundles    = $this->bundleHelper->getMauticBundles(true);
@@ -244,7 +251,7 @@ class CoreSubscriber implements EventSubscriberInterface
                             $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
-                                if ('s' == substr($id[1], -1)) {
+                                if (str_ends_with($id[1], 's')) {
                                     $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
                                 $event->addIcon($id[1], $item['iconClass']);

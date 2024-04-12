@@ -15,8 +15,12 @@ class IntegrationToken implements TokenInterface
     /**
      * @param mixed[] $extraData
      */
-    public function __construct(?string $accessToken, ?string $refreshToken, $expiresAt = null, private array $extraData = [])
-    {
+    public function __construct(
+        ?string $accessToken,
+        ?string $refreshToken,
+        $expiresAt = null,
+        private array $extraData = []
+    ) {
         $this->accessToken  = (string) $accessToken;
         $this->refreshToken = (string) $refreshToken;
         $this->expiresAt    = (int) $expiresAt;
@@ -48,6 +52,12 @@ class IntegrationToken implements TokenInterface
 
     public function isExpired(): bool
     {
+        // Consider expired if there is not an access token
+        if (!$this->getAccessToken()) {
+            return true;
+        }
+
+        // Otherwise, consider expired if the expiration time has passed
         return $this->expiresAt && $this->expiresAt < time();
     }
 

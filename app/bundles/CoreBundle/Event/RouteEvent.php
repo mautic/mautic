@@ -13,8 +13,10 @@ class RouteEvent extends Event
     /**
      * @param string $type
      */
-    public function __construct(protected Loader $loader, protected $type = 'main')
-    {
+    public function __construct(
+        protected Loader $loader,
+        protected $type = 'main'
+    ) {
         $this->collection = new RouteCollection();
     }
 

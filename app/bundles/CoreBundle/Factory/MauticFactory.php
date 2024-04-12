@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -27,8 +28,16 @@ class MauticFactory
     /**
      * @param ModelFactory<object> $modelFactory
      */
-    public function __construct(private ContainerInterface $container, private ModelFactory $modelFactory, private CorePermissions $security, private AuthorizationCheckerInterface $authorizationChecker, private UserHelper $userHelper, private RequestStack $requestStack, private ManagerRegistry $doctrine, private Translator $translator)
-    {
+    public function __construct(
+        private ContainerInterface $container,
+        private ModelFactory $modelFactory,
+        private CorePermissions $security,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private UserHelper $userHelper,
+        private RequestStack $requestStack,
+        private ManagerRegistry $doctrine,
+        private Translator $translator
+    ) {
     }
 
     /**
@@ -38,7 +47,7 @@ class MauticFactory
      *
      * @throws \InvalidArgumentException
      */
-    public function getModel($modelNameKey)
+    public function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -129,7 +138,7 @@ class MauticFactory
     /**
      * Retrieves event dispatcher.
      *
-     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @return EventDispatcherInterface
      */
     public function getDispatcher()
     {
@@ -208,15 +217,13 @@ class MauticFactory
      * Returns local config file path.
      *
      * @param bool $checkExists If true, returns false if file doesn't exist
-     *
-     * @return bool
      */
-    public function getLocalConfigFile($checkExists = true)
+    public function getLocalConfigFile($checkExists = true): string
     {
         /** @var \AppKernel $kernel */
         $kernel = $this->container->get('kernel');
 
-        return $kernel->getLocalConfigFile($checkExists);
+        return $kernel->getLocalConfigFile();
     }
 
     /**
@@ -335,20 +342,14 @@ class MauticFactory
      */
     public function getHelper($helper)
     {
-        switch ($helper) {
-            case 'template.assets':
-                return $this->container->get('twig.helper.assets');
-            case 'template.slots':
-                return $this->container->get('twig.helper.slots');
-            case 'template.form':
-                return $this->container->get('twig.helper.form');
-            case 'template.translator':
-                return $this->container->get('twig.helper.translator');
-            case 'template.router':
-                return $this->container->get('twig.helper.router');
-            default:
-                return $this->container->get('mautic.helper.'.$helper);
-        }
+        return match ($helper) {
+            'template.assets'     => $this->container->get('twig.helper.assets'),
+            'template.slots'      => $this->container->get('twig.helper.slots'),
+            'template.form'       => $this->container->get('twig.helper.form'),
+            'template.translator' => $this->container->get('twig.helper.translator'),
+            'template.router'     => $this->container->get('twig.helper.router'),
+            default               => $this->container->get('mautic.helper.'.$helper),
+        };
     }
 
     /**
@@ -407,7 +408,9 @@ class MauticFactory
     }
 
     /**
-     * @return bool
+     * @param string $service
+     *
+     * @return object|bool
      */
     public function get($service)
     {

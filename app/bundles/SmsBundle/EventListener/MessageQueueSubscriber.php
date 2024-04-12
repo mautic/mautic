@@ -10,14 +10,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageQueueSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SmsModel $model)
-    {
+    public function __construct(
+        private SmsModel $model
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],

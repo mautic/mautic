@@ -9,14 +9,26 @@ use Symfony\Contracts\EventDispatcher\Event;
 class BuilderEvent extends Event
 {
     protected $slotTypes            = [];
+
     protected $sections             = [];
+
     protected $tokens               = [];
+
     protected $abTestWinnerCriteria = [];
-    protected $tokenFilterText;
+
+    /**
+     * @var string|string[]
+     */
+    protected string|array $tokenFilterText;
+
     protected string $tokenFilterTarget;
 
-    public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
-    {
+    public function __construct(
+        protected $translator,
+        protected $entity = null,
+        protected $requested = 'all',
+        protected string $tokenFilter = ''
+    ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
@@ -97,12 +109,10 @@ class BuilderEvent extends Event
     {
         uasort(
             $this->abTestWinnerCriteria,
-            function ($a, $b): int {
-                return strnatcasecmp(
-                    $a['group'],
-                    $b['group']
-                );
-            }
+            fn ($a, $b): int => strnatcasecmp(
+                $a['group'],
+                $b['group']
+            )
         );
         $array = ['criteria' => $this->abTestWinnerCriteria];
 
@@ -132,7 +142,7 @@ class BuilderEvent extends Event
      *  - formType - (optional) name of the form type SERVICE for the criteria
      *  - formTypeOptions - (optional) array of options to pass to the formType service
      */
-    public function addAbTestWinnerCriteria($key, array $criteria)
+    public function addAbTestWinnerCriteria($key, array $criteria): void
     {
         if (array_key_exists($key, $this->abTestWinnerCriteria)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
@@ -149,7 +159,7 @@ class BuilderEvent extends Event
         $this->abTestWinnerCriteria[$key] = $criteria;
     }
 
-    private function verifyCriteria(array $keys, array $criteria)
+    private function verifyCriteria(array $keys, array $criteria): void
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $criteria)) {
@@ -203,10 +213,8 @@ class BuilderEvent extends Event
      * Pass in string or array of tokens to filter against if filterType == token.
      *
      * @param string|array|null $tokenKeys
-     *
-     * @return bool
      */
-    public function tokensRequested($tokenKeys = null)
+    public function tokensRequested($tokenKeys = null): bool
     {
         if ($requested = $this->getRequested('tokens')) {
             if (!empty($this->tokenFilter) && 'token' == $this->tokenFilterTarget) {
@@ -261,17 +269,13 @@ class BuilderEvent extends Event
             // Do a search against the label
             $tokens = array_filter(
                 $tokens,
-                function ($v) use ($filter): bool {
-                    return 0 === stripos($v, $filter);
-                }
+                fn ($v): bool => 0 === stripos($v, $filter)
             );
         } else {
             // Do a search against the token
             $found = array_filter(
                 array_keys($tokens),
-                function ($k) use ($filter): bool {
-                    return 0 === stripos($k, $filter);
-                }
+                fn ($k): bool => 0 === stripos($k, $filter)
             );
 
             $tokens = array_intersect_key($tokens, array_flip($found));
@@ -322,30 +326,24 @@ class BuilderEvent extends Event
 
     /**
      * Check if AB Test Winner Criteria has been requested.
-     *
-     * @return bool
      */
-    public function abTestWinnerCriteriaRequested()
+    public function abTestWinnerCriteriaRequested(): bool
     {
         return $this->getRequested('abTestWinnerCriteria');
     }
 
     /**
      * Check if Slot types has been requested.
-     *
-     * @return bool
      */
-    public function slotTypesRequested()
+    public function slotTypesRequested(): bool
     {
         return $this->getRequested('slotTypes');
     }
 
     /**
      * Check if Sections has been requested.
-     *
-     * @return bool
      */
-    public function sectionsRequested()
+    public function sectionsRequested(): bool
     {
         return $this->getRequested('sections');
     }

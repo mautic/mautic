@@ -15,25 +15,16 @@ class DateTimeHelper
      */
     private $string;
 
-    /**
-     * @var string
-     */
-    private $format;
+    private string $format;
 
     /**
      * @var string
      */
     private $timezone;
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $utc;
+    private \DateTimeZone $utc;
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $local;
+    private \DateTimeZone $local;
 
     /**
      * @var \DateTimeInterface
@@ -204,16 +195,15 @@ class DateTimeHelper
     /**
      * Gets a difference.
      *
-     * @param string     $compare
-     * @param null       $format
-     * @param bool|false $resetTime
+     * @param string|\DateTime $compare
+     * @param bool|false       $resetTime
      *
      * @return bool|\DateInterval|string
      */
     public function getDiff($compare = 'now', $format = null, $resetTime = false)
     {
         if ('now' == $compare) {
-            $compare = new \DateTime();
+            $compare = new \DateTime('now', $this->datetime->getTimezone());
         }
 
         $with = clone $this->datetime;
@@ -287,17 +277,11 @@ class DateTimeHelper
             throw new \InvalidArgumentException($unit.' is invalid unit for DateInterval');
         }
 
-        switch ($unit) {
-            case 'I':
-                $spec = "PT{$interval}M";
-                break;
-            case 'H':
-            case 'S':
-                $spec = "PT{$interval}{$unit}";
-                break;
-            default:
-                $spec = "P{$interval}{$unit}";
-        }
+        $spec = match ($unit) {
+            'I' => "PT{$interval}M",
+            'H', 'S' => "PT{$interval}{$unit}",
+            default => "P{$interval}{$unit}",
+        };
 
         return new \DateInterval($spec);
     }
@@ -334,16 +318,12 @@ class DateTimeHelper
 
         $diffDays = (int) $interval->format('%R%a');
 
-        switch ($diffDays) {
-            case 0:
-                return 'today';
-            case -1:
-                return 'yesterday';
-            case +1:
-                return 'tomorrow';
-            default:
-                return false;
-        }
+        return match ($diffDays) {
+            0       => 'today',
+            -1      => 'yesterday',
+            +1      => 'tomorrow',
+            default => false,
+        };
     }
 
     /**
@@ -379,7 +359,7 @@ class DateTimeHelper
      *
      * @throws \InvalidArgumentException
      */
-    public static function validateMysqlDateTimeUnit($unit)
+    public static function validateMysqlDateTimeUnit($unit): void
     {
         $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
 

@@ -31,10 +31,7 @@ class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var PointModel|null
@@ -102,7 +99,6 @@ class PointApiController extends CommonApiController
     /**
      * Log the lead points change.
      *
-     * @param int $leadId
      * @param int $delta
      */
     protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator)

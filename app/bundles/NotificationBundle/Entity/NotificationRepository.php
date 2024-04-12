@@ -22,7 +22,7 @@ class NotificationRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'e.id');
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
 
@@ -58,7 +58,7 @@ class NotificationRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -99,9 +99,9 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -125,9 +125,6 @@ class NotificationRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'e';
@@ -149,7 +146,7 @@ class NotificationRepository extends CommonRepository
                 ->where('id = '.(int) $id);
 
             $q->executeStatement();
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             // not important
         }
     }

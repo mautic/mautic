@@ -9,10 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
@@ -24,7 +21,7 @@ class PointSubscriber implements EventSubscriberInterface
         $changeLists = [
             'group'    => 'mautic.campaign.point.trigger',
             'label'    => 'mautic.campaign.point.trigger.changecampaigns',
-            'callback' => ['\\Mautic\\CampaignBundle\\Helper\\CampaignEventHelper', 'addRemoveLead'],
+            'callback' => [\Mautic\CampaignBundle\Helper\CampaignEventHelper::class, 'addRemoveLead'],
             'formType' => CampaignEventAddRemoveLeadType::class,
         ];
 

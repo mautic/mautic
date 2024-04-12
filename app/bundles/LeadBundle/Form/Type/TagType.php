@@ -11,10 +11,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Tag>
+ */
 class TagType extends AbstractType
 {
-    public function __construct(private EntityManager $em)
-    {
+    public function __construct(
+        private EntityManager $em
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -34,11 +38,9 @@ class TagType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'label'         => 'mautic.lead.tags',
-                'class'         => \Mautic\LeadBundle\Entity\Tag::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC);
-                },
+                'label'           => 'mautic.lead.tags',
+                'class'           => \Mautic\LeadBundle\Entity\Tag::class,
+                'query_builder'   => fn (EntityRepository $er) => $er->createQueryBuilder('t')->orderBy('t.tag', \Doctrine\Common\Collections\Criteria::ASC),
                 'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,

@@ -4,12 +4,13 @@ namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractFormController extends CommonController
 {
-    protected $permissionBase;
+    protected ?string $permissionBase = null;
 
     /**
      * @return mixed
@@ -151,8 +152,6 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Binds form data, checks validity, and determines cancel request.
-     *
-     * @param array $data
      */
     protected function isFormValid(FormInterface $form): bool
     {
@@ -200,9 +199,9 @@ abstract class AbstractFormController extends CommonController
         return $this->user->isAdmin();
     }
 
-    protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
+    protected function copyErrorsRecursively(FormInterface $copyFrom, FormInterface $copyTo)
     {
-        /** @var $error FormError */
+        /** @var FormError $error */
         foreach ($copyFrom->getErrors() as $error) {
             $copyTo->addError($error);
         }
@@ -236,11 +235,11 @@ abstract class AbstractFormController extends CommonController
 
         $urlMatcher  = explode('/s/', $returnUrl);
         $actionRoute = $this->get('router')->match('/s/'.$urlMatcher[1]);
-        $objAction   = isset($actionRoute['objectAction']) ? $actionRoute['objectAction'] : 'index';
+        $objAction   = $actionRoute['objectAction'] ?? 'index';
         $routeCtrlr  = explode('\\', $actionRoute['_controller']);
 
         $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
-        $vars['contentTemplate'] = isset($vars['contentTemplate']) ? $vars['contentTemplate'] : $defaultContentTemplate;
+        $vars['contentTemplate'] ??= $defaultContentTemplate;
 
         $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
 

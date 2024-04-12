@@ -30,7 +30,7 @@ class Release
     {
         $this->version         = $release['tag_name'];
         $this->downloadUrl     = $this->parseUpdatePackage($release['assets']);
-        $this->announcementUrl = $metadata->getAnnouncementUrl() ? $metadata->getAnnouncementUrl() : $release['html_url'];
+        $this->announcementUrl = $metadata->getAnnouncementUrl() ?: $release['html_url'];
         $this->stability       = $metadata->getStability();
         $this->metadata        = $metadata;
     }

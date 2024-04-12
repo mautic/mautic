@@ -6,14 +6,12 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class VtigerIntegration extends CrmAbstractIntegration
 {
-    private $authorzationError = '';
+    private string $authorzationError = '';
 
     /**
      * Returns the name of the social integration that must match the name of the file.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Vtiger';
     }
@@ -23,10 +21,7 @@ class VtigerIntegration extends CrmAbstractIntegration
         return ['push_lead'];
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'vTiger';
     }
@@ -43,41 +38,27 @@ class VtigerIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'username';
     }
 
-    /**
-     * @return string
-     */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'accessKey';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'sessionName';
     }
 
-    /**
-     * @return string
-     */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         return sprintf('%s/webservice.php', $this->keys['url']);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return bool
      */
     public function isAuthorized()
@@ -126,8 +107,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -140,17 +119,15 @@ class VtigerIntegration extends CrmAbstractIntegration
      *
      * @param array $settings
      * @param array $parameters
-     *
-     * @return array
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback($settings = [], $parameters = []): string|bool
     {
         $success = $this->isAuthorized();
         if (!$success) {
             return $this->authorzationError;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -159,13 +136,13 @@ class VtigerIntegration extends CrmAbstractIntegration
     public function getAvailableLeadFields($settings = []): array
     {
         $vTigerFields      = [];
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
 
         if (isset($settings['feature_settings']['objects'])) {
             $vTigerObjects = $settings['feature_settings']['objects'];
         } else {
             $settings      = $this->settings->getFeatureSettings();
-            $vTigerObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $vTigerObjects = $settings['objects'] ?? ['contacts'];
         }
 
         try {
@@ -224,8 +201,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array<mixed>
      */
     public function getFormNotes($section)
@@ -237,9 +212,6 @@ class VtigerIntegration extends CrmAbstractIntegration
         return parent::getFormNotes($section);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function amendLeadDataBeforePush(&$mappedData): void
     {
         if (!empty($mappedData)) {
@@ -279,10 +251,8 @@ class VtigerIntegration extends CrmAbstractIntegration
      * Get available company fields for choices in the config UI.
      *
      * @param array $settings
-     *
-     * @return array
      */
-    public function getFormCompanyFields($settings = [])
+    public function getFormCompanyFields($settings = []): array
     {
         return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }

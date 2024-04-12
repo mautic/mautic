@@ -11,11 +11,9 @@ use Mautic\LeadBundle\Model\CompanyModel;
 
 class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(private CompanyModel $companyModel)
-    {
+    public function __construct(
+        private CompanyModel $companyModel
+    ) {
     }
 
     public function load(ObjectManager $manager): void
@@ -28,7 +26,7 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
             foreach ($l as $col => $val) {
                 $company->addUpdatedField($col, $val);
             }
-            $this->companyModel->saveEntity($company);
+            $this->companyModel->getRepository()->saveEntity($company);
 
             $this->setReference('company-'.$count, $company);
         }

@@ -28,6 +28,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
     private array $supportedLanguages;
@@ -483,7 +486,7 @@ class ConfigType extends AbstractType
             $data = $event->getData();
             $form = $event->getForm();
 
-            $ipServiceName = (isset($data['ip_lookup_service'])) ? $data['ip_lookup_service'] : null;
+            $ipServiceName = $data['ip_lookup_service'] ?? null;
             if ($ipServiceName && $lookupService = $ipLookupFactory->getService($ipServiceName)) {
                 if ($lookupService instanceof IpLookupFormInterface && $formType = $lookupService->getConfigFormService()) {
                     $form->add(
@@ -700,17 +703,11 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'coreconfig';

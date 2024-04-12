@@ -30,7 +30,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
 
             return 'https://download.maxmind.com/app/geoip_download?'.$queryString;
         } else {
-            $this->logger->warn('MaxMind license key is required.');
+            $this->logger->warning('MaxMind license key is required.');
         }
     }
 
@@ -70,7 +70,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $this->longitude = $record->location->longitude;
             $this->timezone  = $record->location->timeZone;
             $this->zipcode   = $record->location->postalCode;
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
     }
 }

@@ -11,13 +11,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_install', 'group_mautic_install_data'];
@@ -39,9 +37,6 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Fixtu
         $this->addReference('admin-role', $role);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 1;

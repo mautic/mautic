@@ -8,8 +8,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadListQueryBuilderGeneratedEvent extends Event
 {
-    public function __construct(private LeadList $segment, private QueryBuilder $queryBuilder)
-    {
+    public function __construct(
+        private LeadList $segment,
+        private QueryBuilder $queryBuilder
+    ) {
     }
 
     /**

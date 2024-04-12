@@ -9,8 +9,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class WebhookRequestEvent extends Event
 {
-    public function __construct(private Lead $contact, private string $url, private array $headers, private array $payload)
-    {
+    public function __construct(
+        private Lead $contact,
+        private string $url,
+        private array $headers,
+        private array $payload
+    ) {
     }
 
     public function getUrl(): string

@@ -20,17 +20,14 @@ class RouteHelperTest extends TestCase
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $objectProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
-    /**
-     * @var RouteHelper
-     */
-    private $routeHelper;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper $routeHelper;
 
     protected function setUp(): void
     {

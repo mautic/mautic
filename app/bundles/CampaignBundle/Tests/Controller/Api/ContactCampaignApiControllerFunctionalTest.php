@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CampaginBundle\Tests\Controller\Api;
+namespace Mautic\CampaignBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;

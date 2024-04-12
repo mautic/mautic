@@ -6,8 +6,10 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 class NotificationDAO
 {
-    public function __construct(private ObjectChangeDAO $objectChangeDAO, private string $message)
-    {
+    public function __construct(
+        private ObjectChangeDAO $objectChangeDAO,
+        private string $message
+    ) {
     }
 
     /**

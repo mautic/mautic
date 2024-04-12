@@ -13,14 +13,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private MembershipManager $membershipManager, private CampaignModel $campaignModel)
-    {
+    public function __construct(
+        private MembershipManager $membershipManager,
+        private CampaignModel $campaignModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD                    => ['addAction', 0],

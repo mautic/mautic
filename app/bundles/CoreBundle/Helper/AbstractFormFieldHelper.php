@@ -257,7 +257,7 @@ abstract class AbstractFormFieldHelper
         foreach ($parsers as $parser) {
             try {
                 $list = $parser->parse($list);
-            } catch (FormatNotSupportedException $exception) {
+            } catch (FormatNotSupportedException) {
                 continue;
             }
         }

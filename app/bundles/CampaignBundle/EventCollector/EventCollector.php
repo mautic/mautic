@@ -13,18 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventCollector
 {
-    /**
-     * @var array
-     */
-    private $eventsArray = [];
+    private array $eventsArray = [];
 
-    /**
-     * @var EventAccessor
-     */
-    private $events;
+    private ?\Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor $events = null;
 
-    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

@@ -21,8 +21,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class SyncService implements SyncServiceInterface
 {
-    public function __construct(private MauticSyncDataExchange $internalSyncDataExchange, private SyncDateHelper $syncDateHelper, private MappingHelper $mappingHelper, private RelationsHelper $relationsHelper, private SyncIntegrationsHelper $syncIntegrationsHelper, private EventDispatcherInterface $eventDispatcher, private Notifier $notifier, private IntegrationSyncProcess $integratinSyncProcess, private MauticSyncProcess $mauticSyncProcess)
-    {
+    public function __construct(
+        private MauticSyncDataExchange $internalSyncDataExchange,
+        private SyncDateHelper $syncDateHelper,
+        private MappingHelper $mappingHelper,
+        private RelationsHelper $relationsHelper,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private EventDispatcherInterface $eventDispatcher,
+        private Notifier $notifier,
+        private IntegrationSyncProcess $integratinSyncProcess,
+        private MauticSyncProcess $mauticSyncProcess
+    ) {
     }
 
     /**
@@ -52,7 +61,7 @@ final class SyncService implements SyncServiceInterface
                 $inputOptionsDAO->isFirstTimeSync() ? 'first time' : 'subsequent',
                 $inputOptionsDAO->getStartDateTime() ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : 'yet to be determined'
             ),
-            __CLASS__.':'.__FUNCTION__
+            self::class.':'.__FUNCTION__
         );
 
         try {

@@ -99,14 +99,14 @@ class AuditlogController extends CommonController
         $dataType = $request->get('filetype', 'csv');
 
         $resultsCallback = function ($event) use ($dateHelper): array {
-            $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+            $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];
             }
 
             return [
                 'eventName'      => $eventLabel,
-                'eventType'      => isset($event['eventType']) ? $event['eventType'] : '',
+                'eventType'      => $event['eventType'] ?? '',
                 'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };

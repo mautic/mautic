@@ -13,8 +13,10 @@ class MailboxOrganizer
      */
     protected $containers = [];
 
-    public function __construct(protected ParseEmailEvent $event, protected array $mailboxes)
-    {
+    public function __construct(
+        protected ParseEmailEvent $event,
+        protected array $mailboxes
+    ) {
     }
 
     /**
@@ -36,8 +38,8 @@ class MailboxOrganizer
                 continue;
             }
 
-            $criteria   = isset($criteriaRequested[$name]) ? $criteriaRequested[$name] : Mailbox::CRITERIA_UNSEEN;
-            $markAsSeen = isset($markAsSeenInstructions[$name]) ? $markAsSeenInstructions[$name] : true;
+            $criteria   = $criteriaRequested[$name] ?? Mailbox::CRITERIA_UNSEEN;
+            $markAsSeen = $markAsSeenInstructions[$name] ?? true;
 
             $container = $this->getContainer($config);
             if (!$markAsSeen) {

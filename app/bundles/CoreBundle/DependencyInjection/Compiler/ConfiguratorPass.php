@@ -8,9 +8,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ConfiguratorPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('mautic.configurator')) {
@@ -20,7 +17,7 @@ class ConfiguratorPass implements CompilerPassInterface
         $configuratorDef = $container->findDefinition('mautic.configurator');
 
         foreach ($container->findTaggedServiceIds('mautic.configurator.step') as $id => $tags) {
-            $priority = isset($tags[0]['priority']) ? $tags[0]['priority'] : 0;
+            $priority = $tags[0]['priority'] ?? 0;
             $configuratorDef->addMethodCall('addStep', [new Reference($id), $priority]);
         }
     }

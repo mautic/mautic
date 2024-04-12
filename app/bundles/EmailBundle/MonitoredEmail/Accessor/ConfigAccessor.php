@@ -7,8 +7,9 @@ class ConfigAccessor
     /**
      * @param mixed[] $config
      */
-    public function __construct(private array $config)
-    {
+    public function __construct(
+        private array $config
+    ) {
     }
 
     /**
@@ -58,6 +59,6 @@ class ConfigAccessor
      */
     protected function getProperty($property)
     {
-        return isset($this->config[$property]) ? $this->config[$property] : null;
+        return $this->config[$property] ?? null;
     }
 }

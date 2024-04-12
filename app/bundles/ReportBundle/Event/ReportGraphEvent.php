@@ -10,8 +10,11 @@ class ReportGraphEvent extends AbstractReportEvent
     /**
      * @param mixed[] $requestedGraphs
      */
-    public function __construct(Report $report, private array $requestedGraphs, private QueryBuilder $queryBuilder)
-    {
+    public function __construct(
+        Report $report,
+        private array $requestedGraphs,
+        private QueryBuilder $queryBuilder
+    ) {
         $this->report          = $report;
         $this->context         = $report->getSource();
     }
@@ -47,11 +50,7 @@ class ReportGraphEvent extends AbstractReportEvent
      */
     public function getOptions($graph)
     {
-        if (isset($this->requestedGraphs[$graph]['options'])) {
-            return $this->requestedGraphs[$graph]['options'];
-        }
-
-        return [];
+        return $this->requestedGraphs[$graph]['options'] ?? [];
     }
 
     /**

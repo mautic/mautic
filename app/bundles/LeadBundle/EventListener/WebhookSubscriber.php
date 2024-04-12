@@ -17,14 +17,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private WebhookModel $webhookModel, private LeadModel $leadModel)
-    {
+    public function __construct(
+        private WebhookModel $webhookModel,
+        private LeadModel $leadModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
@@ -264,7 +263,7 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     public function onSegmentChange(ListChangeEvent $changeEvent): void
     {
-        $contacts = null !== $changeEvent->getLeads() ? $changeEvent->getLeads() : [$changeEvent->getLead()];
+        $contacts = $changeEvent->getLeads() ?? [$changeEvent->getLead()];
         foreach ($contacts as $contact) {
             if (is_array($contact)) {
                 $contact = $this->leadModel->getEntity($contact['id']);

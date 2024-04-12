@@ -13,14 +13,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AvatarHelper $avatarHelper, private FormUploader $uploader, private LeadModel $leadModel)
-    {
+    public function __construct(
+        private AvatarHelper $avatarHelper,
+        private FormUploader $uploader,
+        private LeadModel $leadModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
@@ -55,7 +55,7 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
                         $this->leadModel->saveEntity($contact);
 
                         return;
-                    } catch (\Exception $exception) {
+                    } catch (\Exception) {
                     }
 
                     break;

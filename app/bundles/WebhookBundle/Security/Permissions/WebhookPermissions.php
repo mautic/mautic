@@ -7,9 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class WebhookPermissions extends AbstractPermissions
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -22,9 +19,6 @@ class WebhookPermissions extends AbstractPermissions
         return 'webhook';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addStandardFormFields('webhook', 'categories', $builder, $data);

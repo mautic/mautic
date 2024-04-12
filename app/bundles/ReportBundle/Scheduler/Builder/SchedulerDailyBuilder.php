@@ -11,15 +11,13 @@ use Recurr\Rule;
 class SchedulerDailyBuilder implements BuilderInterface
 {
     /**
-     * @return Rule
-     *
      * @throws InvalidSchedulerException
      */
-    public function build(Rule $rule, SchedulerInterface $scheduler)
+    public function build(Rule $rule, SchedulerInterface $scheduler): Rule
     {
         try {
             $rule->setFreq('DAILY');
-        } catch (InvalidArgument $e) {
+        } catch (InvalidArgument) {
             throw new InvalidSchedulerException();
         }
 

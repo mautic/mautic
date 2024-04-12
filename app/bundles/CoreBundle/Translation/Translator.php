@@ -43,9 +43,6 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function warmUp(string $cacheDir)
     {
         $this->translator->warmUp($cacheDir);

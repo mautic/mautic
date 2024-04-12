@@ -3,12 +3,10 @@
 namespace Mautic\LeadBundle\Segment\Stat\ChartQuery;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 
 class SegmentContactsLineChartQuery extends ChartQuery
@@ -18,38 +16,22 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private $segmentId;
 
-    /**
-     * @var bool|string
-     */
-    private $firstEventLog;
+    private ?array $addedEventLogStats = null;
 
-    /**
-     * @var array
-     */
-    private $addedEventLogStats;
-
-    /**
-     * @var array
-     */
-    private $removedEventLogStats;
-
-    /**
-     * @var array
-     */
-    private $addedLeadListStats;
-
-    /**
-     * @var bool
-     */
-    private $statsFromEventLog;
+    private ?array $removedEventLogStats = null;
 
     /**
      * @param string|null $unit
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, private array $filters = [], $unit = null)
-    {
+    public function __construct(
+        Connection $connection,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        private array $filters = [],
+        $unit = null
+    ) {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
         $this->dateTo     = $dateTo;
@@ -104,10 +86,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
      * Get data about add/remove from segment based on LeadEventLog.
      *
      * @param string $action
-     *
-     * @return array
      */
-    public function getDataFromLeadEventLog($action)
+    public function getDataFromLeadEventLog($action): array
     {
         $qb = $this->prepareTimeDataQuery(
             'lead_event_log',
@@ -125,57 +105,11 @@ class SegmentContactsLineChartQuery extends ChartQuery
     }
 
     /**
-     * Get data about add from segment based on LeadListLead before upgrade to 2.15.
-     *
-     * @return array
-     */
-    public function getDataFromLeadListLeads()
-    {
-        $q = $this->prepareTimeDataQuery('lead_lists_leads', 'date_added', $this->filters);
-        if ($this->firstEventLog) {
-            $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($this->firstEventLog)));
-        }
-        $q = $this->optimizeListLeadQuery($q);
-
-        return $this->loadAndBuildTimeData($q);
-    }
-
-    /**
-     * @return bool|string
-     */
-    private function getFirstDateAddedSegmentEventLog()
-    {
-        $subQuery = $this->connection->createQueryBuilder();
-        $subQuery->select('el.date_added - INTERVAL 10 SECOND')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log el FORCE INDEX ('.MAUTIC_TABLE_PREFIX.'IDX_SEARCH)')
-            ->where(
-                $subQuery->expr()->and(
-                    $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
-                    $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
-                    $subQuery->expr()->eq('el.object_id', $this->segmentId)
-                )
-            )
-            ->orderBy('el.date_added')
-            ->setFirstResult(0)
-            ->setMaxResults(1);
-
-        return $subQuery->executeQuery()->fetchOne();
-    }
-
-    /**
      * @return int
      */
     public function getSegmentId()
     {
         return $this->segmentId;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatsFromEventLog()
-    {
-        return $this->statsFromEventLog;
     }
 
     /**
@@ -199,46 +133,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private function init(): void
     {
-        $this->firstEventLog        = $this->getFirstDateAddedSegmentEventLog();
-        $this->addedLeadListStats   = $this->getDataFromLeadListLeads();
         $this->addedEventLogStats   = $this->getDataFromLeadEventLog('added');
         $this->removedEventLogStats = $this->getDataFromLeadEventLog('removed');
-        $this->statsFromEventLog    = (
-            empty(array_filter($this->addedLeadListStats))
-            && (!empty(array_filter($this->addedEventLogStats))
-            || !empty(array_filter($this->removedEventLogStats)))
-        );
-    }
-
-    private function optimizeListLeadQuery(QueryBuilder $qb): QueryBuilder
-    {
-        if (
-            // Remove unwanted self join with lead_lists_leads table
-            false !== ($key = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('from'), 'table'))) &&
-            false !== ($joinKey = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('join')[$tableAlias = $qb->getQueryPart('from')[$key]['alias']], 'joinTable')))
-        ) {
-            $joinAlias = $qb->getQueryPart('join')[$tableAlias][$joinKey]['joinAlias'];
-            $qb->resetQueryPart('join');
-            $compositeExpression = $qb->getQueryPart('where');
-            $this->removeUnwantedWhereClause($compositeExpression, $joinAlias);
-        }
-
-        return $qb;
-    }
-
-    private function removeUnwantedWhereClause(CompositeExpression $compositeExpression, string $joinAlias): void
-    {
-        // CompositeExpression class has no way to remove members of it's 'parts' property, and we have
-        // to resort on Reflection here.
-        $compositeExpressionReflection      = new \ReflectionClass(CompositeExpression::class);
-        $compositeExpressionReflectionParts = $compositeExpressionReflection->getProperty('parts');
-        $compositeExpressionReflectionParts->setAccessible(true);
-        $parts    = $compositeExpressionReflectionParts->getValue($compositeExpression);
-        $newParts = array_filter($parts, function ($val) use ($joinAlias): bool {
-            return !str_starts_with($val, "$joinAlias.");
-        });
-        $compositeExpressionReflectionParts->setValue($compositeExpression, $newParts);
-        $compositeExpressionReflectionParts->setAccessible(false);
     }
 
     private function optimizeSearchInLeadEventLog(QueryBuilder $qb): QueryBuilder

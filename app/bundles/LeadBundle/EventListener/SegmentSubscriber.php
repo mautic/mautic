@@ -2,30 +2,36 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
+use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel, private ListModel $listModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private ListModel $listModel,
+        private SegmentUsedInCampaignsValidator $segmentUsedInCampaignsValidator,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LIST_PRE_UNPUBLISH => ['onSegmentPreUnpublish', 0],
             LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
             LeadEvents::LIST_POST_DELETE   => ['onSegmentDelete', 0],
+            LeadEvents::LIST_PRE_UNPUBLISH => [
+                ['validateSegmentFilters', 0],
+                ['validateSegmentsUsedInCampaigns', 0],
+            ],
         ];
     }
 
@@ -48,16 +54,17 @@ class SegmentSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onSegmentPreUnpublish(SegmentEvent $event): ?RecordCanNotUnpublishException
+    /**
+     * @throws RecordNotUnpublishedException
+     */
+    public function validateSegmentFilters(SegmentEvent $event): void
     {
         $leadList = $event->getList();
         $lists    = $this->listModel->getSegmentsWithDependenciesOnSegment($leadList->getId(), 'name');
         if (count($lists)) {
             $message = $this->translator->trans('mautic.lead_list.is_in_use', ['%segments%' => implode(',', $lists)], 'validators');
-            throw new RecordCanNotUnpublishException($message);
+            throw new RecordNotUnpublishedException($message);
         }
-
-        return null;
     }
 
     /**
@@ -75,5 +82,13 @@ class SegmentSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * @throws RecordNotUnpublishedException
+     */
+    public function validateSegmentsUsedInCampaigns(SegmentEvent $event): void
+    {
+        $this->segmentUsedInCampaignsValidator->validate($event->getList());
     }
 }

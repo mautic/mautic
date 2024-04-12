@@ -157,7 +157,7 @@ class Asset extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass('Mautic\AssetBundle\Entity\AssetRepository')
+            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -842,7 +842,7 @@ class Asset extends FormEntity
             return $this->maxSize;
         }
 
-        return 6000000;
+        return 6_000_000;
     }
 
     /**
@@ -1089,7 +1089,7 @@ class Asset extends FormEntity
 
         try {
             $file = new File($path);
-        } catch (FileNotFoundException $e) {
+        } catch (FileNotFoundException) {
             $file = null;
         }
 
@@ -1098,8 +1098,6 @@ class Asset extends FormEntity
 
     /**
      * Load content of the file from it's path.
-     *
-     * @return string
      */
     public function getFileContents(): string|bool
     {
@@ -1137,7 +1135,7 @@ class Asset extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback([__CLASS__, 'validateFile']));
+        $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
     }
 
     /**
@@ -1282,10 +1280,8 @@ class Asset extends FormEntity
      *
      * @param string    $setting
      * @param bool|true $convertToBytes
-     *
-     * @return int
      */
-    public static function getIniValue($setting, $convertToBytes = true)
+    public static function getIniValue($setting, $convertToBytes = true): int
     {
         $value = ini_get($setting);
 
@@ -1305,7 +1301,7 @@ class Asset extends FormEntity
      */
     public static function convertBytesToHumanReadable($size, $unit = ''): string
     {
-        list($number, $unit) = self::convertBytesToUnit($size, $unit);
+        [$number, $unit] = self::convertBytesToUnit($size, $unit);
 
         // Format number
         $number = number_format($number, 2);

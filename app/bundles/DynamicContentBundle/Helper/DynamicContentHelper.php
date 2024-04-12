@@ -18,8 +18,12 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    public function __construct(protected DynamicContentModel $dynamicContentModel, protected RealTimeExecutioner $realTimeExecutioner, protected EventDispatcherInterface $dispatcher, protected LeadModel $leadModel)
-    {
+    public function __construct(
+        protected DynamicContentModel $dynamicContentModel,
+        protected RealTimeExecutioner $realTimeExecutioner,
+        protected EventDispatcherInterface $dispatcher,
+        protected LeadModel $leadModel
+    ) {
     }
 
     /**
@@ -158,9 +162,10 @@ class DynamicContentHelper
             $dwc     = $translation;
             $content = $dwc->getContent();
         }
-        $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+        $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+        $tokenEvent->setStat($stat);
         $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();
@@ -202,18 +207,14 @@ class DynamicContentHelper
 
     /**
      * @param Lead $lead
-     *
-     * @return array
      */
-    public function convertLeadToArray($lead)
+    public function convertLeadToArray($lead): array
     {
         return array_merge(
             $lead->getProfileFields(),
             [
                 'tags' => array_map(
-                    function (Tag $v) {
-                        return $v->getId();
-                    },
+                    fn (Tag $v) => $v->getId(),
                     $lead->getTags()->toArray()
                 ),
             ]

@@ -17,10 +17,7 @@ class CompanyDecorator extends BaseDecorator
         return 'company_id';
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }

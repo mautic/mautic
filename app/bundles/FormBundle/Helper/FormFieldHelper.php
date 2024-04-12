@@ -20,10 +20,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
 {
     private ?\Symfony\Component\Validator\Validator\ValidatorInterface $validator;
 
-    /**
-     * @var array
-     */
-    private $types = [
+    private array $types = [
         'captcha' => [
             'constraints' => [
                 NotBlank::class => ['message' => 'mautic.form.submission.captcha.invalid'],
@@ -65,9 +62,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'file' => [],
     ];
 
-    /**
-     * FormFieldHelper constructor.
-     */
     public function __construct(Translator $translator, ValidatorInterface $validator = null)
     {
         $this->translator = $translator;
@@ -116,11 +110,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function getFieldFilter($type)
     {
         if (array_key_exists($type, $this->types)) {
-            if (isset($this->types[$type]['filter'])) {
-                return $this->types[$type]['filter'];
-            }
-
-            return 'clean';
+            return $this->types[$type]['filter'] ?? 'clean';
         }
 
         return 'alphanum';
@@ -174,12 +164,16 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
+    /**
+     * Search and replace the HTML of the form field with the value.
+     */
     public function populateField($field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 
         switch ($field->getType()) {
             case 'text':
+            case 'number':
             case 'email':
             case 'hidden':
             case 'tel':
@@ -257,7 +251,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function sanitizeValue($value)
     {
         $valueType = gettype($value);
-        $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(urldecode($value)));
+        $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(rawurldecode($value)));
         // for boolean expect 0 or 1
         if ('boolean' === $valueType) {
             return (int) $value;

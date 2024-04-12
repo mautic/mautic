@@ -12,9 +12,6 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class ExceptionController extends CommonController
 {
-    /**
-     * {@inheritdoc}
-     */
     public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, DebugLoggerInterface $logger = null)
     {
         $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
@@ -23,7 +20,9 @@ class ExceptionController extends CommonController
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();
 
-        if (0 === $code) {
+        // All valid status codes are within the range of 100 to 599, inclusive
+        // @see https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes
+        if ($code < 100 || $code > 599) {
             // thrown exception that didn't set a code
             $code = 500;
         }
@@ -82,7 +81,7 @@ class ExceptionController extends CommonController
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
-        $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
+        $statusText = Response::$statusTexts[$code] ?? '';
 
         $url      = $request->getRequestUri();
         $urlParts = parse_url($url);
@@ -115,10 +114,8 @@ class ExceptionController extends CommonController
 
     /**
      * @param int $startObLevel
-     *
-     * @return string
      */
-    protected function getAndCleanOutputBuffering($startObLevel)
+    protected function getAndCleanOutputBuffering($startObLevel): string|false
     {
         if (ob_get_level() <= $startObLevel) {
             return '';

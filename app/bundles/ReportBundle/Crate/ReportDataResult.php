@@ -45,8 +45,12 @@ class ReportDataResult
      * @param array<mixed> $data
      * @param array<mixed> $totals
      */
-    public function __construct(array $data, private array $totals = [], private int $preBatchSize = 0, private bool $isLastBatch = true)
-    {
+    public function __construct(
+        array $data,
+        private array $totals = [],
+        private int $preBatchSize = 0,
+        private bool $isLastBatch = true
+    ) {
         if (
             !array_key_exists('data', $data) ||
             !array_key_exists('dataColumns', $data) ||
@@ -102,7 +106,7 @@ class ReportDataResult
      */
     public function getType($column)
     {
-        return isset($this->types[$column]) ? $this->types[$column] : 'string';
+        return $this->types[$column] ?? 'string';
     }
 
     /**

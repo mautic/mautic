@@ -8,10 +8,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ContactFrequencyType extends AbstractType
 {
-    public function __construct(protected CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
