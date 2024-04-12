@@ -674,7 +674,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testUpdateDncByMauticDate(): void
     {
-        $this->sfMockMethods = ['makeRequest', 'updateDncByDate', 'getDncHistory'];
+        $this->sfMockMethods = ['makeRequest', 'updateDncByDate', 'getDoNotContactHistory'];
 
         $objects = ['Contact', 'Lead'];
         foreach ($objects as $object) {
@@ -695,7 +695,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
             $sf = $this->getSalesforceIntegration(2, 2);
             $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())->method('getDncHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
+            $sf->expects($this->any())->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
 
             $sf->pushLeadDoNotContactByDate('email', $mappedData, $object, ['start' => '2017-10-15T10:00:00.000000']);
             foreach ($mappedData as $assertion) {

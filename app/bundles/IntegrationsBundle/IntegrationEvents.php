@@ -205,4 +205,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION = 'mautic.integration.INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION';
+
+    /**
+     * This event is dispatched when api keys is updated/inserted.
+     *
+     * The event listener receives a Mautic\IntegrationsBundle\Event\KeysSaveEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_API_KEYS_BEFORE_SAVE = 'mautic.integration.INTEGRATION_API_KEYS_BEFORE_SAVE';
 }

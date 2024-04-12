@@ -633,6 +633,11 @@ class WebhookModel extends FormModel
         return 'webhook:webhooks';
     }
 
+    public function getWebhookLimit(): int
+    {
+        return $this->webhookLimit;
+    }
+
     public function setMinQueueId(int $minQueueId): self
     {
         $this->minQueueId = $minQueueId;
