@@ -242,32 +242,32 @@ abstract class AbstractChart
         }
     }
 
-  public function addCompanyFilter(QueryBuilder $q, ?int $companyId = null, string $fromAlias = 't'): void
-  {
-      if ($companyId) {
-          $sb = $q->expr()->and(
-              $q->expr()->eq('cl.company_id', ':companyId'),
-              $q->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
-          );
+    public function addCompanyFilter(QueryBuilder $q, ?int $companyId = null, string $fromAlias = 't'): void
+    {
+        if ($companyId) {
+            $sb = $q->expr()->and(
+                $q->expr()->eq('cl.company_id', ':companyId'),
+                $q->expr()->eq('cl.lead_id', $fromAlias.'.lead_id')
+            );
 
-          $q->andWhere(
-              sprintf('EXISTS (SELECT null FROM %scompanies_leads cl WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
-          )->setParameter('companyId', $companyId);
-      }
-  }
+            $q->andWhere(
+                sprintf('EXISTS (SELECT null FROM %scompanies_leads cl WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
+            )->setParameter('companyId', $companyId);
+        }
+    }
 
- public function addSegmentFilter(QueryBuilder $q, ?int $segmentId = null, string $fromAlias = 't'): void
- {
-     if ($segmentId) {
-         $sb = $q->expr()->and(
-             $q->expr()->eq('lll.leadlist_id', ':segmentId'),
-             $q->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
-             $q->expr()->eq('lll.manually_removed', 0)
-         );
+    public function addSegmentFilter(QueryBuilder $q, ?int $segmentId = null, string $fromAlias = 't'): void
+    {
+        if ($segmentId) {
+            $sb = $q->expr()->and(
+                $q->expr()->eq('lll.leadlist_id', ':segmentId'),
+                $q->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
+                $q->expr()->eq('lll.manually_removed', 0)
+            );
 
-         $q->andWhere(
-             sprintf('EXISTS (SELECT null FROM %slead_lists_leads lll WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
-         )->setParameter('segmentId', $segmentId);
-     }
- }
+            $q->andWhere(
+                sprintf('EXISTS (SELECT null FROM %slead_lists_leads lll WHERE %s)', MAUTIC_TABLE_PREFIX, $sb)
+            )->setParameter('segmentId', $segmentId);
+        }
+    }
 }

@@ -63,7 +63,7 @@ class PageModel extends FormModel
      */
     protected $catInUrl;
 
-    protected \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
+    protected DateTimeHelper $dateTimeHelper;
 
     public function __construct(
         protected CookieHelper $cookieHelper,
@@ -101,7 +101,7 @@ class PageModel extends FormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository(\Mautic\PageBundle\Entity\Page::class);
+        $repo = $this->em->getRepository(Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -112,7 +112,7 @@ class PageModel extends FormModel
      */
     public function getHitRepository()
     {
-        return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
+        return $this->em->getRepository(Hit::class);
     }
 
     public function getPermissionBase(): string
@@ -226,9 +226,9 @@ class PageModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -371,7 +371,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', Lead $lead = null, $query = []): void
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = []): void
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
@@ -482,7 +482,7 @@ class PageModel extends FormModel
         Lead $lead,
         bool $trackingNewlyGenerated,
         bool $activeRequest = true,
-        \DateTimeInterface $hitDate = null
+        ?\DateTimeInterface $hitDate = null
     ): void {
         // Store Page/Redirect association
         if ($page) {
@@ -720,7 +720,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
@@ -733,7 +733,7 @@ class PageModel extends FormModel
      *
      * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null): array
+    public function getBounces(Page $page, ?\DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -905,7 +905,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getPopularPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -934,7 +934,7 @@ class PageModel extends FormModel
      *
      * @return array<array<int|string>>
      */
-    public function getPopularTrackedPages(int $limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, array $filters = []): array
+    public function getPopularTrackedPages(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = []): array
     {
         $companyId  = $filters['companyId'] ?? null;
         $campaignId = $filters['campaignId'] ?? null;
@@ -967,7 +967,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getPageList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')
@@ -1049,7 +1049,7 @@ class PageModel extends FormModel
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\UtmTag::class);
+            $repo = $this->em->getRepository(UtmTag::class);
             $repo->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);
