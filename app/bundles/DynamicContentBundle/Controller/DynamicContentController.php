@@ -15,10 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentController extends FormController
 {
-    /**
-     * @return array
-     */
-    protected function getPermissions()
+    protected function getPermissions(): array
     {
         return (array) $this->security->isGranted(
             [
@@ -36,9 +33,6 @@ class DynamicContentController extends FormController
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function indexAction(Request $request, $page = 1)
     {
         $model = $this->getModel('dynamicContent');
@@ -51,7 +45,6 @@ class DynamicContentController extends FormController
 
         $this->setListFilters();
 
-        // set limits
         $limit = $request->getSession()->get('mautic.dynamicContent.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -115,9 +108,6 @@ class DynamicContentController extends FormController
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function newAction(Request $request, $entity = null)
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
@@ -385,7 +375,7 @@ class DynamicContentController extends FormController
 
         /* @var DynamicContent $parent */
         /* @var DynamicContent[] $children */
-        list($translationParent, $translationChildren) = $entity->getTranslations();
+        [$translationParent, $translationChildren] = $entity->getTranslations();
 
         // Audit Log
         $auditLogModel = $this->getModel('core.auditlog');

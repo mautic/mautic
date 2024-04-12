@@ -1,0 +1,35 @@
+{
+  "name": "Brand New Report",
+  "description": "A new report",
+  "system": true,
+  "source": "email.stats",
+  "columns": [
+    "es.date_sent",
+    "es.date_read",
+    "e.subject",
+    "es.email_address",
+    "e.id"
+  ],
+  "filters": [],
+  "tableOrder": [
+    {
+      "column": "es.date_sent",
+      "direction": "ASC"
+    }
+  ],
+  "graphs": [
+    "mautic.email.graph.line.stats",
+    "mautic.email.graph.pie.ignored.read.failed",
+    "mautic.email.table.most.emails.read",
+    "mautic.email.table.most.emails.sent",
+    "mautic.email.table.most.emails.read.percent",
+    "mautic.email.table.most.emails.failed"
+  ],
+  "groupBy": null,
+  "settings": [],
+  "isScheduled": true,
+  "scheduleUnit": "DAILY",
+  "toAddress": "test2@mailinator.com",
+  "scheduleDay": null,
+  "scheduleMonthFrequency": null
+}

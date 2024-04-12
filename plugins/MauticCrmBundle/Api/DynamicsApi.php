@@ -8,10 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class DynamicsApi extends CrmApi
 {
-    /**
-     * @return string
-     */
-    private function getUrl()
+    private function getUrl(): string
     {
         $keys = $this->integration->getKeys();
 
@@ -136,10 +133,8 @@ class DynamicsApi extends CrmApi
      * @param array  $data
      * @param string $object
      * @param bool   $isUpdate
-     *
-     * @return array
      */
-    public function createLeads($data, $object = 'contacts', $isUpdate = false)
+    public function createLeads($data, $object = 'contacts', $isUpdate = false): array
     {
         if (0 === count($data)) {
             return [];
@@ -197,20 +192,16 @@ class DynamicsApi extends CrmApi
 
     /**
      * @param array $data
-     *
-     * @return array
      */
-    public function updateLeads($data, $object = 'contacts')
+    public function updateLeads($data, $object = 'contacts'): array
     {
         return $this->createLeads($data, $object, true);
     }
 
     /**
      * @see https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
-     *
-     * @return array
      */
-    public function parseRawHttpResponse(ResponseInterface $response)
+    public function parseRawHttpResponse(ResponseInterface $response): array
     {
         $a_data      = [];
         $input       = $response->getBody();
@@ -223,10 +214,10 @@ class DynamicsApi extends CrmApi
         array_pop($a_blocks);
         // there is only one batchresponse
         $input                = array_pop($a_blocks);
-        list($header, $input) = explode("\r\n\r\n", $input, 2);
+        [$header, $input]     = explode("\r\n\r\n", $input, 2);
         foreach (explode("\r\n", $header) as $r) {
             if (0 === stripos($r, 'Content-Type:')) {
-                list($headername, $contentType) = explode(':', $r, 2);
+                [$headername, $contentType] = explode(':', $r, 2);
             }
         }
         // grab multipart boundary from content type header

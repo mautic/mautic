@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
@@ -17,6 +8,7 @@ use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -118,7 +110,7 @@ class PageController extends FormController
         $filter['force'][] = ['column' => 'p.variantParent', 'expr' => 'isNull'];
 
         $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
-        if (false === strpos($search, "{$langSearchCommand}:")) {
+        if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
 
@@ -301,24 +293,28 @@ class PageController extends FormController
         // get related translations
         [$translationParent, $translationChildren] = $activePage->getTranslations();
 
+        $variants = [
+            'parent'             => $parent,
+            'children'           => $children,
+            'properties'         => $properties,
+            'criteria'           => $criteria['criteria'],
+        ];
+
+        $translations = [
+            'parent'   => $translationParent,
+            'children' => $translationChildren,
+        ];
+
         return $this->delegateView([
             'returnUrl' => $this->generateUrl('mautic_page_action', [
                     'objectAction' => 'view',
                     'objectId'     => $activePage->getId(), ]
             ),
             'viewParameters' => [
-                'activePage' => $activePage,
-                'variants'   => [
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties,
-                    'criteria'   => $criteria['criteria'],
-                ],
-                'translations' => [
-                    'parent'   => $translationParent,
-                    'children' => $translationChildren,
-                ],
-                'permissions' => $security->isGranted([
+                'activePage'   => $activePage,
+                'variants'     => $variants,
+                'translations' => $translations,
+                'permissions'  => $security->isGranted([
                     'page:pages:viewown',
                     'page:pages:viewother',
                     'page:pages:create',
@@ -343,7 +339,16 @@ class PageController extends FormController
                 'pageUrl'       => $model->generateUrl($activePage, true),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'logs'          => $logs,
-                'dateRangeForm' => $dateRangeForm->createView(),
+                'dateRangeForm' => $dateRangeForm->createView(), 'previewSettingsForm' => $this->createForm(
+                    ContentPreviewSettingsType::class,
+                    null,
+                    [
+                        'type'         => ContentPreviewSettingsType::TYPE_PAGE,
+                        'objectId'     => $activePage->getId(),
+                        'variants'     => $variants,
+                        'translations' => $translations,
+                    ]
+                )->createView(),
             ],
             'contentTemplate' => '@MauticPage/Page/details.html.twig',
             'passthroughVars' => [
@@ -591,7 +596,7 @@ class PageController extends FormController
 
             // set the lookup values
             $parent = $entity->getTranslationParent();
-            if ($parent && isset($form['translationParent_lookup'])) {
+            if ($parent instanceof Page && isset($form['translationParent_lookup'])) {
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
             }
 
@@ -823,7 +828,7 @@ class PageController extends FormController
         $model = $this->getModel('page.page');
 
         // permission check
-        if (false !== strpos($objectId, 'new')) {
+        if (str_contains((string) $objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('page:pages:create')) {
                 return $this->accessDenied();
@@ -985,7 +990,7 @@ class PageController extends FormController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity)
+    private function processSlots(SlotsHelper $slotsHelper, $slots, $entity): void
     {
         $slotsHelper->inBuilder(true);
 
@@ -1007,7 +1012,7 @@ class PageController extends FormController
                 $slotConfig['placeholder'] = 'mautic.page.builder.addcontent';
             }
 
-            $value = isset($content[$slot]) ? $content[$slot] : '';
+            $value = $content[$slot] ?? '';
 
             $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }
@@ -1231,7 +1236,7 @@ class PageController extends FormController
         return 'page';
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }

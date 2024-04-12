@@ -8,14 +8,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class StageActionType.
+ * @extends AbstractType<array<mixed>>
  */
 class StageActionType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $masks           = [];
         $formTypeOptions = [
@@ -33,10 +30,7 @@ class StageActionType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'formType'        => GenericStageActionType::class,
@@ -44,9 +38,6 @@ class StageActionType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'stageaction';

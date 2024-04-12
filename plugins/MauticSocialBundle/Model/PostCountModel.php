@@ -12,10 +12,8 @@ class PostCountModel extends AbstractCommonModel
 {
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?PostCount
     {
         if (null !== $id) {
             $repo = $this->getRepository();
@@ -44,7 +42,7 @@ class PostCountModel extends AbstractCommonModel
      *
      * @return boolean
      */
-    public function updatePostCount($monitor, \DateTime $postDate)
+    public function updatePostCount($monitor, \DateTime $postDate): bool
     {
         // query the db for posts on this date
         $q    = $this->getRepository()->createQueryBuilder($this->getRepository()->getTableAlias());

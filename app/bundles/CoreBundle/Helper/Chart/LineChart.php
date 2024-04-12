@@ -3,19 +3,10 @@
 namespace Mautic\CoreBundle\Helper\Chart;
 
 /**
- * Class LineChart.
- *
- * Line chart requires the same data as Bar chart
+ * Line chart requires the same data as Bar chart.
  */
 class LineChart extends AbstractChart implements ChartInterface
 {
-    /**
-     * Configurable date format.
-     *
-     * @var string
-     */
-    protected $dateFormat;
-
     /**
      * Match date/time unit to a humanly readable label
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
@@ -42,22 +33,24 @@ class LineChart extends AbstractChart implements ChartInterface
      * @param \DateTime   $dateTo
      * @param string      $dateFormat
      */
-    public function __construct(?string $unit = null, $dateFrom = null, $dateTo = null, $dateFormat = null)
-    {
-        $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
+    public function __construct(
+        ?string $unit = null,
+        $dateFrom = null,
+        $dateTo = null,
+        protected $dateFormat = null
+    ) {
+        $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);
         $this->setDateRange($dateFrom, $dateTo);
-
-        $this->dateFormat = $dateFormat;
         $this->amount     = $this->countAmountFromDateRange();
         $this->generateTimeLabels($this->amount);
         $this->addOneUnitMinusOneSec($this->dateTo);
     }
 
     /**
-     * Render chart data.
+     * @return array{labels: mixed[], datasets: mixed[]}
      */
-    public function render()
+    public function render(): array
     {
         return [
             'labels'   => $this->labels,
@@ -91,7 +84,7 @@ class LineChart extends AbstractChart implements ChartInterface
      *
      * @param int $amount
      */
-    public function generateTimeLabels($amount)
+    public function generateTimeLabels($amount): void
     {
         if (!isset($this->labelFormats[$this->unit])) {
             throw new \UnexpectedValueException('Date/Time unit "'.$this->unit.'" is not available for a label.');
@@ -118,10 +111,8 @@ class LineChart extends AbstractChart implements ChartInterface
      * Generate unique color for the dataset.
      *
      * @param int $datasetId
-     *
-     * @return array
      */
-    public function generateColors($datasetId)
+    public function generateColors($datasetId): array
     {
         $color = $this->configureColorHelper($datasetId);
 

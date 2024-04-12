@@ -12,9 +12,6 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class ExceptionController extends CommonController
 {
-    /**
-     * {@inheritdoc}
-     */
     public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, DebugLoggerInterface $logger = null)
     {
         $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
@@ -23,22 +20,24 @@ class ExceptionController extends CommonController
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();
 
-        if (0 === $code) {
+        // All valid status codes are within the range of 100 to 599, inclusive
+        // @see https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes
+        if ($code < 100 || $code > 599) {
             // thrown exception that didn't set a code
             $code = 500;
         }
 
         // Special handling for oauth and api urls
         if (
-            (false !== strpos($request->getUri(), '/oauth') && false === strpos($request->getUri(), 'authorize'))
+            (str_contains($request->getUri(), '/oauth') && !str_contains($request->getUri(), 'authorize'))
             || RequestHelper::isApiRequest($request)
-            || (!defined('MAUTIC_AJAX_VIEW') && false !== strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
+            || (!defined('MAUTIC_AJAX_VIEW') && str_contains($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
         ) {
             $allowRealMessage =
                 'dev' === MAUTIC_ENV ||
-                false !== strpos($class, 'UnexpectedValueException') ||
-                false !== strpos($class, 'NotFoundHttpException') ||
-                false !== strpos($class, 'AccessDeniedHttpException');
+                str_contains($class, 'UnexpectedValueException') ||
+                str_contains($class, 'NotFoundHttpException') ||
+                str_contains($class, 'AccessDeniedHttpException');
 
             $message   = $allowRealMessage
                 ? $exception->getMessage()
@@ -82,7 +81,7 @@ class ExceptionController extends CommonController
             $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
-        $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';
+        $statusText = Response::$statusTexts[$code] ?? '';
 
         $url      = $request->getRequestUri();
         $urlParts = parse_url($url);
@@ -115,10 +114,8 @@ class ExceptionController extends CommonController
 
     /**
      * @param int $startObLevel
-     *
-     * @return string
      */
-    protected function getAndCleanOutputBuffering($startObLevel)
+    protected function getAndCleanOutputBuffering($startObLevel): string|false
     {
         if (ob_get_level() <= $startObLevel) {
             return '';

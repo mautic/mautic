@@ -12,7 +12,7 @@ class ListLeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->_em->getConnection()->createQueryBuilder()
@@ -57,12 +57,10 @@ class ListLeadRepository extends CommonRepository
             ->where('ll.list = :segmentId')
             ->setParameter('segmentId', $segmentId);
 
-        if (!empty($filters)) {
-            foreach ($filters as $colName => $val) {
-                $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
-                $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
-                $qb->setParameter($entityFieldName, $val);
-            }
+        foreach ($filters as $colName => $val) {
+            $entityFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $colName))));
+            $qb->andWhere(sprintf('ll.%s=:%s', $entityFieldName, $entityFieldName));
+            $qb->setParameter($entityFieldName, $val);
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();

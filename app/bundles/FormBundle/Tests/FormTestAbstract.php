@@ -48,12 +48,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 class FormTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
+
     protected static $mockName = 'Mock test name';
+
     protected $mockTrackingId;
+
     protected $formRepository;
+
     protected $leadFieldModel;
 
     /**
