@@ -11,15 +11,17 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).
+     *
+     * @var string
      */
-    protected string $bundle = 'page';
+    protected $bundle  = 'page';
 
     /**
      * Define the widget(s).
      *
      * @var array<string,array<string, string>>
      */
-    protected array $types = [
+    protected $types = [
         'best.tracking.pages' => [
             'formAlias' => DashboardBestTrackingPagesType::class,
         ],
