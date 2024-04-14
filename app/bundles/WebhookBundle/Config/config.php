@@ -31,7 +31,7 @@ return [
             'items' => [
                 'mautic.webhook.webhooks' => [
                     'id'        => 'mautic_webhook_root',
-                    'iconClass' => 'fa-exchange',
+                    'iconClass' => 'ri-webhook-fill',
                     'access'    => ['webhook:webhooks:viewown', 'webhook:webhooks:viewother'],
                     'route'     => 'mautic_webhook_index',
                 ],
