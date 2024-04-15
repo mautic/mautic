@@ -18,14 +18,14 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|ReportModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $reportModel;
+    private MockObject $reportModel;
 
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+    private MockObject $formBuilder;
 
-    private \Mautic\ReportBundle\Form\Type\ReportType $reportType;
+    private ReportType $reportType;
 
     protected function setUp(): void
     {
