@@ -25,7 +25,7 @@ return [
             ],
             'mautic_email_countries_stats_export' => [
                 'path'         => '/email/countries-stats/export/{objectId}/{format}',
-                'controller'   => 'Mautic\EmailBundle\Controller\EmailController::exportAction',
+                'controller'   => 'Mautic\EmailBundle\Controller\EmailController::exportCountriesStatsAction',
             ],
         ],
         'api' => [

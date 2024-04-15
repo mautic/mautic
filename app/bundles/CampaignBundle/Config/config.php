@@ -33,7 +33,7 @@ return [
             ],
             'mautic_campaign_countries_stats_export' => [
                 'path'         => '/campaign/countries-stats/export/{objectId}/{format}',
-                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignController::exportAction',
+                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignController::exportCountriesStatsAction',
             ],
         ],
         'api'  => [

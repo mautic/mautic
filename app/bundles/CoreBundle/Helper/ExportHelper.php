@@ -23,11 +23,6 @@ class ExportHelper
 
     public const EXPORT_TYPE_CSV   = 'csv';
 
-    /**
-     * @var array<int, string>
-     */
-    private array $headerRow = [];
-
     public function __construct(
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
@@ -123,20 +118,12 @@ class ExportHelper
         return $response;
     }
 
-    /**
-     * @param array<int, string> $headerRow
-     */
-    public function setHeaderRow(array $headerRow): void
+    private function addHeaderToSheet(Spreadsheet $spreadsheet, array $headerRow): void
     {
-        $this->headerRow = $headerRow;
+        $spreadsheet->getActiveSheet()->fromArray($headerRow);
     }
 
-    private function addHeaderToSheet(Spreadsheet $spreadsheet): void
-    {
-        $spreadsheet->getActiveSheet()->fromArray($this->headerRow);
-    }
-
-    private function getSpreadsheetGeneric(\Iterator $data, string $filename): Spreadsheet
+    private function getSpreadsheetGeneric(\Iterator $data, string $filename, array $headerRow = []): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getProperties()->setTitle($filename);
@@ -146,7 +133,7 @@ class ExportHelper
         foreach ($data as $key => $row) {
             // Build the header row if defined
             if (0 === $key) {
-                if (empty($this->headerRow)) {
+                if (empty($headerRow)) {
                     $this->setHeaderRow(array_keys($row));
                 }
                 $this->addHeaderToSheet($spreadsheet);
@@ -237,5 +224,12 @@ class ExportHelper
         $leadExport['stage'] = $stage ? $stage->getName() : null;
 
         return $leadExport;
+    }
+
+    public function getExportFilename(string $objectName): string
+    {
+        $date = (new DateTimeHelper())->toLocalString();
+
+        return str_replace(' ', '_', $date).'_'.InputHelper::alphanum($objectName, false, '_');
     }
 }

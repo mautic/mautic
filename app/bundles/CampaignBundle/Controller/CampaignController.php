@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Doctrine\DBAL\Cache\CacheException;
-use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -1188,19 +1187,10 @@ class CampaignController extends AbstractStandardFormController
         return 'DESC';
     }
 
-    public function hasAccess(Campaign $entity): bool
-    {
-        return $this->security->hasEntityAccess(
-            'campaign:campaigns:viewown',
-            'campaign:campaigns:viewother',
-            $entity->getCreatedBy()
-        );
-    }
-
     /**
      * @return array<int, string>
      */
-    public function getExportHeader(Campaign $entity): array
+    private function getCountriesTableExportHeader(Campaign $entity): array
     {
         $headers = [
             $this->translator->trans('mautic.lead.lead.thead.country'),
@@ -1219,16 +1209,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @return array<int|string, array<int|string, int|string>>
-     *
-     * @throws Exception
-     */
-    public function getData(Campaign $entity): array
-    {
-        return $this->getCampaignModel()->getCountryStats($entity);
-    }
-
-    /**
      * @throws \Exception
      */
     public function countryStatsAction(
@@ -1236,11 +1216,15 @@ class CampaignController extends AbstractStandardFormController
     ): Response {
         $entity = $this->getCampaignModel()->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($entity)) {
+        if (empty($entity) || !$this->security->hasEntityAccess(
+            'campaign:campaigns:viewown',
+            'campaign:campaigns:viewother',
+            $entity->getCreatedBy()
+        )) {
             throw new AccessDeniedHttpException();
         }
 
-        $statsCountries = $this->getData($entity);
+        $statsCountries = $this->getCampaignModel()->getCountryStats($entity);
 
         return $this->render(
             '@MauticCore/Helper/countries_table.html.twig',
@@ -1254,17 +1238,21 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @throws \Exception
      */
-    public function exportAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
+    public function exportCountriesStatsAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
     {
         $model  = $this->getCampaignModel();
         $entity = $model->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($entity)) {
+        if (empty($entity) || !$this->security->hasEntityAccess(
+            'campaign:campaigns:viewown',
+            'campaign:campaigns:viewother',
+            $entity->getCreatedBy()
+        )) {
             throw new AccessDeniedHttpException();
         }
 
         $filename       = $model->getExportFilename($entity->getName()).'.'.$format;
-        $headerRow      = $this->getExportHeader($entity);
+        $headerRow      = $this->getCountriesTableExportHeader($entity);
         $statsCountries = $this->getData($entity);
 
         if (empty($statsCountries)) {

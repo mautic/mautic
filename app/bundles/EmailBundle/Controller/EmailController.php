@@ -1684,7 +1684,7 @@ class EmailController extends FormController
      *
      * @throws Exception
      */
-    public function getData(Email $entity): array
+    private function getCountriesTableData(Email $entity): array
     {
         $model = $this->getEmailModel();
 
@@ -1701,19 +1701,10 @@ class EmailController extends FormController
         );
     }
 
-    public function hasAccess(Email $entity): bool
-    {
-        return $this->security->hasEntityAccess(
-            'email:emails:viewown',
-            'email:emails:viewother',
-            $entity->getCreatedBy()
-        );
-    }
-
     /**
      * @return array<int, string>
      */
-    public function getExportHeader(): array
+    private function getCountriesTableExportHeader(): array
     {
         return [
             $this->translator->trans('mautic.lead.lead.thead.country'),
@@ -1732,11 +1723,15 @@ class EmailController extends FormController
         $model  = $this->getEmailModel();
         $entity = $model->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($entity)) {
+        if (empty($entity) || !$this->security->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $entity->getCreatedBy()
+        )) {
             throw new AccessDeniedHttpException();
         }
 
-        $statsCountries = $this->getData($entity);
+        $statsCountries = $this->getCountriesTableData($entity);
 
         return $this->render(
             '@MauticCore/Helper/countries_table.html.twig',
@@ -1750,18 +1745,22 @@ class EmailController extends FormController
     /**
      * @throws \Exception
      */
-    public function exportAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
+    public function exportCountriesStatsAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
     {
         $model  = $this->getEmailModel();
         $entity = $model->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($entity)) {
+        if (empty($entity) || !$this->security->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $entity->getCreatedBy()
+        )) {
             throw new AccessDeniedHttpException();
         }
 
         $filename       = $model->getExportFilename($entity->getName()).'.'.$format;
-        $headerRow      = $this->getExportHeader();
-        $statsCountries = $this->getData($entity);
+        $headerRow      = $this->getCountriesTableExportHeader();
+        $statsCountries = $this->getCountriesTableData($entity);
 
         if (empty($statsCountries)) {
             throw new NotFoundHttpException();

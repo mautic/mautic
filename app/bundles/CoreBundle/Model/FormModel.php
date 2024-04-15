@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -447,12 +446,5 @@ class FormModel extends AbstractCommonModel
                 ['exception' => $ex]
             );
         }
-    }
-
-    public function getExportFilename(string $objectName): string
-    {
-        $date = (new DateTimeHelper())->toLocalString();
-
-        return str_replace(' ', '_', $date).'_'.InputHelper::alphanum($objectName, false, '_');
     }
 }

@@ -382,7 +382,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function testGetData(): void
+    public function testCountryStatsAction(): void
     {
         $campaign = $this->createCampaignWithEmail();
         $this->addLeadsFromCountry($campaign, 4, 'Finland');

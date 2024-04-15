@@ -290,6 +290,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls('Country', 'Sent', 'Read', 'Clicked');
 
-        $this->assertSame(['Country', 'Sent', 'Read', 'Clicked'], $this->controller->getExportHeader());
+        $this->assertSame(['Country', 'Sent', 'Read', 'Clicked'], $this->controller->getCountryTableExportHeader());
     }
 }

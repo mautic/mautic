@@ -138,7 +138,7 @@ class CampaignControllerTest extends MauticMysqlTestCase
             )
             ->willReturnOnConsecutiveCalls('Country', 'Contacts', 'Country', 'Contacts', 'Sent', 'Read', 'Clicked');
 
-        $this->assertSame(['Country', 'Contacts'], $this->controller->getExportHeader($campaignNoEmail));
-        $this->assertSame(['Country', 'Contacts', 'Sent', 'Read', 'Clicked'], $this->controller->getExportHeader($campaign));
+        $this->assertSame(['Country', 'Contacts'], $this->controller->getCountryTableExportHeader($campaignNoEmail));
+        $this->assertSame(['Country', 'Contacts', 'Sent', 'Read', 'Clicked'], $this->controller->getCountryTableExportHeader($campaign));
     }
 }
