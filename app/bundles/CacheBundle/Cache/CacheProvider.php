@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class CacheProvider implements CacheProviderInterface
 {
-    private ?\Symfony\Component\Cache\Psr16Cache $psr16 = null;
+    private ?Psr16Cache $psr16 = null;
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -108,7 +108,7 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * Persists a cache item immediately.
      *
-     * @param cacheItemInterface $item The cache item to save
+     * @param CacheItemInterface $item The cache item to save
      *
      * @return bool True if the item was successfully persisted. False if there was an error.
      */
@@ -120,7 +120,7 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * Sets a cache item to be persisted later.
      *
-     * @param cacheItemInterface $item The cache item to save
+     * @param CacheItemInterface $item The cache item to save
      *
      * @return bool False if the item could not be queued or if a commit was attempted and failed. True otherwise.
      */

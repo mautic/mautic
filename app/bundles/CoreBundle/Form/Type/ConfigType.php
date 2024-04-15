@@ -595,12 +595,12 @@ class ConfigType extends AbstractType
             'transliterate_page_title',
             YesNoButtonGroupType::class,
             [
-              'label' => 'mautic.core.config.form.transliterate.page.title',
-              'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
-              'attr'  => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
-              ],
+                'label' => 'mautic.core.config.form.transliterate.page.title',
+                'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
+                ],
             ]
         );
 

@@ -170,7 +170,7 @@ class FormType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'         => 'form-control',
-                 'data-hide-on' => '{"mauticform_postAction":"return"}',
+                'data-hide-on'  => '{"mauticform_postAction":"return"}',
             ],
             'required'   => $required,
         ]);

@@ -51,7 +51,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private \Mautic\EmailBundle\EventListener\CampaignSubscriber $subscriber;
+    private CampaignSubscriber $subscriber;
 
     protected function setUp(): void
     {
