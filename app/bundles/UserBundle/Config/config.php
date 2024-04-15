@@ -6,12 +6,12 @@ return [
             'mautic.user.users' => [
                 'access'    => 'user:users:view',
                 'route'     => 'mautic_user_index',
-                'iconClass' => 'fa-users',
+                'iconClass' => 'ri-user-settings-fill',
             ],
             'mautic.user.roles' => [
                 'access'    => 'user:roles:view',
                 'route'     => 'mautic_role_index',
-                'iconClass' => 'fa-lock',
+                'iconClass' => 'ri-shield-user-fill',
             ],
         ],
     ],
