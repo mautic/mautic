@@ -783,8 +783,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     protected function indexStandard(Request $request, $page = null): Response
     {
