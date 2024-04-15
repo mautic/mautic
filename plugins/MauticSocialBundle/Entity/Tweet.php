@@ -465,6 +465,9 @@ class Tweet extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getStats()
     {
         return $this->stats;

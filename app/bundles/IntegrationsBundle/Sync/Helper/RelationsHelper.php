@@ -97,6 +97,8 @@ class RelationsHelper
     }
 
     /**
+     * @return mixed
+     *
      * @throws ObjectNotFoundException
      */
     private function getInternalObjectName(MappingManualDAO $mappingManualDao, string $relObjectName)

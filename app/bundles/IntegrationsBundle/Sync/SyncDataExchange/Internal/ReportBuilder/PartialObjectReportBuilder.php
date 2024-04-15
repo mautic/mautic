@@ -30,7 +30,7 @@ class PartialObjectReportBuilder
 
     private array $objectsWithMissingFields = [];
 
-    private ?ReportDAO $syncReport = null;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO $syncReport = null;
 
     public function __construct(
         private FieldChangeRepository $fieldChangeRepository,

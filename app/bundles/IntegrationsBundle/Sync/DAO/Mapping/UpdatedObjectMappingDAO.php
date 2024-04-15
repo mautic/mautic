@@ -10,11 +10,12 @@ class UpdatedObjectMappingDAO
 {
     private \DateTimeInterface $objectModifiedDate;
 
-    private ?ObjectMapping $objectMapping = null;
+    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
 
     /**
      * @param string $integration
      * @param string $integrationObjectName
+     * @param mixed  $integrationObjectId
      */
     public function __construct(
         private $integration,
@@ -38,6 +39,9 @@ class UpdatedObjectMappingDAO
         return $this->integrationObjectName;
     }
 
+    /**
+     * @return mixed
+     */
     public function getIntegrationObjectId()
     {
         return $this->integrationObjectId;

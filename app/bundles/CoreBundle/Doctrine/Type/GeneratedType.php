@@ -23,11 +23,19 @@ class GeneratedType extends Type
         return '';
     }
 
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         return $value;
     }
 
+    /**
+     * @param mixed $value
+     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         return null;

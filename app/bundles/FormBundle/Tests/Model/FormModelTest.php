@@ -39,89 +39,89 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&RequestStack
      */
-    private MockObject $requestStack;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStack;
 
     /**
      * @var MockObject&Environment
      */
-    private MockObject $twigMock;
+    private \PHPUnit\Framework\MockObject\MockObject $twigMock;
 
     /**
      * @var MockObject&ThemeHelper
      */
-    private MockObject $themeHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $themeHelper;
 
     /**
      * @var MockObject&ActionModel
      */
-    private MockObject $formActionModel;
+    private \PHPUnit\Framework\MockObject\MockObject $formActionModel;
 
     /**
      * @var MockObject&FieldModel
      */
-    private MockObject $formFieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $formFieldModel;
 
     /**
      * @var MockObject&EventDispatcher
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject&Translator
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject&EntityManager
      */
-    private MockObject $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var MockObject&FormUploader
      */
-    private MockObject $formUploaderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formUploaderMock;
 
     /**
      * @var MockObject&ColumnSchemaHelper
      */
-    private MockObject $columnSchemaHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $columnSchemaHelper;
 
     /**
      * @var MockObject&TableSchemaHelper
      */
-    private MockObject $tableSchemaHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $tableSchemaHelper;
 
     /**
      * @var MockObject&FormRepository
      */
-    private MockObject $formRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $formRepository;
 
     /**
      * @var MockObject&LeadFieldModel
      */
-    private MockObject $leadFieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
 
     /**
      * @var MockObject&ContactTracker
      */
-    private MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     /**
      * @var MockObject&FormFieldHelper
      */
-    private MockObject $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var MockObject&PrimaryCompanyHelper
      */
-    private MockObject $primaryCompanyHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $primaryCompanyHelper;
 
     /**
      * @var MockObject&MappedObjectCollectorInterface
      */
-    private MockObject $mappedObjectCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $mappedObjectCollector;
 
-    private FormModel $formModel;
+    private \Mautic\FormBundle\Model\FormModel $formModel;
 
     protected function setUp(): void
     {
@@ -149,7 +149,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [Form::class, $this->formRepository],
+                        [\Mautic\FormBundle\Entity\Form::class, $this->formRepository],
                     ]
                 )
             );

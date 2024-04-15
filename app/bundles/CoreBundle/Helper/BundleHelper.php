@@ -46,6 +46,8 @@ class BundleHelper
      * @param string $configKey
      * @param bool   $includePlugins
      *
+     * @return mixed
+     *
      * @throws \Exception
      */
     public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)

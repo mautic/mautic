@@ -10,5 +10,8 @@ interface ValueNormalizerInterface
 {
     public function normalizeForMautic(string $value, $type): NormalizedValueDAO;
 
+    /**
+     * @return mixed
+     */
     public function normalizeForIntegration(NormalizedValueDAO $value);
 }

@@ -14,7 +14,7 @@ class LeadDevice
     private $id;
 
     /**
-     * @var Lead
+     * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
 
@@ -73,7 +73,7 @@ class LeadDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_devices')
-            ->setCustomRepositoryClass(LeadDeviceRepository::class)
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadDeviceRepository::class)
             ->addIndex(['date_added'], 'date_added_search')
             ->addIndex(['device'], 'device_search')
             ->addIndex(['device_os_name'], 'device_os_name_search')
@@ -166,26 +166,41 @@ class LeadDevice
         return md5(json_encode($this->clientInfo).$this->device.$this->deviceOsName.$this->deviceOsPlatform.$this->deviceBrand.$this->deviceModel);
     }
 
+    /**
+     * @return mixed
+     */
     public function getClientInfo()
     {
         return $this->clientInfo;
     }
 
+    /**
+     * @param mixed $clientInfo
+     */
     public function setClientInfo($clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDevice()
     {
         return $this->device;
     }
 
+    /**
+     * @param mixed $device
+     */
     public function setDevice($device): void
     {
         $this->device = $device;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDeviceBrand()
     {
         return $this->deviceBrand;
@@ -196,11 +211,17 @@ class LeadDevice
         $this->deviceBrand = $brand;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDeviceModel()
     {
         return $this->deviceModel;
     }
 
+    /**
+     * @param mixed $deviceModel
+     */
     public function setDeviceModel($deviceModel): void
     {
         $this->deviceModel = $deviceModel;
@@ -351,11 +372,17 @@ class LeadDevice
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDateAdded()
     {
         return $this->dateAdded;
     }
 
+    /**
+     * @param mixed $dateAdded
+     */
     public function setDateAdded($dateAdded): void
     {
         $this->dateAdded = $dateAdded;

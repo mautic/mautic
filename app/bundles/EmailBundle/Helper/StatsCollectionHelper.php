@@ -27,6 +27,8 @@ class StatsCollectionHelper
     /**
      * Fetch stats from listeners.
      *
+     * @return mixed
+     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function fetchSentStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
@@ -36,6 +38,8 @@ class StatsCollectionHelper
 
     /**
      * Fetch stats from listeners.
+     *
+     * @return mixed
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
@@ -47,6 +51,8 @@ class StatsCollectionHelper
     /**
      * Fetch stats from listeners.
      *
+     * @return mixed
+     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function fetchFailedStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
@@ -56,6 +62,8 @@ class StatsCollectionHelper
 
     /**
      * Fetch stats from listeners.
+     *
+     * @return mixed
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
@@ -67,6 +75,8 @@ class StatsCollectionHelper
     /**
      * Fetch stats from listeners.
      *
+     * @return mixed
+     *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function fetchBouncedStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
@@ -76,6 +86,8 @@ class StatsCollectionHelper
 
     /**
      * Fetch stats from listeners.
+     *
+     * @return mixed
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */

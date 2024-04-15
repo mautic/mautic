@@ -49,6 +49,8 @@ trait CustomFieldEntityTrait
 
     /**
      * @param string $name
+     *
+     * @return mixed
      */
     public function __call($name, $arguments)
     {
@@ -164,6 +166,8 @@ trait CustomFieldEntityTrait
     /**
      * @param string      $field
      * @param string|null $group
+     *
+     * @return mixed
      */
     public function getFieldValue($field, $group = null)
     {

@@ -14,7 +14,7 @@ class CustomFieldObject
         'company' => 'companies',
     ];
 
-    private LeadField $leadField;
+    private \Mautic\LeadBundle\Entity\LeadField $leadField;
 
     /**
      * @throws InvalidObjectTypeException

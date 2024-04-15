@@ -34,9 +34,9 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private MockObject $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    private FormSubmitActionUserEmailType $form;
+    private \Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType $form;
 
     protected function setUp(): void
     {

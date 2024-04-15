@@ -105,7 +105,7 @@ class MonitoringController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request, MonitoringModel $model, IpLookupHelper $ipLookupHelper)
     {
@@ -225,7 +225,7 @@ class MonitoringController extends FormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false)
     {
@@ -381,7 +381,7 @@ class MonitoringController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
     {

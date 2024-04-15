@@ -283,6 +283,9 @@ class HubspotIntegration extends CrmAbstractIntegration
         return isset($keys[$this->getAuthTokenKey()]) || isset($keys[self::ACCESS_KEY]);
     }
 
+    /**
+     * @return mixed
+     */
     public function getHubSpotApiKey()
     {
         $tokenData = $this->getKeys();
@@ -503,7 +506,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
             if (isset($stageName)) {
-                $stage = $this->em->getRepository(Stage::class)->getStageByName($stageName);
+                $stage = $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class)->getStageByName($stageName);
 
                 if (empty($stage)) {
                     $stage = new Stage();

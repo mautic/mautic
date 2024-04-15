@@ -20,9 +20,9 @@ class TokenPersistenceTest extends TestCase
     /**
      * @var MockObject|IntegrationsHelper
      */
-    private MockObject $integrationsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationsHelper;
 
-    private TokenPersistence $tokenPersistence;
+    private \Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence $tokenPersistence;
 
     public function setUp(): void
     {

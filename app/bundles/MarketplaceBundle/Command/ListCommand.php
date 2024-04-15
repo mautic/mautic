@@ -61,7 +61,7 @@ class ListCommand extends Command
         $io->writeln("<fg=green>Total packages: {$this->pluginCollector->getTotal()}</>");
         $io->writeln("<fg=green>Execution time: {$event->getDuration()} ms</>");
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Lists plugins that are available at Packagist.org';

@@ -8,9 +8,9 @@ use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
 class DynamicsApiTest extends AbstractIntegrationTestCase
 {
-    private DynamicsApi $api;
+    private \MauticPlugin\MauticCrmBundle\Api\DynamicsApi $api;
 
-    private DynamicsIntegration $integration;
+    private \MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration $integration;
 
     protected function setUp(): void
     {

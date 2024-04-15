@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ThemeController extends FormController
 {
     /**
-     * @return JsonResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
     {

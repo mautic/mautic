@@ -33,7 +33,7 @@ class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private ReportSubscriber $subscriber;
+    private \Mautic\PageBundle\EventListener\ReportSubscriber $subscriber;
 
     public function setUp(): void
     {

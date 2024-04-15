@@ -34,7 +34,7 @@ class PostCountModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(PostCount::class);
+        return $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\PostCount::class);
     }
 
     /*
@@ -63,7 +63,7 @@ class PostCountModel extends AbstractCommonModel
 
         // if there isn't anything then create it
         if (!count($postCounts)) {
-            /** @var PostCount $postCount */
+            /** @var \MauticPlugin\MauticSocialBundle\Entity\PostCount $postCount */
             $postCount = $this->getEntity();
             $postCount->setMonitor($monitor);
             $postCount->setPostDate($postDate); // $postDate->format('m-d-Y')

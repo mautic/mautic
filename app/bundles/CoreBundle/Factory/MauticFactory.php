@@ -55,7 +55,7 @@ class MauticFactory
     /**
      * Retrieves Mautic's security object.
      *
-     * @return CorePermissions
+     * @return \Mautic\CoreBundle\Security\Permissions\CorePermissions
      */
     public function getSecurity()
     {
@@ -85,7 +85,7 @@ class MauticFactory
     /**
      * Retrieves Doctrine EntityManager.
      *
-     * @return EntityManager
+     * @return \Doctrine\ORM\EntityManager
      */
     public function getEntityManager()
     {
@@ -108,7 +108,7 @@ class MauticFactory
     /**
      * Retrieves Translator.
      *
-     * @return Translator
+     * @return \Mautic\CoreBundle\Translation\Translator
      */
     public function getTranslator()
     {
@@ -148,7 +148,7 @@ class MauticFactory
     /**
      * Retrieves request.
      *
-     * @return Request|null
+     * @return \Symfony\Component\HttpFoundation\Request|null
      */
     public function getRequest()
     {
@@ -165,6 +165,8 @@ class MauticFactory
 
     /**
      * Retrieves a Mautic parameter.
+     *
+     * @param mixed $default
      *
      * @return bool|mixed
      */
@@ -236,6 +238,8 @@ class MauticFactory
 
     /**
      * Returns if Symfony is in debug mode.
+     *
+     * @return mixed
      */
     public function getDebugMode()
     {
@@ -247,6 +251,8 @@ class MauticFactory
      *
      * @param string $theme
      * @param bool   $throwException
+     *
+     * @return mixed
      *
      * @throws FileNotFoundException
      * @throws \Exception
@@ -383,6 +389,8 @@ class MauticFactory
      *
      * @param string $configKey
      * @param bool   $includePlugins
+     *
+     * @return mixed
      *
      * @throws \Exception
      */

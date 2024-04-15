@@ -6,5 +6,8 @@ namespace Mautic\CoreBundle\Helper\Tree;
 
 interface NodeFormatterInterface
 {
+    /**
+     * @return mixed
+     */
     public function format(NodeInterface $node);
 }

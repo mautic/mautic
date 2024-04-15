@@ -60,7 +60,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
-    private DecisionHelper $decisionHelper;
+    private \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper $decisionHelper;
 
     protected function setUp(): void
     {

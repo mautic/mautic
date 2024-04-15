@@ -17,24 +17,24 @@ class ApiSubscriberTest extends CommonMocks
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var Translator&MockObject
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var Request&MockObject
      */
-    private MockObject $request;
+    private \PHPUnit\Framework\MockObject\MockObject $request;
 
     /**
      * @var RequestEvent&MockObject
      */
-    private MockObject $event;
+    private \PHPUnit\Framework\MockObject\MockObject $event;
 
-    private ApiSubscriber $subscriber;
+    private \Mautic\ApiBundle\EventListener\ApiSubscriber $subscriber;
 
     protected function setUp(): void
     {

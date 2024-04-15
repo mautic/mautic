@@ -10,8 +10,14 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 class Cache
 {
+    /**
+     * @var mixed
+     */
     private $id;
 
+    /**
+     * @var mixed
+     */
     private $data;
 
     /**
@@ -54,8 +60,8 @@ class Cache
             [
                 'columnName' => 'item_time',
                 'options'    => [
-                    'unsigned' => true,
-                ],
+                        'unsigned' => true,
+                    ],
             ]
         );
     }

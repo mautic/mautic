@@ -99,6 +99,9 @@ abstract class AbstractEventAccessor
         return $this->getProperty('channel');
     }
 
+    /**
+     * @return mixed
+     */
     public function getChannelIdField()
     {
         return $this->getProperty('channelIdField');
@@ -114,6 +117,9 @@ abstract class AbstractEventAccessor
 
     /**
      * @param string $property
+     * @param mixed  $default
+     *
+     * @return mixed
      */
     protected function getProperty($property, $default = null)
     {

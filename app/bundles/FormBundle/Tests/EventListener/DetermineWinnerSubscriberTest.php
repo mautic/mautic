@@ -16,14 +16,14 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|SubmissionRepository
      */
-    private MockObject $submissionRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $submissionRepository;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private DetermineWinnerSubscriber $subscriber;
+    private \Mautic\FormBundle\EventListener\DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -50,7 +50,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 'id'    => 1,
                 'name'  => 'Test 5',
                 'total' => 100,
-            ],
+                ],
             2 => [
                 'count' => 25,
                 'id'    => 2,
@@ -92,7 +92,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $expectedData = [
             $transSubmissions => [$counts[1]['count'], $counts[2]['count']],
             $transHits        => [$counts[1]['total'], $counts[2]['total']],
-        ];
+         ];
 
         $abTestResults = $event->getAbTestResults();
 

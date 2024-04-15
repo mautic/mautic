@@ -13,7 +13,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private DateHelper $helper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $helper;
 
     /**
      * @var string

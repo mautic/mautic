@@ -20,7 +20,7 @@ class TwilioTransportTest extends TestCase
     /**
      * @var MockObject&\Monolog\Logger
      */
-    private MockObject $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     protected function setUp(): void
     {

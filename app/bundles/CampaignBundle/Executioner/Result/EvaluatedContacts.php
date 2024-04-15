@@ -7,9 +7,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class EvaluatedContacts
 {
-    private ArrayCollection $passed;
+    private \Doctrine\Common\Collections\ArrayCollection $passed;
 
-    private ArrayCollection $failed;
+    private \Doctrine\Common\Collections\ArrayCollection $failed;
 
     public function __construct(ArrayCollection $passed = null, ArrayCollection $failed = null)
     {

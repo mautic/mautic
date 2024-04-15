@@ -47,126 +47,126 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|IpLookupHelper
      */
-    private MockObject $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|Environment
      */
-    private MockObject $twigMock;
+    private \PHPUnit\Framework\MockObject\MockObject $twigMock;
 
     /**
      * @var MockObject|FormModel
      */
-    private MockObject $formModel;
+    private \PHPUnit\Framework\MockObject\MockObject $formModel;
 
     /**
      * @var MockObject|PageModel
      */
-    private MockObject $pageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $pageModel;
 
     /**
      * @var MockObject|LeadModel
      */
-    private MockObject $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var MockObject|CampaignModel
      */
-    private MockObject $campaignModel;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignModel;
 
     /**
      * @var MockObject|MembershipManager
      */
-    private MockObject $membershipManager;
+    private \PHPUnit\Framework\MockObject\MockObject $membershipManager;
 
     /**
      * @var MockObject|LeadFieldModel
      */
-    private MockObject $leadFieldModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private MockObject $companyModel;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModel;
 
     /**
      * @var MockObject|FormFieldHelper
      */
-    private MockObject $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|Translator
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private DateHelper $dateHelper;
+    private \Mautic\CoreBundle\Twig\Helper\DateHelper $dateHelper;
 
     /**
      * @var MockObject|UserHelper
      */
-    private MockObject $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var MockObject|EntityManager
      */
-    private MockObject $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var MockObject|SubmissionRepository
      */
-    private MockObject $submissioRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $submissioRepository;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private MockObject $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var MockObject|Logger
      */
-    private MockObject $mockLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $mockLogger;
 
     /**
      * @var MockObject|UploadFieldValidator
      */
-    private MockObject $uploadFieldValidatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $uploadFieldValidatorMock;
 
     /**
      * @var MockObject|FormUploader
      */
-    private MockObject $formUploaderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formUploaderMock;
 
     /**
      * @var MockObject|DeviceTrackingServiceInterface
      */
-    private MockObject $deviceTrackingService;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackingService;
 
     /**
      * @var MockObject|UploadedFile
      */
-    private MockObject $file1Mock;
+    private \PHPUnit\Framework\MockObject\MockObject $file1Mock;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private MockObject $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     /**
      * @var MockObject|ContactMerger
      */
-    private MockObject $contactMerger;
+    private \PHPUnit\Framework\MockObject\MockObject $contactMerger;
 
-    private SubmissionModel $submissionModel;
+    private \Mautic\FormBundle\Model\SubmissionModel $submissionModel;
 
     /**
      * @var \ReflectionClass<SubmissionModel>
@@ -195,7 +195,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'Y-m-d',
             'H:i',
             $this->translator,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
         );
         $this->userHelper               = $this->createMock(UserHelper::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
@@ -278,7 +278,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [Lead::class, $this->leadRepository],
+                        [\Mautic\LeadBundle\Entity\Lead::class, $this->leadRepository],
                         [Submission::class, $this->submissioRepository],
                     ]
                 )

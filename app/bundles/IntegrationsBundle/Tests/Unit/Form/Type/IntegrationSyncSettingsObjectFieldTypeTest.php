@@ -17,9 +17,9 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private MockObject $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    private IntegrationSyncSettingsObjectFieldType $form;
+    private \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType $form;
 
     protected function setUp(): void
     {

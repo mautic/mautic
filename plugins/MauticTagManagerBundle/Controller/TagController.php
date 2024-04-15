@@ -425,11 +425,11 @@ class TagController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var TagModel $model */
+        /** @var \Mautic\LeadBundle\Model\TagModel $model */
         $model    = $this->getModel('lead.tag');
         $security = $this->security;
 

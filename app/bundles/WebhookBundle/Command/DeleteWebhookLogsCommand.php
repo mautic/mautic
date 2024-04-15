@@ -45,7 +45,7 @@ class DeleteWebhookLogsCommand extends Command
             $output->writeln(sprintf('<info>%s logs deleted successfully for webhook id - %s</info>', $deletedLogCount, $webHookId));
         }
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Retains a rolling number of log records.';

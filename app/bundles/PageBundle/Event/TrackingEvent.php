@@ -11,7 +11,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TrackingEvent extends Event
 {
-    private ParameterBag $response;
+    private \Symfony\Component\HttpFoundation\ParameterBag $response;
 
     public function __construct(
         private Lead $contact,

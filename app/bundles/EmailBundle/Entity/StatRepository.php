@@ -16,6 +16,8 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
+     * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -624,6 +626,9 @@ class StatRepository extends CommonRepository
             ->getResult();
     }
 
+    /**
+     * @return mixed
+     */
     public function checkContactsSentEmail($contacts, $emailId)
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();

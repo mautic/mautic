@@ -14,7 +14,7 @@ class PushID
     private $id;
 
     /**
-     * @var Lead|null
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -38,7 +38,7 @@ class PushID
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('push_ids')
-            ->setCustomRepositoryClass(PushIDRepository::class);
+            ->setCustomRepositoryClass(\Mautic\NotificationBundle\Entity\PushIDRepository::class);
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
@@ -50,7 +50,7 @@ class PushID
             ->nullable(false)
             ->build();
 
-        $builder->createManyToOne('lead', Lead::class)
+        $builder->createManyToOne('lead', \Mautic\LeadBundle\Entity\Lead::class)
             ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
             ->inversedBy('pushIds')
             ->build();
@@ -80,7 +80,7 @@ class PushID
     }
 
     /**
-     * @return Lead
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {

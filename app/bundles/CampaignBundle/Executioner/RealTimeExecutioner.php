@@ -31,7 +31,7 @@ class RealTimeExecutioner
      */
     private $events;
 
-    private ?Responses $responses = null;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Responses $responses = null;
 
     public function __construct(
         private LoggerInterface $logger,
@@ -48,6 +48,7 @@ class RealTimeExecutioner
 
     /**
      * @param string      $type
+     * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
      *
@@ -143,6 +144,7 @@ class RealTimeExecutioner
     }
 
     /**
+     * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
      *

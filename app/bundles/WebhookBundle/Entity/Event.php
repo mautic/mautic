@@ -76,6 +76,9 @@ class Event
             ->build();
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;
@@ -99,11 +102,17 @@ class Event
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventType()
     {
         return $this->eventType;
     }
 
+    /**
+     * @param mixed $eventType
+     */
     public function setEventType($eventType)
     {
         $this->eventType = $eventType;

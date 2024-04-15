@@ -49,106 +49,106 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|RequestStack
      */
-    private MockObject $requestStackMock;
+    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private MockObject $ipLookupHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelperMock;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private MockObject $pathsHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
 
     /**
      * @var MockObject|IntegrationHelper
      */
-    private MockObject $integrationHelperkMock;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationHelperkMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private MockObject $fieldModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldModelMock;
 
     /**
      * @var MockObject|ListModel
      */
-    private MockObject $listModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $listModelMock;
 
     /**
      * @var MockObject|FormFactory
      */
-    private MockObject $formFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formFactoryMock;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private MockObject $companyModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyModelMock;
 
     /**
      * @var MockObject|CategoryModel
      */
-    private MockObject $categoryModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $categoryModelMock;
 
-    private ChannelListHelper $channelListHelperMock;
+    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private MockObject $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|EmailValidator
      */
-    private MockObject $emailValidatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $emailValidatorMock;
 
     /**
      * @var MockObject|UserProvider
      */
-    private MockObject $userProviderMock;
+    private \PHPUnit\Framework\MockObject\MockObject $userProviderMock;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private MockObject $contactTrackerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTrackerMock;
 
     /**
      * @var MockObject|DeviceTracker
      */
-    private MockObject $deviceTrackerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackerMock;
 
     /**
      * @var MockObject|IpAddressModel
      */
-    private MockObject $ipAddressModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $ipAddressModelMock;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private MockObject $leadRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|CompanyLeadRepository
      */
-    private MockObject $companyLeadRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $companyLeadRepositoryMock;
 
     /**
      * @var MockObject|UserHelper
      */
-    private MockObject $userHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelperMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private MockObject $dispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
 
     /**
      * @var MockObject|EntityManager
      */
-    private MockObject $entityManagerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
 
-    private LeadModel $leadModel;
+    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var MockObject&Translator
@@ -668,6 +668,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      * @param object $object
      * @param string $class
      * @param string $property
+     * @param mixed  $value
      */
     private function setProperty($object, $class, $property, $value): void
     {

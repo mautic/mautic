@@ -13,6 +13,8 @@ class CommandListEvent extends Event
 
     /**
      * Returns the list of currently stored commands.
+     *
+     * @return mixed
      */
     public function getCommands()
     {

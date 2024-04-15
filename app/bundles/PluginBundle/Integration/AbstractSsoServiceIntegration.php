@@ -17,6 +17,8 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      * details.
      *
      * @param $response mixed Typically the response from request to authenticating service
+     *
+     * @return mixed
      */
     abstract public function getUser($response);
 

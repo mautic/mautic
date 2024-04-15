@@ -9,14 +9,14 @@ class InputHelper
     /**
      * String filter.
      */
-    private static ?InputFilter $stringFilter = null;
+    private static ?\Joomla\Filter\InputFilter $stringFilter = null;
 
     /**
      * HTML filter.
      */
-    private static ?InputFilter $htmlFilter = null;
+    private static ?\Joomla\Filter\InputFilter $htmlFilter = null;
 
-    private static ?InputFilter $strictHtmlFilter = null;
+    private static ?\Joomla\Filter\InputFilter $strictHtmlFilter = null;
 
     /**
      * Adjust the boolean values from text to boolean.
@@ -96,6 +96,8 @@ class InputHelper
 
     /**
      * Wrapper to InputHelper.
+     *
+     * @return mixed
      */
     public static function __callStatic($name, $arguments)
     {
@@ -106,7 +108,11 @@ class InputHelper
      * Wrapper function to clean inputs.  $mask can be an array of keys as the field names and values as the cleaning
      * function to be used for the specific field.
      *
-     * @param bool $urldecode
+     * @param mixed $value
+     * @param mixed $mask
+     * @param bool  $urldecode
+     *
+     * @return mixed
      */
     public static function _($value, $mask = 'clean', $urldecode = false)
     {
@@ -255,6 +261,7 @@ class InputHelper
      *
      * @param bool|false         $urldecode
      * @param array<string>|null $allowedProtocols
+     * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
      * @param bool|false         $ignoreFragment
      *
@@ -472,6 +479,8 @@ class InputHelper
 
     /**
      * Converts UTF8 into Latin.
+     *
+     * @return mixed
      */
     public static function transliterate($value)
     {

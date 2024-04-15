@@ -70,7 +70,7 @@ EOT
             if (0 == count($doNotSellContacts)) {
                 $output->writeln('<info>No matches found.</info>');
 
-                return Command::SUCCESS;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
 
             $output->writeln('Found '.count($doNotSellContacts)." contacts with an IP from the Do Not Sell list.\n");
@@ -78,7 +78,7 @@ EOT
             if ($dryRun) {
                 $output->writeln('<info>Dry run; skipping purge.</info>');
 
-                return Command::SUCCESS;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
 
             $output->writeln('<info>Step 2: Purging data...</info>');
@@ -92,11 +92,11 @@ EOT
             $purgeProgress->finish();
             $output->writeln("\n<info>Purge complete.</info>\n");
 
-            return Command::SUCCESS;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         } catch (\Exception $e) {
             $output->writeln("\n<error>".$e->getMessage().'</error>');
 
-            return Command::FAILURE;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
     }
 

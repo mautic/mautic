@@ -156,7 +156,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

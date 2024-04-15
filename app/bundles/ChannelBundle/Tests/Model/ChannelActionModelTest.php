@@ -23,7 +23,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
-    private ChannelActionModel $actionModel;
+    private \Mautic\ChannelBundle\Model\ChannelActionModel $actionModel;
 
     protected function setUp(): void
     {

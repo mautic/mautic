@@ -16,7 +16,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
-    private SegmentActionModel $actionModel;
+    private \Mautic\LeadBundle\Model\SegmentActionModel $actionModel;
 
     protected function setUp(): void
     {

@@ -284,6 +284,8 @@ class ContactSegmentService
     /**
      * @param int $segmentId
      *
+     * @return mixed
+     *
      * @throws \Exception
      */
     private function timedFetch(QueryBuilder $qb, $segmentId)
@@ -312,6 +314,8 @@ class ContactSegmentService
 
     /**
      * @param int $segmentId
+     *
+     * @return mixed
      *
      * @throws \Exception
      */

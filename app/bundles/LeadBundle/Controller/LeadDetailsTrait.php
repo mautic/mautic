@@ -93,6 +93,8 @@ trait LeadDetailsTrait
     /**
      * Makes sure that the event filter array is in the right format.
      *
+     * @param mixed $filters
+     *
      * @return array
      *
      * @throws InvalidArgumentException if not an array

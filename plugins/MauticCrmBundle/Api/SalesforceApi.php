@@ -425,6 +425,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param mixed $modifiedSince
+     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -527,7 +529,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param bool $isRetry
+     * @param mixed $response
+     * @param bool  $isRetry
      *
      * @throws ApiErrorException
      * @throws RetryRequestException

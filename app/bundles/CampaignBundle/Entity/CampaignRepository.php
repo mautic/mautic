@@ -21,7 +21,7 @@ class CampaignRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().', cat')
-            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(\Mautic\CampaignBundle\Entity\Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
@@ -57,6 +57,8 @@ class CampaignRepository extends CommonRepository
     /**
      * Returns a list of all published (and active) campaigns (optionally for a specific lead).
      *
+
+
      * @param bool $forList   If true, returns ID and name only
      * @param bool $viewOther If true, returns all the campaigns
      *
@@ -65,7 +67,7 @@ class CampaignRepository extends CommonRepository
     public function getPublishedCampaigns($specificId = null, ?int $leadId = null, $forList = false, $viewOther = false)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Campaign::class, 'c', 'c.id');
+            ->from(\Mautic\CampaignBundle\Entity\Campaign::class, 'c', 'c.id');
 
         if ($forList && $leadId) {
             $q->select('partial c.{id, name}, partial l.{campaign, lead, dateAdded, manuallyAdded, manuallyRemoved}, partial ll.{id}');
@@ -497,6 +499,9 @@ class CampaignRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
+    /**
+     * @return mixed
+     */
     public function getContactSingleSegmentByCampaign($contactId, $campaignId)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -554,7 +559,7 @@ class CampaignRepository extends CommonRepository
         $emails = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e.channelId')
-            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(\Mautic\CampaignBundle\Entity\Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin(
                 $this->getTableAlias().'.events',
                 'e',

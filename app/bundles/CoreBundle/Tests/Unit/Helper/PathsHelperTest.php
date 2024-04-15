@@ -21,14 +21,14 @@ class PathsHelperTest extends TestCase
     /**
      * @var MockObject|UserHelper
      */
-    private MockObject $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    private PathsHelper $helper;
+    private \Mautic\CoreBundle\Helper\PathsHelper $helper;
 
     protected function setUp(): void
     {

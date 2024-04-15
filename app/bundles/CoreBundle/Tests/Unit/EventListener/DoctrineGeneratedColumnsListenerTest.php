@@ -40,7 +40,7 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $table;
 
-    private DoctrineGeneratedColumnsListener $listener;
+    private \Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener $listener;
 
     protected function setUp(): void
     {

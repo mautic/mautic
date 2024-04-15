@@ -22,27 +22,27 @@ class EventLoggerTest extends TestCase
     /**
      * @var LeadRepository|MockObject
      */
-    private MockObject $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /**
      * @var ContactTracker|MockObject
      */
-    private MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     /**
      * @var LeadEventLogRepository|MockObject
      */
-    private MockObject $leadEventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private MockObject $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var SummaryModel|MockObject
      */
-    private MockObject $summaryModel;
+    private \PHPUnit\Framework\MockObject\MockObject $summaryModel;
 
     protected function setUp(): void
     {

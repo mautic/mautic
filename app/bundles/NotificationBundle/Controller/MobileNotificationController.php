@@ -22,11 +22,11 @@ class MobileNotificationController extends FormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request, $page = 1)
     {
-        /** @var NotificationModel $model */
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->getModel('notification');
 
         // set some permissions
@@ -142,15 +142,15 @@ class MobileNotificationController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var NotificationModel $model */
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model    = $this->getModel('notification');
         $security = $this->security;
 
-        /** @var Notification $notification */
+        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
         $notification = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.mobile_notification.page', 1);
@@ -248,15 +248,15 @@ class MobileNotificationController extends FormController
      *
      * @param Notification $entity
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null)
     {
-        /** @var NotificationModel $model */
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model = $this->getModel('notification');
 
         if (!$entity instanceof Notification) {
-            /** @var Notification $entity */
+            /** @var \Mautic\NotificationBundle\Entity\Notification $entity */
             $entity = $model->getEntity();
         }
 
@@ -385,11 +385,11 @@ class MobileNotificationController extends FormController
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var NotificationModel $model */
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model   = $this->getModel('notification');
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
@@ -721,7 +721,7 @@ class MobileNotificationController extends FormController
 
     public function previewAction($objectId): Response
     {
-        /** @var NotificationModel $model */
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model        = $this->getModel('notification');
         $notification = $model->getEntity($objectId);
 

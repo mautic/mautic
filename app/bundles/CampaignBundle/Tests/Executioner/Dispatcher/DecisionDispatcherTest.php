@@ -22,19 +22,19 @@ class DecisionDispatcherTest extends TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|LegacyEventDispatcher
      */
-    private MockObject $legacyDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $legacyDispatcher;
 
     /**
      * @var MockObject|DecisionAccessor
      */
-    private MockObject $config;
+    private \PHPUnit\Framework\MockObject\MockObject $config;
 
-    private DecisionDispatcher $decisionDispatcher;
+    private \Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher $decisionDispatcher;
 
     protected function setUp(): void
     {

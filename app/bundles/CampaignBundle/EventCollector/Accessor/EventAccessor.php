@@ -69,6 +69,8 @@ class EventAccessor
     /**
      * @param string $key
      *
+     * @return mixed
+     *
      * @throws EventNotFoundException
      */
     public function getCondition($key)

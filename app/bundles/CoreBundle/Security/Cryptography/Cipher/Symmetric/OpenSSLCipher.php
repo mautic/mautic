@@ -78,7 +78,6 @@ class OpenSSLCipher implements SymmetricCipherInterface
     private function getHashKey($binaryKey): string
     {
         $hexKey = bin2hex($binaryKey);
-
         // Get second half of hexKey version (stable but different than original key)
         return substr($hexKey, -32);
     }

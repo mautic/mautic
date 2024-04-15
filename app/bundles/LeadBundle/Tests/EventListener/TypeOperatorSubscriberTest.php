@@ -30,54 +30,54 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private MockObject $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var MockObject&ListModel
      */
-    private MockObject $listModel;
+    private \PHPUnit\Framework\MockObject\MockObject $listModel;
 
     /**
      * @var MockObject&campaignModel
      */
-    private MockObject $campaignModel;
+    private \PHPUnit\Framework\MockObject\MockObject $campaignModel;
 
     /**
      * @var MockObject&emailModel
      */
-    private MockObject $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var MockObject&StageModel
      */
-    private MockObject $stageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $stageModel;
 
     /**
      * @var MockObject&StageRepository
      */
-    private MockObject $stageRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $stageRepository;
 
     /**
      * @var MockObject&CategoryModel
      */
-    private MockObject $categoryModel;
+    private \PHPUnit\Framework\MockObject\MockObject $categoryModel;
 
     /**
      * @var MockObject&AssetModel
      */
-    private MockObject $assetModel;
+    private \PHPUnit\Framework\MockObject\MockObject $assetModel;
 
     /**
      * @var MockObject&TranslatorInterface
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject&FormInterface<FormInterface<mixed>>
      */
-    private MockObject $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
-    private TypeOperatorSubscriber $subscriber;
+    private \Mautic\LeadBundle\EventListener\TypeOperatorSubscriber $subscriber;
 
     protected function setUp(): void
     {

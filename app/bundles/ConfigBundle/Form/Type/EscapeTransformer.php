@@ -49,6 +49,11 @@ class EscapeTransformer implements DataTransformerInterface
         return $this->escape($value);
     }
 
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
     private function unescape($value)
     {
         if (!is_string($value)) {
@@ -58,6 +63,11 @@ class EscapeTransformer implements DataTransformerInterface
         return str_replace('%%', '%', $value);
     }
 
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
     private function escape($value)
     {
         if (!is_string($value)) {

@@ -103,6 +103,8 @@ class BouncedEmail
     }
 
     /**
+     * @param mixed $bounceType
+     *
      * @return BouncedEmail
      */
     public function setType($bounceType)

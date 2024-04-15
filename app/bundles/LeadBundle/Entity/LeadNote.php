@@ -17,7 +17,7 @@ class LeadNote extends FormEntity
     private $id;
 
     /**
-     * @var Lead
+     * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
 
@@ -41,7 +41,7 @@ class LeadNote extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_notes')
-            ->setCustomRepositoryClass(LeadNoteRepository::class);
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadNoteRepository::class);
 
         $builder->addId();
 
@@ -166,11 +166,17 @@ class LeadNote extends FormEntity
         return get_object_vars($this);
     }
 
+    /**
+     * @return mixed
+     */
     public function getDateTime()
     {
         return $this->dateTime;
     }
 
+    /**
+     * @param mixed $dateTime
+     */
     public function setDateTime($dateTime): void
     {
         $this->dateTime = $dateTime;

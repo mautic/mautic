@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RedirectListTypeTest extends TestCase
 {
-    private RedirectListType $form;
+    private \Mautic\PageBundle\Form\Type\RedirectListType $form;
 
     public function setUp(): void
     {

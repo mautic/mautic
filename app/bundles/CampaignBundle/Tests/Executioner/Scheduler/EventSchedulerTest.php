@@ -24,33 +24,33 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
-    private NullLogger $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var EventLogger|MockObject
      */
-    private MockObject $eventLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
 
-    private Interval $intervalScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval $intervalScheduler;
 
-    private DateTime $dateTimeScheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime $dateTimeScheduler;
 
     /**
      * @var EventCollector|MockObject
      */
-    private MockObject $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private MockObject $coreParamtersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParamtersHelper;
 
-    private EventScheduler $scheduler;
+    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
 
     protected function setUp(): void
     {

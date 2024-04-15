@@ -19,7 +19,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    private NullLogger $logger;
+    private \Psr\Log\NullLogger $logger;
 
     /**
      * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject

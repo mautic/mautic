@@ -16,12 +16,12 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|RandomHelperInterface
      */
-    private MockObject $randomHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $randomHelperMock;
 
     /**
      * @var MockObject|UserTokenRepositoryInterface
      */
-    private MockObject $userTokenRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $userTokenRepositoryMock;
 
     protected function setUp(): void
     {

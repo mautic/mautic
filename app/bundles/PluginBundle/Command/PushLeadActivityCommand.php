@@ -85,7 +85,7 @@ class PushLeadActivityCommand extends Command
             }
         }
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Push lead activity to integration.';

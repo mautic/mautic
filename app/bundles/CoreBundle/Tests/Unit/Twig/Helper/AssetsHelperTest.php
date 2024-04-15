@@ -17,12 +17,12 @@ class AssetsHelperTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var PathsHelper|MockObject
      */
-    private MockObject $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     private AssetsHelper $assetHelper;
 

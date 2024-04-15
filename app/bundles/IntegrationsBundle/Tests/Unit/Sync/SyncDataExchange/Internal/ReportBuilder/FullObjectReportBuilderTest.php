@@ -48,7 +48,7 @@ class FullObjectReportBuilderTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
 
-    private FullObjectReportBuilder $reportBuilder;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {

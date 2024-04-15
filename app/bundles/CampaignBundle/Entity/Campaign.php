@@ -205,6 +205,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * @param string $prop
+     * @param mixed  $val
      */
     protected function isChanged($prop, $val)
     {
@@ -321,7 +322,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get events.
      *
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\ArrayCollection
      */
     public function getEvents()
     {
@@ -442,11 +443,17 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this->publishDown;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCategory()
     {
         return $this->category;
     }
 
+    /**
+     * @param mixed $category
+     */
     public function setCategory($category): void
     {
         $this->isChanged('category', $category);
@@ -551,6 +558,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $this->forms->removeElement($form);
     }
 
+    /**
+     * @return mixed
+     */
     public function getCanvasSettings()
     {
         return $this->canvasSettings;

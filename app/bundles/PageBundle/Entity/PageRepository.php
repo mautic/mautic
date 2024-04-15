@@ -34,6 +34,8 @@ class PageRepository extends CommonRepository
 
     /**
      * @param string $alias
+     *
+     * @return mixed
      */
     public function checkPageUniqueAlias($alias, $ignoreIds = [])
     {

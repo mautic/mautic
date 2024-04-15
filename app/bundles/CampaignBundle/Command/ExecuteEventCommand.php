@@ -55,7 +55,7 @@ class ExecuteEventCommand extends Command
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Execute specific scheduled events.';

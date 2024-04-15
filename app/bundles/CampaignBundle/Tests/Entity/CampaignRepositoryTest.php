@@ -20,7 +20,7 @@ class CampaignRepositoryTest extends TestCase
     /**
      * @var MockObject&QueryBuilder
      */
-    private MockObject $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     private CampaignRepository $repository;
 
@@ -60,7 +60,7 @@ class CampaignRepositoryTest extends TestCase
 
         $this->queryBuilder->expects(self::once())
             ->method('from')
-            ->with(Campaign::class, $this->repository->getTableAlias(), $this->repository->getTableAlias().'.id')
+            ->with(\Mautic\CampaignBundle\Entity\Campaign::class, $this->repository->getTableAlias(), $this->repository->getTableAlias().'.id')
             ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects(self::once())

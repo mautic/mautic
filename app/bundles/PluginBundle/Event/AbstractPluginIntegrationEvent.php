@@ -14,6 +14,8 @@ class AbstractPluginIntegrationEvent extends Event
 
     /**
      * Get the integration's name.
+     *
+     * @return mixed
      */
     public function getIntegrationName()
     {

@@ -63,7 +63,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $contactTracker;
 
-    private Reply $processor;
+    private \Mautic\EmailBundle\MonitoredEmail\Processor\Reply $processor;
 
     /**
      * @var MockObject&LeadRepository

@@ -22,12 +22,12 @@ class InstallCommandTest extends TestCase
     /**
      * @var MockObject&InstallService
      */
-    private MockObject $installer;
+    private \PHPUnit\Framework\MockObject\MockObject $installer;
 
     /**
      * @var MockObject&Registry
      */
-    private MockObject $doctrineRegistry;
+    private \PHPUnit\Framework\MockObject\MockObject $doctrineRegistry;
 
     private InstallCommand $command;
 

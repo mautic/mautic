@@ -130,7 +130,7 @@ class CategoryModel extends FormModel
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

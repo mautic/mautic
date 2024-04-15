@@ -99,7 +99,7 @@ class SyncCommand extends Command
         } catch (InvalidValueException $e) {
             $io->error($e->getMessage());
 
-            return Command::FAILURE;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         try {
@@ -116,12 +116,12 @@ class SyncCommand extends Command
 
             $io->error($e->getMessage());
 
-            return Command::FAILURE;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Fetch objects from integration.';

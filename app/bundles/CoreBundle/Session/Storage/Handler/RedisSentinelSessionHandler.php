@@ -18,7 +18,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
     /**
      * @var Client Redis client
      */
-    private Client $redis;
+    private \Predis\Client $redis;
 
     public function __construct(
         private array $redisConfiguration,

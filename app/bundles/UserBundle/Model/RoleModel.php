@@ -29,7 +29,7 @@ class RoleModel extends FormModel
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function saveEntity($entity, $unlock = true): void
     {
@@ -113,7 +113,7 @@ class RoleModel extends FormModel
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

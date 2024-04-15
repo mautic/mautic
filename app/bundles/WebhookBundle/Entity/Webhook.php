@@ -166,7 +166,7 @@ class Webhook extends FormEntity
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
-            new NotBlank(
+            new Assert\NotBlank(
                 [
                     'message' => 'mautic.core.valid_url_required',
                 ]
@@ -450,7 +450,7 @@ class Webhook extends FormEntity
     {
         $this->logs = $logs;
 
-        /** @var Log $log */
+        /** @var \Mautic\WebhookBundle\Entity\Log $log */
         foreach ($logs as $log) {
             $log->setWebhook($this);
         }

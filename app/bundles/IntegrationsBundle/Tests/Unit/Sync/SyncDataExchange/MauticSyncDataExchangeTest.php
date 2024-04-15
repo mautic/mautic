@@ -28,34 +28,34 @@ class MauticSyncDataExchangeTest extends TestCase
     /**
      * @var MockObject|FieldChangeRepository
      */
-    private MockObject $fieldChangeRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
 
     /**
      * @var MockObject|FieldHelper
      */
-    private MockObject $fieldHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
      * @var MockObject|MappingHelper
      */
-    private MockObject $mappingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
     /**
      * @var MockObject|FullObjectReportBuilder
      */
-    private MockObject $fullObjectReportBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $fullObjectReportBuilder;
 
     /**
      * @var MockObject|PartialObjectReportBuilder
      */
-    private MockObject $partialObjectReportBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $partialObjectReportBuilder;
 
     /**
      * @var MockObject|OrderExecutioner
      */
-    private MockObject $orderExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $orderExecutioner;
 
-    private MauticSyncDataExchange $mauticSyncDataExchange;
+    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange $mauticSyncDataExchange;
 
     /**
      * @var SyncDateHelper&MockObject

@@ -124,7 +124,7 @@ class Focus extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('focus')
-            ->setCustomRepositoryClass(FocusRepository::class)
+            ->setCustomRepositoryClass(\MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class)
             ->addIndex(['focus_type'], 'focus_type')
             ->addIndex(['style'], 'focus_style')
             ->addIndex(['form_id'], 'focus_form')
@@ -201,17 +201,25 @@ class Focus extends FormEntity
         return get_object_vars($this);
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDescription()
     {
         return $this->description;
     }
 
     /**
+     * @param mixed $description
+     *
      * @return Focus
      */
     public function setDescription($description)
@@ -223,6 +231,9 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEditor()
     {
         return $this->editor;
@@ -240,6 +251,9 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getHtml()
     {
         return $this->html;
@@ -257,6 +271,9 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getHtmlMode()
     {
         return $this->htmlMode;
@@ -274,12 +291,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getName()
     {
         return $this->name;
     }
 
     /**
+     * @param mixed $name
+     *
      * @return Focus
      */
     public function setName($name)
@@ -291,12 +313,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCategory()
     {
         return $this->category;
     }
 
     /**
+     * @param mixed $category
+     *
      * @return Focus
      */
     public function setCategory($category)
@@ -308,12 +335,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPublishUp()
     {
         return $this->publishUp;
     }
 
     /**
+     * @param mixed $publishUp
+     *
      * @return Focus
      */
     public function setPublishUp($publishUp)
@@ -325,12 +357,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPublishDown()
     {
         return $this->publishDown;
     }
 
     /**
+     * @param mixed $publishDown
+     *
      * @return Focus
      */
     public function setPublishDown($publishDown)
@@ -342,12 +379,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getProperties()
     {
         return $this->properties;
     }
 
     /**
+     * @param mixed $properties
+     *
      * @return Focus
      */
     public function setProperties($properties)
@@ -378,12 +420,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getType()
     {
         return $this->type;
     }
 
     /**
+     * @param mixed $type
+     *
      * @return Focus
      */
     public function setType($type)
@@ -395,12 +442,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getStyle()
     {
         return $this->style;
     }
 
     /**
+     * @param mixed $style
+     *
      * @return Focus
      */
     public function setStyle($style)
@@ -412,12 +464,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getWebsite()
     {
         return $this->website;
     }
 
     /**
+     * @param mixed $website
+     *
      * @return Focus
      */
     public function setWebsite($website)
@@ -429,12 +486,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getForm()
     {
         return $this->form;
     }
 
     /**
+     * @param mixed $form
+     *
      * @return Focus
      */
     public function setForm($form)
@@ -450,12 +512,17 @@ class Focus extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCache()
     {
         return $this->cache;
     }
 
     /**
+     * @param mixed $cache
+     *
      * @return Focus
      */
     public function setCache($cache)

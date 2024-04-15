@@ -241,7 +241,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<int, mixed> $segments
+     * @param array<integer, mixed> $segments
      *
      * @throws \Doctrine\ORM\ORMException
      */

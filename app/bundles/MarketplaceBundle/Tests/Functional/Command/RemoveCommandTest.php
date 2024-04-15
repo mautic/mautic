@@ -17,7 +17,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
     /**
      * @var MockObject&LoggerInterface
      */
-    private MockObject $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     private string $packageName;
 

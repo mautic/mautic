@@ -318,7 +318,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      *
      * @throws \Exception
      */
@@ -580,6 +580,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Get the name of the JS onLoad and onUnload methods for ajax.
+     *
+     * @return mixed
      */
     protected function getJsLoadMethodPrefix()
     {
@@ -614,6 +616,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Get the route base for getIndexRoute() and getActionRoute() if they do not meet the mautic_*_index and mautic_*_action standards.
+     *
+     * @return mixed
      */
     protected function getRouteBase()
     {
@@ -640,6 +644,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
         return 'ASC';
     }
 
+    /**
+     * @return mixed
+     */
     protected function getSessionBase($objectId = null)
     {
         $base = $this->getModelName();
@@ -777,7 +784,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     protected function indexStandard(Request $request, $page = null): Response
     {
@@ -897,7 +904,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      *
      * @throws \Exception
      */
@@ -1034,7 +1041,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param string|null $listPage
      * @param string      $itemName
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
     {

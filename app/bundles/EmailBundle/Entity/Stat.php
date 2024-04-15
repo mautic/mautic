@@ -139,7 +139,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatRepository::class)
+            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatRepository::class)
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
@@ -164,7 +164,7 @@ class Stat
             ->columnName('email_address')
             ->build();
 
-        $builder->createManyToOne('list', LeadList::class)
+        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -214,7 +214,7 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('storedCopy', Copy::class)
+        $builder->createManyToOne('storedCopy', \Mautic\EmailBundle\Entity\Copy::class)
             ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -659,6 +659,10 @@ class Stat
         return $this->changes;
     }
 
+    /**
+     * @param mixed $currentValue
+     * @param mixed $newValue
+     */
     private function addChange(string $property, $currentValue, $newValue): void
     {
         if ($currentValue === $newValue) {

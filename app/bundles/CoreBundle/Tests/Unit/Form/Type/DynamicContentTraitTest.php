@@ -17,27 +17,27 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&FormBuilderInterface<FormBuilderInterface>
      */
-    private MockObject $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
     /**
      * @var MockObject&FormEvent
      */
-    private MockObject $formEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $formEvent;
 
     /**
      * @var MockObject&FormInterface<FormInterface>
      */
-    private MockObject $form;
+    private \PHPUnit\Framework\MockObject\MockObject $form;
 
     /**
      * @var MockObject (use DynamicContentEntityTrait)
      */
-    private MockObject $entity;
+    private \PHPUnit\Framework\MockObject\MockObject $entity;
 
     /**
      * @var MockObject (use DynamicContentTrait)
      */
-    private MockObject $trait;
+    private \PHPUnit\Framework\MockObject\MockObject $trait;
 
     protected function setUp(): void
     {
@@ -121,6 +121,8 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param mixed[] $args
+     *
+     * @return mixed
      */
     private function invokeMethod(object $object, string $methodName, array $args = [])
     {

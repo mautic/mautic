@@ -53,7 +53,7 @@ class ImportController extends FormController
 
     private \Symfony\Component\HttpFoundation\Session\SessionInterface $session;
 
-    private ImportModel $importModel;
+    private \Mautic\LeadBundle\Model\ImportModel $importModel;
 
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -417,7 +417,7 @@ class ImportController extends FormController
                         return $this->newAction($request, 0, true);
                     }
 
-                    /** @var Import $import */
+                    /** @var \Mautic\LeadBundle\Entity\Import $import */
                     $import = $this->importModel->getEntity();
 
                     $import->setMatchedFields($matchedFields)

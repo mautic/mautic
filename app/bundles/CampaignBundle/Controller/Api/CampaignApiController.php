@@ -70,7 +70,7 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -103,7 +103,7 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -249,7 +249,7 @@ class CampaignApiController extends CommonApiController
     /**
      * Obtains a list of campaign contacts.
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getContactsAction(Request $request, $id)
     {

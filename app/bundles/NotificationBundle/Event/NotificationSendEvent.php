@@ -33,12 +33,17 @@ class NotificationSendEvent extends CommonEvent
         $this->message = $message;
     }
 
+    /**
+     * @return mixed
+     */
     public function getHeading()
     {
         return $this->heading;
     }
 
     /**
+     * @param mixed $heading
+     *
      * @return NotificationSendEvent
      */
     public function setHeading($heading)

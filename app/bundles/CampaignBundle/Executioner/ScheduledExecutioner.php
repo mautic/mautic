@@ -23,17 +23,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 {
-    private ?Campaign $campaign = null;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
-    private ?ContactLimiter $limiter = null;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    private ?OutputInterface $output = null;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     private ?array $scheduledEvents = null;
 
-    private ?Counter $counter = null;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 
     protected ?\DateTime $now = null;
 

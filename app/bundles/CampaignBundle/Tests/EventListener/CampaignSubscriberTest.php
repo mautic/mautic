@@ -21,7 +21,7 @@ class CampaignSubscriberTest extends TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $campaignAuditService;
 
-    private CampaignSubscriber $subscriber;
+    private \Mautic\CampaignBundle\EventListener\CampaignSubscriber $subscriber;
 
     public function setUp(): void
     {

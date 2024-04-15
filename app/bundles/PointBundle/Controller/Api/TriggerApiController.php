@@ -158,7 +158,7 @@ class TriggerApiController extends CommonApiController
      *
      * @param int $triggerId
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deletePointTriggerEventsAction($triggerId)
     {

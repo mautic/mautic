@@ -249,6 +249,7 @@ class Field
 
     /**
      * @param string $prop
+     * @param mixed  $val
      */
     private function isChanged($prop, $val): void
     {
@@ -572,6 +573,9 @@ class Field
         return $this->inputAttributes;
     }
 
+    /**
+     * @return mixed
+     */
     public function getContainerAttributes()
     {
         return $this->containerAttributes;
@@ -697,11 +701,17 @@ class Field
         return $this->customParameters;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSessionId()
     {
         return $this->sessionId;
     }
 
+    /**
+     * @param mixed $sessionId
+     */
     public function setSessionId($sessionId): void
     {
         $this->sessionId = $sessionId;
@@ -709,6 +719,8 @@ class Field
 
     /**
      * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
+     *
+     * @return mixed
      */
     public function getLeadField()
     {
@@ -717,17 +729,25 @@ class Field
 
     /**
      * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
+     *
+     * @param mixed $leadField
      */
     public function setLeadField($leadField): void
     {
         $this->leadField = $leadField;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSaveResult()
     {
         return $this->saveResult;
     }
 
+    /**
+     * @param mixed $saveResult
+     */
     public function setSaveResult($saveResult): void
     {
         $this->saveResult = $saveResult;
@@ -741,6 +761,9 @@ class Field
         return $this->isAutoFill;
     }
 
+    /**
+     * @param mixed $isAutoFill
+     */
     public function setIsAutoFill($isAutoFill): void
     {
         $this->isAutoFill = $isAutoFill;
@@ -878,8 +901,8 @@ class Field
     {
         $properties = $this->getProperties();
 
-        return 'checkboxgrp' === $this->getType()
-            || (key_exists('multiple', $properties) && 1 === $properties['multiple']);
+        return 'checkboxgrp' === $this->getType() ||
+            (key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
     /**

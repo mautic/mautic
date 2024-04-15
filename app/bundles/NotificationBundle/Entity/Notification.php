@@ -140,7 +140,7 @@ class Notification extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('push_notifications')
-            ->setCustomRepositoryClass(NotificationRepository::class);
+            ->setCustomRepositoryClass(\Mautic\NotificationBundle\Entity\NotificationRepository::class);
 
         $builder->addIdColumns();
 
@@ -184,7 +184,7 @@ class Notification extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', LeadList::class)
+        $builder->createManyToMany('lists', \Mautic\LeadBundle\Entity\LeadList::class)
             ->setJoinTable('push_notification_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -311,6 +311,9 @@ class Notification extends FormEntity
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getName()
     {
         return $this->name;
@@ -356,6 +359,9 @@ class Notification extends FormEntity
         return $this->id;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCategory()
     {
         return $this->category;
@@ -456,6 +462,9 @@ class Notification extends FormEntity
         $this->url = $url;
     }
 
+    /**
+     * @return mixed
+     */
     public function getReadCount()
     {
         return $this->readCount;
@@ -471,6 +480,9 @@ class Notification extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLanguage()
     {
         return $this->language;
@@ -487,6 +499,9 @@ class Notification extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPublishDown()
     {
         return $this->publishDown;
@@ -503,6 +518,9 @@ class Notification extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPublishUp()
     {
         return $this->publishUp;
@@ -519,6 +537,9 @@ class Notification extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSentCount()
     {
         return $this->sentCount;
@@ -534,6 +555,9 @@ class Notification extends FormEntity
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLists()
     {
         return $this->lists;
@@ -559,6 +583,9 @@ class Notification extends FormEntity
         $this->lists->removeElement($list);
     }
 
+    /**
+     * @return mixed
+     */
     public function getStats()
     {
         return $this->stats;

@@ -40,9 +40,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected $output;
 
-    private ?ContactLimiter $limiter = null;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    private ?Campaign $campaign = null;
+    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
 
     public function __construct(
         private CampaignRepository $campaignRepository,
@@ -194,7 +194,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         // Specific campaign;
         if ($id) {
             $statusCode = 0;
-            /** @var Campaign $campaign */
+            /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
             if ($campaign = $this->campaignRepository->getEntity($id)) {
                 $this->triggerCampaign($campaign);
             } else {

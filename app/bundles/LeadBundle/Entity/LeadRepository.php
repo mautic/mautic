@@ -404,6 +404,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * The primary company data will be a flat array on the entity
      * with a key of `primaryCompany`
      *
+     * @param mixed $entity
+     *
      * @return mixed|null
      */
     public function getEntityWithPrimaryCompany($entity)
@@ -530,7 +532,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return QueryBuilder
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function getEntitiesDbalQueryBuilder()
     {
@@ -557,7 +559,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $q->select($select)
-            ->from(Lead::class, $alias, $alias.'.id')
+            ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
 
@@ -662,7 +664,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      *
-     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -686,7 +688,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
+     * @param \Doctrine\DBAL\Query\QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -1058,7 +1060,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Check Lead segments by ids.
      *
-     * @param array<int> $stages
+     * @param array<integer> $stages
      */
     public function isContactInOneOfStages(Lead $lead, array $stages = []): bool
     {
@@ -1234,6 +1236,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param array $tables          $tables[0] should be primary table
      * @param bool  $innerJoinTables
+     * @param mixed $whereExpression
+     * @param mixed $having
      */
     public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void
     {

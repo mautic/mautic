@@ -23,36 +23,36 @@ class InactiveHelperTest extends TestCase
     /**
      * @var EventScheduler|MockObject
      */
-    private MockObject $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var InactiveContactFinder|MockObject
      */
-    private MockObject $inactiveContactFinder;
+    private \PHPUnit\Framework\MockObject\MockObject $inactiveContactFinder;
 
     /**
      * @var LeadEventLogRepository|MockObject
      */
-    private MockObject $eventLogRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogRepository;
 
     /**
      * @var EventRepository|MockObject
      */
-    private MockObject $eventRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $eventRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private MockObject $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
      * @var LoggerInterface|MockObject
      */
-    private MockObject $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
-    private InactiveHelper $inactiveHelper;
+    private \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper $inactiveHelper;
 
-    private DecisionHelper $decisionHelper;
+    private \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper $decisionHelper;
 
     protected function setUp(): void
     {

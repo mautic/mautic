@@ -27,17 +27,17 @@ class GrapesJsController extends CommonController
      * @param string $objectType
      * @param int    $objectId
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function builderAction(
-        Request $request,
-        LoggerInterface $mauticLogger,
-        ThemeHelper $themeHelper,
-        SlotsHelper $slotsHelper,
-        AssetsHelper $assetsHelper,
-        FormFactoryInterface $formFactory,
-        $objectType,
-        $objectId
+            Request $request,
+            LoggerInterface $mauticLogger,
+            ThemeHelper $themeHelper,
+            SlotsHelper $slotsHelper,
+            AssetsHelper $assetsHelper,
+            FormFactoryInterface $formFactory,
+            $objectType,
+            $objectId
     ) {
         if (!in_array($objectType, self::OBJECT_TYPE)) {
             throw new \Exception('Object not authorized to load custom builder', Response::HTTP_CONFLICT);
@@ -59,11 +59,11 @@ class GrapesJsController extends CommonController
                 return $this->accessDenied();
             }
 
-            /** @var Email|Page $entity */
+            /** @var \Mautic\EmailBundle\Entity\Email|\Mautic\PageBundle\Entity\Page $entity */
             $entity = $model->getEntity();
             $entity->setSessionId($objectId);
         } else {
-            /** @var Email|Page $entity */
+            /** @var \Mautic\EmailBundle\Entity\Email|\Mautic\PageBundle\Entity\Page $entity */
             $entity = $model->getEntity($objectId);
             $isNew  = false;
 

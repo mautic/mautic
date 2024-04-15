@@ -51,7 +51,7 @@ class PublicController extends AbstractFormController
         RouterInterface $router,
         $slug)
     {
-        /** @var PageModel $model */
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model    = $this->getModel('page');
         $security = $this->security;
         /** @var Page|bool $entity */
@@ -400,7 +400,7 @@ class PublicController extends AbstractFormController
      */
     public function trackingImageAction(Request $request)
     {
-        /** @var PageModel $model */
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
         $model->hitPage(null, $request);
 
@@ -427,7 +427,7 @@ class PublicController extends AbstractFormController
             return $notSuccessResponse;
         }
 
-        /** @var PageModel $model */
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
 
         try {
@@ -556,7 +556,7 @@ class PublicController extends AbstractFormController
      */
     private function processSlots($slots, $entity): void
     {
-        /** @var AssetsHelper $assetsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');

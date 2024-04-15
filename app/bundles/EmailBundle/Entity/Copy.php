@@ -111,12 +111,17 @@ class Copy
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSubject()
     {
         return $this->subject;
     }
 
     /**
+     * @param mixed $subject
+     *
      * @return Copy
      */
     public function setSubject($subject)

@@ -24,12 +24,12 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Connection
      */
-    private MockObject $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private MockObject $queryBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     private string $dateColumn;
 

@@ -78,7 +78,7 @@ EOT
             }
         }
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Cleans up obsolete files in the media folder that are present in the app/assets folder';

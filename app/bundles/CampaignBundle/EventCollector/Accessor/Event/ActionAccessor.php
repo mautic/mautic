@@ -11,6 +11,9 @@ class ActionAccessor extends AbstractEventAccessor
         parent::__construct($config);
     }
 
+    /**
+     * @return mixed
+     */
     public function getBatchEventName()
     {
         return $this->getProperty('batchEventName');

@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class RouteEvent extends Event
 {
-    protected RouteCollection $collection;
+    protected \Symfony\Component\Routing\RouteCollection $collection;
 
     /**
      * @param string $type

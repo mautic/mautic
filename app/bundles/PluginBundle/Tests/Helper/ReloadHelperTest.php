@@ -15,9 +15,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private MockObject $factoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $factoryMock;
 
-    private ReloadHelper $helper;
+    private \Mautic\PluginBundle\Helper\ReloadHelper $helper;
 
     private array $sampleAllPlugins = [];
 
@@ -28,7 +28,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private MockObject $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -57,7 +57,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
                 'bundle'            => 'MauticZapierBundle',
                 'namespace'         => 'MauticPlugin\MauticZapierBundle',
                 'symfonyBundleName' => 'MauticZapierBundle',
-                'bundleClass'       => PluginBundleBaseStub::class,
+                'bundleClass'       => \Mautic\PluginBundle\Tests\Helper\PluginBundleBaseStub::class,
                 'permissionClasses' => [],
                 'relative'          => 'plugins/MauticZapierBundle',
                 'directory'         => '/Users/jan/dev/mautic/plugins/MauticZapierBundle',

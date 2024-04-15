@@ -405,6 +405,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testCustomReplyTo();
     }
 
+    /**
+     * @param mixed $value
+     */
     private function setPrivateProperty(object $object, string $property, $value): void
     {
         $reflector = new \ReflectionProperty($object::class, $property);
@@ -455,7 +458,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<int, mixed> $segments
+     * @param array<integer, mixed> $segments
      *
      * @throws \Doctrine\ORM\ORMException
      */

@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageListTypeTest extends TestCase
 {
-    private PageListType $page;
+    private \Mautic\PageBundle\Form\Type\PageListType $page;
 
     private \PHPUnit\Framework\MockObject\MockObject $pageModelMock;
 

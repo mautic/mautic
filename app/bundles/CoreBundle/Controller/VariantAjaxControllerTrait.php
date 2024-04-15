@@ -17,6 +17,8 @@ trait VariantAjaxControllerTrait
      * @param string $parentFormName
      * @param string $abFormTemplate
      * @param array  $formThemes
+     *
+     * @return mixed
      */
     private function getAbTestForm(Request $request, FormFactoryInterface $formFactory, $modelName, $abSettingsFormName, $abSettingsFormBlockPrefix, $parentFormName, $abFormTemplate, $formThemes = [])
     {

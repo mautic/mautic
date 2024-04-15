@@ -74,7 +74,7 @@ class TrackableModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(Trackable::class);
+        return $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
     }
 
     /**
@@ -219,6 +219,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Extract URLs from content and return as trackables.
      *
+     * @param mixed      $content
      * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
      *                                      or & for URLs tracked that include query parameters
      *

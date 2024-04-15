@@ -98,7 +98,7 @@ class UserRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder();
 
         $q->select('partial u.{id, firstName, lastName}')
-            ->from(User::class, 'u')
+            ->from(\Mautic\UserBundle\Entity\User::class, 'u')
             ->leftJoin('u.role', 'r')
             ->leftJoin('r.permissions', 'p');
 
@@ -186,7 +186,7 @@ class UserRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder()
             ->select('u.position')
             ->distinct()
-            ->from(User::class, 'u')
+            ->from(\Mautic\UserBundle\Entity\User::class, 'u')
             ->where("u.position != ''")
             ->andWhere('u.position IS NOT NULL');
         if (!empty($search)) {

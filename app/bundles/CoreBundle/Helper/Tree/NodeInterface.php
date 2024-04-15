@@ -9,6 +9,9 @@ namespace Mautic\CoreBundle\Helper\Tree;
  */
 interface NodeInterface extends \RecursiveIterator
 {
+    /**
+     * @return mixed
+     */
     public function getValue();
 
     public function setParent(NodeInterface $parent): void;
@@ -22,7 +25,15 @@ interface NodeInterface extends \RecursiveIterator
      */
     public function getChildrenArray(): array;
 
+    /**
+     * @param mixed $value
+     */
     public function addParam(string $key, $value): void;
 
+    /**
+     * @param mixed $default
+     *
+     * @return mixed
+     */
     public function getParam(string $key, $default = null);
 }

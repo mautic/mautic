@@ -102,6 +102,9 @@ class CampaignScheduledEvent extends Event
         return $this->dateScheduled;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventSettings()
     {
         return $this->eventSettings;

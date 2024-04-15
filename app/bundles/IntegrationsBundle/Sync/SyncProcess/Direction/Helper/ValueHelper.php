@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 class ValueHelper
 {
-    private ?NormalizedValueDAO $normalizedValueDAO = null;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO $normalizedValueDAO = null;
 
     private ?string $fieldState = null;
 

@@ -80,7 +80,7 @@ class ColumnSchemaHelper
     /**
      * Get table details.
      *
-     * @return Table
+     * @return \Doctrine\DBAL\Schema\Table
      */
     public function getTable()
     {

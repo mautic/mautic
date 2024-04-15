@@ -18,9 +18,9 @@ class BuilderIntegrationsHelperTest extends TestCase
     /**
      * @var IntegrationsHelper|MockObject
      */
-    private MockObject $integrationsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationsHelper;
 
-    private BuilderIntegrationsHelper $builderIntegrationsHelper;
+    private \Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     protected function setUp(): void
     {

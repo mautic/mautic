@@ -35,7 +35,7 @@ class IpLookupHelper
      */
     private $realIp;
 
-    private CoreParametersHelper $coreParametersHelper;
+    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         protected RequestStack $requestStack,

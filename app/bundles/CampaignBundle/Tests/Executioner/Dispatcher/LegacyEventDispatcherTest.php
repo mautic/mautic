@@ -30,32 +30,32 @@ class LegacyEventDispatcherTest extends TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private MockObject $scheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
     /**
      * @var MockObject|MauticFactory
      */
-    private MockObject $mauticFactory;
+    private \PHPUnit\Framework\MockObject\MockObject $mauticFactory;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     /**
      * @var MockObject|AbstractEventAccessor
      */
-    private MockObject $config;
+    private \PHPUnit\Framework\MockObject\MockObject $config;
 
     /**
      * @var MockObject|PendingEvent
      */
-    private MockObject $pendingEvent;
+    private \PHPUnit\Framework\MockObject\MockObject $pendingEvent;
 
     protected function setUp(): void
     {

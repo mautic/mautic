@@ -22,11 +22,11 @@ class SmsController extends FormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request, TransportChain $transportChain, $page = 1)
     {
-        /** @var SmsModel $model */
+        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
         $model = $this->getModel('sms');
 
         // set some permissions
@@ -134,15 +134,15 @@ class SmsController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var SmsModel $model */
+        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
         $model    = $this->getModel('sms');
         $security = $this->security;
 
-        /** @var Sms $sms */
+        /** @var \Mautic\SmsBundle\Entity\Sms $sms */
         $sms = $model->getEntity($objectId);
         // set the page we came from
         $page = $request->getSession()->get('mautic.sms.page', 1);
@@ -239,15 +239,15 @@ class SmsController extends FormController
      *
      * @param Sms $entity
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request, $entity = null)
     {
-        /** @var SmsModel $model */
+        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
         $model = $this->getModel('sms');
 
         if (!$entity instanceof Sms) {
-            /** @var Sms $entity */
+            /** @var \Mautic\SmsBundle\Entity\Sms $entity */
             $entity = $model->getEntity();
         }
 
@@ -373,11 +373,11 @@ class SmsController extends FormController
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
-        /** @var SmsModel $model */
+        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
         $model   = $this->getModel('sms');
         $method  = $request->getMethod();
         $entity  = $model->getEntity($objectId);
@@ -702,7 +702,7 @@ class SmsController extends FormController
      */
     public function previewAction($objectId)
     {
-        /** @var SmsModel $model */
+        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
         $model    = $this->getModel('sms');
         $sms      = $model->getEntity($objectId);
         $security = $this->security;

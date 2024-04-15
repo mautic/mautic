@@ -48,7 +48,7 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -83,7 +83,7 @@ class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int $contactId Lead ID
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

@@ -9,11 +9,11 @@ use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 
 class DisplayManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private Form $form;
+    private \Mautic\FormBundle\Entity\Form $form;
 
     private array $viewOnlyFields;
 
-    private DisplayCounter $displayCounter;
+    private \Mautic\FormBundle\ProgressiveProfiling\DisplayCounter $displayCounter;
 
     public function setUp(): void
     {

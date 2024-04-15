@@ -20,31 +20,31 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private MockObject $eventDispatcherMock;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherMock;
 
-    private ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
+    private \Mautic\LeadBundle\Services\ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
 
     /**
      * @var MockObject|BaseDecorator
      */
-    private MockObject $baseDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $baseDecorator;
 
     /**
      * @var MockObject|CustomMappedDecorator
      */
-    private MockObject $customMappedDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $customMappedDecorator;
 
     /**
      * @var MockObject|CompanyDecorator
      */
-    private MockObject $companyDecorator;
+    private \PHPUnit\Framework\MockObject\MockObject $companyDecorator;
 
     /**
      * @var MockObject|DateOptionFactory
      */
-    private MockObject $dateOptionFactory;
+    private \PHPUnit\Framework\MockObject\MockObject $dateOptionFactory;
 
-    private DecoratorFactory $decoratorFactory;
+    private \Mautic\LeadBundle\Segment\Decorator\DecoratorFactory $decoratorFactory;
 
     protected function setUp(): void
     {

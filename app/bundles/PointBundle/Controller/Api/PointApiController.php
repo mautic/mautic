@@ -31,7 +31,7 @@ class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    protected LeadModel $leadModel;
+    protected \Mautic\LeadBundle\Model\LeadModel $leadModel;
 
     /**
      * @var PointModel|null
@@ -78,7 +78,7 @@ class PointApiController extends CommonApiController
      * @param string $operator
      * @param int    $delta
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta)
     {

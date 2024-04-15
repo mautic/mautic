@@ -25,15 +25,15 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $campaign;
 
-    private ?ContactLimiter $limiter = null;
+    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
 
-    private ?OutputInterface $output = null;
+    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    private ?Counter $counter = null;
+    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
 
-    private ?ArrayCollection $decisions = null;
+    private ?\Doctrine\Common\Collections\ArrayCollection $decisions = null;
 
     protected ?\DateTime $now = null;
 
@@ -244,10 +244,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
-     * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
+     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
+     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
     private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
     {

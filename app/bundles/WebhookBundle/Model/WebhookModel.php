@@ -188,6 +188,8 @@ class WebhookModel extends FormModel
 
     /**
      * Gets array of custom events from bundles subscribed MauticWehbhookBundle::WEBHOOK_ON_BUILD.
+     *
+     * @return mixed
      */
     public function getEvents()
     {
@@ -231,7 +233,7 @@ class WebhookModel extends FormModel
             return;
         }
 
-        /** @var Event $event */
+        /** @var \Mautic\WebhookBundle\Entity\Event $event */
         foreach ($webhookEvents as $event) {
             $webhook = $event->getWebhook();
             $queue   = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
@@ -470,7 +472,7 @@ class WebhookModel extends FormModel
 
         /* @var WebhookQueue $queueItem */
         foreach ($queuesArray as $queueItem) {
-            /** @var Event $event */
+            /** @var \Mautic\WebhookBundle\Entity\Event $event */
             $event = $queueItem->getEvent();
             $type  = $event->getEventType();
 
@@ -562,7 +564,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null): ?SymfonyEvent
     {

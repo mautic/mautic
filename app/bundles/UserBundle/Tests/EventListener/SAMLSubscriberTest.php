@@ -17,17 +17,17 @@ class SAMLSubscriberTest extends TestCase
     /**
      * @var RequestEvent|MockObject
      */
-    private MockObject $event;
+    private \PHPUnit\Framework\MockObject\MockObject $event;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var Router|MockObject
      */
-    private MockObject $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     protected function setUp(): void
     {

@@ -44,7 +44,7 @@ class MauticSocialMonitoringCommand extends Command
         if (!$monitorList->count()) {
             $output->writeln('No published monitors found. Make sure the id you supplied is published');
 
-            return Command::SUCCESS;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         // max iterations
@@ -56,7 +56,7 @@ class MauticSocialMonitoringCommand extends Command
             $output->writeln('Result Code: '.$resultCode);
         }
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**

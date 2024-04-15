@@ -98,9 +98,9 @@ class Form extends FormEntity
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: \Mautic\FormBundle\Entity\Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
-    private Collection $submissions;
+    private \Doctrine\Common\Collections\Collection $submissions;
 
     /**
      * @var int
@@ -148,7 +148,7 @@ class Form extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('forms')
-            ->setCustomRepositoryClass(FormRepository::class);
+            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\FormRepository::class);
 
         $builder->addIdColumns();
 
@@ -616,7 +616,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return Collection|Submission[]
+     * @return \Doctrine\Common\Collections\Collection|Submission[]
      */
     public function getSubmissions()
     {
@@ -659,52 +659,81 @@ class Form extends FormEntity
         return $this->actions;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCategory()
     {
         return $this->category;
     }
 
+    /**
+     * @param mixed $category
+     */
     public function setCategory($category): void
     {
         $this->category = $category;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTemplate()
     {
         return $this->template;
     }
 
+    /**
+     * @param mixed $template
+     */
     public function setTemplate($template): void
     {
         $this->template = $template;
     }
 
+    /**
+     * @return mixed
+     */
     public function getInKioskMode()
     {
         return $this->inKioskMode;
     }
 
+    /**
+     * @param mixed $inKioskMode
+     */
     public function setInKioskMode($inKioskMode): void
     {
         $this->inKioskMode = $inKioskMode;
     }
 
+    /**
+     * @param mixed $renderStyle
+     */
     public function setRenderStyle($renderStyle): void
     {
         $this->renderStyle = $renderStyle;
     }
 
+    /**
+     * @return mixed
+     */
     public function isInKioskMode()
     {
         return $this->getInKioskMode();
     }
 
+    /**
+     * @return mixed
+     */
     public function getFormType()
     {
         return $this->formType;
     }
 
     /**
+     * @param mixed $formType
+     *
      * @return Form
      */
     public function setFormType($formType)

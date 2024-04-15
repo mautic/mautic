@@ -57,6 +57,9 @@ class Tag
             ->build();
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;

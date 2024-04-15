@@ -11,16 +11,16 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    private Lead $contactMock5;
+    private \Mautic\LeadBundle\Entity\Lead $contactMock5;
 
-    private Lead $contactMock6;
+    private \Mautic\LeadBundle\Entity\Lead $contactMock6;
 
     /**
      * @var MockObject|LeadModel
      */
-    private MockObject $contactModelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
-    private ContactActionModel $actionModel;
+    private \Mautic\CategoryBundle\Model\ContactActionModel $actionModel;
 
     protected function setUp(): void
     {

@@ -11,6 +11,9 @@ class DecisionEvent extends CampaignExecutionEvent
 
     private bool $applicable = false;
 
+    /**
+     * @param mixed $passthrough
+     */
     public function __construct(
         private AbstractEventAccessor $eventConfig,
         private LeadEventLog $eventLog,
@@ -47,6 +50,9 @@ class DecisionEvent extends CampaignExecutionEvent
         return $this->eventLog;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPassthrough()
     {
         return $this->passthrough;
@@ -85,6 +91,8 @@ class DecisionEvent extends CampaignExecutionEvent
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
+     *
+     * @param mixed $result
      *
      * @return $this
      */

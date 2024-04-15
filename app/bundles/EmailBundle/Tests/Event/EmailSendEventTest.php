@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 
 class EmailSendEventTest extends \PHPUnit\Framework\TestCase
 {
-    private EmailSendEvent $emailSendEvent;
+    private \Mautic\EmailBundle\Event\EmailSendEvent $emailSendEvent;
 
     protected function setUp(): void
     {

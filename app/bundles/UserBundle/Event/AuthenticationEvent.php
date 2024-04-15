@@ -34,7 +34,7 @@ class AuthenticationEvent extends Event
     /**
      * @var UserProvider
      */
-    protected UserProviderInterface $userProvider;
+    protected \Symfony\Component\Security\Core\User\UserProviderInterface $userProvider;
 
     protected bool $isFormLogin;
 

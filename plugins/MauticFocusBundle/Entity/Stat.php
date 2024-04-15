@@ -50,7 +50,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('focus_stats')
-            ->setCustomRepositoryClass(StatRepository::class)
+            ->setCustomRepositoryClass(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)
             ->addIndex(['type'], 'focus_type')
             ->addIndex(['type', 'type_id'], 'focus_type_id')
             ->addIndex(['date_added'], 'focus_date_added');
@@ -70,17 +70,25 @@ class Stat
         $builder->addLead(true, 'SET NULL');
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @return mixed
+     */
     public function getFocus()
     {
         return $this->focus;
     }
 
     /**
+     * @param mixed $focus
+     *
      * @return Stat
      */
     public function setFocus($focus)
@@ -90,12 +98,17 @@ class Stat
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getType()
     {
         return $this->type;
     }
 
     /**
+     * @param mixed $type
+     *
      * @return Stat
      */
     public function setType($type)
@@ -105,12 +118,17 @@ class Stat
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTypeId()
     {
         return $this->typeId;
     }
 
     /**
+     * @param mixed $typeId
+     *
      * @return Stat
      */
     public function setTypeId($typeId)
@@ -120,12 +138,17 @@ class Stat
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDateAdded()
     {
         return $this->dateAdded;
     }
 
     /**
+     * @param mixed $dateAdded
+     *
      * @return Stat
      */
     public function setDateAdded($dateAdded)

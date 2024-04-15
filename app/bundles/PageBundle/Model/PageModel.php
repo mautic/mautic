@@ -63,7 +63,7 @@ class PageModel extends FormModel
      */
     protected $catInUrl;
 
-    protected DateTimeHelper $dateTimeHelper;
+    protected \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
 
     public function __construct(
         protected CookieHelper $cookieHelper,
@@ -101,7 +101,7 @@ class PageModel extends FormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository(Page::class);
+        $repo = $this->em->getRepository(\Mautic\PageBundle\Entity\Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -112,7 +112,7 @@ class PageModel extends FormModel
      */
     public function getHitRepository()
     {
-        return $this->em->getRepository(Hit::class);
+        return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
     public function getPermissionBase(): string
@@ -226,7 +226,7 @@ class PageModel extends FormModel
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -1018,7 +1018,7 @@ class PageModel extends FormModel
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->em->getRepository(UtmTag::class);
+            $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\UtmTag::class);
             $repo->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);

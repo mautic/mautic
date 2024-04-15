@@ -43,7 +43,7 @@ class LeadSubscriberTest extends CommonMocks
      */
     private MockObject $leadEventDispatcher;
 
-    private DncReasonHelper $dncReasonHelper;
+    private \Mautic\LeadBundle\Twig\Helper\DncReasonHelper $dncReasonHelper;
 
     /**
      * @var EntityManager&MockObject

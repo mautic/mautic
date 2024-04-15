@@ -21,6 +21,8 @@ trait ChannelTrait
 
     /**
      * Get the model for a channel.
+     *
+     * @return mixed
      */
     protected function getChannelModel($channel)
     {
@@ -33,6 +35,8 @@ trait ChannelTrait
 
     /**
      * Get the entity for a channel item.
+     *
+     * @return mixed
      */
     protected function getChannelEntity($channel, $channelId)
     {

@@ -20,6 +20,9 @@ class StatDAO
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getStat($key)
     {
         if (!isset($this->stats[$key])) {

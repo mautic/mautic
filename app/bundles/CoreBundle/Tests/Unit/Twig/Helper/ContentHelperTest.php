@@ -23,7 +23,7 @@ class ContentHelperTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contentHelper = new ContentHelper($delegationMock, $dispatcherMock);
+        $this->contentHelper = new contenthelper($delegationMock, $dispatcherMock);
     }
 
     public function testShowScriptTagsContext(): void

@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AggregateStatRequestEvent extends Event
 {
-    private StatCollection $statCollection;
+    private \Mautic\StatsBundle\Aggregate\Collection\StatCollection $statCollection;
 
     /**
      * @param string $statName

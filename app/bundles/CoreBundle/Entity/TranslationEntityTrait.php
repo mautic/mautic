@@ -15,8 +15,14 @@ trait TranslationEntityTrait
      */
     public $languageSlug;
 
+    /**
+     * @var mixed
+     **/
     private $translationChildren;
 
+    /**
+     * @var mixed
+     **/
     private $translationParent;
 
     /**
@@ -166,7 +172,7 @@ trait TranslationEntityTrait
      *
      * @param bool $onlyChildren
      *
-     * @return array|ArrayCollection
+     * @return array|\Doctrine\Common\Collections\ArrayCollection
      */
     public function getTranslations($onlyChildren = false)
     {

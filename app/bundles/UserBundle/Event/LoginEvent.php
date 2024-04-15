@@ -13,7 +13,7 @@ class LoginEvent extends Event
     }
 
     /**
-     * @return User|null
+     * @return \Mautic\UserBundle\Entity\User|null
      */
     public function getUser()
     {

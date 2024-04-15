@@ -33,7 +33,7 @@ class ReloadCommand extends Command
     {
         $output->writeLn($this->reloadFacade->reloadPlugins());
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Installs, updates, enable and/or disable plugins.';

@@ -11,6 +11,9 @@ class ValidationEvent extends CommonEvent
 
     private string $invalidReason = '';
 
+    /**
+     * @param mixed $value
+     */
     public function __construct(
         private Field $field,
         private $value
@@ -25,6 +28,9 @@ class ValidationEvent extends CommonEvent
         return $this->field;
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue()
     {
         return $this->value;

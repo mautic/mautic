@@ -15,7 +15,7 @@ class EventCollector
 {
     private array $eventsArray = [];
 
-    private ?EventAccessor $events = null;
+    private ?\Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor $events = null;
 
     public function __construct(
         private TranslatorInterface $translator,

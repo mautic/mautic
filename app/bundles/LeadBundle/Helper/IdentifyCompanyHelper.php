@@ -10,6 +10,7 @@ class IdentifyCompanyHelper
 {
     /**
      * @param array $data
+     * @param mixed $lead
      */
     public static function identifyLeadsCompany($data, $lead, CompanyModel $companyModel): array
     {

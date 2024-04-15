@@ -594,6 +594,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * Get active permissions.
+     *
+     * @return mixed
      */
     public function getActivePermissions()
     {
@@ -685,11 +687,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getLastLogin()
     {
         return $this->lastLogin;
     }
 
+    /**
+     * @param mixed $lastLogin
+     */
     public function setLastLogin($lastLogin = null): void
     {
         if (empty($lastLogin)) {
@@ -698,11 +706,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $this->lastLogin = $lastLogin;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLastActive()
     {
         return $this->lastActive;
     }
 
+    /**
+     * @param mixed $lastActive
+     */
     public function setLastActive($lastActive = null): void
     {
         if (empty($lastActive)) {
@@ -711,6 +725,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $this->lastActive = $lastActive;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPreferences()
     {
         return $this->preferences;

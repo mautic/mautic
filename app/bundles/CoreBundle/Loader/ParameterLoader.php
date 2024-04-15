@@ -11,9 +11,9 @@ class ParameterLoader
 {
     private string $configBaseDir;
 
-    private ParameterBag $parameterBag;
+    private \Symfony\Component\HttpFoundation\ParameterBag $parameterBag;
 
-    private ParameterBag $localParameterBag;
+    private \Symfony\Component\HttpFoundation\ParameterBag $localParameterBag;
 
     /**
      * @var array<string, mixed>

@@ -63,9 +63,9 @@ class UserApiController extends CommonApiController
     /**
      * Obtains the logged in user's data.
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function getSelfAction()
     {
@@ -101,7 +101,7 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws NotFoundHttpException
      */
@@ -116,8 +116,8 @@ class UserApiController extends CommonApiController
         }
 
         if (null === $entity) {
-            if ('PATCH' === $method
-                || ('PUT' === $method && !$this->security->isGranted('user:users:create'))
+            if ('PATCH' === $method ||
+                ('PUT' === $method && !$this->security->isGranted('user:users:create'))
             ) {
                 // PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
@@ -173,7 +173,7 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -202,7 +202,7 @@ class UserApiController extends CommonApiController
     /**
      * Obtains a list of roles for user edits.
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getRolesAction(Request $request)
     {

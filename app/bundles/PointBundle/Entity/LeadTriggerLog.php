@@ -20,7 +20,7 @@ class LeadTriggerLog
     private $lead;
 
     /**
-     * @var IpAddress|null
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      **/
     private $ipAddress;
 
@@ -51,11 +51,17 @@ class LeadTriggerLog
             ->build();
     }
 
+    /**
+     * @return mixed
+     */
     public function getDateFired()
     {
         return $this->dateFired;
     }
 
+    /**
+     * @param mixed $dateFired
+     */
     public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
@@ -77,21 +83,33 @@ class LeadTriggerLog
         $this->ipAddress = $ipAddress;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLead()
     {
         return $this->lead;
     }
 
+    /**
+     * @param mixed $lead
+     */
     public function setLead($lead): void
     {
         $this->lead = $lead;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEvent()
     {
         return $this->event;
     }
 
+    /**
+     * @param mixed $event
+     */
     public function setEvent($event): void
     {
         $this->event = $event;

@@ -165,7 +165,7 @@ class InstallCommand extends Command
         if ($this->installer->checkIfInstalled()) {
             $output->writeln('Mautic already installed');
 
-            return Command::SUCCESS;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         $output->writeln([
@@ -355,7 +355,7 @@ class InstallCommand extends Command
             '================',
         ]);
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**

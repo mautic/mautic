@@ -50,6 +50,9 @@ final class AvatarHelper
         $fs->copy($filePath, $avatarDir.DIRECTORY_SEPARATOR.'avatar'.$lead->getId(), true);
     }
 
+    /**
+     * @return mixed
+     */
     public function getAvatar(Lead $lead)
     {
         $preferred  = $lead->getPreferredProfileImage();

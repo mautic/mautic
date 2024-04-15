@@ -17,7 +17,7 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
 class SchemaHelper
 {
-    protected Connection $db;
+    protected \Doctrine\DBAL\Connection $db;
 
     /**
      * @var EntityManager
@@ -249,7 +249,7 @@ class SchemaHelper
         // now backup tables
         foreach ($backupTables as $t => $backup) {
             // drop old indexes
-            /** @var Index $oldIndex */
+            /** @var \Doctrine\DBAL\Schema\Index $oldIndex */
             foreach ($backupIndexes[$t] as $indexName => $oldIndex) {
                 if ('primary' == $indexName) {
                     continue;

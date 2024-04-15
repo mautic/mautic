@@ -20,11 +20,11 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
 class IntegrationSyncProcess
 {
-    private ?InputOptionsDAO $inputOptionsDAO = null;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO = null;
 
-    private ?MappingManualDAO $mappingManualDAO = null;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManualDAO = null;
 
-    private ?SyncDataExchangeInterface $syncDataExchange = null;
+    private ?\Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface $syncDataExchange = null;
 
     public function __construct(
         private SyncDateHelper $syncDateHelper,

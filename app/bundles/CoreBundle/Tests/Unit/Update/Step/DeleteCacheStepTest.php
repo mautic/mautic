@@ -12,14 +12,14 @@ class DeleteCacheStepTest extends AbstractStepTest
     /**
      * @var MockObject|CacheHelper
      */
-    private MockObject $cacheHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $cacheHelper;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private DeleteCacheStep $step;
+    private \Mautic\CoreBundle\Update\Step\DeleteCacheStep $step;
 
     protected function setUp(): void
     {

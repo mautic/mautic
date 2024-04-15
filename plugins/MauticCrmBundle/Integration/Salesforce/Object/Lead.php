@@ -13,16 +13,25 @@ class Lead
     ) {
     }
 
+    /**
+     * @return mixed
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCampaignId()
     {
         return $this->campaignId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getisDeleted()
     {
         return $this->isDeleted;

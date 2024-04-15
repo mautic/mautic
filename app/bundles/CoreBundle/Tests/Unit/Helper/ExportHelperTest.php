@@ -22,12 +22,12 @@ class ExportHelperTest extends TestCase
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translatorInterfaceMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorInterfaceMock;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private MockObject $coreParametersHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 
     private ExportHelper $exportHelper;
 
@@ -57,7 +57,7 @@ class ExportHelperTest extends TestCase
     /**
      * @var FilePathResolver|MockObject
      */
-    private MockObject $filePathResolver;
+    private \PHPUnit\Framework\MockObject\MockObject $filePathResolver;
 
     protected function setUp(): void
     {

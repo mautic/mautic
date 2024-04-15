@@ -16,26 +16,26 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Router
      */
-    private MockObject $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var MockObject|FileProperties
      */
-    private MockObject $fileProperties;
+    private \PHPUnit\Framework\MockObject\MockObject $fileProperties;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
-    private Report $report;
+    private \Mautic\ReportBundle\Entity\Report $report;
 
-    private MessageSchedule $messageSchedule;
+    private \Mautic\ReportBundle\Scheduler\Model\MessageSchedule $messageSchedule;
 
     protected function setUp(): void
     {

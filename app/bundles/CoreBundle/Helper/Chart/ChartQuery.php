@@ -14,7 +14,7 @@ class ChartQuery extends AbstractChart
 {
     private DateTimeHelper $dateTimeHelper;
 
-    private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
+    private ?\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
     /**
      * Match date/time unit to a SQL datetime format
@@ -200,7 +200,7 @@ class ChartQuery extends AbstractChart
      * @param string $column  name. The column must be type of datetime
      * @param array  $filters will be added to where claues
      *
-     * @return QueryBuilder
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
@@ -546,6 +546,9 @@ class ChartQuery extends AbstractChart
         return (int) $data['count'];
     }
 
+    /**
+     * @return mixed
+     */
     protected function prepareTable($table)
     {
         if (MAUTIC_TABLE_PREFIX && str_starts_with($table, MAUTIC_TABLE_PREFIX)) {

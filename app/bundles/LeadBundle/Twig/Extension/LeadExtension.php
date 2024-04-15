@@ -28,6 +28,8 @@ class LeadExtension extends AbstractExtension
 
     /**
      * @see AvatarHelper::getAvatar
+     *
+     * @return mixed
      */
     public function getAvatar(Lead $lead)
     {

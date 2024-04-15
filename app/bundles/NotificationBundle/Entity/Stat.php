@@ -22,7 +22,7 @@ class Stat
     private $notification;
 
     /**
-     * @var Lead|null
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -32,7 +32,7 @@ class Stat
     private $list;
 
     /**
-     * @var IpAddress|null
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
@@ -101,7 +101,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatRepository::class)
+            ->setCustomRepositoryClass(\Mautic\NotificationBundle\Entity\StatRepository::class)
             ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
             ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
             ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
@@ -196,21 +196,33 @@ class Stat
             ->build();
     }
 
+    /**
+     * @return mixed
+     */
     public function getDateClicked()
     {
         return $this->dateClicked;
     }
 
+    /**
+     * @param mixed $dateClicked
+     */
     public function setDateClicked($dateClicked): void
     {
         $this->dateClicked = $dateClicked;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDateSent()
     {
         return $this->dateSent;
     }
 
+    /**
+     * @param mixed $dateSent
+     */
     public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
@@ -250,11 +262,17 @@ class Stat
         $this->ipAddress = $ip;
     }
 
+    /**
+     * @return mixed
+     */
     public function getIsClicked()
     {
         return $this->isClicked;
     }
 
+    /**
+     * @param mixed $isClicked
+     */
     public function setIsClicked($isClicked): void
     {
         $this->isClicked = $isClicked;
@@ -276,11 +294,17 @@ class Stat
         $this->lead = $lead;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTrackingHash()
     {
         return $this->trackingHash;
     }
 
+    /**
+     * @param mixed $trackingHash
+     */
     public function setTrackingHash($trackingHash): void
     {
         $this->trackingHash = $trackingHash;
@@ -294,16 +318,25 @@ class Stat
         return $this->list;
     }
 
+    /**
+     * @param mixed $list
+     */
     public function setList($list): void
     {
         $this->list = $list;
     }
 
+    /**
+     * @return mixed
+     */
     public function getRetryCount()
     {
         return $this->retryCount;
     }
 
+    /**
+     * @param mixed $retryCount
+     */
     public function setRetryCount($retryCount): void
     {
         $this->retryCount = $retryCount;
@@ -314,42 +347,65 @@ class Stat
         ++$this->retryCount;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSource()
     {
         return $this->source;
     }
 
+    /**
+     * @param mixed $source
+     */
     public function setSource($source): void
     {
         $this->source = $source;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSourceId()
     {
         return $this->sourceId;
     }
 
+    /**
+     * @param mixed $sourceId
+     */
     public function setSourceId($sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTokens()
     {
         return $this->tokens;
     }
 
+    /**
+     * @param mixed $tokens
+     */
     public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
     }
 
+    /**
+     * @return mixed
+     */
     public function getClickCount()
     {
         return $this->clickCount;
     }
 
     /**
+     * @param mixed $clickCount
+     *
      * @return Stat
      */
     public function setClickCount($clickCount)
@@ -379,6 +435,9 @@ class Stat
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLastClicked()
     {
         return $this->lastClicked;
@@ -394,12 +453,17 @@ class Stat
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getClickDetails()
     {
         return $this->clickDetails;
     }
 
     /**
+     * @param mixed $clickDetails
+     *
      * @return Stat
      */
     public function setClickDetails($clickDetails)

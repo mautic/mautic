@@ -22,41 +22,41 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private MockObject $versionProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $versionProvider;
 
     /**
      * @var MockObject|GeneratedColumnsProviderInterface
      */
-    private MockObject $generatedColumnsProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Connection
      */
-    private MockObject $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     private ConsoleTerminateEvent $event;
 
     /**
      * @var MockObject|Command
      */
-    private MockObject $command;
+    private \PHPUnit\Framework\MockObject\MockObject $command;
 
     /**
-     * @var MockObject|MySQLSchemaManager
+     * @var MockObject|MySqlSchemaManager
      */
-    private MockObject $schemaManager;
+    private \PHPUnit\Framework\MockObject\MockObject $schemaManager;
 
     /**
      * @var MockObject|OutputInterface
      */
-    private MockObject $output;
+    private \PHPUnit\Framework\MockObject\MockObject $output;
 
     /**
      * @var GeneratedColumns<GeneratedColumn>
      */
-    private GeneratedColumns $generatedColumns;
+    private \Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns $generatedColumns;
 
-    private MigrationCommandSubscriber $subscriber;
+    private \Mautic\CoreBundle\EventListener\MigrationCommandSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -67,7 +67,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->connection               = $this->createMock(Connection::class);
         $this->command                  = $this->createMock(Command::class);
         $this->output                   = $this->createMock(OutputInterface::class);
-        $this->schemaManager            = $this->createMock(MySQLSchemaManager::class);
+        $this->schemaManager            = $this->createMock(MySqlSchemaManager::class);
         $this->generatedColumns         = new GeneratedColumns();
         $this->subscriber               = new MigrationCommandSubscriber(
             $this->versionProvider,

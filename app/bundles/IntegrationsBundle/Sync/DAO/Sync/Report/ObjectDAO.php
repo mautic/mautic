@@ -15,6 +15,7 @@ class ObjectDAO
 
     /**
      * @param string $object
+     * @param mixed  $objectId
      */
     public function __construct(
         private $object,
@@ -45,6 +46,9 @@ class ObjectDAO
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getObjectId()
     {
         return $this->objectId;

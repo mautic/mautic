@@ -61,7 +61,7 @@ class Role extends FormEntity implements CacheInvalidateInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('roles')
-            ->setCustomRepositoryClass(RoleRepository::class);
+            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\RoleRepository::class);
 
         $builder->addIdColumns();
 

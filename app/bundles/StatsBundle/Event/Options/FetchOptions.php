@@ -33,6 +33,7 @@ class FetchOptions
 
     /**
      * @param string $key
+     * @param mixed  $value
      *
      * @return $this
      */
@@ -45,6 +46,8 @@ class FetchOptions
 
     /**
      * @param string $key
+     *
+     * @return mixed
      */
     public function getOption($key, $default = null)
     {

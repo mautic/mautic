@@ -13,12 +13,12 @@ class ModelFactoryTest extends TestCase
     /**
      * @var MockObject|ContainerInterface
      */
-    private MockObject $container;
+    private \PHPUnit\Framework\MockObject\MockObject $container;
 
     /**
      * @var ModelFactory<object>
      */
-    private ModelFactory $factory;
+    private \Mautic\CoreBundle\Factory\ModelFactory $factory;
 
     protected function setUp(): void
     {

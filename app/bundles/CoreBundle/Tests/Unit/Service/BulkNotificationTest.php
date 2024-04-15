@@ -12,9 +12,9 @@ use PHPUnit\Framework\TestCase;
 
 class BulkNotificationTest extends TestCase
 {
-    private BulkNotification $bulkNotification;
+    private \Mautic\CoreBundle\Service\BulkNotification $bulkNotification;
 
-    private NotificationModel $notificationModelFake;
+    private \Mautic\CoreBundle\Model\NotificationModel $notificationModelFake;
 
     protected function setUp(): void
     {

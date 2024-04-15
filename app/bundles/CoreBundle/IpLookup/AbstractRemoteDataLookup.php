@@ -15,9 +15,14 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
 
     /**
      * Get the URL to fetch data from.
+     *
+     * @return mixed
      */
     abstract protected function getUrl();
 
+    /**
+     * @return mixed
+     */
     abstract protected function parseResponse($response);
 
     /**

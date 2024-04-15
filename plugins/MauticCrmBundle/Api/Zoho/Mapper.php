@@ -120,6 +120,9 @@ class Mapper
         throw new MatchingKeyNotFoundException();
     }
 
+    /**
+     * @return mixed
+     */
     private function getField($fieldName)
     {
         return $this->fields[$this->object][$fieldName] ?? null;

@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ContactIdentificationEvent extends Event
 {
-    private ?Lead $identifiedContact = null;
+    private ?\Mautic\LeadBundle\Entity\Lead $identifiedContact = null;
 
     /**
      * @var string

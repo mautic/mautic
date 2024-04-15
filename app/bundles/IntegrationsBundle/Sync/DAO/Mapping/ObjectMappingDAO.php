@@ -65,6 +65,8 @@ class ObjectMappingDAO
     }
 
     /**
+     * @param mixed $integrationObjectId
+     *
      * @return mixed|null
      */
     public function getMappedInternalObjectId($integrationObjectId)

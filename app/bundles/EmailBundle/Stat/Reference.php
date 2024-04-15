@@ -40,6 +40,9 @@ class Reference
         return $this->leadId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getStatId()
     {
         return $this->statId;

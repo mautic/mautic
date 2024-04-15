@@ -50,7 +50,7 @@ class SubmissionEvent extends CommonEvent
      */
     private array $feedback = [];
 
-    private ?Action $action = null;
+    private ?\Mautic\FormBundle\Entity\Action $action = null;
 
     private ?string $context = null;
 
@@ -257,6 +257,9 @@ class SubmissionEvent extends CommonEvent
         $this->callbacks[$key] = $callback;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPostSubmitCallback($key = null)
     {
         return (null === $key) ? $this->callbacks : $this->callbacks[$key];
@@ -267,12 +270,17 @@ class SubmissionEvent extends CommonEvent
         return count($this->callbacks) || count($this->callbackResponses);
     }
 
+    /**
+     * @return mixed
+     */
     public function getPostSubmitCallbackResponse($key = null)
     {
         return (null === $key) ? $this->callbackResponses : $this->callbackResponses[$key];
     }
 
     /**
+     * @param mixed $callbackResponse
+     *
      * @return SubmissionEvent
      */
     public function setPostSubmitCallbackResponse($key, $callbackResponse)

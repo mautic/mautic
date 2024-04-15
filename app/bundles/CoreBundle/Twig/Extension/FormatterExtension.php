@@ -34,6 +34,8 @@ class FormatterExtension extends AbstractExtension
 
     /**
      * Format a string.
+     *
+     * @param mixed $val
      */
     public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1): string
     {

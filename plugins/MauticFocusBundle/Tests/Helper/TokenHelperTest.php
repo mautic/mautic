@@ -17,19 +17,19 @@ class TokenHelperTest extends TestCase
     /**
      * @var FocusModel|MockObject
      */
-    private MockObject $model;
+    private \PHPUnit\Framework\MockObject\MockObject $model;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private MockObject $router;
+    private \PHPUnit\Framework\MockObject\MockObject $router;
 
     /**
      * @var CorePermissions|MockObject
      */
-    private MockObject $security;
+    private \PHPUnit\Framework\MockObject\MockObject $security;
 
-    private TokenHelper $helper;
+    private \MauticPlugin\MauticFocusBundle\Helper\TokenHelper $helper;
 
     protected function setUp(): void
     {

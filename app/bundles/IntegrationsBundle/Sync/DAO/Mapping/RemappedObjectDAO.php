@@ -6,6 +6,10 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class RemappedObjectDAO
 {
+    /**
+     * @param mixed $oldObjectId
+     * @param mixed $newObjectId
+     */
     public function __construct(
         private string $integration,
         private string $oldObjectName,
@@ -25,6 +29,9 @@ class RemappedObjectDAO
         return $this->oldObjectName;
     }
 
+    /**
+     * @return mixed
+     */
     public function getOldObjectId()
     {
         return $this->oldObjectId;
@@ -35,6 +42,9 @@ class RemappedObjectDAO
         return $this->newObjectName;
     }
 
+    /**
+     * @return mixed
+     */
     public function getNewObjectId()
     {
         return $this->newObjectId;

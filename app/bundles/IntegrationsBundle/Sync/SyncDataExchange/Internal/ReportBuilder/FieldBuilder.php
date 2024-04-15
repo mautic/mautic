@@ -16,11 +16,11 @@ use Symfony\Component\Routing\Router;
 
 class FieldBuilder
 {
-    private ValueNormalizer $valueNormalizer;
+    private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
 
     private ?array $mauticObject = null;
 
-    private ?RequestObjectDAO $requestObject = null;
+    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO $requestObject = null;
 
     public function __construct(
         private Router $router,

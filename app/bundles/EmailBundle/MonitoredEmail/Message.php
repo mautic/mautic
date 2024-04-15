@@ -70,6 +70,9 @@ class Message
         return preg_match_all('/=["\'](ci?d:([\w\.%*@-]+))["\']/i', $this->textHtml, $matches) ? array_combine($matches[2], $matches[1]) : [];
     }
 
+    /**
+     * @return mixed
+     */
     public function replaceInternalLinks($baseUri)
     {
         $baseUri     = rtrim($baseUri, '\\/').'/';

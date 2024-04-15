@@ -84,7 +84,7 @@ class NoteModel extends FormModel
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -123,6 +123,9 @@ class NoteModel extends FormModel
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getNoteCount(Lead $lead, $useFilters = false)
     {
         $filter   = ($useFilters) ? $this->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;

@@ -43,7 +43,7 @@ class PluginModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(Plugin::class);
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Plugin::class);
     }
 
     public function getIntegrationEntityRepository()

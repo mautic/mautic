@@ -20,29 +20,29 @@ class UserNotificationHelperTest extends TestCase
     /**
      * @var Writer|MockObject
      */
-    private MockObject $writer;
+    private \PHPUnit\Framework\MockObject\MockObject $writer;
 
     /**
      * @var UserHelper|MockObject
      */
-    private MockObject $userHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $userHelper;
 
     /**
      * @var OwnerProvider|MockObject
      */
-    private MockObject $ownerProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $ownerProvider;
 
     /**
      * @var RouteHelper|MockObject
      */
-    private MockObject $routeHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $routeHelper;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private UserNotificationHelper $helper;
+    private \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper $helper;
 
     protected function setUp(): void
     {

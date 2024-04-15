@@ -13,9 +13,9 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FormModel
      */
-    private MockObject $formModel;
+    private \PHPUnit\Framework\MockObject\MockObject $formModel;
 
-    private PropertiesAccessor $propertiesAccessor;
+    private \Mautic\FormBundle\Helper\PropertiesAccessor $propertiesAccessor;
 
     protected function setUp(): void
     {

@@ -13,11 +13,15 @@ interface TranslationEntityInterface
 
     /**
      * Set entity this is a translation of.
+     *
+     * @return mixed
      */
     public function setTranslationParent(TranslationEntityInterface $parent = null);
 
     /**
      * Set this entity as a main content (remove translation parent).
+     *
+     * @return mixed
      */
     public function removeTranslationParent();
 
@@ -28,8 +32,14 @@ interface TranslationEntityInterface
      */
     public function getTranslationChildren();
 
+    /**
+     * @return mixed
+     */
     public function addTranslationChild(TranslationEntityInterface $child);
 
+    /**
+     * @return mixed
+     */
     public function removeTranslationChild(TranslationEntityInterface $child);
 
     /**
@@ -48,5 +58,8 @@ interface TranslationEntityInterface
      */
     public function isTranslation($isChild = false);
 
+    /**
+     * @return mixed
+     */
     public function getLanguage();
 }

@@ -12,6 +12,7 @@ trait FormThemeTrait
      *
      * @param FormInterface<mixed> $form
      * @param string               $template
+     * @param mixed                $themes
      *
      * @return \Symfony\Component\Form\FormView
      */

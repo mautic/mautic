@@ -247,7 +247,7 @@ class Configurator
     /**
      * Writes parameters to file.
      *
-     * @throws RuntimeException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     public function write(): int
     {

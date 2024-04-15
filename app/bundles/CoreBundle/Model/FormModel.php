@@ -157,6 +157,8 @@ class FormModel extends AbstractCommonModel
     /**
      * Determines if an entity is new or not.
      *
+     * @param mixed $entity
+     *
      * @return bool
      */
     public function isNewEntity($entity)
@@ -314,7 +316,6 @@ class FormModel extends AbstractCommonModel
             }
         }
         $this->em->flush();
-
         // retrieving the entities while here so may as well return them so they can be used if needed
         return $entities;
     }
@@ -328,7 +329,7 @@ class FormModel extends AbstractCommonModel
      *
      * @return \Symfony\Component\Form\FormInterface<mixed>
      *
-     * @throws NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {

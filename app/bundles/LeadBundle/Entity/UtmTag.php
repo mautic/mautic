@@ -20,7 +20,7 @@ class UtmTag
     private $dateAdded;
 
     /**
-     * @var Lead
+     * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
 

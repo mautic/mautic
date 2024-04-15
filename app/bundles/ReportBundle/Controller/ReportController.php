@@ -25,7 +25,7 @@ class ReportController extends FormController
     /**
      * @param int $page
      *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
+     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
@@ -174,7 +174,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST === $request->getMethod()) {
+        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('report');
             \assert($model instanceof ReportModel);
             $entity = $model->getEntity($objectId);
@@ -217,7 +217,7 @@ class ReportController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return Response
+     * @return HttpFoundation\Response
      */
     public function batchDeleteAction(Request $request)
     {
@@ -235,7 +235,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST === $request->getMethod()) {
+        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('report');
             \assert($model instanceof ReportModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
@@ -295,7 +295,7 @@ class ReportController extends FormController
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
      *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
+     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
@@ -458,7 +458,7 @@ class ReportController extends FormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (Request::METHOD_POST === $request->getMethod()) {
+        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -537,7 +537,7 @@ class ReportController extends FormController
      * @param int $objectId   Report ID
      * @param int $reportPage
      *
-     * @return HttpFoundation\JsonResponse|Response
+     * @return HttpFoundation\JsonResponse|HttpFoundation\Response
      */
     public function viewAction(Request $request, $objectId, $reportPage = 1)
     {
@@ -737,13 +737,13 @@ class ReportController extends FormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return Response
+     * @return HttpFoundation\Response
      *
      * @throws \Exception
      */
     public function exportAction(Request $request, $objectId, $format = 'csv')
     {
-        /** @var ReportModel $model */
+        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
         $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->security;
@@ -848,10 +848,10 @@ class ReportController extends FormController
             throw new \Exception($this->translator->trans('mautic.format.invalid', ['%format%' => $format, '%validFormats%' => 'csv']));
         }
 
-        /** @var ReportModel $model */
+        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
         $model = $this->getModel('report');
 
-        /** @var Report $report */
+        /** @var \Mautic\ReportBundle\Entity\Report $report */
         $report = $model->getEntity($reportId);
 
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */

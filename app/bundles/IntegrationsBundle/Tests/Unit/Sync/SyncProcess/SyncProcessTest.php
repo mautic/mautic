@@ -35,64 +35,64 @@ class SyncProcessTest extends TestCase
     /**
      * @var MockObject|MappingManualDAO
      */
-    private MockObject $mappingManualDAO;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingManualDAO;
 
     /**
      * @var MockObject|MauticSyncDataExchange
      */
-    private MockObject $internalSyncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $internalSyncDataExchange;
 
     /**
      * @var MockObject|SyncDataExchangeInterface
      */
-    private MockObject $integrationSyncDataExchange;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationSyncDataExchange;
 
     /**
      * @var MockObject|SyncDateHelper
      */
-    private MockObject $syncDateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
 
     /**
      * @var MockObject|MappingHelper
      */
-    private MockObject $mappingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
     /**
      * @var MockObject|RelationsHelper
      */
-    private MockObject $relationsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $relationsHelper;
 
     /**
      * @var MockObject|IntegrationSyncProcess
      */
-    private MockObject $integrationSyncProcess;
+    private \PHPUnit\Framework\MockObject\MockObject $integrationSyncProcess;
 
     /**
      * @var MockObject|MauticSyncProcess
      */
-    private MockObject $mauticSyncProcess;
+    private \PHPUnit\Framework\MockObject\MockObject $mauticSyncProcess;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private MockObject $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     /**
      * @var MockObject|Notifier
      */
-    private MockObject $notifier;
+    private \PHPUnit\Framework\MockObject\MockObject $notifier;
 
     /**
      * @var MockObject|InputOptionsDAO
      */
-    private MockObject $inputOptionsDAO;
+    private \PHPUnit\Framework\MockObject\MockObject $inputOptionsDAO;
 
     /**
      * @var MockObject|SyncServiceInterface
      */
-    private MockObject $syncService;
+    private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
-    private SyncProcess $syncProcess;
+    private \Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess $syncProcess;
 
     protected function setUp(): void
     {

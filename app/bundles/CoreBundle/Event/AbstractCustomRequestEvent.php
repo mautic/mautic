@@ -42,7 +42,7 @@ abstract class AbstractCustomRequestEvent extends Event
     }
 
     /**
-     * @return Request
+     * @return request
      */
     public function getRequest()
     {

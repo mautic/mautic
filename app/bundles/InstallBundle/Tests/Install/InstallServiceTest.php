@@ -21,29 +21,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallServiceTest extends \PHPUnit\Framework\TestCase
 {
-    private MockObject $configurator;
+    private \PHPUnit\Framework\MockObject\MockObject $configurator;
 
-    private MockObject $cacheHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $cacheHelper;
 
-    private MockObject $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
     /**
      * @var EntityManager&MockObject
      */
-    private MockObject $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private MockObject $kernel;
+    private \PHPUnit\Framework\MockObject\MockObject $kernel;
 
-    private MockObject $validator;
+    private \PHPUnit\Framework\MockObject\MockObject $validator;
 
     private UserPasswordHasher $hasher;
 
     /**
      * @var MockObject&FixturesLoaderInterface
      */
-    private MockObject $fixtureLoader;
+    private \PHPUnit\Framework\MockObject\MockObject $fixtureLoader;
 
     private InstallService $installer;
 

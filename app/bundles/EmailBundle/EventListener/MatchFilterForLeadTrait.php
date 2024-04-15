@@ -172,6 +172,10 @@ trait MatchFilterForLeadTrait
         return in_array(true, $groups);
     }
 
+    /**
+     * @param mixed $leadVal
+     * @param mixed $filterVal
+     */
     private function checkLeadValueIsInFilter($leadVal, $filterVal, bool $defaultFlag): bool
     {
         $leadVal    = !is_array($leadVal) ? [$leadVal] : $leadVal;

@@ -34,6 +34,11 @@ class EntityResultHelper
         return $entities;
     }
 
+    /**
+     * @param mixed $entityRow
+     *
+     * @return mixed
+     */
     private function getEntityData($entityRow)
     {
         if (is_array($entityRow) && isset($entityRow[0])) {
@@ -45,6 +50,8 @@ class EntityResultHelper
 
     /**
      * @param array $array
+     *
+     * @return mixed
      */
     private function getDataForArray($array)
     {
@@ -57,6 +64,8 @@ class EntityResultHelper
 
     /**
      * @param object $object
+     *
+     * @return mixed
      */
     private function getDataForObject($object)
     {

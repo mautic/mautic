@@ -32,7 +32,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $request;
 
-    private CircularDependencyValidator $validator;
+    private \Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator $validator;
 
     protected function setUp(): void
     {

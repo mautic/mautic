@@ -20,14 +20,14 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EntityManagerInterface
      */
-    private MockObject $em;
+    private \PHPUnit\Framework\MockObject\MockObject $em;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private DetermineWinnerSubscriber $subscriber;
+    private \Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -53,12 +53,12 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 'totalCount' => 5,
                 'readCount'  => 0,
                 'readRate'   => 0,
-            ],
+                ],
             2 => [
                 'totalCount' => 6,
                 'readCount'  => 3,
                 'readRate'   => 50,
-            ],
+                ],
         ];
 
         $this->translator->method('trans')

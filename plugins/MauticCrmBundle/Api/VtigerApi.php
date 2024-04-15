@@ -35,6 +35,8 @@ class VtigerApi extends CrmApi
 
     /**
      * List types.
+     *
+     * @return mixed
      */
     public function listTypes()
     {
@@ -43,6 +45,8 @@ class VtigerApi extends CrmApi
 
     /**
      * List leads.
+     *
+     * @return mixed
      */
     public function getLeadFields($object)
     {
@@ -55,6 +59,9 @@ class VtigerApi extends CrmApi
         return $this->request('describe', $object);
     }
 
+    /**
+     * @return mixed
+     */
     public function createLead(array $data)
     {
         return $this->request('create', $this->element, $data, 'POST');

@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class TagManagerIntegrationTest extends TestCase
 {
-    private TagManagerIntegration $tagManagerIntegration;
+    private \MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration $tagManagerIntegration;
 
     protected function setUp(): void
     {

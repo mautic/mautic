@@ -12,6 +12,8 @@ final class BarStringTransformerTest extends TestCase
 {
     /**
      * @dataProvider transformProvider
+     *
+     * @param mixed $value
      */
     public function testTransform($value, string $expected): void
     {
@@ -37,6 +39,7 @@ final class BarStringTransformerTest extends TestCase
     /**
      * @dataProvider reverseTransformProvider
      *
+     * @param mixed    $value
      * @param string[] $expected
      */
     public function testReverseTransform($value, array $expected): void

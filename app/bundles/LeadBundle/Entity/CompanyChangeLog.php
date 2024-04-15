@@ -47,7 +47,7 @@ class CompanyChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_companies_change_log')
-            ->setCustomRepositoryClass(CompanyChangeLogRepository::class)
+            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\CompanyChangeLogRepository::class)
             ->addIndex(['date_added'], 'company_date_added');
 
         $builder->addId();
@@ -218,7 +218,7 @@ class CompanyChangeLog
     /**
      * Get lead.
      *
-     * @return Lead
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {

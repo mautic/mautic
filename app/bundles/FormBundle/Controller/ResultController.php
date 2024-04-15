@@ -47,7 +47,7 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1)
     {
@@ -320,7 +320,7 @@ class ResultController extends CommonFormController
             'form'       => $form,
         ];
 
-        /** @var SubmissionModel $model */
+        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
         $model = $this->getModel('form.submission');
 
         return $model->exportResults($format, $form, $args);
@@ -441,6 +441,8 @@ class ResultController extends CommonFormController
 
     /**
      * @param array $parameters
+     *
+     * @return mixed
      */
     protected function getFormIdFromRequest($parameters = [])
     {

@@ -25,6 +25,9 @@ class MenuBuilder
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return mixed
+     */
     public function __call($name, $arguments)
     {
         $name = str_replace('Menu', '', $name);
@@ -68,6 +71,9 @@ class MenuBuilder
         return null;
     }
 
+    /**
+     * @return mixed
+     */
     private function buildMenu($name)
     {
         static $menus = [];

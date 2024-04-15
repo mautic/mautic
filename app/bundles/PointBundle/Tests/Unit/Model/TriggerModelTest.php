@@ -33,49 +33,49 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var IpLookupHelper|MockObject
      */
-    private MockObject $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
     /**
      * @var LeadModel|MockObject
      */
-    private MockObject $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
      * @var TriggerEventModel|MockObject
      */
-    private MockObject $triggerEventModel;
+    private \PHPUnit\Framework\MockObject\MockObject $triggerEventModel;
 
     /**
      * @var MauticFactory|MockObject
      */
-    private MockObject $mauticFactory;
+    private \PHPUnit\Framework\MockObject\MockObject $mauticFactory;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var EntityManager|MockObject
      */
-    private MockObject $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var TriggerEventRepository|MockObject
      */
-    private MockObject $triggerEventRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $triggerEventRepository;
 
-    private TriggerModel $triggerModel;
+    private \Mautic\PointBundle\Model\TriggerModel $triggerModel;
 
     /**
      * @var ContactTracker
      */
-    private MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
     public function setUp(): void
     {

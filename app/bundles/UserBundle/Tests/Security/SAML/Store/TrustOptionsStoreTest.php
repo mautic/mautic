@@ -13,9 +13,9 @@ class TrustOptionsStoreTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    private TrustOptionsStore $store;
+    private \Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore $store;
 
     protected function setUp(): void
     {

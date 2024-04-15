@@ -17,14 +17,14 @@ final class FilterOperatorProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private FilterOperatorProvider $provider;
+    private \Mautic\LeadBundle\Provider\FilterOperatorProvider $provider;
 
     protected function setUp(): void
     {

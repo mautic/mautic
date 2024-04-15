@@ -23,6 +23,9 @@ class DeleteContactSecondaryCompaniesCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure(): void
     {
         $this->setName(self::NAME)
@@ -35,6 +38,9 @@ EOT
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $allowMultiple = $this->coreParametersHelper->get('contact_allow_multiple_companies');
@@ -43,7 +49,7 @@ EOT
         if ($allowMultiple) {
             $output->writeln($this->translator->trans('mautic.lead.command.delete_contact_secondary_company.allow_multiple_enabled'));
 
-            return Command::SUCCESS;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         try {
@@ -56,6 +62,6 @@ EOT
 
         $output->writeln($this->translator->trans('mautic.lead.command.delete_contact_secondary_company.success'));
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 }

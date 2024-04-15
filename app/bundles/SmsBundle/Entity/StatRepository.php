@@ -14,6 +14,8 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
+     * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */

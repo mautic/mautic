@@ -81,11 +81,17 @@ class ListLead
         $this->dateAdded = $date;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLead()
     {
         return $this->lead;
     }
 
+    /**
+     * @param mixed $lead
+     */
     public function setLead($lead): void
     {
         $this->lead = $lead;

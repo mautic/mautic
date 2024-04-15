@@ -20,16 +20,16 @@ class ModeratedCommandTest extends TestCase
     /**
      * @var MockObject|InputInterface
      */
-    private MockObject $input;
+    private \PHPUnit\Framework\MockObject\MockObject $input;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private MockObject $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
-    private NullOutput $output;
+    private \Symfony\Component\Console\Output\NullOutput $output;
 
-    private FakeModeratedCommand $fakeModeratedCommand;
+    private \Mautic\CoreBundle\Tests\Unit\Command\src\FakeModeratedCommand $fakeModeratedCommand;
 
     protected function setUp(): void
     {

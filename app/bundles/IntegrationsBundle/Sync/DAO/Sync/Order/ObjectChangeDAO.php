@@ -14,7 +14,7 @@ class ObjectChangeDAO
      */
     private array $fields = [];
 
-    private ?ObjectMapping $objectMapping = null;
+    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
 
     /**
      * @var FieldDAO[]
@@ -28,6 +28,7 @@ class ObjectChangeDAO
     /**
      * @param string             $integration
      * @param string             $object
+     * @param mixed              $objectId
      * @param string             $mappedObject   Name of the source object type
      * @param mixed              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
@@ -69,11 +70,17 @@ class ObjectChangeDAO
         return $this->object;
     }
 
+    /**
+     * @param mixed $objectId
+     */
     public function setObjectId($objectId): void
     {
         $this->objectId = $objectId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getObjectId()
     {
         return $this->objectId;
@@ -91,6 +98,8 @@ class ObjectChangeDAO
 
     /**
      * Returns the ID for the object in this system that is being synced to the other.
+     *
+     * @return mixed
      */
     public function getMappedObjectId()
     {

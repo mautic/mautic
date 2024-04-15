@@ -45,7 +45,7 @@ class MappingHelperTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $objectMappingRepository;
 
-    private MappingHelper $mappingHelper;
+    private \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper $mappingHelper;
 
     protected function setUp(): void
     {

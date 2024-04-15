@@ -14,9 +14,9 @@ final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&CacheProviderInterface
      */
-    private MockObject $cacheProvider;
+    private \PHPUnit\Framework\MockObject\MockObject $cacheProvider;
 
-    private AlreadyMappedFieldCollector $collector;
+    private \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector $collector;
 
     protected function setup(): void
     {

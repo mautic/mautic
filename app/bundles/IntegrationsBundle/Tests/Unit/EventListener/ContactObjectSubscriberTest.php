@@ -35,7 +35,7 @@ class ContactObjectSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $router;
 
-    private ContactObjectSubscriber $subscriber;
+    private \Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber $subscriber;
 
     public function setUp(): void
     {

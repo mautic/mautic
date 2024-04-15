@@ -26,6 +26,8 @@ trait EntityContactsTrait
      * @param int|null                $count              optional $count if already known to avoid an extra query
      * @param \DateTimeInterface|null $dateFrom           optionally limit to leads added between From and To dates
      * @param \DateTimeInterface|null $dateTo             optionally limit to leads added between From and To dates
+     *
+     * @return mixed
      */
     protected function generateContactsGrid(
         Request $request,

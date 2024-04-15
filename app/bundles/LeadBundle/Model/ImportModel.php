@@ -439,6 +439,8 @@ class ImportModel extends FormModel
 
     /**
      * Decide whether the CSV row is empty.
+     *
+     * @param mixed $row
      */
     public function isEmptyCsvRow($row): bool
     {
@@ -540,7 +542,7 @@ class ImportModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(Import::class);
+        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Import::class);
     }
 
     /**
@@ -548,7 +550,7 @@ class ImportModel extends FormModel
      */
     public function getEventLogRepository()
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
     }
 
     public function getPermissionBase(): string
@@ -587,7 +589,7 @@ class ImportModel extends FormModel
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

@@ -17,9 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 {
-    private DeviceCreatorService $deviceCreatorService;
+    private \Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService $deviceCreatorService;
 
-    private DeviceDetectorFactory $deviceDetectorFactory;
+    private \Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory $deviceDetectorFactory;
 
     /**
      * @var DeviceTrackingServiceInterface

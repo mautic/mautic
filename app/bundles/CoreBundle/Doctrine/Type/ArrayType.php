@@ -29,6 +29,8 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
     }
 
     /**
+     * @param mixed $value
+     *
      * @return array
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)

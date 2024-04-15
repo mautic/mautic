@@ -52,7 +52,7 @@ EOT
             $question       = new ConfirmationQuestion($questionString, false);
 
             if (!$helper->ask($input, $output, $question)) {
-                return Command::SUCCESS;
+                return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }
 
@@ -110,7 +110,7 @@ EOT
             $this->translator->trans('mautic.core.command.install_data_success')
         );
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Installs Mautic with sample data';

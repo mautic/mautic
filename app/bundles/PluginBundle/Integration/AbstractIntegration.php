@@ -96,7 +96,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $persistIntegrationEntities = [];
 
-    protected array $commandParameters         = [];
+    protected array  $commandParameters         = [];
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
@@ -270,6 +270,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Returns the field the integration needs in order to find the user.
+     *
+     * @return mixed
      */
     public function getIdentifierFields()
     {
@@ -383,6 +385,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Returns already decrypted keys.
+     *
+     * @return mixed
      */
     public function getKeys()
     {
@@ -558,6 +562,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param string $data
      * @param bool   $postAuthorization
+     *
+     * @return mixed
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
@@ -834,7 +840,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ->setInternalEntityId($internalEntityId);
 
         if ($persist) {
-            $this->em->getRepository(IntegrationEntity::class)->saveEntity($entity);
+            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntity($entity);
         }
 
         return $entity;
@@ -845,7 +851,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository(IntegrationEntity::class);
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
     /**
@@ -1154,6 +1160,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Called in extractAuthKeys before key comparison begins to give opportunity to set expiry, rename keys, etc.
+     *
+     * @return mixed
      */
     public function prepareResponseForExtraction($data)
     {
@@ -1682,7 +1690,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        /** @var LeadModel $leadModel */
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
@@ -1698,7 +1706,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository(Lead::class)
+            $existingLeads = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
@@ -1795,6 +1803,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param string $field
      * @param string $subfield
+     *
+     * @return mixed
      */
     public function matchFieldName($field, $subfield = '')
     {
@@ -1807,6 +1817,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Convert and assign the data to assignable fields.
+     *
+     * @param mixed $data
      *
      * @return array
      */
@@ -1898,7 +1910,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return NotificationModel
+     * @return \Mautic\CoreBundle\Model\NotificationModel
      */
     public function getNotificationModel()
     {
@@ -2151,6 +2163,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Cleans the identifier for api calls.
      *
+     * @param mixed $identifier
+     *
      * @return string
      */
     protected function cleanIdentifier($identifier)
@@ -2320,6 +2334,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             : new \DateTime();
     }
 
+    /**
+     * @return mixed
+     */
     public function prepareFieldsForSync($fields, $keys, $object = null)
     {
         return $fields;
@@ -2373,6 +2390,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Get pseudo fields from mautic, these are lead properties we want to map to integration fields.
+     *
+     * @return mixed
      */
     public function getCompoundMauticFields($lead)
     {

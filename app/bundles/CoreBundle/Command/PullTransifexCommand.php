@@ -67,7 +67,7 @@ EOT
         } catch (InvalidConfigurationException) {
             $output->writeln($this->translator->trans('mautic.core.command.transifex_no_credentials'));
 
-            return Command::FAILURE;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $statistics = $transifex->getConnector(Statistics::class);
@@ -122,7 +122,7 @@ EOT
                 } catch (\Exception $exception) {
                     $output->writeln($this->translator->trans('mautic.core.command.transifex_error_pulling_data', ['%message%' => $exception->getMessage()]));
 
-                    return Command::FAILURE;
+                    return \Symfony\Component\Console\Command\Command::FAILURE;
                 }
             }
         }
@@ -143,7 +143,7 @@ EOT
 
         $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_downloaded'));
 
-        return Command::SUCCESS;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Fetches translations for Mautic from Transifex';

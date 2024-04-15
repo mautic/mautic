@@ -20,34 +20,34 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|EntityManager
      */
-    private MockObject $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     /**
      * @var MockObject|StageModel
      */
-    private MockObject $stageModel;
+    private \PHPUnit\Framework\MockObject\MockObject $stageModel;
 
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private MockObject $formBuilder;
+    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
-    private EmailType $form;
+    private \Mautic\EmailBundle\Form\Type\EmailType $form;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
      * @var ThemeHelperInterface|MockObject
      */
-    private MockObject $themeHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $themeHelper;
 
     protected function setUp(): void
     {

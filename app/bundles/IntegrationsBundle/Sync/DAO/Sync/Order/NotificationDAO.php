@@ -35,6 +35,9 @@ class NotificationDAO
         return $this->objectChangeDAO->getObject();
     }
 
+    /**
+     * @return mixed
+     */
     public function getIntegrationObjectId()
     {
         return $this->objectChangeDAO->getObjectId();

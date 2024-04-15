@@ -15,19 +15,19 @@ class InstallNewFilesStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
      * @var MockObject|UpdateHelper
      */
-    private MockObject $updateHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $updateHelper;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private MockObject $pathsHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
 
-    private InstallNewFilesStep $step;
+    private \Mautic\CoreBundle\Update\Step\InstallNewFilesStep $step;
 
     protected function setUp(): void
     {

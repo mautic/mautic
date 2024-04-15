@@ -39,7 +39,7 @@ class MessageQueue
     private $event;
 
     /**
-     * @var Lead
+     * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
 
@@ -114,7 +114,7 @@ class MessageQueue
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('message_queue')
-            ->setCustomRepositoryClass(MessageQueueRepository::class)
+            ->setCustomRepositoryClass(\Mautic\ChannelBundle\Entity\MessageQueueRepository::class)
             ->addIndex(['status'], 'message_status_search')
             ->addIndex(['date_sent'], 'message_date_sent')
             ->addIndex(['scheduled_date'], 'message_scheduled_date')
@@ -127,7 +127,7 @@ class MessageQueue
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
 
-        $builder->createManyToOne('event', Event::class)
+        $builder->createManyToOne('event', \Mautic\CampaignBundle\Entity\Event::class)
             ->addJoinColumn('event_id', 'id', true, false, 'CASCADE')
             ->build();
 
@@ -231,12 +231,17 @@ class MessageQueue
         $this->channel = $channel;
     }
 
+    /**
+     * @return mixed
+     */
     public function getChannelId()
     {
         return $this->channelId;
     }
 
     /**
+     * @param mixed $channelId
+     *
      * @return MessageQueue
      */
     public function setChannelId($channelId)
@@ -365,6 +370,9 @@ class MessageQueue
         return $this->scheduledDate;
     }
 
+    /**
+     * @param mixed $scheduledDate
+     */
     public function setScheduledDate($scheduledDate): void
     {
         $this->scheduledDate = $scheduledDate;

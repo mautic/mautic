@@ -9,6 +9,11 @@ class ArrayHelper
 {
     /**
      * If the $key exists in the $origin array then it will return its value.
+     *
+     * @param mixed $key
+     * @param mixed $defaultValue
+     *
+     * @return mixed
      */
     public static function getValue($key, array $origin, $defaultValue = null)
     {
@@ -18,6 +23,11 @@ class ArrayHelper
     /**
      * If the $key exists in the $origin array then it will return its value
      * and unsets the $key from the $array.
+     *
+     * @param mixed $key
+     * @param mixed $defaultValue
+     *
+     * @return mixed
      */
     public static function pickValue($key, array &$origin, $defaultValue = null)
     {

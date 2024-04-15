@@ -47,12 +47,12 @@ class VideoHit
     private $redirect;
 
     /**
-     * @var Lead|null
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var IpAddress|null
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
@@ -130,7 +130,7 @@ class VideoHit
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(VideoHitRepository::class)
+            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\VideoHitRepository::class)
             ->addIndex(['date_hit'], 'video_date_hit')
             ->addIndex(['channel', 'channel_id'], 'video_channel_search')
             ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');

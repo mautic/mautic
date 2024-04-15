@@ -33,64 +33,64 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Translator
      */
-    private MockObject $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
     /**
      * @var MockObject|Session
      */
-    private MockObject $sessionMock;
+    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
 
     /**
      * @var MockObject|ModelFactory<EmailModel>
      */
-    private MockObject $modelFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|Container
      */
-    private MockObject $containerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
 
     /**
      * @var MockObject|Router
      */
-    private MockObject $routerMock;
+    private \PHPUnit\Framework\MockObject\MockObject $routerMock;
 
     /**
      * @var MockObject|EmailModel
      */
-    private MockObject $modelMock;
+    private \PHPUnit\Framework\MockObject\MockObject $modelMock;
 
     /**
      * @var MockObject|Email
      */
-    private MockObject $emailMock;
+    private \PHPUnit\Framework\MockObject\MockObject $emailMock;
 
     /**
      * @var MockObject|FlashBag
      */
-    private MockObject $flashBagMock;
+    private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
 
-    private EmailController $controller;
+    private \Mautic\EmailBundle\Controller\EmailController $controller;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private MockObject $corePermissionsMock;
+    private \PHPUnit\Framework\MockObject\MockObject $corePermissionsMock;
 
     /**
      * @var MockObject|FormFactory
      */
-    private MockObject $formFactoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formFactoryMock;
 
     /**
      * @var MockObject|Form
      */
-    private MockObject $formMock;
+    private \PHPUnit\Framework\MockObject\MockObject $formMock;
 
     /**
      * @var MockObject|Environment
      */
-    private MockObject $twigMock;
+    private \PHPUnit\Framework\MockObject\MockObject $twigMock;
 
     private RequestStack $requestStack;
 

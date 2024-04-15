@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class SmsTransportPass implements CompilerPassInterface
 {
-    private ?ContainerBuilder $container = null;
+    private ?\Symfony\Component\DependencyInjection\ContainerBuilder $container = null;
 
     public function process(ContainerBuilder $container): void
     {

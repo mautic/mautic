@@ -27,6 +27,8 @@ class VideoHitEvent extends CommonEvent
 
     /**
      * Get HTML code.
+     *
+     * @return mixed
      */
     public function getCode()
     {

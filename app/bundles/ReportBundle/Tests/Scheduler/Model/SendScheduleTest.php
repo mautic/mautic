@@ -14,26 +14,26 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    private Report $report;
+    private \Mautic\ReportBundle\Entity\Report $report;
 
-    private Scheduler $scheduler;
+    private \Mautic\ReportBundle\Entity\Scheduler $scheduler;
 
-    private SendSchedule $sendSchedule;
+    private \Mautic\ReportBundle\Scheduler\Model\SendSchedule $sendSchedule;
 
     /**
      * @var MockObject|MailHelper
      */
-    private MockObject $mailHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $mailHelperMock;
 
     /**
      * @var MockObject|MessageSchedule
      */
-    private MockObject $messageSchedule;
+    private \PHPUnit\Framework\MockObject\MockObject $messageSchedule;
 
     /**
      * @var MockObject|FileHandler
      */
-    private MockObject $fileHandler;
+    private \PHPUnit\Framework\MockObject\MockObject $fileHandler;
 
     private \PHPUnit\Framework\MockObject\MockObject|EventDispatcher $eventDispatcher;
 

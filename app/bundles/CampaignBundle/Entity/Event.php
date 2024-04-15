@@ -359,9 +359,9 @@ class Event implements ChannelInterface
                      'triggerInterval',
                      'triggerIntervalUnit',
                      'triggerHour',
-                     'triggerRestrictedStartHour',
-                     'triggerRestrictedStopHour',
-                     'triggerRestrictedDaysOfWeek',
+                    'triggerRestrictedStartHour',
+                    'triggerRestrictedStopHour',
+                    'triggerRestrictedDaysOfWeek',
                      'triggerMode',
                      'children',
                      'parent',
@@ -404,6 +404,7 @@ class Event implements ChannelInterface
 
     /**
      * @param string $prop
+     * @param mixed  $val
      */
     private function isChanged($prop, $val): void
     {
@@ -722,6 +723,9 @@ class Event implements ChannelInterface
         return $this->parent;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTriggerDate()
     {
         return $this->triggerDate;
@@ -780,17 +784,26 @@ class Event implements ChannelInterface
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTriggerIntervalUnit()
     {
         return $this->triggerIntervalUnit;
     }
 
+    /**
+     * @param mixed $triggerIntervalUnit
+     */
     public function setTriggerIntervalUnit($triggerIntervalUnit): void
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventType()
     {
         return $this->eventType;
@@ -807,44 +820,68 @@ class Event implements ChannelInterface
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTriggerMode()
     {
         return $this->triggerMode;
     }
 
+    /**
+     * @param mixed $triggerMode
+     */
     public function setTriggerMode($triggerMode): void
     {
         $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDecisionPath()
     {
         return $this->decisionPath;
     }
 
+    /**
+     * @param mixed $decisionPath
+     */
     public function setDecisionPath($decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTempId()
     {
         return $this->tempId;
     }
 
+    /**
+     * @param mixed $tempId
+     */
     public function setTempId($tempId): void
     {
         $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getChannel()
     {
         return $this->channel;
     }
 
+    /**
+     * @param mixed $channel
+     */
     public function setChannel($channel): void
     {
         $this->isChanged('channel', $channel);
