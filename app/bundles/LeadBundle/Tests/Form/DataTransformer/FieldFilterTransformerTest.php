@@ -13,9 +13,9 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
-    private \Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer $transformer;
+    private FieldFilterTransformer $transformer;
 
     protected function setUp(): void
     {

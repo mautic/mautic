@@ -124,7 +124,7 @@ class Focus extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('focus')
-            ->setCustomRepositoryClass(\MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class)
+            ->setCustomRepositoryClass(FocusRepository::class)
             ->addIndex(['focus_type'], 'focus_type')
             ->addIndex(['style'], 'focus_style')
             ->addIndex(['form_id'], 'focus_form')

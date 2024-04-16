@@ -205,7 +205,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     protected function getStat(Form $form = null, Lead $lead = null, Page $preferenceCenter = null): Stat
     {

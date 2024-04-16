@@ -81,7 +81,7 @@ class Trigger extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_triggers')
-            ->setCustomRepositoryClass(\Mautic\PointBundle\Entity\TriggerRepository::class);
+            ->setCustomRepositoryClass(TriggerRepository::class);
 
         $builder->addIdColumns();
 

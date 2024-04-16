@@ -31,27 +31,27 @@ class SentHelperTest extends TestCase
     /**
      * @var MockObject|Connection
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
      * @var MockObject|GeneratedColumnsProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
+    private MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|UserHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userHelperMock;
+    private MockObject $userHelperMock;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
+    private MockObject $queryBuilder;
 
     /**
      * @var MockObject|Result
      */
-    private \PHPUnit\Framework\MockObject\MockObject $result;
+    private MockObject $result;
 
     private GeneratedColumns $generatedColumns;
 

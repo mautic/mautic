@@ -17,17 +17,17 @@ class StatDevice
     private $id;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Stat|null
+     * @var Stat|null
      */
     private $stat;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadDevice|null
+     * @var LeadDevice|null
      */
     private $device;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -41,12 +41,12 @@ class StatDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatDeviceRepository::class)
+            ->setCustomRepositoryClass(StatDeviceRepository::class)
             ->addIndex(['date_opened'], 'date_opened_search');
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('device', \Mautic\LeadBundle\Entity\LeadDevice::class)
+        $builder->createManyToOne('device', LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
             ->build();
 
