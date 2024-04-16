@@ -419,7 +419,7 @@ class InputHelper
 
             try {
                 $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
-            } catch (\ErrorException $e) {
+            } catch (\ErrorException) {
                 $hasUnicode = 'UTF-8"' === mb_detect_encoding($value);
             }
 
