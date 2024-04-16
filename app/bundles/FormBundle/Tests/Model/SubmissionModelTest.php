@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -209,6 +210,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->router                   = $this->createMock(RouterInterface::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
+        $this->exportHelper             = $this->createMock(ExportHelper::class);
 
         $this->fieldHelper->method('getFieldFilter')->willReturn('string');
 
@@ -237,7 +239,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->mockLogger,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createMock(CoreParametersHelper::class),
+            $this->exportHelper
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);

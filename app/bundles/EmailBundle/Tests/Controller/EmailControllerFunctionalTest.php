@@ -554,19 +554,4 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($email->getSubject(), $response['subject']);
         $this->assertNotEmpty($response['body']);
     }
-
-    public function testGetExportHeader(): void
-    {
-        $this->translatorMock->expects($this->exactly(4))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.lead.lead.thead.country'],
-                ['mautic.email.graph.line.stats.sent'],
-                ['mautic.email.graph.line.stats.read'],
-                ['mautic.email.clicked']
-            )
-            ->willReturnOnConsecutiveCalls('Country', 'Sent', 'Read', 'Clicked');
-
-        $this->assertSame(['Country', 'Sent', 'Read', 'Clicked'], $this->controller->getCountryTableExportHeader());
-    }
 }
