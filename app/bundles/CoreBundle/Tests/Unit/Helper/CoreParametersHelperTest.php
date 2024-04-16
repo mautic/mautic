@@ -15,7 +15,7 @@ class CoreParametersHelperTest extends TestCase
     /**
      * @var MockObject|ContainerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $container;
+    private MockObject $container;
 
     protected function setUp(): void
     {
