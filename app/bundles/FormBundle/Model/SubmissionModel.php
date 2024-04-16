@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -88,7 +89,8 @@ class SubmissionModel extends CommonFormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        protected ExportHelper $exportHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -420,7 +422,7 @@ class SubmissionModel extends CommonFormModel
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
         $queryArgs['simpleResults']  = true;
         $results                     = $this->getEntities($queryArgs);
-        $name                        = $this->getExportFilename($form->getAlias());
+        $name                        = $this->exportHelper->getExportFilename($form->getAlias());
 
         switch ($format) {
             case 'csv':
@@ -527,7 +529,7 @@ class SubmissionModel extends CommonFormModel
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
-        $name       = $this->getExportFilename($page->getAlias());
+        $name       = $this->exportHelper->getExportFilename($page->getAlias());
 
         switch ($format) {
             case 'csv':

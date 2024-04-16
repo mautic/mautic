@@ -277,19 +277,4 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->push($request);
         $this->controller->sendExampleAction($request, 1);
     }
-
-    public function testGetExportHeader(): void
-    {
-        $this->translatorMock->expects($this->exactly(4))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.lead.lead.thead.country'],
-                ['mautic.email.graph.line.stats.sent'],
-                ['mautic.email.graph.line.stats.read'],
-                ['mautic.email.clicked']
-            )
-            ->willReturnOnConsecutiveCalls('Country', 'Sent', 'Read', 'Clicked');
-
-        $this->assertSame(['Country', 'Sent', 'Read', 'Clicked'], $this->controller->getCountryTableExportHeader());
-    }
 }
