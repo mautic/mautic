@@ -9,14 +9,14 @@ class InputHelper
     /**
      * String filter.
      */
-    private static ?\Joomla\Filter\InputFilter $stringFilter = null;
+    private static ?InputFilter $stringFilter = null;
 
     /**
      * HTML filter.
      */
-    private static ?\Joomla\Filter\InputFilter $htmlFilter = null;
+    private static ?InputFilter $htmlFilter = null;
 
-    private static ?\Joomla\Filter\InputFilter $strictHtmlFilter = null;
+    private static ?InputFilter $strictHtmlFilter = null;
 
     /**
      * Adjust the boolean values from text to boolean.

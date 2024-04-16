@@ -280,7 +280,7 @@ class FetchLeadsCommand extends Command
             }
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Fetch leads from integration.';

@@ -108,7 +108,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $redirectUrl;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     private $category;
 
@@ -147,7 +147,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('pages')
-            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\PageRepository::class)
+            ->setCustomRepositoryClass(PageRepository::class)
             ->addIndex(['alias'], 'page_alias_search');
 
         $builder->addId();
@@ -641,7 +641,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get category.
      *
-     * @return \Mautic\CategoryBundle\Entity\Category
+     * @return Category
      */
     public function getCategory()
     {
