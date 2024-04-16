@@ -5,6 +5,8 @@ if (typeof Chart != 'undefined') {
     Chart.defaults.global.elements.point.radius = 2;
     Chart.defaults.global.legend.labels.boxWidth = 12;
     Chart.defaults.global.maintainAspectRatio = false;
+    Chart.defaults.scale.ticks.padding = 10;
+
 }
 
 /**
