@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
@@ -15,8 +17,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
+class Campaign extends FormEntity implements PublishStatusIconAttributesInterface, OptimisticLockInterface
 {
+    use OptimisticLockTrait;
+
     public const TABLE_NAME = 'campaigns';
     /**
      * @var int
@@ -143,6 +147,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
         $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
         $builder->addNullableField('deleted', 'datetime');
+
+        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
