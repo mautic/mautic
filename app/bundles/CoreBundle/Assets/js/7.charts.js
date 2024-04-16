@@ -64,7 +64,14 @@ Mautic.renderLineChart = function(canvas) {
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        callback: function(value, index, values) {
+                            if (index === 0 || index === Math.floor(values.length / 2) || index === values.length - 1) {
+                                return value;
+                            } else {
+                                return '';
+                            }
+                        }
                     }
                 }]
             }
