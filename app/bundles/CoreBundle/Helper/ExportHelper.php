@@ -46,7 +46,7 @@ class ExportHelper
      *
      * @param array|\Iterator $data
      */
-    public function exportDataAs($data, string $type, string $filename): StreamedResponse
+    public function exportDataAs($data, string $type, string $filename, array $headerRow = []): StreamedResponse
     {
         if (is_array($data)) {
             $data = new \ArrayIterator($data);
@@ -57,11 +57,11 @@ class ExportHelper
         }
 
         if (self::EXPORT_TYPE_EXCEL === $type) {
-            return $this->exportAsExcel($data, $filename);
+            return $this->exportAsExcel($data, $filename, $headerRow);
         }
 
         if (self::EXPORT_TYPE_CSV === $type) {
-            return $this->exportAsCsv($data, $filename);
+            return $this->exportAsCsv($data, $filename, $headerRow);
         }
 
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_EXCEL]));
@@ -96,9 +96,9 @@ class ExportHelper
         throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
-    private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
+    private function exportAsExcel(\Iterator $data, string $filename, array $headerRow = []): StreamedResponse
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename, $headerRow);
 
         $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $objWriter->setPreCalculateFormulas(false);
@@ -133,10 +133,7 @@ class ExportHelper
         foreach ($data as $key => $row) {
             // Build the header row if defined
             if (0 === $key) {
-                if (empty($headerRow)) {
-                    $this->setHeaderRow(array_keys($row));
-                }
-                $this->addHeaderToSheet($spreadsheet);
+                $this->addHeaderToSheet($spreadsheet, empty($headerRow) ? array_keys($row) : $headerRow);
             }
 
             $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
@@ -148,9 +145,9 @@ class ExportHelper
         return $spreadsheet;
     }
 
-    private function exportAsCsv(\Iterator $data, string $filename): StreamedResponse
+    private function exportAsCsv(\Iterator $data, string $filename, array $headerRow = []): StreamedResponse
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename, $headerRow);
         $objWriter   = new Csv($spreadsheet);
         $objWriter->setPreCalculateFormulas(false);
         // For UTF-8 support

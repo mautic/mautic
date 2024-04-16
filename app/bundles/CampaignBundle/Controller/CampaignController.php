@@ -1251,16 +1251,14 @@ class CampaignController extends AbstractStandardFormController
             throw new AccessDeniedHttpException();
         }
 
-        $filename       = $model->getExportFilename($entity->getName()).'.'.$format;
+        $filename       = $this->exportHelper->getExportFilename($entity->getName()).'.'.$format;
         $headerRow      = $this->getCountriesTableExportHeader($entity);
-        $statsCountries = $this->getData($entity);
+        $statsCountries = $this->getCampaignModel()->getCountryStats($entity);
 
         if (empty($statsCountries)) {
             throw new NotFoundHttpException();
         }
 
-        $this->exportHelper->setHeaderRow($headerRow);
-
-        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename);
+        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename, $headerRow);
     }
 }

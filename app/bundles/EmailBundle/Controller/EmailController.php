@@ -1758,7 +1758,7 @@ class EmailController extends FormController
             throw new AccessDeniedHttpException();
         }
 
-        $filename       = $model->getExportFilename($entity->getName()).'.'.$format;
+        $filename       = $this->exportHelper->getExportFilename($entity->getName()).'.'.$format;
         $headerRow      = $this->getCountriesTableExportHeader();
         $statsCountries = $this->getCountriesTableData($entity);
 
@@ -1766,8 +1766,6 @@ class EmailController extends FormController
             throw new NotFoundHttpException();
         }
 
-        $this->exportHelper->setHeaderRow($headerRow);
-
-        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename);
+        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename, $headerRow);
     }
 }

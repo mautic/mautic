@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -30,7 +29,6 @@ abstract class AbstractCommonModel implements MauticModelInterface
         protected UserHelper $userHelper,
         protected LoggerInterface $logger,
         protected CoreParametersHelper $coreParametersHelper,
-        protected ExportHelper $exportHelper,
     ) {
     }
 

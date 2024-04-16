@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -325,5 +327,16 @@ class ExportHelperTest extends TestCase
             );
 
         return $iteratorExportDataModelMock;
+    }
+
+    public function testExportFilename(): void
+    {
+        $form = new Form();
+        $form->setAlias('Test form results');
+        $date = (new DateTimeHelper())->toLocalString('Y-m-d H');
+        $name =$this->exportHelper->getExportFilename($form->getAlias());
+
+        $this->assertStringContainsString('Test_form_results', $name);
+        $this->assertStringContainsString(str_replace(' ', '_', $date), $name);
     }
 }
