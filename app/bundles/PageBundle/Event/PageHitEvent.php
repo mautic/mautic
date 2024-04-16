@@ -8,7 +8,7 @@ use Mautic\PageBundle\Entity\Page;
 
 class PageHitEvent extends CommonEvent
 {
-    protected ?\Mautic\PageBundle\Entity\Page $page = null;
+    protected ?Page $page = null;
 
     /**
      * @param mixed[] $clickthroughData

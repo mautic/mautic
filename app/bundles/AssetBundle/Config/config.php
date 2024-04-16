@@ -21,7 +21,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => \Mautic\AssetBundle\Controller\Api\AssetApiController::class,
+                'controller'      => Mautic\AssetBundle\Controller\Api\AssetApiController::class,
             ],
         ],
         'public' => [
@@ -55,7 +55,7 @@ return [
     'services' => [
         'permissions' => [
             'mautic.asset.permissions' => [
-                'class'     => \Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
+                'class'     => Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
@@ -63,16 +63,16 @@ return [
         ],
         'others' => [
             'mautic.asset.upload.error.handler' => [
-                'class'     => \Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
+                'class'     => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
                 'arguments' => 'mautic.factory',
             ],
             // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => \Mautic\AssetBundle\Controller\UploadController::class,
+            'oneup_uploader.controller.dropzone.class' => Mautic\AssetBundle\Controller\UploadController::class,
         ],
         'fixtures' => [
             'mautic.asset.fixture.asset' => [
-                'class'     => \Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
         ],
     ],

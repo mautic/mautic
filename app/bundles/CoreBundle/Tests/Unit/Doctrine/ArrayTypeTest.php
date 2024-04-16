@@ -38,7 +38,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $arrayType;
 
-    private \Doctrine\DBAL\Platforms\MySQLPlatform $platform;
+    private MySQLPlatform $platform;
 
     protected function setUp(): void
     {

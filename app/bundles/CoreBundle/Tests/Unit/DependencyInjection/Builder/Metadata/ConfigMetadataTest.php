@@ -12,7 +12,7 @@ class ConfigMetadataTest extends TestCase
     /**
      * @var BundleMetadata|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $metadata;
+    private MockObject $metadata;
 
     protected function setUp(): void
     {
