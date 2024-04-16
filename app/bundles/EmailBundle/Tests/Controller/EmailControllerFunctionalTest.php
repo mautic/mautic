@@ -560,7 +560,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     private function getCountryTableExportContent(Email $email, string $format = 'xlsx'): false|string
     {
         ob_start();
-        $this->client->request(Request::METHOD_GET, '/email/countries-stats/export/'.$email->getId().'/'.$format);
+        $this->client->request(Request::METHOD_GET, 's/email/countries-stats/export/'.$email->getId().'/'.$format);
         $content = ob_get_contents();
         ob_end_clean();
 
