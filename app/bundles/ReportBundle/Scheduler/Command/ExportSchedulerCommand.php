@@ -38,7 +38,7 @@ class ExportSchedulerCommand extends Command
         } catch (\InvalidArgumentException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         try {
@@ -55,7 +55,7 @@ class ExportSchedulerCommand extends Command
             $output->writeln('<error>'.$e->getMessage().'</error>');
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Processes scheduler for report\'s export';

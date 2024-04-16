@@ -10,7 +10,7 @@ class UpdatedObjectMappingDAO
 {
     private \DateTimeInterface $objectModifiedDate;
 
-    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
+    private ?ObjectMapping $objectMapping = null;
 
     /**
      * @param string $integration

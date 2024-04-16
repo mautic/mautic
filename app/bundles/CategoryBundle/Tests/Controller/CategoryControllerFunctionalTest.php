@@ -24,7 +24,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             [
                 'title'  => 'TestTitleCategoryController1',
                 'bundle' => 'page',
-                ],
+            ],
             [
                 'title'  => 'TestTitleCategoryController2',
                 'bundle' => 'global',
