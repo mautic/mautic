@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -403,5 +404,66 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->assertSame('Contacts', $crawlerTableHeaders->eq(1)->text());
         $this->assertSame('Finland', $crawlerTableValues->eq(0)->text());
         $this->assertSame('4', $crawlerTableValues->eq(1)->text());
+    }
+
+    private function getCountryTableExportContent(Campaign $campaign, string $format = 'xlsx'): false|string
+    {
+        ob_start();
+        $this->client->request(Request::METHOD_GET, 's/campaign/countries-stats/export/'.$campaign->getId().'/'.$format);
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        switch ($format) {
+            case 'csv':
+                $this->assertEquals('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
+                break;
+            case 'xlsx':
+            default:
+                $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        }
+
+        return $content;
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testExportCountryTableCampaignWithEmail(): void
+    {
+        $campaign = $this->createCampaignWithEmail();
+        $this->addLeadsFromCountry($campaign, 4, 'Finland');
+        $content =  $this->getCountryTableExportContent($campaign);
+
+        // We need to write to a temp file as PhpSpreadsheet can only read from files
+        file_put_contents('campaign.xlsx', $content);
+        $spreadsheet       = IOFactory::load('campaign.xlsx');
+        $rows              = $spreadsheet->getActiveSheet()->toArray();
+
+        $this->assertSame(['Country', 'Contacts', 'Sent', 'Read', 'Clicked'], $rows[0]);
+        $this->assertSame('Finland', $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame(4, $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testExportCountryTableCampaignNoEmail(): void
+    {
+        $campaignNoEmail = $this->createCampaign();
+        $this->addLeadsFromCountry($campaignNoEmail, 12, 'Portugal');
+        $content =  $this->getCountryTableExportContent($campaignNoEmail, 'csv');
+
+        // We need to write to a temp file as PhpSpreadsheet can only read from files
+        file_put_contents('campaign.csv', $content);
+        $spreadsheet       = IOFactory::load('campaign.csv');
+        $rows              = $spreadsheet->getActiveSheet()->toArray();
+
+        $this->assertSame(['Country', 'Contacts'], $rows[0]);
+        $this->assertSame('Portugal', $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame(12, $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
     }
 }

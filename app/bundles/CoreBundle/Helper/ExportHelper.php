@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -44,7 +45,10 @@ class ExportHelper
     /**
      * Exports data as the given export type. You can get available export types with getSupportedExportTypes().
      *
-     * @param array|\Iterator $data
+     * @param array|\Iterator   $data
+     * @param array<int,string> $headerRow
+     *
+     * @throws Exception
      */
     public function exportDataAs($data, string $type, string $filename, array $headerRow = []): StreamedResponse
     {
@@ -96,6 +100,11 @@ class ExportHelper
         throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
+    /**
+     * @param array<int,string> $headerRow
+     *
+     * @throws Exception
+     */
     private function exportAsExcel(\Iterator $data, string $filename, array $headerRow = []): StreamedResponse
     {
         $spreadsheet = $this->getSpreadsheetGeneric($data, $filename, $headerRow);
@@ -118,11 +127,17 @@ class ExportHelper
         return $response;
     }
 
+    /**
+     * @param array<int,string> $headerRow
+     */
     private function addHeaderToSheet(Spreadsheet $spreadsheet, array $headerRow): void
     {
         $spreadsheet->getActiveSheet()->fromArray($headerRow);
     }
 
+    /**
+     * @param array<int,string> $headerRow
+     */
     private function getSpreadsheetGeneric(\Iterator $data, string $filename, array $headerRow = []): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
@@ -145,6 +160,9 @@ class ExportHelper
         return $spreadsheet;
     }
 
+    /**
+     * @param array<int,string> $headerRow
+     */
     private function exportAsCsv(\Iterator $data, string $filename, array $headerRow = []): StreamedResponse
     {
         $spreadsheet = $this->getSpreadsheetGeneric($data, $filename, $headerRow);

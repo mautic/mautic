@@ -117,28 +117,4 @@ class CampaignControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
-
-    public function testGetExportHeader(): void
-    {
-        $campaign        = $this->createMock(Campaign::class);
-        $campaign->method('isEmailCampaign')->willReturn(true);
-
-        $campaignNoEmail = $this->createMock(Campaign::class);
-
-        $this->translator->expects($this->exactly(7))
-            ->method('trans')
-            ->withConsecutive(
-                ['mautic.lead.lead.thead.country'],
-                ['mautic.lead.leads'],
-                ['mautic.lead.lead.thead.country'],
-                ['mautic.lead.leads'],
-                ['mautic.email.graph.line.stats.sent'],
-                ['mautic.email.graph.line.stats.read'],
-                ['mautic.email.clicked']
-            )
-            ->willReturnOnConsecutiveCalls('Country', 'Contacts', 'Country', 'Contacts', 'Sent', 'Read', 'Clicked');
-
-        $this->assertSame(['Country', 'Contacts'], $this->controller->getCountryTableExportHeader($campaignNoEmail));
-        $this->assertSame(['Country', 'Contacts', 'Sent', 'Read', 'Clicked'], $this->controller->getCountryTableExportHeader($campaign));
-    }
 }
