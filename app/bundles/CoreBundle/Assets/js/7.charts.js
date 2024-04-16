@@ -63,6 +63,10 @@ Mautic.renderLineChart = function(canvas) {
         options: {
             lineTension : 0.2,
             borderWidth: 1,
+              tooltips: {
+                mode: 'index',
+                intersect: false
+            },
             scales: {
                 xAxes: [{
                     gridLines: {
