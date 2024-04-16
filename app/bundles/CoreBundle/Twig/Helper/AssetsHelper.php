@@ -23,7 +23,7 @@ final class AssetsHelper
      */
     public const CONTEXT_BUILDER = 'builder';
 
-    private ?\Mautic\CoreBundle\Helper\AssetGenerationHelper $assetHelper = null;
+    private ?AssetGenerationHelper $assetHelper = null;
 
     private string $context = self::CONTEXT_APP;
 
@@ -41,7 +41,7 @@ final class AssetsHelper
      */
     private $siteUrl;
 
-    private ?\Mautic\CoreBundle\Helper\PathsHelper $pathsHelper = null;
+    private ?PathsHelper $pathsHelper = null;
 
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 

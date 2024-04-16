@@ -592,7 +592,7 @@ class FieldType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => $this->translator->trans('mautic.lead.field.form.isIndex.tooltip', ['%indexCount%' => $this->indexHelper->getIndexCount(), '%maxCount%' => $this->indexHelper->getMaxCount()]),
                     'readonly'=> (false === $isIndex && $this->indexHelper->getIndexCount() >= $this->indexHelper->getMaxCount()),
-                    ],
+                ],
                 'required'    => false,
                 'constraints' => $constraints,
             ]

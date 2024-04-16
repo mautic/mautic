@@ -35,8 +35,8 @@ class FieldList
         // Get a list of custom form fields
         $fields = $this->leadFieldRepository->getEntities([
             'filter' => [
-                 'force' => $forceFilters,
-             ],
+                'force' => $forceFilters,
+            ],
             'orderBy'      => 'f.order',
             'orderByDir'   => 'asc',
             'result_cache' => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),

@@ -20,7 +20,7 @@ class LeadTriggerLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      **/
     private $ipAddress;
 
