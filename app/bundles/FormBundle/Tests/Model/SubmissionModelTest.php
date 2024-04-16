@@ -210,7 +210,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->router                   = $this->createMock(RouterInterface::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
-        $this->exportHelper             = $this->createMock(ExportHelper::class);
+        $exportHelper                   = $this->createMock(ExportHelper::class);
 
         $this->fieldHelper->method('getFieldFilter')->willReturn('string');
 
@@ -240,7 +240,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->mockLogger,
             $this->createMock(CoreParametersHelper::class),
-            $this->exportHelper
+            $exportHelper
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
