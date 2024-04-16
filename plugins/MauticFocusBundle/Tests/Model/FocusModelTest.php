@@ -27,32 +27,32 @@ class FocusModelTest extends TestCase
     /**
      * @var ContactTracker|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var FormModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formModel;
+    private MockObject $formModel;
 
     /**
      * @var FieldModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
+    private MockObject $leadFieldModel;
 
     /**
      * @var Environment|mixed|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $twig;
+    private MockObject $twig;
 
     /**
      * @var TrackableModel|mixed|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $trackableModel;
+    private MockObject $trackableModel;
 
     protected function setUp(): void
     {

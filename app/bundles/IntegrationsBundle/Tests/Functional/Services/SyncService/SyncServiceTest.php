@@ -56,21 +56,21 @@ class SyncServiceTest extends MauticMysqlTestCase
         $this->assertEquals(
             [
                 4 => [
-                        'id'         => 4,
-                        'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
-                        'first_name' => 'Lewis',
-                        'last_name'  => 'Syed',
-                        'email'      => 'LewisTSyed@gustr.com',
-                        'street1'    => '107 Yorkie Lane',
-                    ],
+                    'id'         => 4,
+                    'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
+                    'first_name' => 'Lewis',
+                    'last_name'  => 'Syed',
+                    'email'      => 'LewisTSyed@gustr.com',
+                    'street1'    => '107 Yorkie Lane',
+                ],
                 3 => [
-                        'id'         => 3,
-                        'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
-                        'first_name' => 'Nellie',
-                        'last_name'  => 'Baird',
-                        'email'      => 'NellieABaird@armyspy.com',
-                        'street1'    => '1930 Uitsig St',
-                    ],
+                    'id'         => 3,
+                    'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
+                    'first_name' => 'Nellie',
+                    'last_name'  => 'Baird',
+                    'email'      => 'NellieABaird@armyspy.com',
+                    'street1'    => '1930 Uitsig St',
+                ],
             ],
             $payload['update']
         );

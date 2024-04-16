@@ -13,7 +13,7 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $fieldRepository;
 
-    private \Mautic\LeadBundle\Helper\FieldAliasHelper $helper;
+    private FieldAliasHelper $helper;
 
     protected function setUp(): void
     {
