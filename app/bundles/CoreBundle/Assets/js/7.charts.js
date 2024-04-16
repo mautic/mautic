@@ -63,6 +63,15 @@ Mautic.renderLineChart = function(canvas) {
             borderWidth: 1,
             scales: {
                 yAxes: [{
+                    afterBuildTicks: function(scale) {
+                        scale.ticks = [];
+                        scale.ticks.push(scale.min);
+                        scale.ticks.push((scale.max - scale.min) / 2);
+                        scale.ticks.push(scale.max);
+                    },
+                    gridLines: {
+                        drawBorder: false,
+                    },
                     ticks: {
                         beginAtZero: true,
                         callback: function(value, index, values) {
