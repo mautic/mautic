@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class TrustOptionsStore implements TrustOptionsStoreInterface
 {
-    private ?\LightSaml\Meta\TrustOptions\TrustOptions $trustOptions = null;
+    private ?TrustOptions $trustOptions = null;
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

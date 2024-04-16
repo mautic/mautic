@@ -17,27 +17,27 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&FormBuilderInterface<FormBuilderInterface>
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+    private MockObject $formBuilder;
 
     /**
      * @var MockObject&FormEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formEvent;
+    private MockObject $formEvent;
 
     /**
      * @var MockObject&FormInterface<FormInterface>
      */
-    private \PHPUnit\Framework\MockObject\MockObject $form;
+    private MockObject $form;
 
     /**
      * @var MockObject (use DynamicContentEntityTrait)
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entity;
+    private MockObject $entity;
 
     /**
      * @var MockObject (use DynamicContentTrait)
      */
-    private \PHPUnit\Framework\MockObject\MockObject $trait;
+    private MockObject $trait;
 
     protected function setUp(): void
     {

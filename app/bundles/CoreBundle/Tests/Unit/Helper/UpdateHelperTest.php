@@ -26,44 +26,44 @@ class UpdateHelperTest extends TestCase
     /**
      * @var PathsHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var Logger|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var Client|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $client;
+    private MockObject $client;
 
     /**
      * @var ResponseInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $response;
+    private MockObject $response;
 
     /**
      * @var StreamInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $streamBody;
+    private MockObject $streamBody;
 
     /**
      * @var ReleaseParser|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $releaseParser;
+    private MockObject $releaseParser;
 
     /**
      * @var PreUpdateCheckHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $preUpdateCheckHelper;
+    private MockObject $preUpdateCheckHelper;
 
-    private \Mautic\CoreBundle\Helper\UpdateHelper $helper;
+    private UpdateHelper $helper;
 
     protected function setUp(): void
     {
