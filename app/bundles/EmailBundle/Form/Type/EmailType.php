@@ -287,7 +287,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\EmailBundle\Entity\Email::class);
+        $transformer = new IdToEntityModelTransformer($this->em, Email::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -414,6 +414,23 @@ class EmailType extends AbstractType
                     'multiple' => true,
                     'expanded' => false,
                     'required' => true,
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+
+        $builder->add(
+            $builder->create(
+                'excludedLists',
+                LeadListType::class,
+                [
+                    'label'      => 'mautic.email.form.excluded_list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'multiple'   => true,
+                    'expanded'   => false,
                 ]
             )
                 ->addModelTransformer($transformer)

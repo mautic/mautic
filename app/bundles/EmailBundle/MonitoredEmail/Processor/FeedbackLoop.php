@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FeedbackLoop implements ProcessorInterface
 {
-    private ?\Mautic\EmailBundle\MonitoredEmail\Message $message = null;
+    private ?Message $message = null;
 
     public function __construct(
         private ContactFinder $contactFinder,

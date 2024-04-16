@@ -19,20 +19,20 @@ class CompanyControllerTest extends MauticMysqlTestCase
         parent::setUp();
 
         $companiesData = [
-          1 => [
-            'name'     => 'Amazon',
-            'state'    => 'Washington',
-            'city'     => 'Seattle',
-            'country'  => 'United States',
-            'industry' => 'Goods',
-          ],
-          2 => [
-            'name'     => 'Google',
-            'state'    => 'Washington',
-            'city'     => 'Seattle',
-            'country'  => 'United States',
-            'industry' => 'Services',
-          ],
+            1 => [
+                'name'     => 'Amazon',
+                'state'    => 'Washington',
+                'city'     => 'Seattle',
+                'country'  => 'United States',
+                'industry' => 'Goods',
+            ],
+            2 => [
+                'name'     => 'Google',
+                'state'    => 'Washington',
+                'city'     => 'Seattle',
+                'country'  => 'United States',
+                'industry' => 'Services',
+            ],
         ];
 
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */

@@ -22,9 +22,9 @@ class GenericPointSettingsType extends AbstractType
                 'label'      => 'mautic.point.action.delta',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.point.action.delta.help',
-                    ],
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.action.delta.help',
+                ],
                 'scale'       => 0,
                 'data'        => $default,
                 'constraints' => [

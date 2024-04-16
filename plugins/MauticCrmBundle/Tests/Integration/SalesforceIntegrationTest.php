@@ -674,7 +674,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testUpdateDncByMauticDate(): void
     {
-        $this->sfMockMethods = ['makeRequest', 'updateDncByDate', 'getDncHistory'];
+        $this->sfMockMethods = ['makeRequest', 'updateDncByDate', 'getDoNotContactHistory'];
 
         $objects = ['Contact', 'Lead'];
         foreach ($objects as $object) {
@@ -695,7 +695,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
             $sf = $this->getSalesforceIntegration(2, 2);
             $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())->method('getDncHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
+            $sf->expects($this->any())->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
 
             $sf->pushLeadDoNotContactByDate('email', $mappedData, $object, ['start' => '2017-10-15T10:00:00.000000']);
             foreach ($mappedData as $assertion) {
@@ -790,17 +790,17 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         'objectId' => 1,
                         'action'   => 'update',
                         'details'  => [
-                                'dnc_channel_status' => [
-                                        'email' => [
-                                                'reason'   => 3,
-                                                'comments' => 'Set by Salesforce',
-                                            ],
-                                    ],
-                                'dnc_status' => [
-                                        'manual',
-                                        'Set by Salesforce',
-                                    ],
+                            'dnc_channel_status' => [
+                                'email' => [
+                                    'reason'   => 3,
+                                    'comments' => 'Set by Salesforce',
+                                ],
                             ],
+                            'dnc_status' => [
+                                'manual',
+                                'Set by Salesforce',
+                            ],
+                        ],
                         'dateAdded' => new \DateTime('2017-10-16 15:00:36.000000', new \DateTimeZone('UTC')),
                         'ipAddress' => '127.0.0.1',
                     ],
@@ -810,7 +810,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $this->em->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
+                    [IntegrationEntity::class, $integrationEntityRepository],
                     [\Mautic\CoreBundle\Entity\AuditLog::class, $auditLogRepo],
                 ]
             );
@@ -819,7 +819,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->willReturnCallback(
                 function () {
                     switch (func_get_arg(0)) {
-                        case \Mautic\PluginBundle\Entity\IntegrationEntity::class:
+                        case IntegrationEntity::class:
                             return new IntegrationEntity();
                     }
                 }
@@ -838,70 +838,70 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $leadFields = [
             'Id__Lead' => [
-                    'type'        => 'string',
-                    'label'       => 'Lead-Lead ID',
-                    'required'    => false,
-                    'group'       => 'Lead',
-                    'optionLabel' => 'Lead ID',
-                ],
+                'type'        => 'string',
+                'label'       => 'Lead-Lead ID',
+                'required'    => false,
+                'group'       => 'Lead',
+                'optionLabel' => 'Lead ID',
+            ],
             'LastName__Lead' => [
-                    'type'        => 'string',
-                    'label'       => 'Lead-Last Name',
-                    'required'    => true,
-                    'group'       => 'Lead',
-                    'optionLabel' => 'Last Name',
-                ],
+                'type'        => 'string',
+                'label'       => 'Lead-Last Name',
+                'required'    => true,
+                'group'       => 'Lead',
+                'optionLabel' => 'Last Name',
+            ],
             'FirstName__Lead' => [
-                    'type'        => 'string',
-                    'label'       => 'Lead-First Name',
-                    'required'    => false,
-                    'group'       => 'Lead',
-                    'optionLabel' => 'First Name',
-                ],
+                'type'        => 'string',
+                'label'       => 'Lead-First Name',
+                'required'    => false,
+                'group'       => 'Lead',
+                'optionLabel' => 'First Name',
+            ],
             'Company__Lead' => [
-                    'type'        => 'string',
-                    'label'       => 'Lead-Company',
-                    'required'    => true,
-                    'group'       => 'Lead',
-                    'optionLabel' => 'Company',
-                ],
+                'type'        => 'string',
+                'label'       => 'Lead-Company',
+                'required'    => true,
+                'group'       => 'Lead',
+                'optionLabel' => 'Company',
+            ],
             'Email__Lead' => [
-                    'type'        => 'string',
-                    'label'       => 'Lead-Email',
-                    'required'    => false,
-                    'group'       => 'Lead',
-                    'optionLabel' => 'Email',
-                ],
+                'type'        => 'string',
+                'label'       => 'Lead-Email',
+                'required'    => false,
+                'group'       => 'Lead',
+                'optionLabel' => 'Email',
+            ],
         ];
         $contactFields = [
             'Id__Contact' => [
-                    'type'        => 'string',
-                    'label'       => 'Contact-Contact ID',
-                    'required'    => false,
-                    'group'       => 'Contact',
-                    'optionLabel' => 'Contact ID',
-                ],
+                'type'        => 'string',
+                'label'       => 'Contact-Contact ID',
+                'required'    => false,
+                'group'       => 'Contact',
+                'optionLabel' => 'Contact ID',
+            ],
             'LastName__Contact' => [
-                    'type'        => 'string',
-                    'label'       => 'Contact-Last Name',
-                    'required'    => true,
-                    'group'       => 'Contact',
-                    'optionLabel' => 'Last Name',
-                ],
+                'type'        => 'string',
+                'label'       => 'Contact-Last Name',
+                'required'    => true,
+                'group'       => 'Contact',
+                'optionLabel' => 'Last Name',
+            ],
             'FirstName__Contact' => [
-                    'type'        => 'string',
-                    'label'       => 'Contact-First Name',
-                    'required'    => false,
-                    'group'       => 'Contact',
-                    'optionLabel' => 'First Name',
-                ],
+                'type'        => 'string',
+                'label'       => 'Contact-First Name',
+                'required'    => false,
+                'group'       => 'Contact',
+                'optionLabel' => 'First Name',
+            ],
             'Email__Contact' => [
-                    'type'        => 'string',
-                    'label'       => 'Contact-Email',
-                    'required'    => false,
-                    'group'       => 'Contact',
-                    'optionLabel' => 'Email',
-                ],
+                'type'        => 'string',
+                'label'       => 'Contact-Email',
+                'required'    => false,
+                'group'       => 'Contact',
+                'optionLabel' => 'Email',
+            ],
         ];
 
         $this->cache
@@ -923,7 +923,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      * @param int $maxSfLeads
      * @param int $maxSfContacts
      *
-     * @return SalesforceIntegration|\PHPUnit\Framework\MockObject\MockObject
+     * @return SalesforceIntegration|MockObject
      */
     protected function getSalesforceIntegration($maxUpdate = 100, $maxCreate = 200, $maxSfLeads = 25, $maxSfContacts = 25, $updateObject = null)
     {
@@ -931,35 +931,35 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $featureSettings = [
             'sandbox' => [
-                ],
+            ],
             'updateOwner' => [
-                ],
+            ],
             'objects'    => $this->sfObjects,
             'namespace'  => null,
             'leadFields' => [
-                    'Company__Lead'      => 'company',
-                    'FirstName__Lead'    => 'firstname',
-                    'LastName__Lead'     => 'lastname',
-                    'Email__Lead'        => 'email',
-                    'FirstName__Contact' => 'firstname',
-                    'LastName__Contact'  => 'lastname',
-                    'Email__Contact'     => 'email',
-                ],
+                'Company__Lead'      => 'company',
+                'FirstName__Lead'    => 'firstname',
+                'LastName__Lead'     => 'lastname',
+                'Email__Lead'        => 'email',
+                'FirstName__Contact' => 'firstname',
+                'LastName__Contact'  => 'lastname',
+                'Email__Contact'     => 'email',
+            ],
             'update_mautic' => [
-                    'Company__Lead'      => '0',
-                    'FirstName__Lead'    => '0',
-                    'LastName__Lead'     => '0',
-                    'Email__Lead'        => '0',
-                    'FirstName__Contact' => '0',
-                    'LastName__Contact'  => '0',
-                    'Email__Contact'     => '0',
-                ],
+                'Company__Lead'      => '0',
+                'FirstName__Lead'    => '0',
+                'LastName__Lead'     => '0',
+                'Email__Lead'        => '0',
+                'FirstName__Contact' => '0',
+                'LastName__Contact'  => '0',
+                'Email__Contact'     => '0',
+            ],
             'companyFields' => [
-                    'Name' => 'companyname',
-                ],
+                'Name' => 'companyname',
+            ],
             'update_mautic_company' => [
-                    'Name' => '0',
-                ],
+                'Name' => '0',
+            ],
         ];
 
         $integration = new Integration();
@@ -1282,7 +1282,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $datePriority = [
             'SF'     => '2017-10-16T00:43:43.000+0000',
             'Mautic' => '2017-10-16T18:43:43.000+0000',
-            ];
+        ];
 
         return [
             'totalSize' => 3,
@@ -1292,7 +1292,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     'attributes' => [
                         'type' => 'ContactHistory',
                         'url'  => '/services/data/v34.0/sobjects/'.$object.'History/0170SFH1',
-                        ],
+                    ],
                     'Field'       => 'HasOptedOutOfEmail',
                     $object.'Id'  => 'SF1',
                     'CreatedDate' => $datePriority[$priority],
@@ -1320,9 +1320,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             case self::SC_MULTIPLE_SF_LEADS:
                 $records[] = [
                     'attributes' => [
-                            'type' => 'Lead',
-                            'url'  => '/services/data/v34.0/sobjects/Lead/SF'.$id.'b',
-                        ],
+                        'type' => 'Lead',
+                        'url'  => '/services/data/v34.0/sobjects/Lead/SF'.$id.'b',
+                    ],
                     'Id'                 => 'SF'.$id.'b',
                     'FirstName'          => 'Lead'.$id,
                     'LastName'           => 'Lead'.$id,
@@ -1335,9 +1335,9 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             case self::SC_MULTIPLE_SF_CONTACTS:
                 $records[] = [
                     'attributes' => [
-                            'type' => 'Contact',
-                            'url'  => '/services/data/v34.0/sobjects/Contact/SF'.$id.'b',
-                        ],
+                        'type' => 'Contact',
+                        'url'  => '/services/data/v34.0/sobjects/Contact/SF'.$id.'b',
+                    ],
                     'Id'                 => 'SF'.$id.'b',
                     'FirstName'          => 'Contact'.$id,
                     'LastName'           => 'Contact'.$id,

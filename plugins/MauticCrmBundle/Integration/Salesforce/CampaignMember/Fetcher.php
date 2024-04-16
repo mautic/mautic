@@ -29,7 +29,7 @@ class Fetcher
     private array $knownCampaignMembers = [];
 
     /**
-     * @param string $campaignId
+     * @param string|int $campaignId
      */
     public function __construct(
         private IntegrationEntityRepository $repo,

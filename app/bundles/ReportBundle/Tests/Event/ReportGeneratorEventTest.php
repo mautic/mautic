@@ -17,19 +17,19 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Report
      */
-    private \PHPUnit\Framework\MockObject\MockObject $report;
+    private MockObject $report;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
+    private MockObject $queryBuilder;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
-    private \Mautic\ReportBundle\Event\ReportGeneratorEvent $reportGeneratorEvent;
+    private ReportGeneratorEvent $reportGeneratorEvent;
 
     protected function setUp(): void
     {
@@ -279,9 +279,9 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder->expects($this->once())
       ->method('getQueryParts')
       ->willReturn([
-        'join' => [
-          'l' => [['joinTable' => MAUTIC_TABLE_PREFIX.'companies_leads', 'joinAlias' => ReportGeneratorEvent::COMPANY_LEAD_PREFIX]],
-        ],
+          'join' => [
+              'l' => [['joinTable' => MAUTIC_TABLE_PREFIX.'companies_leads', 'joinAlias' => ReportGeneratorEvent::COMPANY_LEAD_PREFIX]],
+          ],
       ]);
         $this->queryBuilder->expects($this->never())
       ->method('leftJoin');

@@ -17,17 +17,17 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject&EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject&EmailValidationEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $event;
+    private MockObject $event;
 
     private EmailValidator $emailValidator;
 

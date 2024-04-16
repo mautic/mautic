@@ -729,11 +729,12 @@ body > #app-wrapper {
   padding-top: 20px;
 }
 .app-sidebar .nav-sidebar .sidebar-minimizer > .direction:after {
-  font-family: 'FontAwesome';
-  content: '\f053';
+  font-family: 'remixicon';
+  font-size: 18px;
+  content: '\EA64';
 }
 .app-sidebar .nav-sidebar .sidebar-minimizer.active .direction:after {
-  content: '\f054';
+  content: '\EA6E';
 }
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {
@@ -1498,6 +1499,10 @@ blockquote > p:after {
 }
 .ck.ck-balloon-panel.ck-balloon-panel_caret_se.ck-balloon-panel_visible {
   z-index: 99999 !important;
+}
+.ck-body-wrapper {
+  position: fixed;
+  z-index: 99999;
 }
 a.media {
   display: block;
@@ -4824,4 +4829,13 @@ ul.media-list.media-list-feed div.media-object {
   float: right;
   position: relative;
   right: 10px;
+}
+.ui-sortable-handle {
+  cursor: grab;
+}
+.ui-sortable-handle:active {
+  cursor: grabbing;
+}
+.flip-vertically {
+  transform: scaleY(-1);
 }
