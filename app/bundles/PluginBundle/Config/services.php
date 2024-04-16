@@ -26,8 +26,8 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias('mautic.plugin.model.plugin', \Mautic\PluginBundle\Model\PluginModel::class);
-    $services->alias('mautic.plugin.model.integration_entity', \Mautic\PluginBundle\Model\IntegrationEntityModel::class);
+    $services->alias('mautic.plugin.model.plugin', Mautic\PluginBundle\Model\PluginModel::class);
+    $services->alias('mautic.plugin.model.integration_entity', Mautic\PluginBundle\Model\IntegrationEntityModel::class);
 
     $services->set(FormSubscriber::class)
         ->call('setIntegrationHelper', [service('mautic.helper.integration')]);
