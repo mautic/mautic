@@ -5,7 +5,6 @@ import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
-import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor5';
 
@@ -15,6 +14,7 @@ import 'grapesjs-plugin-ckeditor5';
 // import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
 
 import CodeModeButton from './codeMode/codeMode.button';
+import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
 
 export default class BuilderService {
   editor;
@@ -99,7 +99,7 @@ export default class BuilderService {
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (mjmlService.getOriginalContentMjml()) {
+      if (MjmlService.getOriginalContentMjml()) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -168,9 +168,9 @@ export default class BuilderService {
   }
 
   initEmailMjml() {
-    const components = mjmlService.getOriginalContentMjml();
+    const components = MjmlService.getOriginalContentMjml();
     // validate
-    mjmlService.mjmlToHtml(components);
+    MjmlService.mjmlToHtml(components);
 
     const styles = [
       `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
@@ -179,7 +179,6 @@ export default class BuilderService {
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components,
       height: '100%',
       canvas: {
         styles,
@@ -193,6 +192,14 @@ export default class BuilderService {
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
     });
+    this.unsetComponentVoidTypes(this.editor);
+    this.editor.setComponents(components);
+
+    // Reinitialize the content after parsing MJML.
+    // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
+    // See: https://github.com/GrapesJS/mjml/issues/149
+    const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
+    this.editor.setComponents(parsedContent);
 
     this.editor.BlockManager.get('mj-button').set({
       content: '<mj-button href="https://">Button</mj-button>',
@@ -305,6 +312,44 @@ export default class BuilderService {
       };
     }
   }
+
+  unsetComponentVoidTypes(editor) {
+    // Support for self-closing components is temporarily disabled due to parsing issues with mjml tags.
+    // Browsers only recognize explicit self-closing tags like <img /> and <br />, leading to rendering problems.
+    // This can be reverted once the issue with self-closing tags is resolved in grapesjs-mjml.
+    // See: https://github.com/GrapesJS/mjml/issues/149
+    const voidTypes = ['mj-image', 'mj-divider', 'mj-font'];
+    voidTypes.forEach(function(component) {
+      editor.DomComponents.addType(component, {
+        model: {
+          defaults: {
+            void: false
+          },
+          toHTML() {
+            const tag = this.get('tagName');
+            const attr = this.getAttrToHTML();
+            const content = this.get('content');
+            let strAttr = '';
+
+            for (let prop in attr) {
+              const val = attr[prop];
+              const hasValue = typeof val !== 'undefined' && val !== '';
+              strAttr += hasValue ? ` ${prop}="${val}"` : '';
+            }
+
+            let html = `<${tag}${strAttr}>${content}</${tag}>`;
+
+            // Add the components after the closing tag
+            const componentsHtml = this.get('components')
+                .map(model => model.toHTML())
+                .join('');
+            return html + componentsHtml;
+          },
+        }
+      });
+    });
+  }
+
   /**
    * Generate assets list from GrapesJs
    */

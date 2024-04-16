@@ -14,14 +14,14 @@ use Twig\Environment;
 
 class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\CoreBundle\EventListener\RequestSubscriber $subscriber;
+    private RequestSubscriber $subscriber;
 
-    private \Symfony\Component\HttpFoundation\Request $request;
+    private Request $request;
 
     /**
      * @var MockObject&RequestEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $event;
+    private MockObject $event;
 
     protected function setUp(): void
     {

@@ -24,11 +24,11 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testIdentifyContactByStat(): void
     {
         $ct = [
-                'lead'    => 2,
-                'channel' => [
-                    'sms' => 1,
-                ],
-                'stat'    => 'abc123',
+            'lead'    => 2,
+            'channel' => [
+                'sms' => 1,
+            ],
+            'stat'    => 'abc123',
         ];
 
         $sms = $this->createMock(Sms::class);
