@@ -1,12 +1,12 @@
 //set global Chart defaults
 if (typeof Chart != 'undefined') {
     // configure global Chart options
-    Chart.defaults.global.elements.line.borderWidth = 1;
-    Chart.defaults.global.elements.point.radius = 2;
+    Chart.defaults.global.elements.line.borderWidth = 2;
+    Chart.defaults.global.elements.point.radius = 0;
     Chart.defaults.global.legend.labels.boxWidth = 12;
     Chart.defaults.global.maintainAspectRatio = false;
     Chart.defaults.scale.ticks.padding = 10;
-    Chart.defaults.global.elements.point.hoverRadius = 4;
+    Chart.defaults.global.elements.point.hoverRadius = 6;
     Chart.defaults.global.elements.point.hitRadius = 20;
     Chart.defaults.global.legend.labels.usePointStyle = true;
     Chart.defaults.global.legend.labels.pointStyle = 'circle';
