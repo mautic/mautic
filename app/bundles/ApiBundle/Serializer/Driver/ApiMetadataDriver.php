@@ -9,7 +9,7 @@ use Metadata\Driver\DriverInterface;
 
 class ApiMetadataDriver implements DriverInterface
 {
-    private ?\JMS\Serializer\Metadata\ClassMetadata $metadata = null;
+    private ?ClassMetadata $metadata = null;
 
     /**
      * @var PropertyMetadata[]

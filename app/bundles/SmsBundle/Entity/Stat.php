@@ -25,17 +25,17 @@ class Stat
     private $sms;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList|null
+     * @var LeadList|null
      */
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -79,7 +79,7 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\SmsBundle\Entity\StatRepository::class)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
             ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_sms_source_search')
@@ -94,7 +94,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToOne('list', LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
