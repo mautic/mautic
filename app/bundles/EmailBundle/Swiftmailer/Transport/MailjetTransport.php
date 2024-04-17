@@ -128,9 +128,11 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 $leadEmail   = substr($event['CustomID'], $fistDashPos + 1, strlen($event['CustomID']));
                 if ($event['email'] == $leadEmail) {
                     $this->transportCallback->addFailureByHashId($leadIdHash, $reason, $type);
+                    $this->transportCallback->dispatchBounceEvent($request, $leadIdHash);
                 }
             } else {
                 $this->transportCallback->addFailureByAddress($event['email'], $reason, $type);
+                $this->transportCallback->dispatchBounceEvent($request, '', $event['email']);
             }
         }
     }
