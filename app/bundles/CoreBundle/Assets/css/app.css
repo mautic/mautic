@@ -1367,8 +1367,16 @@ blockquote > p:after {
 .btn:active {
   outline: 0;
 }
-.btn .fa {
+.btn span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.btn .fa,
+.btn i {
   min-width: 13px;
+  order: 2;
 }
 .btn [class^="ri-"],
 .btn [class*=" ri-"] {
