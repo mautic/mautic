@@ -49,6 +49,16 @@ final class EmailEvents
     const EMAIL_ON_SEND = 'mautic.email_on_send';
 
     /**
+     * The mautic.email_on_bounce event is dispatched when an email is bounced.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailSendEvent instance.
+     *
+     * @var string
+     */
+    const EMAIL_ON_BOUNCE = 'mautic.email_on_bounce';
+
+    /**
      * The mautic.email_on_display event is dispatched when an email is viewed via a browser.
      *
      * The event listener receives a

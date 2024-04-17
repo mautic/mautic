@@ -855,6 +855,7 @@ return [
                     'mautic.lead.model.dnc',
                     'mautic.message.search.contact',
                     'mautic.email.repository.stat',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.email.transport_type' => [
