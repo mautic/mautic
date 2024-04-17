@@ -12,8 +12,18 @@
     outline: 0;
   }
 
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
   // reset font awesome width
-  .fa { min-width: 13px; }
+  .fa, i { 
+    min-width: 13px;
+    order: 2;
+  }
 
   // remix icon
   [class^="ri-"], [class*=" ri-"] {
