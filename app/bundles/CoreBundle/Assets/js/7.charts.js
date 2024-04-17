@@ -92,7 +92,7 @@ Mautic.renderLineChart = function(canvas) {
                             if (index === 0 || index === values.length - 1) {
                                 return value;
                             }
-                            if (value === 0.5) {
+                            if (/^\d+\.5$/.test(value.toString())) {
                                 return '';
                             }
                             if (index === Math.floor(values.length / 2)) {
