@@ -54,6 +54,15 @@
   font-weight: 700;
   src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700italic.woff2') format('woff2');
 }
+:root {
+  --timing: 0.3s ease;
+  --all: all var(--timing);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --timing: 0;
+  }
+}
 html,
 body {
   width: 100%;
@@ -990,6 +999,9 @@ hr.hr-w-3,
 .hr-expand.hr-w-3 a.arrow {
   top: -3px;
 }
+a {
+  transition: var(--all);
+}
 a:hover {
   cursor: pointer;
 }
@@ -1328,6 +1340,9 @@ blockquote > p:after {
 .no-touchevents .scroll-wrapper > .scroll-bar {
   background-color: gray !important;
   right: 3px !important;
+}
+.btn {
+  transition: var(--all);
 }
 .btn,
 .btn:active,
