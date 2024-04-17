@@ -43,8 +43,8 @@ return [
             'items' => [
                 'mautic.api.client.menu.index' => [
                     'route'     => 'mautic_client_index',
-                    'iconClass' => 'fa-puzzle-piece',
                     'access'    => 'api:clients:view',
+                    'parent'    => 'mautic.core.integrations',
                     'checks'    => [
                         'parameters' => [
                             'api_enabled' => true,

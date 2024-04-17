@@ -16,7 +16,7 @@ return [
             'mautic.user.roles' => [
                 'access'    => 'user:roles:view',
                 'route'     => 'mautic_role_index',
-                'parent'   => 'mautic.user_management',
+                'parent'    => 'mautic.user_management',
             ],
         ],
     ],
