@@ -6,7 +6,10 @@ if (typeof Chart != 'undefined') {
     Chart.defaults.global.legend.labels.boxWidth = 12;
     Chart.defaults.global.maintainAspectRatio = false;
     Chart.defaults.scale.ticks.padding = 10;
-
+    Chart.defaults.global.elements.point.hoverRadius = 4;
+    Chart.defaults.global.elements.point.hitRadius = 20;
+    Chart.defaults.global.legend.labels.usePointStyle = true;
+    Chart.defaults.global.legend.labels.pointStyle = 'circle';
 }
 
 /**
