@@ -66,7 +66,7 @@ Mautic.renderLineChart = function(canvas) {
         options: {
             lineTension : 0.2,
             borderWidth: 1,
-              tooltips: {
+            tooltips: {
                 mode: 'index',
                 intersect: false
             },
@@ -89,12 +89,18 @@ Mautic.renderLineChart = function(canvas) {
                     ticks: {
                         beginAtZero: true,
                         callback: function(value, index, values) {
-                            if (index === 0 || index === Math.floor(values.length / 2) || index === values.length - 1) {
+                            if (index === 0 || index === values.length - 1) {
                                 return value;
-                            } else {
+                            }
+                            if (value === 0.5) {
                                 return '';
                             }
+                            if (index === Math.floor(values.length / 2)) {
+                                return value !== 0.5 ? value : '';
+                            }
+                            return '';
                         }
+                        
                     }
                 }]
             }
