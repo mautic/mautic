@@ -9723,6 +9723,15 @@ button.close {
 .has-error select.form-control + .chosen-container-multi .chosen-choices {
   border-color: #a94442;
 }
+:root {
+  --timing: 0.3s ease;
+  --all: all var(--timing);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --timing: 0;
+  }
+}
 .ms-container {
   background: transparent url('multiselect/switch.png') no-repeat 50% 50%;
   /*width: 370px;*/
