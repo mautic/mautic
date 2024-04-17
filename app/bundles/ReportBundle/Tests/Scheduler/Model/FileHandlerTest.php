@@ -17,19 +17,19 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FilePathResolver
      */
-    private \PHPUnit\Framework\MockObject\MockObject $filePathResolver;
+    private MockObject $filePathResolver;
 
     /**
      * @var MockObject|FileProperties
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fileProperties;
+    private MockObject $fileProperties;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
-    private \Mautic\ReportBundle\Scheduler\Model\FileHandler $fileHandler;
+    private FileHandler $fileHandler;
 
     protected function setUp(): void
     {

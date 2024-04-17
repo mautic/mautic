@@ -1077,8 +1077,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param object                     $filter
+     * @param QueryBuilder $q
+     * @param object       $filter
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns): array
     {
@@ -1228,7 +1228,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder $q
      */
     protected function buildClauses($q, array $args): bool
     {
@@ -1357,7 +1357,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
     protected function buildSelectClause($q, array $args)
     {
@@ -1541,8 +1541,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $query
-     * @param array                                          $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
+     * @param QueryBuilder|DbalQueryBuilder $query
+     * @param array                         $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
     protected function buildWhereClauseFromArray($query, array $clauses, $expr = null)
     {

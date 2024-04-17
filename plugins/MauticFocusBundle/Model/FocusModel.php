@@ -93,7 +93,7 @@ class FocusModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Focus::class);
+        return $this->em->getRepository(Focus::class);
     }
 
     /**
@@ -101,7 +101,7 @@ class FocusModel extends FormModel
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
@@ -321,7 +321,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -363,12 +363,12 @@ class FocusModel extends FormModel
     /**
      * @param bool $canViewOthers
      */
-    public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true): array
+    public function getStats(Focus $focus, $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
 
-        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['focus_id' => $focus->getId()]);
+        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_NOTIFICATION, 'focus_id' => $focus->getId()]);
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }

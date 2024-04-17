@@ -287,7 +287,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\EmailBundle\Entity\Email::class);
+        $transformer = new IdToEntityModelTransformer($this->em, Email::class);
         $builder->add(
             $builder->create(
                 'variantParent',
