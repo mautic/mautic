@@ -39,9 +39,9 @@
     "url": "https://github.com/mautic/plugin-grapesjs-builder/issues"
   },
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
-  "engines" : { 
-    "npm" : ">=8.0.0",
-    "node" : ">=16.0.0"
+  "engines": {
+    "npm": ">=8.0.0",
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "grapesjs": "^0.21.8",
