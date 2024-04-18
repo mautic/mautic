@@ -86,6 +86,22 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
+    public function testContactPreferencesLandingPageTracking(): void
+    {
+        $lead                 = $this->createLead();
+        $preferenceCenterPage = $this->getPreferencesCenterLandingPage();
+        $stat                 = $this->getStat(null, $lead, $preferenceCenterPage);
+
+        $this->em->flush();
+
+        $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        $this->em->clear(Page::class);
+
+        $entity = $this->em->getRepository(Page::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
+        $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
+    }
+
     public function testContactPreferencesSaveMessage(): void
     {
         $lead = $this->createLead();
@@ -173,6 +189,19 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $this->assertEquals(1, $tokenInput->count(), $this->client->getResponse()->getContent());
+    }
+
+    private function getPreferencesCenterLandingPage(): Page
+    {
+        $page = new Page();
+        $page->setTitle('Preference center');
+        $page->setAlias('Preference-center');
+        $page->setIsPublished(true);
+        $page->setIsPreferenceCenter(true);
+        $page->setCustomHtml('<html><body>{saveprefsbutton}</body></html>');
+        $this->em->persist($page);
+
+        return $page;
     }
 
     /**
