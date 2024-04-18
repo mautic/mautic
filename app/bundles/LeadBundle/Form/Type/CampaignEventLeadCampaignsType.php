@@ -24,13 +24,13 @@ class CampaignEventLeadCampaignsType extends AbstractType
     {
         $builder->add('campaigns',
             CampaignListType::class, [
-            'label'      => 'mautic.lead.lead.events.campaigns.membership',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class' => 'form-control',
-            ],
-            'required' => true,
-        ]);
+                'label'      => 'mautic.lead.lead.events.campaigns.membership',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'required' => true,
+            ]);
 
         $builder->add(
             'dataAddedLimit',
