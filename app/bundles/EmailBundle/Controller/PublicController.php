@@ -23,6 +23,7 @@ use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
@@ -110,7 +111,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
     {
         $stat                  = $model->getEmailStatus($idHash);
         $message               = '';
@@ -281,6 +282,7 @@ class PublicController extends CommonFormController
                             $lead->getPrimaryIdentifier(),
                             $html
                         );
+                        $pageModel->hitPage($prefCenter, $request, 200, $lead);
                     } else {
                         unset($html);
                     }
