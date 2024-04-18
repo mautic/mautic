@@ -307,7 +307,7 @@
                         </a>
                     </li>
                 {% endif %}
-                {{ customContent('tabs', mauticTemplateVars|default([])) }}
+                {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -357,7 +357,7 @@
             <!--/ #auditlog-container -->
 
             <!-- custom content -->
-            {{ customContent('tabs.content', mauticTemplateVars|default([])) }}
+            {{ customContent('tabs.content', _context) }}
             <!-- end: custom content -->
 
             <!-- #place-container -->
