@@ -1718,6 +1718,7 @@ class EmailController extends FormController
      * @throws \Exception
      */
     public function countryStatsAction(
+        EmailModel $model,
         int $objectId
     ): Response {
         $model  = $this->getEmailModel();
