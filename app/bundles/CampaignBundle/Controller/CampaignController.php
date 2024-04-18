@@ -103,8 +103,7 @@ class CampaignController extends AbstractStandardFormController
         Translator $translator,
         FlashBag $flashBag,
         private RequestStack $requestStack,
-        CorePermissions $security,
-        protected ExportHelper $exportHelper
+        CorePermissions $security
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -1211,10 +1210,9 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @throws \Exception
      */
-    public function countryStatsAction(
-        int $objectId
-    ): Response {
-        $entity = $this->getCampaignModel()->getEntity($objectId);
+    public function countryStatsAction(CampaignModel $model, int $objectId): Response
+    {
+        $entity = $model->getEntity($objectId);
 
         if (empty($entity) || !$this->security->hasEntityAccess(
             'campaign:campaigns:viewown',
@@ -1224,7 +1222,7 @@ class CampaignController extends AbstractStandardFormController
             throw new AccessDeniedHttpException();
         }
 
-        $statsCountries = $this->getCampaignModel()->getCountryStats($entity);
+        $statsCountries = $model->getCountryStats($entity);
 
         return $this->render(
             '@MauticCore/Helper/countries_table.html.twig',
@@ -1238,9 +1236,8 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @throws \Exception
      */
-    public function exportCountriesStatsAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
+    public function exportCountriesStatsAction(CampaignModel $model, ExportHelper $exportHelper, int $objectId, string $format = 'csv'): StreamedResponse|Response
     {
-        $model  = $this->getCampaignModel();
         $entity = $model->getEntity($objectId);
 
         if (empty($entity) || !$this->security->hasEntityAccess(
@@ -1251,14 +1248,14 @@ class CampaignController extends AbstractStandardFormController
             throw new AccessDeniedHttpException();
         }
 
-        $filename       = $this->exportHelper->getExportFilename($entity->getName()).'.'.$format;
+        $filename       = $exportHelper->getExportFilename($entity->getName()).'.'.$format;
         $headerRow      = $this->getCountriesTableExportHeader($entity);
-        $statsCountries = $this->getCampaignModel()->getCountryStats($entity);
+        $statsCountries = $model->getCountryStats($entity);
 
         if (empty($statsCountries)) {
             throw new NotFoundHttpException();
         }
 
-        return $this->exportHelper->exportDataAs(array_values($statsCountries), $format, $filename, $headerRow);
+        return $exportHelper->exportDataAs(array_values($statsCountries), $format, $filename, $headerRow);
     }
 }
