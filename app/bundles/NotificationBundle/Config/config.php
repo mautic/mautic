@@ -4,7 +4,7 @@ return [
     'services' => [
         'events' => [
             'mautic.notification.campaignbundle.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
+                'class'     => Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.notification.model.notification',
@@ -17,7 +17,7 @@ return [
         ],
         'helpers' => [
             'mautic.helper.notification' => [
-                'class'     => \Mautic\NotificationBundle\Helper\NotificationHelper::class,
+                'class'     => Mautic\NotificationBundle\Helper\NotificationHelper::class,
                 'alias'     => 'notification_helper',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
@@ -32,7 +32,7 @@ return [
         ],
         'other' => [
             'mautic.notification.api' => [
-                'class'     => \Mautic\NotificationBundle\Api\OneSignalApi::class,
+                'class'     => Mautic\NotificationBundle\Api\OneSignalApi::class,
                 'arguments' => [
                     'mautic.http.client',
                     'mautic.page.model.trackable',
@@ -43,7 +43,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.onesignal' => [
-                'class'     => \Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
+                'class'     => Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -129,7 +129,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notifications',
                 'path'            => '/notifications',
-                'controller'      => \Mautic\NotificationBundle\Controller\Api\NotificationApiController::class,
+                'controller'      => Mautic\NotificationBundle\Controller\Api\NotificationApiController::class,
             ],
         ],
     ],

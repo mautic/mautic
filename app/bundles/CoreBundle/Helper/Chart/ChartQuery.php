@@ -14,7 +14,7 @@ class ChartQuery extends AbstractChart
 {
     private DateTimeHelper $dateTimeHelper;
 
-    private ?\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface $generatedColumnProvider = null;
+    private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 
     /**
      * Match date/time unit to a SQL datetime format
@@ -200,7 +200,7 @@ class ChartQuery extends AbstractChart
      * @param string $column  name. The column must be type of datetime
      * @param array  $filters will be added to where claues
      *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
+     * @return QueryBuilder
      */
     public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {

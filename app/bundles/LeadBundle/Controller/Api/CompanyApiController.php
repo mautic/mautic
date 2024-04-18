@@ -55,7 +55,7 @@ class CompanyApiController extends CommonApiController
     /**
      * If an existing company is matched, it'll be merged. Otherwise it'll be created.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function newEntityAction(Request $request)
     {
@@ -90,7 +90,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId Company ID
      * @param int $contactId Contact ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -119,7 +119,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId List ID
      * @param int $contactId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
