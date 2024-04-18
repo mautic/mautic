@@ -46,10 +46,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteExpired($isDryRun = false)
+    public function deleteExpired($isDryRun = false): int
     {
         $qb = $this->createQueryBuilder('ut');
 

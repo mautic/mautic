@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class RefreshToken extends BaseRefreshToken
 {
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -24,7 +24,7 @@ class RefreshToken extends BaseRefreshToken
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('user', \Mautic\UserBundle\Entity\User::class)
             ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
             ->build();
 

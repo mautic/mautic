@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SlotDynamicContentType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
     }
 

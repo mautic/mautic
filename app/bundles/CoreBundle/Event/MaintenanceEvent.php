@@ -6,30 +6,18 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MaintenanceEvent extends Event
 {
-    /**
-     * @var int
-     */
-    protected $daysOld;
+    protected int $daysOld;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    protected $date;
+    protected \DateTimeInterface $date;
 
     /**
      * @var array
      */
     protected $stats = [];
 
-    /**
-     * @var bool
-     */
-    protected $dryRun = false;
+    protected bool $dryRun;
 
-    /**
-     * @var bool
-     */
-    protected $gdpr = false;
+    protected bool $gdpr;
 
     /**
      * @var array
@@ -37,8 +25,6 @@ class MaintenanceEvent extends Event
     protected $debug = [];
 
     /**
-     * MaintenanceEvent constructor.
-     *
      * @param int  $daysOld
      * @param bool $dryRun
      */
@@ -52,10 +38,8 @@ class MaintenanceEvent extends Event
 
     /**
      * Get integer for number of days ago to purge data.
-     *
-     * @return int
      */
-    public function getDays()
+    public function getDays(): int
     {
         return $this->daysOld;
     }
@@ -76,7 +60,7 @@ class MaintenanceEvent extends Event
      * @param string $key
      * @param int    $recordCount
      */
-    public function setStat($key, $recordCount, $sql = null, $parameters = [])
+    public function setStat($key, $recordCount, $sql = null, $parameters = []): void
     {
         $this->stats[$key] = (int) $recordCount;
 
@@ -100,10 +84,8 @@ class MaintenanceEvent extends Event
 
     /**
      * Return if this is to be a dry run.
-     *
-     * @return bool
      */
-    public function isDryRun()
+    public function isDryRun(): bool
     {
         return $this->dryRun;
     }
@@ -116,10 +98,7 @@ class MaintenanceEvent extends Event
         return $this->debug;
     }
 
-    /**
-     * @return bool
-     */
-    public function isGdpr()
+    public function isGdpr(): bool
     {
         return $this->gdpr;
     }

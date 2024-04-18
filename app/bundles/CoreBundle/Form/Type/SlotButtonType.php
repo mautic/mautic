@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SlotButtonType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
 
@@ -71,7 +71,7 @@ class SlotButtonType extends SlotType
                     'M' => 1,
                     'L' => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(
@@ -90,7 +90,7 @@ class SlotButtonType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(

@@ -16,30 +16,18 @@ class ActionExecutioner implements EventInterface
 {
     public const TYPE = 'action';
 
-    /**
-     * @var ActionDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * @var EventLogger
-     */
-    private $eventLogger;
-
-    public function __construct(ActionDispatcher $dispatcher, EventLogger $eventLogger)
-    {
-        $this->dispatcher         = $dispatcher;
-        $this->eventLogger        = $eventLogger;
+    public function __construct(
+        private ActionDispatcher $dispatcher,
+        private EventLogger $eventLogger
+    ) {
     }
 
     /**
-     * @return EvaluatedContacts
-     *
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
+    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
     {
         \assert($config instanceof ActionAccessor);
 

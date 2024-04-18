@@ -6,7 +6,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
-use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
+use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -18,6 +18,7 @@ use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -36,11 +37,9 @@ class AjaxController extends CommonController
      * @param int   $statusCode
      * @param bool  $addIgnoreWdt
      *
-     * @return JsonResponse
-     *
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true)
+    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
     {
         $response = new JsonResponse();
 
@@ -75,7 +74,7 @@ class AjaxController extends CommonController
         }
 
         if ($authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            if (false !== strpos($action, ':')) {
+            if (str_contains($action, ':')) {
                 // call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
@@ -117,8 +116,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param null $bundle
-     *
      * @return Response
      */
     public function executeAjaxAction(
@@ -141,10 +138,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 0]);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function globalSearchAction(Request $request)
+    public function globalSearchAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 1];
         $searchStr = InputHelper::clean($request->query->get('global_search', ''));
@@ -161,10 +155,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function commandListAction(Request $request)
+    public function commandListAction(Request $request): JsonResponse
     {
         $model      = InputHelper::clean($request->query->get('model'));
         $commands   = $this->getModel($model)->getCommandList();
@@ -174,13 +165,13 @@ class AjaxController extends CommonController
             if (is_array($c)) {
                 foreach ($c as $subc) {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
                 }
             } else {
                 $command = $translator->trans($c);
-                $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                 $dataArray[$command] = ['value' => $command];
             }
@@ -190,10 +181,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function globalCommandListAction(Request $request)
+    public function globalCommandListAction(Request $request): JsonResponse
     {
         $dispatcher = $this->dispatcher;
         $event      = new CommandListEvent();
@@ -209,7 +197,7 @@ class AjaxController extends CommonController
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
                         $subcommand = $command.$translator->trans($subc);
@@ -220,7 +208,7 @@ class AjaxController extends CommonController
                     }
                 } else {
                     $command = $translator->trans($k);
-                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
+                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {
                         $dataArray[]  = ['value' => $command];
@@ -236,10 +224,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function togglePublishStatusAction(Request $request)
+    public function togglePublishStatusAction(Request $request): JsonResponse
     {
         $dataArray      = ['success' => 0];
         $name           = InputHelper::clean($request->request->get('model'));
@@ -305,7 +290,7 @@ class AjaxController extends CommonController
                                 'item'          => $entity,
                                 'model'         => $name,
                                 'query'         => $extra,
-                                'size'          => (isset($post['size'])) ? $post['size'] : '',
+                                'size'          => $post['size'] ?? '',
                                 'onclick'       => $onclickMethod,
                                 'attributes'    => $dataAttr,
                                 'transKeys'     => $attrTransKeys,
@@ -313,8 +298,8 @@ class AjaxController extends CommonController
                         );
                         $dataArray['statusHtml'] = $html;
                     }
-                } catch (RecordCanNotUnpublishException $e) {
-                    $this->addFlashMessage($e->getMessage());
+                } catch (RecordNotUnpublishedException $exception) {
+                    $this->addFlash(FlashBag::LEVEL_ERROR, $exception->getMessage());
                     $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
             } else {
@@ -330,10 +315,8 @@ class AjaxController extends CommonController
 
     /**
      * Unlock an entity locked by the current user.
-     *
-     * @return JsonResponse
      */
-    public function unlockEntityAction(Request $request)
+    public function unlockEntityAction(Request $request): JsonResponse
     {
         $dataArray   = ['success' => 0];
         $name        = InputHelper::clean($request->request->get('model'));
@@ -358,10 +341,8 @@ class AjaxController extends CommonController
 
     /**
      * Sets the page layout to the update layout.
-     *
-     * @return JsonResponse
      */
-    public function updateSetUpdateLayoutAction(CookieHelper $cookieHelper)
+    public function updateSetUpdateLayoutAction(CookieHelper $cookieHelper): JsonResponse
     {
         $dataArray = [
             'success' => 1,
@@ -423,10 +404,8 @@ class AjaxController extends CommonController
 
     /**
      * Downloads the update package.
-     *
-     * @return JsonResponse
      */
-    public function updateDownloadPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper)
+    public function updateDownloadPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -458,10 +437,8 @@ class AjaxController extends CommonController
 
     /**
      * Extracts the update package.
-     *
-     * @return JsonResponse
      */
-    public function updateExtractPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper, PathsHelper $pathsHelper)
+    public function updateExtractPackageAction(UpdateHelper $updateHelper, CookieHelper $cookieHelper, PathsHelper $pathsHelper): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -474,29 +451,13 @@ class AjaxController extends CommonController
         $archive = $zipper->open($zipFile);
 
         if (true !== $archive) {
-            // Get the exact error
-            switch ($archive) {
-                case \ZipArchive::ER_EXISTS:
-                    $error = 'mautic.core.update.archive_file_exists';
-                    break;
-                case \ZipArchive::ER_INCONS:
-                case \ZipArchive::ER_INVAL:
-                case \ZipArchive::ER_MEMORY:
-                    $error = 'mautic.core.update.archive_zip_corrupt';
-                    break;
-                case \ZipArchive::ER_NOENT:
-                    $error = 'mautic.core.update.archive_no_such_file';
-                    break;
-                case \ZipArchive::ER_NOZIP:
-                    $error = 'mautic.core.update.archive_not_valid_zip';
-                    break;
-                case \ZipArchive::ER_READ:
-                case \ZipArchive::ER_SEEK:
-                case \ZipArchive::ER_OPEN:
-                default:
-                    $error = 'mautic.core.update.archive_could_not_open';
-                    break;
-            }
+            $error = match ($archive) {
+                \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
+                \ZipArchive::ER_INCONS, \ZipArchive::ER_INVAL, \ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
+                \ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
+                \ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
+                default               => 'mautic.core.update.archive_could_not_open',
+            };
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', ['%error%' => $translator->trans($error)]);
@@ -531,8 +492,6 @@ class AjaxController extends CommonController
 
     /**
      * Migrate the database to the latest version.
-     *
-     * @return JsonResponse
      */
     public function updateDatabaseMigrationAction(
         Request $request,
@@ -540,7 +499,7 @@ class AjaxController extends CommonController
         LanguageHelper $languageHelper,
         CookieHelper $cookieHelper,
         LoggerInterface $mauticLogger
-    ) {
+    ): JsonResponse {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
         $result     = 0;
@@ -663,10 +622,8 @@ class AjaxController extends CommonController
 
     /**
      * Finalize update.
-     *
-     * @return JsonResponse
      */
-    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper)
+    public function updateFinalizationAction(Request $request, CookieHelper $cookieHelper): JsonResponse
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
@@ -695,10 +652,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function clearNotificationAction(Request $request)
+    public function clearNotificationAction(Request $request): JsonResponse
     {
         $id = (int) $request->get('id', 0);
 
@@ -709,10 +663,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 1]);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function getBuilderTokensAction(Request $request)
+    public function getBuilderTokensAction(Request $request): JsonResponse
     {
         $tokens = [];
 
@@ -726,10 +677,8 @@ class AjaxController extends CommonController
 
     /**
      * Fetch remote data store.
-     *
-     * @return JsonResponse
      */
-    public function downloadIpLookupDataStoreAction(Request $request, IpLookupFactory $ipServiceFactory)
+    public function downloadIpLookupDataStoreAction(Request $request, IpLookupFactory $ipServiceFactory): JsonResponse
     {
         $dataArray = ['success' => 0];
 
@@ -769,10 +718,8 @@ class AjaxController extends CommonController
 
     /**
      * Fetch IP Lookup form.
-     *
-     * @return JsonResponse
      */
-    public function getIpLookupFormAction(Request $request, FormFactoryInterface $formFactory, IpLookupFactory $ipServiceFactory)
+    public function getIpLookupFormAction(Request $request, FormFactoryInterface $formFactory, IpLookupFactory $ipServiceFactory): JsonResponse
     {
         $dataArray = ['html' => '', 'attribution' => ''];
 

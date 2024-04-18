@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,11 +16,11 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\EmailBundle\Validator\EmailLists;
+use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -148,6 +149,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $lists;
 
     /**
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
+     */
+    private $excludedLists;
+
+    /**
      * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
      */
     private $stats;
@@ -163,12 +169,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $variantReadCount = 0;
 
     /**
-     * @var \Mautic\FormBundle\Entity\Form|null
+     * @var Form|null
      */
     private $unsubscribeForm;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page|null
+     * @var Page|null
      */
     private $preferenceCenter;
 
@@ -197,6 +203,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
+    private bool $isCloned = false;
+
     /**
      * In some use cases, we need to get the original email ID after it's been cloned.
      *
@@ -206,19 +214,20 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function __clone()
     {
-        $this->clonedId         = $this->id;
-        $this->id               = null;
-        $this->sentCount        = 0;
-        $this->readCount        = 0;
-        $this->revision         = 0;
-        $this->variantSentCount = 0;
-        $this->variantReadCount = 0;
-        $this->variantStartDate = null;
-        $this->emailType        = null;
-        $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
-        $this->plainText        = null;
-        $this->publishUp        = null;
-        $this->publishDown      = null;
+        $this->isCloned          = true;
+        $this->clonedId          = $this->id;
+        $this->id                = null;
+        $this->sentCount         = 0;
+        $this->readCount         = 0;
+        $this->revision          = 0;
+        $this->variantSentCount  = 0;
+        $this->variantReadCount  = 0;
+        $this->variantStartDate  = null;
+        $this->emailType         = null;
+        $this->sessionId         = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->plainText         = null;
+        $this->publishUp         = null;
+        $this->publishDown       = null;
         $this->clearTranslations();
         $this->clearVariants();
         $this->clearStats();
@@ -229,6 +238,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function __construct()
     {
         $this->lists               = new ArrayCollection();
+        $this->excludedLists       = new ArrayCollection();
         $this->stats               = new ArrayCollection();
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
@@ -237,15 +247,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->setDateModified(new \DateTime());
     }
 
-    /**
-     * Clear stats.
-     */
-    public function clearStats()
+    public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -283,6 +290,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->fetchExtraLazy()
             ->build();
 
+        $builder->createManyToMany('excludedLists', LeadList::class)
+            ->setJoinTable('email_list_excluded')
+            ->setIndexBy('id')
+            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+
         $builder->createOneToMany('stats', 'Stat')
             ->setIndexBy('id')
             ->mappedBy('email')
@@ -314,7 +329,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -336,11 +351,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
+            new EmailOrEmailTokenList(),
         );
 
         $metadata->addPropertyConstraint(
@@ -361,31 +372,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             )
         );
 
+        $metadata->addConstraint(new EmailLists());
+
         $metadata->addConstraint(new Callback([
-            'callback' => function (Email $email, ExecutionContextInterface $context) {
-                $type              = $email->getEmailType();
-                $translationParent = $email->getTranslationParent();
-
-                if ('list' == $type && null == $translationParent) {
-                    $validator  = $context->getValidator();
-                    $violations = $validator->validate(
-                        $email->getLists(),
-                        [
-                            new LeadListAccess(),
-                            new NotBlank(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
-                        ]
-                    );
-                    foreach ($violations as $violation) {
-                        $context->buildViolation($violation->getMessage())
-                            ->atPath('lists')
-                            ->addViolation();
-                    }
-                }
-
+            'callback' => function (Email $email, ExecutionContextInterface $context): void {
                 if ($email->isVariant()) {
                     // Get a summation of weights
                     $parent   = $email->getVariantParent();
@@ -410,7 +400,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('email')
             ->addListProperties(
@@ -510,10 +500,15 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function setId(int $id): Email
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -552,9 +547,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setContent($content)
     {
-        // Ensure safe emoji
-        $content = array_map(fn ($text) => EmojiHelper::toShort($text), $content);
-
         $this->isChanged('content', $content);
         $this->content = $content;
 
@@ -596,6 +588,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->readCount = $readCount;
 
         return $this;
+    }
+
+    public function getIsClone(): bool
+    {
+        return $this->isCloned;
     }
 
     /**
@@ -654,7 +651,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return bool
+     * @return ?bool
      */
     public function getUseOwnerAsMailer()
     {
@@ -867,6 +864,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function addList(LeadList $list)
     {
+        $this->listsChangedAdd('lists', $list->getId());
         $this->lists[] = $list;
 
         return $this;
@@ -877,7 +875,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setLists(array $lists = [])
     {
-        $this->lists = new ArrayCollection($lists);
+        $lists = new ArrayCollection($lists);
+        $this->listsChangedSet('lists', $this->getListKeys($lists));
+        $this->lists = $lists;
 
         return $this;
     }
@@ -885,9 +885,30 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Remove list.
      */
-    public function removeList(LeadList $list)
+    public function removeList(LeadList $list): void
     {
+        $this->listsChangedRemove('lists', $list->getId());
         $this->lists->removeElement($list);
+    }
+
+    /**
+     * @return Collection<int, \Mautic\LeadBundle\Entity\LeadList>
+     */
+    public function getExcludedLists(): Collection
+    {
+        return $this->excludedLists;
+    }
+
+    public function addExcludedList(LeadList $excludedList): void
+    {
+        $this->listsChangedAdd('excludedLists', $excludedList->getId());
+        $this->excludedLists->add($excludedList);
+    }
+
+    public function removeExcludedList(LeadList $excludedList): void
+    {
+        $this->listsChangedRemove('excludedLists', $excludedList->getId());
+        $this->excludedLists->removeElement($excludedList);
     }
 
     /**
@@ -961,8 +982,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Form $unsubscribeForm
-     *
      * @return $this
      */
     public function setUnsubscribeForm(Form $unsubscribeForm = null)
@@ -981,8 +1000,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param Page $preferenceCenter
-     *
      * @return $this
      */
     public function setPreferenceCenter(Page $preferenceCenter = null)
@@ -1027,7 +1044,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Remove asset.
      */
-    public function removeAssetAttachment(Asset $asset)
+    public function removeAssetAttachment(Asset $asset): void
     {
         $this->assetAttachments->removeElement($asset);
     }
@@ -1035,7 +1052,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Get assetAttachments.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getAssetAttachments()
     {
@@ -1065,7 +1082,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Lifecycle callback to clean URLs in the content.
      */
-    public function cleanUrlsInContent()
+    public function cleanUrlsInContent(): void
     {
         if (is_string($this->plainText)) {
             $this->decodeAmpersands($this->plainText);
@@ -1179,5 +1196,51 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function isBackgroundSending(): bool
     {
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+    }
+
+    private function listsChangedAdd(string $property, ?int $id): void
+    {
+        $this->initListChanges($property);
+        $this->changes[$property][1] = array_unique(array_merge($this->changes[$property][1], [$id]));
+    }
+
+    private function listsChangedRemove(string $property, ?int $id): void
+    {
+        $this->initListChanges($property);
+        $this->changes[$property][1] = array_diff($this->changes[$property][1], [$id]);
+    }
+
+    /**
+     * @param mixed[] $ids
+     */
+    private function listsChangedSet(string $property, array $ids): void
+    {
+        $this->initListChanges($property);
+        $this->changes[$property][1] = $ids;
+    }
+
+    private function initListChanges(string $property): void
+    {
+        if (!isset($this->changes[$property])) {
+            $list                     = $this->$property;
+            $current                  = $this->getListKeys($list);
+            $this->changes[$property] = [$current, $current];
+        }
+    }
+
+    /**
+     * @param iterable<mixed> $list
+     *
+     * @return mixed[]
+     */
+    private function getListKeys(iterable $list): array
+    {
+        $keys = [];
+
+        foreach ($list as $key => $value) {
+            $keys[] = $key;
+        }
+
+        return $keys;
     }
 }

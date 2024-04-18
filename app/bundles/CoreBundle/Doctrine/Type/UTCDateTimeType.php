@@ -9,10 +9,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class UTCDateTimeType extends DateTimeType
 {
-    /**
-     * @var \DateTimeZone
-     */
-    private static $utc;
+    private static ?\DateTimeZone $utc = null;
 
     /**
      * @param \DateTime $value

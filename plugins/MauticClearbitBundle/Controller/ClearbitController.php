@@ -257,7 +257,7 @@ class ClearbitController extends FormController
                 return new JsonResponse(
                     [
                         'closeModal' => true,
-                         'flashes'   => $this->getFlashContent(),
+                        'flashes'    => $this->getFlashContent(),
                     ]
                 );
             }

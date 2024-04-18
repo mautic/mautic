@@ -11,52 +11,28 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastExecutioner
 {
-    /**
-     * @var SmsModel
-     */
-    private $smsModel;
+    private ?ContactLimiter $contactLimiter = null;
 
-    private LeadRepository $leadRepository;
+    private ?BroadcastResult $result = null;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
-
-    /**
-     * @var BroadcastQuery
-     */
-    private $broadcastQuery;
-
-    /**
-     * @var BroadcastResult
-     */
-    private $result;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator, LeadRepository $leadRepository)
-    {
-        $this->smsModel       = $smsModel;
-        $this->broadcastQuery = $broadcastQuery;
-        $this->translator     = $translator;
-        $this->leadRepository = $leadRepository;
+    public function __construct(
+        private SmsModel $smsModel,
+        private BroadcastQuery $broadcastQuery,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository
+    ) {
     }
 
-    public function execute(ChannelBroadcastEvent $event)
+    public function execute(ChannelBroadcastEvent $event): void
     {
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $smses = $this->smsModel->getRepository()->getPublishedBroadcasts($event->getId());
-        while (false !== ($next = $smses->next())) {
-            $sms                  = reset($next);
+        $smses = $this->smsModel->getRepository()->getPublishedBroadcastsIterable($event->getId());
+        foreach ($smses as $sms) {
             $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], $event->getThreadId(), $event->getMaxThreads(), $event->getLimit());
             $this->result         = new BroadcastResult();
             try {
                 $this->send($sms);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
             $event->setResults(
                 sprintf('%s: %s', $this->translator->trans('mautic.sms.sms'), $sms->getName()),
@@ -70,7 +46,7 @@ class BroadcastExecutioner
      * @throws LimitQuotaException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
      */
-    private function send(Sms $sms)
+    private function send(Sms $sms): void
     {
         $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
         while (!empty($contacts)) {

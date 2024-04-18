@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 
 class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         /** @var LeadListRepository $leadListRepo */
         $leadListRepo = $manager->getRepository(LeadList::class);
@@ -32,7 +32,8 @@ class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixt
         }
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
+        return 1;
     }
 }

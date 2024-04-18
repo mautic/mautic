@@ -7,9 +7,12 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class UploadType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'file',
@@ -27,13 +30,13 @@ class UploadType extends AbstractType
             'start',
             SubmitType::class,
             [
-            'attr' => [
-                'class'   => 'btn btn-primary',
-                'icon'    => 'fa fa-upload',
-                'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'dashboard_upload\']').submit();",
-            ],
-            'label' => 'mautic.lead.import.upload',
-        ]);
+                'attr' => [
+                    'class'   => 'btn btn-primary',
+                    'icon'    => 'fa fa-upload',
+                    'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'dashboard_upload\']').submit();",
+                ],
+                'label' => 'mautic.lead.import.upload',
+            ]);
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }

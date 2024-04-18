@@ -11,14 +11,12 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 class DsnParser
 {
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message)
+    public function getBounce(Message $message): BouncedEmail
     {
         // Parse the bounce
-        $dsnMessage = ($message->dsnMessage) ? $message->dsnMessage : $message->textPlain;
+        $dsnMessage = $message->dsnMessage ?: $message->textPlain;
         $dsnReport  = $message->dsnReport;
 
         // Try parsing the report
@@ -40,10 +38,8 @@ class DsnParser
 
     /**
      * @todo - refactor to get rid of the if/else statements
-     *
-     * @return array
      */
-    public function parse(string $dsnMessage, string $dsnReport)
+    public function parse(string $dsnMessage, string $dsnReport): array
     {
         // initialize the result array
         $result = [
@@ -60,8 +56,7 @@ class DsnParser
         // get the recipient email
         if (
             preg_match('/Original-Recipient: rfc822;(.*)/i', $dsnReport, $match)
-            ||
-            preg_match('/Final-Recipient:\s?rfc822;(.*)/i', $dsnReport, $match)
+            || preg_match('/Final-Recipient:\s?rfc822;(.*)/i', $dsnReport, $match)
         ) {
             if ($parsedAddressList = Address::parseList($match[1])) {
                 $result['email'] = key($parsedAddressList);
@@ -1224,10 +1219,10 @@ class DsnParser
                     $result['rule_cat'] = Category::DELAYED;
                     $result['rule_no']  = '0110';
                     break;
+                    // unhandled cases
                 case 'delivered':
                 case 'relayed':
-                case 'expanded': // unhandled cases
-                    break;
+                case 'expanded':
                 default:
                     break;
             }

@@ -21,12 +21,9 @@ class ReferenceResolverTest extends TestCase
     /**
      * @var Connection|MockObject
      */
-    private $connection;
+    private MockObject $connection;
 
-    /**
-     * @var ReferenceResolver
-     */
-    private $referenceResolver;
+    private ReferenceResolver $referenceResolver;
 
     protected function setup(): void
     {

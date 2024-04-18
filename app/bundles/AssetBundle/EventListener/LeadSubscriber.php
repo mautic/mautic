@@ -14,30 +14,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    private \Mautic\AssetBundle\Model\AssetModel $assetModel;
-
-    private \Symfony\Contracts\Translation\TranslatorInterface $translator;
-
-    private \Symfony\Component\Routing\RouterInterface $router;
-
-    private \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository;
-
     public function __construct(
-        AssetModel $assetModel,
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        DownloadRepository $downloadRepository
+        private AssetModel $assetModel,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private DownloadRepository $downloadRepository
     ) {
-        $this->assetModel         = $assetModel;
-        $this->translator         = $translator;
-        $this->router             = $router;
-        $this->downloadRepository = $downloadRepository;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -49,7 +34,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'asset.download';
@@ -94,7 +79,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onLeadChange(LeadChangeEvent $event)
+    public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
@@ -103,7 +88,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }

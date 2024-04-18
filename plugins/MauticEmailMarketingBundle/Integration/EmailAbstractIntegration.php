@@ -21,7 +21,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     /**
      * @param FormBuilder|Form $builder
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         if ('features' == $formArea || 'integration' == $formArea) {
             if ($this->isAuthorized()) {
@@ -35,7 +35,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
                     $builder->add('list_settings', $formType, [
                         'label'     => false,
                         'form_area' => $formArea,
-                        'data'      => (isset($data['list_settings'])) ? $data['list_settings'] : [],
+                        'data'      => $data['list_settings'] ?? [],
                     ]);
                 }
             }

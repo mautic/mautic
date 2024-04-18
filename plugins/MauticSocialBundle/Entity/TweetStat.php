@@ -77,7 +77,7 @@ class TweetStat
      */
     private $responseDetails = [];
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -141,7 +141,7 @@ class TweetStat
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -203,7 +203,7 @@ class TweetStat
     /**
      * @param mixed $dateSent
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -219,7 +219,7 @@ class TweetStat
     /**
      * @param mixed $tweet
      */
-    public function setTweet(Tweet $tweet = null)
+    public function setTweet(Tweet $tweet = null): void
     {
         $this->tweet = $tweet;
     }
@@ -235,7 +235,7 @@ class TweetStat
     /**
      * @param mixed $lead
      */
-    public function setLead(TheLead $lead = null)
+    public function setLead(TheLead $lead = null): void
     {
         $this->lead = $lead;
     }
@@ -251,12 +251,12 @@ class TweetStat
     /**
      * @param mixed $retryCount
      */
-    public function setRetryCount($retryCount)
+    public function setRetryCount($retryCount): void
     {
         $this->retryCount = $retryCount;
     }
 
-    public function retryCountUp()
+    public function retryCountUp(): void
     {
         $this->setRetryCount($this->getRetryCount() + 1);
     }
@@ -312,7 +312,7 @@ class TweetStat
     /**
      * @param mixed $isFailed
      */
-    public function setIsFailed($isFailed)
+    public function setIsFailed($isFailed): void
     {
         $this->isFailed = $isFailed;
     }
@@ -336,7 +336,7 @@ class TweetStat
     /**
      * @param mixed $handle
      */
-    public function setHandle($handle)
+    public function setHandle($handle): void
     {
         $this->handle = $handle;
     }
@@ -352,7 +352,7 @@ class TweetStat
     /**
      * @param mixed $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         $this->source = $source;
     }
@@ -368,7 +368,7 @@ class TweetStat
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }

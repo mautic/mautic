@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SlotImageType extends SlotType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'align',
@@ -24,7 +24,7 @@ class SlotImageType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         parent::buildForm($builder, $options);

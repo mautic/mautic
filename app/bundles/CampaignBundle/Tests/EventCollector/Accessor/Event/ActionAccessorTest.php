@@ -6,21 +6,21 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 
 class ActionAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBatchEventNameIsNotExtra()
+    public function testBatchEventNameIsNotExtra(): void
     {
         $actionAccessor = new ActionAccessor(['batchEventName' => 'test']);
 
         $this->assertEmpty($actionAccessor->getExtraProperties());
     }
 
-    public function testBatchNameIsReturned()
+    public function testBatchNameIsReturned(): void
     {
         $actionAccessor = new ActionAccessor(['batchEventName' => 'test']);
 
         $this->assertEquals('test', $actionAccessor->getBatchEventName());
     }
 
-    public function testExtraParamIsReturned()
+    public function testExtraParamIsReturned(): void
     {
         $actionAccessor = new ActionAccessor(['batchEventName' => 'test', 'foo' => 'bar']);
 

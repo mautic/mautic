@@ -19,41 +19,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_FORMS           = 'forms';
+
     public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+
     public const CONTEXT_FORM_RESULT     = 'form.results';
 
-    private CompanyReportData $companyReportData;
-
-    private SubmissionRepository $submissionRepository;
-
-    private FormModel $formModel;
-
-    private ReportHelper $reportHelper;
-
-    private CoreParametersHelper $coreParametersHelper;
-
-    private TranslatorInterface $translator;
-
     public function __construct(
-        CompanyReportData $companyReportData,
-        SubmissionRepository $submissionRepository,
-        FormModel $formModel,
-        ReportHelper $reportHelper,
-        CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator
+        private CompanyReportData $companyReportData,
+        private SubmissionRepository $submissionRepository,
+        private FormModel $formModel,
+        private ReportHelper $reportHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
     ) {
-        $this->companyReportData    = $companyReportData;
-        $this->submissionRepository = $submissionRepository;
-        $this->formModel            = $formModel;
-        $this->reportHelper         = $reportHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -65,7 +46,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
@@ -186,7 +167,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
@@ -235,7 +216,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext(self::CONTEXT_FORM_SUBMISSION)) {

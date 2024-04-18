@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 
 trait ComponentValidationTrait
 {
-    private function verifyComponent(array $keys, array $component, array $callbacks = [])
+    private function verifyComponent(array $keys, array $component, array $callbacks = []): void
     {
         foreach ($keys as $k) {
             if (is_array($k)) {

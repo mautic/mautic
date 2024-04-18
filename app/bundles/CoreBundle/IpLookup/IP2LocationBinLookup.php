@@ -6,10 +6,7 @@ use IP2Location\Database;
 
 class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return 'IP2Location Local Bin File DB9BIN only';
     }
@@ -40,7 +37,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
 
             return 'https://www.ip2location.com/download?'.$queryString;
         } else {
-            $this->logger->warn('Both username and password are required');
+            $this->logger->warning('Both username and password are required');
         }
     }
 
@@ -65,7 +62,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
             }
         } catch (\Exception $exception) {
             if ($this->logger) {
-                $this->logger->warn('IP LOOKUP: '.$exception->getMessage());
+                $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
             }
         }
     }

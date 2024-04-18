@@ -29,7 +29,7 @@ class FormEvent extends CommonEvent
     /**
      * Sets the Form entity.
      */
-    public function setForm(Form $form)
+    public function setForm(Form $form): void
     {
         $this->entity = $form;
     }

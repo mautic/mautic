@@ -29,7 +29,7 @@ class SmsEvent extends CommonEvent
     /**
      * Sets the Sms entity.
      */
-    public function setSms(Sms $sms)
+    public function setSms(Sms $sms): void
     {
         $this->entity = $sms;
     }

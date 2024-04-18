@@ -29,7 +29,7 @@ class LeadDeviceEvent extends CommonEvent
     /**
      * Sets the LeadDevice entity.
      */
-    public function setDevice(LeadDevice $device)
+    public function setDevice(LeadDevice $device): void
     {
         $this->entity = $device;
     }

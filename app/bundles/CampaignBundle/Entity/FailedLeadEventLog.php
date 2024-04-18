@@ -23,7 +23,7 @@ class FailedLeadEventLog
      */
     private $reason;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -45,7 +45,7 @@ class FailedLeadEventLog
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaignEventFailedLog')
                  ->addProperties(
@@ -66,8 +66,6 @@ class FailedLeadEventLog
     }
 
     /**
-     * @param LeadEventLog $log
-     *
      * @return FailedLeadEventLog
      */
     public function setLog(LeadEventLog $log = null)
@@ -90,8 +88,6 @@ class FailedLeadEventLog
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return FailedLeadEventLog
      */
     public function setDateAdded(\DateTime $dateAdded = null)

@@ -14,54 +14,18 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class DeviceTrackingService implements DeviceTrackingServiceInterface
 {
     /**
-     * @var CookieHelper
-     */
-    private $cookieHelper;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
-     * @var RandomHelperInterface
-     */
-    private $randomHelper;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
      * @var LeadDevice
      */
     private $trackedDevice;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
     public function __construct(
-        CookieHelper $cookieHelper,
-        EntityManagerInterface $entityManager,
-        LeadDeviceRepository $leadDeviceRepository,
-        RandomHelperInterface $randomHelper,
-        RequestStack $requestStack,
-        CorePermissions $security
+        private CookieHelper $cookieHelper,
+        private EntityManagerInterface $entityManager,
+        private LeadDeviceRepository $leadDeviceRepository,
+        private RandomHelperInterface $randomHelper,
+        private RequestStack $requestStack,
+        private CorePermissions $security
     ) {
-        $this->cookieHelper         = $cookieHelper;
-        $this->entityManager        = $entityManager;
-        $this->randomHelper         = $randomHelper;
-        $this->leadDeviceRepository = $leadDeviceRepository;
-        $this->requestStack         = $requestStack;
-        $this->security             = $security;
     }
 
     public function isTracked(): bool
@@ -133,7 +97,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $device;
     }
 
-    public function clearTrackingCookies()
+    public function clearTrackingCookies(): void
     {
         $this->cookieHelper->deleteCookie('mautic_device_id');
         $this->cookieHelper->deleteCookie('mtc_id');
@@ -170,10 +134,10 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $generatedIdentifier;
     }
 
-    private function createTrackingCookies(LeadDevice $device)
+    private function createTrackingCookies(LeadDevice $device): void
     {
         // Device cookie
-        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000, sameSite: Cookie::SAMESITE_NONE);
+        $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31_536_000, sameSite: Cookie::SAMESITE_NONE);
 
         // Mainly for landing pages so that JS has the same access as 3rd party tracking code
         $this->cookieHelper->setCookie('mtc_id', $device->getLead()->getId(), null, sameSite: Cookie::SAMESITE_NONE);

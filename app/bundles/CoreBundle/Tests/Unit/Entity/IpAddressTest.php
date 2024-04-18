@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 
 class IpAddressTest extends \PHPUnit\Framework\TestCase
 {
-    public function testExactIp()
+    public function testExactIp(): void
     {
         $ipAddress = new IpAddress();
         $ipAddress->setDoNotTrackList(
@@ -21,7 +21,7 @@ class IpAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($ipAddress->isTrackable());
     }
 
-    public function testIpRange()
+    public function testIpRange(): void
     {
         // HostMin:   172.16.0.1
         // HostMax:   172.31.255.255
@@ -45,7 +45,7 @@ class IpAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($ipAddress->isTrackable());
     }
 
-    public function testIpWildcard()
+    public function testIpWildcard(): void
     {
         $ipAddress = new IpAddress();
         $ipAddress->setDoNotTrackList(

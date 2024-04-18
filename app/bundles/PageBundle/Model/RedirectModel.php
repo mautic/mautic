@@ -39,9 +39,7 @@ class RedirectModel extends FormModel
 
     public function getRepository(): RedirectRepository
     {
-        $result = $this->em->getRepository(Redirect::class);
-
-        return $result;
+        return $this->em->getRepository(Redirect::class);
     }
 
     /**
@@ -92,10 +90,8 @@ class RedirectModel extends FormModel
 
     /**
      * Generate UTMs params for url.
-     *
-     * @return array
      */
-    public function getUtmTagsForUrl($rawUtmTags)
+    public function getUtmTagsForUrl($rawUtmTags): array
     {
         $utmTags = [];
         foreach ($rawUtmTags as $utmTag => $value) {

@@ -8,7 +8,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.outlook' => [
-                'class'     => \MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration::class,
+                'class'     => MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

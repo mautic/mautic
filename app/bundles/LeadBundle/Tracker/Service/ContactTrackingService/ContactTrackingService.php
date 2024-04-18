@@ -10,49 +10,17 @@ use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class ContactTrackingService.
- *
- * Used to ensure that contacts tracked under the old method are continued to be tracked under the new
+ * Used to ensure that contacts tracked under the old method are continued to be tracked under the new.
  */
 final class ContactTrackingService implements ContactTrackingServiceInterface
 {
-    /**
-     * @var CookieHelper
-     */
-    private $cookieHelper;
-
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
-
-    /**
-     * @var MergeRecordRepository
-     */
-    private $mergeRecordRepository;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
-        CookieHelper $cookieHelper,
-        LeadDeviceRepository $leadDeviceRepository,
-        LeadRepository $leadRepository,
-        MergeRecordRepository $mergeRecordRepository,
-        RequestStack $requestStack
+        private CookieHelper $cookieHelper,
+        private LeadDeviceRepository $leadDeviceRepository,
+        private LeadRepository $leadRepository,
+        private MergeRecordRepository $mergeRecordRepository,
+        private RequestStack $requestStack
     ) {
-        $this->cookieHelper          = $cookieHelper;
-        $this->leadDeviceRepository  = $leadDeviceRepository;
-        $this->leadRepository        = $leadRepository;
-        $this->mergeRecordRepository = $mergeRecordRepository;
-        $this->requestStack          = $requestStack;
     }
 
     /**

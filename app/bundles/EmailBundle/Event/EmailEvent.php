@@ -29,7 +29,7 @@ class EmailEvent extends CommonEvent
     /**
      * Sets the Email entity.
      */
-    public function setEmail(Email $email)
+    public function setEmail(Email $email): void
     {
         $this->entity = $email;
     }

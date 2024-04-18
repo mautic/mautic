@@ -8,30 +8,29 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class CategoryChangeEvent extends Event
 {
-    private $lead;
-    private $leads;
-    private $category;
-    private $added;
+    private ?Lead $lead = null;
 
     /**
-     * CategoryChangeEvent constructor.
-     *
-     * @param bool $added
+     * @var Lead[]|null
      */
-    public function __construct($leads, Category $category, $added = true)
-    {
+    private ?array $leads = null;
+
+    /**
+     * @param Lead|Lead[] $leads
+     */
+    public function __construct(
+        Lead|array $leads,
+        private Category $category,
+        private bool $added = true
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
             $this->lead = $leads;
         }
-        $this->category = $category;
-        $this->added    = $added;
     }
 
     /**
-     * Returns the Lead entity.
-     *
      * @return Lead
      */
     public function getLead()
@@ -57,18 +56,12 @@ class CategoryChangeEvent extends Event
         return $this->category;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
         return $this->added;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
         return !$this->added;
     }

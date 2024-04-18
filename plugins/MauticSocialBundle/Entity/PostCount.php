@@ -27,12 +27,12 @@ class PostCount
      */
     private $postCount;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitor_post_count')
-            ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\PostCountRepository');
+            ->setCustomRepositoryClass(PostCountRepository::class);
 
         $builder->addId();
 
@@ -54,7 +54,7 @@ class PostCount
     }
 
     /**
-     * @return \MauticPlugin\MauticSocialBundle\Entity\Monitoring
+     * @return Monitoring
      */
     public function getMonitor()
     {

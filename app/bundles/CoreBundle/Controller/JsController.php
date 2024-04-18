@@ -8,10 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class JsController extends CommonController
 {
-    /**
-     * @return Response
-     */
-    public function indexAction()
+    public function indexAction(): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
@@ -29,10 +26,8 @@ class JsController extends CommonController
 
     /**
      * Build a JS header for the Mautic embedded JS.
-     *
-     * @return string
      */
-    protected function getJsHeader()
+    protected function getJsHeader(): string
     {
         $year = date('Y');
 

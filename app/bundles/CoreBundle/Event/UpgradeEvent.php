@@ -6,14 +6,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class UpgradeEvent extends Event
 {
-    /**
-     * @var array
-     */
-    protected $status = [];
-
-    public function __construct(array $status)
-    {
-        $this->status = $status;
+    public function __construct(
+        protected array $status
+    ) {
     }
 
     /**
@@ -24,7 +19,7 @@ class UpgradeEvent extends Event
         return $this->status;
     }
 
-    public function isSuccessful()
+    public function isSuccessful(): bool
     {
         if (array_key_exists('success', $this->status)) {
             return (bool) $this->status['success'];

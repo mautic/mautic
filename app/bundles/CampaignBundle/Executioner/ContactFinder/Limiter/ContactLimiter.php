@@ -6,59 +6,28 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
 class ContactLimiter
 {
-    /**
-     * @var int|null
-     */
-    private $batchLimit;
+    private int $batchLimit;
 
-    /**
-     * @var int|null
-     */
-    private $contactId;
+    private ?int $contactId;
 
-    /**
-     * @var int|null
-     */
-    private $minContactId;
+    private ?int $minContactId;
 
-    /**
-     * @var int|null
-     */
-    private $batchMinContactId;
+    private ?int $batchMinContactId = null;
 
-    /**
-     * @var int|null
-     */
-    private $maxContactId;
+    private ?int $maxContactId;
 
-    /**
-     * @var array
-     */
-    private $contactIdList;
+    private ?int $threadId = null;
 
-    /**
-     * @var int|null
-     */
-    private $threadId;
-
-    /**
-     * @var int|null
-     */
-    private $maxThreads;
+    private ?int $maxThreads = null;
 
     /**
      * @var int|null
      */
     private $campaignLimit;
 
-    /**
-     * @var int|null
-     */
-    private $campaignLimitUsed;
+    private ?int $campaignLimitUsed = null;
 
     /**
-     * ContactLimiter constructor.
-     *
      * @param int      $batchLimit
      * @param int|null $contactId
      * @param int|null $minContactId
@@ -72,7 +41,7 @@ class ContactLimiter
         $contactId = null,
         $minContactId = null,
         $maxContactId = null,
-        array $contactIdList = [],
+        private array $contactIdList = [],
         $threadId = null,
         $maxThreads = null,
         $campaignLimit = null
@@ -81,7 +50,6 @@ class ContactLimiter
         $this->contactId     = ($contactId) ? (int) $contactId : null;
         $this->minContactId  = ($minContactId) ? (int) $minContactId : null;
         $this->maxContactId  = ($maxContactId) ? (int) $maxContactId : null;
-        $this->contactIdList = $contactIdList;
 
         if ($threadId && $maxThreads) {
             $this->threadId     = (int) $threadId;
@@ -98,10 +66,7 @@ class ContactLimiter
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getBatchLimit()
+    public function getBatchLimit(): int
     {
         return $this->batchLimit;
     }
@@ -114,12 +79,9 @@ class ContactLimiter
         return $this->contactId;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMinContactId()
+    public function getMinContactId(): ?int
     {
-        return ($this->batchMinContactId) ? $this->batchMinContactId : $this->minContactId;
+        return $this->batchMinContactId ?: $this->minContactId;
     }
 
     /**

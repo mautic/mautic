@@ -11,20 +11,10 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class DoNotContact implements MauticModelInterface
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var DoNotContactRepository
-     */
-    protected $dncRepo;
-
-    public function __construct(LeadModel $leadModel, DoNotContactRepository $dncRepo)
-    {
-        $this->leadModel = $leadModel;
-        $this->dncRepo   = $dncRepo;
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected DoNotContactRepository $dncRepo
+    ) {
     }
 
     /**
@@ -63,13 +53,13 @@ class DoNotContact implements MauticModelInterface
     /**
      * Create a DNC entry for a lead.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead|int|null $contactId
-     * @param string|array                            $channel                  If an array with an ID, use the structure ['email' => 123]
-     * @param string                                  $comments
-     * @param int                                     $reason                   Must be a class constant from the DoNotContact class
-     * @param bool                                    $persist
-     * @param bool                                    $checkCurrentStatus
-     * @param bool                                    $allowUnsubscribeOverride
+     * @param Lead|int|null  $contactId
+     * @param string|mixed[] $channel                  If an array with an ID, use the structure ['email' => 123]
+     * @param string         $comments
+     * @param int            $reason                   Must be a class constant from the DoNotContact class
+     * @param bool           $persist
+     * @param bool           $checkCurrentStatus
+     * @param bool           $allowUnsubscribeOverride
      *
      * @return bool|DNC If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                  and has the specified reason, nothing is done and this returns false
@@ -165,12 +155,7 @@ class DoNotContact implements MauticModelInterface
         return DNC::IS_CONTACTABLE;
     }
 
-    /**
-     * @param null $comments
-     *
-     * @return DNC
-     */
-    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null)
+    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null): DNC
     {
         $dnc = new DNC();
 
@@ -192,10 +177,7 @@ class DoNotContact implements MauticModelInterface
         return $dnc;
     }
 
-    /**
-     * @param null $comments
-     */
-    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null)
+    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null): void
     {
         // Update the DNC entry
         $dnc->setChannel($channel);

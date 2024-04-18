@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ConfigEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetSetConfig()
+    public function testGetSetConfig(): void
     {
         // Config not defined
         $config   = [];
@@ -20,7 +20,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         // Config defined with setter
         $key    = 'defined';
         $config = ['config' => []];
-        $this->assertNull($event->setConfig($config, $key));
+        $event->setConfig($config, $key);
         $this->assertEquals($config, $event->getConfig($key));
 
         // Config not found by key so complete config returned;
@@ -32,7 +32,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($config, $event->getConfig());
     }
 
-    public function testGetSetPreserved()
+    public function testGetSetPreserved(): void
     {
         $config   = [];
         $paramBag = $this->createMock(ParameterBag::class);
@@ -42,16 +42,16 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
 
         $preserved = 'preserved';
         $result    = [$preserved];
-        $this->assertNull($event->unsetIfEmpty($preserved));
+        $event->unsetIfEmpty($preserved);
         $this->assertEquals($result, $event->getPreservedFields());
 
         $preserved = ['preserved' => 'value'];
         $result    = array_merge($result, $preserved);
-        $this->assertNull($event->unsetIfEmpty($preserved));
+        $event->unsetIfEmpty($preserved);
         $this->assertEquals($result, $event->getPreservedFields());
     }
 
-    public function testGetSetErrors()
+    public function testGetSetErrors(): void
     {
         $config   = [];
         $paramBag = $this->createMock(ParameterBag::class);
@@ -82,7 +82,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fieldErrors, $event->getFieldErrors());
     }
 
-    public function testGetFileContent()
+    public function testGetFileContent(): void
     {
         $config   = [];
         $paramBag = $this->createMock(ParameterBag::class);
@@ -102,7 +102,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(file_exists($realPath));
     }
 
-    public function testEncodeFileContents()
+    public function testEncodeFileContents(): void
     {
         $config   = [];
         $paramBag = $this->createMock(ParameterBag::class);
@@ -113,7 +113,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $event->encodeFileContents($string));
     }
 
-    public function testNormalizedDataGetSet()
+    public function testNormalizedDataGetSet(): void
     {
         $config   = [];
         $paramBag = $this->createMock(ParameterBag::class);
@@ -126,7 +126,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
 
         $normData = ['norm'];
 
-        $this->assertNull($event->setNormData($normData));
+        $event->setNormData($normData);
         $this->assertEquals($normData, $event->getNormData());
     }
 }

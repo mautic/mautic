@@ -18,32 +18,32 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CorePermissions|MockObject
      */
-    private $security;
+    private MockObject $security;
 
     /**
      * @var EntityManager|MockObject
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var User|MockObject
      */
-    private $user;
+    private MockObject $user;
 
     /**
      * @var MockObject&CommonRepository<object>
      */
-    private $repository;
+    private MockObject $repository;
 
     /**
      * @var StatsEvent|MockObject
      */
-    private $statsEvent;
+    private MockObject $statsEvent;
 
     /**
      * @var CommonStatsSubscriber|MockObject
      */
-    private $subscirber;
+    private MockObject $subscirber;
 
     protected function setUp(): void
     {

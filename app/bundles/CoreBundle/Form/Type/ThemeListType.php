@@ -8,23 +8,21 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ThemeListType extends AbstractType
 {
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
-    public function __construct(ThemeHelperInterface $helper)
-    {
-        $this->themeHelper = $helper;
+    public function __construct(
+        private ThemeHelperInterface $themeHelper
+    ) {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'choices'           => function (Options $options) {
+                'choices'           => function (Options $options): array {
                     $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
                     $themes['mautic_code_mode'] = 'Code Mode';
 

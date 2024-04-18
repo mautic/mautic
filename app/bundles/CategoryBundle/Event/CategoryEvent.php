@@ -29,7 +29,7 @@ class CategoryEvent extends CommonEvent
     /**
      * Sets the Category entity.
      */
-    public function setCategory(Category $category)
+    public function setCategory(Category $category): void
     {
         $this->entity = $category;
     }

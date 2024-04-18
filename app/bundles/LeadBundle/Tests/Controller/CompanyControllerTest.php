@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CompanyControllerTest extends MauticMysqlTestCase
@@ -18,20 +19,20 @@ class CompanyControllerTest extends MauticMysqlTestCase
         parent::setUp();
 
         $companiesData = [
-          1 => [
-            'name'     => 'Amazon',
-            'state'    => 'Washington',
-            'city'     => 'Seattle',
-            'country'  => 'United States',
-            'industry' => 'Goods',
-          ],
-          2 => [
-            'name'     => 'Google',
-            'state'    => 'Washington',
-            'city'     => 'Seattle',
-            'country'  => 'United States',
-            'industry' => 'Services',
-          ],
+            1 => [
+                'name'     => 'Amazon',
+                'state'    => 'Washington',
+                'city'     => 'Seattle',
+                'country'  => 'United States',
+                'industry' => 'Goods',
+            ],
+            2 => [
+                'name'     => 'Google',
+                'state'    => 'Washington',
+                'city'     => 'Seattle',
+                'country'  => 'United States',
+                'industry' => 'Services',
+            ],
         ];
 
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -133,5 +134,15 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    public function testNonExitingCompanyIsRedirected(): void
+    {
+        $this->client->followRedirects(false);
+        $this->client->request(
+            Request::METHOD_GET,
+            's/companies/view/1000',
+        );
+        $this->assertEquals(true, $this->client->getResponse()->isRedirect('/s/companies'));
     }
 }

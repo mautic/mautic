@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DynamicContentDecisionType extends DynamicContentSendType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'dwc_slot_name',
@@ -50,10 +50,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'dwcdecision_list';
     }

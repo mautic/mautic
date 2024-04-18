@@ -26,24 +26,23 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MessageQueueModel extends FormModel
 {
-    /** @var string A default message reschedule interval */
+    /**
+     * @var string A default message reschedule interval
+     */
     public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper, EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
-    {
-        $this->leadModel            = $leadModel;
-        $this->companyModel         = $companyModel;
-
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected CompanyModel $companyModel,
+        CoreParametersHelper $coreParametersHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -52,19 +51,16 @@ class MessageQueueModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\MessageQueue::class);
+        return $this->em->getRepository(MessageQueue::class);
     }
 
     /**
-     * @param null   $campaignEventId
      * @param int    $attempts
      * @param int    $priority
-     * @param null   $messageQueue
+     * @param mixed  $messageQueue
      * @param string $statTableName
      * @param string $statContactColumn
      * @param string $statSentColumn
-     *
-     * @return array
      */
     public function processFrequencyRules(
         array &$leads,
@@ -77,7 +73,7 @@ class MessageQueueModel extends FormModel
         $statTableName = 'email_stats',
         $statContactColumn = 'lead_id',
         $statSentColumn = 'date_sent'
-    ) {
+    ): array {
         $leadIds = array_keys($leads);
         $leadIds = array_combine($leadIds, $leadIds);
 
@@ -161,7 +157,7 @@ class MessageQueueModel extends FormModel
             $messageQueue->setDatePublished(new \DateTime());
             $messageQueue->setMaxAttempts($maxAttempts);
             $messageQueue->setLead(
-                ($lead instanceof Lead) ? $lead : $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId)
+                ($lead instanceof Lead) ? $lead : $this->em->getReference(Lead::class, $leadId)
             );
             $messageQueue->setPriority($priority);
             $messageQueue->setScheduledDate($scheduledDate);
@@ -179,13 +175,7 @@ class MessageQueueModel extends FormModel
         return true;
     }
 
-    /**
-     * @param null $channel
-     * @param null $channelId
-     *
-     * @return int
-     */
-    public function sendMessages($channel = null, $channelId = null)
+    public function sendMessages($channel = null, $channelId = null): int
     {
         // Note when the process started for batch purposes
         $processStarted = new \DateTime();
@@ -197,7 +187,9 @@ class MessageQueueModel extends FormModel
             $event   = $queue->getEvent();
             $lead    = $queue->getLead();
 
-            $this->em->detach($event);
+            if ($event) {
+                $this->em->detach($event);
+            }
             $this->em->detach($lead);
             $this->em->detach($queue);
         }
@@ -205,10 +197,7 @@ class MessageQueueModel extends FormModel
         return $counter;
     }
 
-    /**
-     * @return int
-     */
-    public function processMessageQueue($queue)
+    public function processMessageQueue($queue): int
     {
         if (!is_array($queue)) {
             if (!$queue instanceof MessageQueue) {
@@ -232,9 +221,7 @@ class MessageQueueModel extends FormModel
         }
         if (!empty($contacts)) {
             $contactData = $this->leadModel->getRepository()->getContacts($contacts);
-            $companyData = $this->companyModel->getRepository()->getCompaniesForContacts($contacts);
             foreach ($contacts as $messageId => $contactId) {
-                $contactData[$contactId]['companies'] = isset($companyData[$contactId]) ? $companyData[$contactId] : null;
                 $queue[$messageId]->getLead()->setFields($contactData[$contactId]);
             }
         }
@@ -301,7 +288,7 @@ class MessageQueueModel extends FormModel
     /**
      * @param bool $persist
      */
-    public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false)
+    public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false): void
     {
         if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
             $message = $this->getRepository()->findMessage($channel, $channelId, $leadId);
@@ -332,32 +319,27 @@ class MessageQueueModel extends FormModel
      * @deprecated to be removed in 3.0; use reschedule method instead
      *
      * @param string $rescheduleInterval
-     * @param null   $leadId
-     * @param null   $channel
-     * @param null   $channelId
      * @param bool   $persist
      */
-    public function rescheduleMessage($message, $rescheduleInterval = null, $leadId = null, $channel = null, $channelId = null, $persist = false)
+    public function rescheduleMessage($message, $rescheduleInterval = null, $leadId = null, $channel = null, $channelId = null, $persist = false): void
     {
         $rescheduleInterval = null == $rescheduleInterval ? self::DEFAULT_RESCHEDULE_INTERVAL : ('P'.$rescheduleInterval);
 
-        return $this->reschedule($message, new \DateInterval($rescheduleInterval), $leadId, $channel, $channelId, $persist);
+        $this->reschedule($message, new \DateInterval($rescheduleInterval), $leadId, $channel, $channelId, $persist);
     }
 
     /**
      * @param array $channelIds
      */
-    public function getQueuedChannelCount($channel, $channelIds = [])
+    public function getQueuedChannelCount($channel, $channelIds = []): int
     {
         return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         switch ($action) {
             case 'process_message_queue':

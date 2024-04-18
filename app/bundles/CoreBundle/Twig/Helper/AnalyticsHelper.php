@@ -6,20 +6,14 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final class AnalyticsHelper
 {
-    /**
-     * @var string
-     */
-    private $code;
+    private string $code;
 
     public function __construct(CoreParametersHelper $parametersHelper)
     {
         $this->code = htmlspecialchars_decode((string) $parametersHelper->get('google_analytics'));
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -33,9 +27,9 @@ final class AnalyticsHelper
         $analytics = $this->getCode();
 
         // Check for html doc
-        if (false === strpos($content, '<html')) {
+        if (!str_contains($content, '<html')) {
             $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
-        } elseif (false === strpos($content, '<head>')) {
+        } elseif (!str_contains($content, '<head>')) {
             $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
         } elseif (!empty($analytics)) {
             $content = str_replace('</head>', $analytics."\n</head>", $content);
@@ -44,10 +38,7 @@ final class AnalyticsHelper
         return $content;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'analytics';
     }

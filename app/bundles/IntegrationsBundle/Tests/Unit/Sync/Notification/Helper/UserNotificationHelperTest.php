@@ -20,32 +20,29 @@ class UserNotificationHelperTest extends TestCase
     /**
      * @var Writer|MockObject
      */
-    private $writer;
+    private MockObject $writer;
 
     /**
      * @var UserHelper|MockObject
      */
-    private $userHelper;
+    private MockObject $userHelper;
 
     /**
      * @var OwnerProvider|MockObject
      */
-    private $ownerProvider;
+    private MockObject $ownerProvider;
 
     /**
      * @var RouteHelper|MockObject
      */
-    private $routeHelper;
+    private MockObject $routeHelper;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var UserNotificationHelper
-     */
-    private $helper;
+    private UserNotificationHelper $helper;
 
     protected function setUp(): void
     {

@@ -12,17 +12,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelExporter
 {
-    /**
-     * @var FormatterHelper
-     */
-    protected $formatterHelper;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
-    {
-        $this->formatterHelper      = $formatterHelper;
-        $this->translator           = $translator;
+    public function __construct(
+        protected FormatterHelper $formatterHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -30,7 +23,7 @@ class ExcelExporter
      *
      * @throws \Exception
      */
-    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output')
+    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output'): void
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');

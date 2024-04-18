@@ -3,41 +3,38 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Page>
+ */
 class PreferenceCenterListType extends AbstractType
 {
-    /**
-     * @var PageModel
-     */
-    private $model;
-
     /**
      * @var bool
      */
     private $canViewOther = false;
 
-    public function __construct(PageModel $pageModel, CorePermissions $corePermissions)
-    {
-        $this->model        = $pageModel;
+    public function __construct(
+        private PageModel $model,
+        CorePermissions $corePermissions
+    ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $model        = $this->model;
         $canViewOther = $this->canViewOther;
 
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) use ($model, $canViewOther) {
+                'choices' => function (Options $options) use ($model, $canViewOther): array {
                     $choices = [];
                     $pages   = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], ['isPreferenceCenter']);
                     foreach ($pages as $page) {
@@ -61,15 +58,12 @@ class PreferenceCenterListType extends AbstractType
                 'required'          => false,
                 'top_level'         => 'variant',
                 'ignore_ids'        => [],
-                ]
+            ]
         );
 
         $resolver->setDefined(['top_level', 'ignore_ids']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return ChoiceType::class;

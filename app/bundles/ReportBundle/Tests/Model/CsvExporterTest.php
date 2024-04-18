@@ -71,7 +71,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testExport()
+    public function testExport(): void
     {
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
         $this->csvExporter->export($reportDataResult, $this->file);
