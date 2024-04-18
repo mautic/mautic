@@ -120,7 +120,7 @@ class TransportCallback
         $this->statRepository->saveEntity($stat);
     }
 
-    public function dispatchBounceEvent(Request $request, ?string $hashId, ?string $emailAddress): void
+    public function dispatchBounceEvent(Request $request, ?string $hashId = '', ?string $emailAddress = ''): void
     {
         if (empty($hashId) && empty($emailAddress)) {
             throw new \InvalidArgumentException();
@@ -129,7 +129,7 @@ class TransportCallback
         $result = null;
         if (!empty($hashId)) {
             $result = $this->finder->findByHash($hashId);
-        }elseif (!empty($emailAddress)) {
+        } elseif (!empty($emailAddress)) {
             $result = $this->finder->findByAddress($emailAddress);
         }
 
