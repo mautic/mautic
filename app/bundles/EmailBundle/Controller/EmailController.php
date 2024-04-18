@@ -1746,7 +1746,7 @@ class EmailController extends FormController
     /**
      * @throws \Exception
      */
-    public function exportCountriesStatsAction(int $objectId, string $format = 'csv'): StreamedResponse|Response
+    public function exportCountriesStatsAction(EmailModel $model, ExportHelper $exportHelper, int $objectId, string $format = 'csv'): StreamedResponse|Response
     {
         $model  = $this->getEmailModel();
         $entity = $model->getEntity($objectId);
