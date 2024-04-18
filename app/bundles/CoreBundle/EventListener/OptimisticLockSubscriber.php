@@ -37,7 +37,7 @@ class OptimisticLockSubscriber implements EventSubscriber
             return;
         }
 
-        $className     = get_class($object);
+        $className     = $object::class;
         $metadata      = $entityManager->getClassMetadata($className);
         $versionField  = $object->getVersionField();
         $versionColumn = $metadata->fieldNames[$versionField] ?? null;
@@ -50,7 +50,7 @@ class OptimisticLockSubscriber implements EventSubscriber
         $connection->createQueryBuilder()
             ->update($metadata->table['name'])
             ->set($versionColumn, "(@newVersion := {$versionColumn} + 1)")
-            ->where(implode(' AND ', array_map(function (string $name) {
+            ->where(implode(' AND ', array_map(function (string $name): string {
                 return "{$name} = :{$name}";
             }, $metadata->getIdentifierFieldNames())))
             ->setParameters($entityManager->getUnitOfWork()->getEntityIdentifier($object))
