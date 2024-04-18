@@ -801,7 +801,7 @@ class PageModel extends FormModel
     }
 
     /**
-     * @deprecated method not usefully and not use anymore
+     * @deprecated Use getUniqueVsReturningPieChartData() instead.
      *
      * Get data for pie chart showing new vs returning leads.
      * Returning leads are even leads who visit 2 different page once.
