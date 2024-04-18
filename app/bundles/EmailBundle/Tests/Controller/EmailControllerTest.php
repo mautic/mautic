@@ -8,7 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -119,7 +118,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->flashBagMock         = $this->createMock(FlashBag::class);
         $this->requestStack         = new RequestStack();
         $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
-        $exportHelper               = $this->createMock(ExportHelper::class);
 
         $helperUserMock->method('getUser')
             ->willReturn(new User(false));
@@ -136,8 +134,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             $this->translatorMock,
             $this->flashBagMock,
             $this->requestStack,
-            $this->corePermissionsMock,
-            $exportHelper
+            $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
