@@ -206,10 +206,6 @@ html {
   background-color: rgba(255, 255, 255, 0.09);
 }
 
-.gjs-f-button::before {
-  content: 'B';
-}
-
 .gjs-f-divider::before {
   content: 'D';
 }
@@ -263,3 +259,73 @@ html {
   display: inline-block;
   opacity: 0.5;
 }
+
+/* overrides for the icons now that they are SVGs */
+
+.gjs-pn-panel .gjs-block__media svg {
+  max-height: 48px;
+}
+
+/* Newsletter preset theme */
+
+.gjs-one-bg {
+  background-color: #373d49;
+}
+
+.gjs-one-color {
+  color: #373d49;
+}
+
+.gjs-one-color-h:hover {
+  color: #373d49;
+}
+
+.gjs-two-bg {
+  background-color: #dae5e6;
+}
+
+.gjs-two-color {
+  color: #dae5e6;
+}
+
+.gjs-two-color-h:hover {
+  color: #dae5e6;
+}
+
+.gjs-three-bg {
+  background-color: #4c9790;
+}
+
+.gjs-three-color {
+  color: #4c9790;
+}
+
+.gjs-three-color-h:hover {
+  color: #4c9790;
+}
+
+.gjs-four-bg {
+  background-color: #35d7bb;
+}
+
+.gjs-four-color {
+  color: #35d7bb;
+}
+
+.gjs-four-color-h:hover {
+  color: #35d7bb;
+}
+
+/* revert colors for nested panels */
+.gjs-mdl-dialog .panel {
+  color: var(--gjs-main-color);
+}
+
+.anim-spin {
+  animation: 0.5s linear 0s normal none infinite running spin; }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }
