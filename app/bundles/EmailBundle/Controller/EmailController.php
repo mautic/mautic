@@ -775,10 +775,10 @@ class EmailController extends FormController
             }
 
             if ($cancelled
-                || ($valid && ($this->getFormButton($form, ['buttons', 'save'])->isClicked() ||
-                    ($form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked()) ||
-                    ($form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked()) ||
-                    ($form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked())))
+                || ($valid && ($this->getFormButton($form, ['buttons', 'save'])->isClicked()
+                    || ($form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked())
+                    || ($form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked())
+                    || ($form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked())))
             ) {
                 $viewParameters = [
                     'objectAction' => 'view',
