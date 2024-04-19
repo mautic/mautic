@@ -37,7 +37,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'points',
                 'path'            => '/points',
-                'controller'      => \Mautic\PointBundle\Controller\Api\PointApiController::class,
+                'controller'      => Mautic\PointBundle\Controller\Api\PointApiController::class,
             ],
             'mautic_api_getpointactiontypes' => [
                 'path'       => '/points/actions/types',
@@ -47,7 +47,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
-                'controller'      => \Mautic\PointBundle\Controller\Api\TriggerApiController::class,
+                'controller'      => Mautic\PointBundle\Controller\Api\TriggerApiController::class,
             ],
             'mautic_api_getpointtriggereventtypes' => [
                 'path'       => '/points/triggers/events/types',
@@ -70,7 +70,7 @@ return [
         'main' => [
             'mautic.points.menu.root' => [
                 'id'        => 'mautic_points_root',
-                'iconClass' => 'fa-calculator',
+                'iconClass' => 'ri-focus-2-fill',
                 'access'    => ['point:points:view', 'point:triggers:view', 'point:groups:view'],
                 'priority'  => 30,
                 'children'  => [

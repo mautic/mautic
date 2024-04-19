@@ -17,7 +17,7 @@ class LeadNote extends FormEntity
     private $id;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     private $lead;
 
@@ -41,7 +41,7 @@ class LeadNote extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_notes')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\LeadNoteRepository::class);
+            ->setCustomRepositoryClass(LeadNoteRepository::class);
 
         $builder->addId();
 

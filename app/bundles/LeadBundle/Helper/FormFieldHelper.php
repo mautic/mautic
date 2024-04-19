@@ -69,7 +69,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             'properties' => [],
         ],
         'html' => [
-          'properties' => [],
+            'properties' => [],
         ],
         'number' => [
             'properties' => [

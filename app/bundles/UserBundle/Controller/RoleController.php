@@ -17,7 +17,7 @@ class RoleController extends FormController
      *
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
@@ -102,7 +102,7 @@ class RoleController extends FormController
     /**
      * Generate's new role form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
@@ -186,7 +186,7 @@ class RoleController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
@@ -194,7 +194,7 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\UserBundle\Model\RoleModel $model */
+        /** @var RoleModel $model */
         $model  = $this->getModel('user.role');
         $entity = $model->getEntity($objectId);
 
@@ -297,7 +297,7 @@ class RoleController extends FormController
         $translator        = $this->translator;
 
         $permissionsArray = ($role->getId()) ?
-            $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
+            $this->get('doctrine')->getRepository(Entity\Permission::class)->getPermissionsByRole($role, true) :
             [];
 
         $permissions     = [];
@@ -440,7 +440,7 @@ class RoleController extends FormController
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
+                $users  = $this->get('doctrine')->getRepository(Entity\User::class)->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [

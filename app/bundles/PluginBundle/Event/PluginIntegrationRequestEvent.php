@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    private ?\Psr\Http\Message\ResponseInterface $response = null;
+    private ?ResponseInterface $response = null;
 
     /**
      * @param mixed[] $parameters
