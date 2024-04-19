@@ -227,9 +227,9 @@ class SearchStringHelper
     }
 
     private function setFilter(&$filters, &$baseName, &$keyCount, &$string, &$command, $overrideCommand,
-                                      $setFilter = true,
-                                      $type = null,
-                                      $setUpNext = true): void
+        $setFilter = true,
+        $type = null,
+        $setUpNext = true): void
     {
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = strtolower($type);

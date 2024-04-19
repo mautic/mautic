@@ -1,6 +1,6 @@
 <!-- Recent activity block(audit_log table) -->
 <div class="col-md-3 bg-white height-auto">
-	{{ customContent('right.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+	{{ customContent('right.section.top', _context) }}
 	<div class="panel bg-white shd-none bdr-rds-0 bdr-w-0 mb-0">
 		<div class="panel-heading">
 			<div class="panel-title">{% trans %}mautic.core.recent.activity{% endtrans %}</div>
@@ -190,6 +190,6 @@
 			{% endif %}
 		</div>
 	</div>
-	{{ customContent('right.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+	{{ customContent('right.section.bottom', _context) }}
 </div>
 <!-- Recent activity block(audit_log table) -->

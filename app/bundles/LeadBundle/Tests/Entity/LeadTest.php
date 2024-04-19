@@ -245,15 +245,15 @@ class LeadTest extends TestCase
         $lead->setFields(
             [
                 'core' => [
-                        'attribution_date' => [
-                            'type'  => 'date',
-                            'value' => 0,
-                        ],
-                        'attribution' => [
-                            'type'  => 'int',
-                            'value' => 0,
-                        ],
+                    'attribution_date' => [
+                        'type'  => 'date',
+                        'value' => 0,
                     ],
+                    'attribution' => [
+                        'type'  => 'int',
+                        'value' => 0,
+                    ],
+                ],
             ]
         );
 

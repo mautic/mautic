@@ -16,24 +16,24 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|SchedulerRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $schedulerRepository;
+    private MockObject $schedulerRepository;
 
     /**
      * @var MockObject|EntityManager
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject|SchedulerPlanner
      */
-    private \PHPUnit\Framework\MockObject\MockObject $schedulerPlanner;
+    private MockObject $schedulerPlanner;
 
     /**
      * @var MockObject|ExportOption
      */
-    private \PHPUnit\Framework\MockObject\MockObject $exportOption;
+    private MockObject $exportOption;
 
-    private \Mautic\ReportBundle\Model\ScheduleModel $scheduleModel;
+    private ScheduleModel $scheduleModel;
 
     protected function setUp(): void
     {
