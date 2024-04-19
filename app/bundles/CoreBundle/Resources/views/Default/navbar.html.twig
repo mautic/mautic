@@ -10,14 +10,15 @@
                 <i class="fa fa-navicon fs-16"></i>
             </a>
         </li>
-        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
         {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
     </ul>
     <!--/ end: left nav -->
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
+        
         {{ include('@MauticCore/Menu/profile.html.twig') }}
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
         <li>
             <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
                 <i class="ri-settings-5-line ri-xl"></i>

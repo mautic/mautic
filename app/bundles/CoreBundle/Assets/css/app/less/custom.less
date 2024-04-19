@@ -126,7 +126,7 @@ label.required:after {
     left: 0px;
     width: 24px;
     height: 34px;
-    padding: 0 0 0 24px;
+    padding: 0 0 0 32px;
     margin: 12px 0 0 5px;
     z-index: 1;
     .transition(all 0.5s ease);
@@ -343,6 +343,11 @@ ul.media-list.media-list-feed div.media-object
 .ui-sortable-handle:active {
   cursor: grabbing;
 }
+
+.flex-column-inline {
+  display: inline-flex;
+  flex-direction: column;
+}
 .notification {
   width: inherit !important;
 }
@@ -353,6 +358,7 @@ ul.media-list.media-list-feed div.media-object
   width: 100px;
   margin: 50px;
 }
+
 .flip-vertically {
   transform: scaleY(-1);
 }
