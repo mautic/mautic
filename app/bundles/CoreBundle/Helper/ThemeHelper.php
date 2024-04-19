@@ -36,9 +36,9 @@ class ThemeHelper implements ThemeHelperInterface
      */
     private array $themeHelpers = [];
 
-    private \Mautic\CoreBundle\Helper\Filesystem $filesystem;
+    private Filesystem $filesystem;
 
-    private \Symfony\Component\Finder\Finder $finder;
+    private Finder $finder;
 
     private bool $themesLoadedFromFilesystem = false;
 

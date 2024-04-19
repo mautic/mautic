@@ -12,7 +12,7 @@ class DayStatTest extends TestCase
 
     private $hour = 11;
 
-    private \Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat $dayStat;
+    private DayStat $dayStat;
 
     private $hourStat;
 
