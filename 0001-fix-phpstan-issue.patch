@@ -1,0 +1,225 @@
+From ce8722f8a119e4e2f114c738f91a0d0c6126a729 Mon Sep 17 00:00:00 2001
+From: Saurabh Gupta <saurabh.gupta@acquia.com>
+Date: Fri, 19 Apr 2024 14:16:51 +0530
+Subject: [PATCH] fix phpstan issue
+
+---
+ .../Resources/views/Helper/builder.html.twig  |  2 +-
+ .../Controller/EmailController.php            |  6 +--
+ app/bundles/EmailBundle/Entity/EmailDraft.php | 49 +++----------------
+ .../EmailBundle/Helper/EmailConfig.php        | 16 +-----
+ .../Helper/EmailConfigInterface.php           |  9 ----
+ .../Resources/views/Email/_list.html.twig     |  2 +-
+ .../Resources/views/Email/details.html.twig   |  2 +-
+ 7 files changed, 15 insertions(+), 71 deletions(-)
+
+diff --git a/app/bundles/CoreBundle/Resources/views/Helper/builder.html.twig b/app/bundles/CoreBundle/Resources/views/Helper/builder.html.twig
+index 295a7ed020..12767225eb 100644
+--- a/app/bundles/CoreBundle/Resources/views/Helper/builder.html.twig
++++ b/app/bundles/CoreBundle/Resources/views/Helper/builder.html.twig
+@@ -18,7 +18,7 @@
+     </div>
+     <div class="builder-panel">
+         <div class="builder-panel-top">
+-            {{ include('@MauticCore/Helper/builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');', 'draftDetail'   => draftDetail is defined ? draftDetail : null,}, with_context=false) }}
++            {{ include('@MauticCore/Helper/builder_buttons.html.twig', {'onclick': 'Mautic.closeBuilder(\'' ~ type ~'\');', 'draftDetail' : draftDetail is defined ? draftDetail : null,}, with_context=false) }}
+ 
+             <div class="code-mode-toolbar {% if not isCodeMode %}hide{% endif %}">
+                 <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.core.media.manager.desc'|trans }}">
+diff --git a/app/bundles/EmailBundle/Controller/EmailController.php b/app/bundles/EmailBundle/Controller/EmailController.php
+index 8d169ec3f5..57be5c8f80 100644
+--- a/app/bundles/EmailBundle/Controller/EmailController.php
++++ b/app/bundles/EmailBundle/Controller/EmailController.php
+@@ -714,7 +714,7 @@ class EmailController extends FormController
+             if (!$cancelled = $this->isFormCancelled($form)) {
+                 $existingEmail = clone $entity;
+                 $this->restoreNullifiedFieldsDuringClone($existingEmail, $entity);
+-                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($emailform, $form, $entity)) {
++                if ($valid = $this->isFormValid($form)) {
+                     $content = $entity->getCustomHtml();
+                     $entity->setCustomHtml($content);
+ 
+@@ -722,7 +722,7 @@ class EmailController extends FormController
+                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+ 
+                     if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
+-                        $this->dispatcher->dispatch(EmailEvents::ON_EMAIL_EDIT_SUBMIT, new EmailEditSubmitEvent(
++                        $this->dispatcher->dispatch(new EmailEditSubmitEvent(
+                             $existingEmail,
+                             $entity,
+                             $form->get('buttons')->get('save')->isClicked(),
+@@ -730,7 +730,7 @@ class EmailController extends FormController
+                             ($form->get('buttons')->has('save_draft') && $form->get('buttons')->get('save_draft')->isClicked()),
+                             ($form->get('buttons')->has('apply_draft') && $form->get('buttons')->get('apply_draft')->isClicked()),
+                             ($form->get('buttons')->has('discard_draft') && $form->get('buttons')->get('discard_draft')->isClicked())
+-                        ));
++                        ), EmailEvents::ON_EMAIL_EDIT_SUBMIT);
+                     }
+ 
+                     $this->addFlashMessage(
+diff --git a/app/bundles/EmailBundle/Entity/EmailDraft.php b/app/bundles/EmailBundle/Entity/EmailDraft.php
+index 5d0f12706d..efeedf1eae 100644
+--- a/app/bundles/EmailBundle/Entity/EmailDraft.php
++++ b/app/bundles/EmailBundle/Entity/EmailDraft.php
+@@ -2,60 +2,22 @@
+ 
+ declare(strict_types=1);
+ 
+-/*
+- * @copyright   2020 Mautic Contributors. All rights reserved
+- * @author      Mautic
+- *
+- * @link        http://mautic.org
+- *
+- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+- */
+-
+ namespace Mautic\EmailBundle\Entity;
+ 
+-use Doctrine\DBAL\Types\Type;
+ use Doctrine\DBAL\Types\Types;
+ use Doctrine\ORM\Events;
+ use Doctrine\ORM\Mapping as ORM;
+ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+-use Mautic\CoreBundle\Entity\FormEntity;
+ 
+ /**
+  * Class EmailDraft.
+  */
+ class EmailDraft
+ {
+-    /**
+-     * @var int
+-     */
+-    private $id;
+-
+-    /**
+-     * @var Email
+-     */
+-    private $email;
+-
+-    /**
+-     * @var string
+-     */
+-    private $html;
++    private int $id;
+ 
+-    /**
+-     * @var string
+-     */
+-    private $template;
+-
+-    /**
+-     * @var bool
+-     */
+-    private $publicPreview;
+-
+-    public function __construct(Email $email, string $html, string $template, bool $publicPreview = true)
++    public function __construct(private Email $email, private string $html, private  string $template, private bool $publicPreview = true)
+     {
+-        $this->email         = $email;
+-        $this->html          = $html;
+-        $this->template      = $template;
+-        $this->publicPreview = $publicPreview;
+     }
+ 
+     public static function loadMetadata(ORM\ClassMetadata $metadata): void
+@@ -148,7 +110,12 @@ class EmailDraft
+ 
+     public function isPublicPreview(): bool
+     {
+-        return (bool) $this->publicPreview;
++        return $this->publicPreview;
++    }
++
++    public function getPublishStatus(): bool
++    {
++        return $this->publicPreview;
+     }
+ 
+     public function setPublicPreview(bool $publicPreview): void
+diff --git a/app/bundles/EmailBundle/Helper/EmailConfig.php b/app/bundles/EmailBundle/Helper/EmailConfig.php
+index acfdccf2d9..0ffea6858f 100644
+--- a/app/bundles/EmailBundle/Helper/EmailConfig.php
++++ b/app/bundles/EmailBundle/Helper/EmailConfig.php
+@@ -2,15 +2,6 @@
+ 
+ declare(strict_types=1);
+ 
+-/*
+- * @copyright   2020 Mautic. All rights reserved
+- * @author      Mautic
+- *
+- * @link        https://mautic.org
+- *
+- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+- */
+-
+ namespace Mautic\EmailBundle\Helper;
+ 
+ use Mautic\CoreBundle\Helper\CoreParametersHelper;
+@@ -19,14 +10,9 @@ use Mautic\EmailBundle\Helper\EmailConfigInterface;
+ 
+ final class EmailConfig implements EmailConfigInterface
+ {
+-    /**
+-     * @var CoreParametersHelper
+-     */
+-    private $coreParametersHelper;
+ 
+-    public function __construct(CoreParametersHelper $coreParametersHelper)
++    public function __construct(private CoreParametersHelper $coreParametersHelper)
+     {
+-        $this->coreParametersHelper = $coreParametersHelper;
+     }
+ 
+     public function isDraftEnabled(): bool
+diff --git a/app/bundles/EmailBundle/Helper/EmailConfigInterface.php b/app/bundles/EmailBundle/Helper/EmailConfigInterface.php
+index e5be84b9ea..f8aa5210f6 100644
+--- a/app/bundles/EmailBundle/Helper/EmailConfigInterface.php
++++ b/app/bundles/EmailBundle/Helper/EmailConfigInterface.php
+@@ -2,15 +2,6 @@
+ 
+ declare(strict_types=1);
+ 
+-/*
+- * @copyright   2020 Mautic. All rights reserved
+- * @author      Mautic
+- *
+- * @link        https://mautic.org
+- *
+- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+- */
+-
+ namespace Mautic\EmailBundle\Helper;
+ 
+ use Mautic\EmailBundle\Entity\Email;
+diff --git a/app/bundles/EmailBundle/Resources/views/Email/_list.html.twig b/app/bundles/EmailBundle/Resources/views/Email/_list.html.twig
+index fc66e83432..1304772472 100644
+--- a/app/bundles/EmailBundle/Resources/views/Email/_list.html.twig
++++ b/app/bundles/EmailBundle/Resources/views/Email/_list.html.twig
+@@ -130,7 +130,7 @@
+                                 {% if 'list' == type %}
+                                   <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="fa fa-fw fa-pie-chart"></i></span>
+                                 {% endif %}
+-                                {% if true === isDraftEnabled and hasDraft %}
++                                {% if isDraftEnabled and hasDraft %}
+                                 <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                                     <i class="fa fa-fw fa-file"></i>
+                                 </span>
+diff --git a/app/bundles/EmailBundle/Resources/views/Email/details.html.twig b/app/bundles/EmailBundle/Resources/views/Email/details.html.twig
+index bf197d3df5..71f214cadd 100644
+--- a/app/bundles/EmailBundle/Resources/views/Email/details.html.twig
++++ b/app/bundles/EmailBundle/Resources/views/Email/details.html.twig
+@@ -373,7 +373,7 @@
+           {% if draftPreviewUrl is not empty %}
+           <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+               <div class="panel-heading">
+-                  <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.draft.preview.url'); ?></div>
++                  <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
+               </div>
+               <div class="panel-body pt-xs">
+                   <div class="input-group">
+-- 
+2.39.3 (Apple Git-145)
+

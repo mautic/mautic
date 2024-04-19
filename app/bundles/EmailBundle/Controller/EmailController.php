@@ -714,7 +714,7 @@ class EmailController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $existingEmail = clone $entity;
                 $this->restoreNullifiedFieldsDuringClone($existingEmail, $entity);
-                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($emailform, $form, $entity)) {
+                if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
@@ -722,7 +722,7 @@ class EmailController extends FormController
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
-                        $this->dispatcher->dispatch(EmailEvents::ON_EMAIL_EDIT_SUBMIT, new EmailEditSubmitEvent(
+                        $this->dispatcher->dispatch(new EmailEditSubmitEvent(
                             $existingEmail,
                             $entity,
                             $form->get('buttons')->get('save')->isClicked(),
@@ -730,7 +730,7 @@ class EmailController extends FormController
                             ($form->get('buttons')->has('save_draft') && $form->get('buttons')->get('save_draft')->isClicked()),
                             ($form->get('buttons')->has('apply_draft') && $form->get('buttons')->get('apply_draft')->isClicked()),
                             ($form->get('buttons')->has('discard_draft') && $form->get('buttons')->get('discard_draft')->isClicked())
-                        ));
+                        ), EmailEvents::ON_EMAIL_EDIT_SUBMIT);
                     }
 
                     $this->addFlashMessage(

@@ -2,60 +2,22 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Entity\FormEntity;
 
 /**
  * Class EmailDraft.
  */
 class EmailDraft
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private int $id;
 
-    /**
-     * @var Email
-     */
-    private $email;
-
-    /**
-     * @var string
-     */
-    private $html;
-
-    /**
-     * @var string
-     */
-    private $template;
-
-    /**
-     * @var bool
-     */
-    private $publicPreview;
-
-    public function __construct(Email $email, string $html, string $template, bool $publicPreview = true)
+    public function __construct(private Email $email, private string $html, private  string $template, private bool $publicPreview = true)
     {
-        $this->email         = $email;
-        $this->html          = $html;
-        $this->template      = $template;
-        $this->publicPreview = $publicPreview;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -148,7 +110,12 @@ class EmailDraft
 
     public function isPublicPreview(): bool
     {
-        return (bool) $this->publicPreview;
+        return $this->publicPreview;
+    }
+
+    public function getPublishStatus(): bool
+    {
+        return $this->publicPreview;
     }
 
     public function setPublicPreview(bool $publicPreview): void
