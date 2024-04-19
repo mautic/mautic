@@ -13,8 +13,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class EmailDraftModel
 {
     public function __construct(
-       private EntityManagerInterface $entityManager,
-       private EmailDraftRepository $emailDraftRepository
+        private EntityManagerInterface $entityManager,
+        private EmailDraftRepository $emailDraftRepository
     ) {
     }
 

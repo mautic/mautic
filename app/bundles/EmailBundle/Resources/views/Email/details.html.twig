@@ -370,7 +370,7 @@
           </div>
 
           <!-- Draft preview URL -->
-          {% if draftPreviewUrl is not empty %}
+          {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
           <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>

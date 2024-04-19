@@ -51,7 +51,7 @@
                 </div>
             </div>
         {% endif %}
-        {% if draftPreviewUrl %}
+        {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
         <div class="panel panel-default" id="preview">
             <div class="panel-heading">
                 <h4 class="panel-title">{{ 'mautic.email.drafturlvariant'|trans }}</h4>

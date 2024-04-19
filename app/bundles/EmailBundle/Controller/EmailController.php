@@ -774,8 +774,8 @@ class EmailController extends FormController
                 );
             }
 
-            if ($cancelled ||
-                ($valid && ($this->getFormButton($form, ['buttons', 'save'])->isClicked() ||
+            if ($cancelled
+                || ($valid && ($this->getFormButton($form, ['buttons', 'save'])->isClicked() ||
                     ($form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked()) ||
                     ($form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked()) ||
                     ($form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked())))
@@ -1184,7 +1184,7 @@ class EmailController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, EmailConfig $emailConfig, $objectId)
     {
         $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
@@ -1212,7 +1212,7 @@ class EmailController extends FormController
             $clone->setVariantParent($entity);
         }
 
-        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $clone);
+        return $this->newAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $clone);
     }
 
     /**

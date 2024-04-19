@@ -203,7 +203,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
-    private EmailDraft|null $draft;
+    private ?EmailDraft $draft = null;
 
     private bool $isCloned = false;
 

@@ -448,13 +448,13 @@ class PublicController extends CommonFormController
         /** @var EmailModel $model */
         $model         = $this->getModel('email');
         $emailEntity   = $model->getEntity($objectId);
+        if (null === $emailEntity) {
+            return $this->notFound();
+        }
         $publicPreview = $emailEntity->isPublicPreview();
         $draftEnabled  = $emailConfig->isDraftEnabled();
         if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
             $publicPreview = $emailEntity->getDraft()->isPublicPreview();
-        }
-        if (null === $emailEntity) {
-            return $this->notFound();
         }
 
         if (
