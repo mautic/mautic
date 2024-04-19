@@ -33,7 +33,7 @@ class DashboardModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         private PathsHelper $pathsHelper,
-        private WidgetDetailEventFactory $eventFactory,
+        private WidgetDetailEventFactory $widgetEventFactory,
         private Filesystem $filesystem,
         private RequestStack $requestStack,
         EntityManagerInterface $em,
@@ -141,6 +141,20 @@ class DashboardModel extends FormModel
     }
 
     /**
+     * Fill widgets with their empty content.
+     *
+     * @param array<mixed> $widgets
+     */
+    public function populateWidgetPreviews(&$widgets): void
+    {
+        if (count($widgets)) {
+            foreach ($widgets as &$widget) {
+                $this->populateWidgetPreview($widget);
+            }
+        }
+    }
+
+    /**
      * Fill widgets with their content.
      *
      * @param array $widgets
@@ -177,6 +191,16 @@ class DashboardModel extends FormModel
     }
 
     /**
+     * Populate widget preview.
+     */
+    public function populateWidgetPreview(Widget $widget): void
+    {
+        $event = $this->widgetEventFactory->create($widget);
+
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD);
+    }
+
+    /**
      * Load widget content from the onWidgetDetailGenerate event.
      *
      * @param array $filter
@@ -206,7 +230,7 @@ class DashboardModel extends FormModel
         $widget->setParams($resultParams);
 
         $this->dispatcher->dispatch(
-            $this->eventFactory->create($widget),
+            $this->widgetEventFactory->create($widget),
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
         );
     }

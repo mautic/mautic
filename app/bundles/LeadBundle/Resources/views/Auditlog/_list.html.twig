@@ -93,7 +93,7 @@
               {% set rowStripe = cycle(['', 'timeline-row-highlighted'], loop.index0) %}
               {% set hasDetails = false %}
               {% for key, value in event.details %}
-                  {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key %}
+                  {% if event.contentTemplate is defined and event.details|length > 0 %}
                       {% set hasDetails = true %}
                   {% endif %}
               {% endfor %}

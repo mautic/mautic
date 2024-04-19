@@ -14,7 +14,7 @@ class ObjectChangeDAO
      */
     private array $fields = [];
 
-    private ?\Mautic\IntegrationsBundle\Entity\ObjectMapping $objectMapping = null;
+    private ?ObjectMapping $objectMapping = null;
 
     /**
      * @var FieldDAO[]

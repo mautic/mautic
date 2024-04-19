@@ -30,9 +30,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -91,12 +93,13 @@ class ReportModel extends FormModel
         return 'report:reports';
     }
 
-    protected function getSession(): Session
+    protected function getSession(): SessionInterface
     {
-        $session = $this->requestStack->getSession();
-        \assert($session instanceof Session);
-
-        return $session;
+        try {
+            return $this->requestStack->getSession();
+        } catch (SessionNotFoundException) {
+            return new Session(); // in case of CLI
+        }
     }
 
     /**
@@ -136,7 +139,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -555,7 +558,11 @@ class ReportModel extends FormModel
             }
         }
 
-        $query->add('orderBy', $order);
+        $columnsAllowed = $this->getColumnList($entity->getSource());
+        $order          = $this->getOrderBySanitized($order, $columnsAllowed);
+        if ($order['hasOrderBy']) {
+            $query->add('orderBy', $order['orderBy']);
+        }
 
         // Allow plugin to manipulate the query
         $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
@@ -643,6 +650,55 @@ class ReportModel extends FormModel
             'debug'             => $debugData,
             'aggregatorColumns' => $dataAggregatorColumns,
         ];
+    }
+
+    /**
+     * Sanitize order by array comparing it to the allowed columns.
+     *
+     * @param iterable<mixed> $orderBys
+     *
+     * @return iterable<mixed>
+     */
+    private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
+    {
+        $hasOrderBy = false;
+        foreach ($orderBys as $key => $orderBy) {
+            if ($this->orderByIsValid($orderBy, $allowedColumns)) {
+                $hasOrderBy = true;
+                continue;
+            }
+            $orderBys[$key] = '';
+        }
+
+        return [
+            'orderBy'    => $orderBys,
+            'hasOrderBy' => $hasOrderBy,
+        ];
+    }
+
+    /**
+     * Check if order by is valid.
+     */
+    private function orderByIsValid(string $order, \stdClass $allowedColumns): bool
+    {
+        if (empty($order)) {
+            return false;
+        }
+
+        $orderBy         = $order;
+        $oderByDirection = '';
+
+        if (str_contains($order, ' ')) {
+            $orderTemp       = explode(' ', $order);
+            $orderBy         = $orderTemp[0];
+            $oderByDirection = $orderTemp[1];
+        }
+
+        if (!array_key_exists($orderBy, $allowedColumns->choices) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

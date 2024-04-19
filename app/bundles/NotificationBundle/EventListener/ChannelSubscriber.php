@@ -33,7 +33,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                 'notification',
                 [
                     MessageModel::CHANNEL_FEATURE => [
-                        'campaignAction'             => 'notification.send_notification',
+                        'campaignAction'             => CampaignSubscriber::EVENT_ACTION_SEND_NOTIFICATION,
                         'campaignDecisionsSupported' => [
                             'page.pagehit',
                             'asset.download',
@@ -59,7 +59,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                     'mobile_notification',
                     [
                         MessageModel::CHANNEL_FEATURE => [
-                            'campaignAction'             => 'notification.send_mobile_notification',
+                            'campaignAction'             => CampaignSubscriber::EVENT_ACTION_SEND_MOBILE_NOTIFICATION,
                             'campaignDecisionsSupported' => [
                                 'page.pagehit',
                                 'asset.download',

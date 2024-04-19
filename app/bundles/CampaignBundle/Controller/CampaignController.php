@@ -128,7 +128,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction(Request $request)
     {
@@ -190,7 +190,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes the entity.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction(Request $request, $objectId)
     {
@@ -210,7 +210,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, $page = null)
     {
@@ -330,7 +330,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
@@ -452,7 +452,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * View a specific campaign.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {
@@ -945,6 +945,7 @@ class CampaignController extends AbstractStandardFormController
                 break;
             case 'new':
             case 'edit':
+                $session                = $this->getCurrentRequest()->getSession();
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
@@ -952,6 +953,7 @@ class CampaignController extends AbstractStandardFormController
                         'campaignEvents'  => $this->campaignEvents,
                         'campaignSources' => $this->campaignSources,
                         'deletedEvents'   => $this->deletedEvents,
+                        'hasEventClone'   => $session->has('mautic.campaign.events.clone.storage'),
                     ]
                 );
                 break;
@@ -1138,10 +1140,10 @@ class CampaignController extends AbstractStandardFormController
 
         // rewrite stats data from parent condition if exist
         foreach ($events as &$event) {
-            if (!empty($event['decisionPath']) &&
-                !empty($event['parent_id']) &&
-                isset($events[$event['parent_id']]) &&
-                'condition' !== $event['eventType']) {
+            if (!empty($event['decisionPath'])
+                && !empty($event['parent_id'])
+                && isset($events[$event['parent_id']])
+                && 'condition' !== $event['eventType']) {
                 $parentEvent                 = $events[$event['parent_id']];
                 $event['percent']            = $parentEvent['percent'];
                 $event['yesPercent']         = $parentEvent['yesPercent'];

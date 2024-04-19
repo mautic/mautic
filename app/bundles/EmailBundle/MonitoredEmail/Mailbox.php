@@ -932,8 +932,7 @@ class Mailbox
                     case TYPEMULTIPART:
                         if (
                             'report' != $subtype
-                            ||
-                            empty($params['report-type'])
+                            || empty($params['report-type'])
                         ) {
                             break;
                         }

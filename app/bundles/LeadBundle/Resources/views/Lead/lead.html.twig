@@ -38,7 +38,7 @@
               'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'email'}),
           },
           'btnText': 'mautic.lead.email.send_email'|trans,
-          'iconClass': 'fa fa-send',
+          'iconClass': 'ri-mail-send-line',
           'primary': true,
       }]) %}
     {% endif %}
@@ -53,7 +53,7 @@
               'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactFrequency'}),
           },
           'btnText': 'mautic.lead.contact.frequency'|trans,
-          'iconClass': 'fa fa-signal',
+          'iconClass': 'ri-settings-5-line',
       }]) %}
 
       {% if pointGroups is not empty %}
@@ -65,7 +65,7 @@
                   'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactGroupPoints'}),
               },
               'btnText': 'mautic.lead.groups.panel.title'|trans,
-              'iconClass': 'fa fa-calculator',
+              'iconClass': 'ri-focus-2-fill',
           }]) %}
       {% endif %}
 
@@ -82,7 +82,7 @@
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'campaign'}),
             },
             'btnText': 'mautic.campaign.campaigns'|trans,
-            'iconClass': 'fa fa-clock-o',
+            'iconClass': 'ri-megaphone-line',
       }]) %}
     {% endif %}
 
@@ -96,7 +96,7 @@
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'merge'}),
             },
             'btnText': 'mautic.lead.merge'|trans,
-            'iconClass': 'fa fa-user',
+            'iconClass': 'ri-exchange-2-line',
         }]) %}
     {% endif %}
 
@@ -108,7 +108,7 @@
                 'href': path('mautic_contact_export_action', {'contactId': lead.id}),
             },
             'btnText': 'mautic.core.export'|trans,
-            'iconClass': 'fa fa-download',
+            'iconClass': 'ri-export-line',
         }]) %}
     {% endif %}
 
@@ -191,6 +191,8 @@
                                                                 {% endif %}
                                                             {% elseif 'url' == field.type %}
                                                                 <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
+                                                            {% elseif 'html' == field.type %}
+                                                                <div style="resize: vertical; overflow: auto">{{ field.value|e }}</div>
                                                             {% elseif 'datetime' == field.type %}
                                                                 {{ dateToFullConcat(field.value, 'UTC') }}
                                                             {% else %}
@@ -269,7 +271,7 @@
                         {{ 'mautic.lead.lead.tab.notes'|trans }}
                     </a>
                 </li>
-                {% if not isAnonymous %}
+                {% if not isAnonymous and socialProfiles is not empty %}
                     <li class="">
                         <a href="#social-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="SocialCount">
@@ -325,7 +327,7 @@
             <!--/ #notes-container -->
 
             <!-- #social-container -->
-            {% if not isAnonymous %}
+            {% if not isAnonymous and socialProfiles is not empty %}
                 <div class="tab-pane fade bdr-w-0" id="social-container">
                     {{ include('@MauticLead/Social/index.html.twig', {
                         'lead': lead,
@@ -503,13 +505,16 @@
         {% endif %}
         <div class="pa-sm">
             {% for tag in lead.tags %}
-                <h5 class="pull-left mt-xs mr-xs">
-                    <span class="label label-success label-tag">
-                        <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
-                             {{ tag.tag|purify }}
-                        </a>
-                    </span>
-                </h5>
+                <div id="tagLabel{{ tag.id }}">
+                    <h5 class="pull-left mt-xs mr-xs">
+                        <span class="label label-success label-tag">
+                            <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
+                                {{ tag.tag|purify }}
+                            </a>
+                            <i class="fa fa-times has-click-event" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
+                        </span>
+                    </h5>
+                </div>
             {% endfor %}
             <div class="clearfix"></div>
         </div>
