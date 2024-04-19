@@ -21,7 +21,7 @@ class EnvironmentSubscriberTest extends TestCase
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+    private MockObject $coreParametersHelperMock;
 
     protected function setUp(): void
     {

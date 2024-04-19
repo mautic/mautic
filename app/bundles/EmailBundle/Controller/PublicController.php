@@ -24,6 +24,7 @@ use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
@@ -42,7 +43,7 @@ class PublicController extends CommonFormController
      */
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
@@ -111,7 +112,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
     {
         $stat                  = $model->getEmailStatus($idHash);
         $message               = '';
@@ -282,6 +283,7 @@ class PublicController extends CommonFormController
                             $lead->getPrimaryIdentifier(),
                             $html
                         );
+                        $pageModel->hitPage($prefCenter, $request, 200, $lead);
                     } else {
                         unset($html);
                     }
@@ -443,12 +445,11 @@ class PublicController extends CommonFormController
     public function previewAction(AnalyticsHelper $analyticsHelper, EmailConfig $emailConfig, Request $request, string $objectId, string $objectType = null)
     {
         $contactId = (int) $request->query->get('contactId');
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model         = $this->getModel('email');
         $emailEntity   = $model->getEntity($objectId);
         $publicPreview = $emailEntity->isPublicPreview();
-
-        $draftEnabled = $emailConfig->isDraftEnabled();
+        $draftEnabled  = $emailConfig->isDraftEnabled();
         if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
             $publicPreview = $emailEntity->getDraft()->isPublicPreview();
         }
@@ -656,7 +657,7 @@ class PublicController extends CommonFormController
             $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
         }
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         // email is a semicolon delimited list of emails

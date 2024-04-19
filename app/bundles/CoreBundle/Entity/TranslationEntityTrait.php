@@ -172,7 +172,7 @@ trait TranslationEntityTrait
      *
      * @param bool $onlyChildren
      *
-     * @return array|\Doctrine\Common\Collections\ArrayCollection
+     * @return array|ArrayCollection
      */
     public function getTranslations($onlyChildren = false)
     {

@@ -20,7 +20,7 @@ class FieldController extends FormController
      *
      * @param int $page
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction(Request $request, $page = 1)
     {
@@ -110,7 +110,7 @@ class FieldController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
@@ -228,7 +228,7 @@ class FieldController extends FormController
      *
      * @param bool|false $ignorePost
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
@@ -321,9 +321,9 @@ class FieldController extends FormController
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
-                            'viewParameters'  => ['objectId' => $field->getId()],
-                            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
-                        ]
+                        'viewParameters'  => ['objectId' => $field->getId()],
+                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+                    ]
                     )
                 );
             } elseif ($valid) {

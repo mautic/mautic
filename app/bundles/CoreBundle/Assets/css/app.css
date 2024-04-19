@@ -54,6 +54,15 @@
   font-weight: 700;
   src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700italic.woff2') format('woff2');
 }
+:root {
+  --timing: 0.3s ease;
+  --all: all var(--timing);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --timing: 0;
+  }
+}
 html,
 body {
   width: 100%;
@@ -729,11 +738,12 @@ body > #app-wrapper {
   padding-top: 20px;
 }
 .app-sidebar .nav-sidebar .sidebar-minimizer > .direction:after {
-  font-family: 'FontAwesome';
-  content: '\f053';
+  font-family: 'remixicon';
+  font-size: 18px;
+  content: '\EA64';
 }
 .app-sidebar .nav-sidebar .sidebar-minimizer.active .direction:after {
-  content: '\f054';
+  content: '\EA6E';
 }
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {
@@ -988,6 +998,9 @@ hr.hr-w-3,
 }
 .hr-expand.hr-w-3 a.arrow {
   top: -3px;
+}
+a {
+  transition: var(--all);
 }
 a:hover {
   cursor: pointer;
@@ -1327,6 +1340,9 @@ blockquote > p:after {
 .no-touchevents .scroll-wrapper > .scroll-bar {
   background-color: gray !important;
   right: 3px !important;
+}
+.btn {
+  transition: var(--all);
 }
 .btn,
 .btn:active,
@@ -4834,4 +4850,7 @@ ul.media-list.media-list-feed div.media-object {
 }
 .ui-sortable-handle:active {
   cursor: grabbing;
+}
+.flip-vertically {
+  transform: scaleY(-1);
 }

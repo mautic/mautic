@@ -49,106 +49,106 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|RequestStack
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
+    private MockObject $requestStackMock;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelperMock;
+    private MockObject $ipLookupHelperMock;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
+    private MockObject $pathsHelperMock;
 
     /**
      * @var MockObject|IntegrationHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $integrationHelperkMock;
+    private MockObject $integrationHelperkMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModelMock;
+    private MockObject $fieldModelMock;
 
     /**
      * @var MockObject|ListModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $listModelMock;
+    private MockObject $listModelMock;
 
     /**
      * @var MockObject|FormFactory
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formFactoryMock;
+    private MockObject $formFactoryMock;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyModelMock;
+    private MockObject $companyModelMock;
 
     /**
      * @var MockObject|CategoryModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $categoryModelMock;
+    private MockObject $categoryModelMock;
 
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
+    private ChannelListHelper $channelListHelperMock;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+    private MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|EmailValidator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $emailValidatorMock;
+    private MockObject $emailValidatorMock;
 
     /**
      * @var MockObject|UserProvider
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userProviderMock;
+    private MockObject $userProviderMock;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTrackerMock;
+    private MockObject $contactTrackerMock;
 
     /**
      * @var MockObject|DeviceTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackerMock;
+    private MockObject $deviceTrackerMock;
 
     /**
      * @var MockObject|IpAddressModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipAddressModelMock;
+    private MockObject $ipAddressModelMock;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
+    private MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|CompanyLeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyLeadRepositoryMock;
+    private MockObject $companyLeadRepositoryMock;
 
     /**
      * @var MockObject|UserHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userHelperMock;
+    private MockObject $userHelperMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var MockObject|EntityManager
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
+    private MockObject $entityManagerMock;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadModel $leadModel;
 
     /**
      * @var MockObject&Translator

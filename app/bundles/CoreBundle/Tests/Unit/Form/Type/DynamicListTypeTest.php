@@ -15,9 +15,9 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&FormBuilderInterface<FormBuilderInterface>
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+    private MockObject $formBuilder;
 
-    private \Mautic\CoreBundle\Form\Type\DynamicListType $form;
+    private DynamicListType $form;
 
     protected function setUp(): void
     {
