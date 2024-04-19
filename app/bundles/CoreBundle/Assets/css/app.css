@@ -1352,6 +1352,11 @@ blockquote > p:after {
 .btn .fa {
   min-width: 13px;
 }
+.btn [class^="ri-"],
+.btn [class*=" ri-"] {
+  font-size: 12px;
+  vertical-align: -0.05em;
+}
 .btn > .caret {
   margin-top: -1px;
 }
@@ -1719,6 +1724,13 @@ label.list-group-item:focus {
 }
 .dropdown-menu > li > a .fa {
   min-width: 15px;
+}
+.dropdown-menu > li > a [class^="ri-"],
+.dropdown-menu > li > a [class*=" ri-"] {
+  font-size: 1.25em;
+  vertical-align: -0.05em;
+  line-height: 0;
+  padding-right: 3px;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
