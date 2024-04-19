@@ -2,6 +2,13 @@ import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
+import grapesjsblocksbasic from 'grapesjs-blocks-basic';
+import grapesjscomponentcountdown from 'grapesjs-component-countdown';
+import grapesjsnavbar from 'grapesjs-navbar';
+import grapesjscustomcode from 'grapesjs-custom-code';
+import grapesjstouch from 'grapesjs-touch';
+import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
+import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
@@ -11,10 +18,9 @@ import 'grapesjs-plugin-ckeditor5';
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
 // import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
-// import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
 
 import CodeModeButton from './codeMode/codeMode.button';
-import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
+import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 
 export default class BuilderService {
   editor;
@@ -62,6 +68,10 @@ export default class BuilderService {
     const keymaps = this.editor.Keymaps;
     let allKeymaps;
 
+    if (mauticEditorFonts) {
+      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
+    }
+
     this.editor.on('modal:open', () => {
       // Save all keyboard shortcuts
       allKeymaps = { ...keymaps.getAll() };
@@ -87,6 +97,7 @@ export default class BuilderService {
         data: { filename: response.getFilename() },
       });
     });
+
   }
 
   /**
@@ -113,10 +124,6 @@ export default class BuilderService {
     const codeModeButton = new CodeModeButton(this.editor);
     codeModeButton.addCommand();
     codeModeButton.addButton();
-
-    if (mauticEditorFonts) {
-      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
-    }
 
     this.overrideCustomRteDisable();
     this.setListeners();
@@ -154,15 +161,33 @@ export default class BuilderService {
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
+      plugins: [
+        // partially copied from: https://github.com/GrapesJS/grapesjs/blob/gh-pages/demo.html
+        grapesjswebpage,
+        grapesjspostcss,
+        grapesjsmautic,
+        'gjs-plugin-ckeditor5',
+        grapesjsblocksbasic,
+        grapesjscomponentcountdown,
+        grapesjsnavbar,
+        grapesjscustomcode,
+        grapesjstouch,
+        grapesjspostcss,
+        grapesjstuiimageeditor,
+        grapesjsstylebg,
+      ],
       pluginsOpts: {
         [grapesjswebpage]: {
           formsOpts: false,
+          useCustomTheme: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('page:getBuilderTokens'),
+        
       },
     });
+
+    this.moveBlocksPage();
 
     return this.editor;
   }
@@ -177,21 +202,35 @@ export default class BuilderService {
     ];
 
     this.editor = grapesjs.init({
+      selectorManager: {
+        componentFirst: true,
+      },
+      avoidInlineStyle: false, // TEMP: fixes issue with disappearing inline styles
+      forceClass: false, // create new styles if there are some already on the element: https://github.com/GrapesJS/grapesjs/issues/1531
       clearOnRender: true,
       container: '.builder-panel',
       height: '100%',
       canvas: {
         styles,
       },
+      domComponents: {
+        // disable all except link components
+        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
+      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
-        grapesjsmjml: {},
+        [grapesjsmjml]: {
+          hideSelector: false,
+          custom: false,
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
     });
+
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
 
@@ -206,6 +245,43 @@ export default class BuilderService {
     });
 
     return this.editor;
+  }
+
+  unsetComponentVoidTypes(editor) {
+    // Support for self-closing components is temporarily disabled due to parsing issues with mjml tags.
+    // Browsers only recognize explicit self-closing tags like <img /> and <br />, leading to rendering problems.
+    // This can be reverted once the issue with self-closing tags is resolved in grapesjs-mjml.
+    // See: https://github.com/GrapesJS/mjml/issues/149
+    const voidTypes = ['mj-image', 'mj-divider', 'mj-font'];
+    voidTypes.forEach(function(component) {
+      editor.DomComponents.addType(component, {
+        model: {
+          defaults: {
+            void: false
+          },
+          toHTML() {
+            const tag = this.get('tagName');
+            const attr = this.getAttrToHTML();
+            const content = this.get('content');
+            let strAttr = '';
+
+            for (let prop in attr) {
+              const val = attr[prop];
+              const hasValue = typeof val !== 'undefined' && val !== '';
+              strAttr += hasValue ? ` ${prop}="${val}"` : '';
+            }
+
+            let html = `<${tag}${strAttr}>${content}</${tag}>`;
+
+            // Add the components after the closing tag
+            const componentsHtml = this.get('components')
+                .map(model => model.toHTML())
+                .join('');
+            return html + componentsHtml;
+          },
+        }
+      });
+    });
   }
 
   initEmailHtml() {
@@ -231,7 +307,9 @@ export default class BuilderService {
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
       pluginsOpts: {
-        grapesjsnewsletter: {},
+        grapesjsnewsletter: {
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
       },
@@ -291,6 +369,7 @@ export default class BuilderService {
     return this.editor;
   }
 
+  // https://github.com/artf/grapesjs-mjml/issues/193
   overrideCustomRteDisable() {
     const richTextEditor = this.editor.RichTextEditor;
 
@@ -313,40 +392,26 @@ export default class BuilderService {
     }
   }
 
-  unsetComponentVoidTypes(editor) {
-    // Support for self-closing components is temporarily disabled due to parsing issues with mjml tags.
-    // Browsers only recognize explicit self-closing tags like <img /> and <br />, leading to rendering problems.
-    // This can be reverted once the issue with self-closing tags is resolved in grapesjs-mjml.
-    // See: https://github.com/GrapesJS/mjml/issues/149
-    const voidTypes = ['mj-image', 'mj-divider', 'mj-font'];
-    voidTypes.forEach(function(component) {
-      editor.DomComponents.addType(component, {
-        model: {
-          defaults: {
-            void: false
-          },
-          toHTML() {
-            const tag = this.get('tagName');
-            const attr = this.getAttrToHTML();
-            const content = this.get('content');
-            let strAttr = '';
-
-            for (let prop in attr) {
-              const val = attr[prop];
-              const hasValue = typeof val !== 'undefined' && val !== '';
-              strAttr += hasValue ? ` ${prop}="${val}"` : '';
-            }
-
-            let html = `<${tag}${strAttr}>${content}</${tag}>`;
-
-            // Add the components after the closing tag
-            const componentsHtml = this.get('components')
-                .map(model => model.toHTML())
-                .join('');
-            return html + componentsHtml;
-          },
-        }
-      });
+  /**
+   * Move the blocks and categories in the sidebar
+   */
+  moveBlocksPage() {
+    const blocks = this.editor.BlockManager.getAll();
+    blocks.map(block => {
+      // columns go into a new category, at the top
+      if(block.attributes.id.indexOf('column') !== -1) {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Sections",
+          order: -1
+        });
+      }
+      // 'Blocks' category goes after 'Basic'
+      if(block.attributes.category === 'Basic') {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Basic",
+          order: -1
+        });
+      }
     });
   }
 
