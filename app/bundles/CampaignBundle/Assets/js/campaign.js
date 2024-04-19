@@ -1151,6 +1151,8 @@ Mautic.campaignToggleTimeframes = function() {
  * Close campaign builder
  */
 Mautic.closeCampaignBuilder = function() {
+    // Disable buttons
+    mQuery('.btns-builder').find('button').prop('disabled', true);
     var builderCss = {
         margin: "0",
         padding: "0",
@@ -1165,9 +1167,7 @@ Mautic.closeCampaignBuilder = function() {
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
-    mQuery('.btn-close-builder').prop('disabled', true);
 
-    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
     mQuery('#builder-errors').hide('fast').text('');
 
     Mautic.updateConnections(function(err, response) {
@@ -1178,13 +1178,16 @@ Mautic.closeCampaignBuilder = function() {
             mQuery('body').css('overflow-y', '');
             if (response.success) {
                 mQuery('#campaign-builder').trigger('campaign-builder:hide');
+                // Enable buttons
+                mQuery('.btns-builder').find('button').prop('disabled', false);
             }
-            mQuery('.btn-close-builder').prop('disabled', false);
         }
     });
 };
 
 Mautic.saveCampaignFromBuilder = function() {
+    // Disable buttons
+    mQuery('.btns-builder').find('button').prop('disabled', true);
     Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-builder'));
     Mautic.updateConnections(function(err) {
         if (!err) {
@@ -1263,7 +1266,23 @@ Mautic.submitCampaignEvent = function(e) {
     mQuery('#campaignevent_canvasSettings_droppedX').val(mQuery('#droppedX').val());
     mQuery('#campaignevent_canvasSettings_droppedY').val(mQuery('#droppedY').val());
 
+    // Disable save and apply buttton
+    mQuery('.btns-builder').find('button').prop('disabled', true);
+    // Get number of running ajax
+    const runningAjax = mQuery.active;
+
     mQuery('form[name="campaignevent"]').submit();
+
+    const waitForElement = function (){
+        if(mQuery.active <= runningAjax){
+            mQuery('.btns-builder').find('button').prop('disabled', false);
+        }
+        else{
+            setTimeout(waitForElement, 100);
+        }
+    }
+    // When Ajax finish enable buttons
+    waitForElement();
 };
 
 /**

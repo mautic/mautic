@@ -99,7 +99,7 @@ class PointController extends AbstractFormController
     /**
      * Generates new form and processes post data.
      *
-     * @param \Mautic\PointBundle\Entity\Point $entity
+     * @param Point $entity
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
@@ -109,7 +109,7 @@ class PointController extends AbstractFormController
         \assert($model instanceof PointModel);
 
         if (!($entity instanceof Point)) {
-            /** @var \Mautic\PointBundle\Entity\Point $entity */
+            /** @var Point $entity */
             $entity = $model->getEntity();
         }
 
@@ -192,9 +192,9 @@ class PointController extends AbstractFormController
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
                 'route'         => $this->generateUrl('mautic_point_action', [
-                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
-                        'objectId'     => $entity->getId(),
-                    ]
+                    'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
+                    'objectId'     => $entity->getId(),
+                ]
                 ),
             ],
         ]);
@@ -326,9 +326,9 @@ class PointController extends AbstractFormController
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
                 'route'         => $this->generateUrl('mautic_point_action', [
-                        'objectAction' => 'edit',
-                        'objectId'     => $entity->getId(),
-                    ]
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId(),
+                ]
                 ),
             ],
         ]);

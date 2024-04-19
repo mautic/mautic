@@ -19,9 +19,9 @@ class ConfigSubscriberTest extends TestCase
     /**
      * @var ConfigChangeLogger|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
-    private \Mautic\ConfigBundle\EventListener\ConfigSubscriber $subscriber;
+    private ConfigSubscriber $subscriber;
 
     protected function setUp(): void
     {
