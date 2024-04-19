@@ -45,10 +45,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $coreParametersHelper;
 
-    /**
-     * @var EmailConfigInterface|MockObject
-     */
-    private $emailConfig;
+    private MockObject $emailConfig;
 
     /**
      * @var ThemeHelperInterface|MockObject

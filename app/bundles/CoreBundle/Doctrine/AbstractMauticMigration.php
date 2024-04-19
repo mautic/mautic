@@ -37,10 +37,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     protected $platform;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
     protected static string $tableName;
 
