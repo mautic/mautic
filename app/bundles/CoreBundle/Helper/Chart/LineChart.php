@@ -119,7 +119,7 @@ class LineChart extends AbstractChart implements ChartInterface
         return [
             'backgroundColor'           => $color->toRgba(0.1),
             'borderColor'               => $color->toRgba(0.8),
-            'pointHoverBackgroundColor' => $color->toRgba(0.75),
+            'pointHoverBackgroundColor' => $color->toRgba(1),
             'pointHoverBorderColor'     => $color->toRgba(1),
         ];
     }

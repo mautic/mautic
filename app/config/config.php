@@ -7,13 +7,12 @@ use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/** @var Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
 $root        = $container->getParameter('mautic.application_dir').'/app';
 $projectRoot = $container->getParameter('kernel.project_dir');
 
-/** @var array $paths */
 include __DIR__.'/paths_helper.php';
 
 // Load extra annotations
@@ -26,7 +25,7 @@ $container->loadFromExtension('sensio_framework_extra', [
 
 // Build and store Mautic bundle metadata
 $symfonyBundles        = $container->getParameter('kernel.bundles');
-$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
+$bundleMetadataBuilder = new Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths);
 
 $container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
 $container->setParameter('mautic.plugin.bundles', $bundleMetadataBuilder->getPluginMetadata());
@@ -37,7 +36,7 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$parameterLoader         = new Mautic\CoreBundle\Loader\ParameterLoader();
 $configParameterBag      = $parameterLoader->getParameterBag();
 $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
@@ -45,11 +44,11 @@ $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 // This cannot be set dynamically
 
 if (defined('MAUTIC_INSTALLER')) {
-    $request      = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $request      = Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $secureCookie = $request->isSecure();
 } else {
     $siteUrl      = $configParameterBag->get('site_url');
-    $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+    $secureCookie = ($siteUrl && str_starts_with($siteUrl, 'https'));
 }
 
 $container->loadFromExtension('framework', [
@@ -77,32 +76,32 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        'dsn' => '%env(mailer:MAUTIC_MAILER_DSN)%',
+        'dsn' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
     ],
     'messenger'            => [
         'failure_transport'  => 'failed',
         'transports'         => [
             'email' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_EMAIL)%',
+                'dsn'            => '%env(urlencoded-dsn:MAUTIC_MESSENGER_DSN_EMAIL)%',
                 'retry_strategy' => [
-                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
+                    'service' => Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
             'hit' => [
-                'dsn'            => '%env(MAUTIC_MESSENGER_DSN_HIT)%',
+                'dsn'            => '%env(urlencoded-dsn:MAUTIC_MESSENGER_DSN_HIT)%',
                 'retry_strategy' => [
-                    'service' => \Mautic\MessengerBundle\Retry\RetryStrategy::class,
+                    'service' => Mautic\MessengerBundle\Retry\RetryStrategy::class,
                 ],
             ],
             'failed' => '%env(messenger-nullable:MAUTIC_MESSENGER_DSN_FAILED)%',
         ],
         'routing' => [
-            \Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
-            \Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
-            \Mautic\MessengerBundle\Message\TestHit::class              => 'hit',
-            \Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
-            \Mautic\MessengerBundle\Message\PageHitNotification::class  => 'hit',
-            \Mautic\MessengerBundle\Message\EmailHitNotification::class => 'hit',
+            Symfony\Component\Mailer\Messenger\SendEmailMessage::class => 'email',
+            Mautic\MessengerBundle\Message\TestEmail::class            => 'email',
+            Mautic\MessengerBundle\Message\TestHit::class              => 'hit',
+            Mautic\MessengerBundle\Message\TestFailed::class           => 'failed',
+            Mautic\MessengerBundle\Message\PageHitNotification::class  => 'hit',
+            Mautic\MessengerBundle\Message\EmailHitNotification::class => 'hit',
         ],
     ],
 
@@ -134,14 +133,14 @@ $connectionSettings = [
         'bit'   => 'string',
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
-    'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'options'        => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+    'wrapper_class'  => Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
+    'options'        => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
-    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
-    $dbalSettings['keep_replica']    = true;
-    $dbalSettings['replicas']        = [
+    $connectionSettings['wrapper_class']   = Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $connectionSettings['keep_replica']    = true;
+    $connectionSettings['replicas']        = [
         'replica1' => [
             'host'                  => '%mautic.db_host_ro%',
             'port'                  => '%mautic.db_port%',
@@ -161,7 +160,7 @@ $container->loadFromExtension('doctrine', [
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
                     PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
-                    \PDO::ATTR_STRINGIFY_FETCHES       => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+                    PDO::ATTR_STRINGIFY_FETCHES        => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),
         ],
@@ -178,7 +177,7 @@ $container->loadFromExtension('doctrine', [
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
         'dql'                         => [
             'string_functions' => [
-                'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+                'match' => DoctrineExtensions\Query\Mysql\MatchAgainst::class,
             ],
         ],
         'result_cache_driver' => [
@@ -285,19 +284,19 @@ $container->loadFromExtension('twig', [
 
 $rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'        => 0 === $rateLimit ? false : true,
-  'storage_engine' => 'cache',
-  'cache_service'  => 'api_rate_limiter_cache',
-  'path_limits'    => [
-    [
-      'path'   => '/api',
-      'limit'  => $rateLimit,
-      'period' => 3600,
+    'enabled'        => 0 === $rateLimit ? false : true,
+    'storage_engine' => 'cache',
+    'cache_service'  => 'api_rate_limiter_cache',
+    'path_limits'    => [
+        [
+            'path'   => '/api',
+            'limit'  => $rateLimit,
+            'period' => 3600,
+        ],
     ],
-  ],
-  'fos_oauth_key_listener' => true,
-  'display_headers'        => true,
-  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
+    'fos_oauth_key_listener' => true,
+    'display_headers'        => true,
+    'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(

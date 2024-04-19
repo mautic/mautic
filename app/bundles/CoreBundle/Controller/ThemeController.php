@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ThemeController extends FormController
 {
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper)
     {
@@ -266,7 +266,7 @@ class ThemeController extends FormController
     {
         return [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),
-            'contentTemplate' => 'Mautic\CoreBundle\Controller\themeController::indexAction',
+            'contentTemplate' => 'Mautic\CoreBundle\Controller\ThemeController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_themes_index',
                 'mauticContent' => 'theme',

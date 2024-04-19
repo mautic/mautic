@@ -126,12 +126,12 @@ class ButtonExtension extends AbstractExtension
                         'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
                             ? $item->getVariantParent()->getId() : $item->getId(),
                     ];
-                    $icon = ('clone' == $action) ? 'copy' : 'sitemap';
+                    $icon = ('clone' == $action) ? 'file-copy-line' : 'a-b';
                     $path = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     break;
                 case 'close':
                     $closeParameters = $routeVars['close'] ?? [];
-                    $icon            = 'remove';
+                    $icon            = 'close-line';
                     $path            = $this->router->generate($indexRoute, $closeParameters);
                     $primary         = true;
                     $priority        = 200;
@@ -139,7 +139,7 @@ class ButtonExtension extends AbstractExtension
                 case 'new':
                 case 'edit':
                     $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
-                    $icon        = ('edit' == $action) ? 'pencil-square-o' : 'plus';
+                    $icon        = ('edit' == $action) ? 'edit-circle-line' : 'add-line';
                     $path        = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     $primary     = true;
                     break;
@@ -176,7 +176,7 @@ class ButtonExtension extends AbstractExtension
                             ],
                             $mergeAttr
                         ),
-                        'iconClass' => 'fa fa-'.$icon,
+                        'iconClass' => 'ri-'.$icon,
                         'btnText'   => $this->translator->trans('mautic.core.form.'.$action),
                         'priority'  => $priority,
                         'primary'   => $primary,

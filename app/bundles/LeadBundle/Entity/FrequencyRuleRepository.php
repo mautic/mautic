@@ -31,23 +31,22 @@ class FrequencyRuleRepository extends CommonRepository
             return [];
         }
 
-        $violations = $this->getCustomFrequencyRuleViolations($channel, $leadIds, $statTable, $statContactColumn, $statSentColumn);
+        $frequencyRuleViolations = $this->getCustomFrequencyRuleViolations($channel, $leadIds, $statTable, $statContactColumn, $statSentColumn);
 
-        if ($defaultFrequencyNumber && $defaultFrequencyTime) {
-            $violations = array_merge(
-                $violations,
-                $this->getDefaultFrequencyRuleViolations(
-                    $leadIds,
-                    $defaultFrequencyNumber,
-                    $defaultFrequencyTime,
-                    $statTable,
-                    $statContactColumn,
-                    $statSentColumn
-                )
-            );
+        if (!$this->validateDefaultParameters($defaultFrequencyNumber, $defaultFrequencyTime)) {
+            // It makes no sense to calculate default rule violations
+            // if default parameters are not valid
+            return $frequencyRuleViolations;
         }
 
-        return $violations;
+        $defaultRuleViolations = $this->getDefaultFrequencyRuleViolations($leadIds, $defaultFrequencyNumber, $defaultFrequencyTime, $statTable, $statContactColumn, $statSentColumn);
+
+        return array_merge($frequencyRuleViolations, $defaultRuleViolations);
+    }
+
+    private function validateDefaultParameters(mixed $number, mixed $time): bool
+    {
+        return $number && $time;
     }
 
     public function getFrequencyRules($channel = null, $leadIds = null): array
@@ -170,9 +169,9 @@ class FrequencyRuleRepository extends CommonRepository
         $statContactColumn,
         $statSentColumn
     ) {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select("ch.$statContactColumn")
+        $query->select("ch.$statContactColumn")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch');
 
         switch ($defaultFrequencyTime) {
@@ -189,29 +188,33 @@ class FrequencyRuleRepository extends CommonRepository
                 return [];
         }
 
-        $q->andWhere('ch.'.$statSentColumn.' >= :frequencyTime')
+        $query->andWhere('ch.'.$statSentColumn.' >= :frequencyTime')
             ->setParameter('frequencyTime', $since->format('Y-m-d H:i:s'));
 
-        $q->andWhere(
-            $q->expr()->in("ch.$statContactColumn", $leadIds)
+        $query->andWhere(
+            $query->expr()->in("ch.$statContactColumn", $leadIds)
         );
 
-        // Exclude contacts with custom rules defined
-        $subQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subQuery->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr')
-            ->where("fr.lead_id = ch.{$statContactColumn}")
-            ->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
-        $q->andWhere(
-            sprintf('NOT EXISTS (%s)', $subQuery->getSQL())
-        );
+        $hasCustomRules = $this->tableHasRows(MAUTIC_TABLE_PREFIX.'lead_frequencyrules');
+        // We don't need to check if users have custom rules if there are no records inside that table
+        if ($hasCustomRules) {
+            // Exclude contacts with custom rules defined
+            $subQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $subQuery->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr')
+                ->where("fr.lead_id = ch.{$statContactColumn}")
+                ->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
+            $query->andWhere(
+                sprintf('NOT EXISTS (%s)', $subQuery->getSQL())
+            );
+        }
 
-        $q->groupBy("ch.$statContactColumn");
+        $query->groupBy("ch.$statContactColumn");
 
-        $q->having("count(ch.$statContactColumn) >= :defaultNumber")
+        $query->having("count(ch.$statContactColumn) >= :defaultNumber")
             ->setParameter('defaultNumber', $defaultFrequencyNumber);
 
-        $results = $q->executeQuery()->fetchAllAssociative();
+        $results = $query->executeQuery()->fetchAllAssociative();
 
         foreach ($results as $key => $result) {
             $results[$key]['frequency_number'] = $defaultFrequencyNumber;

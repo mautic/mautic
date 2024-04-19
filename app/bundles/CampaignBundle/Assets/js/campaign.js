@@ -82,8 +82,7 @@ Mautic.campaignOnLoad = function (container, response) {
             // Hide events list
 
             if (!mQuery('#CampaignEvent_newsource').length) {
-                // Hide the CampaignEventPanel if visible
-                mQuery('#CampaignEventPanel').addClass('hide');
+                Mautic.hideCampaignEventPanel();
             }
 
             // Get the option clicked
@@ -109,9 +108,20 @@ Mautic.campaignOnLoad = function (container, response) {
 
         mQuery('#CampaignCanvas').on('click', function(event) {
             if (!mQuery(event.target).parents('#CampaignCanvas').length && !mQuery('#CampaignEvent_newsource').length) {
-                // Hide the CampaignEventPanel if visible
-                mQuery('#CampaignEventPanel').addClass('hide');
+                Mautic.hideCampaignEventPanel();
             }
+        });
+
+        const $flashes = mQuery('#flashes');
+        const $builder = mQuery('#campaign-builder');
+        $builder.on('campaign-builder:show', function () {
+            $builder.addClass('builder-active').removeClass('hide');
+            $flashes.addClass('alert-offset');
+
+        });
+        $builder.on('campaign-builder:hide', function () {
+            $builder.addClass('hide').removeClass('builder-active');
+            $flashes.removeClass('alert-offset');
         });
 
         Mautic.prepareCampaignCanvas();
@@ -122,6 +132,20 @@ Mautic.campaignOnLoad = function (container, response) {
             Mautic.processBuilderErrors(response);
         }
 
+        // update the cloned event info when storage is updated from different tab
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'mautic_campaign_event_clone') {
+                Mautic.campaignBuilderUpdateEventCloneDescription();
+            }
+        });
+
+        mQuery(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+            var path = settings.url.split('?')[0];
+
+            if (path === "/s/campaigns/events/insert") {
+                Mautic.campaignEventInsertOnError(event, jqxhr);
+            }
+        });
     }
 };
 
@@ -192,6 +216,28 @@ Mautic.campaignOnUnload = function(container) {
     delete Mautic.campaignBuilderInstance;
     delete Mautic.campaignBuilderLabels;
 }
+
+Mautic.campaignEventCloneOnLoad = function(container, response) {
+    Mautic.setCampaignEventClone({
+        'sourceEventName': response['eventName'],
+        'sourceEventType': response['eventType'],
+        'sourceType': response['type'],
+        'sourceCampaignId': response['campaignId'],
+        'sourceCampaignName': response['campaignName'],
+    });
+    const flashMessage = Mautic.addInfoFlashMessage(Mautic.translate('mautic.campaign.event.clone.success'));
+    Mautic.setFlashes(flashMessage);
+    Mautic.campaignBuilderUpdateEventCloneDescription();
+};
+
+Mautic.campaignEventInsertOnError = function (event, jqxhr) {
+    Mautic.clearCampaignEventClone();
+    Mautic.hideCampaignEventPanel();
+    if (jqxhr.responseJSON.error) {
+        const flashMessage = Mautic.addErrorFlashMessage(jqxhr.responseJSON.error);
+        Mautic.setFlashes(flashMessage);
+    }
+};
 
 /**
  * Setup the campaign event view
@@ -292,6 +338,11 @@ Mautic.campaignEventOnLoad = function (container, response) {
                 domEventId+'_top'
             ]
         });
+    }
+
+    if (response.hasOwnProperty('clearCloneStorage')) {
+        Mautic.hideCampaignEventPanel();
+        Mautic.clearCampaignEventClone();
     }
 
     Mautic.campaignBuilderInstance.repaintEverything();
@@ -404,7 +455,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
             var y = mQuery('#CampaignEvent_newsource').position().top;
 
             mQuery('#CampaignEvent_newsource').attr('id', 'CampaignEvent_newsource_hide');
-            mQuery('#CampaignEventPanel').addClass('hide');
+            Mautic.hideCampaignEventPanel();
             var autoConnect = false;
         } else {
             //append content
@@ -520,7 +571,7 @@ Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
     mQuery('body').css('overflow-y', 'hidden');
 
-    mQuery('.builder').addClass('builder-active').removeClass('hide');
+    mQuery('#campaign-builder').trigger('campaign-builder:show');
 
     // Center new source
     if (mQuery('#CampaignEvent_newsource').length) {
@@ -1100,6 +1151,8 @@ Mautic.campaignToggleTimeframes = function() {
  * Close campaign builder
  */
 Mautic.closeCampaignBuilder = function() {
+    // Disable buttons
+    mQuery('.btns-builder').find('button').prop('disabled', true);
     var builderCss = {
         margin: "0",
         padding: "0",
@@ -1114,9 +1167,7 @@ Mautic.closeCampaignBuilder = function() {
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
-    mQuery('.btn-close-builder').prop('disabled', true);
 
-    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
     mQuery('#builder-errors').hide('fast').text('');
 
     Mautic.updateConnections(function(err, response) {
@@ -1126,14 +1177,17 @@ Mautic.closeCampaignBuilder = function() {
             mQuery('#builder-overlay').remove();
             mQuery('body').css('overflow-y', '');
             if (response.success) {
-                mQuery('.builder').addClass('hide').removeClass('builder-active');
+                mQuery('#campaign-builder').trigger('campaign-builder:hide');
+                // Enable buttons
+                mQuery('.btns-builder').find('button').prop('disabled', false);
             }
-            mQuery('.btn-close-builder').prop('disabled', false);
         }
     });
 };
 
 Mautic.saveCampaignFromBuilder = function() {
+    // Disable buttons
+    mQuery('.btns-builder').find('button').prop('disabled', true);
     Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-builder'));
     Mautic.updateConnections(function(err) {
         if (!err) {
@@ -1212,7 +1266,23 @@ Mautic.submitCampaignEvent = function(e) {
     mQuery('#campaignevent_canvasSettings_droppedX').val(mQuery('#droppedX').val());
     mQuery('#campaignevent_canvasSettings_droppedY').val(mQuery('#droppedY').val());
 
+    // Disable save and apply buttton
+    mQuery('.btns-builder').find('button').prop('disabled', true);
+    // Get number of running ajax
+    const runningAjax = mQuery.active;
+
     mQuery('form[name="campaignevent"]').submit();
+
+    const waitForElement = function (){
+        if(mQuery.active <= runningAjax){
+            mQuery('.btns-builder').find('button').prop('disabled', false);
+        }
+        else{
+            setTimeout(waitForElement, 100);
+        }
+    }
+    // When Ajax finish enable buttons
+    waitForElement();
 };
 
 /**
@@ -1643,11 +1713,14 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
                 }
             });
             Mautic.campaignBuilderAnchorClickedAllowedEvents = allowedEvents;
+            Mautic.campaignBuilderIsEventCloneAllowed = Mautic.isCampaignCloneEventAllowedForEndpoint(epDetails);
 
             if (!(mQuery('.preview').length)) {
                 var el = (mQuery(event.target).hasClass('jtk-endpoint')) ? event.target : mQuery(event.target).parents('.jtk-endpoint')[0];
                 Mautic.campaignBuilderAnchorClickedPosition = Mautic.campaignBuilderGetEventPosition(el);
                 Mautic.campaignBuilderUpdateEventList(allowedEvents, false, 'groups');
+                Mautic.campaignBuilderUpdateEventCloneButton(allowedEvents, epDetails.eventType, epDetails.anchorName);
+                Mautic.campaignBuilderUpdateEventCloneDescription();
             }
 
             // Disable the list items not allowed
@@ -1725,6 +1798,9 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
         }
     });
 
+    mQuery('#CampaignEventPanelGroups').removeClass('groups-enabled-1 groups-enabled-2 groups-enabled-3')
+    mQuery('#CampaignEventPanelGroups').addClass('groups-enabled-' + groups.length)
+
     if (inGroupsView) {
         mQuery.each(groups, function (key, theGroup) {
             mQuery('#'+theGroup+'GroupSelector').removeClass(
@@ -1745,12 +1821,19 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
                 left: (leftPos >=0 ) ? leftPos : 10,
                 top: topPos,
                 width: newWidth,
-                height: 280
+                height: Mautic.campaignBuilderIsEventCloneAllowed ? 372 : 280
             });
 
         mQuery('#CampaignEventPanel').removeClass('hide');
         mQuery('#CampaignEventPanelGroups').removeClass('hide');
         mQuery('#CampaignEventPanelLists').addClass('hide');
+
+        if (Mautic.campaignBuilderIsEventCloneAllowed) {
+            mQuery('#CampaignPasteContainer').removeClass('hide');
+        } else {
+            mQuery('#CampaignPasteContainer').addClass('hide');
+        }
+
     } else {
         var leftPos = (forcePosition) ? forcePosition.left : Mautic.campaignBuilderAnchorClickedPosition.left - 125;
         var topPos  = (forcePosition) ? forcePosition.top : Mautic.campaignBuilderAnchorClickedPosition.top + 25;
@@ -1771,6 +1854,20 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
                 mQuery('#CampaignEventPanelLists #' + groups[0] + 'List').trigger('chosen:open');
             }, 10);
         }
+    }
+};
+
+Mautic.campaignBuilderUpdateEventCloneButton = function (groups, eventType, anchorName) {
+    var $insertButton = mQuery('#EventInsertButton');
+    var updatedUrl = $insertButton.attr('href').replace(/anchor=(.*?)$/, "anchor=" + anchorName + "&anchorEventType=" + eventType);
+    $insertButton.attr('href', updatedUrl);
+};
+
+Mautic.campaignBuilderUpdateEventCloneDescription = function () {
+    var cloneDetails = Mautic.getCampaignEventClone();
+    if (cloneDetails) {
+        mQuery('[data-campaign-event-clone="sourceEventName"]').html(cloneDetails['sourceEventName']);
+        mQuery('[data-campaign-event-clone="sourceCampaignName"]').html(cloneDetails['sourceCampaignName']);
     }
 };
 
@@ -1826,7 +1923,8 @@ Mautic.campaignBuilderPrepareNewSource = function () {
 /**
  *
  * @param epDetails
- * @param optionVal
+ * @param targetType action|decision|condition
+ * @param targetEvent
  * @returns {boolean}
  */
 Mautic.campaignBuilderValidateConnection = function (epDetails, targetType, targetEvent) {
@@ -2142,4 +2240,33 @@ Mautic.confirmCallbackCampaignPublishStatus = function (action, el) {
 
     // Dismiss the confirmation
     Mautic.dismissConfirmation();
+}
+
+Mautic.isCampaignCloneEventAllowedForEndpoint = function(endpointDetails) {
+    const eventClone = Mautic.getCampaignEventClone();
+    if (!eventClone) {
+        return false;
+    }
+    // uppercase first letter for string comparison
+    const eventType = eventClone['sourceEventType'].charAt(0).toUpperCase() + eventClone['sourceEventType'].slice(1);
+    const allowedEvents = Mautic.campaignBuilderAnchorClickedAllowedEvents || [];
+    const isValidConnection = Mautic.campaignBuilderValidateConnection(endpointDetails, eventClone['sourceEventType'], eventClone['sourceType']);
+    return allowedEvents.includes(eventType) && isValidConnection;
+}
+
+Mautic.getCampaignEventClone = function() {
+    const eventClone = localStorage.getItem("mautic_campaign_event_clone");
+    return eventClone === null ? null : JSON.parse(eventClone);
+}
+
+Mautic.setCampaignEventClone = function(data) {
+    localStorage.setItem("mautic_campaign_event_clone", JSON.stringify(data));
+}
+
+Mautic.clearCampaignEventClone = function() {
+    localStorage.removeItem("mautic_campaign_event_clone");
+}
+
+Mautic.hideCampaignEventPanel = function() {
+    mQuery('#CampaignEventPanel').addClass('hide');
 }

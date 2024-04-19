@@ -25,7 +25,7 @@ class EmailRepository extends CommonRepository
         $q->select('l.id, l.email')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
-            ->where('dnc.channel = "email"')
+            ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
         if ($leadIds) {
@@ -57,7 +57,7 @@ class EmailRepository extends CommonRepository
         $q->select('dnc.*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id')
-            ->where('dnc.channel = "email"')
+            ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
@@ -100,8 +100,8 @@ class EmailRepository extends CommonRepository
         $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e')
-            ->from(\Mautic\EmailBundle\Entity\Email::class, 'e', 'e.id');
-        if (empty($args['iterator_mode'])) {
+            ->from(Email::class, 'e', 'e.id');
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
 
             if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || 'list' == $args['email_type'])) {
@@ -124,7 +124,7 @@ class EmailRepository extends CommonRepository
         // Get entities
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(\Mautic\EmailBundle\Entity\Email::class, 'e');
+            ->from(Email::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
@@ -251,6 +251,12 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
+
+        $excludedListQb = $this->getExcludedListQuery((int) $emailId);
+
+        if ($excludedListQb) {
+            $q->andWhere(sprintf('l.id NOT IN (%s)', $excludedListQb->getSQL()));
+        }
 
         // Do not include leads which are not subscribed to the category set for email.
         $unsubscribeLeadsQb = $this->getCategoryUnsubscribedLeadsQuery((int) $emailId);
@@ -646,9 +652,24 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * @depreacated The method is replaced by getPublishedBroadcastsIterable
+     *
      * @param int|null $id
      */
     public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    {
+        return $this->getPublishedBroadcastsQuery($id)->iterate();
+    }
+
+    /**
+     * @return iterable<Email>
+     */
+    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    {
+        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+    }
+
+    private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
@@ -657,14 +678,14 @@ class EmailRepository extends CommonRepository
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
         );
 
-        if (!empty($id)) {
+        if (null !== $id && 0 !== $id) {
             $expr->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
         $qb->where($expr);
 
-        return $qb->getQuery()->iterate();
+        return $qb->getQuery();
     }
 
     /**
@@ -691,13 +712,15 @@ class EmailRepository extends CommonRepository
 
     /**
      * Is one of emails unpublished?
+     *
+     * @deprecated to be removed in 6.0 with no replacement
      */
     public function isOneUnpublished(array $ids): bool
     {
         $result = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias().'.id')
-            ->from(\Mautic\EmailBundle\Entity\Email::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(Email::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->where($this->getTableAlias().'.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->andWhere('e.isPublished = 0')
@@ -718,5 +741,29 @@ class EmailRepository extends CommonRepository
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
+    }
+
+    private function getExcludedListQuery(int $emailId): ?QueryBuilder
+    {
+        $connection = $this->getEntityManager()
+            ->getConnection();
+        $excludedListIds = $connection->createQueryBuilder()
+            ->select('eel.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_excluded', 'eel')
+            ->where('eel.email_id = :emailId')
+            ->setParameter('emailId', $emailId)
+            ->executeQuery()
+            ->fetchFirstColumn();
+
+        if (!$excludedListIds) {
+            return null;
+        }
+
+        $queryBuilder = $connection->createQueryBuilder();
+        $queryBuilder->select('ll.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where($queryBuilder->expr()->in('ll.leadlist_id', $excludedListIds));
+
+        return $queryBuilder;
     }
 }

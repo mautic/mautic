@@ -32,6 +32,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Psr\Log\LoggerInterface;
@@ -189,7 +190,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -333,6 +334,11 @@ class ListModel extends FormModel
             return 0;
         } catch (SegmentNotFoundException) {
             // A segment from filter does not exist anymore. Do not rebuild.
+            return 0;
+        } catch (TableNotFoundException $e) {
+            // Invalid filter table, filter definition is not well asset or it is deleted.  Do not rebuild but log.
+            $this->logger->error($e->getMessage());
+
             return 0;
         }
 
@@ -531,7 +537,7 @@ class ListModel extends FormModel
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         } else {
             $leadId = $lead->getId();
         }
@@ -617,7 +623,7 @@ class ListModel extends FormModel
                 }
             } else {
                 $listLead = new ListLead();
-                $listLead->setList($this->leadChangeLists[$listId]);
+                $listLead->setList($this->em->getReference(LeadList::class, $listId));
                 $listLead->setLead($lead);
                 $listLead->setManuallyAdded($manuallyAdded);
                 $listLead->setDateAdded($dateManipulated);
@@ -1067,13 +1073,8 @@ class ListModel extends FormModel
 
         // added line everytime
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));
-
-        // Just if we have event log data
-        // Added in 2.15 , then we can' display just from data from date range with event logs
-        if ($query->isStatsFromEventLog()) {
-            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
-            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
-        }
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
 
         return $chart->render();
     }

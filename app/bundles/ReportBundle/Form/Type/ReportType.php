@@ -260,7 +260,7 @@ class ReportType extends AbstractType
                             'mautic.core.form.yes'     => 1,
                             'mautic.core.filter.clear' => 2,
                         ],
-                        ]
+                    ]
                 );
 
                 $graphList = $this->reportModel->getGraphList($source);
@@ -388,7 +388,8 @@ class ReportType extends AbstractType
                     $data    = $event->getData();
                     $graphs  = $data['graphs'] ?? [];
                     $columns = $data['columns'] ?? [];
-                    $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
+                    $source  = $data['source'] ?? null;
+                    $formModifier($event->getForm(), $source, $columns, $graphs, $data);
                 }
             );
 

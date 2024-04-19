@@ -5,18 +5,22 @@ namespace Mautic\ReportBundle\Scheduler\Model;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Scheduler;
+use Mautic\ReportBundle\Event\PermanentReportFileCreatedEvent;
 use Mautic\ReportBundle\Exception\FileTooBigException;
+use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendSchedule
 {
-    private \Mautic\EmailBundle\Helper\MailHelper $mailer;
+    private MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,
         private MessageSchedule $messageSchedule,
-        private FileHandler $fileHandler
+        private FileHandler $fileHandler,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->mailer          = $mailer->getMailer();
+        $this->mailer = $mailer->getMailer();
     }
 
     public function send(Scheduler $scheduler, $csvFilePath): void
@@ -43,6 +47,8 @@ class SendSchedule
                 // Send the ZIP file as link in the email message.
                 $this->fileHandler->moveZipToPermanentLocation($report, $zipFilePath);
                 $message = $this->messageSchedule->getMessageForLinkedFile($report);
+                $event   = new PermanentReportFileCreatedEvent($report);
+                $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_PERMANENT_FILE_CREATED);
             }
         }
 
@@ -51,5 +57,11 @@ class SendSchedule
         $this->mailer->setBody($message);
         $this->mailer->parsePlainText($message);
         $this->mailer->send(true);
+
+        $this->fileHandler->delete($csvFilePath);
+
+        if (!empty($zipFilePath)) {
+            $this->fileHandler->delete($zipFilePath);
+        }
     }
 }

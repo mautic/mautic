@@ -36,7 +36,7 @@ class FieldBuilderTest extends TestCase
         $this->router      = $this->createMock(Router::class);
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName'])
+            ->onlyMethods(['getFieldList'])
             ->getMock();
         $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
     }

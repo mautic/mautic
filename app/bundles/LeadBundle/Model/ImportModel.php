@@ -542,7 +542,7 @@ class ImportModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Import::class);
+        return $this->em->getRepository(Import::class);
     }
 
     /**
@@ -550,7 +550,7 @@ class ImportModel extends FormModel
      */
     public function getEventLogRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     public function getPermissionBase(): string
@@ -589,7 +589,7 @@ class ImportModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

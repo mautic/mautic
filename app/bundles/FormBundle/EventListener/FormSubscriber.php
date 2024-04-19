@@ -3,9 +3,11 @@
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Event as Events;
@@ -29,7 +31,8 @@ class FormSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         MailHelper $mailer,
         private TranslatorInterface $translator,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private LanguageHelper $languageHelper
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -64,6 +67,9 @@ class FormSubscriber implements EventSubscriberInterface
             ];
             $this->auditLogModel->writeToLog($log);
         }
+        if (!array_key_exists($form->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
+            $this->languageHelper->extractLanguagePackage($form->getLanguage());
+        }
     }
 
     /**
@@ -95,7 +101,7 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'           => SubmitActionEmailType::class,
             'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
-                'message' => 'html',
+                'message' => 'raw',
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
@@ -217,7 +223,7 @@ class FormSubscriber implements EventSubscriberInterface
             $matchedFields[$key] = $field['alias'];
 
             // decode html chars and quotes before posting to next form
-            $payload[$key]       = htmlspecialchars_decode($value, ENT_QUOTES);
+            $payload[$key]       = html_entity_decode(htmlspecialchars_decode($value, ENT_QUOTES), ENT_QUOTES);
         }
 
         $event->setPostSubmitPayload($payload);
@@ -249,7 +255,7 @@ class FormSubscriber implements EventSubscriberInterface
             if ($redirect = $this->parseResponse($response, $matchedFields)) {
                 $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
-        } catch (ServerException $exception) {
+        } catch (ClientException|ServerException $exception) {
             $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {

@@ -9,6 +9,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
@@ -20,27 +21,28 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class MauticReportBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|Connection
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
-        $this->connection          = $this->createMock(Connection::class);
+        $this->connection          = $this->getMockedConnection();
         $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
 
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
@@ -251,14 +253,14 @@ final class MauticReportBuilderTest extends TestCase
                     'label' => 'Tag',
                     'type'  => 'multiselect',
                     'list'  => [
-                            1 => 'A',
-                            2 => 'B',
-                            3 => 'C',
-                        ],
+                        1 => 'A',
+                        2 => 'B',
+                        3 => 'C',
+                    ],
                     'operators' => [
-                            'in'    => 'mautic.core.operator.in',
-                            'notIn' => 'mautic.core.operator.notin',
-                        ],
+                        'in'    => 'mautic.core.operator.in',
+                        'notIn' => 'mautic.core.operator.notin',
+                    ],
                     'alias' => 'tag',
                 ],
             ],

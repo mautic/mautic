@@ -13,7 +13,7 @@ final class DateHelper
      */
     private array $formats;
 
-    private \Mautic\CoreBundle\Helper\DateTimeHelper $helper;
+    private DateTimeHelper $helper;
 
     /**
      * @param string $dateFullFormat

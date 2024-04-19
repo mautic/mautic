@@ -24,33 +24,33 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
-    private \Psr\Log\NullLogger $logger;
+    private NullLogger $logger;
 
     /**
      * @var EventLogger|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
+    private MockObject $eventLogger;
 
-    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval $intervalScheduler;
+    private Interval $intervalScheduler;
 
-    private \Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime $dateTimeScheduler;
+    private DateTime $dateTimeScheduler;
 
     /**
      * @var EventCollector|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
+    private MockObject $eventCollector;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParamtersHelper;
+    private MockObject $coreParamtersHelper;
 
-    private \Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler $scheduler;
+    private EventScheduler $scheduler;
 
     protected function setUp(): void
     {
@@ -158,6 +158,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
+        $event->method('getId')
+            ->willReturn(1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -185,8 +187,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($event);
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
-        $this->assertFalse($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-08-31 09:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
+        $this->assertEquals('2018-09-01 09:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
@@ -211,6 +213,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
+        $event->method('getId')
+            ->willReturn(1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00');
@@ -239,7 +243,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-08-31 11:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertEquals('2018-09-01 11:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
@@ -273,6 +277,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($campaign);
         $event->method('getTriggerIntervalUnit')
             ->willReturn('d');
+        $event->method('getId')
+            ->willReturn(1);
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')

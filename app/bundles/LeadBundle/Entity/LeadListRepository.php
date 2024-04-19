@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
@@ -205,7 +206,7 @@ class LeadListRepository extends CommonRepository
                 )
             )
             ->setParameter('leadId', $lead->getId())
-            ->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return (bool) $qb->executeQuery()->fetchOne();
     }
@@ -364,7 +365,7 @@ class LeadListRepository extends CommonRepository
             if (is_array($value)) {
                 $subFunc                        = 'in';
                 $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
-                $parameters[$subFilterParamter] = ['value' => $value, 'type' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY];
+                $parameters[$subFilterParamter] = ['value' => $value, 'type' => ArrayParameterType::STRING];
             } else {
                 $parameters[$subFilterParamter] = $value;
             }
@@ -382,7 +383,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -397,7 +398,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -507,5 +508,31 @@ class LeadListRepository extends CommonRepository
             ->fetchOne();
 
         return 1 === $result;
+    }
+
+    /**
+     * Returns array of campaigns related to this segment.
+     *
+     * @return array<int, string>
+     */
+    public function getSegmentCampaigns(int $segmentId): array
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('clx.campaign_id, c.name')
+            ->distinct()
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx')
+            ->join('clx', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = clx.campaign_id');
+        $q->where(
+            $q->expr()->eq('clx.leadlist_id', $segmentId)
+        );
+
+        $lists   = [];
+        $results = $q->executeQuery()->fetchAllAssociative();
+
+        foreach ($results as $row) {
+            $lists[$row['campaign_id']] = $row['name'];
+        }
+
+        return $lists;
     }
 }

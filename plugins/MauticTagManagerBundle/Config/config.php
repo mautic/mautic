@@ -20,7 +20,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.tagmanager' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
+                'class'     => MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -48,9 +48,9 @@ return [
                 'id'        => 'mautic_tagmanager_index',
                 'route'     => 'mautic_tagmanager_index',
                 'access'    => 'tagManager:tagManager:view',
-                'iconClass' => 'fa-tag',
+                'iconClass' => 'ri-hashtag',
                 'priority'  => 1,
             ],
         ],
     ],
-  ];
+];

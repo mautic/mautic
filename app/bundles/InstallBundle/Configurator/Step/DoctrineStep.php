@@ -22,6 +22,11 @@ class DoctrineStep implements StepInterface
     public $host = 'localhost';
 
     /**
+     * Database host. Read Only Replica.
+     */
+    public ?string $host_ro = null;
+
+    /**
      * Database table prefix.
      * Required in step.
      *
@@ -67,6 +72,8 @@ class DoctrineStep implements StepInterface
      */
     public $backup_prefix = 'bak_';
 
+    public ?string $server_version;
+
     public function __construct(Configurator $configurator)
     {
         $parameters = $configurator->getParameters();
@@ -92,8 +99,7 @@ class DoctrineStep implements StepInterface
         if (!class_exists('\PDO')) {
             $messages[] = 'mautic.install.pdo.mandatory';
         } else {
-            $drivers = \PDO::getAvailableDrivers();
-            if (0 == count($drivers)) {
+            if (!in_array('mysql', \PDO::getAvailableDrivers(), true)) {
                 $messages[] = 'mautic.install.pdo.drivers';
             }
         }
@@ -143,7 +149,6 @@ class DoctrineStep implements StepInterface
     {
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
-            'mysqli'    => 'MySQLi',
         ];
 
         $supported = [];
@@ -157,11 +162,6 @@ class DoctrineStep implements StepInterface
                     $supported['pdo_'.$driver] = $mauticSupported['pdo_'.$driver];
                 }
             }
-        }
-
-        // Add MySQLi if available
-        if (function_exists('mysqli_connect')) {
-            $supported['mysqli'] = $mauticSupported['mysqli'];
         }
 
         return $supported;
