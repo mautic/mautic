@@ -245,18 +245,18 @@ class DynamicsIntegration extends CrmAbstractIntegration
                             $type      = 'string';
                             $fieldType = $field['AttributeTypeName']['Value'];
                             if (in_array($fieldType, [
-                                 'LookupType',
-                                 'OwnerType',
-                                 'PicklistType',
-                                 'StateType',
-                                 'StatusType',
-                                 'UniqueidentifierType',
+                                'LookupType',
+                                'OwnerType',
+                                'PicklistType',
+                                'StateType',
+                                'StatusType',
+                                'UniqueidentifierType',
                             ], true)) {
                                 continue;
                             } elseif (in_array($fieldType, [
                                 'DoubleType',
-                                 'IntegerType',
-                                 'MoneyType',
+                                'IntegerType',
+                                'MoneyType',
                             ], true)) {
                                 $type = 'int';
                             } elseif ('Boolean' === $fieldType) {
@@ -313,7 +313,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $object = 'contacts';
                 /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+                $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
                 $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
                 if (!empty($integrationId)) {
                     $integrationEntityId = $integrationId[0]['integration_entity_id'];
@@ -360,7 +360,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts'): int
     {
-        if ('Contact' === $object) {
+        if ('Contacts' === $object) {
             $object = 'contacts';
         }
         $executed    = 0;
@@ -516,7 +516,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             $this->em->getConnection()->getConfiguration()->setMiddlewares([]);
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
-            $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+            $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
             $objects               = $data['value'];
             $integrationEntities   = [];
             /** @var array $objects */
@@ -585,7 +585,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
                         if (!empty($fieldsToUpdateInMautic)) {
-                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdateInMautic));
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
                             $newMatchedFields = $matchedFields;
@@ -699,9 +699,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
         $object                = 'contacts';
         $config                = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
-        $leadFields            = array_unique(array_values($config['leadFields']));
+        $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
 
         if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
@@ -720,7 +720,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $availableFields         = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$object]]]);
         $fieldsToUpdate[$object] = array_values(array_intersect(array_keys($availableFields[$object]), $fieldsToUpdateInCrm));
-        $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate[$object]));
+        $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdate[$object]));
 
         $progress      = false;
         $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
@@ -752,7 +752,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     $lead                       = $this->getCompoundMauticFields($lead);
                     $lead['integration_entity'] = $object;
                     $leadsToUpdateInD[$key]     = $lead;
-                    $integrationEntity          = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $lead['id']);
+                    $integrationEntity          = $this->em->getReference(IntegrationEntity::class, $lead['id']);
                     $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
                 }
             }
@@ -825,6 +825,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
+            }
+            if (!isset($config['leadFields']) || !is_iterable($config['leadFields'])) {
+                continue;
             }
             // Match that data with mapped lead fields
             foreach ($config['leadFields'] as $k => $v) {

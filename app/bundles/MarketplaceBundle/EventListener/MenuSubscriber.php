@@ -38,7 +38,7 @@ final class MenuSubscriber implements EventSubscriberInterface
                     'marketplace.title' => [
                         'id'        => 'marketplace',
                         'route'     => RouteProvider::ROUTE_LIST,
-                        'iconClass' => 'fa-plus',
+                        'iconClass' => 'ri-shopping-bag-3-fill',
                         'access'    => MarketplacePermissions::CAN_VIEW_PACKAGES,
                     ],
                 ],

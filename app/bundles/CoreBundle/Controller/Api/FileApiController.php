@@ -45,7 +45,7 @@ class FileApiController extends CommonApiController
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function createAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
     {
@@ -84,7 +84,7 @@ class FileApiController extends CommonApiController
     /**
      * List the files in /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function listAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
     {
@@ -115,7 +115,7 @@ class FileApiController extends CommonApiController
     /**
      * Delete a file from /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $file)
     {
