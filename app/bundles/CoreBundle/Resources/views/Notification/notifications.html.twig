@@ -1,11 +1,11 @@
-<li class="dropdown dropdown-custom" id="notificationsDropdown">
-    <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown">
+<li class="dropdown dropdown-custom" id="notificationsDropdown" role="none">
+    <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown" role="button" aria-label="{{ 'mautic.core.notifications.accessibility_label'|trans }}" aria-haspopup="true" aria-controls="notificationPanel" id="openNotifications">
         {% set hideClass = updateMessage.isNew or showNewIndicator ? '' : ' hide' %}
-        <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="fa fa-asterisk"></i></span>
-        <span class="ri-notification-3-line ri-xl"></span>
+        <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator" aria-label="{{ 'mautic.core.notifications.new.accessibility_label'|trans }}"><i class="fa fa-asterisk"></i></span>
+        <span class="ri-notification-3-line ri-xl" aria-hidden="true"></span>
     </a>
     <div class="dropdown-menu">
-        <div class="panel panel-default">
+        <div class="panel panel-default" id="notificationPanel" role="dialog">
             <div class="panel-heading">
                 <div class="panel-title notification notification-title">
                     <h6 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
