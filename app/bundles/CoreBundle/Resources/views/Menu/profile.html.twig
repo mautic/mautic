@@ -1,13 +1,13 @@
 {% set inline = menuRender('profile') %}
 <li class="dropdown">
-    <a class="dropdown-toggle user" data-toggle="dropdown" href="#">
-        <span class="img-wrapper"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
+    <a class="dropdown-toggle user" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-label="{{ 'mautic.core.user.menu.accessibility_label'|trans }}">
+        <span class="img-wrapper" role="none"><img alt="{{ 'mautic.core.user.picture.accessibility_label'|trans }}" src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
         <span class="flex-column-inline info">
             <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
-            <span class="text ml-xs small hidden-xs position">{{ app.getUser().getPosition() }}</span>
+            <span role="note" aria-label="{{ 'mautic.core.position'|trans }}" class="text ml-xs small hidden-xs position">{{ app.getUser().getPosition() }}</span>
         </span>
     </a>
-    <ul class="dropdown-menu dropdown-menu-right">
+    <ul class="dropdown-menu dropdown-menu-right" role="menu">
         <li>
             <a href="{{ path('mautic_user_account') }}" data-toggle="ajax">
                 <i class="ri-user-smile-line ri-lg"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
