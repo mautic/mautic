@@ -21,7 +21,7 @@ class LeadStageLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -35,7 +35,7 @@ class LeadStageLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\StageBundle\Entity\LeadStageLogRepository::class);
+            ->setCustomRepositoryClass(LeadStageLogRepository::class);
 
         $builder->createManyToOne('stage', 'Stage')
             ->isPrimaryKey()

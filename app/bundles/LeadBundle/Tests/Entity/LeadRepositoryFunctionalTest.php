@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
-    private \Mautic\LeadBundle\Entity\Lead $lead;
+    private Lead $lead;
 
     protected function setUp(): void
     {
@@ -105,7 +105,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse(isset($changes['points']));
         // Points should remain the same
         $model->saveEntity($this->lead);
-        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($this->lead);
+        $this->em->getRepository(Lead::class)->saveEntity($this->lead);
         $this->assertEquals(220, $this->lead->getPoints());
     }
 

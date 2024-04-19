@@ -1,3 +1,12 @@
+:root {
+  --timing: 0.3s ease;
+  --all: all var(--timing);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --timing: 0;
+  }
+}
 /*!
  * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/

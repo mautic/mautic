@@ -12,9 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class InstallNewFilesStep implements StepInterface
 {
-    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
+    private ?ProgressBar $progressBar = null;
 
-    private ?\Symfony\Component\Console\Input\InputInterface $input = null;
+    private ?InputInterface $input = null;
 
     public function __construct(
         private TranslatorInterface $translator,

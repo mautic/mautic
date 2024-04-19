@@ -14,7 +14,7 @@ class PointRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
-            ->from(\Mautic\PointBundle\Entity\Point::class, $this->getTableAlias())
+            ->from(Point::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
             ->leftJoin($this->getTableAlias().'.group', 'pl');
 
