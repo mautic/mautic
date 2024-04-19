@@ -2,6 +2,20 @@
 // Variables
 // --------------------------------------------------
 
+//== General
+//
+// Animations
+:root {
+    --timing:                                    .3s ease;
+    --all:                                       all var(--timing);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --timing:                                0;
+    }
+}
+
 //== Bootstrap variable
 //
 //## import bootstrap variable.

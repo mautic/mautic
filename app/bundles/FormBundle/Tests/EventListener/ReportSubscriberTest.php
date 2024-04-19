@@ -29,36 +29,36 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     /**
      * @var CompanyReportData|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
+    private MockObject $companyReportData;
 
     /**
      * @var SubmissionRepository|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $submissionRepository;
+    private MockObject $submissionRepository;
 
     /**
      * @var FormModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formModel;
+    private MockObject $formModel;
 
     /**
      * @var FormRepository|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formRepository;
+    private MockObject $formRepository;
 
-    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelper;
+    private ReportHelper $reportHelper;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
-    private \Mautic\FormBundle\EventListener\ReportSubscriber $subscriber;
+    private ReportSubscriber $subscriber;
 
     public function setUp(): void
     {

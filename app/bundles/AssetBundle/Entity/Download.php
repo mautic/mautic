@@ -28,7 +28,7 @@ class Download
     private $asset;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -63,7 +63,7 @@ class Download
     private $sourceId;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Email|null
+     * @var Email|null
      */
     private $email;
 
@@ -82,7 +82,7 @@ class Download
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\DownloadRepository::class)
+            ->setCustomRepositoryClass(DownloadRepository::class)
             ->addIndex(['tracking_id'], 'download_tracking_search')
             ->addIndex(['source', 'source_id'], 'download_source_search')
             ->addIndex(['date_download'], 'asset_date_download');
@@ -120,7 +120,7 @@ class Download
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('email', \Mautic\EmailBundle\Entity\Email::class)
+        $builder->createManyToOne('email', Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 

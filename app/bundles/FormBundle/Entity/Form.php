@@ -100,9 +100,9 @@ class Form extends FormEntity
     /**
      * @var Collection<int, Submission>
      */
-    #[ORM\OneToMany(targetEntity: \Mautic\FormBundle\Entity\Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
-    private \Doctrine\Common\Collections\Collection $submissions;
+    private Collection $submissions;
 
     /**
      * @var int
@@ -150,7 +150,7 @@ class Form extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('forms')
-            ->setCustomRepositoryClass(\Mautic\FormBundle\Entity\FormRepository::class);
+            ->setCustomRepositoryClass(FormRepository::class);
 
         $builder->addIdColumns();
 
@@ -624,7 +624,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return Collection|Submission[]
      */
     public function getSubmissions()
     {
