@@ -82,7 +82,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<int,array<int|string>>
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */

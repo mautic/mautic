@@ -87,7 +87,7 @@ final class ButtonHelper
 
     private bool $buttonsFetched = false;
 
-    private ?\Symfony\Component\HttpFoundation\Request $request = null;
+    private ?Request $request = null;
 
     /**
      * @var mixed

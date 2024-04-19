@@ -92,7 +92,7 @@ class FieldModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\FormBundle\Entity\Field::class);
+        return $this->em->getRepository(Field::class);
     }
 
     public function getPermissionBase(): string
