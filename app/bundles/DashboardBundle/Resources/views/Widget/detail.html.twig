@@ -3,10 +3,10 @@
         <h4>{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false" role="button" aria-label="{{ 'mautic.core.dropdown.accessibility_label'|trans }}" aria-controls="widgetDropdown" id="openWidgetDropdown">
                     <i class="ri-more-2-fill"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-right">
+                <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="openWidgetDropdown" id="widgetDropdown">
                     <li>
                         <a  href="{{ url('mautic_dashboard_action', {'objectAction': 'edit', 'objectId': widget.id}) }}"
                             data-toggle="ajaxmodal"
