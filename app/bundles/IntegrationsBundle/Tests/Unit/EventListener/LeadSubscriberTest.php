@@ -30,39 +30,39 @@ class LeadSubscriberTest extends TestCase
     /**
      * @var MockObject|FieldChangeRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
+    private MockObject $fieldChangeRepository;
 
     /**
      * @var MockObject|ObjectMappingRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectMappingRepository;
+    private MockObject $objectMappingRepository;
 
     /**
      * @var MockObject|VariableExpresserHelperInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $variableExpresserHelper;
+    private MockObject $variableExpresserHelper;
 
     /**
      * @var MockObject|SyncIntegrationsHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncIntegrationsHelper;
+    private MockObject $syncIntegrationsHelper;
 
     /**
      * @var MockObject|LeadEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEvent;
+    private MockObject $leadEvent;
 
     /**
      * @var MockObject|CompanyEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyEvent;
+    private MockObject $companyEvent;
 
-    private \Mautic\IntegrationsBundle\EventListener\LeadSubscriber $subscriber;
+    private LeadSubscriber $subscriber;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherInterfaceMock;
+    private MockObject $eventDispatcherInterfaceMock;
 
     public function setUp(): void
     {
