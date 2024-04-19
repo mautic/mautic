@@ -61,7 +61,7 @@
         {% endif %}
     {% endif %}
 
-  {% set buttons = buttons|merge([{ł
+  {% set buttons = buttons|merge([{
       'attr': {
           'class': 'btn btn-default',
           'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}),
