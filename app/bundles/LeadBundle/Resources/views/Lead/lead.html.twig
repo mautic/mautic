@@ -38,7 +38,7 @@
               'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'email'}),
           },
           'btnText': 'mautic.lead.email.send_email'|trans,
-          'iconClass': 'fa fa-send',
+          'iconClass': 'ri-mail-send-line',
           'primary': true,
       }]) %}
     {% endif %}
@@ -53,7 +53,7 @@
               'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactFrequency'}),
           },
           'btnText': 'mautic.lead.contact.frequency'|trans,
-          'iconClass': 'fa fa-signal',
+          'iconClass': 'ri-settings-5-line',
       }]) %}
 
       {% if pointGroups is not empty %}
@@ -65,7 +65,7 @@
                   'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactGroupPoints'}),
               },
               'btnText': 'mautic.lead.groups.panel.title'|trans,
-              'iconClass': 'fa fa-calculator',
+              'iconClass': 'ri-focus-2-fill',
           }]) %}
       {% endif %}
 
@@ -82,7 +82,7 @@
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'campaign'}),
             },
             'btnText': 'mautic.campaign.campaigns'|trans,
-            'iconClass': 'fa fa-clock-o',
+            'iconClass': 'ri-megaphone-line',
       }]) %}
     {% endif %}
 
@@ -96,7 +96,7 @@
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'merge'}),
             },
             'btnText': 'mautic.lead.merge'|trans,
-            'iconClass': 'fa fa-user',
+            'iconClass': 'ri-exchange-2-line',
         }]) %}
     {% endif %}
 
@@ -108,7 +108,7 @@
                 'href': path('mautic_contact_export_action', {'contactId': lead.id}),
             },
             'btnText': 'mautic.core.export'|trans,
-            'iconClass': 'fa fa-download',
+            'iconClass': 'ri-export-line',
         }]) %}
     {% endif %}
 
