@@ -44,7 +44,7 @@ class DynamicContentLeadData extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content_lead_data')
-            ->setCustomRepositoryClass(\Mautic\DynamicContentBundle\Entity\DynamicContentLeadDataRepository::class);
+            ->setCustomRepositoryClass(DynamicContentLeadDataRepository::class);
 
         $builder->addIdColumns(false, false);
 

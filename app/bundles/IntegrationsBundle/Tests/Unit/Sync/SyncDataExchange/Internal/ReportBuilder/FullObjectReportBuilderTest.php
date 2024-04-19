@@ -31,6 +31,8 @@ class FullObjectReportBuilderTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
+    private const TEST_EMAIL = 'test@test.com';
+
     /**
      * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -46,7 +48,7 @@ class FullObjectReportBuilderTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder $reportBuilder;
+    private FullObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {
@@ -71,9 +73,9 @@ class FullObjectReportBuilderTest extends TestCase
 
         $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
-            ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
+            ->with('email', $this->anything(), $requestObject, $requestDAO->getSyncToIntegration())
             ->willReturn(
-                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
+                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, self::TEST_EMAIL))
             );
 
         $internalObject = new Contact();
@@ -97,7 +99,7 @@ class FullObjectReportBuilderTest extends TestCase
                     $event->setFoundObjects([
                         [
                             'id'            => 1,
-                            'email'         => 'test@test.com',
+                            'email'         => self::TEST_EMAIL,
                             'date_modified' => '2018-10-08 00:30:00',
                         ],
                     ]);
@@ -111,7 +113,7 @@ class FullObjectReportBuilderTest extends TestCase
         $objects = $report->getObjects(Contact::NAME);
 
         $this->assertTrue(isset($objects[1]));
-        $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
+        $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
     public function testBuildingCompanyReport(): void
@@ -125,9 +127,9 @@ class FullObjectReportBuilderTest extends TestCase
 
         $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
-            ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
+            ->with('email', $this->anything(), $requestObject, $requestDAO->getSyncToIntegration())
             ->willReturn(
-                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
+                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, self::TEST_EMAIL))
             );
 
         $internalObject = new Company();
@@ -151,7 +153,7 @@ class FullObjectReportBuilderTest extends TestCase
                     $event->setFoundObjects([
                         [
                             'id'            => 1,
-                            'email'         => 'test@test.com',
+                            'email'         => self::TEST_EMAIL,
                             'date_modified' => '2018-10-08 00:30:00',
                         ],
                     ]);
@@ -165,7 +167,7 @@ class FullObjectReportBuilderTest extends TestCase
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->assertTrue(isset($objects[1]));
-        $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
+        $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
     /**
@@ -183,9 +185,9 @@ class FullObjectReportBuilderTest extends TestCase
 
         $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
-            ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
+            ->with('email', $this->anything(), $requestObject, $requestDAO->getSyncToIntegration())
             ->willReturn(
-                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
+                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, self::TEST_EMAIL))
             );
 
         $internalObject = new Contact();
@@ -231,7 +233,7 @@ class FullObjectReportBuilderTest extends TestCase
                                 [
                                     [
                                         'id'            => 1,
-                                        'email'         => 'test@test.com',
+                                        'email'         => self::TEST_EMAIL,
                                         'date_modified' => '2018-10-08 00:30:00',
                                     ],
                                 ]
@@ -270,7 +272,7 @@ class FullObjectReportBuilderTest extends TestCase
         $objects = $report->getObjects(Contact::NAME);
 
         $this->assertTrue(isset($objects[1]));
-        $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
+        $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
     /**
@@ -288,9 +290,9 @@ class FullObjectReportBuilderTest extends TestCase
 
         $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
-            ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
+            ->with('email', $this->anything(), $requestObject, $requestDAO->getSyncToIntegration())
             ->willReturn(
-                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
+                new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, self::TEST_EMAIL))
             );
 
         $internalObject = new Company();
@@ -336,7 +338,7 @@ class FullObjectReportBuilderTest extends TestCase
                                 [
                                     [
                                         'id'            => 1,
-                                        'email'         => 'test@test.com',
+                                        'email'         => self::TEST_EMAIL,
                                         'date_modified' => '2018-10-08 00:30:00',
                                     ],
                                 ]
@@ -375,6 +377,6 @@ class FullObjectReportBuilderTest extends TestCase
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->assertTrue(isset($objects[1]));
-        $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
+        $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 }

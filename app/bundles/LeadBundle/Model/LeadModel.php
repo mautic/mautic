@@ -636,10 +636,29 @@ class LeadModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
     {
-        $results = [];
+        $results    = [];
+
         switch ($type) {
             case 'user':
                 $results = $this->em->getRepository(User::class)->getUserList($filter, $limit, $start, ['lead' => 'leads']);
+                break;
+            case 'contact':
+                $fetchResults = $this->getEntities([
+                    'start'          => $start,
+                    'limit'          => $limit,
+                    'filter'         => ['string' => $filter],
+                ]);
+
+                $results = [];
+
+                /** @var Lead $fetchResult */
+                foreach ($fetchResults as $fetchResult) {
+                    $results[] = [
+                        'value' => $fetchResult->getName() ?: $fetchResult->getEmail(),
+                        'id'    => $fetchResult->getId(),
+                    ];
+                }
+
                 break;
         }
 
@@ -1497,7 +1516,7 @@ class LeadModel extends FormModel
     {
         // known "synonym" fields expected
         $synonyms = ['useragent'  => 'user_agent',
-                     'remotehost' => 'remote_host', ];
+            'remotehost'          => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -2293,5 +2312,16 @@ class LeadModel extends FormModel
         $statRepository = $this->em->getRepository(Stat::class);
 
         return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
+    }
+
+    public function removeTagFromLead(int $leadId, int $tagId): void
+    {
+        $lead = $this->getEntity($leadId);
+        $tag  = $this->getTagRepository()->find($tagId);
+
+        if ($lead && $tag) {
+            $lead->removeTag($tag);
+            $this->saveEntity($lead);
+        }
     }
 }

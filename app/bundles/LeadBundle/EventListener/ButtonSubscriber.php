@@ -48,7 +48,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
-                'iconClass' => 'fa fa-file-excel-o',
+                'iconClass' => 'ri-file-excel-line',
             ],
             ButtonHelper::LOCATION_BULK_ACTIONS
         );
@@ -69,7 +69,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.csv'),
-                'iconClass' => 'fa fa-file-text-o',
+                'iconClass' => 'ri-file-text-line',
             ],
             ButtonHelper::LOCATION_BULK_ACTIONS
         );
@@ -81,7 +81,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-toggle' => null,
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
-                'iconClass' => 'fa fa-file-excel-o',
+                'iconClass' => 'ri-file-excel-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
         );
@@ -93,7 +93,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-toggle' => null,
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.csv'),
-                'iconClass' => 'fa fa-file-text-o',
+                'iconClass' => 'ri-file-text-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
         );

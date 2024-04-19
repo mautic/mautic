@@ -72,7 +72,7 @@ Mautic.dashboardFilterPreventSubmit = function() {
     Mautic.dashboardSubmitButton = button.clone();
     button.width(button.width()+'px'); // Keep button width
     button.html('<i class="fa fa-spin fa-spinner"></i>');
-    jQuery('.widget').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
+    jQuery('.widget').find('.card-body').html('<div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>');
     form
         .unbind('submit')
         .on('submit', function(e){
@@ -85,9 +85,17 @@ Mautic.dashboardOnUnload = function(id) {
     mQuery('.jvectormap-tip').remove();
 };
 
+/**
+ * Render widget from XHR to DOM
+ *
+ * @param container
+ * @param response
+ */
 Mautic.widgetOnLoad = function(container, response) {
     if (!response.widgetId) return;
-    var widget = mQuery('[data-widget-id=' + response.widgetId + ']');
+    // target in DOM
+    var widget = mQuery('.widget[data-widget-id="' + response.widgetId + '"]');
+    // source from response
     var widgetHtml = mQuery(response.widgetHtml);
 
     // initialize edit button modal again

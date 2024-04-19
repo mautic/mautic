@@ -9,6 +9,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
+use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Exception\ReferenceNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -26,7 +27,16 @@ final class ReferenceResolver implements ReferenceResolverInterface
     public function resolveReferences(string $objectName, array $changedObjects): void
     {
         if (Contact::NAME !== $objectName) {
-            // references are currently resolved only for contacts
+            DebugLogger::log(
+                'N/A',
+                sprintf(
+                    'references are currently resolved only for %s. Given %s',
+                    Contact::NAME,
+                    $objectName
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
             return;
         }
 

@@ -19,7 +19,7 @@ class FullContact_Base
 
     private \DateTime $_next_req_time;
 
-//    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
+    //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
     protected $_baseUri     = 'https://api.fullcontact.com/';
 
     protected $_version     = 'v2';

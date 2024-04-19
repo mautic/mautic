@@ -65,4 +65,9 @@ final class GeneratedColumns implements GeneratedColumnsInterface
     {
         return isset($this->generatedColumns[$this->position]);
     }
+
+    public function count(): int
+    {
+        return count($this->generatedColumns);
+    }
 }

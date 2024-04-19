@@ -13,6 +13,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\EventListener\FormSubscriber;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -28,31 +29,33 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
     private DoNotContact|MockObject $doNotContact;
 
     /**
-     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var LeadModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var PointGroupModel|(PointGroupModel&object&MockObject)|(PointGroupModel&MockObject)|(object&MockObject)|MockObject
      */
     private MockObject|PointGroupModel $pointGroupModel;
 
-    private \Mautic\LeadBundle\EventListener\FormSubscriber $subscriber;
+    private FormSubscriber $subscriber;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|LeadFieldRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldRepostory;
+    private MockObject $leadFieldRepostory;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
+
+    private MockObject $submissionEvent;
 
     protected function setUp(): void
     {
@@ -62,6 +65,7 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
         $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
         $this->doNotContact       = $this->createMock(DoNotContact::class);
+        $this->submissionEvent    = $this->createMock(SubmissionEvent::class);
         $this->subscriber         = new FormSubscriber(
             $this->leadModel,
             $this->contactTracker,
@@ -92,5 +96,38 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onFormSubmitActionChangePoints($submissionEvent);
 
         $this->assertEquals(1, $submissionEvent->getSubmission()->getLead()->getPoints());
+    }
+
+    public function testThatTheLeadIsAddedToTheSegmentOnLeadOnSegmentsChangeEvent(): void
+    {
+        $this->submissionEvent
+            ->method('getActionConfig')
+            ->willReturn([
+                'addToLists'      => 1,
+                'removeFromLists' => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('addToLists');
+        $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
+    }
+
+    public function testThatTheLeadIsRemovedFromTheSegmentOnLeadOnSegmentsChangeEvent(): void
+    {
+        $this->submissionEvent
+            ->method('getActionConfig')
+            ->willReturn([
+                'removeFromLists' => 1,
+                'addToLists'      => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('removeFromLists');
+        $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
+    }
+
+    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
+    {
+        $subscribers = FormSubscriber::getSubscribedEvents();
+        $this->assertArrayHasKey(LeadEvents::LEAD_ON_SEGMENTS_CHANGE, $subscribers);
+        $this->assertSame(['onLeadSegmentsChange', 0], $subscribers[LeadEvents::LEAD_ON_SEGMENTS_CHANGE]);
     }
 }

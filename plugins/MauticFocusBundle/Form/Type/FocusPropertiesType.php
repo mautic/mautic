@@ -112,6 +112,7 @@ class FocusPropertiesType extends AbstractType
                     'attr'              => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.focusUpdatePreview()',
+                        'tooltip'  => 'mautic.focus.form.placement.help',
                     ],
                     'required'    => false,
                     'placeholder' => false,

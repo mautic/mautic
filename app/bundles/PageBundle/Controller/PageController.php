@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -31,7 +32,7 @@ class PageController extends FormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
@@ -85,22 +86,22 @@ class PageController extends FormController
             $filter['where'][] = [
                 'expr' => 'orX',
                 'val'  => [
-                        [
-                            'expr' => 'orX',
-                            'val'  => [
-                                ['column' => 'p.isPreferenceCenter', 'expr' => 'isNull'],
-                                ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 0],
-                            ],
-                        ],
-                        [
-                            'expr' => 'andX',
-                            'val'  => [
-                                ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 1],
-                                ['column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()],
-                            ],
+                    [
+                        'expr' => 'orX',
+                        'val'  => [
+                            ['column' => 'p.isPreferenceCenter', 'expr' => 'isNull'],
+                            ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 0],
                         ],
                     ],
-                ];
+                    [
+                        'expr' => 'andX',
+                        'val'  => [
+                            ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 1],
+                            ['column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()],
+                        ],
+                    ],
+                ],
+            ];
         }
 
         $translator = $this->translator;
@@ -171,11 +172,11 @@ class PageController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
         // set some permissions
         $security   = $this->security;
@@ -205,9 +206,9 @@ class PageController extends FormController
             ]);
         } elseif (!$security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
-        ) ||
-            ($activePage->getIsPreferenceCenter() &&
-            !$security->hasEntityAccess(
+        )
+            || ($activePage->getIsPreferenceCenter()
+            && !$security->hasEntityAccess(
                 'page:preference_center:viewown', 'page:preference_center:viewother', $activePage->getCreatedBy()
             ))) {
             return $this->accessDenied();
@@ -292,24 +293,28 @@ class PageController extends FormController
         // get related translations
         [$translationParent, $translationChildren] = $activePage->getTranslations();
 
+        $variants = [
+            'parent'             => $parent,
+            'children'           => $children,
+            'properties'         => $properties,
+            'criteria'           => $criteria['criteria'],
+        ];
+
+        $translations = [
+            'parent'   => $translationParent,
+            'children' => $translationChildren,
+        ];
+
         return $this->delegateView([
             'returnUrl' => $this->generateUrl('mautic_page_action', [
-                    'objectAction' => 'view',
-                    'objectId'     => $activePage->getId(), ]
+                'objectAction' => 'view',
+                'objectId'     => $activePage->getId(), ]
             ),
             'viewParameters' => [
-                'activePage' => $activePage,
-                'variants'   => [
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties,
-                    'criteria'   => $criteria['criteria'],
-                ],
-                'translations' => [
-                    'parent'   => $translationParent,
-                    'children' => $translationChildren,
-                ],
-                'permissions' => $security->isGranted([
+                'activePage'   => $activePage,
+                'variants'     => $variants,
+                'translations' => $translations,
+                'permissions'  => $security->isGranted([
                     'page:pages:viewown',
                     'page:pages:viewother',
                     'page:pages:create',
@@ -334,7 +339,16 @@ class PageController extends FormController
                 'pageUrl'       => $model->generateUrl($activePage, true),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'logs'          => $logs,
-                'dateRangeForm' => $dateRangeForm->createView(),
+                'dateRangeForm' => $dateRangeForm->createView(), 'previewSettingsForm' => $this->createForm(
+                    ContentPreviewSettingsType::class,
+                    null,
+                    [
+                        'type'         => ContentPreviewSettingsType::TYPE_PAGE,
+                        'objectId'     => $activePage->getId(),
+                        'variants'     => $variants,
+                        'translations' => $translations,
+                    ]
+                )->createView(),
             ],
             'contentTemplate' => '@MauticPage/Page/details.html.twig',
             'passthroughVars' => [
@@ -347,17 +361,17 @@ class PageController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @param \Mautic\PageBundle\Entity\Page|null $entity
+     * @param Page|null $entity
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
 
         if (!($entity instanceof Page)) {
-            /** @var \Mautic\PageBundle\Entity\Page $entity */
+            /** @var Page $entity */
             $entity = $model->getEntity();
         }
 
@@ -472,7 +486,7 @@ class PageController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function editAction(
         Request $request,
@@ -483,7 +497,7 @@ class PageController extends FormController
         $objectId,
         $ignorePost = false
     ) {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model    = $this->getModel('page.page');
         $security = $this->security;
         $entity   = $model->getEntity($objectId);
@@ -518,8 +532,8 @@ class PageController extends FormController
             );
         } elseif (!$security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
-        ) ||
-            ($entity->getIsPreferenceCenter() && !$security->hasEntityAccess(
+        )
+            || ($entity->getIsPreferenceCenter() && !$security->hasEntityAccess(
                 'page:preference_center:viewown', 'page:preference_center:viewother', $entity->getCreatedBy()
             ))) {
             return $this->accessDenied();
@@ -582,7 +596,7 @@ class PageController extends FormController
 
             // set the lookup values
             $parent = $entity->getTranslationParent();
-            if ($parent && isset($form['translationParent_lookup'])) {
+            if ($parent instanceof Page && isset($form['translationParent_lookup'])) {
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
             }
 
@@ -637,17 +651,17 @@ class PageController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function cloneAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->security->isGranted('page:pages:create') ||
-                !$this->security->hasEntityAccess(
+            if (!$this->security->isGranted('page:pages:create')
+                || !$this->security->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
                 )
             ) {
@@ -693,7 +707,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
@@ -754,7 +768,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model     = $this->getModel('page');
             $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -806,11 +820,11 @@ class PageController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function builderAction(Request $request, SlotsHelper $slotsHelper, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
 
         // permission check
@@ -865,11 +879,11 @@ class PageController extends FormController
     /**
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
@@ -879,8 +893,8 @@ class PageController extends FormController
 
         $parent = $entity->getVariantParent();
 
-        if ($parent || !$this->security->isGranted('page:pages:create') ||
-                !$this->security->hasEntityAccess(
+        if ($parent || !$this->security->isGranted('page:pages:create')
+                || !$this->security->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
                 )
         ) {
@@ -924,7 +938,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
@@ -1016,11 +1030,11 @@ class PageController extends FormController
      * @param int $objectId
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function resultsAction(Request $request, $objectId, $page = 1)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        /** @var PageModel $pageModel */
         $pageModel    = $this->getModel('page.page');
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $request->getSession();
@@ -1158,7 +1172,7 @@ class PageController extends FormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|Response
      *
      * @throws \Exception
      */
