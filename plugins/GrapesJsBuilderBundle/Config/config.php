@@ -34,7 +34,7 @@ return [
         'other'        => [
             // Provides access to configured API keys, settings, field mapping, etc
             'grapesjsbuilder.config' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
+                'class'     => MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],
@@ -43,7 +43,7 @@ return [
         'sync'         => [],
         'helpers'      => [
             'grapesjsbuilder.helper.filemanager' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
+                'class'     => MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
                 'arguments' => [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',

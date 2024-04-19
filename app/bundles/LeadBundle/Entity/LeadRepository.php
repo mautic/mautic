@@ -532,7 +532,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
+     * @return QueryBuilder
      */
     public function getEntitiesDbalQueryBuilder()
     {
@@ -559,7 +559,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $q->select($select)
-            ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
+            ->from(Lead::class, $alias, $alias.'.id')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
 
@@ -664,7 +664,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      *
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -688,7 +688,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -1060,7 +1060,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Check Lead segments by ids.
      *
-     * @param array<integer> $stages
+     * @param array<int> $stages
      */
     public function isContactInOneOfStages(Lead $lead, array $stages = []): bool
     {
