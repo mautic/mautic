@@ -27,8 +27,8 @@
 
     {{ buttonsRender(
         (
-            '<button type="button" class="btn btn-default btn-nospin dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="ri-arrow-down-s-line"></i></button>\n'
-            ~ '<ul class="dropdown-menu dropdown-menu-right" role="menu">'
+            '<button type="button" class="btn btn-default btn-nospin dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="dropdownMenuButton"><i class="ri-arrow-down-s-line"></i></button>\n'
+            ~ '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenuButton">'
         )
         , '</ul>'
     )|raw }}
