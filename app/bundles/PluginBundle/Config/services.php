@@ -3,7 +3,11 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\PluginBundle\EventListener\CampaignSubscriber;
+use Mautic\PluginBundle\EventListener\FormSubscriber;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -22,6 +26,11 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias('mautic.plugin.model.plugin', \Mautic\PluginBundle\Model\PluginModel::class);
-    $services->alias('mautic.plugin.model.integration_entity', \Mautic\PluginBundle\Model\IntegrationEntityModel::class);
+    $services->alias('mautic.plugin.model.plugin', Mautic\PluginBundle\Model\PluginModel::class);
+    $services->alias('mautic.plugin.model.integration_entity', Mautic\PluginBundle\Model\IntegrationEntityModel::class);
+
+    $services->set(FormSubscriber::class)
+        ->call('setIntegrationHelper', [service('mautic.helper.integration')]);
+    $services->set(CampaignSubscriber::class)
+        ->call('setIntegrationHelper', [service('mautic.helper.integration')]);
 };

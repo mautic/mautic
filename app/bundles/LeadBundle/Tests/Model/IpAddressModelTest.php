@@ -20,14 +20,14 @@ class IpAddressModelTest extends TestCase
     /**
      * @var EntityManager|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject|LoggerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
-    private \Mautic\LeadBundle\Model\IpAddressModel $ipAddressModel;
+    private IpAddressModel $ipAddressModel;
 
     protected function setUp(): void
     {

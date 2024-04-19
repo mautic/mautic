@@ -361,7 +361,7 @@ class MailHelper
             }
 
             // Attach assets
-            /** @var \Mautic\AssetBundle\Entity\Asset $asset */
+            /** @var Asset $asset */
             foreach ($this->assets as $asset) {
                 if (!in_array($asset->getId(), $this->attachedAssets)) {
                     $this->attachedAssets[] = $asset->getId();

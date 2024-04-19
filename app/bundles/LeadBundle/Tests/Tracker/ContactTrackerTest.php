@@ -28,49 +28,49 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
+    private MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|ContactTrackingServiceInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTrackingServiceMock;
+    private MockObject $contactTrackingServiceMock;
 
     /**
      * @var MockObject|DeviceTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackerMock;
+    private MockObject $deviceTrackerMock;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private \PHPUnit\Framework\MockObject\MockObject $securityMock;
+    private MockObject $securityMock;
 
     /**
      * @var MockObject|Logger
      */
-    private \PHPUnit\Framework\MockObject\MockObject $loggerMock;
+    private MockObject $loggerMock;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelperMock;
+    private MockObject $ipLookupHelperMock;
 
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
+    private RequestStack $requestStack;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+    private MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|EventDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModelMock;
+    private MockObject $leadFieldModelMock;
 
     protected function setUp(): void
     {

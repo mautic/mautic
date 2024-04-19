@@ -71,7 +71,7 @@ class FormApiController extends CommonApiController
     /**
      * Delete fields from a form.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteFieldsAction(Request $request, $formId)
     {
@@ -101,7 +101,7 @@ class FormApiController extends CommonApiController
     /**
      * Delete fields from a form.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteActionsAction(Request $request, $formId)
     {
@@ -363,5 +363,16 @@ class FormApiController extends CommonApiController
         }
 
         return parent::processForm($request, $entity, $parameters, $method);
+    }
+
+    public function newEntityAction(Request $request): Response
+    {
+        $parameters = $request->request->all();
+
+        if (!isset($parameters['postAction'])) {
+            $request->request->add(['postAction' => 'return']);
+        }
+
+        return parent::newEntityAction($request);
     }
 }
