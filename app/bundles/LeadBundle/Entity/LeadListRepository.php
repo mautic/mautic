@@ -384,7 +384,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -399,7 +399,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {

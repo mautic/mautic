@@ -33,11 +33,11 @@ class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth2_three_legged';
 
-    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface $credentials = null;
+    private ?AuthCredentialsInterface $credentials = null;
 
     private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|null $config = null;
 
-    private ?\GuzzleHttp\Client $reAuthClient = null;
+    private ?Client $reAuthClient = null;
 
     /**
      * Cache of initialized clients.

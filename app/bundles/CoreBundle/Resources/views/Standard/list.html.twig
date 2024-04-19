@@ -1,4 +1,3 @@
-{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
 {% set ignoreStandardColumns = ignoreStandardColumns is defined ? ignoreStandardColumns : [] %}
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
@@ -57,9 +56,9 @@
             }) -}}
 
             <div class="page-list">
-                {{ customContent('content.above', mauticTemplateVars) }}
+                {{ customContent('content.above', _context) }}
                 {{ block('mainContent') }}
-                {{ customContent('content.below', mauticTemplateVars) }}
+                {{ customContent('content.below', _context) }}
             </div>
         </div>
     {% else %}
@@ -141,7 +140,7 @@
                         }) -}}
                         {% endif %}
 
-                        {{ customContent('list.headers', mauticTemplateVars) }}
+                        {{ customContent('list.headers', _context) }}
                 </tr>
                 </thead>
                 <tbody>
@@ -193,7 +192,7 @@
                                         {'objectId' : item.getId(), 'objectAction' : nameAction}
                                     ) }}">
                                         {{ item.getName() }}
-                                        {{ customContent('list.name', mauticTemplateVars) }}
+                                        {{ customContent('list.name', _context) }}
                                     </a>
                                 </div>
                                 {% if attribute(item, 'getDescription') is defined and item.getDescription() %}
@@ -220,7 +219,7 @@
                             <td class="visible-md visible-lg">{{ item.getId() }}</td>
                         {% endif %}
 
-                        {{ customContent('list.columns', mauticTemplateVars) }}
+                        {{ customContent('list.columns', _context) }}
                     </tr>
                 {% endfor %}
                 </tbody>

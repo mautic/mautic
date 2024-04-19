@@ -102,8 +102,8 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * @param \Mautic\PointBundle\Entity\Trigger $entity
-     * @param bool                               $unlock
+     * @param Trigger $entity
+     * @param bool    $unlock
      */
     public function saveEntity($entity, $unlock = true): void
     {
@@ -366,10 +366,10 @@ class TriggerModel extends CommonFormModel
     private function invokeCallback($event, Lead $lead, array $settings)
     {
         $args = [
-          'event'   => $event,
-          'lead'    => $lead,
-          'factory' => $this->mauticFactory,
-          'config'  => $event['properties'],
+            'event'   => $event,
+            'lead'    => $lead,
+            'factory' => $this->mauticFactory,
+            'config'  => $event['properties'],
         ];
 
         if (is_array($settings['callback'])) {
