@@ -58,7 +58,7 @@
     <div class="scroll-content slimscroll">
         <!-- start: navigation -->
         <nav class="nav-sidebar">
-            {{ customContent('menu.above', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+            {{ customContent('menu.above', _context) }}
             {{ menuRender('main') }}
 
             <!-- start: left nav -->
