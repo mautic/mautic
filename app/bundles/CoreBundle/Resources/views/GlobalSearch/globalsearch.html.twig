@@ -16,7 +16,7 @@
 </li>
 <li>
     <div class="search-container" id="globalSearchContainer">
-        <a href="javascript: void(0);" class="search-button">
+        <a href="javascript: void(0);" class="search-button" aria-label="{{ 'mautic.core.search.everything.placeholder'|trans }}" id="globalSearchButton">
             <i class="ri-search-line ri-xl"></i>
         </a>
         <input
@@ -26,6 +26,7 @@
             id="globalSearchInput"
             name="global_search"
             placeholder="{% trans %}mautic.core.search.everything.placeholder{% endtrans %}"
+            aria-labelledby="globalSearchButton"
             autocomplete="false"
             data-toggle="livesearch"
             data-target="#globalSearchResults"
