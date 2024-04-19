@@ -58,7 +58,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
     }
 
     /**
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {

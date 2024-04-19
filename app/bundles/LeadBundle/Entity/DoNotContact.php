@@ -66,7 +66,7 @@ class DoNotContact
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_donotcontact')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\DoNotContactRepository::class)
+            ->setCustomRepositoryClass(DoNotContactRepository::class)
             ->addIndex(['lead_id', 'channel', 'reason'], 'leadid_reason_channel');
 
         $builder->addId();

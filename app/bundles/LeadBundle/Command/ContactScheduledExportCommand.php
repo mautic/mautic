@@ -65,7 +65,7 @@ class ContactScheduledExportCommand extends Command
 
         $output->writeln('Contact export email(s) sent: '.$count);
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Export contacts which are scheduled in `contact_export_scheduler` table.';

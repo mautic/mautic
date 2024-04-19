@@ -57,7 +57,7 @@
             'href'        : path('mautic_email_action', {'objectAction' : 'sendExample', 'objectId' : email.getId()}),
             'data-header' : 'mautic.email.send.example'|trans,
         },
-        'iconClass' : 'fa fa-send',
+        'iconClass' : 'ri-mail-send-line',
         'btnText'   : 'mautic.email.send.example',
         'primary'   : true,
     } %}
@@ -71,7 +71,7 @@
             'href'        : '#',
             'data-header' : 'mautic.email.heatmap.click_heatmap'|trans,
         },
-        'iconClass' : 'fa fa-fire',
+        'iconClass' : 'ri-fire-line',
         'btnText'   : 'mautic.email.heatmap.click_heatmap'
     } %}
     {% set customButtons = customButtons|merge([heatmapButton]) %}
@@ -358,7 +358,7 @@
                               <input id="content_preview_url" data-route="email/preview" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
                               <span class="input-group-btn">
                               <button id="content_preview_url_button" class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
-                                  <i class="fa fa-external-link"></i>
+                                  <i class="ri-external-link-line"></i>
                               </button>
                           </span>
                               <input type="hidden" id="content_preview_settings_object_id" value="{{ email.id }}">

@@ -180,9 +180,9 @@ class PageModelTest extends PageTestAbstract
             'stat'    => '5f5dedc3b0dc0366144010',
             'lead'    => 2,
             'channel' => [
-                            'email' => 4,
-                        ],
-            ];
+                'email' => 4,
+            ],
+        ];
         $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
         $params = [[
