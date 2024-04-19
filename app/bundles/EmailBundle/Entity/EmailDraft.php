@@ -16,7 +16,7 @@ class EmailDraft
 {
     private int $id;
 
-    public function __construct(private Email $email, private string $html, private  string $template, private bool $publicPreview = true)
+    public function __construct(private Email $email, private ?string $html, private ?string $template, private ?bool $publicPreview = true)
     {
     }
 
@@ -55,16 +55,14 @@ class EmailDraft
     /**
      * Check all links in content and decode &amp;
      * This even works with double encoded ampersands.
-     *
-     * @param $content
      */
-    private function decodeAmpersands(&$content): void
+    private function decodeAmpersands(string &$content): void
     {
         if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
             foreach ($matches[0] as $url) {
                 $newUrl = $url;
 
-                while (false !== strpos($newUrl, '&amp;')) {
+                while (str_contains($newUrl, '&amp;')) {
                     $newUrl = str_replace('&amp;', '&', $newUrl);
                 }
 

@@ -8,34 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailDraft;
 use Mautic\EmailBundle\Entity\EmailDraftRepository;
-use Mautic\EmailBundle\Entity\EmailRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class EmailDraftModel
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var EmailRepository
-     */
-    private $emailRepository;
-
-    /**
-     * @var EmailDraftRepository
-     */
-    private $emailDraftRepository;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        EmailRepository $emailRepository,
-        EmailDraftRepository $emailDraftRepository
+       private EntityManagerInterface $entityManager,
+       private EmailDraftRepository $emailDraftRepository
     ) {
-        $this->entityManager        = $entityManager;
-        $this->emailRepository      = $emailRepository;
-        $this->emailDraftRepository = $emailDraftRepository;
     }
 
     public function createDraft(Email $email, string $html, string $template, bool $publicPreview = true): EmailDraft

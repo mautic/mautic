@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -18,51 +9,15 @@ use Mautic\EmailBundle\Entity\Email;
 
 class EmailEditSubmitEvent extends CommonEvent
 {
-    /**
-     * @var Email
-     */
-    private $previousEmail;
-    /**
-     * @var Email
-     */
-    private $currentEmail;
-    /**
-     * @var bool
-     */
-    private $saveAndClose;
-    /**
-     * @var bool
-     */
-    private $apply;
-    /**
-     * @var bool
-     */
-    private $saveAsDraft;
-    /**
-     * @var bool
-     */
-    private $applyDraft;
-    /**
-     * @var bool
-     */
-    private $discardDraft;
-
     public function __construct(
-        Email $previousEmail,
-        Email $currentEmail,
-        bool $saveAndClose,
-        bool $apply,
-        bool $saveAsDraft,
-        bool $applyDraft,
-        bool $discardDraft
+        private Email $previousEmail,
+        private Email $currentEmail,
+        private bool $saveAndClose,
+        private bool $apply,
+        private bool $saveAsDraft,
+        private bool $applyDraft,
+        private bool $discardDraft
     ) {
-        $this->previousEmail = $previousEmail;
-        $this->currentEmail  = $currentEmail;
-        $this->saveAndClose  = $saveAndClose;
-        $this->apply         = $apply;
-        $this->saveAsDraft   = $saveAsDraft;
-        $this->applyDraft    = $applyDraft;
-        $this->discardDraft  = $discardDraft;
     }
 
     public function getPreviousEmail(): Email

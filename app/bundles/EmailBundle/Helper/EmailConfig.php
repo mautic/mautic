@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Helper\EmailConfigInterface;
 
 final class EmailConfig implements EmailConfigInterface
 {
-
     public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
     }

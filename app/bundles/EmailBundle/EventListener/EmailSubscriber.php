@@ -180,7 +180,7 @@ class EmailSubscriber implements EventSubscriberInterface
     {
         try {
             $this->emailDraftModel->deleteDraft($event->getEmail());
-        } catch (NotFoundHttpException $exception) {
+        } catch (NotFoundHttpException) {
             // No associated draft found for deletion. We have nothing to do here. Return.
             return;
         }

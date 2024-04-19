@@ -14,12 +14,14 @@ class EmailDraftFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        // Don't automatically load symfony because these tests need to set custom config parameters
+        $this->configParams['email_draft_enabled'] = 'testEmailDraftNotConfigured' !== $this->getName();
+
+        parent::setUp();
     }
 
     public function testEmailDraftNotConfigured(): void
     {
-        $email   = $this->createNewEmail('blank', 'Test html', false);
+        $email   = $this->createNewEmail();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         Assert::assertEquals(0, $crawler->selectButton('Save as Draft')->count());
         Assert::assertEquals(0, $crawler->selectButton('Apply Draft')->count());
@@ -28,7 +30,7 @@ class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailDraftConfigured(): void
     {
-        $email   = $this->createNewEmail('blank', 'Test html', true);
+        $email   = $this->createNewEmail();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
 
         Assert::assertEquals(1, $crawler->selectButton('Save as Draft')->count());
@@ -38,7 +40,7 @@ class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
     public function testCheckDraftInList(): void
     {
-        $email   = $this->createNewEmail('blank', 'Test html', true);
+        $email   = $this->createNewEmail();
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
         $this->assertStringNotContainsString('Has draft', $crawler->filter('#app-content a[href="/s/emails/view/'.$email->getId().'"]')->html());
         $this->saveDraft($email);
@@ -48,7 +50,7 @@ class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewDraft(): void
     {
-        $email = $this->createNewEmail('blank', 'Test html', true);
+        $email = $this->createNewEmail();
         $this->saveDraft($email);
         $crawler = $this->client->request(Request::METHOD_GET, "/email/preview/{$email->getId()}");
         $this->assertEquals('Test html', $crawler->text());
@@ -59,25 +61,13 @@ class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
     public function testSaveDraftAndApplyDraftForLegacy(): void
     {
-        $email = $this->createNewEmail('blank', 'Test html', true);
-        $this->applyDraft($email);
-    }
-
-    public function testSaveDraftAndApplyDraftForBee(): void
-    {
-        $email = $this->createNewEmail('beefree-empty', 'Test html', true);
+        $email = $this->createNewEmail();
         $this->applyDraft($email);
     }
 
     public function testDiscardDraftForLegacy(): void
     {
-        $email = $this->createNewEmail('blank', 'Test html', true);
-        $this->discardDraft($email);
-    }
-
-    public function testDiscardDraftForBee(): void
-    {
-        $email = $this->createNewEmail('beefree-empty', 'Test html', true);
+        $email = $this->createNewEmail();
         $this->discardDraft($email);
     }
 
@@ -132,9 +122,8 @@ class EmailDraftFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Test html', $email->getCustomHtml());
     }
 
-    private function createNewEmail(string $templateName = 'blank', string $templateContent = 'Test html', bool $isDraftEnabled = true): Email
+    private function createNewEmail(string $templateName = 'blank', string $templateContent = 'Test html'): Email
     {
-        $this->setConfig($isDraftEnabled);
         $email = new Email();
         $email->setName('Email A');
         $email->setSubject('Email A Subject');
@@ -145,14 +134,5 @@ class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $email;
-    }
-
-    private function setConfig(bool $isDraftEnabled = true): void
-    {
-        $this->setUpSymfony(
-            [
-                'email_draft_enabled' => $isDraftEnabled,
-            ]
-        );
     }
 }

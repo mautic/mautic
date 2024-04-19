@@ -10,9 +10,6 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20201019100000 extends AbstractMauticMigration
 {
-    /**
-     * @var string
-     */
     protected static string $tableName = 'emails_draft';
 
     /**

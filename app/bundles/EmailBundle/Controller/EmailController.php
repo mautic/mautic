@@ -49,7 +49,7 @@ class EmailController extends FormController
     public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, $page = 1)
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             [
                 'email:emails:viewown',
@@ -304,7 +304,7 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-        //get A/B test information
+        // get A/B test information
         [$parent, $children]     = $email->getVariants();
         $properties              = [];
         $variantError            = false;
@@ -361,7 +361,7 @@ class EmailController extends FormController
             }
         }
 
-        //get related translations
+        // get related translations
         [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Audit Log
@@ -378,8 +378,7 @@ class EmailController extends FormController
                 [
                     'objectId'   => $email->getId(),
                     'objectType' => 'draft',
-                ],
-                true
+                ]
             );
         }
 
@@ -469,7 +468,7 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
+    public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, EmailConfig $emailConfig, $entity = null)
     {
         $model = $this->getModel('email');
         \assert($model instanceof EmailModel);
@@ -540,7 +539,7 @@ class EmailController extends FormController
                         $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $entity->getId(), true);
+                        return $this->editAction($request, $assetsHelper, $translator, $routerHelper, $coreParametersHelper, $emailConfig, $entity->getId(), true);
                     }
                 }
             } else {
@@ -725,11 +724,11 @@ class EmailController extends FormController
                         $this->dispatcher->dispatch(new EmailEditSubmitEvent(
                             $existingEmail,
                             $entity,
-                            $form->get('buttons')->get('save')->isClicked(),
-                            $form->get('buttons')->get('apply')->isClicked(),
-                            ($form->get('buttons')->has('save_draft') && $form->get('buttons')->get('save_draft')->isClicked()),
-                            ($form->get('buttons')->has('apply_draft') && $form->get('buttons')->get('apply_draft')->isClicked()),
-                            ($form->get('buttons')->has('discard_draft') && $form->get('buttons')->get('discard_draft')->isClicked())
+                            $this->getFormButton($form, ['buttons', 'save'])->isClicked(),
+                            $this->getFormButton($form, ['buttons', 'apply'])->isClicked(),
+                            $form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked(),
+                            $form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked(),
+                            $form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked()
                         ), EmailEvents::ON_EMAIL_EDIT_SUBMIT);
                     }
 
@@ -777,10 +776,10 @@ class EmailController extends FormController
 
             if ($cancelled ||
                 ($valid && ($this->getFormButton($form, ['buttons', 'save'])->isClicked() ||
-                    ($form->get('buttons')->has('save_draft') && $form->get('buttons')->get('save_draft')->isClicked()) ||
-                    ($form->get('buttons')->has('apply_draft') && $form->get('buttons')->get('apply_draft')->isClicked()) ||
-                    ($form->get('buttons')->has('discard_draft') && $form->get('buttons')->get('discard_draft')->isClicked())))
-                ) {
+                    ($form->get('buttons')->has('save_draft') && $this->getFormButton($form, ['buttons', 'save_draft'])->isClicked()) ||
+                    ($form->get('buttons')->has('apply_draft') && $this->getFormButton($form, ['buttons', 'apply_draft'])->isClicked()) ||
+                    ($form->get('buttons')->has('discard_draft') && $this->getFormButton($form, ['buttons', 'discard_draft'])->isClicked())))
+            ) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -847,8 +846,7 @@ class EmailController extends FormController
                 'mautic_email_preview',
                 ['objectId'       => $entity->getId(),
                     'objectType'  => 'draft',
-                ],
-                true
+                ]
             );
         }
 

@@ -1196,6 +1196,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         return $this->pendingCount;
     }
+
     public function getClonedId(): ?int
     {
         return $this->clonedId;

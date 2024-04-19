@@ -44,11 +44,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmailType extends AbstractType
 {
     use DynamicContentTrait;
-
-    /**
-     * @var bool
-     */
-    private $isDraftEnabled;
+    private bool $isDraftEnabled;
 
     public function __construct(
         private TranslatorInterface $translator,
@@ -56,9 +52,9 @@ class EmailType extends AbstractType
         private StageModel $stageModel,
         private CoreParametersHelper $coreParametersHelper,
         private ThemeHelperInterface $themeHelper,
-        private EmailConfigInterface $emailConfig,
+        EmailConfigInterface $emailConfig,
     ) {
-        $this->isDraftEnabled       = $emailConfig->isDraftEnabled();
+        $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -495,16 +491,16 @@ class EmailType extends AbstractType
         $builder->add('emailType', HiddenType::class);
 
         $extraButtons['pre_extra_buttons'] = [
-                [
-                    'name'  => 'builder',
-                    'label' => 'mautic.core.builder',
-                    'attr'  => [
-                        'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                        'icon'    => 'ri-layout-line',
-                        'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
-                    ],
+            [
+                'name'  => 'builder',
+                'label' => 'mautic.core.builder',
+                'attr'  => [
+                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
+                    'icon'    => 'ri-layout-line',
+                    'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
                 ],
-            ];
+            ],
+        ];
 
         $draftActionButtons = $this->getDraftActionButtons($options['data']);
         if (!empty($draftActionButtons)) {
@@ -534,6 +530,9 @@ class EmailType extends AbstractType
         }
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getDraftActionButtons(Email $email): array
     {
         $draftActionButtons = [];
