@@ -42,7 +42,7 @@ class CampaignMapStatsController extends AbstractCountryMapController
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getData($entity, \DateTimeInterface $dateFromObject, \DateTimeInterface $dateToObject): array
     {
         return $this->model->getCountryStats($entity, $dateFromObject, $dateToObject);
     }

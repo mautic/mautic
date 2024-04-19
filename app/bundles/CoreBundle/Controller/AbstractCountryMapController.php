@@ -32,7 +32,7 @@ abstract class AbstractCountryMapController extends AbstractController
      *
      * @return array<string, array<int, array<string, int|string>>>
      */
-    abstract public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array;
+    abstract public function getData($entity, \DateTimeInterface $dateFromObject, \DateTimeInterface $dateToObject): array;
 
     /**
      * @template T

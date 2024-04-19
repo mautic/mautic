@@ -802,7 +802,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      *
      * @throws Exception
      */
-    public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array
+    public function getCountryStats($entity, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, bool $includeVariants = false): array
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
@@ -830,7 +830,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      *
      * @return array{}|array<int, array<string, string|null>>
      */
-    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeInterface $dateFromObject, \DateTimeInterface $dateToObject): array
     {
         return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
     }

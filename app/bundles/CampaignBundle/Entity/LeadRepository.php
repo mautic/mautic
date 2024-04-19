@@ -601,7 +601,7 @@ class LeadRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeInterface $dateFromObject, \DateTimeInterface $dateToObject): array
     {
         $queryBuilder      = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $leadCampaignAlias = 'lc';

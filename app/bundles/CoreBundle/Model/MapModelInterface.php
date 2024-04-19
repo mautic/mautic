@@ -20,7 +20,7 @@ interface MapModelInterface
      *
      * @throws Exception
      */
-    public function getCountryStats($entity, \DateTime $dateFrom, \DateTime $dateTo, bool $includeVariants = false): array;
+    public function getCountryStats($entity, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, bool $includeVariants = false): array;
 
     /**
      * @param int|array id

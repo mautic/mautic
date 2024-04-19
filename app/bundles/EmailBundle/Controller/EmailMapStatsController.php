@@ -38,7 +38,7 @@ class EmailMapStatsController extends AbstractCountryMapController
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTime $dateFromObject, \DateTime $dateToObject): array
+    public function getData($entity, \DateTimeInterface $dateFromObject, \DateTimeInterface $dateToObject): array
     {
         // get A/B test information
         $parent = $entity->getVariantParent();
