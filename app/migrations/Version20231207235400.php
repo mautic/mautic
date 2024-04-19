@@ -8,13 +8,16 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 class Version20231207235400 extends AbstractMauticMigration
 {
-    public function up(Schema $schema): void
+    public function preUp(Schema $schema): void
     {
         $table = $schema->getTable($this->prefix.'forms');
         if ($table->hasColumn('lang')) {
             throw new SkipMigration('Schema includes this migration');
         }
+    }
 
+    public function up(Schema $schema): void
+    {
         $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD lang VARCHAR(191)  DEFAULT NULL');
     }
 
