@@ -27,34 +27,34 @@ class ThemeHelperTest extends TestCase
     /**
      * @var PathsHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    private MockObject $pathsHelper;
 
     /**
      * @var Environment|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $twig;
+    private MockObject $twig;
 
     /**
      * @var FilesystemLoader|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $loader;
+    private MockObject $loader;
 
     /**
      * @var TranslatorInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParameterHelper;
+    private MockObject $coreParameterHelper;
 
     /**
      * @var BuilderIntegrationsHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $builderIntegrationsHelper;
+    private MockObject $builderIntegrationsHelper;
 
-    private \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper;
+    private ThemeHelper $themeHelper;
 
     protected function setUp(): void
     {

@@ -19,17 +19,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class KickoffExecutioner implements ExecutionerInterface
 {
-    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
+    private ?ContactLimiter $limiter = null;
 
-    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
+    private ?Campaign $campaign = null;
 
-    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
+    private ?OutputInterface $output = null;
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     private ?\Doctrine\Common\Collections\ArrayCollection $rootEvents = null;
 
-    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
+    private ?Counter $counter = null;
 
     public function __construct(
         private LoggerInterface $logger,

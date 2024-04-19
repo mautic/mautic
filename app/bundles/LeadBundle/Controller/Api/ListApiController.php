@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,7 +80,7 @@ class ListApiController extends CommonApiController
     /**
      * Obtains a list of smart lists for the user.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getListsAction()
     {
@@ -99,7 +100,7 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -136,7 +137,7 @@ class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -184,7 +185,7 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -227,10 +228,10 @@ class ListApiController extends CommonApiController
     protected function checkEntityAccess($entity, $action = 'view')
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
-            return $this->security->isGranted('lead:leads:viewown');
+            return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         } elseif ('delete' == $action) {
             return $this->factory->getSecurity()->hasEntityAccess(
-                true, 'lead:lists:deleteother', $entity->getCreatedBy()
+                true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );
         }
 

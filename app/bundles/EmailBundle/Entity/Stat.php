@@ -17,6 +17,8 @@ class Stat
      */
     public const MAX_OPEN_DETAILS = 1000;
 
+    public const TABLE_NAME = 'email_stats';
+
     /**
      * @var string|null
      */
@@ -48,7 +50,7 @@ class Stat
     private $ipAddress;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTime|null
      */
     private $dateSent;
 
@@ -68,7 +70,7 @@ class Stat
     private $viewedInBrowser = false;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTime|null
      */
     private $dateRead;
 
@@ -108,7 +110,7 @@ class Stat
     private $openCount = 0;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTime|null
      */
     private $lastOpened;
 
@@ -136,8 +138,8 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stats')
-            ->setCustomRepositoryClass(\Mautic\EmailBundle\Entity\StatRepository::class)
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')
@@ -162,7 +164,7 @@ class Stat
             ->columnName('email_address')
             ->build();
 
-        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
+        $builder->createManyToOne('list', LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -212,7 +214,7 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('storedCopy', \Mautic\EmailBundle\Entity\Copy::class)
+        $builder->createManyToOne('storedCopy', Copy::class)
             ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -259,7 +261,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return \DateTime|null
      */
     public function getDateRead()
     {
@@ -267,16 +269,17 @@ class Stat
     }
 
     /**
-     * @param \DateTime|null $dateRead
+     * @param \DateTimeInterface|null $dateRead
      */
     public function setDateRead($dateRead): void
     {
+        $dateRead = $this->toDateTime($dateRead);
         $this->addChange('dateRead', $this->dateRead, $dateRead);
         $this->dateRead = $dateRead;
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return \DateTime|null
      */
     public function getDateSent()
     {
@@ -284,10 +287,11 @@ class Stat
     }
 
     /**
-     * @param \DateTime|null $dateSent
+     * @param \DateTimeInterface|null $dateSent
      */
     public function setDateSent($dateSent): void
     {
+        $dateSent = $this->toDateTime($dateSent);
         $this->addChange('dateSent', $this->dateSent, $dateSent);
         $this->dateSent = $dateSent;
     }
@@ -576,7 +580,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return \DateTime|null
      */
     public function getLastOpened()
     {
@@ -584,12 +588,13 @@ class Stat
     }
 
     /**
-     * @param \DateTime|null $lastOpened
+     * @param \DateTimeInterface|null $lastOpened
      *
      * @return Stat
      */
     public function setLastOpened($lastOpened)
     {
+        $lastOpened = $this->toDateTime($lastOpened);
         $this->addChange('lastOpened', $this->lastOpened, $lastOpened);
         $this->lastOpened = $lastOpened;
 
@@ -665,5 +670,13 @@ class Stat
         }
 
         $this->changes[$property] = [$currentValue, $newValue];
+    }
+
+    /**
+     * @param \DateTime|\DateTimeImmutable|null $dateTime
+     */
+    private function toDateTime($dateTime): ?\DateTime
+    {
+        return $dateTime instanceof \DateTimeImmutable ? \DateTime::createFromImmutable($dateTime) : $dateTime;
     }
 }

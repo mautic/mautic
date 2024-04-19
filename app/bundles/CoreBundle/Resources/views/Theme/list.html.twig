@@ -6,7 +6,7 @@
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered theme-list" id="themeTable">
                 <thead>
-                    <tr>   
+                    <tr>
                         {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'checkall': 'true',
                             'target'  : '#themeTable',
@@ -41,10 +41,10 @@
                                 {% set previewButtonSettings = {
                                     'attr': {
                                         'data-toggle': 'modal',
-                                        'data-target': '#theme-' ~ k,   
+                                        'data-target': '#theme-' ~ k,
                                     },
                                     'btnText': 'mautic.asset.asset.preview'|trans,
-                                    'iconClass': 'fa fa-image',
+                                    'iconClass': 'ri-eye-line',
                                     } %}
                                 {% set previewButton = hasThumbnail ? previewButtonSettings : [] %}
                                 {% set deleteButton = {
@@ -61,14 +61,14 @@
                                         'customButtons': [
                                             {
                                                 'attr': {
-                                                    'href': path('mautic_themes_action', { 
+                                                    'href': path('mautic_themes_action', {
                                                         objectAction: 'download',
                                                         objectId: k
                                                     }),
                                                     'data-toggle': '0',
                                                 },
                                                 'btnText': 'mautic.core.download'|trans,
-                                                'iconClass': 'fa fa-download',
+                                                'iconClass': 'ri-download-line',
                                             },
                                             previewButton,
                                         ],

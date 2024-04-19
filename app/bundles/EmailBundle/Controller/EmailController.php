@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -40,7 +41,7 @@ class EmailController extends FormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(Request $request, $page = 1)
     {
@@ -253,7 +254,7 @@ class EmailController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {
@@ -370,6 +371,18 @@ class EmailController extends FormController
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
 
+        $variants = [
+            'parent'             => $parent,
+            'children'           => $children,
+            'properties'         => $properties,
+            'criteria'           => $criteria['criteria'],
+        ];
+
+        $translations = [
+            'parent'   => $translationParent,
+            'children' => $translationChildren,
+        ];
+
         return $this->delegateView(
             [
                 'returnUrl' => $this->generateUrl(
@@ -384,17 +397,9 @@ class EmailController extends FormController
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
                     'isEmbedded'   => $request->get('isEmbedded') ?: false,
-                    'variants'     => [
-                        'parent'     => $parent,
-                        'children'   => $children,
-                        'properties' => $properties,
-                        'criteria'   => $criteria['criteria'],
-                    ],
-                    'translations' => [
-                        'parent'   => $translationParent,
-                        'children' => $translationChildren,
-                    ],
-                    'permissions' => $security->isGranted(
+                    'variants'     => $variants,
+                    'translations' => $translations,
+                    'permissions'  => $security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -423,7 +428,17 @@ class EmailController extends FormController
                             'ignoreAjax' => true,
                         ]
                     )->getContent(),
-                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'dateRangeForm'       => $dateRangeForm->createView(),
+                    'previewSettingsForm' => $this->createForm(
+                        ContentPreviewSettingsType::class,
+                        null,
+                        [
+                            'type'         => ContentPreviewSettingsType::TYPE_EMAIL,
+                            'objectId'     => $email->getId(),
+                            'variants'     => $variants,
+                            'translations' => $translations,
+                        ]
+                    )->createView(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/details.html.twig',
                 'passthroughVars' => [
@@ -439,7 +454,7 @@ class EmailController extends FormController
      *
      * @param Email $entity
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $entity = null)
     {
@@ -604,7 +619,7 @@ class EmailController extends FormController
      * @param bool $ignorePost
      * @param bool $forceTypeSelection
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(
         Request $request,
@@ -1061,7 +1076,7 @@ class EmailController extends FormController
     /**
      * Activate the builder.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
@@ -1126,7 +1141,7 @@ class EmailController extends FormController
     /**
      * Create an AB test.
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
@@ -1314,7 +1329,9 @@ class EmailController extends FormController
             ]);
         }
 
-        if ($translationParent = $entity->getTranslationParent()) {
+        $translationParent = $entity->getTranslationParent();
+
+        if ($translationParent instanceof Email) {
             return $this->redirectToRoute('mautic_email_action', [
                 'objectAction' => 'send',
                 'objectId'     => $translationParent->getId(),

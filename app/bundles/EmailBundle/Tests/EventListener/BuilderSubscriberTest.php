@@ -10,36 +10,74 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\BuilderSubscriber;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
+class BuilderSubscriberTest extends TestCase
 {
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+    /**
+     * @var BuilderSubscriber
+     */
+    private $builderSubscriber;
+    /**
+     * @var MockObject|EmailModel
+     */
+    private $emailModel;
+    /**
+     * @var MockObject|TrackableModel
+     */
+    private $trackableModel;
+    /**
+     * @var MockObject|RedirectModel
+     */
+    private $redirectModel;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param array<mixed> $data
+     * @param int|string   $dataName
+     */
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->emailModel           = $this->createMock(EmailModel::class);
+        $this->trackableModel       = $this->createMock(TrackableModel::class);
+        $this->redirectModel        = $this->createMock(RedirectModel::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $mailHashHelper             = new MailHashHelper($this->coreParametersHelper);
+        $this->builderSubscriber    = new BuilderSubscriber(
+            $this->coreParametersHelper,
+            $this->emailModel,
+            $this->trackableModel,
+            $this->redirectModel,
+            $this->translator,
+            $mailHashHelper
+        );
+        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
+        $this->translator->method('trans')->willReturn('some translation');
+    }
+
     /**
      * @dataProvider fixEmailAccessibilityContent
      */
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $emailModel           = $this->createMock(EmailModel::class);
-        $trackableModel       = $this->createMock(TrackableModel::class);
-        $redirectModel        = $this->createMock(RedirectModel::class);
-        $translator           = $this->createMock(TranslatorInterface::class);
-        $mailHashHelper       = new MailHashHelper($coreParametersHelper);
-        $builderSubscriber    = new BuilderSubscriber(
-            $coreParametersHelper,
-            $emailModel,
-            $trackableModel,
-            $redirectModel,
-            $translator,
-            $mailHashHelper
-        );
-
-        $emailModel->method('buildUrl')->willReturn('https://some.url');
-        $translator->method('trans')->willReturn('some translation');
-
-        $coreParametersHelper->method('get')->willReturnCallback(function ($key) {
+        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
             if ('locale' === $key) {
                 return 'default_locale';
             }
@@ -53,8 +91,8 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $emailSendEvent = new EmailSendEvent(null, ['email' => $email]);
         $emailSendEvent->setContent($content);
-        $builderSubscriber->fixEmailAccessibility($emailSendEvent);
-        $builderSubscriber->onEmailGenerate($emailSendEvent);
+        $this->builderSubscriber->fixEmailAccessibility($emailSendEvent);
+        $this->builderSubscriber->onEmailGenerate($emailSendEvent);
         $this->assertSame($expectedContent, $emailSendEvent->getContent());
     }
 
@@ -113,5 +151,42 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
             '<html lang="en"><head><title>A unicorn spotted in Alaska</title></head><body>xxx</body></html>',
             'en',
         ];
+    }
+
+    public function testUnsubscribeTestTokensAreReplacedOnEmailGenerate(): void
+    {
+        $lead = new Lead();
+        $lead->setId(7);
+        $lead->setLastname('Boss');
+
+        $company = new Company();
+        $company->setName('ACME');
+
+        $leadArray                = $lead->convertToArray();
+        $leadArray['companies'][] = ['companyname' => $company->getName(), 'is_primary' => true];
+
+        $args = [
+            'lead' => $leadArray,
+            'email'=> (new Email()),
+        ];
+        $event = new EmailSendEvent(null, $args);
+
+        $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
+
+        $this->coreParametersHelper->expects($this->exactly(4))
+            ->method('get')
+            ->withConsecutive(['unsubscribe_text'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
+            ->willReturnOnConsecutiveCalls($unsubscribeTokenizedText, 'Just a text', 'Signature', 'jan.kozak@acquia.com');
+
+        $this->translator->expects($this->never())
+            ->method('trans')
+            ->withConsecutive([$unsubscribeTokenizedText], [])
+            ->willReturn($unsubscribeTokenizedText);
+
+        $this->builderSubscriber->onEmailGenerate($event);
+        $this->assertEquals(
+            $company->getName().' '.$lead->getLastname(),
+            $event->getTokens()['{unsubscribe_text}']
+        );
     }
 }

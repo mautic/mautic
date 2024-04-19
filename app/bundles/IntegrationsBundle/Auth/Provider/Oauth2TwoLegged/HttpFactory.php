@@ -40,7 +40,7 @@ class HttpFactory implements AuthProviderInterface
 
     private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|ConfigTokenFactoryInterface|null $config = null;
 
-    private ?\GuzzleHttp\Client $reAuthClient = null;
+    private ?Client $reAuthClient = null;
 
     /**
      * Cache of initialized clients.
