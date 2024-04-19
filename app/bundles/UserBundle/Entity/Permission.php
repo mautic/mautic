@@ -40,7 +40,7 @@ class Permission implements CacheInvalidateInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('permissions')
-            ->setCustomRepositoryClass(\Mautic\UserBundle\Entity\PermissionRepository::class)
+            ->setCustomRepositoryClass(PermissionRepository::class)
             ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->addId();

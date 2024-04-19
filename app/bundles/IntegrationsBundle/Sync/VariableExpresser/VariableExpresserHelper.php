@@ -14,7 +14,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
 
     public const FALSE_BOOLEAN_VALUE = 'false';
 
-    private \Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {

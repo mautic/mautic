@@ -901,8 +901,8 @@ class Field
     {
         $properties = $this->getProperties();
 
-        return 'checkboxgrp' === $this->getType() ||
-            (key_exists('multiple', $properties) && 1 === $properties['multiple']);
+        return 'checkboxgrp' === $this->getType()
+            || (key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
     /**

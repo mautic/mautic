@@ -74,7 +74,7 @@ class ReportGenerator
     }
 
     /**
-     * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @throws RuntimeException
      */
     protected function getBuilder(): MauticReportBuilder
     {
