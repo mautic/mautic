@@ -55,7 +55,7 @@
     "grapesjs-plugin-ckeditor5": "^0.0.33",
     "grapesjs-plugin-export": "^1.0.12",
     "grapesjs-plugin-forms": "^2.0.6",
-    "grapesjs-preset-mautic": "github:LordRembo/grapesjs-preset-mautic#update-grapesjs-compatibility-m5",
+    "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#5.1",
     "grapesjs-preset-newsletter": "^1.0.2",
     "grapesjs-preset-webpage": "^1.0.3",
     "grapesjs-style-bg": "^2.0.2",
