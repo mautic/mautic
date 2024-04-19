@@ -244,7 +244,7 @@ body > #app-wrapper {
   position: static;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .dropdown-custom .dropdown-menu {
-  width: auto;
+  width: 320px;
   overflow: hidden;
 }
 @media (max-width: 480px) {
