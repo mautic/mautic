@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\BigIntType;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
@@ -94,7 +95,7 @@ final class Version20230621074925 extends PreUpAssertionMigration
 
         $this->addSql("CREATE TABLE `{$this->contactScoreTableName}`
 (
-    `contact_id`          BIGINT UNSIGNED NOT NULL,
+    `contact_id`          {$this->getContactIdColumnType($schema)} NOT NULL,
     `group_id`           INT UNSIGNED    NOT NULL,
     `score`               INT             NOT NULL,
     PRIMARY KEY (`contact_id`, `group_id`)
@@ -188,5 +189,13 @@ final class Version20230621074925 extends PreUpAssertionMigration
             fn (Schema $schema) => $schema->getTable("{$tableName}")->hasForeignKey($fkName),
             "Foreign key {$fkName} already exists in {$tableName} table"
         );
+    }
+
+    private function getContactIdColumnType(Schema $schema): string
+    {
+        $contactTable    = $schema->getTable($this->contactTableName);
+        $contactIdColumn = $contactTable->getColumn('id');
+
+        return $contactIdColumn->getType() instanceof BigIntType ? 'BIGINT UNSIGNED' : 'INT';
     }
 }

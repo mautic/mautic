@@ -54,8 +54,9 @@ class FormSubscriberTest extends TestCase
     public function testOnFormSubmitActionRepost(): void
     {
         $postData = [
-            'first_name' => "Test's Name",
-            'notes'      => 'A & B < dy >',
+            'first_name' => "Test's Name un être> and être",
+            'notes'      => 'A & B < dy >
+New line',
             'formId'     => '1',
             'return'     => '',
             'formName'   => 'form190122',
@@ -63,8 +64,8 @@ class FormSubscriberTest extends TestCase
         ];
 
         $resultData = [
-            'first_name' => 'Test&#39;s Name',
-            'notes'      => 'A &#38; B &#60; dy &#62;',
+            'first_name' => 'Test&#39;s Name un &ecirc;tre&gt; and être',
+            'notes'      => 'A &#38; B &#60; dy &#62;&#10;New line',
         ];
 
         $request         = new Request();

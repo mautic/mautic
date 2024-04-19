@@ -36,7 +36,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignEditPageCheckUnpublishWorkflowAttributesPresent(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = $this->getContainer()->get('translator');
+        $translator = static::getContainer()->get('translator');
 
         // Check the message in the Campaign edit page
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/edit/%d', $campaign->getId()));
@@ -66,7 +66,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignListPageCheckUnpublishWorkflowAttributesPresent(): void
     {
         $this->saveSomeCampaignLeadEventLogs();
-        $translator = $this->getContainer()->get('translator');
+        $translator = static::getContainer()->get('translator');
 
         // Check the message in the Campaign listing page
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns'));
@@ -92,7 +92,7 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
     public function testCampaignUnpublishToggle(): void
     {
         $campaign   = $this->saveSomeCampaignLeadEventLogs();
-        $translator = $this->getContainer()->get('translator');
+        $translator = static::getContainer()->get('translator');
 
         $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'campaign', 'id' => $campaign->getId()]);
         $response = $this->client->getResponse();

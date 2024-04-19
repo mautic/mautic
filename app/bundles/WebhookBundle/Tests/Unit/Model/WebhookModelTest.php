@@ -166,7 +166,7 @@ class WebhookModelTest extends TestCase
 
         $queueRepositoryMock->expects($this->once())
             ->method('getEntities')
-            ->willReturn([[$queueMock]]);
+            ->willReturn([$queueMock]);
 
         $expectedPayload = [
             'leads' => [
@@ -297,7 +297,7 @@ class WebhookModelTest extends TestCase
                         ],
                     ],
                     'limit'         => 0,
-                    'iterator_mode' => true,
+                    'iterable_mode' => true,
                     'start'         => 0,
                     'orderBy'       => 'w.id',
                     'orderByDir'    => 'ASC',
@@ -347,7 +347,7 @@ class WebhookModelTest extends TestCase
                             ],
                         ],
                     ],
-                    'iterator_mode' => true,
+                    'iterable_mode' => true,
                     'orderBy'       => 'w.id',
                     'orderByDir'    => 'ASC',
                 ]

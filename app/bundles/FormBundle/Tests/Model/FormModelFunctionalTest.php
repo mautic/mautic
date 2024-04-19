@@ -96,6 +96,7 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
                     'type'      => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request('POST', '/api/forms/new', $formPayload);

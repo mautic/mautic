@@ -5,6 +5,9 @@ namespace Mautic\CampaignBundle\Service;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
+/**
+ * @deprecated to be removed in 6.0; use CampaignAuditService instead
+ */
 class Campaign
 {
     public function __construct(

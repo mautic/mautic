@@ -110,7 +110,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', null));
         $user->setRole($role);
 

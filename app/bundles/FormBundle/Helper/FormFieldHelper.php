@@ -164,12 +164,16 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
+    /**
+     * Search and replace the HTML of the form field with the value.
+     */
     public function populateField($field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 
         switch ($field->getType()) {
             case 'text':
+            case 'number':
             case 'email':
             case 'hidden':
             case 'tel':
@@ -247,7 +251,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function sanitizeValue($value)
     {
         $valueType = gettype($value);
-        $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(urldecode($value)));
+        $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(rawurldecode($value)));
         // for boolean expect 0 or 1
         if ('boolean' === $valueType) {
             return (int) $value;

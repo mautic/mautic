@@ -193,6 +193,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'data' => $defaultSignature,
+                'help' => 'mautic.user.config.signature.helper',
             ]
         );
 
@@ -216,7 +217,9 @@ class UserType extends AbstractType
                 )
             );
 
-            $builder->add('isPublished', YesNoButtonGroupType::class);
+            $builder->add('isPublished', YesNoButtonGroupType::class, [
+                'label' => 'mautic.user.active',
+            ]);
 
             $builder->add('buttons', FormButtonsType::class);
         } else {

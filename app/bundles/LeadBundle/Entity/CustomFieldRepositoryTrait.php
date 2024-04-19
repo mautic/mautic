@@ -54,7 +54,13 @@ trait CustomFieldRepositoryTrait
             }
 
             // get a total count
-            $result = $dq->executeQuery()->fetchAllAssociative();
+            if (!empty($args['totalCountTtl'])) {
+                $statement = ResultCacheHelper::executeCachedDbalQuery($this->getEntityManager()->getConnection(), $dq, new ResultCacheOptions($object.'-total-count', $args['totalCountTtl']));
+            } else {
+                $statement = $dq->executeQuery();
+            }
+
+            $result = $statement->fetchAllAssociative();
             $total  = ($result) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];

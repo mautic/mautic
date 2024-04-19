@@ -55,6 +55,7 @@
                                 <tr>
                                     <td>{{ startCount }}</td>
                                     {% for key in columnOrder|filter(v => columns[v] is defined) %}
+                                        {%- set collapse = columns[key].collapse is defined ? columns[key].collapse : false -%}
                                         <td>
                                             {%- set closeLink = false -%}
                                             {% if columns[key].link is defined and row[columns[key].alias] is defined and row[columns[key].alias] is not empty %}
@@ -81,10 +82,29 @@
                                                 {% elseif 'date' is same as cellType %}
                                                     {{ dateToShort(cellVal, 'UTC') }}
                                                 {% else %}
-                                                    {{ format(cellVal, cellType) }}
+                                                    {% set value = format(cellVal, cellType) %}
+                                                    {% if collapse == false %}
+                                                        {{ format(cellVal, cellType) }}
+                                                    {% else %}
+                                                        {% set value = htmlEntityDecode(format(cellVal, cellType)) %}
+                                                        <div data-toggle="collapse" data-target="#audit-log-details-{{ startCount }}" class="accordion-toggle" style="cursor: pointer">
+                                                            {{ value|length > 50 ? value|slice(0, 50) ~ '...' : value }}
+                                                        </div>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                             {% if closeLink %}</a>{% endif %}
+                                            {% if collapse %}
+                                            <div class="accordian-body collapse" id="audit-log-details-{{ startCount }}">
+                                                <pre id="pre-audit-log-details-{{ startCount }}"></pre>
+                                            </div>
+                                            <script>
+                                                var txt = document.createElement("textarea");
+                                                txt.innerHTML = '{{ (value) }}';
+                                                document.getElementById('pre-audit-log-details-{{ startCount }}').textContent
+                                                    = JSON.stringify(JSON.parse((txt.value)), undefined, 2);
+                                            </script>
+                                            {% endif %}
                                         </td>
                                     {% endfor %}
                                     {% if aggregatorCount %}

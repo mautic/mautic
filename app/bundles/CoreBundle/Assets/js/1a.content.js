@@ -1622,7 +1622,8 @@ Mautic.activateTypeahead = function (el, options) {
         if (options.remote) {
             sourceOptions.remote = {
                 url: mauticAjaxUrl + "?action=" + options.action + "&filter=%QUERY",
-                filter: filterClosure
+                filter: filterClosure,
+                wildcard: '%QUERY',
             };
         }
 

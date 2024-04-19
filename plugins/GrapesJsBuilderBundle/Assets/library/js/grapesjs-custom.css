@@ -232,10 +232,6 @@ html {
   background-color: rgba(255, 255, 255, 0.09);
 }
 
-.gjs-f-button::before {
-  content: 'B';
-}
-
 .gjs-f-divider::before {
   content: 'D';
 }
@@ -310,8 +306,8 @@ html {
   color: #373d49;
 }
 
-.gjs-two-bg {
-  background-color: #dae5e6;
+.gjs-two-bg{
+  color: #dae5e6;
 }
 
 .gjs-two-color {
@@ -345,3 +341,17 @@ html {
 .gjs-four-color-h:hover {
   color: #35d7bb;
 }
+
+/* revert colors for nested panels */
+.gjs-mdl-dialog .panel {
+  color: var(--gjs-main-color);
+}
+
+.anim-spin {
+  animation: 0.5s linear 0s normal none infinite running spin; }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }

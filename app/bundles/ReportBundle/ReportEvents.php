@@ -107,4 +107,13 @@ final class ReportEvents
      * @var string
      */
     public const REPORT_ON_COLUMN_COLLECT = 'mautic.report_on_column_collect';
+
+    /**
+     * The mautic.report_cleanup event is dispatched to cleanup report files after they had been sent via email.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\PermanentReportFileCreated instance.
+     *
+     * @var string
+     */
+    public const REPORT_PERMANENT_FILE_CREATED = 'mautic.report_permanent_file_created';
 }

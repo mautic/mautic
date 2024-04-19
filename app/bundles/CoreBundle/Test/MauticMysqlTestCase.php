@@ -307,7 +307,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function getSqlFilePath(string $name): string
     {
-        return sprintf('%s/%s-%s.sql', self::$container->getParameter('kernel.cache_dir'), $name, $this->connection->getParams()['dbname']);
+        return sprintf('%s/%s-%s.sql', static::getContainer()->getParameter('kernel.cache_dir'), $name, $this->connection->getParams()['dbname']);
     }
 
     private function resetCustomFields(): bool
@@ -368,7 +368,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function getTablePrefix(): string
     {
-        return (string) self::$container->getParameter('mautic.db_table_prefix');
+        return (string) static::getContainer()->getParameter('mautic.db_table_prefix');
     }
 
     private function isDatabasePrepared(): bool
@@ -383,7 +383,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function clearCache(): void
     {
-        $cacheProvider = self::$container->get('mautic.cache.provider');
+        $cacheProvider = static::getContainer()->get('mautic.cache.provider');
         \assert($cacheProvider instanceof CacheItemPoolInterface);
         $cacheProvider->clear();
     }
