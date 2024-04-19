@@ -110,7 +110,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
             'language'   => 'fr',
             'postAction' => 'return',
             'fields'     => [
-               [
+                [
                     'label'      => 'Email',
                     'alias'      => 'email',
                     'type'       => 'email',
