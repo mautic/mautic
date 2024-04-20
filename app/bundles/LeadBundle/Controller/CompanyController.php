@@ -209,7 +209,7 @@ class CompanyController extends FormController
         $leadFieldModel = $this->getModel('lead.field');
         \assert($leadFieldModel instanceof FieldModel);
         $fields = $leadFieldModel->getPublishedFieldArrays('company');
-        $form   = $model->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        $form   = $model->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect, 'hide_extra_buttons' => true]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
