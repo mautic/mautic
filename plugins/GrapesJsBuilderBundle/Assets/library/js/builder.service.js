@@ -225,6 +225,7 @@ export default class BuilderService {
       forceClass: false, // create new styles if there are some already on the element: https://github.com/GrapesJS/grapesjs/issues/1531
       clearOnRender: true,
       container: '.builder-panel',
+      components,
       height: '100%',
       canvas: {
         styles,
@@ -249,13 +250,13 @@ export default class BuilderService {
     });
 
     this.unsetComponentVoidTypes(this.editor);
-    this.editor.setComponents(components);
+    this.editor.DomComponents.clear({ temporary: true }).addComponent(components);
 
     // Reinitialize the content after parsing MJML.
     // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
     // See: https://github.com/GrapesJS/mjml/issues/149
     const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
-    this.editor.setComponents(parsedContent);
+    this.editor.DomComponents.clear({ temporary: true }).addComponent(parsedContent);
 
     this.editor.BlockManager.get('mj-button').set({
       content: '<mj-button href="https://">Button</mj-button>',
