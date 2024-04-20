@@ -202,6 +202,8 @@ Mautic.MentionLinks =  function (editor) {
 
 /*
  * Customizes the way the list of user suggestions is displayed.
+ *
+ * @deprecated: will be removed in M6
  */
 Mautic.customItemRenderer = function (item) {
     let tokenId = item.id;
@@ -228,6 +230,9 @@ Mautic.customItemRenderer = function (item) {
     return itemElement;
 }
 
+/*
+ * @deprecated: will be removed in M6
+ */
 Mautic.getFeedItems = function (queryText) {
     return new Promise( resolve => {
         setTimeout( () => {
