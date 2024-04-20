@@ -90,32 +90,40 @@ class CompanyType extends AbstractType
                 FormButtonsType::class
             );
         }
-        $builder->add(
-            'buttons',
-            FormButtonsType::class,
-            [
-                'post_extra_buttons' => [
-                    [
-                        'name'  => 'merge',
-                        'label' => 'mautic.lead.merge',
-                        'attr'  => [
-                            'class'       => 'btn btn-default btn-dnd',
-                            'icon'        => 'ri-exchange-2-line',
-                            'data-toggle' => 'ajaxmodal',
-                            'data-target' => '#MauticSharedModal',
-                            'data-header' => $this->translator->trans('mautic.lead.company.header.merge'),
-                            'href'        => $this->router->generate(
-                                'mautic_company_action',
-                                [
-                                    'objectId'     => $options['data']->getId(),
-                                    'objectAction' => 'merge',
-                                ]
-                            ),
+
+        if (!empty($options['hide_extra_buttons'])) {
+            $builder->add(
+                'buttons',
+                FormButtonsType::class
+            );
+        } else {
+            $builder->add(
+                'buttons',
+                FormButtonsType::class,
+                [
+                    'post_extra_buttons' => [
+                        [
+                            'name'  => 'merge',
+                            'label' => 'mautic.lead.merge',
+                            'attr'  => [
+                                'class'       => 'btn btn-default btn-dnd',
+                                'icon'        => 'fa fa-building',
+                                'data-toggle' => 'ajaxmodal',
+                                'data-target' => '#MauticSharedModal',
+                                'data-header' => $this->translator->trans('mautic.lead.company.header.merge'),
+                                'href'        => $this->router->generate(
+                                    'mautic_company_action',
+                                    [
+                                        'objectId'     => $options['data']->getId(),
+                                        'objectAction' => 'merge',
+                                    ]
+                                ),
+                            ],
                         ],
                     ],
-                ],
-            ]
-        );
+                ]
+            );
+        }
 
         $builder->addEventSubscriber(new CleanFormSubscriber($cleaningRules));
     }
@@ -124,9 +132,10 @@ class CompanyType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'    => Company::class,
-                'isShortForm'   => false,
-                'update_select' => false,
+                'data_class'         => Company::class,
+                'isShortForm'        => false,
+                'update_select'      => false,
+                'hide_extra_buttons' => false,
             ]
         );
 
