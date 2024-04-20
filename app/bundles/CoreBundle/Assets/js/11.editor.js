@@ -210,11 +210,9 @@ Mautic.customItemRenderer = function (item) {
     const idElement = document.createElement( 'span' );
     idElement.classList.add( 'custom-item-id' );
     itemElement.classList.add( 'custom-item' );
-    const tokenNameArr = tokenName.split(':');
 
-    if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
-    {
-        tokenId = tokenName =  tokenNameArr[1];
+    if (tokenName.startsWith('a:')) {
+        tokenName = tokenName.substring(2);
     }
 
     if (tokenId.match(/dwc=/i)){
