@@ -4,8 +4,11 @@ namespace Mautic\ReportBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\Persistence\Mapping\MappingException;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use PHPUnit\Framework\Assert;
@@ -13,6 +16,54 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testMostVisitedPagesReport()
+    {
+        $page = new Page();
+        $page->setTitle('test page 1');
+        $page->setAlias('test_page');
+
+        $this->em->persist($page);
+        $this->em->flush();
+
+        $hit = new Hit();
+        $hit->setDateHit(new \DateTime());
+        $hit->setCode(200);
+        $hit->setTrackingId(hash('sha1', uniqid(mt_rand(), true)));
+        $hit->setIpAddress(new IpAddress('127.0.0.1'));
+        $hit->setPage($page);
+
+        $this->em->persist($hit);
+        $this->em->flush();
+
+        $hit = new Hit();
+        $hit->setDateHit(new \DateTime());
+        $hit->setCode(200);
+        $hit->setTrackingId(hash('sha1', uniqid(mt_rand(), true)));
+        $hit->setIpAddress(new IpAddress('127.0.0.1'));
+
+        $this->em->persist($hit);
+        $this->em->flush();
+
+        $raportName = 'Report Most Visited Pages';
+
+        $report = new Report();
+        $report->setName($raportName);
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource('page.hits');
+        $report->setGraphs([
+            'mautic.page.table.most.visited.unique',
+            'mautic.page.table.most.visited',
+        ]);
+
+        $this->em->persist($report);
+        $this->em->flush();
+
+        // Check the details page
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+    }
+
     public function testCreatingNewReportAndClone(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
