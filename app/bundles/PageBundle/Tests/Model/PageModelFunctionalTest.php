@@ -20,7 +20,7 @@ class PageModelFunctionalTest extends MauticMysqlTestCase
         $this->pageModel = self::$container->get('mautic.page.model.page');
     }
 
-    public function testMostVisitedPagesReport()
+    public function testMostVisitedPagesReport(): void
     {
         $page = new Page();
         $page->setTitle('test page');
@@ -32,7 +32,7 @@ class PageModelFunctionalTest extends MauticMysqlTestCase
         $hit = new Hit();
         $hit->setDateHit(new \DateTime());
         $hit->setCode(200);
-        $hit->setTrackingId(hash('sha1', uniqid(mt_rand(), true)));
+        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
         $hit->setIpAddress(new IpAddress('127.0.0.1'));
         $hit->setPage($page);
 
@@ -42,7 +42,7 @@ class PageModelFunctionalTest extends MauticMysqlTestCase
         $hit = new Hit();
         $hit->setDateHit(new \DateTime());
         $hit->setCode(200);
-        $hit->setTrackingId(hash('sha1', uniqid(mt_rand(), true)));
+        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
         $hit->setIpAddress(new IpAddress('127.0.0.1'));
 
         $this->em->persist($hit);
@@ -52,7 +52,6 @@ class PageModelFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
         $res = $this->pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
         foreach ($res as $hit) {
