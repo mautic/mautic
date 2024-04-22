@@ -1187,27 +1187,6 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @return array<int, string>
-     */
-    private function getCountriesTableExportHeader(Campaign $entity): array
-    {
-        $headers = [
-            $this->translator->trans('mautic.lead.lead.thead.country'),
-            $this->translator->trans('mautic.lead.leads'),
-        ];
-
-        if ($entity->isEmailCampaign()) {
-            array_push($headers,
-                $this->translator->trans('mautic.email.graph.line.stats.sent'),
-                $this->translator->trans('mautic.email.graph.line.stats.read'),
-                $this->translator->trans('mautic.email.clicked')
-            );
-        }
-
-        return $headers;
-    }
-
-    /**
      * @throws \Exception
      */
     public function countryStatsAction(CampaignModel $model, int $objectId): Response
@@ -1257,5 +1236,26 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $exportHelper->exportDataAs(array_values($statsCountries), $format, $filename, $headerRow);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getCountriesTableExportHeader(Campaign $entity): array
+    {
+        $headers = [
+            $this->translator->trans('mautic.lead.lead.thead.country'),
+            $this->translator->trans('mautic.lead.leads'),
+        ];
+
+        if ($entity->isEmailCampaign()) {
+            array_push($headers,
+                $this->translator->trans('mautic.email.graph.line.stats.sent'),
+                $this->translator->trans('mautic.email.graph.line.stats.read'),
+                $this->translator->trans('mautic.email.clicked')
+            );
+        }
+
+        return $headers;
     }
 }
