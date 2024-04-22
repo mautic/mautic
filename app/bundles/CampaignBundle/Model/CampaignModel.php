@@ -829,6 +829,6 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignMembersGroupByCountry(Campaign $campaign): array
     {
-        return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign);
+        return $this->getCampaignLeadRepository()->getCampaignMembersGroupByCountry($campaign);
     }
 }
