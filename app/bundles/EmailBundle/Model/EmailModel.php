@@ -635,15 +635,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, MapModel
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCountryStats($entity, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, bool $includeVariants = false): array
+    public function getCountryStats($entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
     {
         $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
 
         /** @var StatRepository $statRepo */
-        $statRepo      = $this->em->getRepository(Stat::class);
-        $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-
-        $emailStats            = $statRepo->getStatsSummaryByCountry($query, $emailIds);
+        $statRepo              = $this->em->getRepository(Stat::class);
+        $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds);
         $results['read_count'] = $results['clicked_through_count'] = [];
 
         foreach ($emailStats as $e) {

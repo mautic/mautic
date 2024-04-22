@@ -32,7 +32,7 @@ abstract class AbstractCountryMapController extends AbstractController
      *
      * @return array<string, array<int, array<string, int|string>>>
      */
-    abstract public function getData($entity, \DateTimeInterface $dateFromObject, \DateTimeInterface $dateToObject): array;
+    abstract public function getData($entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array;
 
     /**
      * @template T
@@ -67,7 +67,7 @@ abstract class AbstractCountryMapController extends AbstractController
             throw new AccessDeniedHttpException();
         }
 
-        $statsCountries = $this->getData($entity, new \DateTime($dateFrom), new \DateTime($dateTo));
+        $statsCountries = $this->getData($entity, new \DateTimeImmutable($dateFrom), new \DateTimeImmutable($dateTo));
         $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions($entity), self::LEGEND_TEXT);
 
         return $this->render(

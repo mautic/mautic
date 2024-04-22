@@ -755,7 +755,7 @@ class StatRepository extends CommonRepository
      *
      * @throws Exception
      */
-    public function getStatsSummaryByCountry(ChartQuery $chartQuery, array $entityIds, string $sourceType = 'email'): array
+    public function getStatsSummaryByCountry(\DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, array $entityIds, string $sourceType = 'email'): array
     {
         $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -816,7 +816,9 @@ class StatRepository extends CommonRepository
         }
 
         $queryBuilder->groupBy("{$leadAlias}.country");
-        $chartQuery->applyDateFilters($queryBuilder, 'date_sent', $statsAlias);
+        $queryBuilder->andWhere("{$statsAlias}.date_sent BETWEEN :dateFrom AND :dateTo");
+        $queryBuilder->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+        $queryBuilder->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
     }

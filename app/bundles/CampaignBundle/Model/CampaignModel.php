@@ -802,18 +802,17 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      *
      * @throws Exception
      */
-    public function getCountryStats($entity, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, bool $includeVariants = false): array
+    public function getCountryStats($entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
 
         /** @var StatRepository $statRepo */
         $statRepo            = $this->em->getRepository(Stat::class);
-        $query               = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
 
         if ($eventsEmailsSend->count() > 0) {
-            $emailStats            = $statRepo->getStatsSummaryByCountry($query, $eventsIds, 'campaign');
+            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $eventsIds, 'campaign');
             $results['read_count'] = $results['clicked_through_count'] = [];
 
             foreach ($emailStats as $e) {
@@ -830,7 +829,7 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
      *
      * @return array{}|array<int, array<string, string|null>>
      */
-    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeInterface $dateFromObject, \DateTimeInterface $dateToObject): array
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
         return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
     }
