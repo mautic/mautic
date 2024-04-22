@@ -52,7 +52,7 @@ class PageModelFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        $res = $this->pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
+        $res = $this->pageModel->getHitRepository()->getMostVisited($query);
 
         foreach ($res as $hit) {
             Assert::assertNotNull($hit['id']);
