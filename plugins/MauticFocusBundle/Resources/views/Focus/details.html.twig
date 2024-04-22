@@ -105,7 +105,7 @@
               </div>
               <!--/ stats -->
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+              {{ customContent('details.stats.graph.below', _context) }}
 
               {% if trackables is defined and trackables is not empty %}
                   <!-- tabs controls -->

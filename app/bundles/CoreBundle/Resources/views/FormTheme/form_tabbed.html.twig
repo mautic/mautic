@@ -1,4 +1,3 @@
-{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
 {% extends "@MauticCore/FormTheme/form.html.twig" %}
 {% set hasRightColumn = block('rightFormContent') is defined %}
 {% block mainFormContent %}
@@ -9,7 +8,7 @@
                 <div class="col-xs-12">
                     {{ form_errors(form) }}
                     {% block aboveTabsContent %}{% endblock %}
-                    {{ customContent('tabs.above', mauticTemplateVars) }}
+                    {{ customContent('tabs.above', _context) }}
                     {{- include('@MauticCore/Helper/tabs.html.twig', {'tabs' : formTabs }) -}}
                     <div class="pr-md pl-md">
                         {% if block('_content') is defined %}
@@ -19,7 +18,7 @@
                         {% endif %}
                     </div>
                     {% block belowTabsContent %}{% endblock %}
-                    {{ customContent('tabs.below', mauticTemplateVars) }}
+                    {{ customContent('tabs.below', _context) }}
                 </div>
             </div>
         </div>

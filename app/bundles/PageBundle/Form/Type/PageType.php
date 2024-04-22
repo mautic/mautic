@@ -321,7 +321,7 @@ class PageType extends AbstractType
                     'label' => 'mautic.core.builder',
                     'attr'  => [
                         'class'   => 'btn btn-default btn-dnd btn-nospin btn-builder text-primary',
-                        'icon'    => 'fa fa-cube',
+                        'icon'    => 'ri-layout-line',
                         'onclick' => "Mautic.launchBuilder('page');",
                     ],
                 ],
