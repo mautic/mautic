@@ -85,10 +85,10 @@
             </div>
             <!--/ campaign detail collapseable toggler -->
 
-            {{ customContent('left.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            {{ customContent('left.section.top', _context) }}
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
-
+            <!-- some stats -->
             <div class="stats-menu pl-md mt-lg">
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs">
@@ -104,14 +104,12 @@
                     </li>
                 </ul>
                 <!--/ tabs controls -->
-
                 <div class="date-range">
                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
                         'dateRangeForm': dateRangeForm,
                     }) }}
                 </div>
             </div>
-
             <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
                 <div class="tab-pane active bdr-w-0" id="stats-container">
                     <div id="emailGraphStats">
@@ -131,8 +129,9 @@
                     </div>
                 </div>
             </div>
+            <!--/ stats -->
 
-            {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
@@ -167,7 +166,7 @@
                         {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>
-                {{ customContent('tabs', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+                {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -207,21 +206,21 @@
                 <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
-            {{ customContent('tabs.content', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+            {{ customContent('tabs.content', _context) }}
         </div>
         <!--/ end: tab-content -->
 
-        {{ customContent('left.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+        {{ customContent('left.section.bottom', _context) }}
     </div>
     <!--/ left section -->
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
-        {{ customContent('right.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+        {{ customContent('right.section.top', _context) }}
 
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
 
-        {{ customContent('right.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
+        {{ customContent('right.section.bottom', _context) }}
     </div>
     <!--/ right section -->
 </div>

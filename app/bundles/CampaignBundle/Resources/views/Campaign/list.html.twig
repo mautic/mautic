@@ -32,7 +32,7 @@
                 'filters': filters|default([]),
         }) -}}
         <div class="page-list">
-            {{- customContent('content.above', mauticTemplateVars|default({})) -}}
+            {{- customContent('content.above', _context) -}}
   {% endif %}
 
   {% if items|length > 0 %}
@@ -95,7 +95,6 @@
           </thead>
           <tbody>
             {% for item in items %}
-                {% set mauticTemplateVars = {'item': item} %}
                 <tr>
                     <td>
                       {{- include('@MauticCore/Helper/list_actions.html.twig', {
@@ -127,7 +126,7 @@
                           }) -}}
                             <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                                 {{- item.name -}}
-                                {{- customContent('campaign.name', mauticTemplateVars) -}}
+                                {{- customContent('campaign.name', _context|merge({'item': item})) -}}
                             </a>
                         </div>
                         {%- if item.description -%}
@@ -167,7 +166,7 @@
   {% endif %}
 
   {% if isIndex %}
-            {{- customContent('content.below', mauticTemplateVars|default({})) -}}
+            {{- customContent('content.below', _context) -}}
         </div>
     </div>
   {% endif %}
