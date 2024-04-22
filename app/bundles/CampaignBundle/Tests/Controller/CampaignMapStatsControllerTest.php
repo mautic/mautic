@@ -121,8 +121,8 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     {
         $campaign = $this->createCampaignWithEmail();
 
-        $dateFrom = new \DateTime('2023-07-20');
-        $dateTo   = new \DateTime('2023-07-25');
+        $dateFrom = new \DateTimeImmutable('2023-07-20');
+        $dateTo   = new \DateTimeImmutable('2023-07-25');
 
         $this->campaignModelMock->method('getCountryStats')
             ->with($campaign, $dateFrom, $dateTo)

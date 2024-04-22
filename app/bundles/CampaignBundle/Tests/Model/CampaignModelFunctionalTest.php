@@ -32,8 +32,8 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
         /** @var CampaignModel $model */
         $model = $this->getContainer()->get('mautic.campaign.model.campaign');
 
-        $dateFrom     = new \DateTime('2023-07-21');
-        $dateTo       = new \DateTime('2023-07-24');
+        $dateFrom     = new \DateTimeImmutable('2023-07-21');
+        $dateTo       = new \DateTimeImmutable('2023-07-24');
         $leadsPayload = [
             [
                 'email'   => 'example1@test.com',

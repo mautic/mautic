@@ -129,8 +129,8 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setName('Test email');
 
-        $dateFrom = new \DateTime('2023-07-20');
-        $dateTo   = new \DateTime('2023-07-25');
+        $dateFrom = new \DateTimeImmutable('2023-07-20');
+        $dateTo   = new \DateTimeImmutable('2023-07-25');
 
         $this->emailModelMock->method('getCountryStats')
             ->with($email, $dateFrom, $dateTo, false)

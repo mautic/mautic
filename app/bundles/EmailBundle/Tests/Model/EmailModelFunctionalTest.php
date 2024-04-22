@@ -236,8 +236,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     {
         /** @var EmailModel $emailModel */
         $emailModel   = $this->getContainer()->get('mautic.email.model.email');
-        $dateFrom     = new \DateTime('2023-07-21');
-        $dateTo       = new \DateTime('2023-07-24');
+        $dateFrom     = new \DateTimeImmutable('2023-07-21');
+        $dateTo       = new \DateTimeImmutable('2023-07-24');
         $leadsPayload = [
             [
                 'email'   => 'example1@test.com',
