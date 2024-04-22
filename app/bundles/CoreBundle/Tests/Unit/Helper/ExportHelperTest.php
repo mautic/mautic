@@ -334,7 +334,7 @@ class ExportHelperTest extends TestCase
         $form = new Form();
         $form->setAlias('Test form results');
         $date = (new DateTimeHelper())->toLocalString('Y-m-d H');
-        $name =$this->exportHelper->getExportFilename($form->getAlias());
+        $name = $this->exportHelper->getExportFilename($form->getAlias());
 
         $this->assertStringContainsString('Test_form_results', $name);
         $this->assertStringContainsString(str_replace(' ', '_', $date), $name);
