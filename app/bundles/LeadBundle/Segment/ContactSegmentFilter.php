@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Segment\Decorator\ContactDecoratorForeignInterface;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -44,6 +45,10 @@ class ContactSegmentFilter implements \Stringable
         $currentDBName = $this->schemaCache->getCurrentDatabaseName();
 
         $table = preg_replace("/^{$currentDBName}\./", '', $this->getTable());
+
+        if (!$table) {
+            throw new TableNotFoundException('Segment Query is missing table, perhaps incorrectly registered custom Query Builder. ');
+        }
 
         $columns = $this->schemaCache->getColumns($table);
 

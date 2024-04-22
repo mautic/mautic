@@ -16,7 +16,6 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
@@ -29,22 +28,17 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
+    private MockObject $scheduler;
 
     /**
      * @var MockObject|LegacyEventDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $legacyDispatcher;
-
-    /**
-     * @var MockObject|NotificationHelper
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $notificationHelper;
+    private MockObject $legacyDispatcher;
 
     protected function setUp(): void
     {
@@ -52,7 +46,6 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->scheduler          = $this->createMock(EventScheduler::class);
-        $this->notificationHelper = $this->createMock(NotificationHelper::class);
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
     }
 
@@ -79,7 +72,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ->willReturn($event);
 
         $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->exactly(3))
+        $log2->expects($this->exactly(2))
             ->method('getLead')
             ->willReturn($lead2);
         $log2->method('getMetadata')
@@ -134,10 +127,6 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                     $this->assertEquals($log2, $logs->first());
                 }
             );
-
-        $this->notificationHelper->expects($this->once())
-            ->method('notifyOfFailure')
-            ->with($lead2, $event);
 
         $this->legacyDispatcher->expects($this->once())
             ->method('dispatchExecutionEvents');
@@ -293,7 +282,6 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,
-            $this->notificationHelper,
             $this->legacyDispatcher
         );
     }

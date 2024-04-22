@@ -4,9 +4,12 @@ namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 class LeadStageLog
 {
+    public const TABLE_NAME = 'stage_lead_action_log';
+
     /**
      * @var Stage
      **/
@@ -18,7 +21,7 @@ class LeadStageLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -31,8 +34,8 @@ class LeadStageLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('stage_lead_action_log')
-            ->setCustomRepositoryClass(\Mautic\StageBundle\Entity\LeadStageLogRepository::class);
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(LeadStageLogRepository::class);
 
         $builder->createManyToOne('stage', 'Stage')
             ->isPrimaryKey()
@@ -66,7 +69,7 @@ class LeadStageLog
     }
 
     /**
-     * @return mixed
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -74,7 +77,7 @@ class LeadStageLog
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param IpAddress $ipAddress
      */
     public function setIpAddress($ipAddress): void
     {

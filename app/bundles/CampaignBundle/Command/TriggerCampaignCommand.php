@@ -40,9 +40,9 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     protected $output;
 
-    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
+    private ?ContactLimiter $limiter = null;
 
-    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
+    private ?Campaign $campaign = null;
 
     public function __construct(
         private CampaignRepository $campaignRepository,
@@ -142,6 +142,13 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set batch size of contacts to process per round. Defaults to 100.',
                 100
+            )
+            ->addOption(
+                'exclude',
+                'd',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude a specific campaign from being triggered. Otherwise, all campaigns will be triggered.',
+                []
             );
 
         parent::configure();
@@ -158,14 +165,15 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->scheduleOnly = $input->getOption('scheduled-only');
         $this->inactiveOnly = $input->getOption('inactive-only');
 
-        $batchLimit    = $input->getOption('batch-limit');
-        $campaignLimit = $input->getOption('campaign-limit');
-        $contactMinId  = $input->getOption('min-contact-id');
-        $contactMaxId  = $input->getOption('max-contact-id');
-        $contactId     = $input->getOption('contact-id');
-        $contactIds    = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
-        $threadId      = $input->getOption('thread-id');
-        $maxThreads    = $input->getOption('max-threads');
+        $batchLimit       = $input->getOption('batch-limit');
+        $campaignLimit    = $input->getOption('campaign-limit');
+        $contactMinId     = $input->getOption('min-contact-id');
+        $contactMaxId     = $input->getOption('max-contact-id');
+        $contactId        = $input->getOption('contact-id');
+        $contactIds       = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
+        $threadId         = $input->getOption('thread-id');
+        $maxThreads       = $input->getOption('max-threads');
+        $excludeCampaigns = $input->getOption('exclude');
 
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
@@ -186,7 +194,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         // Specific campaign;
         if ($id) {
             $statusCode = 0;
-            /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
+            /** @var Campaign $campaign */
             if ($campaign = $this->campaignRepository->getEntity($id)) {
                 $this->triggerCampaign($campaign);
             } else {
@@ -200,12 +208,27 @@ class TriggerCampaignCommand extends ModeratedCommand
         }
 
         // All published campaigns
-        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
-        $campaigns = $this->campaignRepository->getEntities([
+        $filter = [
             'iterable_mode' => true,
             'orderBy'       => 'c.dateAdded',
             'orderByDir'    => 'DESC',
-        ]);
+        ];
+
+        // exclude excluded campaigns
+        if (is_array($excludeCampaigns) && count($excludeCampaigns) > 0) {
+            $filter['filter'] = [
+                'force' => [
+                    [
+                        'expr'   => 'notIn',
+                        'column' => $this->campaignRepository->getTableAlias().'.id',
+                        'value'  => $excludeCampaigns,
+                    ],
+                ],
+            ];
+        }
+
+        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
+        $campaigns = $this->campaignRepository->getEntities($filter);
 
         foreach ($campaigns as $campaign) {
             $this->triggerCampaign($campaign);

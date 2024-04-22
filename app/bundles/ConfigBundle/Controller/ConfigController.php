@@ -25,7 +25,7 @@ class ConfigController extends FormController
     /**
      * Controller action for editing the application configuration.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
     {
@@ -184,7 +184,7 @@ class ConfigController extends FormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
     {
@@ -223,7 +223,7 @@ class ConfigController extends FormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
     {

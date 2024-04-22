@@ -10,6 +10,7 @@ additional_fqdns: []
 mariadb_version: "10.3"
 mysql_version: ""
 provider: default
+upload_dir: "media/files, media/images" # Specify the directories containing user-generated uploads
 use_dns_when_possible: true
 composer_version: "2"
 webimage_extra_packages: [php8.2-imap]

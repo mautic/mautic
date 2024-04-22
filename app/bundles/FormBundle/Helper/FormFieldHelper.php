@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ?\Symfony\Component\Validator\Validator\ValidatorInterface $validator;
+    private ?ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [
@@ -164,12 +164,16 @@ class FormFieldHelper extends AbstractFormFieldHelper
         return $errors;
     }
 
+    /**
+     * Search and replace the HTML of the form field with the value.
+     */
     public function populateField($field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 
         switch ($field->getType()) {
             case 'text':
+            case 'number':
             case 'email':
             case 'hidden':
             case 'tel':
