@@ -21,7 +21,7 @@
 
     <div class="input-group-btn">
         <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
-            <i class="fa fa-angle-down "></i>
+            <i class="ri-arrow-down-s-line"></i>
         </button>
         {% if tooltip is defined and tooltip is not empty %}<i class="fa fa-question-circle"></i>{% endif %}
         <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
@@ -35,7 +35,7 @@
                     ),
                     'data-toggle': editMode
                 }),
-                iconClass: 'fa fa-pencil-square-o',
+                iconClass: 'ri-edit-circle-line',
                 btnText: 'mautic.core.form.edit'|trans,
                 primary: true
             }) }}
@@ -50,7 +50,7 @@
                     ),
                     'data-toggle': 'ajax'
                 }),
-                iconClass: 'fa fa-copy',
+                iconClass: 'ri-file-copy-line',
                 btnText: 'mautic.core.form.clone'|trans,
                 priority: 200
             }) }}
@@ -70,7 +70,7 @@
                 priority: -1
             }) }}
             {% endif %}
-            
+
             {{ buttonsRender()|raw }}
         </ul>
     </div>
