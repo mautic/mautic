@@ -4,8 +4,11 @@ namespace Mautic\ReportBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\Persistence\Mapping\MappingException;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use PHPUnit\Framework\Assert;
@@ -13,6 +16,43 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testHitRepositoryMostVisited(): void
+    {
+        $page = $this->createPage('test page 1');
+        $this->createHit($page);
+        $this->createHit(null);
+
+        $query = $this->em->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
+        $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
+
+        $pageModel = self::$container->get('mautic.page.model.page');
+        $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
+
+        foreach ($res as $hit) {
+            Assert::assertNotNull($hit['id']);
+            Assert::assertNotNull($hit['title']);
+            Assert::assertNotNull($hit['hits']);
+        }
+    }
+
+    public function testMostVisitedPagesReport(): void
+    {
+        $page = $this->createPage('test page 1');
+        $this->createHit($page);
+        $this->createHit(null);
+
+        $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
+                        'mautic.page.table.most.visited.unique',
+                        'mautic.page.table.most.visited',
+                    ]);
+
+        // Check the details page
+        $this->client->request('GET', '/s/reports/view/'.$report->getId());
+
+        Assert::assertTrue($this->client->getResponse()->isOk());
+    }
+
     public function testCreatingNewReportAndClone(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
@@ -382,5 +422,46 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+    }
+
+    private function createReport(string $name, string $source, array $graphs): Report
+    {
+        $report = new Report();
+        $report->setName($name);
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource($source);
+        $report->setGraphs($graphs);
+
+        $this->em->persist($report);
+        $this->em->flush();
+
+        return $report;
+    }
+
+    private function createPage($title): Page
+    {
+        $page = new Page();
+        $page->setTitle($title);
+        $page->setAlias(str_replace(' ', '_', $title));
+
+        $this->em->persist($page);
+        $this->em->flush();
+
+        return $page;
+    }
+
+    private function createHit(?Page $page): Hit
+    {
+        $hit = new Hit();
+        $hit->setDateHit(new \DateTime());
+        $hit->setCode(200);
+        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
+        $hit->setIpAddress(new IpAddress('127.0.0.1'));
+        $hit->setPage($page);
+
+        $this->em->persist($hit);
+        $this->em->flush();
+
+        return $hit;
     }
 }
