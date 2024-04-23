@@ -2589,6 +2589,9 @@ ul.line-legend li {
 .table-responsive-force > .table-bordered > tfoot > tr:last-child > td {
   border-bottom: 0;
 }
+.table-hover > tbody > tr:hover {
+  transition: var(--all);
+}
 .progress {
   background-color: #ebedf0;
   -webkit-box-shadow: none;
