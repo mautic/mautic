@@ -873,9 +873,9 @@ class CompanyController extends FormController
             CompanyMergeType::class,
             [],
             [
-                'action'          => $action,
-                'main_entity'     => $secondaryCompany->getId(),
-                'model_lookup_method'   => 'getSimpleLookupResults',
+                'action'              => $action,
+                'main_entity'         => $secondaryCompany->getId(),
+                'model_lookup_method' => 'getSimpleLookupResults',
             ]
         );
 
