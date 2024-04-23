@@ -9726,6 +9726,46 @@ button.close {
 :root {
   --timing: 0.3s ease;
   --all: all var(--timing);
+  --tag-background-gray: #e0e0e0;
+  --tag-color-gray: #161616;
+  --tag-hover-gray: #d1d1d1;
+  --tag-border-gray: #a8a8a8;
+  --tag-background-cool-gray: #dde1e6;
+  --tag-color-cool-gray: #121619;
+  --tag-hover-cool-gray: #cdd3da;
+  --tag-border-cool-gray: #a2a9b0;
+  --tag-background-warm-gray: #e5e0df;
+  --tag-color-warm-gray: #171414;
+  --tag-hover-warm-gray: #d8d0cf;
+  --tag-border-warm-gray: #ada8a8;
+  --tag-background-red: #ffd7d9;
+  --tag-color-red: #a2191f;
+  --tag-hover-red: #ffc2c5;
+  --tag-border-red: #ff8389;
+  --tag-background-magenta: #ffd6e8;
+  --tag-color-magenta: #9f1853;
+  --tag-hover-magenta: #ffbdda;
+  --tag-border-magenta: #ff7eb6;
+  --tag-background-purple: #e8daff;
+  --tag-color-purple: #6929c4;
+  --tag-hover-purple: #dcc7ff;
+  --tag-border-purple: #be95ff;
+  --tag-background-blue: #d0e2ff;
+  --tag-color-blue: #0043ce;
+  --tag-hover-blue: #b8d3ff;
+  --tag-border-blue: #78a9ff;
+  --tag-background-cyan: #bae6ff;
+  --tag-color-cyan: #00539a;
+  --tag-hover-cyan: #99daff;
+  --tag-border-cyan: #33b1ff;
+  --tag-background-teal: #9ef0f0;
+  --tag-color-teal: #005d5d;
+  --tag-hover-teal: #57e5e5;
+  --tag-border-teal: #08bdba;
+  --tag-background-green: #a7f0ba;
+  --tag-color-green: #0e6027;
+  --tag-hover-green: #74e792;
+  --tag-border-green: #42be65;
 }
 @media (prefers-reduced-motion: reduce) {
   :root {

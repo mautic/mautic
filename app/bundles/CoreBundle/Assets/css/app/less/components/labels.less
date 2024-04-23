@@ -3,11 +3,180 @@
 // --------------------------------------------------
 
 .label {
-  display: inline-block;
+  display: inline-flex;
+  gap: 2px;
   //vertical-align: top;
   line-height: 1.5;
-  padding: 0.25em 0.6em 0.15em 0.6em;
+  padding: 0.25em 0.8em 0.15em 0.8em;
   //padding-top: 0.3em;
-  border-radius: @border-radius-small;
-  text-shadow: 0px -1px 0px rgba(0,0,0,0.1);
+  border-radius: @border-radius-infinite;
+  min-width: 30px;
+  transition: var(--all);
+
+  // Exception for category color labels
+  &.pa-4 {
+    min-width: auto;
+  }
+
+  // Colors
+
+  &.gray-tag {
+    background-color: var(--tag-background-gray);
+    color: var(--tag-color-gray);
+    > a {
+      color: var(--tag-color-gray);
+    }
+    &:hover {
+      background-color: var(--tag-hover-gray);
+    }
+  }
+
+  &.cool-gray-tag {
+    background-color: var(--tag-background-cool-gray);
+    color: var(--tag-color-cool-gray);
+    > a {
+      color: var(--tag-color-cool-gray);
+    }
+    &:hover {
+      background-color: var(--tag-hover-cool-gray);
+    }
+  }
+  
+  &.warm-gray-tag {
+    background-color: var(--tag-background-warm-gray);
+    color: var(--tag-color-warm-gray);
+    > a {
+      color: var(--tag-color-warm-gray);
+    }
+    &:hover {
+      background-color: var(--tag-hover-warm-gray);
+    }
+  }
+  
+  &.red-tag {
+    background-color: var(--tag-background-red);
+    color: var(--tag-color-red);
+    > a {
+      color: var(--tag-color-red);
+    }
+    &:hover {
+      background-color: var(--tag-hover-red);
+    }
+  }
+  
+  &.magenta-tag {
+    background-color: var(--tag-background-magenta);
+    color: var(--tag-color-magenta);
+    > a {
+      color: var(--tag-color-magenta);
+    }
+    &:hover {
+      background-color: var(--tag-hover-magenta);
+    }
+  }
+  
+  &.purple-tag {
+    background-color: var(--tag-background-purple);
+    color: var(--tag-color-purple);
+    > a {
+      color: var(--tag-color-purple);
+    }
+    &:hover {
+      background-color: var(--tag-hover-purple);
+    }
+  }
+  
+  &.blue-tag {
+    background-color: var(--tag-background-blue);
+    color: var(--tag-color-blue);
+    > a {
+      color: var(--tag-color-blue);
+    }
+    &:hover {
+      background-color: var(--tag-hover-blue);
+    }
+  }
+  
+  &.cyan-tag {
+    background-color: var(--tag-background-cyan);
+    color: var(--tag-color-cyan);
+    > a {
+      color: var(--tag-color-cyan);
+    }
+    &:hover {
+      background-color: var(--tag-hover-cyan);
+    }
+  }
+  
+  &.teal-tag {
+    background-color: var(--tag-background-teal);
+    color: var(--tag-color-teal);
+    > a {
+      color: var(--tag-color-teal);
+    }
+    &:hover {
+      background-color: var(--tag-hover-teal);
+    }
+  }
+  
+  &.green-tag {
+    background-color: var(--tag-background-green);
+    color: var(--tag-color-green);
+    > a {
+      color: var(--tag-color-green);
+    }
+    &:hover {
+      background-color: var(--tag-hover-green);
+    }
+  }
+    
+
+  // Operational state
+
+  &.has-click-event {
+    border: 1px solid #00000017;
+
+    // Operational tag border colors
+
+    &.gray-tag {
+      border: 1px solid var(--tag-border-gray);
+    }
+    
+    &.cool-gray-tag {
+      border: 1px solid var(--tag-border-cool-gray);
+    }
+    
+    &.warm-gray-tag {
+      border: 1px solid var(--tag-border-warm-gray);
+    }
+    
+    &.red-tag {
+      border: 1px solid var(--tag-border-red);
+    }
+    
+    &.magenta-tag {
+      border: 1px solid var(--tag-border-magenta);
+    }
+    
+    &.purple-tag {
+      border: 1px solid var(--tag-border-purple);
+    }
+    
+    &.blue-tag {
+      border: 1px solid var(--tag-border-blue);
+    }
+    
+    &.cyan-tag {
+      border: 1px solid var(--tag-border-cyan);
+    }
+    
+    &.teal-tag {
+      border: 1px solid var(--tag-border-teal);
+    }
+    
+    &.green-tag {
+      border: 1px solid var(--tag-border-green);
+    }
+    
+  }
 }
