@@ -63,7 +63,7 @@ class PageModel extends FormModel
      */
     protected $catInUrl;
 
-    protected \Mautic\CoreBundle\Helper\DateTimeHelper $dateTimeHelper;
+    protected DateTimeHelper $dateTimeHelper;
 
     public function __construct(
         protected CookieHelper $cookieHelper,
@@ -101,7 +101,7 @@ class PageModel extends FormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository(\Mautic\PageBundle\Entity\Page::class);
+        $repo = $this->em->getRepository(Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -112,7 +112,7 @@ class PageModel extends FormModel
      */
     public function getHitRepository()
     {
-        return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
+        return $this->em->getRepository(Hit::class);
     }
 
     public function getPermissionBase(): string
@@ -138,7 +138,7 @@ class PageModel extends FormModel
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', 0, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-', ['_']);
 
             // make sure alias is not already taken
             $repo      = $this->getRepository();
@@ -210,10 +210,7 @@ class PageModel extends FormModel
         return $formFactory->create($formClass, $entity, $options);
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Page
     {
         if (null === $id) {
             $entity = new Page();
@@ -229,7 +226,7 @@ class PageModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -616,7 +613,7 @@ class PageModel extends FormModel
 
         // glean info from the IP address
         $ipAddress = $hit->getIpAddress();
-        if ($details = $ipAddress->getIpDetails()) {
+        if ($ipAddress && $details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
             $hit->setRegion($details['region']);
             $hit->setCity($details['city']);
@@ -734,9 +731,9 @@ class PageModel extends FormModel
     /**
      * Get number of page bounces.
      *
-     * @return int
+     * @return mixed[]
      */
-    public function getBounces(Page $page, \DateTime $fromDate = null)
+    public function getBounces(Page $page, \DateTime $fromDate = null): array
     {
         return $this->getHitRepository()->getBounces($page->getId(), $fromDate);
     }
@@ -758,10 +755,8 @@ class PageModel extends FormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -806,17 +801,17 @@ class PageModel extends FormModel
     }
 
     /**
+     * @deprecated Use getUniqueVsReturningPieChartData() instead.
+     *
      * Get data for pie chart showing new vs returning leads.
-     * Returning leads are even leads who visits 2 different page once.
+     * Returning leads are even leads who visit 2 different page once.
      *
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param array     $filters
      * @param bool      $canViewOthers
-     *
-     * @return array
      */
-    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart              = new PieChart();
         $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -841,14 +836,73 @@ class PageModel extends FormModel
     }
 
     /**
+     * Get data for pie chart showing new vs returning leads.
+     * Returning leads are even leads who visits 2 different page once.
+     *
+     * @return array<string, array<int|string>>
+     */
+    public function getUniqueVsReturningPieChartData(\DateTime $dateFrom, \DateTime $dateTo, bool $canViewOthers = true): array
+    {
+        $chart              = new PieChart();
+        $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+
+        $filters = [
+            'lead_id' => [
+                'expression' => 'isNotNull',
+            ],
+            'date_left' => [
+                'expression' => 'isNull',
+            ],
+            'redirect_id' => [
+                'expression' => 'isNull',
+            ],
+            'email_id' => [
+                'expression' => 'isNull',
+            ],
+        ];
+
+        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+
+        if (!$canViewOthers) {
+            $this->limitQueryToCreator($allQ);
+        }
+
+        $allQ->resetQueryPart('select')->select('t.lead_id');
+        $allQ->groupBy('t.lead_id');
+
+        // fetch all group by lead_id
+        $q  = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(*) as count')
+            ->from(
+                sprintf('(%s)', $allQ->getSQL()), 'tt'
+            );
+        $q->setParameters($allQ->getParameters());
+        $all       = $query->fetchCount($q);
+
+        // date_left is NULL more like 1 mean returned visitor
+        $allQ->having('COUNT(t.id) > 1');
+        $q  = $this->em->getConnection()->createQueryBuilder();
+        $q->select('COUNT(*) as count')
+            ->from(
+                sprintf('(%s)', $allQ->getSQL()), 'tt'
+            );
+        $q->setParameters($allQ->getParameters());
+        $returning = $query->fetchCount($q);
+
+        $unique    = $all - $returning;
+        $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
+        $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
+
+        return $chart->render();
+    }
+
+    /**
      * Get pie chart data of dwell times.
      *
      * @param array $filters
      * @param bool  $canViewOthers
-     *
-     * @return array
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
         $timesOnSite = $this->getHitRepository()->getDwellTimeLabels();
         $chart       = new PieChart();
@@ -870,10 +924,8 @@ class PageModel extends FormModel
 
     /**
      * Get bar chart data of hits.
-     *
-     * @return array
      */
-    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
+    public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
 
@@ -1029,7 +1081,7 @@ class PageModel extends FormModel
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\UtmTag::class);
+            $repo = $this->em->getRepository(UtmTag::class);
             $repo->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);

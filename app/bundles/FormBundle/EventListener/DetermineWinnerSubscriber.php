@@ -11,14 +11,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SubmissionRepository $submissionRepository, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private SubmissionRepository $submissionRepository,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER => ['onDetermineSubmissionWinner', 0],

@@ -20,8 +20,13 @@ class CookieHelper implements EventSubscriberInterface
      */
     private array $cookies = [];
 
-    public function __construct(private ?string $path, private ?string $domain, private bool $secure, private bool $httponly, private RequestStack $requestStack)
-    {
+    public function __construct(
+        private ?string $path,
+        private ?string $domain,
+        private bool $secure,
+        private bool $httponly,
+        private RequestStack $requestStack
+    ) {
     }
 
     /**

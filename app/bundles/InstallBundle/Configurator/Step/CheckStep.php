@@ -65,17 +65,11 @@ class CheckStep implements StepInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFormType(): string
     {
         return CheckStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkRequirements(): array
     {
         $messages = [];
@@ -157,9 +151,6 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkOptionalSettings(): array
     {
         $messages = [];
@@ -189,7 +180,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.iconv';
         }
 
-        if (!function_exists('utf8_decode')) {
+        if (!extension_loaded('xml')) {
             $messages[] = 'mautic.install.function.xml';
         }
 
@@ -234,17 +225,12 @@ class CheckStep implements StepInterface
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTemplate(): string
     {
         return '@MauticInstall/Install/check.html.twig';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return mixed[]
      */
     public function update(StepInterface $data): array

@@ -7,15 +7,21 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class UserListType extends AbstractType
 {
-    public function __construct(private UserModel $userModel)
-    {
+    /**
+     * @var array<string,int>
+     */
+    private array $choices = [];
+
+    public function __construct(
+        private UserModel $userModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -37,10 +43,16 @@ class UserListType extends AbstractType
         return ChoiceType::class;
     }
 
+    /**
+     * @return array<string,int>
+     */
     private function getUserChoices(): array
     {
-        $choices = [];
-        $users   = $this->userModel->getRepository()->getEntities(
+        if ($this->choices) {
+            return $this->choices;
+        }
+
+        $users = $this->userModel->getRepository()->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -55,12 +67,12 @@ class UserListType extends AbstractType
         );
 
         foreach ($users as $user) {
-            $choices[$user->getName(true)] = $user->getId();
+            $this->choices[$user->getName(true)] = $user->getId();
         }
 
         // sort by user name
-        ksort($choices);
+        ksort($this->choices);
 
-        return $choices;
+        return $this->choices;
     }
 }

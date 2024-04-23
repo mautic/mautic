@@ -57,8 +57,11 @@ class CampaignExecutionEvent extends Event
     /**
      * @param bool|mixed[]|string|null $result
      */
-    public function __construct(array $args, protected $result, protected ?LeadEventLog $log = null)
-    {
+    public function __construct(
+        array $args,
+        protected $result,
+        protected ?LeadEventLog $log = null
+    ) {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
         $this->eventDetails    = $args['eventDetails'];

@@ -5,11 +5,13 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class LeadListAccessValidator extends ConstraintValidator
 {
-    public function __construct(private ListModel $segmentModel)
-    {
+    public function __construct(
+        private ListModel $segmentModel
+    ) {
     }
 
     /**
@@ -17,6 +19,10 @@ class LeadListAccessValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
+        if (!$constraint instanceof LeadListAccess) {
+            throw new UnexpectedTypeException($constraint, LeadListAccess::class);
+        }
+
         if (count($value)) {
             $lists = $this->segmentModel->getUserLists();
             foreach ($value as $l) {
@@ -28,7 +34,7 @@ class LeadListAccessValidator extends ConstraintValidator
                     break;
                 }
             }
-        } else {
+        } elseif (!$constraint->allowEmpty) {
             $this->context->addViolation($constraint->message);
         }
     }

@@ -21,25 +21,27 @@
                     </thead>
                     <tbody>
                         {% for rowKey, row in graph.data %}
-                        <tr>
-                            {% for cellName, cell in row %}
-                                {% if graph.data[0].id is defined and 'title' == cellName and graph.link is defined %}
-                                    <td>
-                                        <a href="{{ path(graph.link, {'objectAction': 'view', 'objectId': row.id}) }}" data-toggle="ajax">
-                                            {{ cell }}
-                                        </a>
-                                    </td>
-                                {% elseif 'id' != cellName %}
-                                    <td>
-                                        {% if cell is numeric %}
-                                            {{ cell }}
-                                        {% else %}
-                                            {{ assetMakeLinks(cell) }}
+                            {% if row['id'] is not null %}
+                                <tr>
+                                    {% for cellName, cell in row %}
+                                        {% if graph.data[0].id is defined and 'title' == cellName and graph.link is defined %}
+                                            <td>
+                                                <a href="{{ path(graph.link, {'objectAction': 'view', 'objectId': row.id}) }}" data-toggle="ajax">
+                                                    {{ cell }}
+                                                </a>
+                                            </td>
+                                        {% elseif 'id' != cellName %}
+                                            <td>
+                                                {% if cell is numeric %}
+                                                    {{ cell }}
+                                                {% else %}
+                                                    {{ assetMakeLinks(cell) }}
+                                                {% endif %}
+                                            </td>
                                         {% endif %}
-                                    </td>
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
+                                    {% endfor %}
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>

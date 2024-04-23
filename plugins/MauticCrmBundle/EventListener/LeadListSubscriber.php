@@ -15,14 +15,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadListSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IntegrationHelper $helper, private ListModel $listModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private IntegrationHelper $helper,
+        private ListModel $listModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onFilterChoiceFieldsGenerate', 0],

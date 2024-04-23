@@ -11,13 +11,11 @@ use Mautic\UserBundle\Entity\User;
 class AuditLogModel extends AbstractCommonModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CoreBundle\Entity\AuditLogRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class);
+        return $this->em->getRepository(AuditLog::class);
     }
 
     /**
@@ -32,9 +30,8 @@ class AuditLogModel extends AbstractCommonModel
         $objectId  = $args['objectId'] ?? '';
         $action    = $args['action'] ?? '';
         $details   = $args['details'] ?? '';
-        $ipAddress = $args['ipAddress'] ?? '';
-
-        $log = new AuditLog();
+        $ipAddress = isset($args['ipAddress']) ? ($this->coreParametersHelper->get('anonymize_ip') ? '*.*.*.*' : $args['ipAddress']) : '';
+        $log       = new AuditLog();
         $log->setBundle($bundle);
         $log->setObject($object);
         $log->setObjectId($objectId);
@@ -53,7 +50,7 @@ class AuditLogModel extends AbstractCommonModel
         $log->setUserId($userId);
         $log->setUserName($userName);
 
-        $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class)->saveEntity($log);
+        $this->em->getRepository(AuditLog::class)->saveEntity($log);
 
         $this->em->detach($log);
     }

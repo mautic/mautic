@@ -13,8 +13,10 @@ class MailboxOrganizer
      */
     protected $containers = [];
 
-    public function __construct(protected ParseEmailEvent $event, protected array $mailboxes)
-    {
+    public function __construct(
+        protected ParseEmailEvent $event,
+        protected array $mailboxes
+    ) {
     }
 
     /**

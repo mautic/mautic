@@ -24,8 +24,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper
 {
-    public function __construct(private FieldModel $fieldModel, private ObjectMappingRepository $objectMappingRepository, private ObjectProvider $objectProvider, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private FieldModel $fieldModel,
+        private ObjectMappingRepository $objectMappingRepository,
+        private ObjectProvider $objectProvider,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

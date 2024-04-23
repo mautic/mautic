@@ -4,15 +4,17 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 
 class TransportCallback
 {
-    public function __construct(private DoNotContact $dncModel, private ContactFinder $finder, private StatRepository $statRepository)
-    {
+    public function __construct(
+        private DoNotContact $dncModel,
+        private ContactFinder $finder,
+        private EmailStatModel $emailStatModel
+    ) {
     }
 
     /**
@@ -80,6 +82,6 @@ class TransportCallback
             'reason'   => $comments,
         ];
         $stat->setOpenDetails($openDetails);
-        $this->statRepository->saveEntity($stat);
+        $this->emailStatModel->saveEntity($stat);
     }
 }

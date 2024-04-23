@@ -3,23 +3,24 @@
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\EventDispatcher\Event;
 
-class ReplyEvent extends Event
+class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
-    /**
-     * @var Response|null
-     */
-    private $response;
+    private ?Response $response = null;
+
+    private ?LeadEventLog $eventLog = null;
 
     /**
      * ReplyEvent constructor.
      *
      * @param string $message
      */
-    public function __construct(private Lead $contact, private $message)
-    {
+    public function __construct(
+        private Lead $contact,
+        private $message
+    ) {
     }
 
     /**
@@ -49,5 +50,15 @@ class ReplyEvent extends Event
     public function getResponse()
     {
         return $this->response;
+    }
+
+    public function getEventLog(): ?LeadEventLog
+    {
+        return $this->eventLog;
+    }
+
+    public function setEventLog(LeadEventLog $eventLog): void
+    {
+        $this->eventLog = $eventLog;
     }
 }

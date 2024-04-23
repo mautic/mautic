@@ -20,8 +20,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractCommonModel implements MauticModelInterface
 {
-    public function __construct(protected EntityManagerInterface $em, protected CorePermissions $security, protected EventDispatcherInterface $dispatcher, protected UrlGeneratorInterface $router, protected Translator $translator, protected UserHelper $userHelper, protected LoggerInterface $logger, protected CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        protected EntityManagerInterface $em,
+        protected CorePermissions $security,
+        protected EventDispatcherInterface $dispatcher,
+        protected UrlGeneratorInterface $router,
+        protected Translator $translator,
+        protected UserHelper $userHelper,
+        protected LoggerInterface $logger,
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
@@ -92,12 +100,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Get a specific entity.
-     *
-     * @param int|array id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?object
     {
         if (null !== $id) {
             $repo = $this->getRepository();

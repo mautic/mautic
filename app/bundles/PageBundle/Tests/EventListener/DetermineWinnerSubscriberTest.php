@@ -18,17 +18,14 @@ class DetermineWinnerSubscriberTest extends TestCase
     /**
      * @var MockObject|HitRepository
      */
-    private $hitRepository;
+    private MockObject $hitRepository;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -57,13 +54,13 @@ class DetermineWinnerSubscriberTest extends TestCase
                 'bounces'   => 5,
                 'rate'      => 25,
                 'title'     => 'Page 1.1',
-                ],
+            ],
             2 => [
                 'totalHits' => 10,
                 'bounces'   => 1,
                 'rate'      => 10,
                 'title'     => 'Page 1.2',
-                ],
+            ],
             3 => [
                 'totalHits' => 30,
                 'bounces'   => 15,
@@ -133,7 +130,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         self::assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
     }
 
-    public function testOnDetermineDwellTimeWinner()
+    public function testOnDetermineDwellTimeWinner(): void
     {
         $parentMock  = $this->createMock(Page::class);
         $ids         = [1, 2];

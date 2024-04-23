@@ -2,21 +2,27 @@
 
 namespace Mautic\WebhookBundle\Form\DataTransformer;
 
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * @implements DataTransformerInterface<Collection<int, Event>, array<int, string>>
+ */
 class EventsToArrayTransformer implements DataTransformerInterface
 {
-    public function __construct(private Webhook $webhook)
-    {
+    public function __construct(
+        private Webhook $webhook
+    ) {
     }
 
     /**
      * Convert from the PersistentCollection of Event entities to a simple array.
      *
-     * @return array
+     * @param $events Collection<int, Event>
+     *
+     * @return array<int, string>
      */
     public function transform($events)
     {
@@ -31,13 +37,14 @@ class EventsToArrayTransformer implements DataTransformerInterface
     /**
      * Convert a simple array into a PersistentCollection of Event entities.
      *
-     * @return PersistentCollection
+     * @param $submittedArray array<int, string>
+     *
+     * @return Collection<int, Event>
      */
     public function reverseTransform($submittedArray)
     {
         // Get a list of existing events and types
 
-        //  /** @v ar PersistentCollection[] $events */
         $events     = $this->webhook->getEvents();
         $eventTypes = $events->getKeys();
 

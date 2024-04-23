@@ -13,8 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class MenuSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config)
-    {
+    public function __construct(
+        private Config $config
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -37,7 +38,7 @@ final class MenuSubscriber implements EventSubscriberInterface
                     'marketplace.title' => [
                         'id'        => 'marketplace',
                         'route'     => RouteProvider::ROUTE_LIST,
-                        'iconClass' => 'fa-plus',
+                        'iconClass' => 'ri-shopping-bag-3-fill',
                         'access'    => MarketplacePermissions::CAN_VIEW_PACKAGES,
                     ],
                 ],

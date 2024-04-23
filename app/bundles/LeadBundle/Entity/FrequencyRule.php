@@ -10,7 +10,9 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 class FrequencyRule extends CommonEntity
 {
     public const TIME_DAY   = 'DAY';
+
     public const TIME_WEEK  = 'WEEK';
+
     public const TIME_MONTH = 'MONTH';
 
     /**
@@ -63,8 +65,9 @@ class FrequencyRule extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_frequencyrules')
-            ->setCustomRepositoryClass(\Mautic\LeadBundle\Entity\FrequencyRuleRepository::class)
-            ->addIndex(['channel'], 'channel_frequency');
+            ->setCustomRepositoryClass(FrequencyRuleRepository::class)
+            ->addIndex(['channel'], 'channel_frequency')
+            ->addIndex(['lead_id', 'date_added'], 'idx_frequency_date_added');
 
         $builder->addId();
 

@@ -14,14 +14,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ApiSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private Translator $translator)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private Translator $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST  => ['onKernelRequest', 255],

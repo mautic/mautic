@@ -4,8 +4,6 @@ namespace Mautic\PluginBundle\Integration;
 
 /**
  * Used by SSO auth plugins that use credentials from the login form to authenticate.
- *
- * Class AbstractSsoFormIntegration
  */
 abstract class AbstractSsoFormIntegration extends AbstractSsoServiceIntegration
 {

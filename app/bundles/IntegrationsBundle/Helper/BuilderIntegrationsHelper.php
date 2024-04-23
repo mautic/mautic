@@ -13,10 +13,11 @@ class BuilderIntegrationsHelper
     /**
      * @var BuilderInterface[]
      */
-    private $builders = [];
+    private array $builders = [];
 
-    public function __construct(private IntegrationsHelper $integrationsHelper)
-    {
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    ) {
     }
 
     /**

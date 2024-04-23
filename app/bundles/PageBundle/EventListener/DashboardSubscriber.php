@@ -43,8 +43,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page:pages:viewother',
     ];
 
-    public function __construct(protected PageModel $pageModel, protected RouterInterface $router)
-    {
+    public function __construct(
+        protected PageModel $pageModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**
@@ -88,7 +90,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $this->pageModel->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
+                    'chartData'   => $this->pageModel->getUniqueVsReturningPieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers),
                 ]);
             }
 

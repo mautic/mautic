@@ -70,10 +70,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * Standard Channel Columns.
      */
     public const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
+
     public const CHANNEL_COLUMN_NAME            = 'channel.name';
+
     public const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
+
     public const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
+
     public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+
     public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
     /**
@@ -81,8 +86,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private $contentTemplate;
 
-    public function __construct(private EventDispatcherInterface $dispatcher, private Connection $db, private Report $entity, private ChannelListHelper $channelListHelper)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private Connection $db,
+        private Report $entity,
+        private ChannelListHelper $channelListHelper
+    ) {
     }
 
     /**
@@ -94,7 +103,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $queryBuilder = $this->configureBuilder($options);
 
-        if (QueryBuilder::SELECT !== $queryBuilder->getType()) {
+        if (!array_key_exists('select', $queryBuilder->getQueryParts())) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
 
@@ -426,6 +435,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'email':
                             case 'url':
                                 switch ($exprFunction) {
+                                    case 'like':
+                                    case 'notLike':
+                                        $filter['value'] = !str_contains($filter['value'], '%') ? '%'.$filter['value'].'%' : $filter['value'];
+                                        break;
                                     case 'startsWith':
                                         $exprFunction    = 'like';
                                         $filter['value'] = $filter['value'].'%';
@@ -455,7 +468,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             // Add the remaining $andGroup to the rest of the $orGroups if exists so we don't miss it.
             $orGroups[] = CompositeExpression::and(...$andGroup);
             $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
-        } else {
+        } elseif ($andGroup) {
             $queryBuilder->andWhere(CompositeExpression::and(...$andGroup));
         }
     }

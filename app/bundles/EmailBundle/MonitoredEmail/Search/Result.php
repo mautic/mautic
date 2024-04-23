@@ -7,15 +7,12 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Result
 {
-    /**
-     * @var Stat
-     */
-    private $stat;
+    private ?Stat $stat = null;
 
     /**
      * @var Lead[]
      */
-    private $contacts = [];
+    private array $contacts = [];
 
     /**
      * @var string

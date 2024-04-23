@@ -7,14 +7,15 @@ use Mautic\LeadBundle\Segment\Decorator\ContactDecoratorForeignInterface;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class ContactSegmentFilter is used for accessing $filter as an object and to keep logic in an object.
+ * Used for accessing $filter as an object and to keep logic in an object.
  */
-class ContactSegmentFilter
+class ContactSegmentFilter implements \Stringable
 {
     /**
      * @var ContactSegmentFilterCrate
@@ -44,6 +45,10 @@ class ContactSegmentFilter
         $currentDBName = $this->schemaCache->getCurrentDatabaseName();
 
         $table = preg_replace("/^{$currentDBName}\./", '', $this->getTable());
+
+        if (!$table) {
+            throw new TableNotFoundException('Segment Query is missing table, perhaps incorrectly registered custom Query Builder. ');
+        }
 
         $columns = $this->schemaCache->getColumns($table);
 
@@ -135,18 +140,12 @@ class ContactSegmentFilter
         return $this->contactSegmentFilterCrate->getGlue();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAggregateFunction()
+    public function getAggregateFunction(): string|bool
     {
         return $this->filterDecorator->getAggregateFunc($this->contactSegmentFilterCrate);
     }
 
-    /**
-     * @return FilterQueryBuilderInterface
-     */
-    public function getFilterQueryBuilder()
+    public function getFilterQueryBuilder(): FilterQueryBuilderInterface
     {
         return $this->filterQueryBuilder;
     }
@@ -164,10 +163,7 @@ class ContactSegmentFilter
         return 'leadlist' === $this->getField();
     }
 
-    /**
-     * @return bool
-     */
-    public function isColumnTypeBoolean()
+    public function isColumnTypeBoolean(): bool
     {
         return $this->contactSegmentFilterCrate->isBooleanType();
     }
@@ -190,7 +186,7 @@ class ContactSegmentFilter
         return new IntegrationCampaignParts($this->getParameterValue());
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf(
             'table: %s,  %s on %s %s %s',

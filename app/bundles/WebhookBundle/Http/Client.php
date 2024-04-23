@@ -12,8 +12,10 @@ class Client
     /**
      * @param GuzzleClient $httpClient
      */
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private $httpClient)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private $httpClient
+    ) {
     }
 
     /**
@@ -23,8 +25,6 @@ class Client
      */
 
     /**
-     * @param null $secret
-     *
      * @return mixed|ResponseInterface
      *
      * @throws \Http\Client\Exception

@@ -9,15 +9,12 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class PointRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
-            ->from(\Mautic\PointBundle\Entity\Point::class, $this->getTableAlias())
+            ->from(Point::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
             ->leftJoin($this->getTableAlias().'.group', 'pl');
 
@@ -26,9 +23,6 @@ class PointRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'p';
@@ -115,10 +109,7 @@ class PointRepository extends CommonRepository
         return $return;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'p.name',
@@ -126,18 +117,15 @@ class PointRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }

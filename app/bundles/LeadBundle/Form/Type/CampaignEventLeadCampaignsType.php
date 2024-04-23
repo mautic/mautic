@@ -10,26 +10,27 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class CampaignEventLeadCampaignsType extends AbstractType
 {
-    public function __construct(protected ListModel $listModel)
-    {
+    public function __construct(
+        protected ListModel $listModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('campaigns',
             CampaignListType::class, [
-            'label'      => 'mautic.lead.lead.events.campaigns.membership',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class' => 'form-control',
-            ],
-            'required' => true,
-        ]);
+                'label'      => 'mautic.lead.lead.events.campaigns.membership',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'required' => true,
+            ]);
 
         $builder->add(
             'dataAddedLimit',
@@ -77,9 +78,6 @@ class CampaignEventLeadCampaignsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_lead_campaigns';

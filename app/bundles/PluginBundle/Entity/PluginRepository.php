@@ -27,14 +27,11 @@ class PluginRepository extends CommonRepository
         return $q->getQuery()->getOneOrNullResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $q = $this->_em->createQueryBuilder();
         $q->select($this->getTableAlias())
-            ->from(\Mautic\PluginBundle\Entity\Plugin::class, $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
+            ->from(Plugin::class, $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
 
         $args['qb']               = $q;
         $args['ignore_paginator'] = true;
@@ -42,9 +39,6 @@ class PluginRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -52,9 +46,6 @@ class PluginRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'p';

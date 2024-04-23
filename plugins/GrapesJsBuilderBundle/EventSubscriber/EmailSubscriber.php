@@ -12,14 +12,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config, private GrapesJsBuilderModel $grapesJsBuilderModel)
-    {
+    public function __construct(
+        private Config $config,
+        private GrapesJsBuilderModel $grapesJsBuilderModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],

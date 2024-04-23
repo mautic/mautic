@@ -17,15 +17,17 @@ class SyncIntegrationsHelper
     /**
      * @var SyncInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
     /**
      * @var array<int,string>|null
      */
-    private $enabled;
+    private ?array $enabled = null;
 
-    public function __construct(private IntegrationsHelper $integrationsHelper, private ObjectProvider $objectProvider)
-    {
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper,
+        private ObjectProvider $objectProvider
+    ) {
     }
 
     public function addIntegration(SyncInterface $integration): void

@@ -17,10 +17,11 @@ class ObjectProvider
      *
      * @var ObjectInterface[]
      */
-    private $objects = [];
+    private array $objects = [];
 
-    public function __construct(private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
     /**

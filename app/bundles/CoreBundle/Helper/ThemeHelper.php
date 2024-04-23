@@ -15,19 +15,16 @@ use Twig\Environment;
 class ThemeHelper implements ThemeHelperInterface
 {
     /**
-     * @var array|mixed
+     * @var array<string, mixed[]>
      */
-    private $themes = [];
+    private array $themes = [];
 
     /**
-     * @var array
+     * @var array<string, mixed[]>
      */
-    private $themesInfo = [];
+    private array $themesInfo = [];
 
-    /**
-     * @var array
-     */
-    private $steps = [];
+    private array $steps = [];
 
     /**
      * @var string
@@ -37,16 +34,13 @@ class ThemeHelper implements ThemeHelperInterface
     /**
      * @var twigThemeHelper[]
      */
-    private $themeHelpers = [];
+    private array $themeHelpers = [];
 
-    private \Mautic\CoreBundle\Helper\Filesystem $filesystem;
+    private Filesystem $filesystem;
 
-    private \Symfony\Component\Finder\Finder $finder;
+    private Finder $finder;
 
-    /**
-     * @var bool
-     */
-    private $themesLoadedFromFilesystem = false;
+    private bool $themesLoadedFromFilesystem = false;
 
     /**
      * Default themes which cannot be deleted.
@@ -377,7 +371,7 @@ class ThemeHelper implements ThemeHelperInterface
     public function zip($themeName)
     {
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
-        $tmpPath   = $this->pathsHelper->getSystemPath('cache', true).'/tmp_'.$themeName.'.zip';
+        $tmpPath   = $this->pathsHelper->getSystemPath('tmp', true).'/tmp_'.$themeName.'.zip';
         $zipper    = new \ZipArchive();
 
         if ($this->filesystem->exists($tmpPath)) {

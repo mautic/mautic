@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
@@ -19,7 +20,7 @@ class FieldController extends FormController
      *
      * @param int $page
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction(Request $request, $page = 1)
     {
@@ -109,7 +110,7 @@ class FieldController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request)
     {
@@ -227,7 +228,7 @@ class FieldController extends FormController
      *
      * @param bool|false $ignorePost
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
@@ -289,10 +290,20 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
-                        // form is valid so process the data
-                        $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                        $flashMessage = 'mautic.core.notice.updated';
 
-                        $this->addFlashMessage('mautic.core.notice.updated', [
+                        // form is valid so process the data
+                        try {
+                            $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                        } catch (AbortColumnUpdateException) {
+                            $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');
+                        } catch (SchemaException $e) {
+                            $flashMessage = $e->getMessage();
+                            $form['alias']->addError(new FormError($e->getMessage()));
+                            $valid = false;
+                        }
+
+                        $this->addFlashMessage($flashMessage, [
                             '%name%'      => $field->getLabel(),
                             '%menu_link%' => 'mautic_contactfield_index',
                             '%url%'       => $this->generateUrl('mautic_contactfield_action', [
@@ -310,9 +321,9 @@ class FieldController extends FormController
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
-                            'viewParameters'  => ['objectId' => $field->getId()],
-                            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
-                        ]
+                        'viewParameters'  => ['objectId' => $field->getId()],
+                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
+                    ]
                     )
                 );
             } elseif ($valid) {
@@ -361,6 +372,7 @@ class FieldController extends FormController
             }
 
             $clone = clone $entity;
+            $clone->setId(null);
             $clone->setIsPublished(false);
             $clone->setIsFixed(false);
             $fieldAliasHelper->makeAliasUnique($clone);

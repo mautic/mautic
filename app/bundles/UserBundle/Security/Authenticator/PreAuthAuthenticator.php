@@ -18,8 +18,13 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class PreAuthAuthenticator implements AuthenticationProviderInterface
 {
-    public function __construct(protected IntegrationHelper $integrationHelper, protected EventDispatcherInterface $dispatcher, protected RequestStack $requestStack, protected UserProviderInterface $userProvider, protected $providerKey)
-    {
+    public function __construct(
+        protected IntegrationHelper $integrationHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected RequestStack $requestStack,
+        protected UserProviderInterface $userProvider,
+        protected $providerKey
+    ) {
     }
 
     /**

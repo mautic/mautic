@@ -12,8 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MauticSocialMonitoringCommand extends Command
 {
-    public function __construct(private MonitoringModel $monitoringModel)
-    {
+    public function __construct(
+        private MonitoringModel $monitoringModel
+    ) {
         parent::__construct();
     }
 
@@ -43,7 +44,7 @@ class MauticSocialMonitoringCommand extends Command
         if (!$monitorList->count()) {
             $output->writeln('No published monitors found. Make sure the id you supplied is published');
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         // max iterations
@@ -55,12 +56,10 @@ class MauticSocialMonitoringCommand extends Command
             $output->writeln('Result Code: '.$resultCode);
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     /**
-     * @param null $id
-     *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     protected function getMonitors($id = null)
@@ -132,5 +131,6 @@ class MauticSocialMonitoringCommand extends Command
 
         return $returnCode;
     }
+
     protected static $defaultDescription = 'Looks at the records of monitors and iterates through them. ';
 }

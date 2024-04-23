@@ -17,15 +17,9 @@ class ResultsPaginator
      */
     private $totalRecords = 0;
 
-    /**
-     * @var int
-     */
-    private $recordCount = 0;
+    private int $recordCount = 0;
 
-    /**
-     * @var int
-     */
-    private $retryCount = 0;
+    private int $retryCount = 0;
 
     /**
      * @var string|null
@@ -35,8 +29,10 @@ class ResultsPaginator
     /**
      * @param string $salesforceBaseUrl
      */
-    public function __construct(private LoggerInterface $logger, private $salesforceBaseUrl)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private $salesforceBaseUrl
+    ) {
     }
 
     /**

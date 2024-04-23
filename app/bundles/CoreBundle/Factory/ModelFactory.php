@@ -11,8 +11,9 @@ use Psr\Container\ContainerInterface;
  */
 class ModelFactory
 {
-    public function __construct(private ContainerInterface $container)
-    {
+    public function __construct(
+        private ContainerInterface $container
+    ) {
     }
 
     /**

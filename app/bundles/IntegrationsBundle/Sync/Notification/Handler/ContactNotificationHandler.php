@@ -16,18 +16,16 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 
 class ContactNotificationHandler implements HandlerInterface
 {
-    /**
-     * @var string
-     */
-    private $integrationDisplayName;
+    private ?string $integrationDisplayName = null;
 
-    /**
-     * @var string
-     */
-    private $objectDisplayName;
+    private ?string $objectDisplayName = null;
 
-    public function __construct(private Writer $writer, private LeadEventLogRepository $leadEventRepository, private EntityManagerInterface $em, private UserSummaryNotificationHelper $userNotificationHelper)
-    {
+    public function __construct(
+        private Writer $writer,
+        private LeadEventLogRepository $leadEventRepository,
+        private EntityManagerInterface $em,
+        private UserSummaryNotificationHelper $userNotificationHelper
+    ) {
     }
 
     public function getIntegration(): string

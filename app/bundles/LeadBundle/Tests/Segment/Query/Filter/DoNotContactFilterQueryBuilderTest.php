@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
@@ -16,6 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoNotContactFilterQueryBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
+
     public function testGetServiceId(): void
     {
         Assert::assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
@@ -51,43 +54,26 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
 
     private function createConnection(): Connection
     {
-        return new class() extends Connection {
-            /** @noinspection PhpMissingParentConstructorInspection */
-            public function __construct()
-            {
-            }
-        };
+        return $this->getMockedConnection();
     }
 
     /**
-     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
-     *
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
         return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
             /**
-             * @var string
+             * @noinspection PhpMissingParentConstructorInspection
              */
-            private $operator;
-
-            /**
-             * @var string
-             */
-            private $parameterValue;
-
-            /**
-             * @var array<string, mixed>
-             */
-            private $batchLimiters;
-
-            /** @noinspection PhpMissingParentConstructorInspection */
-            public function __construct(string $operator, string $parameterValue, array $batchLimiters)
-            {
-                $this->operator       = $operator;
-                $this->parameterValue = $parameterValue;
-                $this->batchLimiters  = $batchLimiters;
+            public function __construct(
+                private string $operator,
+                private string $parameterValue,
+                /**
+                 * @var array<string, mixed>
+                 */
+                private array $batchLimiters
+            ) {
             }
 
             public function getDoNotContactParts(): DoNotContactParts

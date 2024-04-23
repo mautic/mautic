@@ -9,10 +9,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class TrackingPixelSendType extends AbstractType
 {
-    public function __construct(protected TrackingHelper $trackingHelper)
-    {
+    public function __construct(
+        protected TrackingHelper $trackingHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -34,7 +38,7 @@ class TrackingPixelSendType extends AbstractType
                     ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
                 ),
             ],
-            ]);
+        ]);
 
         $builder->add(
             'category',

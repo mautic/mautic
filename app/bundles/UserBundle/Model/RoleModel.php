@@ -23,18 +23,13 @@ class RoleModel extends FormModel
         return $this->em->getRepository(Role::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'user:roles';
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function saveEntity($entity, $unlock = true): void
     {
@@ -76,8 +71,6 @@ class RoleModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws PreconditionRequiredHttpException
      */
     public function deleteEntity($entity): void
@@ -95,8 +88,6 @@ class RoleModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -112,10 +103,7 @@ class RoleModel extends FormModel
         return $formFactory->create(RoleType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Role
     {
         if (null === $id) {
             return new Role();
@@ -125,9 +113,7 @@ class RoleModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

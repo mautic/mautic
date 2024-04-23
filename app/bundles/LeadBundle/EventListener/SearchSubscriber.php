@@ -30,10 +30,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->leadRepo        = $leadModel->getRepository();
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH              => ['onGlobalSearch', 0],

@@ -18,10 +18,7 @@ class DateOptionParameters
 
     private bool $shouldUseLastDayOfRange;
 
-    /**
-     * @var DateTimeHelper
-     */
-    private $dateTimeHelper;
+    private DateTimeHelper $dateTimeHelper;
 
     public function __construct(
         ContactSegmentFilterCrate $leadSegmentFilterCrate,

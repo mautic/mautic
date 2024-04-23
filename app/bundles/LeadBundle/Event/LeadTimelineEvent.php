@@ -323,10 +323,7 @@ class LeadTimelineEvent extends Event
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getQueryOptions()
+    public function getQueryOptions(): array
     {
         return array_merge(
             [
@@ -481,8 +478,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Calculate engagement counts only.
-     *
-     * @param null $groupUnit
      */
     public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null): void
     {

@@ -8,6 +8,9 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -16,20 +19,20 @@ class ConfigSubscriberTest extends TestCase
     /**
      * @var ConfigChangeLogger|MockObject
      */
-    private $logger;
+    private MockObject $logger;
 
-    /**
-     * @var ConfigSubscriber
-     */
-    private $subscriber;
+    private ConfigSubscriber $subscriber;
 
     protected function setUp(): void
     {
         $this->logger     = $this->createMock(ConfigChangeLogger::class);
-        $this->subscriber = new ConfigSubscriber($this->logger);
+        $ipAddressRepo    = $this->createMock(IpAddressRepository::class);
+        $coreParamHelper  = $this->createMock(CoreParametersHelper::class);
+        $auditLogRepo     = $this->createMock(AuditLogRepository::class);
+        $this->subscriber = new ConfigSubscriber($this->logger, $ipAddressRepo, $coreParamHelper, $auditLogRepo);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -39,7 +42,7 @@ class ConfigSubscriberTest extends TestCase
         );
     }
 
-    public function testNothingToLogOnConfigPostSave()
+    public function testNothingToLogOnConfigPostSave(): void
     {
         // Test nothing to log
         $this->logger->expects($this->never())
@@ -52,7 +55,7 @@ class ConfigSubscriberTest extends TestCase
         $this->subscriber->onConfigPostSave($event);
     }
 
-    public function testSomethingToLogOnConfigPostSave()
+    public function testSomethingToLogOnConfigPostSave(): void
     {
         // Test something to log
         $originalNormData = ['orig'];

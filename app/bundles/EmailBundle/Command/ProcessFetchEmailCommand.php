@@ -14,14 +14,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessFetchEmailCommand extends Command
 {
-    public function __construct(private CoreParametersHelper $parametersHelper, private Fetcher $fetcher)
-    {
+    public function __construct(
+        private CoreParametersHelper $parametersHelper,
+        private Fetcher $fetcher
+    ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -55,7 +54,8 @@ EOT
             $output->writeln($log);
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetch and process monitored email.';
 }

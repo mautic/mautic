@@ -12,17 +12,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FullContactIntegration extends AbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'FullContact';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
@@ -30,7 +28,6 @@ class FullContactIntegration extends AbstractIntegration
     /**
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
-
      *
      * @return array<string, string>
      */
@@ -100,8 +97,6 @@ class FullContactIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string|array
      */
     public function getFormNotes($section)

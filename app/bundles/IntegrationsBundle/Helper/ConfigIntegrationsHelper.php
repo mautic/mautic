@@ -13,10 +13,11 @@ class ConfigIntegrationsHelper
     /**
      * @var ConfigFormInterface[]
      */
-    private $integrations = [];
+    private array $integrations = [];
 
-    public function __construct(private IntegrationsHelper $integrationsHelper)
-    {
+    public function __construct(
+        private IntegrationsHelper $integrationsHelper
+    ) {
     }
 
     public function addIntegration(ConfigFormInterface $integration): void

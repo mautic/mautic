@@ -9,7 +9,7 @@ class ConditionalFieldEnum
     /**
      * @var string[]
      */
-    private static $conditionalFieldTypes = ['select', 'country', 'checkboxgrp', 'radiogrp'];
+    private static array $conditionalFieldTypes = ['select', 'country', 'checkboxgrp', 'radiogrp'];
 
     /**
      * @return string[]

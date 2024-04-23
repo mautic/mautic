@@ -7,8 +7,10 @@ use Mautic\FormBundle\Model\FormModel;
 
 class TokenHelper
 {
-    public function __construct(protected FormModel $formModel, protected CorePermissions $security)
-    {
+    public function __construct(
+        protected FormModel $formModel,
+        protected CorePermissions $security
+    ) {
     }
 
     public function findFormTokens($content): array
@@ -25,10 +27,10 @@ class TokenHelper
                     continue;
                 }
                 $form = $this->formModel->getEntity($id);
-                if (null !== $form &&
-                    (
-                        $form->isPublished(false) ||
-                        $this->security->hasEntityAccess(
+                if (null !== $form
+                    && (
+                        $form->isPublished(false)
+                        || $this->security->hasEntityAccess(
                             'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
                         )
                     )

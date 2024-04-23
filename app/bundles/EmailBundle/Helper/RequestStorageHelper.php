@@ -18,8 +18,9 @@ class RequestStorageHelper
      */
     public const KEY_SEPARATOR = ';webhook_request;';
 
-    public function __construct(private CacheProviderInterface $cacheStorage)
-    {
+    public function __construct(
+        private CacheProviderInterface $cacheStorage
+    ) {
     }
 
     /**

@@ -14,16 +14,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-    private $formRegex = '{form=(.*?)}';
+    private string $formRegex = '{form=(.*?)}';
 
-    public function __construct(private FormModel $formModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private CorePermissions $security)
-    {
+    public function __construct(
+        private FormModel $formModel,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private TranslatorInterface $translator,
+        private CorePermissions $security
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
@@ -63,10 +64,10 @@ class PageSubscriber implements EventSubscriberInterface
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $form = $this->formModel->getEntity($id);
-                if (null !== $form &&
-                    (
-                        $form->isPublished(false) ||
-                        $this->security->hasEntityAccess(
+                if (null !== $form
+                    && (
+                        $form->isPublished(false)
+                        || $this->security->hasEntityAccess(
                             'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
                         )
                     )

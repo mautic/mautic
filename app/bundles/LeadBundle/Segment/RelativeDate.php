@@ -6,8 +6,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RelativeDate
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function getRelativeDateStrings(): array

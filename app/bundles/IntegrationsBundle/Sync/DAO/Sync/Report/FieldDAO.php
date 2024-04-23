@@ -9,16 +9,18 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 class FieldDAO
 {
     public const FIELD_CHANGED   = 'changed';
+
     public const FIELD_REQUIRED  = 'required';
+
     public const FIELD_UNCHANGED = 'unchanged';
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $changeDateTime;
+    private ?\DateTimeInterface $changeDateTime = null;
 
-    public function __construct(private string $name, private NormalizedValueDAO $value, private string $state = self::FIELD_CHANGED)
-    {
+    public function __construct(
+        private string $name,
+        private NormalizedValueDAO $value,
+        private string $state = self::FIELD_CHANGED
+    ) {
     }
 
     public function getName(): string

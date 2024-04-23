@@ -8,10 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class DynamicsApi extends CrmApi
 {
-    /**
-     * @return string
-     */
-    private function getUrl()
+    private function getUrl(): string
     {
         $keys = $this->integration->getKeys();
 
@@ -161,7 +158,7 @@ class DynamicsApi extends CrmApi
             $odata .= 'Content-Type: application/http'.PHP_EOL;
             $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
             $odata .= 'Content-ID: '.$objectId.PHP_EOL.PHP_EOL;
-//            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
+            //            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
             $returnIds[$objectId] = $contentId;
             if (!$isUpdate) {
                 $oid                  = $objectId;
@@ -195,10 +192,8 @@ class DynamicsApi extends CrmApi
 
     /**
      * @param array $data
-     *
-     * @return array
      */
-    public function updateLeads($data, $object = 'contacts')
+    public function updateLeads($data, $object = 'contacts'): array
     {
         return $this->createLeads($data, $object, true);
     }

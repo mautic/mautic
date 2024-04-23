@@ -14,17 +14,21 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class EmailType extends AbstractType
 {
     public const REPLY_TO_ADDRESS = 'replyToAddress';
 
-    public function __construct(private UserHelper $userHelper)
-    {
+    public function __construct(
+        private UserHelper $userHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'raw']));
 
         $builder->add(
             'subject',
@@ -45,14 +49,14 @@ class EmailType extends AbstractType
             'fromname',
             TextType::class,
             [
-               'label'      => 'mautic.lead.email.from_name',
-               'label_attr' => ['class' => 'control-label'],
-               'attr'       => [
-                   'class'    => 'form-control',
-                   'preaddon' => 'fa fa-user',
-               ],
-               'required'   => false,
-               'data'       => $default,
+                'label'      => 'mautic.lead.email.from_name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'preaddon' => 'fa fa-user',
+                ],
+                'required'   => false,
+                'data'       => $default,
             ]
         );
 

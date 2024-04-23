@@ -12,11 +12,16 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Notifier
 {
-    public function __construct(private HandlerContainer $handlerContainer, private SyncIntegrationsHelper $syncIntegrationsHelper, private ConfigIntegrationsHelper $configIntegrationsHelper)
-    {
+    public function __construct(
+        private HandlerContainer $handlerContainer,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private ConfigIntegrationsHelper $configIntegrationsHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -48,10 +53,7 @@ class Notifier
         }
     }
 
-    /**
-     * @return string
-     */
-    private function getObjectDisplayName(string $integration, string $object)
+    private function getObjectDisplayName(string $integration, string $object): string
     {
         try {
             $configIntegration = $this->configIntegrationsHelper->getIntegration($integration);
@@ -69,6 +71,6 @@ class Notifier
             return ucfirst($object);
         }
 
-        return $objects[$object];
+        return $this->translator->trans($objects[$object]);
     }
 }

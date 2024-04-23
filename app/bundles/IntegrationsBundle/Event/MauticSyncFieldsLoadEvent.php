@@ -8,8 +8,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MauticSyncFieldsLoadEvent extends Event
 {
-    public function __construct(private string $objectName, private array $fields)
-    {
+    public function __construct(
+        private string $objectName,
+        private array $fields
+    ) {
     }
 
     public function getFields(): array

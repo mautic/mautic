@@ -9,13 +9,12 @@ class ConditionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    /**
-     * @var bool
-     */
-    private $passed = false;
+    private bool $passed = false;
 
-    public function __construct(private AbstractEventAccessor $eventConfig, private LeadEventLog $eventLog)
-    {
+    public function __construct(
+        private AbstractEventAccessor $eventConfig,
+        private LeadEventLog $eventLog
+    ) {
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
@@ -62,10 +61,7 @@ class ConditionEvent extends CampaignExecutionEvent
         $this->passed = false;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasConditionSatisfied()
+    public function wasConditionSatisfied(): bool
     {
         return $this->passed;
     }
@@ -82,10 +78,8 @@ class ConditionEvent extends CampaignExecutionEvent
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @return bool
      */
-    public function getResult()
+    public function getResult(): bool
     {
         return $this->passed;
     }

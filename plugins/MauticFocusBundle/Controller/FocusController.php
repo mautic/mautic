@@ -27,9 +27,24 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
-    /** @phpstan-ignore-next-line */
-    public function __construct(private CacheProvider $cacheProvider, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    /**
+     * @phpstan-ignore-next-line
+     */
+    public function __construct(
+        private CacheProvider $cacheProvider,
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -38,20 +53,15 @@ class FocusController extends AbstractStandardFormController
         return '@MauticFocus/Focus';
     }
 
-    /**
-     * @return string
-     */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'focus';
     }
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         return parent::indexStandard($request, $page);
     }

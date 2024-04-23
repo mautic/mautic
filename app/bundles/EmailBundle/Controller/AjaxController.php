@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +28,7 @@ class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory)
     {
@@ -43,14 +44,11 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function sendBatchAction(Request $request)
+    public function sendBatchAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model    = $this->getModel('email');
         $objectId = $request->request->get('id', 0);
         $pending  = $request->request->get('pending', 0);
@@ -95,16 +93,13 @@ class AjaxController extends CommonAjaxController
      */
     protected function getBuilderTokens($query)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         return $model->getBuilderComponents(null, ['tokens'], (string) $query);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function generatePlaintTextAction(Request $request)
+    public function generatePlaintTextAction(Request $request): JsonResponse
     {
         $custom = $request->request->get('custom');
 
@@ -121,10 +116,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getAttachmentsSizeAction(Request $request)
+    public function getAttachmentsSizeAction(Request $request): JsonResponse
     {
         $assets = $request->query->get('assets') ?? [];
         $size   = 0;
@@ -139,10 +131,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Tests monitored email connection settings.
-     *
-     * @return JsonResponse
      */
-    public function testMonitoredEmailServerConnectionAction(Request $request)
+    public function testMonitoredEmailServerConnectionAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0, 'message' => ''];
 
@@ -160,8 +150,8 @@ class AjaxController extends CommonAjaxController
             $helper = $this->factory->getHelper('mailbox');
 
             try {
-                $helper->setMailboxSettings($settings, false);
-                $folders = $helper->getListingFolders('');
+                $helper->setMailboxSettings($settings);
+                $folders = $helper->getListingFolders();
                 if (!empty($folders)) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
@@ -326,6 +316,27 @@ class AjaxController extends CommonAjaxController
             'totalUniqueClicks' => $totalUniqueClicks,
             'totalClicks'       => $totalClicks,
             'legendTemplate'    => $legendTemplate,
+        ]);
+    }
+
+    public function getEmailUsagesAction(Request $request, EmailDependencies $emailDependencies): JsonResponse
+    {
+        $emailId = (int) $request->query->get('id');
+
+        if (0 === $emailId) {
+            return $this->sendJsonResponse([
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $usagesHtml = $this->renderView('@MauticCore/Helper/usage.html.twig', [
+            'title'    => $this->translator->trans('mautic.email.usages'),
+            'stats'    => $emailDependencies->getChannelsIds($emailId),
+            'noUsages' => $this->translator->trans('mautic.email.no_usages'),
+        ]);
+
+        return $this->sendJsonResponse([
+            'usagesHtml'  => $usagesHtml,
         ]);
     }
 }

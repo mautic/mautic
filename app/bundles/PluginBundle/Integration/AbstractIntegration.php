@@ -56,16 +56,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
     public const FIELD_TYPE_STRING   = 'string';
+
     public const FIELD_TYPE_BOOL     = 'boolean';
+
     public const FIELD_TYPE_NUMBER   = 'number';
+
     public const FIELD_TYPE_DATETIME = 'datetime';
+
     public const FIELD_TYPE_DATE     = 'date';
 
     protected bool $coreIntegration = false;
+
     protected Integration $settings;
+
     protected array $keys = [];
+
     protected ?CacheStorageHelper $cache;
+
     protected ?SessionInterface $session;
+
     protected ?Request $request;
 
     /**
@@ -75,13 +84,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
-    protected array $notifications = [];
-    protected ?string $lastIntegrationError;
+    protected array $notifications              = [];
+
+    protected ?string $lastIntegrationError     = null;
+
     protected array $mauticDuplicates           = [];
+
     protected array $salesforceIdMapping        = [];
+
     protected array $deleteIntegrationEntities  = [];
+
     protected array $persistIntegrationEntities = [];
-    protected array  $commandParameters         = [];
+
+    protected array $commandParameters         = [];
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
@@ -825,7 +840,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ->setInternalEntityId($internalEntityId);
 
         if ($persist) {
-            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntity($entity);
+            $this->em->getRepository(IntegrationEntity::class)->saveEntity($entity);
         }
 
         return $entity;
@@ -836,7 +851,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        return $this->em->getRepository(IntegrationEntity::class);
     }
 
     /**
@@ -1675,7 +1690,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        /** @var LeadModel $leadModel */
         $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
@@ -1691,7 +1706,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)
+            $existingLeads = $this->em->getRepository(Lead::class)
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
@@ -1895,7 +1910,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Mautic\CoreBundle\Model\NotificationModel
+     * @return NotificationModel
      */
     public function getNotificationModel()
     {
@@ -2320,8 +2335,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param null $object
-     *
      * @return mixed
      */
     public function prepareFieldsForSync($fields, $keys, $object = null)

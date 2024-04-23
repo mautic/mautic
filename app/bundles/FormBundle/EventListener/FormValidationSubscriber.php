@@ -15,14 +15,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormValidationSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD    => ['onFormBuilder', 0],

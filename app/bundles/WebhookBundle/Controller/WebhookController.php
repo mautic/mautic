@@ -40,7 +40,7 @@ class WebhookController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): \Symfony\Component\HttpFoundation\Response
     {
         return parent::indexStandard($request, $page);
     }

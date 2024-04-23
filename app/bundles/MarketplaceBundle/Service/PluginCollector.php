@@ -18,8 +18,10 @@ class PluginCollector
 
     private int $total = 0;
 
-    public function __construct(private Connection $connection, private Allowlist $allowlist)
-    {
+    public function __construct(
+        private Connection $connection,
+        private Allowlist $allowlist
+    ) {
     }
 
     public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
@@ -54,15 +56,15 @@ class PluginCollector
 
         return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion): bool {
             if (
-                !empty($entry->minimumMauticVersion) &&
-                !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
+                !empty($entry->minimumMauticVersion)
+                && !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
             ) {
                 return false;
             }
 
             if (
-                !empty($entry->maximumMauticVersion) &&
-                !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
+                !empty($entry->maximumMauticVersion)
+                && !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
             ) {
                 return false;
             }

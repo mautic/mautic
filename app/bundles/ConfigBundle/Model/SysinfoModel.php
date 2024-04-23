@@ -22,8 +22,14 @@ class SysinfoModel
      */
     protected $folders;
 
-    public function __construct(protected PathsHelper $pathsHelper, protected CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator, protected Connection $connection, private InstallService $installService, private CheckStep $checkStep)
-    {
+    public function __construct(
+        protected PathsHelper $pathsHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        protected Connection $connection,
+        private InstallService $installService,
+        private CheckStep $checkStep
+    ) {
     }
 
     /**
@@ -115,10 +121,8 @@ class SysinfoModel
      * Method to tail (a few last rows) of a file.
      *
      * @param int $lines
-     *
-     * @return string
      */
-    public function getLogTail($lines = 10)
+    public function getLogTail($lines = 10): ?string
     {
         $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
@@ -134,7 +138,7 @@ class SysinfoModel
         return [
             'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
             'driver'   => $this->connection->getParams()['driver'],
-            'platform' => get_class($this->connection->getDatabasePlatform()),
+            'platform' => $this->connection->getDatabasePlatform()::class,
         ];
     }
 

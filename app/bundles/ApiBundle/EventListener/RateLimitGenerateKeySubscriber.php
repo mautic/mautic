@@ -9,17 +9,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-          RateLimitEvents::GENERATE_KEY => ['onGenerateKey', 0],
+            RateLimitEvents::GENERATE_KEY => ['onGenerateKey', 0],
         ];
     }
 

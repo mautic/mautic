@@ -92,8 +92,6 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $settings
      *
      * @return array
@@ -177,17 +175,11 @@ abstract class SocialIntegration extends AbstractIntegration
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType()
     {
         return 'oauth2';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredKeyFields()
     {
         return [
@@ -217,8 +209,6 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $data
      * @param bool   $postAuthorization
      *

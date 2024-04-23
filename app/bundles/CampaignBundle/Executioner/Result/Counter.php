@@ -5,8 +5,6 @@ namespace Mautic\CampaignBundle\Executioner\Result;
 class Counter
 {
     /**
-     * Counter constructor.
-     *
      * @param int $eventCount
      * @param int $evaluated
      * @param int $executed
@@ -14,8 +12,14 @@ class Counter
      * @param int $totalExecuted
      * @param int $totalScheduled
      */
-    public function __construct(private $eventCount = 0, private $evaluated = 0, private $executed = 0, private $totalEvaluated = 0, private $totalExecuted = 0, private $totalScheduled = 0)
-    {
+    public function __construct(
+        private $eventCount = 0,
+        private $evaluated = 0,
+        private $executed = 0,
+        private $totalEvaluated = 0,
+        private $totalExecuted = 0,
+        private $totalScheduled = 0
+    ) {
     }
 
     /**

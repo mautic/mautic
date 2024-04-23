@@ -52,8 +52,24 @@ class LeadApiController extends CommonApiController
 
     private DoNotContactModel $doNotContactModel;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, DoNotContactModel $doNotContactModel, AppVersion $appVersion, private ContactMerger $contactMerger, private UserHelper $userHelper, private IpLookupHelper $ipLookupHelper, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        DoNotContactModel $doNotContactModel,
+        AppVersion $appVersion,
+        private ContactMerger $contactMerger,
+        private UserHelper $userHelper,
+        private IpLookupHelper $ipLookupHelper,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
         $this->doNotContactModel = $doNotContactModel;
 
         $leadModel = $modelFactory->getModel(self::MODEL_ID);
@@ -72,7 +88,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of users for lead owner edits.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getOwnersAction(Request $request)
     {
@@ -95,10 +111,15 @@ class LeadApiController extends CommonApiController
         return $this->handleView($view);
     }
 
+    protected function getTotalCountTtl(): ?int
+    {
+        return $this->coreParametersHelper->get('contact_api_count_cache_ttl', 5);
+    }
+
     /**
      * Obtains a list of custom fields.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getFieldsAction()
     {
@@ -131,7 +152,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of notes on a specific lead.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getNotesAction(Request $request, $id)
     {
@@ -183,7 +204,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of devices on a specific lead.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getDevicesAction(Request $request, $id)
     {
@@ -235,7 +256,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact segments the contact is in.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getListsAction($id)
     {
@@ -273,7 +294,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact companies the contact is in.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getCompaniesAction($id)
     {
@@ -303,7 +324,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of campaigns the lead is part of.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getCampaignsAction($id)
     {
@@ -348,7 +369,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getActivityAction(Request $request, $id)
     {
@@ -368,7 +389,7 @@ class LeadApiController extends CommonApiController
     /**
      * Obtains a list of contact events.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getAllActivityAction(Request $request, $lead = null)
     {
@@ -396,7 +417,7 @@ class LeadApiController extends CommonApiController
     /**
      * Adds a DNC to the contact.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function addDncAction(Request $request, $id, $channel)
     {
@@ -439,7 +460,7 @@ class LeadApiController extends CommonApiController
     /**
      * Removes a DNC from the contact.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function removeDncAction($id, $channel)
     {
@@ -473,7 +494,7 @@ class LeadApiController extends CommonApiController
      * @param string           $method
      * @param array<mixed>|int $data
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     protected function applyUtmTagsAction($id, $method, $data)
     {
@@ -513,7 +534,7 @@ class LeadApiController extends CommonApiController
      *
      * @param int $id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function addUtmTagsAction(Request $request, $id)
     {
@@ -526,7 +547,7 @@ class LeadApiController extends CommonApiController
      * @param int $id
      * @param int $utmid
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function removeUtmTagsAction($id, $utmid)
     {
@@ -543,9 +564,6 @@ class LeadApiController extends CommonApiController
         return $this->model->checkForDuplicateContact($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         // Unset the tags from params to avoid a validation error
@@ -571,8 +589,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   $entity
      * @param array  $parameters
      * @param string $action

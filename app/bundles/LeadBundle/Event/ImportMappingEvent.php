@@ -9,10 +9,12 @@ use Mautic\CoreBundle\Event\CommonEvent;
 final class ImportMappingEvent extends CommonEvent
 {
     public bool $objectSupported = false;
+
     public array $fields         = [];
 
-    public function __construct(public string $routeObjectName)
-    {
+    public function __construct(
+        public string $routeObjectName
+    ) {
     }
 
     /**

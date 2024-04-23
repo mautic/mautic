@@ -13,10 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function setIntegrationFilterAction(Request $request)
+    public function setIntegrationFilterAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $session      = $request->getSession();
         $pluginFilter = (int) $request->get('plugin');
@@ -27,10 +24,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the HTML for list of fields.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper)
+    public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
@@ -65,9 +60,9 @@ class AjaxController extends CommonAjaxController
                     $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
                     $enableDataPriority = $integrationObject->getDataPriority();
-                    $formType           = $isLead ? FieldsType::class : CompanyFieldsType::class;
+                    $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
                     $form               = $this->createForm(
-                        $formType,
+                        $isLead ? FieldsType::class : CompanyFieldsType::class,
                         $featureSettings[$object.'Fields'] ?? [],
                         [
                             'mautic_fields'        => $mauticFields,
@@ -83,10 +78,10 @@ class AjaxController extends CommonAjaxController
                     );
 
                     $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
-                            'form'      => $form->createView(),
-                            'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
-                            'function'  => 'row',
-                        ]
+                        'form'      => $form->createView(),
+                        'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
+                        'function'  => 'row',
+                    ]
                     )->getContent();
 
                     if (!isset($settings['prefix'])) {
@@ -96,7 +91,7 @@ class AjaxController extends CommonAjaxController
                     }
 
                     $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                    if ('_' == substr($idPrefix, -1)) {
+                    if (str_ends_with($idPrefix, '_')) {
                         $idPrefix = substr($idPrefix, 0, -1);
                     }
                     $html                 = preg_replace('/'.$form->getName().'\[(.*?)\]/', $prefix.'[$1]', $html);
@@ -112,17 +107,15 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the HTML for integration properties.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function getIntegrationConfigAction(Request $request)
+    public function getIntegrationConfigAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $settings    = $request->query->all()['settings'] ?? [];
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
-            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            /** @var IntegrationHelper $helper */
             $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
             $object = $helper->getIntegrationObject($integration);
@@ -156,7 +149,7 @@ class AjaxController extends CommonAjaxController
 
                 $prefix   = str_replace('[integration]', '[config]', $settings['name']);
                 $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                if ('_' == substr($idPrefix, -1)) {
+                if (str_ends_with($idPrefix, '_')) {
                     $idPrefix = substr($idPrefix, 0, -1);
                 }
 
@@ -171,7 +164,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function getIntegrationCampaignStatusAction(Request $request)
+    public function getIntegrationCampaignStatusAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $campaign    = $request->query->get('campaign');
@@ -179,7 +172,7 @@ class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
-            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            /** @var IntegrationHelper $helper */
             $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
             $object = $helper->getIntegrationObject($integration);
@@ -211,7 +204,7 @@ class AjaxController extends CommonAjaxController
 
                 $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
 
-                if ('_' == substr($idPrefix, -1)) {
+                if (str_ends_with($idPrefix, '_')) {
                     $idPrefix = substr($idPrefix, 0, -1);
                 }
 
@@ -227,16 +220,13 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getIntegrationCampaignsAction(Request $request)
+    public function getIntegrationCampaignsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration = $request->query->get('integration');
         $dataArray   = ['success' => 0];
 
         if (!empty($integration)) {
-            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            /** @var IntegrationHelper $helper */
             $helper = $this->factory->getHelper('integration');
             /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
             $object = $helper->getIntegrationObject($integration);
@@ -272,7 +262,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function matchFieldsAction(Request $request)
+    public function matchFieldsAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $integration       = $request->request->get('integration');
         $integration_field = $request->request->get('integrationField');

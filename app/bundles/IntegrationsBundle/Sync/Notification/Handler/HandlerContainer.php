@@ -8,10 +8,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 
 class HandlerContainer
 {
-    /**
-     * @var array
-     */
-    private $handlers = [];
+    private array $handlers = [];
 
     public function registerHandler(HandlerInterface $handler): void
     {

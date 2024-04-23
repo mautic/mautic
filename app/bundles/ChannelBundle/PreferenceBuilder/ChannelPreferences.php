@@ -11,10 +11,11 @@ class ChannelPreferences
     /**
      * @var ArrayCollection[]
      */
-    private $organizedByPriority = [];
+    private array $organizedByPriority = [];
 
-    public function __construct(private Event $event)
-    {
+    public function __construct(
+        private Event $event
+    ) {
     }
 
     /**

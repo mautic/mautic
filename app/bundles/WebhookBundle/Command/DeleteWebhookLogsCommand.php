@@ -19,8 +19,10 @@ class DeleteWebhookLogsCommand extends Command
 
     private \Mautic\WebhookBundle\Entity\LogRepository $logRepository;
 
-    public function __construct(WebhookModel $webhookModel, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        WebhookModel $webhookModel,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
         $this->logRepository        = $webhookModel->getLogRepository();
 
         parent::__construct();
@@ -43,7 +45,8 @@ class DeleteWebhookLogsCommand extends Command
             $output->writeln(sprintf('<info>%s logs deleted successfully for webhook id - %s</info>', $deletedLogCount, $webHookId));
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Retains a rolling number of log records.';
 }

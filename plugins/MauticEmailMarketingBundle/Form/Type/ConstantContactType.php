@@ -16,10 +16,17 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class ConstantContactType extends AbstractType
 {
-    public function __construct(private IntegrationHelper $integrationHelper, private PluginModel $pluginModel, protected SessionInterface $session, protected CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private IntegrationHelper $integrationHelper,
+        private PluginModel $pluginModel,
+        protected SessionInterface $session,
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -99,9 +106,6 @@ class ConstantContactType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['form_area']);

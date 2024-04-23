@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
+use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 
 class TokenReplacementEvent extends CommonEvent
@@ -22,13 +23,20 @@ class TokenReplacementEvent extends CommonEvent
      */
     protected $tokens = [];
 
+    private ?Stat $stat = null;
+
     /**
      * @param CommonEntity|string|null $content
      * @param Lead|mixed[]|null        $lead
      * @param mixed                    $passthrough
      */
-    public function __construct($content, protected $lead = null, protected array $clickthrough = [], protected $passthrough = null, private bool $internalSend = false)
-    {
+    public function __construct(
+        $content,
+        protected $lead = null,
+        protected array $clickthrough = [],
+        protected $passthrough = null,
+        private bool $internalSend = false
+    ) {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;
         }
@@ -111,6 +119,16 @@ class TokenReplacementEvent extends CommonEvent
     public function getPassthrough()
     {
         return $this->passthrough;
+    }
+
+    public function getStat(): ?Stat
+    {
+        return $this->stat;
+    }
+
+    public function setStat(?Stat $stat): void
+    {
+        $this->stat = $stat;
     }
 
     public function isInternalSend(): bool

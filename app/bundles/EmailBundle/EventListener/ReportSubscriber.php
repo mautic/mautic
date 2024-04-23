@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -21,14 +22,23 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_EMAILS       = 'emails';
+
     public const CONTEXT_EMAIL_STATS  = 'email.stats';
+
     public const EMAILS_PREFIX        = 'e';
+
     public const EMAIL_STATS_PREFIX   = 'es';
+
     public const EMAIL_VARIANT_PREFIX = 'vp';
+
     public const DNC_PREFIX           = 'dnc';
+
     public const CLICK_PREFIX         = 'cut';
+
     public const TRACKABLE_PREFIX     = 'tr';
+
     public const REDIRECT_PREFIX      = 'pr';
+
     public const CLICK_THROUGH_PREFIX = 'ct';
 
     public const DNC_COLUMNS = [
@@ -141,14 +151,16 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    public function __construct(private Connection $db, private CompanyReportData $companyReportData, private StatRepository $statRepository, private GeneratedColumnsProviderInterface $generatedColumnsProvider, private FieldsBuilder $fieldsBuilder)
-    {
+    public function __construct(
+        private Connection $db,
+        private CompanyReportData $companyReportData,
+        private StatRepository $statRepository,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private FieldsBuilder $fieldsBuilder
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -417,7 +429,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     if ($event->hasFilter('e.id')) {
                         $filterParam = $event->createParameterName();
                         $qbcut->andWhere($qb->expr()->in('cut2.channel_id', ":{$filterParam}"));
-                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), Connection::PARAM_INT_ARRAY);
+                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), ArrayParameterType::INTEGER);
                     }
 
                     $qb->leftJoin(
@@ -598,6 +610,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select(
                         'e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
                     )
+                        ->andWhere('es.is_failed = 1')
                         ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
                         ->groupBy('e.id, e.subject')
                         ->orderBy('failed', 'DESC');

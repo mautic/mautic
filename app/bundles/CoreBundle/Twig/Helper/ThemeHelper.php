@@ -26,8 +26,10 @@ final class ThemeHelper
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    public function __construct(PathsHelper $pathsHelper, private $theme)
-    {
+    public function __construct(
+        PathsHelper $pathsHelper,
+        private $theme
+    ) {
         $this->themeDir  = $pathsHelper->getSystemPath('themes').'/'.$this->theme;
         $this->themePath = $pathsHelper->getSystemPath('themes_root').'/'.$this->themeDir;
 
@@ -111,7 +113,7 @@ final class ThemeHelper
     {
         $errorPage = $this->getThemePath()."/error_{$code}.html.twig";
         if (file_exists($errorPage)) {
-            return ":{$this->theme}:error_{$code}.html.twig";
+            return "@themes/{$this->theme}/error_{$code}.html.twig";
         } else {
             return false;
         }

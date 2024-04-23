@@ -35,8 +35,17 @@ class ClientModel extends FormModel
 
     private const DEFAULT_API_MODE = 'oauth2';
 
-    public function __construct(private RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private RequestStack $requestStack,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -58,25 +67,17 @@ class ClientModel extends FormModel
         $this->apiMode = $apiMode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
     {
         return $this->em->getRepository(Client::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'api:clients';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -90,9 +91,6 @@ class ClientModel extends FormModel
         return $formFactory->create(ClientType::class, $entity, $params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntity($id = null): ?Client
     {
         if (null === $id) {
@@ -103,8 +101,6 @@ class ClientModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event

@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 class FocusPropertiesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -109,6 +112,7 @@ class FocusPropertiesType extends AbstractType
                     'attr'              => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.focusUpdatePreview()',
+                        'tooltip'  => 'mautic.focus.form.placement.help',
                     ],
                     'required'    => false,
                     'placeholder' => false,
@@ -117,9 +121,6 @@ class FocusPropertiesType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['focus_style']);

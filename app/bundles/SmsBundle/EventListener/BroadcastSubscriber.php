@@ -9,14 +9,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class BroadcastSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private BroadcastExecutioner $broadcastExecutioner)
-    {
+    public function __construct(
+        private BroadcastExecutioner $broadcastExecutioner
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::CHANNEL_BROADCAST => ['onBroadcast', 0],

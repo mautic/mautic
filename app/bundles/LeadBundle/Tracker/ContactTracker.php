@@ -22,10 +22,7 @@ class ContactTracker
 {
     use DefaultValueTrait;
 
-    /**
-     * @var Lead|null
-     */
-    private $systemContact;
+    private ?Lead $systemContact = null;
 
     /**
      * @var Lead|null
@@ -235,7 +232,7 @@ class ContactTracker
             return $this->createNewContact($ip, false);
         }
 
-        if ($this->coreParametersHelper->get('track_contact_by_ip') && $this->coreParametersHelper->get('anonymize_ip')) {
+        if ($this->coreParametersHelper->get('track_contact_by_ip')) {
             /** @var Lead[] $leads */
             $leads = $this->leadRepository->getLeadsByIp($ip->getIpAddress());
             if (count($leads)) {

@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
@@ -27,37 +28,33 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
 {
+    use MockedConnectionTrait;
+
     /**
      * @var MockObject|RandomParameterName
      */
-    private $randomParameterMock;
+    private MockObject $randomParameterMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
      */
-    private $connectionMock;
+    private MockObject $connectionMock;
 
-    /**
-     * @var SegmentReferenceFilterQueryBuilder
-     */
-    private $queryBuilder;
+    private SegmentReferenceFilterQueryBuilder $queryBuilder;
 
-    /**
-     * @var LeadList
-     */
-    private $segment;
+    private LeadList $segment;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
-        $this->connectionMock      = $this->createMock(Connection::class);
+        $this->connectionMock      = $this->getMockedConnection();
 
         $this->queryBuilder        = new SegmentReferenceFilterQueryBuilder(
             $this->randomParameterMock,
@@ -66,9 +63,6 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
             $this->createMock(ContactSegmentFilterFactory::class),
             $this->dispatcherMock
         );
-
-        $this->connectionMock->method('quote')
-            ->willReturnArgument(0);
 
         $this->segment = $this->createNewSegment();
     }
@@ -150,13 +144,13 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
                     'type'       => 'leadlist',
                     'operator'   => $operator,
                     'properties' => [
-                            'filter' => [
-                                    0 => $parameterValue,
-                                ],
-                        ],
-                    'filter' => [
+                        'filter' => [
                             0 => $parameterValue,
                         ],
+                    ],
+                    'filter' => [
+                        0 => $parameterValue,
+                    ],
                     'display' => null,
                 ]
             ),

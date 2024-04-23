@@ -11,13 +11,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContactScheduledExportSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ContactExportSchedulerModel $contactExportSchedulerModel)
-    {
+    public function __construct(
+        private ContactExportSchedulerModel $contactExportSchedulerModel
+    ) {
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function getSubscribedEvents(): array
     {
         return [

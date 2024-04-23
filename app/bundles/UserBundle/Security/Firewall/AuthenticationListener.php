@@ -26,8 +26,16 @@ final class AuthenticationListener
     /**
      * @param string|mixed $providerKey
      */
-    public function __construct(private AuthenticationHandler $authenticationHandler, private TokenStorageInterface $tokenStorage, private AuthenticationManagerInterface $authenticationManager, private LoggerInterface $logger, private EventDispatcherInterface $dispatcher, private $providerKey, private PermissionRepository $permissionRepository, private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private AuthenticationHandler $authenticationHandler,
+        private TokenStorageInterface $tokenStorage,
+        private AuthenticationManagerInterface $authenticationManager,
+        private LoggerInterface $logger,
+        private EventDispatcherInterface $dispatcher,
+        private $providerKey,
+        private PermissionRepository $permissionRepository,
+        private EntityManagerInterface $entityManager
+    ) {
     }
 
     public function __invoke(RequestEvent $event): void
@@ -47,12 +55,12 @@ final class AuthenticationListener
             if ($authToken instanceof PluginToken) {
                 $response = $authToken->getResponse();
 
-                if ($authToken->isAuthenticated()) {
+                if (null !== $authToken->getUser()) {
                     $this->tokenStorage->setToken($authToken);
 
                     $this->setActivePermissionsOnAuthToken();
 
-                    if ('api' != $this->providerKey) {
+                    if ('api' !== $this->providerKey) {
                         $response = $this->onSuccess($request, $authToken, $response);
                     }
                 } elseif (empty($response)) {

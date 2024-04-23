@@ -18,14 +18,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SmsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AuditLogModel $auditLogModel, private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private SmsHelper $smsHelper, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private SmsHelper $smsHelper,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::SMS_POST_SAVE     => ['onPostSave', 0],

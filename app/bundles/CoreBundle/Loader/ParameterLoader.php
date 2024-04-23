@@ -11,28 +11,23 @@ class ParameterLoader
 {
     private string $configBaseDir;
 
-    /**
-     * @var ParameterBag
-     */
-    private $parameterBag;
+    private ParameterBag $parameterBag;
 
-    /**
-     * @var ParameterBag
-     */
-    private $localParameterBag;
+    private ParameterBag $localParameterBag;
 
     /**
      * @var array<string, mixed>
      */
-    private $localParameters = [];
+    private array $localParameters = [];
 
     /**
      * @var array<string, mixed>
      */
     private static $defaultParameters = [];
 
-    public function __construct(private string $rootPath = __DIR__.'/../../../')
-    {
+    public function __construct(
+        private string $rootPath = __DIR__.'/../../../'
+    ) {
         $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 
         $this->loadDefaultParameters();
@@ -182,6 +177,10 @@ class ParameterLoader
         if ($envParameters) {
             $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
         }
+
+        // Hardcode the db_driver to pdo_mysql, as it is currently the only supported driver.
+        // We set in here, to ensure it is always set to this value.
+        $compiledParameters['db_driver'] = 'pdo_mysql';
 
         $this->localParameters = $compiledParameters;
     }

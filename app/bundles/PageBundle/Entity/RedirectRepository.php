@@ -73,7 +73,7 @@ class RedirectRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->executeQuery();
+        $q->executeStatement();
     }
 
     /**
@@ -82,8 +82,6 @@ class RedirectRepository extends CommonRepository
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
-     *
-     * @return array
      */
     public function getMostHitEmailRedirects(
         $limit,
@@ -93,7 +91,7 @@ class RedirectRepository extends CommonRepository
         $companyId = null,
         $campaignId = null,
         $segmentId = null
-    ) {
+    ): array {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->addSelect('pr.url')
             ->addSelect('count(ph.id) as hits')

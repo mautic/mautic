@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Form\AbstractType;
@@ -20,15 +21,17 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Form>
+ */
 class FormType extends AbstractType
 {
-    public function __construct(private CorePermissions $security)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private LanguageHelper $langHelper,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -40,6 +43,21 @@ class FormType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
+
+        $builder->add(
+            'language',
+            ChoiceType::class,
+            [
+                'choices'           => $this->langHelper->getLanguageChoices(),
+                'label'             => 'mautic.core.config.form.locale',
+                'required'          => false,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.form.locale.tooltip',
+                ],
+                'placeholder'       => '',
+            ]
+        );
 
         $builder->add('formAttributes', TextType::class, [
             'label'      => 'mautic.form.field.form.form_attr',
@@ -148,9 +166,9 @@ class FormType extends AbstractType
 
         $builder->add('postAction', ChoiceType::class, [
             'choices' => [
-                'mautic.form.form.postaction.return'   => 'return',
-                'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.message'  => 'message',
+                'mautic.form.form.postaction.redirect' => 'redirect',
+                'mautic.form.form.postaction.return'   => 'return',
             ],
             'label'             => 'mautic.form.form.postaction',
             'label_attr'        => ['class' => 'control-label'],
@@ -167,7 +185,10 @@ class FormType extends AbstractType
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
+            'attr'       => [
+                'class'         => 'form-control',
+                'data-hide-on'  => '{"mauticform_postAction":"return"}',
+            ],
             'required'   => $required,
         ]);
 
@@ -183,9 +204,6 @@ class FormType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -197,9 +215,6 @@ class FormType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'mauticform';

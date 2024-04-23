@@ -12,8 +12,9 @@ class IconEvent extends Event
      */
     protected $icons = [];
 
-    public function __construct(protected CorePermissions $security)
-    {
+    public function __construct(
+        protected CorePermissions $security
+    ) {
     }
 
     /**

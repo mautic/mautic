@@ -15,13 +15,25 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 final class SecurityHelper
 {
-    public function __construct(private CorePermissions $security, private RequestStack $requestStack, private EventDispatcherInterface $dispatcher, private CsrfTokenManagerInterface $tokenManager)
-    {
+    public function __construct(
+        private CorePermissions $security,
+        private RequestStack $requestStack,
+        private EventDispatcherInterface $dispatcher,
+        private CsrfTokenManagerInterface $tokenManager
+    ) {
     }
 
     public function getName(): string
     {
         return 'security';
+    }
+
+    /**
+     * Helper function to check if user is an Admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->security->isAdmin();
     }
 
     /**
