@@ -16,47 +16,36 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testHitRepositoryMostVisited(): void
+    {
+        $page = $this->createPage('test page 1');
+        $this->createHit($page);
+        $this->createHit(null);
+
+        $query = $this->em->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
+        $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
+
+        $pageModel = self::$container->get('mautic.page.model.page');
+        $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
+
+        foreach ($res as $hit) {
+            Assert::assertNotNull($hit['id']);
+            Assert::assertNotNull($hit['title']);
+            Assert::assertNotNull($hit['hits']);
+        }
+    }
+
     public function testMostVisitedPagesReport(): void
     {
-        $page = new Page();
-        $page->setTitle('test page 1');
-        $page->setAlias('test_page');
+        $page = $this->createPage('test page 1');
+        $this->createHit($page);
+        $this->createHit(null);
 
-        $this->em->persist($page);
-        $this->em->flush();
-
-        $hit = new Hit();
-        $hit->setDateHit(new \DateTime());
-        $hit->setCode(200);
-        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
-        $hit->setIpAddress(new IpAddress('127.0.0.1'));
-        $hit->setPage($page);
-
-        $this->em->persist($hit);
-        $this->em->flush();
-
-        $hit = new Hit();
-        $hit->setDateHit(new \DateTime());
-        $hit->setCode(200);
-        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
-        $hit->setIpAddress(new IpAddress('127.0.0.1'));
-
-        $this->em->persist($hit);
-        $this->em->flush();
-
-        $raportName = 'Report Most Visited Pages';
-
-        $report = new Report();
-        $report->setName($raportName);
-        $report->setDescription('<b>This is allowed HTML</b>');
-        $report->setSource('page.hits');
-        $report->setGraphs([
-            'mautic.page.table.most.visited.unique',
-            'mautic.page.table.most.visited',
-        ]);
-
-        $this->em->persist($report);
-        $this->em->flush();
+        $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
+                        'mautic.page.table.most.visited.unique',
+                        'mautic.page.table.most.visited',
+                    ]);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -385,5 +374,46 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+    }
+
+    private function createReport(string $name, string $source, array $graphs): Report
+    {
+        $report = new Report();
+        $report->setName($name);
+        $report->setDescription('<b>This is allowed HTML</b>');
+        $report->setSource($source);
+        $report->setGraphs($graphs);
+
+        $this->em->persist($report);
+        $this->em->flush();
+
+        return $report;
+    }
+
+    private function createPage($title): Page
+    {
+        $page = new Page();
+        $page->setTitle($title);
+        $page->setAlias(str_replace(' ', '_', $title));
+
+        $this->em->persist($page);
+        $this->em->flush();
+
+        return $page;
+    }
+
+    private function createHit(?Page $page): Hit
+    {
+        $hit = new Hit();
+        $hit->setDateHit(new \DateTime());
+        $hit->setCode(200);
+        $hit->setTrackingId(hash('sha1', uniqid('mt_rand()', true)));
+        $hit->setIpAddress(new IpAddress('127.0.0.1'));
+        $hit->setPage($page);
+
+        $this->em->persist($hit);
+        $this->em->flush();
+
+        return $hit;
     }
 }
