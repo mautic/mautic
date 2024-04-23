@@ -395,7 +395,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * @param string $valueColumn
      * @param bool   $onlyNames
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $onlyNames = false): array
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -418,7 +418,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
         }
 
-        if (!$onlyNames) {
+        if (!(isset($parameters['onlyNames']) && $parameters['onlyNames'])) {
             $labelExpression = '
             case
             when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')

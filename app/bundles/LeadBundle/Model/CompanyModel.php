@@ -526,7 +526,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function getSimpleLookupResults(string $type, array|string $filter = '', int $limit = 10, int $start = 0, ?string $exclude = ''): array
     {
         $valueColumn = 'id';
-        $onlyNames   = true;
         if (!in_array($type, ['companyfield', 'lead.company'])) {
             return [];
         }
@@ -566,7 +565,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
         }
 
-        return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column, $valueColumn, $onlyNames);
+        return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%', 'onlyNames' => true], $column, $valueColumn);
     }
 
     /**

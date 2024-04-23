@@ -875,7 +875,7 @@ class CompanyController extends FormController
             [
                 'action'          => $action,
                 'main_entity'     => $secondaryCompany->getId(),
-                'lookup_method'   => 'getSimpleLookupResults',
+                'model_lookup_method'   => 'getSimpleLookupResults',
             ]
         );
 
