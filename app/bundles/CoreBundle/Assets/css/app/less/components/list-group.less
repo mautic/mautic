@@ -45,27 +45,30 @@ label.list-group-item {
   padding-inline-start: 35px;
 
   > li {
+    @list-padding: 10px;
     counter-increment: item;
     position: relative;
     padding: @list-padding 0px;
 
     &:not(:first-child) {
-      border-top: 1px solid @background-inverse-hover;
+      border-top: 1px solid var(--border-subtle-00);
     }
 
     &:before {
       @marker-size: 16px;
       position: absolute;
-      background: lightgray;
+      background: var(--layer-01);
       border-radius: 50%;
       left: -35px;
       width: @marker-size;
       height: @marker-size;
       text-align: center;
-      line-height: calc(@marker-size + 2px);
+      line-height: @marker-size;
       font-size: calc(@marker-size - 5px);
-      color: black;
-      transition: @all;
+      color: var(--icon-secondary);
+      transition: var(--all);
+      top: 11.8px;
+      vertical-align: middle;
     }
 
     &:hover:before {
@@ -88,7 +91,7 @@ label.list-group-item {
 }
 
 .ds-list-none {
-  padding-inline-start: 0; 
+  padding-inline-start: 0;
 }
 
 .ds-list-bullet {
