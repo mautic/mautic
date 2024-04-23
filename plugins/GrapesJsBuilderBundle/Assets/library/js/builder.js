@@ -1,12 +1,8 @@
 import AssetService from './asset.service';
 import BuilderService from './builder.service';
-// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
 
 // all css get combined into one builder.css and automatically loaded via js/parcel
 import 'grapesjs/dist/css/grapes.min.css';
-// not compatible with the newsletter preset css, brings the redish color
-// import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
-import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import './grapesjs-custom.css';
 
 /**
