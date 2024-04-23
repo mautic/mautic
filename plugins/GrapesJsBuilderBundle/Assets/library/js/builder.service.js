@@ -107,21 +107,17 @@ export default class BuilderService {
     // grapesjs-custom-plugins: add globally defined mautic-grapesjs-plugins using name as pluginId for the plugin-function
     if (window.MauticGrapesJsPlugins) {
       window.MauticGrapesJsPlugins.forEach((item) => {
-        let error = false;
-
         if (!item.name) {
           console.warn('A name is required for Mautic-GrapesJs plugins in window.MauticGrapesJsPlugins. Registration skipped!');
-          error = true;
+          return;
         }
 
         if (typeof item.plugin !== 'function') {
           console.warn('The Mautic-GrapesJs plugin must be a function in window.MauticGrapesJsPlugins. Registration skipped!');
-          error = true;
+          return;
         }
 
-        if (!error) {
-          grapesjs.plugins.add(item.name, item.plugin)
-        }
+        grapesjs.plugins.add(item.name, item.plugin);
       });
     }
 
