@@ -23,11 +23,9 @@ interface MapModelInterface
     public function getCountryStats($entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array;
 
     /**
-     * @param int|array id
-     *
-     * @return object|null
+     * @param int|null $id
      *
      * @phpstan-ignore-next-line
      */
-    public function getEntity($id = null);
+    public function getEntity($id = null): ?object;
 }
