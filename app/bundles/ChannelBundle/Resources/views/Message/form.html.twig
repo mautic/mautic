@@ -4,7 +4,7 @@
     {% if form.children.channel is defined %}
         {% set channel = form.children.channel.vars.data %}
         {% set enabled = form.children.isEnabled.vars.data %}
-        {% set channelContent = customContent('channel.right', mauticTemplateVars is defined ? mauticTemplateVars : []) %}
+        {% set channelContent = customContent('channel.right', _context) %}
         {% set leftCol = channelContent ? 6 : 12 %}
         {% set enableCol = channelContent ? '' : 'col-md-2' %}
         {% set propsCol = channelContent ? '' : 'col-md-10' %}

@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
@@ -57,8 +58,15 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     {
         $package   = $this->getRemoteDateStoreDownloadUrl();
 
+        if (empty($package)) {
+            $this->logger->error('Failed to fetch remote IP data: Invalid or inactive MaxMind license key');
+
+            return false;
+        }
         try {
-            $data = $this->client->get($package);
+            $data = $this->client->get($package, [
+                RequestOptions::ALLOW_REDIRECTS => true,
+            ]);
         } catch (\Exception $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }

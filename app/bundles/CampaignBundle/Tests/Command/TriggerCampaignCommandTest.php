@@ -607,6 +607,31 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         Assert::assertSame($event2->getId(), $campaignEventLogs[1]->getEvent()->getId());
     }
 
+    public function testCampaignExclusion(): void
+    {
+        $campaign1 = $this->createCampaign('Campaign 1');
+        $campaign2 = $this->createCampaign('Campaign 2');
+        $lead      = $this->createLead('Lead');
+        $this->createCampaignLead($campaign1, $lead);
+        $this->createCampaignLead($campaign2, $lead);
+        $this->em->flush();
+        $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
+        $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['--exclude' => [$campaign1->getId()], '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
+
+        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+
+        Assert::assertCount(2, $campaignLeads);
+        Assert::assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
+        Assert::assertFalse($campaignLeads[0]->getManuallyRemoved(), 'Test not executed campaign does not have Contact removed.');
+        Assert::assertSame($campaign2->getId(), $campaignLeads[1]->getCampaign()->getId());
+        Assert::assertFalse($campaignLeads[1]->getManuallyRemoved());
+        Assert::assertFalse($campaignLeads[1]->getManuallyAdded());
+    }
+
     /**
      * @see https://github.com/mautic/mautic/issues/11061
      *

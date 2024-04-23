@@ -2,7 +2,10 @@
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Response;
 
 class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -87,5 +90,50 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $divClass = $crawler->filter('#mauticform_postActionProperty')->parents()->first()->attr('class');
 
         $this->assertStringContainsString('has-error', $divClass);
+    }
+
+    public function testLanguageForm(): void
+    {
+        $translationsPath = __DIR__.'/resource/language/fr';
+        $languagePath     = __DIR__.'/../../../../../translations/fr';
+        $filesystem       = new Filesystem();
+
+        // copy all from $translationsPath to $languagePath
+        $filesystem->mirror($translationsPath, $languagePath);
+
+        /** @var LanguageHelper $languageHelper */
+        $languageHelper = $this->getContainer()->get('mautic.helper.language');
+
+        $formPayload = [
+            'name'       => 'Test Form',
+            'formType'   => 'campaign',
+            'language'   => 'fr',
+            'postAction' => 'return',
+            'fields'     => [
+                [
+                    'label'      => 'Email',
+                    'alias'      => 'email',
+                    'type'       => 'email',
+                    'leadField'  => 'email',
+                    'isRequired' => true,
+                ], [
+                    'label' => 'Submit',
+                    'alias' => 'submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+        $this->client->request('POST', '/api/forms/new', $formPayload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), json_encode($languageHelper->getLanguageChoices()));
+        $form     = $response['form'];
+        $formId   = $form['id'];
+
+        $crawler = $this->client->request('GET', '/form/'.$form['id']);
+        $this->assertStringContainsString('Merci de patienter...', $crawler->html());
+        $this->assertStringContainsString('Ceci est requis.', $crawler->html());
+
+        $filesystem->remove($languagePath);
     }
 }

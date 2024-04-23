@@ -5,10 +5,13 @@ namespace Mautic\AssetBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 
 class Download
 {
+    public const TABLE_NAME = 'asset_downloads';
+
     /**
      * @var string
      */
@@ -25,7 +28,7 @@ class Download
     private $asset;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -60,7 +63,7 @@ class Download
     private $sourceId;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Email|null
+     * @var Email|null
      */
     private $email;
 
@@ -78,8 +81,8 @@ class Download
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('asset_downloads')
-            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\DownloadRepository::class)
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(DownloadRepository::class)
             ->addIndex(['tracking_id'], 'download_tracking_search')
             ->addIndex(['source', 'source_id'], 'download_source_search')
             ->addIndex(['date_download'], 'asset_date_download');
@@ -94,7 +97,7 @@ class Download
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->addLead(true, 'SET NULL');
 
@@ -117,7 +120,7 @@ class Download
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('email', \Mautic\EmailBundle\Entity\Email::class)
+        $builder->createManyToOne('email', Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -250,11 +253,9 @@ class Download
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return Download
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -262,9 +263,7 @@ class Download
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

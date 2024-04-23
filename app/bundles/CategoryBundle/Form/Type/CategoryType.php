@@ -107,7 +107,9 @@ class CategoryType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.category.form.status',
+        ]);
 
         $builder->add(
             'inForm',
