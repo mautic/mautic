@@ -14,7 +14,7 @@ final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&FormInterface<FormInterface<mixed>>
      */
-    private \PHPUnit\Framework\MockObject\MockObject $form;
+    private MockObject $form;
 
     protected function setUp(): void
     {

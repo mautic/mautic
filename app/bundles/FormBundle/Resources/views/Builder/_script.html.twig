@@ -17,7 +17,7 @@
         head.appendChild(script);
         var MauticDomain = '{{ assetGetBaseUrl()|replace({'/index.php': ''}) }}';
         var MauticLang   = {
-            'submittingMessage': "{{ 'mautic.form.submission.pleasewait'|trans }}"
+            'submittingMessage': "{{ 'mautic.form.submission.pleasewait'|trans([], 'messages', form.getLanguage())}}"
         }
     }else if (typeof MauticSDK != 'undefined') {
         MauticSDK.onLoad();

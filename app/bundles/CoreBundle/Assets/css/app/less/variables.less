@@ -5,11 +5,16 @@
 //== General
 //
 // Animations
-@timing:                                    .3s ease;
-@all:                                       all @timing;
+:root {
+    --timing:                                    .3s ease;
+    --all:                                       all var(--timing);
+}
 
-// Colors
-@background-inverse-hover:                  #8d8d8d29;
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --timing:                                0;
+    }
+}
 
 //== Bootstrap variable
 //

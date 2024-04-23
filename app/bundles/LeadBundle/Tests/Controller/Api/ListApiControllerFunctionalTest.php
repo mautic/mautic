@@ -101,55 +101,55 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
         $this->assertEquals([
-                [
-                    'object'     => 'lead',
-                    'glue'       => 'and',
-                    'field'      => 'city',
-                    'type'       => 'text',
-                    'properties' => ['filter' => 'Prague'],
-                    'operator'   => '=',
-                ],
-                [
-                    'object'     => 'lead',
-                    'glue'       => 'and',
-                    'field'      => 'owner_id',
-                    'type'       => 'lookup_id',
-                    'operator'   => '=',
-                    'properties' => [
-                        'display' => 'John Doe',
-                        'filter'  => '4',
-                    ],
-                ],
-                [
-                    'object'     => 'lead',
-                    'glue'       => 'and',
-                    'field'      => 'city',
-                    'type'       => 'text',
-                    'properties' => ['filter' => 'Prague'],
-                    'operator'   => '=',
-                ],
-                [
-                    'object'     => 'lead',
-                    'glue'       => 'and',
-                    'field'      => 'owner_id',
-                    'type'       => 'lookup_id',
-                    'operator'   => '=',
-                    'properties' => [
-                        'display' => 'John Doe',
-                        'filter'  => '4',
-                    ],
-                ],
-                [
-                    'object'     => 'lead',
-                    'glue'       => 'and',
-                    'field'      => 'email',
-                    'type'       => 'email',
-                    'operator'   => '!empty',
-                    'properties' => [
-                        'filter'  => null,
-                    ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'city',
+                'type'       => 'text',
+                'properties' => ['filter' => 'Prague'],
+                'operator'   => '=',
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'owner_id',
+                'type'       => 'lookup_id',
+                'operator'   => '=',
+                'properties' => [
+                    'display' => 'John Doe',
+                    'filter'  => '4',
                 ],
             ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'city',
+                'type'       => 'text',
+                'properties' => ['filter' => 'Prague'],
+                'operator'   => '=',
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'owner_id',
+                'type'       => 'lookup_id',
+                'operator'   => '=',
+                'properties' => [
+                    'display' => 'John Doe',
+                    'filter'  => '4',
+                ],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'email',
+                'type'       => 'email',
+                'operator'   => '!empty',
+                'properties' => [
+                    'filter'  => null,
+                ],
+            ],
+        ],
             $response['list']['filters']
         );
 

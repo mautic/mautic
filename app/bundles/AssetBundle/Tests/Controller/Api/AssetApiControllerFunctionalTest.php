@@ -24,6 +24,19 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotNull($response['asset']['size']);
     }
 
+    public function testCreateNewRemoteAssetWithVulnerableFile(): void
+    {
+        $payload = [
+            'file'            => 'file:///etc/passwd',
+            'storageLocation' => 'remote',
+            'title'           => 'title',
+        ];
+        $this->client->request('POST', 'api/assets/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(400, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals('{"errors":[{"code":400,"message":"remotePath: The remote should be a valid URL.","details":{"remotePath":["The remote should be a valid URL."]}}]}', $clientResponse->getContent());
+    }
+
     public function testCreateNewLocalAsset(): void
     {
         $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');

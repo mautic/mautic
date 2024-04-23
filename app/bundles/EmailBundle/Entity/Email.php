@@ -169,12 +169,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $variantReadCount = 0;
 
     /**
-     * @var \Mautic\FormBundle\Entity\Form|null
+     * @var Form|null
      */
     private $unsubscribeForm;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page|null
+     * @var Page|null
      */
     private $preferenceCenter;
 
@@ -1052,7 +1052,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Get assetAttachments.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getAssetAttachments()
     {
