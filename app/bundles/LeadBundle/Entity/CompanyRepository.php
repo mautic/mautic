@@ -393,7 +393,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param string $valueColumn
-     * @param bool   $onlyNames
      */
     public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
     {
