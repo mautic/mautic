@@ -43,9 +43,9 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->createHit(null);
 
         $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
-                        'mautic.page.table.most.visited.unique',
-                        'mautic.page.table.most.visited',
-                    ]);
+            'mautic.page.table.most.visited.unique',
+            'mautic.page.table.most.visited',
+        ]);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
