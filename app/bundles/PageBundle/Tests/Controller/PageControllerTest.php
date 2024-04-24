@@ -33,14 +33,14 @@ class PageControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pageData = [
             'title'    => 'Test Page',
             'template' => 'blank',
         ];
 
-        $model = self::$container->get('mautic.page.model.page');
+        $model = static::getContainer()->get('mautic.page.model.page');
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -203,7 +203,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
+        $model                  = static::getContainer()->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
@@ -226,7 +226,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/pages/results/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::$container->get('mautic.page.model.page');
+        $model                  = static::getContainer()->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
@@ -288,7 +288,7 @@ class PageControllerTest extends MauticMysqlTestCase
     public function testSavePageAliasWithUnderscores(): void
     {
         /** @var PageModel $pageModel */
-        $pageModel = self::$container->get('mautic.page.model.page');
+        $pageModel = static::getContainer()->get('mautic.page.model.page');
 
         $parentPage = new Page();
         $parentPage->setTitle('This is My Page');

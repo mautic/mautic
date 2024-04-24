@@ -38,7 +38,7 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var NullLogger|\PHPUnit\Framework\MockObject\MockObject
      */
-    private \Psr\Log\NullLogger $logger;
+    private NullLogger $logger;
 
     protected function setUp(): void
     {

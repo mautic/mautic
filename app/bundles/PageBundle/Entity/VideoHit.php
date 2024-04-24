@@ -5,10 +5,12 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
 class VideoHit
 {
+    public const TABLE_NAME = 'video_hits';
     /**
      * @var int
      */
@@ -45,12 +47,12 @@ class VideoHit
     private $redirect;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -127,8 +129,8 @@ class VideoHit
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('video_hits')
-            ->setCustomRepositoryClass(\Mautic\PageBundle\Entity\VideoHitRepository::class)
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(VideoHitRepository::class)
             ->addIndex(['date_hit'], 'video_date_hit')
             ->addIndex(['channel', 'channel_id'], 'video_channel_search')
             ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');
@@ -146,7 +148,7 @@ class VideoHit
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('country', 'string')
             ->nullable()
@@ -553,11 +555,9 @@ class VideoHit
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return VideoHit
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -565,9 +565,7 @@ class VideoHit
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {

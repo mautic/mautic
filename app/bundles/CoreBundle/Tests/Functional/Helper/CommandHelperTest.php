@@ -18,7 +18,7 @@ class CommandHelperTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->commandHelper = $this->getContainer()->get('mautic.helper.command');
+        $this->commandHelper = static::getContainer()->get('mautic.helper.command');
     }
 
     public function testRunCommandWithParam(): void

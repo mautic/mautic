@@ -97,7 +97,7 @@ class WebhookType extends AbstractType
                 'label'      => 'mautic.webhook.form.webhook.events',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => ''],
-                ]
+            ]
         );
 
         $builder->get('events')->addModelTransformer(new EventsToArrayTransformer($options['data']));

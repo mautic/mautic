@@ -31,6 +31,12 @@ class ExecuteEventCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'CSV of specific scheduled log IDs to execute.'
+            )
+            ->addOption(
+                '--execution-time',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Scheduled execution time of event log'
             );
 
         parent::configure();
@@ -43,12 +49,13 @@ class ExecuteEventCommand extends Command
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
+        $now     = empty($input->getOption('execution-time')) ? null : new \DateTime($input->getOption('execution-time'));
         $ids     = $this->formatterHelper->simpleCsvToArray($input->getOption('scheduled-log-ids'), 'int');
-        $counter = $this->scheduledExecutioner->executeByIds($ids, $output);
+        $counter = $this->scheduledExecutioner->executeByIds($ids, $output, $now);
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     protected static $defaultDescription = 'Execute specific scheduled events.';

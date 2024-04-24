@@ -13,7 +13,7 @@
                 'data-toggle' : 'ajax',
                 'href'        : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_CLEAR_CACHE')),
             },
-            'iconClass' : 'fa fa-trash',
+            'iconClass' : 'ri-refresh-line',
             'btnText'   : 'marketplace.clear.cache',
             'tooltip'   : 'marketplace.clear.cache.tooltip',
         },
@@ -51,7 +51,7 @@
 {% block listResults %}
 {% if items|length %}
         <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered" id="marketplace-packages-table">
+        <table class="table table-hover" id="marketplace-packages-table">
             <thead>
             <tr>
                 {{- include(

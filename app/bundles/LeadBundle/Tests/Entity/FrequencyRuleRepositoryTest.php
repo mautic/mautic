@@ -23,7 +23,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->frequencyRuleRepository = self::$container->get('mautic.lead.repository.frequency_rule');
+        $this->frequencyRuleRepository = static::getContainer()->get('mautic.lead.repository.frequency_rule');
     }
 
     /**
@@ -78,5 +78,16 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
             ],
         ];
         Assert::assertSame($expectedViolations, $violations);
+    }
+
+    public function testValidateDefaultParameters(): void
+    {
+        $method = new \ReflectionMethod(FrequencyRuleRepository::class, 'validateDefaultParameters');
+        $method->setAccessible(true);
+
+        $this->assertFalse($method->invoke($this->frequencyRuleRepository, false, false));
+        $this->assertFalse($method->invoke($this->frequencyRuleRepository, false, true));
+        $this->assertFalse($method->invoke($this->frequencyRuleRepository, true, false));
+        $this->assertTrue($method->invoke($this->frequencyRuleRepository, true, true));
     }
 }

@@ -2,14 +2,15 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
 class TwitterIntegration extends SocialIntegration
 {
+    public const NAME = 'Twitter';
+
     public function getName(): string
     {
-        return 'Twitter';
+        return self::NAME;
     }
 
     public function getPriority(): int
@@ -171,7 +172,7 @@ class TwitterIntegration extends SocialIntegration
                 }
 
                 $tweet = [
-                    'tweet'       => EmojiHelper::toHtml($d['text']),
+                    'tweet'       => $d['text'],
                     'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
                     'coordinates' => $d['coordinates'],
                     'published'   => $d['created_at'],

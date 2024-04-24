@@ -27,9 +27,11 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\IntegrationsBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(\Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->alias('mautic.integrations.repository.field_change', \Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class);
-    $services->alias('mautic.integrations.repository.object_mapping', \Mautic\IntegrationsBundle\Entity\ObjectMappingRepository::class);
-    $services->alias('mautic.plugin.integrations.repository.integration', \Mautic\PluginBundle\Entity\IntegrationRepository::class);
+    $services->alias('mautic.integrations.repository.field_change', Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class);
+    $services->alias('mautic.integrations.repository.object_mapping', Mautic\IntegrationsBundle\Entity\ObjectMappingRepository::class);
+    $services->alias('mautic.plugin.integrations.repository.integration', Mautic\PluginBundle\Entity\IntegrationRepository::class);
+    $services->alias('mautic.integrations.helper.contact_object', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class);
+    $services->alias('mautic.integrations.helper.company_object', Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class);
 };

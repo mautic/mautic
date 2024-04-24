@@ -35,7 +35,7 @@ class FullObjectReportBuilder
 
     public function buildReport(RequestDAO $requestDAO): ReportDAO
     {
-        $syncReport       = new ReportDAO(MauticSyncDataExchange::NAME);
+        $syncReport       = new ReportDAO($requestDAO->getSyncToIntegration());
         $requestedObjects = $requestDAO->getObjects();
         $limit            = 200;
         $start            = $limit * ($requestDAO->getSyncIteration() - 1);
@@ -43,7 +43,7 @@ class FullObjectReportBuilder
         foreach ($requestedObjects as $requestedObjectDAO) {
             try {
                 DebugLogger::log(
-                    MauticSyncDataExchange::NAME,
+                    $requestDAO->getSyncToIntegration(),
                     sprintf(
                         'Searching for %s objects between %s and %s (%d,%d)',
                         $requestedObjectDAO->getObject(),
@@ -110,7 +110,7 @@ class FullObjectReportBuilder
                 !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
                 new \DateTimeZone('UTC')
             );
-            $reportObjectDAO  = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
+            $reportObjectDAO = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
             $syncReport->addObject($reportObjectDAO);
 
             if (isset($event)) {
