@@ -2916,6 +2916,7 @@ a.label:focus,
 }
 .label i {
   font-size: calc(1em + 2px);
+  font-weight: normal;
 }
 .label-gray {
   background-color: var(--label-background-gray);
