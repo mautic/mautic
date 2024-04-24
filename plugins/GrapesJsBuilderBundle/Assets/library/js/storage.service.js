@@ -12,14 +12,14 @@ export default class StorageService {
     init() {
         this.storageKey = 'gjs-storage';
         this.restoreMessage = null;
-        const entityId = this.mode === 'page' ? this.getPageId() : this.getEmailId();
-        this.stackItemId = `gjs-${this.mode}-${Mautic.builderTheme}-${entityId}`;
-        const storageItem = this.getStorageItemById(this.stackItemId);
+        const stackItemId = this.getStackItemId();
+        const storageItem = this.getStorageItemById(stackItemId);
         const editorContent = this.getEditorContent();
         if (storageItem && editorContent !== storageItem.content) {
             this.displayRestoreMessage(storageItem);
         }
         this.editor.on("update", () => this.handleUpdate());
+        this.addFormSubmitListeners();
     }
 
     displayRestoreMessage(storedContent) {
@@ -66,6 +66,7 @@ export default class StorageService {
         dismissButtom.addEventListener('click', (event) => {
             this.handleUpdate();
             this.dismissRestoreMessage();
+            this.removeStorageItemById(this.getStackItemId());
             event.preventDefault();
         });
 
@@ -76,18 +77,35 @@ export default class StorageService {
         this.editor.on('hide', () => this.dismissRestoreMessage());
     }
 
+    addFormSubmitListeners() {
+        mQuery(this.getForm()).on('submit:success', (e, requestUrl, response) => {
+            const lastRequestUrlPart = requestUrl.split('/').pop();
+            const lastResponseUrlPart = response.route.split('/').pop();
+
+            // Check if the form was submitted for a new entity and the response contains the entity id
+            // The success response code alone does not guarantee that the form was saved,
+            // so we need to validate the URL changes and the presence of the entity id
+            if (lastRequestUrlPart === 'new' && !isNaN(lastResponseUrlPart)){
+                // Remove the local storage item for the newly created entity after successful form submission
+                this.removeStorageItemById(`gjs-${this.mode}-${Mautic.builderTheme}-new`);
+            }
+        });
+    }
+
     handleUpdate() {
         // update the storage content only when the restore prompt is not available
         if (!this.restoreMessage) {
             const editorContent = this.getEditorContent();
             const dateTime = new Date().toISOString();
-            const contentWithDateTime = { id: this.stackItemId, content: editorContent, date: dateTime };
+            const stackItemId = this.getStackItemId();
+            const contentWithDateTime = { id: stackItemId, content: editorContent, date: dateTime };
             this.saveStorageItem(contentWithDateTime);
         }
     }
 
     load() {
-        const storageItem = this.getStorageItemById(this.stackItemId);
+        const stackItemId = this.getStackItemId();
+        const storageItem = this.getStorageItemById(stackItemId);
         if (storageItem) {
             this.editor.setComponents(storageItem.content);
         }
@@ -104,7 +122,7 @@ export default class StorageService {
     }
 
     getStackItemId() {
-        const entityId = this.mode === 'page' ? this.getPageId() : this.getEmailId();
+        const entityId = this.getFormEntityId(this.mode === 'page' ? 'page' : 'emailform')
         return `gjs-${this.mode}-${Mautic.builderTheme}-${entityId}`;
     }
 
@@ -133,15 +151,32 @@ export default class StorageService {
         return stack.find(item => item.id === id);
     }
 
+    removeStorageItemById(id) {
+        const stack = JSON.parse(localStorage.getItem(this.storageKey)) || [];
+        const index = stack.findIndex(item => item.id === id);
+        if (index !== -1) {
+            stack.splice(index, 1);
+            localStorage.setItem(this.storageKey, JSON.stringify(stack));
+        }
+    }
+
     formatDateTime(dateTime) {
         return new Date(dateTime).toISOString().slice(0, 16).replace('T', ' ');
     }
 
-    getEmailId() {
-        return parseInt(document.getElementById('emailform_sessionId').value) || 'new';
+    getFormEntityId(name) {
+        const form = document.querySelector(`form[name="${name}"]`);
+        const actionUrl = form.getAttribute('action');
+        const urlParts = actionUrl.split('/');
+        const lastPart = urlParts.pop();
+        if (isNaN(lastPart)) {
+            return 'new';
+        } else {
+            return lastPart;
+        }
     }
 
-    getPageId() {
-        return parseInt(document.getElementById('page_sessionId').value) || 'new';
+    getForm() {
+        return document.querySelector(this.mode === 'page' ? 'form[name="page"]' : 'form[name="emailform"]')
     }
 }
