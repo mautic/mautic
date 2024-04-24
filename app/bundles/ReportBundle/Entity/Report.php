@@ -604,8 +604,8 @@ class Report extends FormEntity implements SchedulerInterface
     public function ensureIsMonthlyScheduled(): void
     {
         if (
-            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
-            !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
+            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect())
+            || !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
         ) {
             throw new ScheduleNotValidException();
         }

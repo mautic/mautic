@@ -21,7 +21,7 @@ class NotificationRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'e.id');
+            ->from(Notification::class, 'e', 'e.id');
         if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
@@ -40,7 +40,7 @@ class NotificationRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(\Mautic\NotificationBundle\Entity\Notification::class, 'e');
+            ->from(Notification::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
