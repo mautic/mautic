@@ -34,7 +34,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'tweets',
                 'path'            => '/tweets',
-                'controller'      => 'MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController',
+                'controller'      => MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController::class,
             ],
         ],
         'public' => [
@@ -46,20 +46,9 @@ return [
     ],
 
     'services' => [
-        'models' => [
-            'mautic.social.model.monitoring' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\MonitoringModel',
-            ],
-            'mautic.social.model.postcount' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\PostCountModel',
-            ],
-            'mautic.social.model.tweet' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\TweetModel',
-            ],
-        ],
         'others' => [
             'mautic.social.helper.campaign' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper',
+                'class'     => MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.page.model.trackable',
@@ -69,7 +58,7 @@ return [
                 ],
             ],
             'mautic.social.helper.twitter_command' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper::class,
+                'class'     => MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
@@ -83,7 +72,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.facebook' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration::class,
+                'class'     => MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -105,7 +94,7 @@ return [
                 ],
             ],
             'mautic.integration.foursquare' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::class,
+                'class'     => MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -127,7 +116,7 @@ return [
                 ],
             ],
             'mautic.integration.instagram' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::class,
+                'class'     => MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -149,7 +138,7 @@ return [
                 ],
             ],
             'mautic.integration.twitter' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration::class,
+                'class'     => MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -179,6 +168,13 @@ return [
                 'parent'   => 'mautic.core.channels',
                 'access'   => 'mauticSocial:monitoring:view',
                 'priority' => 0,
+                'checks'   => [
+                    'integration' => [
+                        'Twitter' => [
+                            'enabled' => true,
+                        ],
+                    ],
+                ],
             ],
             'mautic.social.tweets' => [
                 'route'    => 'mautic_tweet_index',

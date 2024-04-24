@@ -102,7 +102,7 @@
   {% set required = true %}
   {% set validationMessage = field.validationMessage %}
   {% if validationMessage is empty %}
-        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) %}
   {% endif %}
   {% set containerAttributes = containerAttributes|merge({
           'class': containerAttributes.class|default([])|merge([
@@ -224,9 +224,9 @@
     }) %}
     <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>
   {% endif %}
-  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage }}</span>{% endif %}
+  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
-  {% for listValue, listLabel in list %}
+  {% for listValue, listLabel in list|default([]) %}
     {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
     {% set checkboxBrackets = ('checkbox' == type) ? '[]' : '' %}
     {% set inputAttributes = inputAttributes|merge({

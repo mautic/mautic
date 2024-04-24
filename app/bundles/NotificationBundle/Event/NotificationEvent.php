@@ -5,9 +5,6 @@ namespace Mautic\NotificationBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\NotificationBundle\Entity\Notification;
 
-/**
- * Class NotificationEvent.
- */
 class NotificationEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class NotificationEvent extends CommonEvent
     /**
      * Sets the Notification entity.
      */
-    public function setNotification(Notification $notification)
+    public function setNotification(Notification $notification): void
     {
         $this->entity = $notification;
     }

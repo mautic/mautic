@@ -2,61 +2,55 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
 use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends FormModel<VideoHit>
  */
 class VideoModel extends FormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var ContactTracker
-     */
-    protected $contactTracker;
-
-    /**
-     * VideoModel constructor.
-     */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        ContactTracker $contactTracker
+        protected IpLookupHelper $ipLookupHelper,
+        protected ContactTracker $contactTracker,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->contactTracker = $contactTracker;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getHitRepository(): VideoHitRepository
     {
-        $result = $this->em->getRepository(VideoHit::class);
-
-        return $result;
+        return $this->em->getRepository(VideoHit::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'page:pages';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
@@ -78,7 +72,7 @@ class VideoModel extends FormModel
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function hitVideo($request, $code = '200')
+    public function hitVideo($request, $code = '200'): void
     {
         // don't skew results with in-house hits
         if (!$this->security->isAnonymous()) {
@@ -143,7 +137,7 @@ class VideoModel extends FormModel
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($hit);
-            $this->em->flush($hit);
+            $this->em->flush();
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;

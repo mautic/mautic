@@ -82,4 +82,6 @@
     {% endfor %}
     </tbody>
 </table>
-{{ form_end(form, {'render_rest': false}) }}
+{% do form.preferred_channel.setRendered %}
+{% do form.subscribed_channels.setRendered %}
+{{ form_end(form) }}

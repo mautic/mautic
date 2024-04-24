@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -21,90 +20,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractCommonModel implements MauticModelInterface
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    protected $security;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    public function setEntityManager(EntityManager $em): void
-    {
-        $this->em = $em;
-    }
-
-    public function setSecurity(CorePermissions $security): void
-    {
-        $this->security = $security;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher): void
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function setRouter(Router $router): void
-    {
-        $this->router = $router;
-    }
-
-    public function setTranslator(Translator $translator): void
-    {
-        $this->translator = $translator;
-    }
-
-    public function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Initialize the user parameter for use in locking procedures.
-     */
-    public function setUserHelper(UserHelper $userHelper): void
-    {
-        $this->userHelper = $userHelper;
-    }
-
-    /**
-     * Initialize the CoreParameters parameter.
-     */
-    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper): void
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        protected EntityManagerInterface $em,
+        protected CorePermissions $security,
+        protected EventDispatcherInterface $dispatcher,
+        protected UrlGeneratorInterface $router,
+        protected Translator $translator,
+        protected UserHelper $userHelper,
+        protected LoggerInterface $logger,
+        protected CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
@@ -175,12 +100,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
     /**
      * Get a specific entity.
-     *
-     * @param int|array id
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?object
     {
         if (null !== $id) {
             $repo = $this->getRepository();
@@ -250,12 +171,12 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         switch (true) {
             case 3 === $slugCount:
-                list($lang, $category, $idSlug) = $slugs;
+                [$lang, $category, $idSlug] = $slugs;
 
                 break;
 
             case 2 === $slugCount:
-                list($category, $idSlug) = $slugs;
+                [$category, $idSlug] = $slugs;
 
                 // Check if the first slug is actually a locale
                 if (isset($locales[$category])) {
@@ -283,7 +204,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         }
 
         $entity = false;
-        if (false !== strpos($idSlug, ':')) {
+        if (str_contains($idSlug, ':')) {
             $parts = explode(':', $idSlug);
             if (2 == count($parts)) {
                 $entity = $this->getEntity($parts[0]);
@@ -309,6 +230,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
+        return null;
     }
 
     /**

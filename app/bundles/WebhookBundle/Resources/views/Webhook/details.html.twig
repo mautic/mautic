@@ -34,7 +34,7 @@
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div class="text-muted">{{ item.getDescription() }}</div>
+                        <div class="text-muted">{{ item.getDescription()|purify }}</div>
                     </div>
                     <div class="col-xs-2 text-right">
                         {{- include(
@@ -124,7 +124,7 @@
                            value="{{ item.getWebhookUrl()|escape('html_attr') }}" />
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-nospin" onclick="window.open('{{ item.getWebhookUrl()|escape('html_attr') }}', '_blank');">
-                            <i class="fa fa-external-link"></i>
+                            <i class="ri-external-link-line"></i>
                         </button>
                     </span>
                 </div>

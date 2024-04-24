@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
@@ -16,20 +17,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
-
-    public function __construct(WebhookModel $webhookModel)
-    {
-        $this->webhookModel = $webhookModel;
+    public function __construct(
+        private WebhookModel $webhookModel,
+        private LeadModel $leadModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
@@ -48,7 +42,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $event->addEvent(
@@ -132,7 +126,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadNewUpdate(LeadEvent $event)
+    public function onLeadNewUpdate(LeadEvent $event): void
     {
         $lead = $event->getLead();
         if ($lead->isAnonymous()) {
@@ -141,6 +135,11 @@ class WebhookSubscriber implements EventSubscriberInterface
         }
 
         $changes = $lead->getChanges(true);
+
+        if (empty($changes)) {
+            return;
+        }
+
         $this->webhookModel->queueWebhooksByType(
             // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
@@ -158,7 +157,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadPointChange(PointsChangeEvent $event)
+    public function onLeadPointChange(PointsChangeEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POINTS_CHANGE,
@@ -180,7 +179,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadDelete(LeadEvent $event)
+    public function onLeadDelete(LeadEvent $event): void
     {
         $lead = $event->getLead();
         $this->webhookModel->queueWebhooksByType(
@@ -199,7 +198,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onChannelSubscriptionChange(ChannelSubscriptionChange $event)
+    public function onChannelSubscriptionChange(ChannelSubscriptionChange $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
@@ -220,7 +219,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
         $leads = $event->getLeads();
         if (empty($leads)) {
@@ -240,7 +239,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCompanySave(CompanyEvent $event)
+    public function onCompanySave(CompanyEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::COMPANY_POST_SAVE,
@@ -250,7 +249,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onCompanyDelete(CompanyEvent $event)
+    public function onCompanyDelete(CompanyEvent $event): void
     {
         $company = $event->getCompany();
         $this->webhookModel->queueWebhooksByType(
@@ -264,8 +263,11 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     public function onSegmentChange(ListChangeEvent $changeEvent): void
     {
-        $contacts = null !== $changeEvent->getLeads() ? $changeEvent->getLeads() : [$changeEvent->getLead()];
+        $contacts = $changeEvent->getLeads() ?? [$changeEvent->getLead()];
         foreach ($contacts as $contact) {
+            if (is_array($contact)) {
+                $contact = $this->leadModel->getEntity($contact['id']);
+            }
             $this->webhookModel->queueWebhooksByType(
                 LeadEvents::LEAD_LIST_CHANGE,
                 [

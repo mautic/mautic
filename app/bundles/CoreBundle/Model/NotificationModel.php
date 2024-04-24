@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use DateTime;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -10,8 +11,15 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UpdateHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends FormModel<Notification>
@@ -23,45 +31,34 @@ class NotificationModel extends FormModel
      */
     protected $disableUpdates;
 
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var UpdateHelper
-     */
-    protected $updateHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
     public function __construct(
-        PathsHelper $pathsHelper,
-        UpdateHelper $updateHelper,
-        CoreParametersHelper $coreParametersHelper
+        protected PathsHelper $pathsHelper,
+        protected UpdateHelper $updateHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        private RequestStack $requestStack,
     ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->updateHelper         = $updateHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setSession(Session $session)
+    private function getSession(): Session
     {
-        $this->session = $session;
+        $session = $this->requestStack->getSession();
+        \assert($session instanceof Session);
+
+        return $session;
     }
 
     /**
      * @param bool $disableUpdates
      */
-    public function setDisableUpdates($disableUpdates)
+    public function setDisableUpdates($disableUpdates): void
     {
         $this->disableUpdates = $disableUpdates;
     }
@@ -98,7 +95,7 @@ class NotificationModel extends FormModel
         User $user = null,
         string $deduplicateValue = null,
         \DateTime $deduplicateDateTimeFrom = null
-    ) {
+    ): void {
         if (null === $user) {
             $user = $this->userHelper->getUser();
         }
@@ -134,7 +131,7 @@ class NotificationModel extends FormModel
     /**
      * Mark notifications read for a user.
      */
-    public function markAllRead()
+    public function markAllRead(): void
     {
         $this->getRepository()->markAllReadForUser($this->userHelper->getUser()->getId());
     }
@@ -142,10 +139,10 @@ class NotificationModel extends FormModel
     /**
      * Clears a notification for a user.
      *
-     * @param $id       Notification to clear; will clear all if empty
-     * @param $limit    Maximum number of notifications to clear if $id is empty
+     * @param $id    Notification to clear; will clear all if empty
+     * @param $limit Maximum number of notifications to clear if $id is empty
      */
-    public function clearNotification($id, $limit = null)
+    public function clearNotification($id, $limit = null): void
     {
         $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }
@@ -153,13 +150,10 @@ class NotificationModel extends FormModel
     /**
      * Get content for notifications.
      *
-     * @param null $afterId
      * @param bool $includeRead
      * @param int  $limit
-     *
-     * @return array
      */
-    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null)
+    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null): array
     {
         if ($this->userHelper->getUser()->isGuest()) {
             return [[], false, ''];
@@ -187,10 +181,10 @@ class NotificationModel extends FormModel
             $cacheFile  = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
 
             // check to see when we last checked for an update
-            $lastChecked = $this->session->get('mautic.update.checked', 0);
+            $lastChecked = $this->getSession()->get('mautic.update.checked', 0);
 
             if (time() - $lastChecked > 3600) {
-                $this->session->set('mautic.update.checked', time());
+                $this->getSession()->set('mautic.update.checked', time());
 
                 $updateData = $this->updateHelper->fetchData();
             } elseif (file_exists($cacheFile)) {
@@ -209,11 +203,11 @@ class NotificationModel extends FormModel
                     ['%version%' => $updateData['version'], '%announcement%' => $announcement]
                 );
 
-                $alreadyNotified = $this->session->get('mautic.update.notified');
+                $alreadyNotified = $this->getSession()->get('mautic.update.notified');
 
                 if (empty($alreadyNotified) || $alreadyNotified != $updateData['version']) {
                     $newUpdate = true;
-                    $this->session->set('mautic.update.notified', $updateData['version']);
+                    $this->getSession()->set('mautic.update.notified', $updateData['version']);
                 }
             }
         }

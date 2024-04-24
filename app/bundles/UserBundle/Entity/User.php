@@ -5,7 +5,9 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\EquatableInterface;
@@ -14,10 +16,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
+class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE = 'User';
+
     /**
-     * @var int
+     * @var ?int
      */
     protected $id;
 
@@ -34,14 +38,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Used for when updating the password.
      *
-     * @var string
+     * @var ?string
      */
     private $plainPassword;
 
     /**
      * Used for updating account.
      *
-     * @var string
+     * @var ?string
      */
     private $currentPassword;
 
@@ -106,19 +110,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $signature;
 
     /**
-     * @var bool
+     * @param bool $guest
      */
-    private $guest = false;
-
-    /**
-     * @param bool $isGuest
-     */
-    public function __construct($isGuest = false)
-    {
-        $this->guest = $isGuest;
+    public function __construct(
+        private $guest = false
+    ) {
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -189,7 +188,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('username', new Assert\NotBlank(
             ['message' => 'mautic.user.user.username.notblank']
@@ -249,13 +248,17 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ]
         ));
 
+        $metadata->addPropertyConstraint('plainPassword', new NotWeak(
+            [
+                'message'    => 'mautic.user.user.password.weak',
+                'groups'     => ['CheckPassword'],
+            ]
+        ));
+
         $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }
 
-    /**
-     * @return array
-     */
-    public static function determineValidationGroups(Form $form)
+    public static function determineValidationGroups(Form $form): array
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
@@ -271,7 +274,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Prepares the metadata for API usage.
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('user')
             ->addListProperties(
@@ -297,9 +300,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             ->build();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
@@ -320,26 +320,22 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsername()
     {
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
     public function getSalt()
     {
         // bcrypt generates its own salt
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -348,7 +344,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get plain password.
      *
-     * @return string
+     * @return ?string
      */
     public function getPlainPassword()
     {
@@ -358,16 +354,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get current password (that a user has typed into a form).
      *
-     * @return string
+     * @return ?string
      */
     public function getCurrentPassword()
     {
         return $this->currentPassword;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles()
     {
         $roles = [];
@@ -385,11 +378,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
+        $this->plainPassword   = null;
+        $this->currentPassword = null;
     }
 
     /**
@@ -420,9 +412,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return ?int
      */
     public function getId()
     {
@@ -536,10 +526,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * Get full name.
      *
      * @param bool $lastFirst
-     *
-     * @return string
      */
-    public function getName($lastFirst = false)
+    public function getName($lastFirst = false): string
     {
         return ($lastFirst) ? $this->lastName.', '.$this->firstName : $this->firstName.' '.$this->lastName;
     }
@@ -571,8 +559,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     /**
      * Set role.
-     *
-     * @param Role $role
      *
      * @return User
      */
@@ -667,13 +653,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Set locale.
-     *
-     * @param string $locale
-     *
      * @return User
      */
-    public function setLocale($locale)
+    public function setLocale(?string $locale)
     {
         $this->isChanged('locale', $locale);
         $this->locale = $locale;
@@ -716,7 +698,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param mixed $lastLogin
      */
-    public function setLastLogin($lastLogin = null)
+    public function setLastLogin($lastLogin = null): void
     {
         if (empty($lastLogin)) {
             $lastLogin = new \DateTime();
@@ -735,7 +717,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param mixed $lastActive
      */
-    public function setLastActive($lastActive = null)
+    public function setLastActive($lastActive = null): void
     {
         if (empty($lastActive)) {
             $lastActive = new \DateTime();
@@ -754,7 +736,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * @param mixed $preferences
      */
-    public function setPreferences(array $preferences)
+    public function setPreferences(array $preferences): void
     {
         $this->preferences = $preferences;
     }
@@ -785,14 +767,12 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @param UserInterface $user
-     *
-     * Needed for SAML to work correctly
+     * Needed for SAML to work correctly.
      */
-    public function isEqualTo(UserInterface $user)
+    public function isEqualTo(UserInterface $user): bool
     {
-        $thisUser = $this->getId().$this->getUsername().$this->getPassword();
-        $thatUser = $user->getId().$user->getUsername().$user->getPassword();
+        $thisUser = $this->getId().$this->getUserIdentifier().$this->getPassword();
+        $thatUser = $user->getId().$user->getUserIdentifier().$user->getPassword();
 
         return $thisUser === $thatUser;
     }
@@ -803,5 +783,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public function isGuest()
     {
         return $this->guest;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
     }
 }

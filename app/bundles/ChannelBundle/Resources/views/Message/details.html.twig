@@ -28,7 +28,7 @@
                 <div class="pr-md pl-md pt-lg pb-lg">
                     <div class="box-layout">
                         <div class="col-xs-10">
-                            <div class="text-muted">{{ item.getDescription() }}</div>
+                            <div class="text-muted">{{ item.getDescription()|purify }}</div>
                         </div>
 
                     </div>
@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <!--/ stats -->
-                {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+                {{ customContent('details.stats.graph.below', _context) }}
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">

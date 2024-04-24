@@ -1,0 +1,56 @@
+{% block dsn_row %}
+    <div class="config-dsn-container">
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.scheme) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.host, { 'attr': {'preaddon_text': '://'} }) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.port, { 'attr': {'preaddon_text': ':'} }) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.path, { 'attr': {'preaddon_text': '/'} }) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-lg-6">
+                        {{ form_row(form.user) }}
+                    </div>
+                    <div class="col-lg-6">
+                        {{ form_row(form.password, { 'attr': {'preaddon_text': ':'} }) }}
+                    </div>
+                </div>
+                <div class="config-dsn-test-container">
+                    <div class="form-inline">
+                        <div class="form-group">
+                            {% if form.test_button is defined %}
+                                {{ form_widget(form.test_button) }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <div class="form-control-static ml-10">
+                                <span class="text-muted">{{ 'mautic.config.dsn.using_current_dsn'|trans }}:</span>
+                                <code>{{ form.vars.currentDsn|default('n/a') }}</code>
+                            </div>
+                        </div>
+                    </div>
+                    {% if form.test_button is defined %}
+                        <div class="help-block">
+                            <span class="fa fa-spinner fa-spin hide pull-left"></span>
+                            <div class="status-msg"></div>
+                            <div class="save-config-msg hide text-danger">{{ 'mautic.config.dsn.save_to_test'|trans }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.options) }}
+            </div>
+        </div>
+        {{ form_rest(form) }}
+    </div>
+{% endblock %}

@@ -4,18 +4,16 @@ namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * @template M of object
  */
 class ModelFactory
 {
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container
+    ) {
     }
 
     /**
@@ -23,8 +21,12 @@ class ModelFactory
      */
     public function getModel(string $modelNameKey): MauticModelInterface
     {
+        if (class_exists($modelNameKey) && $this->container->has($modelNameKey)) {
+            return $this->container->get($modelNameKey);
+        }
+
         // Shortcut for models with the same name as the bundle
-        if (false === strpos($modelNameKey, '.')) {
+        if (!str_contains($modelNameKey, '.')) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
@@ -43,7 +45,7 @@ class ModelFactory
             return $this->container->get($containerKey);
         }
 
-        throw new \InvalidArgumentException($containerKey.' is not a registered container key.');
+        throw new \InvalidArgumentException($containerKey.' is not a registered model container key.');
     }
 
     /**
@@ -55,7 +57,7 @@ class ModelFactory
             $this->getModel($modelNameKey);
 
             return true;
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
     }

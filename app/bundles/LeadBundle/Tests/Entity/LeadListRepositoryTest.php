@@ -21,12 +21,12 @@ class LeadListRepositoryTest extends TestCase
     /**
      * @var QueryBuilder&MockObject
      */
-    private $queryBuilderMock;
+    private MockObject $queryBuilderMock;
 
     /**
      * @var Expr&MockObject
      */
-    private $expressionMock;
+    private MockObject $expressionMock;
 
     protected function setUp(): void
     {
@@ -148,7 +148,7 @@ class LeadListRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $this->queryBuilderMock->expects(self::once())
-            ->method('execute')
+            ->method('executeQuery')
             ->willReturn($this->result);
 
         $this->result->expects(self::once())

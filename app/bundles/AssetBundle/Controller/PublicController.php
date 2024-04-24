@@ -62,7 +62,7 @@ class PublicController extends CommonFormController
                     $entity->setUploadDir($parametersHelper->get('upload_dir'));
                     $contents = $entity->getFileContents();
                     $model->trackDownload($entity, $request, 200);
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     $model->trackDownload($entity, $request, 404);
 
                     return $this->notFound();
@@ -76,8 +76,8 @@ class PublicController extends CommonFormController
 
                 $response->headers->set('Content-Type', $entity->getFileMimeType());
 
-                // Display the file directly in the browser by default
-                $stream = $request->get('stream', '1');
+                // Display the file directly in the browser just for selected extensions
+                $stream = $request->get('stream', in_array($entity->getExtension(), $this->coreParametersHelper->get('streamed_extensions')));
                 if (!$stream) {
                     $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
                 }

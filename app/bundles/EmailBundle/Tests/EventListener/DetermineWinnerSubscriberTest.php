@@ -20,17 +20,14 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EntityManagerInterface
      */
-    private $em;
+    private MockObject $em;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -41,7 +38,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
     }
 
-    public function testOnDetermineOpenRateWinner()
+    public function testOnDetermineOpenRateWinner(): void
     {
         $parentMock = $this->createMock(Email::class);
         $children   = [2 => $this->createMock(Email::class)];
@@ -56,12 +53,12 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 'totalCount' => 5,
                 'readCount'  => 0,
                 'readRate'   => 0,
-                ],
+            ],
             2 => [
                 'totalCount' => 6,
                 'readCount'  => 3,
                 'readRate'   => 50,
-                ],
+            ],
         ];
 
         $this->translator->method('trans')
@@ -115,7 +112,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 
-    public function testOnDetermineOClickthroughRateWinner()
+    public function testOnDetermineOClickthroughRateWinner(): void
     {
         $parentMock    = $this->createMock(Email::class);
         $children      = [2 => $this->createMock(Email::class)];

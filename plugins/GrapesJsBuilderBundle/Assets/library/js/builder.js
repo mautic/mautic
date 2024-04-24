@@ -1,12 +1,8 @@
 import AssetService from './asset.service';
 import BuilderService from './builder.service';
-// import grapesjsmautic from 'grapesjs-preset-mautic/src/content.service';
 
 // all css get combined into one builder.css and automatically loaded via js/parcel
 import 'grapesjs/dist/css/grapes.min.css';
-// not compatible with the newsletter preset css, brings the redish color
-// import 'grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css';
-import 'grapesjs-preset-newsletter/dist/grapesjs-preset-newsletter.css';
 import './grapesjs-custom.css';
 
 /**
@@ -34,7 +30,7 @@ function launchBuilderGrapesjs(formName) {
   builder.initGrapesJS(formName);
 
   // Load and add assets
-  AssetService.getAssetsXhr(function(result) {
+  AssetService.getAssetsXhr(function (result) {
     builder.editor.AssetManager.add(result.data);
   });
 }
@@ -98,7 +94,7 @@ function setThemeHtml(theme) {
  * @param theme
  */
 function switchBuilderButton(theme) {
-  const builderButton  = mQuery('.btn-builder');
+  const builderButton = mQuery('.btn-builder');
   const mEmailBuilderButton = mQuery('#emailform_buttons_builder_toolbar_mobile');
   const mPageBuilderButton = mQuery('#page_buttons_builder_toolbar_mobile');
   const isCodeMode = theme === 'mautic_code_mode';

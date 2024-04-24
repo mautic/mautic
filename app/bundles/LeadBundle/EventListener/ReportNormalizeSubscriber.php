@@ -10,16 +10,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
-    private FieldModel $fieldModel;
-
-    public function __construct(FieldModel $fieldModel)
-    {
-        $this->fieldModel = $fieldModel;
+    public function __construct(
+        private FieldModel $fieldModel
+    ) {
     }
 
-    /**
-     * @return array<string, array<int, int|string>>
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -51,7 +46,7 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
     protected function useContactOrCompanyColumn(array $columns): bool
     {
         foreach ($columns as $column) {
-            if (0 === strpos($column, 'l.') || 0 === strpos($column, 'comp.')) {
+            if (str_starts_with($column, 'l.') || str_starts_with($column, 'comp.')) {
                 return true;
             }
         }

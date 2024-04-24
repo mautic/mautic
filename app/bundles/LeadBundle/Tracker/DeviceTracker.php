@@ -7,57 +7,27 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class DeviceTracker
 {
-    /**
-     * @var DeviceCreatorServiceInterface
-     */
-    private $deviceCreatorService;
-
-    /**
-     * @var DeviceDetectorFactoryInterface
-     */
-    private $deviceDetectorFactory;
-
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
-    private $deviceTrackingService;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
-     * @var bool
-     */
-    private $deviceWasChanged = false;
+    private bool $deviceWasChanged = false;
 
     /**
      * @var LeadDevice[]
      */
-    private $trackedDevice = [];
+    private array $trackedDevice = [];
 
-    /**
-     * DeviceTracker constructor.
-     */
     public function __construct(
-        DeviceCreatorServiceInterface $deviceCreatorService,
-        DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        Logger $logger
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private LoggerInterface $logger
     ) {
-        $this->deviceCreatorService  = $deviceCreatorService;
-        $this->deviceDetectorFactory = $deviceDetectorFactory;
-        $this->deviceTrackingService = $deviceTrackingService;
-        $this->logger                = $logger;
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
+     * @return LeadDevice|null
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {
@@ -75,11 +45,9 @@ class DeviceTracker
 
         if ( // Do not create a new device if
             // ... the device is new
-            $trackedDevice && $trackedDevice->getId()
-            && // ... the device is the same
-            $trackedDevice->getSignature() === $currentDevice->getSignature()
-            && // ... the contact given is the same as the owner of the device tracked
-            $trackedDevice->getLead()->getId() === $trackedContact->getId()
+            $trackedDevice && $trackedDevice->getId() // ... the device is the same
+            && $trackedDevice->getSignature() === $currentDevice->getSignature() // ... the contact given is the same as the owner of the device tracked
+            && $trackedDevice->getLead()->getId() === $trackedContact->getId()
         ) {
             return $trackedDevice;
         }
@@ -93,7 +61,7 @@ class DeviceTracker
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
+     * @return LeadDevice|null
      */
     public function getTrackedDevice()
     {
@@ -106,15 +74,12 @@ class DeviceTracker
         return $trackedDevice;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasDeviceChanged()
+    public function wasDeviceChanged(): bool
     {
         return $this->deviceWasChanged;
     }
 
-    public function clearTrackingCookies()
+    public function clearTrackingCookies(): void
     {
         $this->deviceTrackingService->clearTrackingCookies();
     }

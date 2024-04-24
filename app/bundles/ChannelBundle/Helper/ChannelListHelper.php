@@ -9,8 +9,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ChannelListHelper
 {
-    private Translator $translator;
-
     /**
      * @var array<string,string>
      */
@@ -21,20 +19,16 @@ class ChannelListHelper
      */
     private array $featureChannels = [];
 
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
-    {
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private Translator $translator
+    ) {
     }
 
     /**
      * Get contact channels.
-     *
-     * @return array
      */
-    public function getChannelList()
+    public function getChannelList(): array
     {
         $channels = [];
         foreach ($this->getChannels() as $channel => $details) {
@@ -47,10 +41,8 @@ class ChannelListHelper
 
     /**
      * @param bool $listOnly
-     *
-     * @return array
      */
-    public function getFeatureChannels($features, $listOnly = false)
+    public function getFeatureChannels($features, $listOnly = false): array
     {
         $this->setupChannels();
 
@@ -59,7 +51,7 @@ class ChannelListHelper
         }
         $channels = [];
         foreach ($features as $feature) {
-            $featureChannels = (isset($this->featureChannels[$feature])) ? $this->featureChannels[$feature] : [];
+            $featureChannels = $this->featureChannels[$feature] ?? [];
             $returnChannels  = [];
             foreach ($featureChannels as $channel => $details) {
                 if (!isset($details['label'])) {
@@ -93,25 +85,16 @@ class ChannelListHelper
         return $this->channels;
     }
 
-    /**
-     * @return string
-     */
-    public function getChannelLabel($channel)
+    public function getChannelLabel($channel): string
     {
-        switch (true) {
-            case $this->translator->hasId('mautic.channel.'.$channel):
-                return $this->translator->trans('mautic.channel.'.$channel);
-            case $this->translator->hasId('mautic.'.$channel.'.'.$channel):
-                return $this->translator->trans('mautic.'.$channel.'.'.$channel);
-            default:
-                return ucfirst($channel);
-        }
+        return match (true) {
+            $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
+            $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
+            default                                                   => ucfirst($channel),
+        };
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'chanel';
     }

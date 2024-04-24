@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,21 +25,16 @@ class CreateCustomFieldCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:custom-field:create-column';
 
-    private BackgroundService $backgroundService;
-    private TranslatorInterface $translator;
-    private LeadFieldRepository $leadFieldRepository;
+    protected static $defaultDescription = 'Create custom field column in the background';
 
     public function __construct(
-        BackgroundService $backgroundService,
-        TranslatorInterface $translator,
-        LeadFieldRepository $leadFieldRepository,
+        private BackgroundService $backgroundService,
+        private TranslatorInterface $translator,
+        private LeadFieldRepository $leadFieldRepository,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
-        $this->backgroundService   = $backgroundService;
-        $this->translator          = $translator;
-        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     public function configure(): void
@@ -46,11 +42,11 @@ class CreateCustomFieldCommand extends ModeratedCommand
         parent::configure();
 
         $this->setName(self::COMMAND_NAME)
-            ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
+            ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(
                 <<<'EOT'
-The <info>%command.name%</info> command will create a column in a lead_fields table if the process should run in background.
+The <info>%command.name%</info> command will create columns in a lead_fields table if the process should run in background.
 
 <info>php %command.full_name%</info>
 EOT
@@ -62,65 +58,56 @@ EOT
         $leadFieldId = (int) $input->getOption('id');
         $userId      = (int) $input->getOption('user');
 
+        if ($leadFieldId) {
+            return $this->addColumn($leadFieldId, $userId, $input, $output);
+        }
+
+        return $this->addAllMissingColumns($input, $output);
+    }
+
+    private function addAllMissingColumns(InputInterface $input, OutputInterface $output): int
+    {
+        $hasNoErrors = Command::SUCCESS;
+        while ($leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn()) {
+            if (Command::FAILURE === $this->addColumn($leadField->getId(), $leadField->getCreatedBy(), $input, $output)) {
+                $hasNoErrors = Command::FAILURE;
+            }
+        }
+
+        return $hasNoErrors;
+    }
+
+    private function addColumn(int $leadFieldId, ?int $userId, InputInterface $input, OutputInterface $output): int
+    {
         $moderationKey = sprintf('%s-%s-%s', self::COMMAND_NAME, $leadFieldId, $userId);
 
         if (!$this->checkRunStatus($input, $output, $moderationKey)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
-        }
-        if (!$leadFieldId) {
-            $leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn();
-
-            if (!$leadField) {
-                $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.all_fields_have_columns').'</info>');
-
-                return \Symfony\Component\Console\Command\Command::SUCCESS;
-            }
-
-            $leadFieldId = $leadField->getId();
-            $userId      = $leadField->getCreatedBy();
+            return Command::SUCCESS;
         }
 
         try {
             $this->backgroundService->addColumn($leadFieldId, $userId);
-        } catch (LeadFieldWasNotFoundException $e) {
+        } catch (LeadFieldWasNotFoundException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.notfound').'</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (ColumnAlreadyCreatedException $e) {
+            return Command::FAILURE;
+        } catch (ColumnAlreadyCreatedException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_already_created').'</error>');
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
-        } catch (AbortColumnCreateException $e) {
+            return Command::SUCCESS;
+        } catch (AbortColumnCreateException) {
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_creation_aborted').'</error>');
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
-        } catch (CustomFieldLimitException $e) {
+            return Command::SUCCESS;
+        } catch (CustomFieldLimitException|DriverException|SchemaException|\Doctrine\DBAL\Exception|\Mautic\CoreBundle\Exception\SchemaException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (DriverException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (SchemaException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (\Doctrine\DBAL\Exception $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
-        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
-        $output->writeln('');
         $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_created', ['%id%' => $leadFieldId]).'</info>');
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
-    protected static $defaultDescription = 'Create custom field column in the background';
 }

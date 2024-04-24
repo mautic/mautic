@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
@@ -39,5 +40,92 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($responseContent);
+    }
+
+    public function getViewsCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    {
+        $focusId = (int) InputHelper::clean($request->query->get('focusId'));
+
+        if (0 === $focusId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $cacheProvider->getItem('focus.viewsCount.'.$focusId);
+
+        if ($cacheItem->isHit()) {
+            $cacheItemValue   = $cacheItem->get();
+            $viewsCount       = $cacheItemValue['views'];
+            $uniqueViewsCount = $cacheItemValue['uniqueViews'];
+        } else {
+            /** @var FocusModel $model */
+            $model   = $this->getModel('focus');
+
+            $focus = $model->getEntity($focusId);
+            if (null === $focus) {
+                return $this->sendJsonResponse([
+                    'success' => 0,
+                    'message' => $this->translator->trans('mautic.api.call.notfound'),
+                ], 404);
+            }
+            $viewsCount       = $model->getViewsCount($focus);
+            $uniqueViewsCount = $model->getUniqueViewsCount($focus);
+            $cacheItem->set([
+                'views'       => $viewsCount,
+                'uniqueViews' => $uniqueViewsCount,
+            ]);
+            $cacheItem->tag("focus.{$focusId}");
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $cacheProvider->save($cacheItem);
+        }
+
+        return $this->sendJsonResponse([
+            'success'     => 1,
+            'views'       => $viewsCount,
+            'uniqueViews' => $uniqueViewsCount,
+        ]);
+    }
+
+    public function getClickThroughCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    {
+        $focusId = (int) InputHelper::clean($request->query->get('focusId'));
+
+        if (0 === $focusId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $cacheProvider->getItem('focus.clickThroughCount.'.$focusId);
+
+        if ($cacheItem->isHit()) {
+            $clickThroughCount = $cacheItem->get();
+        } else {
+            /** @var FocusModel $model */
+            $model   = $this->getModel('focus');
+
+            $focus = $model->getEntity($focusId);
+            if (null === $focus) {
+                return $this->sendJsonResponse([
+                    'success' => 0,
+                    'message' => $this->translator->trans('mautic.api.call.notfound'),
+                ], 404);
+            }
+            $clickThroughCount = $model->getClickThroughCount($focus);
+            $cacheItem->set($clickThroughCount);
+            $cacheItem->tag("focus.{$focusId}");
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $cacheProvider->save($cacheItem);
+        }
+
+        return $this->sendJsonResponse([
+            'success'        => 1,
+            'clickThrough'   => $clickThroughCount,
+        ]);
     }
 }

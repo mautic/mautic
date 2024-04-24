@@ -34,7 +34,7 @@ class CompanyApiController extends CommonApiController
     /**
      * @var CompanyModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
@@ -55,7 +55,7 @@ class CompanyApiController extends CommonApiController
     /**
      * If an existing company is matched, it'll be merged. Otherwise it'll be created.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function newEntityAction(Request $request)
     {
@@ -65,7 +65,7 @@ class CompanyApiController extends CommonApiController
         if (empty($parameters['force'])) {
             $leadCompanyModel = $this->getModel('lead.company');
             \assert($leadCompanyModel instanceof CompanyModel);
-            list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
+            [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
 
             if (count($companyEntities)) {
                 return $this->editEntityAction($request, $company['id']);
@@ -76,8 +76,6 @@ class CompanyApiController extends CommonApiController
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Lead   &$entity
      * @param string $action
      */
@@ -92,7 +90,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId Company ID
      * @param int $contactId Contact ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -121,7 +119,7 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId List ID
      * @param int $contactId Lead ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

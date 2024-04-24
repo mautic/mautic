@@ -21,7 +21,6 @@
 } %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
-{% set mauticTemplateVars = mauticTemplateVars|default({'mauticTemplate': '@MauticEmail/Email/form.html.twig', 'email': email}) %}
 
 {% block headerTitle %}
   {% if email.id is not empty %}
@@ -53,7 +52,7 @@
                         <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
                             <a href="#dynamic-content-container" role="tab" data-toggle="tab">{{ 'mautic.core.dynamicContent'|trans }}</a>
                         </li>
-                        {{ customContent('email.tabs', mauticTemplateVars) }}
+                        {{ customContent('email.tabs', _context) }}
                     </ul>
                     <!--/ tabs controls -->
 
@@ -75,7 +74,7 @@
                                     {{ form_row(form.fromAddress) }}
                                     {{ form_row(form.replyToAddress) }}
                                     {{ form_row(form.bccAddress) }}
-                                    {{ customContent('email.settings.advanced', mauticTemplateVars) }}
+                                    {{ customContent('email.settings.advanced', _context) }}
                                     <div>
                                         <div class="pull-left">
                                             {{ form_label(form.assetAttachments) }}
@@ -146,7 +145,7 @@
                                 </div>
                             </div>
                         </div>
-                        {{ customContent('email.tabs.content', mauticTemplateVars) }}
+                        {{ customContent('email.tabs.content', _context) }}
                     </div>
                 </div>
             </div>
@@ -163,6 +162,7 @@
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
                         {{ form_row(form.lists) }}
+                        {{ form_row(form.excludedLists) }}
                     </div>
                     {{ form_row(form.category) }}
                     {{ form_row(form.language) }}
@@ -181,7 +181,7 @@
                 {% endif %}
 
                 {{ form_row(form.unsubscribeForm) }}
-                {% if permissions['page:preference_center:viewown'] is not empty and permissions['page:preference_center:viewother'] is empty %}
+                {% if permissions['page:preference_center:viewown'] is not empty or permissions['page:preference_center:viewother'] is not empty %}
                     {{ form_row(form.preferenceCenter) }}
                 {% endif %}
                 <hr/>
@@ -222,7 +222,7 @@
                             </optgroup>
                         {% else %}
                             {% if 'lists' != dataKey or (currentListId is not defined or (value != currentListId)) %}
-                                <option value="{{ value }}">{{ label }}</option>
+                                <option value="{{ label }}">{{ value }}</option>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
@@ -263,11 +263,11 @@
             'cancelUrl'          : 'mautic_email_index',
             'header'             : 'mautic.email.type.header',
             'typeOneHeader'      : 'mautic.email.type.template.header',
-            'typeOneIconClass'   : 'fa-cube',
+            'typeOneIconClass'   : 'ri-mail-send-fill',
             'typeOneDescription' : 'mautic.email.type.template.description',
             'typeOneOnClick'     : "Mautic.selectEmailType('template');",
             'typeTwoHeader'      : 'mautic.email.type.list.header',
-            'typeTwoIconClass'   : 'fa-pie-chart',
+            'typeTwoIconClass'   : 'ri-pie-chart-fill',
             'typeTwoDescription' : 'mautic.email.type.list.description',
             'typeTwoOnClick'     : "Mautic.selectEmailType('list');",
         }) -}}

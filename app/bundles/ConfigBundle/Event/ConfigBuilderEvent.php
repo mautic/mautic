@@ -17,23 +17,17 @@ class ConfigBuilderEvent extends Event
      */
     private array $formThemes = [
         '@MauticConfig/FormTheme/_config_file_row.html.twig',
+        '@MauticConfig/FormTheme/dsn_row.html.twig',
     ];
-
-    private BundleHelper $bundleHelper;
 
     /**
      * @var string[]
      */
     protected array $encodedFields = [];
 
-    /**
-     * @var array<string> Array of field names which are not exist in local.php but are needed for generation other field
-     */
-    protected array $temporaryFields = [];
-
-    public function __construct(BundleHelper $bundleHelper)
-    {
-        $this->bundleHelper = $bundleHelper;
+    public function __construct(
+        private BundleHelper $bundleHelper
+    ) {
     }
 
     /**
@@ -56,10 +50,8 @@ class ConfigBuilderEvent extends Event
      * Remove a form to the forms array.
      *
      * @param string $formAlias
-     *
-     * @return bool
      */
-    public function removeForm($formAlias)
+    public function removeForm($formAlias): bool
     {
         if (isset($this->forms[$formAlias])) {
             unset($this->forms[$formAlias]);
@@ -126,25 +118,5 @@ class ConfigBuilderEvent extends Event
     public function getFileFields()
     {
         return $this->encodedFields;
-    }
-
-    /**
-     * Adds temporary fields for config.
-     *
-     * @param array<string> $fields
-     */
-    public function addTemporaryFields(array $fields): void
-    {
-        $this->temporaryFields = array_merge($this->temporaryFields, $fields);
-    }
-
-    /**
-     * Return a list of temporary fields.
-     *
-     * @return array<string>
-     */
-    public function getTemporaryFields(): array
-    {
-        return $this->temporaryFields;
     }
 }

@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
-use Mautic\UserBundle\Entity\User;
 
 class PathsHelper
 {
@@ -17,49 +16,26 @@ class PathsHelper
      */
     private $theme;
 
-    /**
-     * @var string
-     */
-    private $imagePath;
+    private string $imagePath;
 
-    /**
-     * @var string
-     */
-    private $dashboardImportDir;
+    private string $dashboardImportDir;
 
-    /**
-     * @var string
-     */
-    private $dashboardUserImportDir;
+    private string $dashboardUserImportDir;
 
-    /**
-     * @var string
-     */
-    private $kernelCacheDir;
+    private string $kernelCacheDir;
 
-    /**
-     * @var string
-     */
-    private $kernelLogsDir;
+    private string $kernelLogsDir;
 
-    /**
-     * @var string
-     */
-    private $kernelRootDir;
+    private string $kernelRootDir;
 
-    /**
-     * @var mixed
-     */
-    private $temporaryDir;
+    private string $temporaryDir;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private ?\Mautic\UserBundle\Entity\User $user;
 
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
+        $projectRoot                  = $this->getVendorRootPath();
         $this->user                   = $userHelper->getUser();
         $this->theme                  = $coreParametersHelper->get('theme');
         $this->imagePath              = $this->removeTrailingSlash((string) $coreParametersHelper->get('image_path'));
@@ -121,6 +97,11 @@ class PathsHelper
         return $this->getSystemPath('assets', true);
     }
 
+    public function getMediaPath(): string
+    {
+        return $this->getSystemPath('media', true);
+    }
+
     public function getCoreBundlesPath(): string
     {
         return $this->getSystemPath('bundles', true);
@@ -166,7 +147,7 @@ class PathsHelper
                 return $this->kernelLogsDir;
             case 'temporary':
             case 'tmp':
-                if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
+                if (!file_exists($this->temporaryDir)) {
                     mkdir($this->temporaryDir, 0777, true);
                 }
 
@@ -190,8 +171,8 @@ class PathsHelper
 
                 $userPath .= '/'.$this->user->getId();
 
-                if (!is_dir($userPath) && !file_exists($userPath) && is_writable($userPath)) {
-                    mkdir($userPath);
+                if (!file_exists($userPath)) {
+                    mkdir($userPath, 0777, true);
                 }
 
                 return $userPath;
@@ -199,7 +180,7 @@ class PathsHelper
             default:
                 if (isset($this->paths[$name])) {
                     $path = $this->paths[$name];
-                } elseif (false !== strpos($name, '_root')) {
+                } elseif (str_contains($name, '_root')) {
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
@@ -212,7 +193,7 @@ class PathsHelper
         }
 
         $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
-        if (false === strpos($path, $rootPath)) {
+        if (!str_contains($path, $rootPath)) {
             return $rootPath.'/'.$path;
         }
 
@@ -221,7 +202,7 @@ class PathsHelper
 
     private function removeTrailingSlash(string $dir): string
     {
-        if ('/' === substr($dir, -1)) {
+        if (str_ends_with($dir, '/')) {
             $dir = substr($dir, 0, -1);
         }
 

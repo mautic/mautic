@@ -31,7 +31,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'categories',
                 'path'            => '/categories',
-                'controller'      => 'Mautic\CategoryBundle\Controller\Api\CategoryApiController',
+                'controller'      => Mautic\CategoryBundle\Controller\Api\CategoryApiController::class,
             ],
         ],
     ],
@@ -41,25 +41,8 @@ return [
             'mautic.category.menu.index' => [
                 'route'     => 'mautic_category_index',
                 'access'    => 'category:categories:view',
-                'iconClass' => 'fa-folder',
+                'iconClass' => 'ri-folder-settings-fill',
                 'id'        => 'mautic_category_index',
-            ],
-        ],
-    ],
-
-    'services' => [
-        'models' => [
-            'mautic.category.model.category' => [
-                'class'     => 'Mautic\CategoryBundle\Model\CategoryModel',
-                'arguments' => [
-                    'request_stack',
-                ],
-            ],
-            'mautic.category.model.contact.action' => [
-                'class'     => \Mautic\CategoryBundle\Model\ContactActionModel::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                ],
             ],
         ],
     ],

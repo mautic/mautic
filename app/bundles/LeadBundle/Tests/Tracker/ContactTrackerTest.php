@@ -28,52 +28,49 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadRepository
      */
-    private $leadRepositoryMock;
+    private MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|ContactTrackingServiceInterface
      */
-    private $contactTrackingServiceMock;
+    private MockObject $contactTrackingServiceMock;
 
     /**
      * @var MockObject|DeviceTracker
      */
-    private $deviceTrackerMock;
+    private MockObject $deviceTrackerMock;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private $securityMock;
+    private MockObject $securityMock;
 
     /**
      * @var MockObject|Logger
      */
-    private $loggerMock;
+    private MockObject $loggerMock;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelperMock;
+    private MockObject $ipLookupHelperMock;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private RequestStack $requestStack;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelperMock;
+    private MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|EventDispatcher
      */
-    private $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private $leadFieldModelMock;
+    private MockObject $leadFieldModelMock;
 
     protected function setUp(): void
     {

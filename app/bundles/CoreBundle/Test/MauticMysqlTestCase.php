@@ -8,13 +8,13 @@ use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     private bool $databaseInstalled = false;
+
     private bool $setUpInvoked      = false;
 
     /**
@@ -80,7 +80,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $isTransactionActive = $this->connection->isTransactionActive();
 
-        if ($isTransactionActive) {
+        if ($isTransactionActive && $this->useCleanupRollback) {
             $this->insertRollbackCheckData();
             $this->connection->rollback();
         }
@@ -154,7 +154,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
      * This may lead to corrupted data. Make sure you know what you are doing.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      */
     protected function truncateTables(string ...$tables): void
     {
@@ -168,7 +168,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function applySqlFromFile($file)
+    private function applySqlFromFile($file): void
     {
         $connection = $this->connection;
         $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
@@ -195,7 +195,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      *
      * @throws \Exception
      */
-    private function prepareDatabase()
+    private function prepareDatabase(): void
     {
         if (!function_exists('proc_open')) {
             $this->installDatabase();
@@ -224,7 +224,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function installDatabase()
+    private function installDatabase(): void
     {
         $this->createDatabase();
         $this->applyMigrations();
@@ -232,15 +232,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->databaseInstalled = true;
     }
 
-    /**
-     * @throws \Exception
-     */
-    private function createDatabase()
+    private function createDatabase(): void
     {
-        $this->runCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
-        $this->runCommand('doctrine:database:create');
-        $this->runCommand('doctrine:schema:create');
-        $this->runCommand('doctrine:migration:sync-metadata-storage');
+        $this->testSymfonyCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
+        $this->testSymfonyCommand('doctrine:database:create');
+        $this->testSymfonyCommand('doctrine:schema:create');
+        $this->testSymfonyCommand('doctrine:migration:sync-metadata-storage');
     }
 
     private function generateResetDatabaseSql(string $file): void
@@ -310,7 +307,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function getSqlFilePath(string $name): string
     {
-        return sprintf('%s/%s-%s.sql', self::$container->getParameter('kernel.cache_dir'), $name, $this->connection->getParams()['dbname']);
+        return sprintf('%s/%s-%s.sql', static::getContainer()->getParameter('kernel.cache_dir'), $name, $this->connection->getParams()['dbname']);
     }
 
     private function resetCustomFields(): bool
@@ -322,7 +319,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
             try {
                 $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
 
@@ -371,7 +368,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function getTablePrefix(): string
     {
-        return (string) self::$container->getParameter('mautic.db_table_prefix');
+        return (string) static::getContainer()->getParameter('mautic.db_table_prefix');
     }
 
     private function isDatabasePrepared(): bool
@@ -386,7 +383,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function clearCache(): void
     {
-        $cacheProvider = self::$container->get('mautic.cache.provider');
+        $cacheProvider = static::getContainer()->get('mautic.cache.provider');
         \assert($cacheProvider instanceof CacheItemPoolInterface);
         $cacheProvider->clear();
     }
@@ -400,7 +397,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function generateTypeSafePayload(mixed $payload): mixed
     {
-        array_walk_recursive($payload, function (&$value) {
+        array_walk_recursive($payload, function (&$value): void {
             $value = is_bool($value) ? ($value ? '1' : '0') : $value;
         });
 

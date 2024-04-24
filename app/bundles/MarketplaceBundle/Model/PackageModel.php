@@ -10,13 +10,10 @@ use Mautic\MarketplaceBundle\Service\Allowlist;
 
 class PackageModel
 {
-    private Connection $connection;
-    private Allowlist $allowlist;
-
-    public function __construct(Connection $connection, Allowlist $allowlist)
-    {
-        $this->connection = $connection;
-        $this->allowlist  = $allowlist;
+    public function __construct(
+        private Connection $connection,
+        private Allowlist $allowlist
+    ) {
     }
 
     public function getPackageDetail(string $name): PackageDetail

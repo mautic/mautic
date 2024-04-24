@@ -7,15 +7,9 @@ use Mautic\ApiBundle\DependencyInjection\Factory\ApiFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Class MauticApiBundle.
- */
 class MauticApiBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

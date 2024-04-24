@@ -20,7 +20,7 @@ return [
     'services'    => [
         'integrations' => [
             'mautic.integration.tagmanager' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
+                'class'     => MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -41,23 +41,6 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.tagmanager.repository.tag' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \MauticPlugin\MauticTagManagerBundle\Entity\Tag::class,
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.tagmanager.model.tag' => [
-                'class'     => \MauticPlugin\MauticTagManagerBundle\Model\TagModel::class,
-                'arguments' => [
-                    'service_container',
-                ],
-            ],
-        ],
     ],
     'menu' => [
         'main' => [
@@ -65,9 +48,9 @@ return [
                 'id'        => 'mautic_tagmanager_index',
                 'route'     => 'mautic_tagmanager_index',
                 'access'    => 'tagManager:tagManager:view',
-                'iconClass' => 'fa-tag',
+                'iconClass' => 'ri-hashtag',
                 'priority'  => 1,
             ],
         ],
     ],
-  ];
+];
