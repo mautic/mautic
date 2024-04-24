@@ -9532,34 +9532,38 @@ button.close {
   outline: 0;
 }
 .chosen-container-multi .chosen-choices .search-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-  background-color: #ebedf0;
-  border: 1px solid #d5d5d5;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-  color: #3c4650;
+  background-color: var(--tag-background-warm-gray);
+  border: 1px solid var(--tag-border-warm-gray);
+  border-top-left-radius: 200px;
+  border-top-right-radius: 200px;
+  border-bottom-right-radius: 200px;
+  border-bottom-left-radius: 200px;
+  color: var(--tag-color-warm-gray);
   cursor: default;
-  line-height: 13px;
+  line-height: 16px;
   margin: 6px 0 3px 5px;
-  padding: 3px 20px 3px 5px;
+  padding: 3px 9px 3px 9px;
   position: relative;
 }
 .chosen-container-multi .chosen-choices .search-choice .search-choice-close {
-  background: url("chosen/chosen-sprite.png") right top no-repeat;
   display: block;
   font-size: 1px;
   height: 10px;
-  position: absolute;
-  right: 4px;
-  top: 5px;
   width: 12px;
   cursor: pointer;
+  line-height: 10px;
+}
+.chosen-container-multi .chosen-choices .search-choice .search-choice-close::before {
+  content: "\eb98";
+  font-family: 'remixicon' !important;
+  font-size: 14px;
+  color: var(--tag-color-warm-gray);
 }
 .chosen-container-multi .chosen-choices .search-choice .search-choice-close:hover {
   background-position: right -11px;
