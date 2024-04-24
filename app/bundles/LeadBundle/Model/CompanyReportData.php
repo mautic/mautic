@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Mautic\FormBundle\Entity\Field;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -65,8 +65,8 @@ class CompanyReportData
     }
 
     /**
-     * @param Field[] $fields
-     * @param string  $prefix
+     * @param LeadField[] $fields
+     * @param string      $prefix
      */
     private function getFieldColumns($fields, $prefix): array
     {

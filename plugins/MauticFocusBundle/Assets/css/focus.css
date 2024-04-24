@@ -15,6 +15,7 @@
 }
 .focus-builder .website-preview .website-placeholder {
   z-index: 1020;
+  margin-top: 10%;
 }
 .focus-builder #websiteScreenshot {
   position: absolute;

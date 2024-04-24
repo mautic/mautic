@@ -7,8 +7,11 @@ use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class LeadTest extends \PHPUnit\Framework\TestCase
+class LeadTest extends TestCase
 {
     use RequestTrait;
 
@@ -169,7 +172,7 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $testDateObject = new \DateTime('12-12-2017 22:03:59');
 
         $this->assertEquals($testDateObject->format('Y-m-d H:i:s'), $data['dateField']);
-        $this->assertEquals((int) true, $data['boolean']);
+        $this->assertEquals(1, $data['boolean']);
         $this->assertEquals(['a', 'b'], $data['multi']);
     }
 
@@ -242,15 +245,15 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $lead->setFields(
             [
                 'core' => [
-                        'attribution_date' => [
-                            'type'  => 'date',
-                            'value' => 0,
-                        ],
-                        'attribution' => [
-                            'type'  => 'int',
-                            'value' => 0,
-                        ],
+                    'attribution_date' => [
+                        'type'  => 'date',
+                        'value' => 0,
                     ],
+                    'attribution' => [
+                        'type'  => 'int',
+                        'value' => 0,
+                    ],
+                ],
             ]
         );
 
@@ -282,13 +285,29 @@ class LeadTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $contact->getChanges());
 
         $contact->addIpAddress($ip1);
-        $changes = $contact->getChanges();
 
         $this->assertSame(['1.2.3.4' => $ip1], $contact->getChanges()['ipAddressList']);
 
         $contact->addIpAddress($ip2);
 
         $this->assertSame(['1.2.3.4' => $ip1, '1.2.3.5' => $ip2], $contact->getChanges()['ipAddressList']);
+    }
+
+    public function testGetLastEventLogByAction(): void
+    {
+        $lead = new Lead();
+
+        $lead->addEventLog((new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2017-01-01')));
+        $lead->addEventLog((new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2018-01-01')));
+        $lead->addEventLog($lastFirst = (new LeadEventLog())->setAction('first')->setDateAdded(new \DateTime('2019-01-01')));
+
+        $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2017-01-01')));
+        $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2018-01-01')));
+        $lead->addEventLog($lastSecond = (new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2019-01-01')));
+
+        Assert::assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
+        Assert::assertSame($lastSecond, $lead->getLastEventLogByAction('second'));
+        Assert::assertNull($lead->getLastEventLogByAction('third'));
     }
 
     /**

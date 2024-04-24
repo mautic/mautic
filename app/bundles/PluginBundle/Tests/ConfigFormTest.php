@@ -46,12 +46,12 @@ class ConfigFormTest extends KernelTestCase
         $authType   = 'oauth2';
         $expected   = [
             [
-              'a' => 'testa',
-              'b' => 'testb',
-              ''  => '',
+                'a' => 'testa',
+                'b' => 'testb',
+                ''  => '',
             ], [
-              'oauth-token: ',
-              'Authorization: OAuth ',
+                'oauth-token: ',
+                'Authorization: OAuth ',
             ],
         ];
 
@@ -97,8 +97,8 @@ class ConfigFormTest extends KernelTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registeredPluginBundles = self::$container->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = self::$container->getParameter('mautic.bundles');
+        $registeredPluginBundles = static::getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = static::getContainer()->getParameter('mautic.bundles');
         $bundleHelper->expects($this->any())->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
 
         $bundleHelper->expects($this->any())->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));

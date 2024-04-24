@@ -25,10 +25,10 @@
             'item': list,
             'customButtons': customButtons|default([]),
             'templateButtons': {
-                'edit': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:editother'], list.createdBy),
-                'delete': securityHasEntityAccess(permissions['lead:lists:deleteother'], permissions['lead:lists:editother'], list.createdBy),
-                'close': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:viewother'], list.createdBy),
-                'clone': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:viewother'], list.createdBy),
+                'edit': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\\Security\\\Permissions\\\LeadPermissions::LISTS_EDIT_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_EDIT_OTHER')], list.createdBy),
+                'delete': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_DELETE_OTHER')], list.createdBy),
+                'close': securityHasEntityAccess(permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OWN')], permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_VIEW_OTHER')], list.createdBy),
+                'clone': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')]
             },
             'routeBase': 'segment',
   }) -}}
@@ -120,7 +120,7 @@
                 </div>
             </div>
 
-            {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+            {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
             <!-- search bar-->
@@ -169,7 +169,7 @@
 
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
                 <div id="campaign-share-container" style="position: relative">
-                    <table id="campaign-share-table" class="table table-bordered table-striped mb-0">
+                    <table id="campaign-share-table" class="table mb-0">
                         <thead>
                         <tr>
                             <th>{{ 'mautic.campaign.campaign'|trans }}</th>

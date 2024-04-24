@@ -28,7 +28,7 @@ class EmailType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'raw']));
 
         $builder->add(
             'subject',
@@ -49,14 +49,14 @@ class EmailType extends AbstractType
             'fromname',
             TextType::class,
             [
-               'label'      => 'mautic.lead.email.from_name',
-               'label_attr' => ['class' => 'control-label'],
-               'attr'       => [
-                   'class'    => 'form-control',
-                   'preaddon' => 'fa fa-user',
-               ],
-               'required'   => false,
-               'data'       => $default,
+                'label'      => 'mautic.lead.email.from_name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'preaddon' => 'fa fa-user',
+                ],
+                'required'   => false,
+                'data'       => $default,
             ]
         );
 

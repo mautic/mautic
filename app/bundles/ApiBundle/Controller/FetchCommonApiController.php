@@ -226,6 +226,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $args['filter']['order'] = $order;
         }
 
+        if ($totalCountTtl = $this->getTotalCountTtl()) {
+            $args['totalCountTtl'] = $totalCountTtl;
+        }
+
         $results = $this->model->getEntities($args);
 
         [$entities, $totalCount] = $this->prepareEntitiesForView($results);
@@ -748,5 +752,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $headers['Mautic-Version'] = $this->appVersion->getVersion();
 
         return parent::view($data, $statusCode, $headers);
+    }
+
+    protected function getTotalCountTtl(): ?int
+    {
+        return null;
     }
 }

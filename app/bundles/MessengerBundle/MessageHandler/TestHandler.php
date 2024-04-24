@@ -53,7 +53,7 @@ class TestHandler implements MessageSubscriberInterface
     private function sendNotification(int $userId, string $type): void
     {
         $this->notificationModel->addNotification(
-            $this->translator->trans('mautic.messenger.config.dns.test_message_processed', ['%type%' => $type]),
+            $this->translator->trans('mautic.messenger.config.dsn.test_message_processed', ['%type%' => $type]),
             null,
             false,
             null,

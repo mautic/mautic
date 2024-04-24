@@ -6,9 +6,9 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -27,9 +27,11 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 class MailHelper
@@ -210,6 +212,8 @@ class MailHelper
      */
     protected $fatal = false;
 
+    protected bool $skip = false;
+
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
      */
@@ -226,6 +230,8 @@ class MailHelper
         private CoreParametersHelper $coreParametersHelper,
         private Mailbox $mailbox,
         private LoggerInterface $logger,
+        private MailHashHelper $mailHashHelper,
+        private RouterInterface $router
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -309,6 +315,7 @@ class MailHelper
             $this->message->returnPath($this->returnPath);
         }
 
+        $this->dispatchPreSendEvent();
         if (empty($this->fatal)) {
             if (!$isQueueFlush) {
                 // Search/replace tokens if this is not a queue flush
@@ -352,12 +359,12 @@ class MailHelper
                 self::searchReplaceTokens($search, $replace, $this->message);
             }
 
-            if (true === $this->factory->getParameter('mailer_convert_embed_images')) {
+            if (true === $this->coreParametersHelper->get('mailer_convert_embed_images')) {
                 $this->convertEmbedImages();
             }
 
             // Attach assets
-            /** @var \Mautic\AssetBundle\Entity\Asset $asset */
+            /** @var Asset $asset */
             foreach ($this->assets as $asset) {
                 if (!in_array($asset->getId(), $this->attachedAssets)) {
                     $this->attachedAssets[] = $asset->getId();
@@ -370,7 +377,10 @@ class MailHelper
             }
 
             try {
-                $this->mailer->send($this->message);
+                if (!$this->skip) {
+                    $this->mailer->send($this->message);
+                }
+                $this->skip = false;
             } catch (TransportExceptionInterface $exception) {
                 /*
                     The nature of symfony/mailer is working with transactional emails only
@@ -610,7 +620,7 @@ class MailHelper
     {
         // Body
         $body         = $message->getHtmlBody();
-        $bodyReplaced = str_ireplace($search, $replace, $body, $updated);
+        $bodyReplaced = str_ireplace($search, $replace, (string) $body, $updated);
         if ($updated) {
             $message->html($bodyReplaced);
         }
@@ -769,10 +779,10 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false): void
     {
-        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
+        if (!$ignoreTrackingPixel && $this->coreParametersHelper->get('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (str_contains($content, '</body>')) {
+            if (str_contains((string) $content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -809,13 +819,13 @@ class MailHelper
 
                 $path = $match;
                 // if the path contains the site url, make it an absolute path, so it can be fetched.
-                if (str_starts_with($match, $this->factory->getParameter('site_url'))) {
-                    $path = str_replace($this->factory->getParameter('site_url'), '', $match);
+                if (str_starts_with($match, $this->coreParametersHelper->get('site_url'))) {
+                    $path = str_replace($this->coreParametersHelper->get('site_url'), '', $match);
                     $path = $this->factory->getSystemPath('root', true).$path;
                 }
 
-                if ($file_content = file_get_contents($path)) {
-                    $this->message->embed($file_content, md5($match));
+                if ($imageContent = file_get_contents($path)) {
+                    $this->message->embed($imageContent, md5($match));
                     $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
                 }
             }
@@ -1214,9 +1224,6 @@ class MailHelper
 
         $subject = $email->getSubject();
 
-        // Convert short codes to emoji
-        $subject = EmojiHelper::toEmoji($subject ?? '', 'short');
-
         // Set message settings from the email
         $this->setSubject($subject);
 
@@ -1257,9 +1264,6 @@ class MailHelper
                 'template' => $template,
             ], true);
         }
-
-        // Convert short codes to emoji
-        $customHtml = EmojiHelper::toEmoji($customHtml ?? '', 'short');
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
 
@@ -1326,7 +1330,7 @@ class MailHelper
             if (!empty($headers['List-Unsubscribe'])) {
                 if (!str_contains($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
                     // Ensure Mautic's is always part of this header
-                    $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
+                    $headers['List-Unsubscribe'] = $listUnsubscribeHeader.','.$headers['List-Unsubscribe'];
                 }
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
@@ -1343,7 +1347,26 @@ class MailHelper
     private function getUnsubscribeHeader()
     {
         if ($this->idHash) {
-            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], UrlGeneratorInterface::ABSOLUTE_URL);
+            $lead    = $this->getLead();
+            $toEmail = null;
+            if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
+                $toEmail = $lead['email'];
+            } elseif ($lead instanceof Lead && is_string($lead->getEmail())) {
+                $toEmail = $lead->getEmail();
+            }
+
+            if ($toEmail) {
+                $unsubscribeHash = $this->mailHashHelper->getEmailHash($toEmail);
+                $url             = $this->router->generate('mautic_email_unsubscribe',
+                    ['idHash' => $this->idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+            } else {
+                $url             = $this->router->generate('mautic_email_unsubscribe',
+                    ['idHash' => $this->idHash],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+            }
 
             return "<$url>";
         }
@@ -1377,7 +1400,7 @@ class MailHelper
 
         // Include the tracking pixel token as it's auto appended to the body
         if ($this->appendTrackingPixel) {
-            $tokens['{tracking_pixel}'] = $this->factory->getRouter()->generate(
+            $tokens['{tracking_pixel}'] = $this->router->generate(
                 'mautic_email_tracker',
                 [
                     'idHash' => $this->idHash,
@@ -1716,14 +1739,14 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(Copy::class, $this->copies[$id]));
             } catch (ORMException) {
                 // keep IDE happy
             }
         }
 
         if ($persist) {
-            $emailModel->getStatRepository()->saveEntity($stat);
+            $emailModel->saveEmailStat($stat);
         }
 
         return $stat;
@@ -1860,13 +1883,31 @@ class MailHelper
 
         // Set custom headers
         if (!empty($headers)) {
+            $tokens = $this->getTokens();
+            // Replace tokens
             $messageHeaders = $this->message->getHeaders();
             foreach ($headers as $headerKey => $headerValue) {
-                if ($messageHeaders->has($headerKey)) {
-                    $header = $messageHeaders->get($headerKey);
-                    $header->setBody($headerValue);
-                } else {
-                    $messageHeaders->addTextHeader($headerKey, $headerValue);
+                $headerValue = str_ireplace(array_keys($tokens), $tokens, $headerValue);
+
+                if (!$headerValue) {
+                    $messageHeaders->remove($headerKey);
+                    continue;
+                }
+
+                try {
+                    if (in_array(strtolower($headerKey), ['from', 'to', 'cc', 'bcc', 'reply-to'])) {
+                        // Handling headers that require MailboxListHeader
+                        $headerValue = array_map(fn ($address): Address => new Address($address),
+                            explode(',', $headerValue));
+                    }
+                    if ($messageHeaders->has($headerKey)) {
+                        $header = $messageHeaders->get($headerKey);
+                        $header->setBody($headerValue);
+                    } else {
+                        $messageHeaders->addHeader($headerKey, $headerValue);
+                    }
+                } catch (RfcComplianceException) {
+                    $messageHeaders->remove($headerKey);
                 }
             }
         }
@@ -1964,7 +2005,7 @@ class MailHelper
             }
         }
 
-        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $email);
 
         $this->setMessageFrom($from);
     }
@@ -2080,5 +2121,32 @@ class MailHelper
         }
 
         return $this->systemFrom;
+    }
+
+    public function dispatchPreSendEvent(): void
+    {
+        if (null === $this->dispatcher) {
+            $this->dispatcher = $this->factory->getDispatcher();
+        }
+
+        if (empty($this->dispatcher)) {
+            return;
+        }
+
+        $event = new EmailSendEvent($this);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PRE_SEND);
+
+        $this->skip               = $event->isSkip();
+        $this->fatal              = $event->isFatal();
+        $errors                   = $event->getErrors();
+        if (!empty($errors)) {
+            $currentErrors = [];
+            if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
+                $currentErrors = $this->errors['failures'];
+            }
+            $this->errors['failures'] = array_merge($errors, $currentErrors);
+        }
+
+        unset($event);
     }
 }

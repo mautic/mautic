@@ -17,7 +17,7 @@ class InternalObjectFindEvent extends Event
 
     private array $foundObjects = [];
 
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\DateRange $dateRange = null;
+    private ?DateRange $dateRange = null;
 
     private ?int $start = null;
 

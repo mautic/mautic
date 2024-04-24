@@ -25,15 +25,15 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $campaign;
 
-    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
+    private ?ContactLimiter $limiter = null;
 
-    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
+    private ?OutputInterface $output = null;
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
+    private ?Counter $counter = null;
 
-    private ?\Doctrine\Common\Collections\ArrayCollection $decisions = null;
+    private ?ArrayCollection $decisions = null;
 
     protected ?\DateTime $now = null;
 
@@ -128,6 +128,10 @@ class InactiveExecutioner implements ExecutionerInterface
         if (!$this->campaign->isPublished()) {
             throw new NoEventsFoundException();
         }
+
+        if ($this->campaign->isDeleted()) {
+            throw new NoEventsFoundException();
+        }
     }
 
     /**
@@ -185,13 +189,13 @@ class InactiveExecutioner implements ExecutionerInterface
             try {
                 // We need the parent ID of the decision in order to fetch the time the contact executed this event
                 $parentEvent   = $decisionEvent->getParent();
-                $parentEventId = ($parentEvent) ? $parentEvent->getId() : null;
+                $parentEventId = $parentEvent && !$parentEvent->isDeleted() ? $parentEvent->getId() : null;
 
                 // Ge the first batch of contacts
                 $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
 
                 // Loop over all contacts till we've processed all those applicable for this decision
-                while ($contacts && $contacts->count()) {
+                while ($contacts->count()) {
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 
@@ -240,10 +244,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
      */
     private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
     {

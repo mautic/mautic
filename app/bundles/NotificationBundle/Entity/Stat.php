@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Stat
 {
+    public const TABLE_NAME = 'push_notification_stats';
     /**
      * @var string
      */
@@ -21,7 +22,7 @@ class Stat
     private $notification;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
@@ -31,7 +32,7 @@ class Stat
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -99,8 +100,8 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('push_notification_stats')
-            ->setCustomRepositoryClass(\Mautic\NotificationBundle\Entity\StatRepository::class)
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
             ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
             ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
@@ -246,7 +247,7 @@ class Stat
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {

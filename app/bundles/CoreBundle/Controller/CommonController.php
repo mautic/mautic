@@ -173,6 +173,10 @@ class CommonController extends AbstractController implements MauticController
             $parameters = $event->getVars();
         }
 
+        $parameters['mauticTemplate'] = $template;
+
+        $parameters['mauticTemplateVars'] = $parameters;
+
         return $this->render($template, $parameters, $response);
     }
 
@@ -180,7 +184,7 @@ class CommonController extends AbstractController implements MauticController
      * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
      * refresh.
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function delegateRedirect($url)
     {
@@ -196,7 +200,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function removeTrailingSlashAction(Request $request, TrailingSlashHelper $trailingSlashHelper)
     {
@@ -430,7 +434,7 @@ class CommonController extends AbstractController implements MauticController
      * @param bool   $batch Flag if a batch action is being performed
      * @param string $msg   Message that is logged
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
+     * @return JsonResponse|RedirectResponse|array
      *
      * @throws AccessDeniedHttpException
      */
@@ -509,7 +513,7 @@ class CommonController extends AbstractController implements MauticController
 
         $session = $request->getSession();
 
-        if (null === $name) {
+        if (empty($name)) {
             $name = InputHelper::clean($request->query->get('name'));
         }
         $name = 'mautic.'.$name;

@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -21,6 +22,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -63,9 +65,15 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
+    /** @var MockObject&CoreParametersHelper */
+    private $coreParametersHelper;
+
+    private MailHashHelper $mailHashHelper;
+
     public function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
     }
 
     public function testOnEmailBuild(): void
@@ -301,9 +309,12 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var LoggerInterface|MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
+        /** @var MockObject&RouterInterface $router */
+        $router = $this->createMock(RouterInterface::class);
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router);
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;

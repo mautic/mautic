@@ -38,106 +38,106 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModelMock;
+    private MockObject $leadModelMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModelMock;
+    private MockObject $leadFieldModelMock;
 
     /**
      * @var MockObject|StageModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $stageModelMock;
+    private MockObject $stageModelMock;
 
     /**
      * @var MockObject|CampaignModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $campaignModelMock;
+    private MockObject $campaignModelMock;
 
     /**
      * @var MockObject|EventCollector
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventCollectorMock;
+    private MockObject $eventCollectorMock;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyModelMock;
+    private MockObject $companyModelMock;
 
     /**
      * @var MockObject|CompanyReportData
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportDataMock;
+    private MockObject $companyReportDataMock;
 
     /**
      * @var MockObject|FieldsBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilderMock;
+    private MockObject $fieldsBuilderMock;
 
     /**
      * @var MockObject|Translator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
+    private MockObject $translatorMock;
 
     /**
      * @var MockObject|ReportGeneratorEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $reportGeneratorEventMock;
+    private MockObject $reportGeneratorEventMock;
 
     /**
      * @var MockObject|ChannelListHelper
      */
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
+    private ChannelListHelper $channelListHelperMock;
 
-    private \Mautic\ReportBundle\Helper\ReportHelper $reportHelperMock;
+    private ReportHelper $reportHelperMock;
 
     /**
      * @var MockObject|CampaignRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $campaignRepositoryMock;
+    private MockObject $campaignRepositoryMock;
 
     /**
      * @var MockObject|ReportBuilderEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $reportBuilderEventMock;
+    private MockObject $reportBuilderEventMock;
 
     /**
      * @var MockObject|QueryBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $queryBuilderMock;
+    private MockObject $queryBuilderMock;
 
     /**
      * @var MockObject|ExpressionBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $expressionBuilderMock;
+    private MockObject $expressionBuilderMock;
 
     /**
      * @var MockObject|ReportGraphEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $reportGraphEventMock;
+    private MockObject $reportGraphEventMock;
 
     /**
      * @var MockObject|CompanyRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyRepositoryMock;
+    private MockObject $companyRepositoryMock;
 
     /**
      * @var MockObject|PointsChangeLogRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pointsChangeLogRepositoryMock;
+    private MockObject $pointsChangeLogRepositoryMock;
 
     /**
      * @var MockObject|ReportMock
      */
-    private \PHPUnit\Framework\MockObject\MockObject $reportMock;
+    private MockObject $reportMock;
 
     /**
      * @var MockObject|ReportDataEventMock
      */
-    private \PHPUnit\Framework\MockObject\MockObject $reportDataEventMock;
+    private MockObject $reportDataEventMock;
 
-    private \Mautic\LeadBundle\EventListener\ReportSubscriber $reportSubscriber;
+    private ReportSubscriber $reportSubscriber;
 
     /**
      * @var array
@@ -204,10 +204,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->fieldsBuilderMock,
             $this->translatorMock
         );
-
-        $this->expressionBuilderMock->expects($this->any())
-            ->method('andX')
-            ->willReturn($this->expressionBuilderMock);
 
         $this->queryBuilderMock->expects($this->any())
                 ->method('expr')
@@ -296,29 +292,29 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'batchEventName'  => 'mautic.email.on_campaign_batch_action',
                             'formType'        => \Mautic\EmailBundle\Form\Type\EmailSendType::class,
                             'formTypeOptions' => [
-                              'update_select'    => 'campaignevent_properties_email',
-                              'with_email_types' => true,
+                                'update_select'    => 'campaignevent_properties_email',
+                                'with_email_types' => true,
                             ],
                             'formTheme'      => "MauticEmailBundle:FormTheme\EmailSendList",
                             'channel'        => 'email',
                             'channelIdField' => 'email',
-                          ],
                         ],
-                        'decision' => [
-                            'email.click' => [
-                              'label'                  => 'Clicks email',
-                              'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
-                              'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                              'formType'               => \Mautic\EmailBundle\Form\Type\EmailClickDecisionType::class,
-                              'connectionRestrictions' => [
+                    ],
+                    'decision' => [
+                        'email.click' => [
+                            'label'                  => 'Clicks email',
+                            'description'            => 'Trigger actions when an email is clicked. Connect a Send Email action to the top of this decision.',
+                            'eventName'              => 'mautic.email.on_campaign_trigger_decision',
+                            'formType'               => \Mautic\EmailBundle\Form\Type\EmailClickDecisionType::class,
+                            'connectionRestrictions' => [
                                 'source' => [
-                                  'action' => [
-                                    'email.send',
-                                  ],
+                                    'action' => [
+                                        'email.send',
+                                    ],
                                 ],
-                              ],
                             ],
                         ],
+                    ],
                 ]);
 
         $this->translatorMock->expects($this->any())
