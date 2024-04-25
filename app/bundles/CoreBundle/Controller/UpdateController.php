@@ -10,9 +10,6 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * Class UpdateController.
- */
 class UpdateController extends CommonController
 {
     /**
@@ -80,7 +77,7 @@ class UpdateController extends CommonController
             $outputBuffer = $output->fetch();
 
             // Check if migrations executed
-            $noMigrations = (0 === $result && false !== strpos($outputBuffer, 'No migrations'));
+            $noMigrations = (0 === $result && str_contains($outputBuffer, 'No migrations'));
         }
 
         if (0 !== $result) {

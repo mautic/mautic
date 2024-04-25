@@ -12,16 +12,11 @@ use Twig\TwigFunction;
 
 class MenuExtension extends AbstractExtension
 {
-    protected MenuHelper $menuHelper;
-
-    public function __construct(MenuHelper $menuHelper)
-    {
-        $this->menuHelper = $menuHelper;
+    public function __construct(
+        protected MenuHelper $menuHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
@@ -34,8 +29,8 @@ class MenuExtension extends AbstractExtension
     /**
      * Renders a menu with the specified renderer.
      *
-     * @param \Knp\Menu\ItemInterface|string|array<mixed> $menu
-     * @param array<mixed>                                $options
+     * @param ItemInterface|string|array<mixed> $menu
+     * @param array<mixed>                      $options
      */
     public function menuRender($menu, array $options = [], ?string $renderer = null): string
     {
@@ -60,10 +55,10 @@ class MenuExtension extends AbstractExtension
      *
      * @return array<mixed>
      */
-    public function buildMenuClasses(ItemInterface $item, ?MatcherInterface $matcher, array $options, ?string $extraClasses)
+    public function buildMenuClasses(ItemInterface $item, ?MatcherInterface $matcher, array $options, ?string $extraClasses): array
     {
-        $isAncestor = (null !== $matcher) ? $matcher->isAncestor($item, (int) $options['matchingDepth']) : false;
-        $isCurrent  = (null !== $matcher) ? $matcher->isCurrent($item) : false;
+        $isAncestor = null !== $matcher && $matcher->isAncestor($item, (int) $options['matchingDepth']);
+        $isCurrent  = null !== $matcher && $matcher->isCurrent($item);
 
         $class = $item->getAttribute('class');
 

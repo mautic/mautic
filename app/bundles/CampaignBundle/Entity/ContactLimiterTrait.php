@@ -13,7 +13,7 @@ trait ContactLimiterTrait
      * @param string $alias
      * @param bool   $isCount
      */
-    private function updateQueryFromContactLimiter($alias, DbalQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false)
+    private function updateQueryFromContactLimiter($alias, DbalQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false): void
     {
         $minContactId = $contactLimiter->getMinContactId();
         $maxContactId = $contactLimiter->getMaxContactId();
@@ -64,7 +64,7 @@ trait ContactLimiterTrait
      * @param string $alias
      * @param bool   $isCount
      */
-    private function updateOrmQueryFromContactLimiter($alias, OrmQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false)
+    private function updateOrmQueryFromContactLimiter($alias, OrmQueryBuilder $qb, ContactLimiter $contactLimiter, $isCount = false): void
     {
         $minContactId = $contactLimiter->getMinContactId();
         $maxContactId = $contactLimiter->getMaxContactId();

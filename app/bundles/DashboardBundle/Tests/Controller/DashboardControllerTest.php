@@ -32,52 +32,49 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Request
      */
-    private $requestMock;
+    private MockObject $requestMock;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private $securityMock;
+    private MockObject $securityMock;
 
     /**
      * @var MockObject|Translator
      */
-    private $translatorMock;
+    private MockObject $translatorMock;
 
     /**
      * @var MockObject|ModelFactory<DashboardModel>
      */
-    private $modelFactoryMock;
+    private MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|DashboardModel
      */
-    private $dashboardModelMock;
+    private MockObject $dashboardModelMock;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private $routerMock;
+    private MockObject $routerMock;
 
     /**
      * @var MockObject|Session
      */
-    private $sessionMock;
+    private MockObject $sessionMock;
 
     /**
      * @var MockObject|FlashBag
      */
-    private $flashBagMock;
+    private MockObject $flashBagMock;
 
     /**
      * @var MockObject|Container
      */
-    private $containerMock;
+    private MockObject $containerMock;
 
-    /**
-     * @var DashboardController
-     */
-    private $controller;
+    private DashboardController $controller;
 
     protected function setUp(): void
     {

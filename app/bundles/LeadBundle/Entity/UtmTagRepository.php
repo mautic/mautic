@@ -14,8 +14,6 @@ class UtmTagRepository extends CommonRepository
     /**
      * Get tag entities by lead.
      *
-     * @param $utmTags
-     *
      * @return array
      */
     public function getUtmTagsByLead(Lead $lead = null, $options = [])

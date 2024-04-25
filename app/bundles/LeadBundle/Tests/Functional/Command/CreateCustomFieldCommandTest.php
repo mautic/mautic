@@ -58,9 +58,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
         $columnNames   = array_map(
-            static function (Column $column) {
-                return $column->getName();
-            },
+            static fn (Column $column) => $column->getName(),
             $columnsSchema
         );
 
@@ -111,9 +109,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
         $columnNames   = array_map(
-            static function (Column $column) {
-                return $column->getName();
-            },
+            static fn (Column $column) => $column->getName(),
             $columnsSchema
         );
 

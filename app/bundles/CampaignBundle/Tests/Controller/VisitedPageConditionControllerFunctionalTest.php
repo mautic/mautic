@@ -61,7 +61,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
     /**
      * @return array<mixed,mixed>
      */
-    public function fieldAndValueProvider(): array
+    public static function fieldAndValueProvider(): array
     {
         return [
             [

@@ -11,29 +11,11 @@ use Mautic\UserBundle\Entity\User;
 
 class Writer
 {
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
     public function __construct(
-        NotificationModel $notificationModel,
-        AuditLogModel $auditLogModel,
-        EntityManagerInterface $entityManager
+        private NotificationModel $notificationModel,
+        private AuditLogModel $auditLogModel,
+        private EntityManagerInterface $em
     ) {
-        $this->notificationModel   = $notificationModel;
-        $this->auditLogModel       = $auditLogModel;
-        $this->em                  = $entityManager;
     }
 
     /**

@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -29,42 +30,39 @@ class LeadSubscriberTest extends TestCase
     /**
      * @var MockObject|FieldChangeRepository
      */
-    private $fieldChangeRepository;
+    private MockObject $fieldChangeRepository;
 
     /**
      * @var MockObject|ObjectMappingRepository
      */
-    private $objectMappingRepository;
+    private MockObject $objectMappingRepository;
 
     /**
      * @var MockObject|VariableExpresserHelperInterface
      */
-    private $variableExpresserHelper;
+    private MockObject $variableExpresserHelper;
 
     /**
      * @var MockObject|SyncIntegrationsHelper
      */
-    private $syncIntegrationsHelper;
+    private MockObject $syncIntegrationsHelper;
 
     /**
      * @var MockObject|LeadEvent
      */
-    private $leadEvent;
+    private MockObject $leadEvent;
 
     /**
      * @var MockObject|CompanyEvent
      */
-    private $companyEvent;
+    private MockObject $companyEvent;
 
-    /**
-     * @var LeadSubscriber
-     */
-    private $subscriber;
+    private LeadSubscriber $subscriber;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcherInterfaceMock;
+    private MockObject $eventDispatcherInterfaceMock;
 
     public function setUp(): void
     {
@@ -88,7 +86,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        Assert::assertEquals(
             [
                 LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
@@ -490,16 +488,14 @@ class LeadSubscriberTest extends TestCase
     private function createLeadMock(array $fieldChanges, int $objectId): Lead
     {
         return new class($fieldChanges, $objectId) extends Lead {
-            /** @var mixed[] */
-            private array $fieldChanges;
-            private int $objectId;
-
-            /** @param mixed[] $fieldChanges */
-            public function __construct(array $fieldChanges, int $objectId)
-            {
+            /**
+             * @param mixed[] $fieldChanges
+             */
+            public function __construct(
+                private array $fieldChanges,
+                private int $objectId
+            ) {
                 parent::__construct();
-                $this->fieldChanges = $fieldChanges;
-                $this->objectId     = $objectId;
             }
 
             public function isAnonymous(): bool
@@ -525,17 +521,13 @@ class LeadSubscriberTest extends TestCase
     private function createCompanyMock(array $fieldChanges, int $objectId): Company
     {
         return new class($fieldChanges, $objectId) extends Company {
-            /** @var mixed[] */
-            private array $fieldChanges;
-            private int $objectId;
-
             /**
              * @param mixed[] $fieldChanges
              */
-            public function __construct(array $fieldChanges, int $objectId)
-            {
-                $this->fieldChanges = $fieldChanges;
-                $this->objectId     = $objectId;
+            public function __construct(
+                private array $fieldChanges,
+                private int $objectId
+            ) {
             }
 
             public function getChanges($includePast = false): array

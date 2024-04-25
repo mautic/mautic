@@ -9,10 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class BundleMetadataBuilderTest extends TestCase
 {
-    /**
-     * @var array
-     */
-    private $paths;
+    private array $paths;
 
     protected function setUp(): void
     {
@@ -26,9 +23,9 @@ class BundleMetadataBuilderTest extends TestCase
         $this->paths = $paths;
     }
 
-    public function testCoreBundleMetadataLoaded()
+    public function testCoreBundleMetadataLoaded(): void
     {
-        $bundles = ['MauticCoreBundle' => 'Mautic\CoreBundle\MauticCoreBundle'];
+        $bundles = ['MauticCoreBundle' => \Mautic\CoreBundle\MauticCoreBundle::class];
 
         $builder  = new BundleMetadataBuilder($bundles, $this->paths);
         $metadata = $builder->getCoreBundleMetadata();
@@ -45,16 +42,16 @@ class BundleMetadataBuilderTest extends TestCase
         $this->assertEquals('app/bundles/CoreBundle', $bundleMetadata['relative']);
         $this->assertEquals(realpath($this->paths['root']).'/app/bundles/CoreBundle', $bundleMetadata['directory']);
         $this->assertEquals('Mautic\CoreBundle', $bundleMetadata['namespace']);
-        $this->assertEquals('Mautic\CoreBundle\MauticCoreBundle', $bundleMetadata['bundleClass']);
+        $this->assertEquals(\Mautic\CoreBundle\MauticCoreBundle::class, $bundleMetadata['bundleClass']);
         $this->assertTrue(isset($bundleMetadata['permissionClasses']));
         $this->assertTrue(isset($bundleMetadata['permissionClasses'][SystemPermissions::class]));
         $this->assertTrue(isset($bundleMetadata['config']));
         $this->assertTrue(isset($bundleMetadata['config']['routes']));
     }
 
-    public function testPluginMetadataLoaded()
+    public function testPluginMetadataLoaded(): void
     {
-        $bundles = ['MauticFocusBundle' => 'MauticPlugin\MauticFocusBundle\MauticFocusBundle'];
+        $bundles = ['MauticFocusBundle' => \MauticPlugin\MauticFocusBundle\MauticFocusBundle::class];
 
         $builder  = new BundleMetadataBuilder($bundles, $this->paths);
         $metadata = $builder->getPluginMetadata();
@@ -70,14 +67,14 @@ class BundleMetadataBuilderTest extends TestCase
         $this->assertEquals('plugins/MauticFocusBundle', $bundleMetadata['relative']);
         $this->assertEquals(realpath($this->paths['root']).'/plugins/MauticFocusBundle', $bundleMetadata['directory']);
         $this->assertEquals('MauticPlugin\MauticFocusBundle', $bundleMetadata['namespace']);
-        $this->assertEquals('MauticPlugin\MauticFocusBundle\MauticFocusBundle', $bundleMetadata['bundleClass']);
+        $this->assertEquals(\MauticPlugin\MauticFocusBundle\MauticFocusBundle::class, $bundleMetadata['bundleClass']);
         $this->assertTrue(isset($bundleMetadata['permissionClasses']));
         $this->assertTrue(isset($bundleMetadata['permissionClasses'][FocusPermissions::class]));
         $this->assertTrue(isset($bundleMetadata['config']));
         $this->assertTrue(isset($bundleMetadata['config']['routes']));
     }
 
-    public function testSymfonyBundleIgnored()
+    public function testSymfonyBundleIgnored(): void
     {
         $bundles = ['FooBarBundle' => 'Foo\Bar\BarBundle'];
 

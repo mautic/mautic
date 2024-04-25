@@ -25,12 +25,14 @@ class Tag
      */
     private $description;
 
+    public ?int $deletedId;
+
     public function __construct(string $tag = null, bool $clean = true)
     {
         $this->tag = $clean && $tag ? $this->validateTag($tag) : $tag;
     }
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('lead_tags')
@@ -42,7 +44,7 @@ class Tag
         $builder->addNamedField('description', Types::TEXT, 'description', true);
     }
 
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('tag')
             ->addListProperties(
