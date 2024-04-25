@@ -240,6 +240,7 @@
     width: 206px;
     padding: 10px 15px;
     border-radius: 6px;
+    margin-bottom: 10px;
 }
 
 .campaign-builder .builder-active {
