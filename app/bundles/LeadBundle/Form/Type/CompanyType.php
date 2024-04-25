@@ -132,10 +132,9 @@ class CompanyType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'         => Company::class,
-                'isShortForm'        => false,
-                'update_select'      => false,
-                'hide_extra_buttons' => false,
+                'data_class'    => Company::class,
+                'isShortForm'   => false,
+                'update_select' => false,
             ]
         );
 
