@@ -495,6 +495,7 @@ class HitRepository extends CommonRepository
         }
 
         $query->select('p.title, p.id, '.$column.$as)
+            ->where('p.id IS NOT NULL')
             ->groupBy('p.id, p.title, '.$column)
             ->orderBy($column, 'DESC')
             ->setMaxResults($limit)

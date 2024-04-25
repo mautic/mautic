@@ -58,6 +58,11 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     {
         $package   = $this->getRemoteDateStoreDownloadUrl();
 
+        if (empty($package)) {
+            $this->logger->error('Failed to fetch remote IP data: Invalid or inactive MaxMind license key');
+
+            return false;
+        }
         try {
             $data = $this->client->get($package, [
                 RequestOptions::ALLOW_REDIRECTS => true,
