@@ -17,7 +17,7 @@ class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-          RateLimitEvents::GENERATE_KEY => ['onGenerateKey', 0],
+            RateLimitEvents::GENERATE_KEY => ['onGenerateKey', 0],
         ];
     }
 

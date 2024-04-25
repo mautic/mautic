@@ -19,7 +19,7 @@ class PublicController extends CommonFormController
     private array $tokens = [];
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function submitAction(Request $request, DateHelper $dateTemplateHelper)
     {

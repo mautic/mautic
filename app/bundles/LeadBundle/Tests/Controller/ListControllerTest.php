@@ -142,8 +142,8 @@ class ListControllerTest extends MauticMysqlTestCase
                 'type'       => 'text',
                 'operator'   => 'contains',
                 'properties' => [
-                        'filter' => 'Acquia',
-                    ],
+                    'filter' => 'Acquia',
+                ],
                 'filter'  => 'Acquia',
                 'display' => null,
             ],
