@@ -91,7 +91,7 @@ class CompanyType extends AbstractType
             );
         }
 
-        if (!empty($options['hide_extra_buttons'])) {
+        if (null === $options['data']->id) {
             $builder->add(
                 'buttons',
                 FormButtonsType::class
