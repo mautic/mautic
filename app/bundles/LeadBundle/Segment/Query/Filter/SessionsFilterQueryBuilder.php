@@ -7,12 +7,12 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.sessions';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias      = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $pageHitsAlias        = $this->generateRandomParameterName();

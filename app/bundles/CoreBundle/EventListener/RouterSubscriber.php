@@ -9,35 +9,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RouterSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private string|int $httpsPort;
 
-    /**
-     * @var string|null
-     */
-    private $baseUrl;
-
-    /**
-     * @var string|null
-     */
-    private $scheme;
-
-    /**
-     * @var string|null
-     */
-    private $host;
-
-    /**
-     * @var string|null
-     */
-    private $httpsPort;
-
-    /**
-     * @var string|null
-     */
-    private $httpPort;
+    private string|int $httpPort;
 
     /**
      * @param string|null $scheme
@@ -46,20 +20,19 @@ class RouterSubscriber implements EventSubscriberInterface
      * @param string|null $httpPort
      * @param string|null $baseUrl
      */
-    public function __construct(RouterInterface $router, $scheme, $host, $httpsPort, $httpPort, $baseUrl)
-    {
-        $this->router    = $router;
-        $this->scheme    = $scheme;
-        $this->host      = $host;
+    public function __construct(
+        private RouterInterface $router,
+        private $scheme,
+        private $host,
+        $httpsPort,
+        $httpPort,
+        private $baseUrl
+    ) {
         $this->httpsPort = $httpsPort ?? 443;
         $this->httpPort  = $httpPort ?? 80;
-        $this->baseUrl   = $baseUrl;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['setRouterRequestContext', 1],
@@ -71,7 +44,7 @@ class RouterSubscriber implements EventSubscriberInterface
      * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
      * via CLI/cron jobs.
      */
-    public function setRouterRequestContext(RequestEvent $event)
+    public function setRouterRequestContext(RequestEvent $event): void
     {
         if (empty($this->host)) {
             return;
@@ -85,7 +58,7 @@ class RouterSubscriber implements EventSubscriberInterface
 
         // Remove index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
         $originalBaseUrl = str_replace(['index.php'], '', $originalContext->getBaseUrl());
-        if ('/' == substr($originalBaseUrl, -1)) {
+        if (str_ends_with($originalBaseUrl, '/')) {
             $originalBaseUrl = substr($originalBaseUrl, 0, -1);
         }
 

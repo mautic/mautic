@@ -36,8 +36,8 @@ class PointSubscriberTest extends TestCase
                     'group'       => 'mautic.page.point.action',
                     'label'       => 'mautic.page.point.action.pagehit',
                     'description' => 'mautic.page.point.action.pagehit_descr',
-                    'callback'    => ['Mautic\PageBundle\Helper\PointActionHelper', 'validatePageHit'],
-                    'formType'    => 'Mautic\PageBundle\Form\Type\PointActionPageHitType',
+                    'callback'    => [\Mautic\PageBundle\Helper\PointActionHelper::class, 'validatePageHit'],
+                    'formType'    => \Mautic\PageBundle\Form\Type\PointActionPageHitType::class,
                 ],
             ],
             [
@@ -46,8 +46,8 @@ class PointSubscriberTest extends TestCase
                     'group'       => 'mautic.page.point.action',
                     'label'       => 'mautic.page.point.action.urlhit',
                     'description' => 'mautic.page.point.action.urlhit_descr',
-                    'callback'    => ['Mautic\PageBundle\Helper\PointActionHelper', 'validateUrlHit'],
-                    'formType'    => 'Mautic\PageBundle\Form\Type\PointActionUrlHitType',
+                    'callback'    => [\Mautic\PageBundle\Helper\PointActionHelper::class, 'validateUrlHit'],
+                    'formType'    => \Mautic\PageBundle\Form\Type\PointActionUrlHitType::class,
                     'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
                 ],
             ]

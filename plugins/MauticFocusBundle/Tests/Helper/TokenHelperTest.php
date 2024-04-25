@@ -17,22 +17,19 @@ class TokenHelperTest extends TestCase
     /**
      * @var FocusModel|MockObject
      */
-    private $model;
+    private MockObject $model;
 
     /**
      * @var MockObject|RouterInterface
      */
-    private $router;
+    private MockObject $router;
 
     /**
      * @var CorePermissions|MockObject
      */
-    private $security;
+    private MockObject $security;
 
-    /**
-     * @var TokenHelper
-     */
-    private $helper;
+    private TokenHelper $helper;
 
     protected function setUp(): void
     {

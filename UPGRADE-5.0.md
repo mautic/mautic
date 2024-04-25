@@ -21,13 +21,15 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
 *   Configuration
     * Replace all occurances of `%kernel.root_dir%` to `%kernel.project_dir%/app` as the "root_dir" was deprecated in Symfony 4 and removed in Symfony 5. The "project_dir" variable is path to the Mautic root directory. The "root_dir" variable was path to the app directory.
     * The index_dev.php was removed. Use env variables to set the environment.
-    * We are following symfony env naming convention. [synfomy 4.4](https://symfony.com/doc/4.4/configuration.html#selecting-the-active-environment)
+    * We are following symfony env naming convention. [Symfony 4.4](https://symfony.com/doc/4.4/configuration.html#selecting-the-active-environment)
       * `.env`                contains default values for the environment variables needed by the app
       * `.env.local`          uncommitted file with local overrides
       * `.env.$APP_ENV`       committed environment-specific defaults
       * `.env.$APP_ENV.local` uncommitted environment-specific overrides
     * The system run similar index_dev.php if you use `APP_ENV=dev` and `APP_DEBUG=1` in your .env.local file.
     * Remove Custom shortener API URL from configuration (link_shortener_url variable) and remove `Mautic\CoreBundle\Helper\UrlHelper::buildShortUrl()` method. As a developer, use the \Mautic\CoreBundle\Shortener\Shortener::class service.
+    * the application config (`/app/config`) was separated from local config (`/config`) to make Mautic more compatible with a Composer based workflows.  
+      There is a Doctrine migration that moves the local config files to the new directory.
 * Installation
     * The email step was removed from both GUI and CLI installers.
     * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
@@ -66,6 +68,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * Library `quicksearch` was updated from unmaintained vendor to latest version of its successor. Details in https://github.com/mautic/mautic/pull/12372.
     * Library `jQueryUI` was updated from version 1.12.1 to 1.13.2. Details in https://github.com/mautic/mautic/pull/12394.
     * Modernizr JS was upgraded from 2.8.3 to 3.12.0 and reduced to only used features. Details in https://github.com/mautic/mautic/pull/12402.
+    * CK editor was upgraded from v4 to v5. See https://github.com/mautic/mautic/pull/12641.
 *   Other
     * `Mautic\UserBundle\Security\Firewall\AuthenticationListener::class` no longer implements the deprecated `Symfony\Component\Security\Http\Firewall\ListenerInterface` and was made final. The `public function handle(GetResponseEvent $event)` method was changed to `public function __invoke(RequestEvent $event): void` to support Symfony 5.
     * `Mautic\IntegrationsBundle\Configuration\PluginConfiguration` removed - we don't use it
@@ -96,6 +99,7 @@ The underlying library used for sending emails (Swift Mailer) was discontinued a
     * The dev dependency `php-http/mock-client` was removed as abandoned and unused. See https://github.com/mautic/mautic/pull/12439
     * `'mautic.guzzle.client'` service was removed. Use `'mautic.http.client'` instead.
     * Removed onlyForBC themes: coffee, Mauve, nature
+    * Replaced asset minification library `mrclay/minify` with `matthiasmullie/minify` for faster asset generation.
 
 ### QueueBundle removed in favor symfony's messenger, see: [readme](app/bundles/MessengerBundle/README.md)
  * **Related configuration** is no longer valid. 

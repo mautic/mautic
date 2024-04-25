@@ -4,37 +4,29 @@ namespace Mautic\PageBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class UntrackableUrlsEvent.
- */
 class UntrackableUrlsEvent extends Event
 {
     /**
-     * @var array
+     * @var string[]
      */
-    private $doNotTrack = [
+    private array $doNotTrack = [
         '{webview_url}',
         '{unsubscribe_url}',
         '{trackable=(.*?)}',
     ];
 
     /**
-     * @var string
+     * @param mixed $content
      */
-    private $content;
-
-    /**
-     * TrackableEvent constructor.
-     */
-    public function __construct($content)
-    {
-        $this->content = $content;
+    public function __construct(
+        private $content
+    ) {
     }
 
     /**
      * set a URL or token to not convert to trackables.
      */
-    public function addNonTrackable($url)
+    public function addNonTrackable($url): void
     {
         $this->doNotTrack[] = $url;
     }
@@ -42,9 +34,9 @@ class UntrackableUrlsEvent extends Event
     /**
      * Get array of non-trackables.
      *
-     * @return array
+     * @return string[]
      */
-    public function getDoNotTrackList()
+    public function getDoNotTrackList(): array
     {
         return $this->doNotTrack;
     }

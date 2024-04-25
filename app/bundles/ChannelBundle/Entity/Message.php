@@ -243,10 +243,7 @@ class Message extends FormEntity
         return $this;
     }
 
-    /**
-     * @return void
-     */
-    public function addChannel(Channel $channel)
+    public function addChannel(Channel $channel): void
     {
         if (!$this->channels->contains($channel)) {
             $channel->setMessage($this);
@@ -256,10 +253,7 @@ class Message extends FormEntity
         }
     }
 
-    /**
-     * @return void
-     */
-    public function removeChannel(Channel $channel)
+    public function removeChannel(Channel $channel): void
     {
         if ($channel->getId()) {
             $this->isChanged('channels', $channel->getId());

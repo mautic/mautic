@@ -9,39 +9,26 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 class MailboxOrganizer
 {
     /**
-     * @var ParseEmailEvent
-     */
-    protected $event;
-
-    /**
-     * @var array
-     */
-    protected $mailboxes;
-
-    /**
      * @var MailboxContainer[]
      */
     protected $containers = [];
 
-    /**
-     * MailboxOrganizer constructor.
-     */
-    public function __construct(ParseEmailEvent $event, array $mailboxes)
-    {
-        $this->event     = $event;
-        $this->mailboxes = $mailboxes;
+    public function __construct(
+        protected ParseEmailEvent $event,
+        protected array $mailboxes
+    ) {
     }
 
     /**
      * Organize the mailboxes into containers by IMAP connection and criteria.
      */
-    public function organize()
+    public function organize(): void
     {
         $criteriaRequested      = $this->event->getCriteriaRequests();
         $markAsSeenInstructions = $this->event->getMarkAsSeenInstructions();
 
         /**
-         * @var string
+         * @var string         $name
          * @var ConfigAccessor $config
          */
         foreach ($this->mailboxes as $name => $config) {
@@ -51,8 +38,8 @@ class MailboxOrganizer
                 continue;
             }
 
-            $criteria   = isset($criteriaRequested[$name]) ? $criteriaRequested[$name] : Mailbox::CRITERIA_UNSEEN;
-            $markAsSeen = isset($markAsSeenInstructions[$name]) ? $markAsSeenInstructions[$name] : true;
+            $criteria   = $criteriaRequested[$name] ?? Mailbox::CRITERIA_UNSEEN;
+            $markAsSeen = $markAsSeenInstructions[$name] ?? true;
 
             $container = $this->getContainer($config);
             if (!$markAsSeen) {

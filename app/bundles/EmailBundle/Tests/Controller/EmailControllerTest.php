@@ -33,67 +33,64 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Translator
      */
-    private $translatorMock;
+    private MockObject $translatorMock;
 
     /**
      * @var MockObject|Session
      */
-    private $sessionMock;
+    private MockObject $sessionMock;
 
     /**
      * @var MockObject|ModelFactory<EmailModel>
      */
-    private $modelFactoryMock;
+    private MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|Container
      */
-    private $containerMock;
+    private MockObject $containerMock;
 
     /**
      * @var MockObject|Router
      */
-    private $routerMock;
+    private MockObject $routerMock;
 
     /**
      * @var MockObject|EmailModel
      */
-    private $modelMock;
+    private MockObject $modelMock;
 
     /**
      * @var MockObject|Email
      */
-    private $emailMock;
+    private MockObject $emailMock;
 
     /**
      * @var MockObject|FlashBag
      */
-    private $flashBagMock;
+    private MockObject $flashBagMock;
 
-    /**
-     * @var EmailController
-     */
-    private $controller;
+    private EmailController $controller;
 
     /**
      * @var MockObject|CorePermissions
      */
-    private $corePermissionsMock;
+    private MockObject $corePermissionsMock;
 
     /**
      * @var MockObject|FormFactory
      */
-    private $formFactoryMock;
+    private MockObject $formFactoryMock;
 
     /**
      * @var MockObject|Form
      */
-    private $formMock;
+    private MockObject $formMock;
 
     /**
      * @var MockObject|Environment
      */
-    private $twigMock;
+    private MockObject $twigMock;
 
     private RequestStack $requestStack;
 
@@ -255,7 +252,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->formFactoryMock->expects($this->once())
             ->method('create')
-            ->with('Mautic\EmailBundle\Form\Type\ExampleSendType',
+            ->with(\Mautic\EmailBundle\Form\Type\ExampleSendType::class,
                 [
                     'emails' => [
                         'list' => [

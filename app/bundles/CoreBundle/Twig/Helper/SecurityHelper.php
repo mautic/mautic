@@ -15,47 +15,25 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 final class SecurityHelper
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var CsrfTokenManagerInterface
-     */
-    private $tokenManager;
-
-    /**
-     * SecurityHelper constructor.
-     */
     public function __construct(
-        CorePermissions $security,
-        RequestStack $requestStack,
-        EventDispatcherInterface $dispatcher,
-        CsrfTokenManagerInterface $tokenManager
+        private CorePermissions $security,
+        private RequestStack $requestStack,
+        private EventDispatcherInterface $dispatcher,
+        private CsrfTokenManagerInterface $tokenManager
     ) {
-        $this->security     = $security;
-        $this->requestStack = $requestStack;
-        $this->dispatcher   = $dispatcher;
-        $this->tokenManager = $tokenManager;
+    }
+
+    public function getName(): string
+    {
+        return 'security';
     }
 
     /**
-     * @return string
+     * Helper function to check if user is an Admin.
      */
-    public function getName()
+    public function isAdmin(): bool
     {
-        return 'security';
+        return $this->security->isAdmin();
     }
 
     /**

@@ -15,29 +15,29 @@ class DetailsTest extends MauticMysqlTestCase
         $campaign = new Campaign();
         $campaign->setName('Campaign A');
         $campaign->setCanvasSettings([
-                'nodes' => [
-                    0 => [
-                        'id'        => '148',
-                        'positionX' => '760',
-                        'positionY' => '155',
-                    ],
-                    1 => [
-                        'id'        => 'lists',
-                        'positionX' => '860',
-                        'positionY' => '50',
+            'nodes' => [
+                0 => [
+                    'id'        => '148',
+                    'positionX' => '760',
+                    'positionY' => '155',
+                ],
+                1 => [
+                    'id'        => 'lists',
+                    'positionX' => '860',
+                    'positionY' => '50',
+                ],
+            ],
+            'connections' => [
+                0 => [
+                    'sourceId' => 'lists',
+                    'targetId' => '148',
+                    'anchors'  => [
+                        'source' => 'leadsource',
+                        'target' => 'top',
                     ],
                 ],
-                'connections' => [
-                    0 => [
-                        'sourceId' => 'lists',
-                        'targetId' => '148',
-                        'anchors'  => [
-                            'source' => 'leadsource',
-                            'target' => 'top',
-                        ],
-                    ],
-                ],
-            ]
+            ],
+        ]
         );
         $this->em->persist($campaign);
         $this->em->flush();

@@ -16,41 +16,22 @@ The Mautic Security Team operates with a limited scope and only directly respond
 Which Releases Get Security Advisories?
 ---------------------------------------
 
-Mautic 3 will receive security advisories until 15 December 2021.
+Check the [Releases page](https://www.mautic.org/mautic-releases) to find which are the currently supported releases.
 
-Starting with the release of Mautic 3.0, one minor versions at a time receives security advisories, the most recent minor release.
+Starting with the release of Mautic 3.0, one minor version at a time receives security advisories, the most recent minor release.
 
-For example, Mautic 3.1 will continue receiving security advisories until the release of Mautic 3.2, and 3.2 will receive security advisories until the release of 3.3.
+For example, Mautic 4.1 will continue receiving security advisories until the release of Mautic 4.2, and 4.2 will receive security advisories until the release of 4.3.
 
-### Supported Versions
-
-| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until *
-|--|--|--|--|--|
-|2.16|30 Jan 2020|13 Feb 2020|15 Jun 2020|15 Dec 2020
-|3.x|27 Jan 2020|15 Jun 2020|30 Aug 2021|28 Feb 2022
-|3.1|17 Aug 2020|24 Aug 2020|23 Nov 2020|30 Nov 2020
-|3.2|23 Nov 2020|30 Nov 2020|16 Feb 2021|22 Feb 2021
-|3.3|16 Feb 2021|22 Feb 2021|17 May 2021|24 May 2021
-|4.x|16 Feb 2021|30 Aug 2021|26 Sept 2022|27 Feb 2023
-|4.0|25 May 2021|30 Aug 2021|29 Nov 2021|29 Nov 2021
-|4.1|N/A|29 Nov 2021|21 Feb 2021|21 Feb 2021
-|4.2|17 Feb 2022|28 Feb 2021|23 May 2022|23 May 2022
-|4.3|17 May 2022|23 May 2022|27 Jun 2021|27 Jun 2022
-|4.4|27 Jun 2022|27 Jun 2022|26 Sept 2022|26 Sept 2022
-
-\* = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
-
-Security advisories are only made for issues affecting stable releases in the supported major version branches. That means there will be no security advisories for development releases (-dev), alphas, betas or release candidates.
-
+Security advisories are only made for issues affecting stable releases in the supported major version branches. That means there will be no security advisories for development releases, alphas, betas or release candidates.
 
 How to report a potential security issue
 ----------------------------------------
 
 If you discover or learn about a potential error, weakness, or threat that can compromise the security of Mautic and is covered by the [Security Advisory Policy](https://www.mautic.org/mautic-security-team/mautic-security-advisory-policy), we ask you to keep it confidential and submit your concern to the Mautic security team.
 
-To make your report please submit it via [https://huntr.dev](https://huntr.dev).
+To make your report please submit it as a private disclosure at [https://github.com/mautic/mautic/security](https://github.com/mautic/mautic/security). You can also create a private fork to provide a fix, if you're able to do so. See the documentation from GitHub on [privately reporting a security issue](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability).
 
-Do not post it in Github, the forums, or or discuss it in Slack.
+Do not post it in GitHub as an issue or a Pull Request, on the forums, or discuss it in Slack.
 
 [Read more: How to report a security issue with Mautic](https://www.mautic.org/mautic-security-team/how-to-report-a-security-issue)
 

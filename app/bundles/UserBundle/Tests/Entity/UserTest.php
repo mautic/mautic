@@ -16,13 +16,13 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($user->getCurrentPassword());
     }
 
-    public function testUserIsGuest()
+    public function testUserIsGuest(): void
     {
         $user = new User(true);
         $this->assertTrue($user->isGuest());
     }
 
-    public function testUserIsNotGuest()
+    public function testUserIsNotGuest(): void
     {
         $user = new User();
         $this->assertFalse($user->isGuest());

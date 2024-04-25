@@ -1,4 +1,3 @@
-{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
 {% set showConversionRate = showConversionRate is defined ? showConversionRate : false %}
 {% if trackables is not empty %}
     <div class="table-responsive">
@@ -9,7 +8,7 @@
                 <td>{{ 'mautic.trackable.click_url'|trans }}</td>
                 <td>{{ 'mautic.trackable.click_count'|trans }}</td>
                 <td>{{ 'mautic.trackable.click_unique_count'|trans }}</td>
-                {{ customContent('click_counts_headers', mauticTemplateVars) }}
+                {{ customContent('click_counts_headers', _context) }}
                 {% if showConversionRate %}
                     <td>{{ 'mautic.trackable.click_conversion_rate'|trans }}</td>
                 {% endif %}
@@ -38,7 +37,7 @@
                         {% endif %}
                         </span>
                             </td>
-                            {{ customContent('click_counts', mauticTemplateVars|merge({'redirect_id' : link.redirect_id})) }}
+                            {{ customContent('click_counts', _context|merge({'redirect_id' : link.redirect_id})) }}
                             {% if showConversionRate %}
                                 <td data-conversion-rate-cell data-unique-hits="{{ link.unique_hits }}"><div class="spinner"><i class="fa fa-spin fa-spinner"></i></div></td>
                             {% endif %}

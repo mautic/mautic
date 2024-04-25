@@ -16,8 +16,10 @@ class EmailHitNotificationHandler implements MessageHandlerInterface
 {
     private bool $isSyncTransport;
 
-    public function __construct(private EmailModel $emailModel, CoreParametersHelper $parametersHelper)
-    {
+    public function __construct(
+        private EmailModel $emailModel,
+        CoreParametersHelper $parametersHelper
+    ) {
         $this->isSyncTransport = str_starts_with($parametersHelper->get('messenger_dsn_hit'), 'sync://');
     }
 

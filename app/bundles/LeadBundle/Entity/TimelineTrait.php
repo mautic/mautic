@@ -11,14 +11,14 @@ trait TimelineTrait
 {
     /**
      * @param QueryBuilder $query                 DBAL QueryBuilder
-     * @param array        $options               Query optons from LeadTimelineEvent
+     * @param array<mixed> $options               Query optons from LeadTimelineEvent
      * @param string       $eventNameColumn       Name of column to sort event name by
      * @param string       $timestampColumn       Name of column to sort timestamp by
-     * @param array        $serializedColumns     Array of columns to unserialize
-     * @param array        $dateTimeColumns       Array of columns to be converted to \DateTime
-     * @param null         $resultsParserCallback Callback to custom parse results
+     * @param array<mixed> $serializedColumns     Array of columns to unserialize
+     * @param array<mixed> $dateTimeColumns       Array of columns to be converted to \DateTime
+     * @param mixed|null   $resultsParserCallback Callback to custom parse results
      *
-     * @return array
+     * @return array<mixed>
      */
     private function getTimelineResults(
         QueryBuilder $query,
@@ -30,7 +30,7 @@ trait TimelineTrait
         $resultsParserCallback = null
     ) {
         if (!empty($options['unitCounts'])) {
-            list($tablePrefix, $column) = explode('.', $timestampColumn);
+            [$tablePrefix, $column] = explode('.', $timestampColumn);
 
             // Get counts grouped by unit based on date range
             /** @var ChartQuery $cq */
@@ -63,17 +63,12 @@ trait TimelineTrait
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = $eventNameColumn;
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = $timestampColumn;
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => $eventNameColumn,
+                default      => $timestampColumn,
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }

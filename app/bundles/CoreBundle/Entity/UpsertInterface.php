@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Entity;
 interface UpsertInterface
 {
     public const ROWS_AFFECTED_ON_INSERT = 1;
+
     public const ROWS_AFFECTED_ON_UPDATE = 2;
 
     public function hasBeenInserted(): bool;
