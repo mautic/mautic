@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\PointBundle\Entity\Group;
@@ -12,6 +15,9 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 {
     public function testPointGroupCRUDActions(): void
     {
+        /** @var Translator $translator */
+        $translator = static::getContainer()->get('translator');
+
         // Create a new point group
         $this->client->request('POST', '/api/points/groups/new', [
             'name'        => 'New Point Group',
@@ -61,16 +67,29 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->client->request('DELETE', "/api/points/groups/{$createdData['id']}/delete");
         $deleteResponse = $this->client->getResponse();
 
-        $this->assertSame(200, $deleteResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $deleteResponse->getStatusCode());
         $responseData = json_decode($deleteResponse->getContent(), true);
         $this->assertArrayHasKey('pointGroup', $responseData);
         $deleteData = $responseData['pointGroup'];
         $this->assertEquals('Updated Point Group Name', $deleteData['name']);
         $this->assertEquals('Updated description of the point group', $deleteData['description']);
+
+        // Try to GET the group that should no longer exist
+        $this->client->request('GET', "/api/points/groups/{$createdData['id']}");
+        $getResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_NOT_FOUND, $getResponse->getStatusCode());
+        $responseData = json_decode($getResponse->getContent(), true);
+        $this->assertArrayHasKey('errors', $responseData);
+        $this->assertCount(1, $responseData['errors']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $responseData['errors'][0]['code']);
+        $this->assertSame($translator->trans('mautic.core.error.notfound', [], 'flashes'), $responseData['errors'][0]['message']);
     }
 
     public function testContactGroupPointsActions(): void
     {
+        /** @var Translator $translator */
+        $translator = static::getContainer()->get('translator');
+
         // Arrange
         $contact     = $this->createContact('test@example.com');
         $pointGroupA = $this->createGroup('Group A');
@@ -115,6 +134,26 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
             ['delta' => 12, 'groupId' => $pointGroupA->getId()],
             ['delta' => 21, 'groupId' => $pointGroupB->getId()],
         ]);
+
+        // Try to GET the group points that should not exist
+        $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups/0");
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('errors', $responseData);
+        $this->assertCount(1, $responseData['errors']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $responseData['errors'][0]['code']);
+        $this->assertSame($translator->trans('mautic.lead.event.api.point.group.not.found'), $responseData['errors'][0]['message']);
+
+        // Try to GET the group points for a contact that should not exist
+        $this->client->request('GET', '/api/contacts/0/points/groups/0');
+        $response = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('errors', $responseData);
+        $this->assertCount(1, $responseData['errors']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $responseData['errors'][0]['code']);
+        $this->assertSame($translator->trans('mautic.lead.event.api.lead.not.found'), $responseData['errors'][0]['message']);
     }
 
     private function adjustPointsAndAssert(Lead $contact, Group $pointGroup, string $operator, int $value, int $expectedScore): void

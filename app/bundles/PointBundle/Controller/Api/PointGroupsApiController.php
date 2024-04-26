@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,7 +35,7 @@ class PointGroupsApiController extends CommonApiController
      */
     protected $model;
 
-    /** @phpstan-ignore-next-line */
+    /** @phpstan-ignore-next-line the parent class uses the deprecated MauticFactory */
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory, PointGroupModel $pointGroupModel, private LeadModel $leadModel)
     {
         $this->model            = $pointGroupModel;

@@ -67,7 +67,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'pointGroups',
                 'path'            => '/points/groups',
-                'controller'      => \Mautic\PointBundle\Controller\Api\PointGroupsApiController::class,
+                'controller'      => Mautic\PointBundle\Controller\Api\PointGroupsApiController::class,
             ],
             'mautic_api_getcontactpointgroups' => [
                 'path'       => '/contacts/{contactId}/points/groups',
