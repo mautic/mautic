@@ -2024,7 +2024,7 @@ ul.dropdown-menu-form {
   min-width: 30px;
   transition: var(--all);
 }
-.label.pa-4 {
+.label.pa-10 {
   min-width: auto;
 }
 .label.gray-tag {
