@@ -175,10 +175,15 @@
                 name="dwc[filters][__name__][filter]"
                 id="dwc_filters___name___filter">
             {% if form.vars[dataKey] is defined %}
-                {% for value, label in form.vars[dataKey] %}
-                    {% if label is iterable %}
-                        <optgroup label="{{ value }}">
-                        {% for optionValue, optionLabel in label %}
+                {% set index = 0 %}
+                {% for label, value in form.vars[dataKey] %}
+                    {% if value is iterable %}
+                        <optgroup label="{{ label }}">
+                        {% for optionLabel, optionValue in value %}
+                            {% if (dataKey == 'regions') %}
+                                {% set optionValue = index %}
+                                {% set index = index + 1 %}
+                            {% endif %}
                             <option value="{{ optionValue }}">{{ optionLabel }}</option>
                         {% endfor %}
                         </optgroup>
