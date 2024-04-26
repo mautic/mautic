@@ -2017,11 +2017,13 @@ ul.dropdown-menu-form {
 }
 .label {
   display: inline-flex;
-  gap: 2px;
+  gap: 6px;
   line-height: 1.5;
   padding: 0.25em 0.8em 0.15em 0.8em;
   border-radius: 200px;
   min-width: 30px;
+  justify-content: center;
+  align-items: center;
   transition: var(--all);
 }
 .label.pa-10 {
