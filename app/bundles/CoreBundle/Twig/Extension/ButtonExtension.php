@@ -139,7 +139,7 @@ class ButtonExtension extends AbstractExtension
                 case 'new':
                 case 'edit':
                     $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
-                    $icon        = ('edit' == $action) ? 'edit-circle-line' : 'add-line';
+                    $icon        = ('edit' == $action) ? 'edit-line' : 'add-line';
                     $path        = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     $primary     = true;
                     break;

@@ -679,8 +679,9 @@ class ReportController extends FormController
                         ],
                         'RETURN_ARRAY'
                     ),
-                    'dateRangeForm'     => $dateRangeForm->createView(),
-                    'dynamicFilterForm' => $dynamicFilterForm->createView(),
+                    'dateRangeForm'          => $dateRangeForm->createView(),
+                    'dynamicFilterForm'      => $dynamicFilterForm->createView(),
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => $reportData['contentTemplate'],
                 'passthroughVars' => [
@@ -770,6 +771,8 @@ class ReportController extends FormController
                 ]
             );
         } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+            return $this->accessDenied();
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
