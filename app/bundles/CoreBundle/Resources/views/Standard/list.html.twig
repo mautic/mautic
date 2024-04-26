@@ -207,7 +207,7 @@
                                     {% set catName, color = category
                                         ? category.getTitle()
                                         : 'mautic.core.form.uncategorized'|trans, category ? '#' ~ category.getColor() : 'inherit' %}
-                                    <span style="white-space: nowrap;"><span class="label gray-tag pa-10" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> <span>{{ catName }}</span></span>
+                                    <span style="white-space: nowrap;"><span class="label gray-tag pa-10" style="background: {{ color }};"> </span> <span>{{ catName }}</span></span>
                                 </td>
                             {% endif %}
                         {% endif %}
