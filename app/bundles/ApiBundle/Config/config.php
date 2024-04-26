@@ -45,6 +45,7 @@ return [
                     'route'     => 'mautic_client_index',
                     'access'    => 'api:clients:view',
                     'parent'    => 'mautic.core.integrations',
+                    'priority'  => 17,
                     'checks'    => [
                         'parameters' => [
                             'api_enabled' => true,
