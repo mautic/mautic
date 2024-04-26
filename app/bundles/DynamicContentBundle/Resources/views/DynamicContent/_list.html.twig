@@ -89,7 +89,7 @@
                         {% set catName = item.category is not empty ? item.category.title : 'mautic.core.form.uncategorized'|trans %}
                         {% set color = item.category is not empty ? '#' ~ item.category.color : 'inherit' %}
                         <span style="white-space: nowrap;">
-                          <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
+                          <span class="label gray-tag pa-10" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
                           <span>{{ catName }}</span>
                         </span>
                     </td>
