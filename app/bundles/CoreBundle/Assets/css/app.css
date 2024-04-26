@@ -191,11 +191,39 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > img,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .img-wrapper {
+  --width: 28px;
+  border-radius: 100%;
+  width: var(--width);
+  height: var(--width);
   display: inline-block;
-  width: 32px;
-  height: 32px;
-  margin-top: -11px;
-  margin-bottom: -11px;
+  margin-top: -8px;
+  margin-bottom: -8px;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user .info {
+  transform: translateY(-6%);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user .info > .position {
+  opacity: 0;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user:hover .info {
+  transform: translateY(-20%);
+}
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+  }
+  to {
+    transform: translateY(-5px);
+  }
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user:hover .info > .position {
+  display: flex;
+  animation: fadeIn 0.5s ease-in-out forwards, slideDown 0.5s ease-in-out forwards;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user > .text {
+  line-height: 14px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .badge,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .label {
@@ -2561,6 +2589,9 @@ ul.line-legend li {
 .table-responsive-force > .table-bordered > tfoot > tr:last-child > td {
   border-bottom: 0;
 }
+.table-hover > tbody > tr:hover {
+  transition: var(--all);
+}
 .progress {
   background-color: #ebedf0;
   -webkit-box-shadow: none;
@@ -4682,7 +4713,7 @@ label.required:after {
   left: 0px;
   width: 24px;
   height: 34px;
-  padding: 0 0 0 24px;
+  padding: 0 0 0 32px;
   margin: 12px 0 0 5px;
   z-index: 1;
   -webkit-transition: all 0.5s ease;
@@ -4745,10 +4776,14 @@ body.noscroll {
 .table .input-group-sm > .input-group-addon {
   font-size: 10px;
   line-height: 1em;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
 }
 .table .input-group-sm .dropdown-toggle {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  border: 0;
+  background-color: transparent;
+  padding: 5px 8px;
 }
 .input-group .input-group-btn button {
   height: 32px;
@@ -4862,6 +4897,10 @@ ul.media-list.media-list-feed div.media-object {
 }
 .ui-sortable-handle:active {
   cursor: grabbing;
+}
+.flex-column-inline {
+  display: inline-flex;
+  flex-direction: column;
 }
 .notification {
   width: inherit !important;

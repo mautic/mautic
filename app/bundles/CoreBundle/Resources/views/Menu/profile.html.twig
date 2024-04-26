@@ -1,19 +1,21 @@
 {% set inline = menuRender('profile') %}
 <li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-        <span class="img-wrapper img-rounded" style="width:32px;"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
-        <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
-        <span class="caret ml-xs"></span>
+    <a class="dropdown-toggle user" data-toggle="dropdown" href="#">
+        <span class="img-wrapper"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
+        <span class="flex-column-inline info">
+            <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
+            <span class="text ml-xs small hidden-xs position">{{ app.getUser().getPosition() }}</span>
+        </span>
     </a>
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
             <a href="{{ path('mautic_user_account') }}" data-toggle="ajax">
-                <i class="fa fa-user fs-14"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
+                <i class="ri-user-smile-line ri-lg"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
             </a>
         </li>
         <li>
             <a href="{{ path('mautic_user_logout') }}">
-                <i class="fa fa-sign-out fs-14"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
+                <i class="ri-logout-circle-r-line ri-lg"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
             </a>
         </li>
 

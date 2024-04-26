@@ -2,14 +2,14 @@
     <a href="javascript: void(0);" onclick="Mautic.showNotifications();" class="dropdown-toggle dropdown-notification" data-toggle="dropdown">
         {% set hideClass = updateMessage.isNew or showNewIndicator ? '' : ' hide' %}
         <span class="label label-danger{{ hideClass }}" id="newNotificationIndicator"><i class="fa fa-asterisk"></i></span>
-        <span class="fa fa-bell fs-16"></span>
+        <span class="ri-notification-3-line ri-xl"></span>
     </a>
     <div class="dropdown-menu">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="panel-title notification notification-title">
                     <h6 class="fw-sb">{% trans %}mautic.core.notifications{% endtrans %}
-                        <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clearall{% endtrans %}" onclick="Mautic.clearNotification(0);"><i class="fa fa-times"></i></a>
+                        <a href="javascript:void(0);" class="btn-link btn-xs btn-nospin pull-right" onclick="Mautic.clearNotification(0);">{% trans %}mautic.core.notifications.clearall{% endtrans %}</a>
                     </h6>
                 </div>
             </div>
