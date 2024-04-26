@@ -4,30 +4,24 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailDraft;
 use Mautic\EmailBundle\Entity\EmailDraftRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class EmailDraftModel
+class EmailDraftModel extends AbstractCommonModel
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        private EmailDraftRepository $emailDraftRepository
-    ) {
-    }
-
     public function createDraft(Email $email, string $html, string $template, bool $publicPreview = true): EmailDraft
     {
-        $emailDraft = $this->emailDraftRepository->findOneBy(['email' => $email]);
+        $emailDraft = $this->getRepository()->findOneBy(['email' => $email]);
         if (!is_null($emailDraft)) {
             throw new \Exception(sprintf('Draft already exists for email %d', $email->getId()));
         }
         $emailDraft = new EmailDraft($email, $html, $template, $publicPreview);
 
-        $this->entityManager->persist($emailDraft);
-        $this->entityManager->flush();
+        $this->em->persist($emailDraft);
+        $this->em->flush();
 
         return $emailDraft;
     }
@@ -37,13 +31,8 @@ class EmailDraftModel
         if (is_null($emailDraft = $email->getDraft())) {
             throw new NotFoundHttpException(sprintf('Draft not found for email %d', $email->getId()));
         }
-        $this->entityManager->remove($emailDraft);
-        $this->entityManager->flush();
-    }
-
-    public function getEntity(int $id): ?EmailDraft
-    {
-        return $this->emailDraftRepository->find($id);
+        $this->em->remove($emailDraft);
+        $this->em->flush();
     }
 
     public function getPermissionBase(): string
@@ -53,6 +42,6 @@ class EmailDraftModel
 
     public function getRepository(): EmailDraftRepository
     {
-        return $this->emailDraftRepository;
+        return $this->em->getRepository(EmailDraft::class);
     }
 }
