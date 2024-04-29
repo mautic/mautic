@@ -424,17 +424,17 @@ class PeakInteractionTimerTest extends TestCase
         $timeToReadObj = $dateSentObj->diff($dateReadObj);
 
         return [
-             'email_id'      => '36',
-             'id'            => '634',
-             'dateRead'      => $dateReadObj,
-             'dateSent'      => $dateSentObj,
-             'subject'       => 'Email subject',
-             'email_name'    => 'Email name',
-             'isRead'        => '1',
-             'isFailed'      => '0',
-             'storedSubject' => 'Email subject',
-             'timeToRead'    => $timeToReadObj,
-         ];
+            'email_id'      => '36',
+            'id'            => '634',
+            'dateRead'      => $dateReadObj,
+            'dateSent'      => $dateSentObj,
+            'subject'       => 'Email subject',
+            'email_name'    => 'Email name',
+            'isRead'        => '1',
+            'isFailed'      => '0',
+            'storedSubject' => 'Email subject',
+            'timeToRead'    => $timeToReadObj,
+        ];
     }
 
     /**
