@@ -219,9 +219,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects[] = 'Lead';
         }
 
-        $isRequired = fn (array $field, $object): bool => ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate'])) ||
-        ('Lead' == $object && in_array($field['name'], ['Company'])) ||
-        (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
+        $isRequired = fn (array $field, $object): bool => ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate']))
+        || ('Lead' == $object && in_array($field['name'], ['Company']))
+        || (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
 
         $salesFields = [];
         try {
@@ -2194,7 +2194,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->salesforceIdMapping[$contactId] = (!empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['ConvertedContactId']
                     : $sfEntityRecord['Id'];
 
-                $leadEntity = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadData['internal_entity_id']);
+                $leadEntity = $this->em->getReference(Lead::class, $leadData['internal_entity_id']);
                 if ($updateLead = $this->buildCompositeBody(
                     $mauticData,
                     $objectFields[$sfObject],
@@ -2896,7 +2896,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $companyData = $processedCompanies[$key] = $checkCompaniesInSF[$key];
             }
 
-            $companyEntity = $this->em->getReference(\Mautic\LeadBundle\Entity\Company::class, $companyData['internal_entity_id']);
+            $companyEntity = $this->em->getReference(Company::class, $companyData['internal_entity_id']);
 
             if ($updateCompany = $this->buildCompositeBody(
                 $mauticData,

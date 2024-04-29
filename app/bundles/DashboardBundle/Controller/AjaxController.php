@@ -83,7 +83,7 @@ class AjaxController extends CommonAjaxController
         //     return $this->accessDenied();
         // }
 
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        /** @var DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
         if ($entity) {

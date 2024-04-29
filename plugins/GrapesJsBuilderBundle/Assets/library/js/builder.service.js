@@ -2,19 +2,25 @@ import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
+import grapesjsblocksbasic from 'grapesjs-blocks-basic';
+import grapesjscomponentcountdown from 'grapesjs-component-countdown';
+import grapesjsnavbar from 'grapesjs-navbar';
+import grapesjscustomcode from 'grapesjs-custom-code';
+import grapesjstouch from 'grapesjs-touch';
+import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
+import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
-import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor5';
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
 // import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
-// import mjmlService from '../../../../../../grapesjs-preset-mautic/src/mjml/mjml.service';
 
 import CodeModeButton from './codeMode/codeMode.button';
+import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 
 export default class BuilderService {
   editor;
@@ -62,6 +68,10 @@ export default class BuilderService {
     const keymaps = this.editor.Keymaps;
     let allKeymaps;
 
+    if (mauticEditorFonts) {
+      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
+    }
+
     this.editor.on('modal:open', () => {
       // Save all keyboard shortcuts
       allKeymaps = { ...keymaps.getAll() };
@@ -94,12 +104,29 @@ export default class BuilderService {
    * correct mode
    */
   initGrapesJS(object) {
+    // grapesjs-custom-plugins: add globally defined mautic-grapesjs-plugins using name as pluginId for the plugin-function
+    if (window.MauticGrapesJsPlugins) {
+      window.MauticGrapesJsPlugins.forEach((item) => {
+        if (!item.name) {
+          console.warn('A name is required for Mautic-GrapesJs plugins in window.MauticGrapesJsPlugins. Registration skipped!');
+          return;
+        }
+
+        if (typeof item.plugin !== 'function') {
+          console.warn('The Mautic-GrapesJs plugin must be a function in window.MauticGrapesJsPlugins. Registration skipped!');
+          return;
+        }
+
+        grapesjs.plugins.add(item.name, item.plugin);
+      });
+    }
+
     // disable mautic global shortcuts
     Mousetrap.reset();
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (mjmlService.getOriginalContentMjml()) {
+      if (MjmlService.getOriginalContentMjml()) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -113,10 +140,6 @@ export default class BuilderService {
     const codeModeButton = new CodeModeButton(this.editor);
     codeModeButton.addCommand();
     codeModeButton.addButton();
-
-    if (mauticEditorFonts) {
-      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
-    }
 
     this.overrideCustomRteDisable();
     this.setListeners();
@@ -154,51 +177,128 @@ export default class BuilderService {
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
+      plugins: [
+        // partially copied from: https://github.com/GrapesJS/grapesjs/blob/gh-pages/demo.html
+        grapesjswebpage,
+        grapesjspostcss,
+        grapesjsmautic,
+        'gjs-plugin-ckeditor5',
+        grapesjsblocksbasic,
+        grapesjscomponentcountdown,
+        grapesjsnavbar,
+        grapesjscustomcode,
+        grapesjstouch,
+        grapesjspostcss,
+        grapesjstuiimageeditor,
+        grapesjsstylebg,
+        ...BuilderService.getPluginNames('page'), // grapesjs-custom-plugins: load custom plugins by their name
+      ],
       pluginsOpts: {
         [grapesjswebpage]: {
           formsOpts: false,
+          useCustomTheme: false,
         },
         grapesjsmautic: BuilderService.getMauticConf('page-html'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('page:getBuilderTokens'),
+        ...BuilderService.getPluginOptions('page'), // grapesjs-custom-plugins: add the plugin-options
       },
     });
 
+    this.moveBlocksPage();
     return this.editor;
   }
 
   initEmailMjml() {
-    const components = mjmlService.getOriginalContentMjml();
+    const components = MjmlService.getOriginalContentMjml();
     // validate
-    mjmlService.mjmlToHtml(components);
+    MjmlService.mjmlToHtml(components);
 
     const styles = [
       `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
     ];
 
     this.editor = grapesjs.init({
+      selectorManager: {
+        componentFirst: true,
+      },
+      avoidInlineStyle: false, // TEMP: fixes issue with disappearing inline styles
+      forceClass: false, // create new styles if there are some already on the element: https://github.com/GrapesJS/grapesjs/issues/1531
       clearOnRender: true,
       container: '.builder-panel',
-      components,
       height: '100%',
       canvas: {
         styles,
       },
+      domComponents: {
+        // disable all except link components
+        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
+      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', ...BuilderService.getPluginNames('email-mjml')],
       pluginsOpts: {
-        grapesjsmjml: {},
+        [grapesjsmjml]: {
+          hideSelector: false,
+          custom: false,
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
+        ...BuilderService.getPluginOptions('email-mjml'),
       },
     });
+
+    this.unsetComponentVoidTypes(this.editor);
+    this.editor.setComponents(components);
+
+    // Reinitialize the content after parsing MJML.
+    // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
+    // See: https://github.com/GrapesJS/mjml/issues/149
+    const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
+    this.editor.setComponents(parsedContent);
 
     this.editor.BlockManager.get('mj-button').set({
       content: '<mj-button href="https://">Button</mj-button>',
     });
 
     return this.editor;
+  }
+
+  unsetComponentVoidTypes(editor) {
+    // Support for self-closing components is temporarily disabled due to parsing issues with mjml tags.
+    // Browsers only recognize explicit self-closing tags like <img /> and <br />, leading to rendering problems.
+    // This can be reverted once the issue with self-closing tags is resolved in grapesjs-mjml.
+    // See: https://github.com/GrapesJS/mjml/issues/149
+    const voidTypes = ['mj-image', 'mj-divider', 'mj-font'];
+    voidTypes.forEach(function(component) {
+      editor.DomComponents.addType(component, {
+        model: {
+          defaults: {
+            void: false
+          },
+          toHTML() {
+            const tag = this.get('tagName');
+            const attr = this.getAttrToHTML();
+            const content = this.get('content');
+            let strAttr = '';
+
+            for (let prop in attr) {
+              const val = attr[prop];
+              const hasValue = typeof val !== 'undefined' && val !== '';
+              strAttr += hasValue ? ` ${prop}="${val}"` : '';
+            }
+
+            let html = `<${tag}${strAttr}>${content}</${tag}>`;
+
+            // Add the components after the closing tag
+            const componentsHtml = this.get('components')
+                .map(model => model.toHTML())
+                .join('');
+            return html + componentsHtml;
+          },
+        }
+      });
+    });
   }
 
   initEmailHtml() {
@@ -222,11 +322,14 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5'],
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', ...BuilderService.getPluginNames('email-html')],
       pluginsOpts: {
-        grapesjsnewsletter: {},
+        grapesjsnewsletter: {
+          useCustomTheme: false,
+        },
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
+        ...BuilderService.getPluginOptions('email-html'),
       },
     });
 
@@ -239,6 +342,62 @@ export default class BuilderService {
     });
 
     return this.editor;
+  }
+
+  /**
+   * Return the names of dynamically added plugins
+   * @param context
+   * @returns string[]
+   */
+  static getPluginNames(context) {
+    let plugins = [];
+
+    if (window.MauticGrapesJsPlugins) {
+      window.MauticGrapesJsPlugins.forEach((item) => {
+        if (item.name) {
+          if (!item.context || !Array.isArray(item.context) || item.context.length === 0) {
+            // if no context is given, the plugin is always added
+            plugins.push(item.name);
+          } else {
+            // check if the plugin should be added for the current editor context
+            item.context.forEach((pluginContext) => {
+              if (pluginContext === context) {
+                plugins.push(item.name);
+              }
+            })
+          }
+        }
+      });
+    }
+
+    return plugins;
+  }
+
+  /**
+   * Return the options of dynamically added plugins
+   * @param context
+   * @returns object[]
+   */
+  static getPluginOptions(context) {
+    let pluginOptions = {};
+
+    if (window.MauticGrapesJsPlugins) {
+      window.MauticGrapesJsPlugins.forEach((item) => {
+        if (!item.context || !Array.isArray(item.context) || item.context.length === 0) {
+          // if no context is given, the plugin is always added
+          pluginOptions[item.name] = item.pluginOptions ?? {};
+        } else {
+          // check if the plugin should be added for the current editor context
+          item.context.forEach((pluginContext) => {
+            if (pluginContext === context) {
+              pluginOptions[item.name] = item.pluginOptions ?? {};
+            }
+          })
+        }
+      });
+    }
+
+    return pluginOptions;
   }
 
   /**
@@ -284,6 +443,7 @@ export default class BuilderService {
     return this.editor;
   }
 
+  // https://github.com/artf/grapesjs-mjml/issues/193
   overrideCustomRteDisable() {
     const richTextEditor = this.editor.RichTextEditor;
 
@@ -305,6 +465,30 @@ export default class BuilderService {
       };
     }
   }
+
+  /**
+   * Move the blocks and categories in the sidebar
+   */
+  moveBlocksPage() {
+    const blocks = this.editor.BlockManager.getAll();
+    blocks.map(block => {
+      // columns go into a new category, at the top
+      if(block.attributes.id.indexOf('column') !== -1) {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Sections",
+          order: -1
+        });
+      }
+      // 'Blocks' category goes after 'Basic'
+      if(block.attributes.category === 'Basic') {
+        this.editor.BlockManager.get(block.attributes.id).set('category', {
+          label:"Basic",
+          order: -1
+        });
+      }
+    });
+  }
+
   /**
    * Generate assets list from GrapesJs
    */
