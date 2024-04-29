@@ -79,7 +79,7 @@ return [
                 ],
             ],
             'mautic.plugin.validator.can_publish_validator' => [
-                'class'     => \Mautic\PluginBundle\Form\Constraint\CanPublishValidator::class,
+                'class'     => Mautic\PluginBundle\Form\Constraint\CanPublishValidator::class,
                 'arguments' => [
                     'event_dispatcher',
                 ],

@@ -2,7 +2,6 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-use Closure;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
@@ -97,8 +96,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $persistIntegrationEntities = [];
 
-    protected array  $commandParameters = [];
-    private Closure $clientFactory;
+    protected array $commandParameters = [];
+    private \Closure $clientFactory;
+
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -121,7 +121,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $session : null;
         $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
 
-        $this->setClientFactory(fn (array $options) => new Client([
+        $this->setClientFactory(fn (array $options): \GuzzleHttp\Client => new Client([
             'handler' => HandlerStack::create(new CurlHandler([
                 'options' => $options,
             ])),
@@ -2451,7 +2451,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function setClientFactory(callable $clientFactory): void
     {
-        $this->clientFactory = Closure::fromCallable($clientFactory);
+        $this->clientFactory = \Closure::fromCallable($clientFactory);
     }
 
     /**
