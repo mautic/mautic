@@ -312,6 +312,7 @@ return [
                     'iconClass' => 'ri-input-field',
                     'route'     => 'mautic_contactfield_index',
                     'access'    => 'lead:fields:full',
+                    'priority'  => 19,
                 ],
             ],
         ],
@@ -577,8 +578,6 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'router',
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.repository.company_lead',
                 ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
