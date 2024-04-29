@@ -312,6 +312,7 @@ return [
                     'iconClass' => 'ri-input-field',
                     'route'     => 'mautic_contactfield_index',
                     'access'    => 'lead:fields:full',
+                    'priority'  => 19,
                 ],
             ],
         ],

@@ -3,15 +3,20 @@
 return [
     'menu' => [
         'admin' => [
+            'mautic.user_management' => [
+                'id'        => 'mautic_user_management_root',
+                'iconClass' => 'ri-user-settings-fill',
+                'priority'  => 17,
+            ],
             'mautic.user.users' => [
                 'access'    => 'user:users:view',
                 'route'     => 'mautic_user_index',
-                'iconClass' => 'ri-user-settings-fill',
+                'parent'    => 'mautic.user_management',
             ],
             'mautic.user.roles' => [
                 'access'    => 'user:roles:view',
                 'route'     => 'mautic_role_index',
-                'iconClass' => 'ri-shield-user-fill',
+                'parent'    => 'mautic.user_management',
             ],
         ],
     ],
