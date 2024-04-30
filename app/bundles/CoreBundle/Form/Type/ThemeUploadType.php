@@ -32,7 +32,7 @@ class ThemeUploadType extends AbstractType
             [
                 'attr'  => [
                     'class'   => 'btn btn-primary',
-                    'icon'    => 'fa fa-upload',
+                    'icon'    => 'ri-upload-line',
                     'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'theme_upload\']').submit();",
                 ],
                 'label' => 'mautic.core.theme.install',

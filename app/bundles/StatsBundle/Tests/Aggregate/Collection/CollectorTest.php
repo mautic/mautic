@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CollectorTest extends TestCase
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcher $eventDispatcher;
+    private EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {

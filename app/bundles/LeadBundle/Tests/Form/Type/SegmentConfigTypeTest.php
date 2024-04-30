@@ -17,7 +17,7 @@ final class SegmentConfigTypeTest extends TestCase
     /**
      * @var FormBuilderInterface<FormBuilderInterface>&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilderInterface;
+    private MockObject $formBuilderInterface;
 
     protected function setUp(): void
     {
@@ -39,12 +39,12 @@ final class SegmentConfigTypeTest extends TestCase
         $rebuildParameters = [
             'label'      => 'mautic.lead.list.form.config.segment_rebuild_time_warning',
             'label_attr' => [
-                    'class' => 'control-label',
-                ],
+                'class' => 'control-label',
+            ],
             'attr' => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.lead.list.form.config.segment_rebuild_time_warning.tooltip',
-                ],
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.lead.list.form.config.segment_rebuild_time_warning.tooltip',
+            ],
             'required' => false,
         ];
 

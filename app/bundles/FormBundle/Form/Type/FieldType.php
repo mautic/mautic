@@ -537,9 +537,18 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'number':
+                    $builder->add(
+                        'properties',
+                        FormFieldNumberType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
                 case 'date':
                 case 'email':
-                case 'number':
                 case 'text':
                 case 'url':
                 case 'tel':

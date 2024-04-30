@@ -150,15 +150,15 @@ class Interval implements ScheduleModeInterface
 
     private function isRestrictedToDailyScheduling(Event $event): bool
     {
-        return !in_array($event->getTriggerIntervalUnit(), ['i', 'h', 'd', 'm', 'y']) &&
-            empty($event->getTriggerRestrictedDaysOfWeek());
+        return !in_array($event->getTriggerIntervalUnit(), ['i', 'h', 'd', 'm', 'y'])
+            && empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     private function hasTimeRelatedRestrictions(Event $event): bool
     {
-        return null === $event->getTriggerHour() &&
-            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
-            empty($event->getTriggerRestrictedDaysOfWeek());
+        return null === $event->getTriggerHour()
+            && (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour())
+            && empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     /**
