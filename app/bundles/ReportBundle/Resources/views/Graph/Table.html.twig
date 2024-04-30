@@ -21,7 +21,7 @@
                     </thead>
                     <tbody>
                         {% for rowKey, row in graph.data %}
-                            {% if row['id'] is not null %}
+                            {% if row['id']|default(null) is not null %}
                                 <tr>
                                     {% for cellName, cell in row %}
                                         {% if graph.data[0].id is defined and 'title' == cellName and graph.link is defined %}
