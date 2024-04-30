@@ -103,7 +103,10 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $builder->add('buttons', FormButtonsType::class, [
+        $builder->add('buttons', FormButtonsType::class,
+        [
+            'apply_text' => false,
+            'save_text'  => 'mautic.core.form.save',
             'pre_extra_buttons' => [
                 [
                     'name'  => 'builder',
