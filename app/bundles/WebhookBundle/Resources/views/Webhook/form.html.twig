@@ -1,6 +1,6 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
 
-{% block headerTitle %}{{ entity.getId() ?
+{% block headerTitle %}{{ entity.getId() ? 
     'mautic.webhook.webhook.header.edit'|trans({'%name%': entity.getName()|trans}) :
     'mautic.webhook.webhook.header.new'|trans }}{% endblock %}
 {% block mauticContent %}mauticWebhook{% endblock %}
@@ -41,7 +41,7 @@
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.category) }}
             {{ form_row(form.eventsOrderbyDir) }}
-            {{ form_row(form.isPublished, {'label': 'mautic.webhook.active'}) }}
+            {{ form_row(form.isPublished) }}
         </div>
     </div>
 </div>
