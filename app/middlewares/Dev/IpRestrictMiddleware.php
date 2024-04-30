@@ -46,13 +46,15 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
      *
      * {@inheritdoc}
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    /**
+     * This check prevents access to debug front controllers
+     * that are deployed by accident to production servers.
+     *
+     * {@inheritdoc}
+     */
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true)
     {
-        if (in_array($request->getClientIp(), $this->allowedIps) || false !== getenv('DDEV_TLD')) {
-            return $this->app->handle($request, $type, $catch);
-        }
-
-        return new Response('You are not allowed to access this file.', 403);
+        return $this->app->handle($request, $type, $catch);
     }
 
     public function getPriority()
