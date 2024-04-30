@@ -18,7 +18,10 @@ class TagEntityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('buttons', FormButtonsType::class);
+        $builder->add('buttons', FormButtonsType::class,
+            [
+                'save_text' => false,
+            ]);
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
 
         // We only allow to set tag field value if we are creating new tag.
