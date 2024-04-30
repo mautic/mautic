@@ -105,6 +105,7 @@
   --tag-color-gold: #cc7a00;
   --tag-hover-gold: #FFDBA6;
   --tag-border-gold: #FABE64;
+  --text-on-color: white;
 }
 @media (prefers-reduced-motion: reduce) {
   :root {
@@ -2025,6 +2026,8 @@ ul.dropdown-menu-form {
 }
 .label {
   display: inline-flex;
+  font-size: 75%;
+  font-weight: 700;
   gap: 6px;
   line-height: 1.5;
   padding: 0.25em 0.8em 0.15em 0.8em;
@@ -2036,6 +2039,18 @@ ul.dropdown-menu-form {
 }
 .label.pa-10 {
   min-width: auto;
+}
+a.label:hover,
+a.label:focus {
+  text-decoration: none;
+  cursor: pointer;
+}
+.label:empty {
+  display: none;
+}
+.btn .label {
+  position: relative;
+  top: -1px;
 }
 .label.gray-tag {
   background-color: var(--tag-background-gray);
@@ -2195,6 +2210,56 @@ ul.dropdown-menu-form {
 }
 .label.has-click-event.gold-tag {
   border: 1px solid var(--tag-border-gold);
+}
+.label-default {
+  background-color: #a0acb8;
+}
+.label-default[href]:hover,
+.label-default[href]:focus {
+  background-color: #8392a2;
+}
+.label-primary {
+  background-color: #4E5D9D;
+}
+.label-primary[href]:hover,
+.label-primary[href]:focus {
+  background-color: #3d497b;
+}
+.label-success {
+  background-color: #00B49C;
+}
+.label-success[href]:hover,
+.label-success[href]:focus {
+  background-color: #008170;
+}
+.label-info {
+  background-color: #35B4B9;
+}
+.label-info[href]:hover,
+.label-info[href]:focus {
+  background-color: #2a8d91;
+}
+.label-warning {
+  background-color: #FDB933;
+}
+.label-warning[href]:hover,
+.label-warning[href]:focus {
+  background-color: #fba702;
+}
+.label-danger {
+  background-color: #F86B4F;
+}
+.label-danger[href]:hover,
+.label-danger[href]:focus {
+  background-color: #f6421e;
+}
+.label-default,
+.label-primary,
+.label-success,
+.label-info,
+.label-warning,
+.label-danger {
+  color: var(--text-on-color);
 }
 .badge {
   padding-top: 0px;

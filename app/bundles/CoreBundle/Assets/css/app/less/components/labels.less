@@ -4,11 +4,11 @@
 
 .label {
   display: inline-flex;
+  font-size: 75%;
+  font-weight: 700;
   gap: 6px;
-  //vertical-align: top;
   line-height: 1.5;
   padding: 0.25em 0.8em 0.15em 0.8em;
-  //padding-top: 0.3em;
   border-radius: @border-radius-infinite;
   min-width: 30px;
   justify-content: center;
@@ -20,7 +20,28 @@
     min-width: auto;
   }
 
+  // Add hover effects, but only for links
+  a& {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    cursor: pointer;
+    }
+  }
+
+  // Empty labels collapse automatically (not available in IE8)
+  &:empty {
+    display: none;
+  }
+
+  // Quick fix for labels in buttons
+  .btn & {
+    position: relative;
+    top: -1px;
+  }
+
   // Colors
+  /// Neutral variations
 
   &.gray-tag {
     background-color: var(--tag-background-gray);
@@ -211,3 +232,39 @@
     }
   }
 }
+
+  // Contextual Bootstrap variations (linked labels get darker on :hover)
+  .label-default {
+    .label-variant(@label-default-bg);
+  }
+
+  .label-primary {
+    .label-variant(@label-primary-bg);
+  }
+
+  .label-success {
+    .label-variant(@label-success-bg);
+  }
+
+  .label-info {
+    .label-variant(@label-info-bg);
+  }
+
+  .label-warning {
+    .label-variant(@label-warning-bg);
+  }
+
+  .label-danger {
+    .label-variant(@label-danger-bg);
+  }
+
+  .label-default,
+  .label-primary,
+  .label-success,
+  .label-info,
+  .label-warning,
+  .label-danger {
+    color: var(--text-on-color);
+  }
+
+

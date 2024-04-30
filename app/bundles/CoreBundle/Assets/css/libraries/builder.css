@@ -49,6 +49,7 @@
   --tag-color-gold: #cc7a00;
   --tag-hover-gold: #FFDBA6;
   --tag-border-gold: #FABE64;
+  --text-on-color: white;
 }
 @media (prefers-reduced-motion: reduce) {
   :root {
