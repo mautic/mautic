@@ -315,6 +315,19 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
         fontSize: {
             options: [8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48, 72],
             supportAllValues : true
+        },
+        link: {
+            decorators: {
+                // based on: https://ckeditor.com/docs/ckeditor5/latest/features/link.html#adding-target-and-rel-attributes-to-external-links
+                openInNewTab: {
+                    mode: 'manual',
+                    label: 'Open in a new tab',
+                    attributes: {
+                        target: '_blank',
+                        rel: 'noopener noreferrer'
+                    }
+                }
+            }
         }
     };
 

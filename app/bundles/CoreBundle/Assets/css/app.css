@@ -3432,6 +3432,9 @@ ul.line-legend li {
 .table-responsive-force > .table-bordered > tfoot > tr:last-child > td {
   border-bottom: 0;
 }
+.table-hover > tbody > tr:hover {
+  transition: var(--all);
+}
 .progress {
   background-color: #ebedf0;
   -webkit-box-shadow: none;
@@ -5619,10 +5622,14 @@ body.noscroll {
 .table .input-group-sm > .input-group-addon {
   font-size: 10px;
   line-height: 1em;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
 }
 .table .input-group-sm .dropdown-toggle {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  border: 0;
+  background-color: transparent;
+  padding: 5px 8px;
 }
 .input-group .input-group-btn button {
   height: 32px;
