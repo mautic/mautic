@@ -2504,6 +2504,9 @@ ul.line-legend li {
 .img-rounded {
   border-radius: 3px;
 }
+.contact-avatar {
+  width: 100%;
+}
 .table > thead > tr > th,
 .table > tbody > tr > th,
 .table > tfoot > tr > th,
