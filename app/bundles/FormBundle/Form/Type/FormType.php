@@ -196,7 +196,11 @@ class FormType extends AbstractType
             'mapped' => false,
         ]);
 
-        $builder->add('buttons', FormButtonsType::class);
+        $builder->add('buttons', FormButtonsType::class,
+        [
+            'apply_text' => false,
+            'save_text'  => 'mautic.core.form.save',
+        ]);
         $builder->add('formType', HiddenType::class, ['empty_data' => 'standalone']);
 
         if (!empty($options['action'])) {
