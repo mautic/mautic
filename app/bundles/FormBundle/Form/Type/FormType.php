@@ -94,8 +94,9 @@ class FormType extends AbstractType
         }
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'data' => $data,
-            'attr' => [
+            'label' => 'mautic.core.status.available',
+            'data'  => $data,
+            'attr'  => [
                 'readonly' => $readonly,
             ],
         ]);
