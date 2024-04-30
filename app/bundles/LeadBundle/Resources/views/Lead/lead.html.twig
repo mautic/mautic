@@ -507,7 +507,7 @@
             {% for tag in lead.tags %}
                 <div id="tagLabel{{ tag.id }}">
                     <h5 class="pull-left mt-xs mr-xs">
-                        <span class="label blue-tag label-tag">
+                        <span class="label blue-tag label-tag has-click-event">
                             <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax">
                                 {{ tag.tag|purify }}
                             </a>
