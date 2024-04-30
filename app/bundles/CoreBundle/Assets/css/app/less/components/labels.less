@@ -131,6 +131,28 @@
       background-color: var(--tag-hover-green);
     }
   }
+
+  &.mautic-blue-tag {
+    background-color: var(--tag-background-mautic-blue);
+    color: var(--tag-color-mautic-blue);
+    > a {
+      color: var(--tag-color-mautic-blue);
+    }
+    &:hover {
+      background-color: var(--tag-hover-mautic-blue);
+    }
+}
+
+  &.gold-tag {
+    background-color: var(--tag-background-gold);
+    color: var(--tag-color-gold);
+    > a {
+      color: var(--tag-color-gold);
+    }
+    &:hover {
+      background-color: var(--tag-hover-gold);
+    }
+  }
     
 
   // Operational state
@@ -179,6 +201,13 @@
     &.green-tag {
       border: 1px solid var(--tag-border-green);
     }
+
+    &.mautic-blue-tag {
+      border: 1px solid var(--tag-border-mautic-blue);
+    }
     
+    &.gold-tag {
+        border: 1px solid var(--tag-border-gold);
+    }
   }
 }
