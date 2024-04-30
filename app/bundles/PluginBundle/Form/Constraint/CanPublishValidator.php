@@ -25,7 +25,7 @@ class CanPublishValidator extends ConstraintValidator
             throw new \Symfony\Component\Validator\Exception\UnexpectedTypeException($constraint, CanPublish::class);
         }
         $event = new PluginIsPublishedEvent($value, $constraint->integrationName);
-        $event = $this->eventDispatcher->dispatch(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING, $event);
+        $event = $this->eventDispatcher->dispatch($event, PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING);
 
         if (!$event->isCanPublish()) {
             $this->context->buildViolation($event->getMessage())

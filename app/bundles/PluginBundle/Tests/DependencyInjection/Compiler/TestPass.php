@@ -18,7 +18,9 @@ class TestPass implements CompilerPassInterface
             ->setArguments([new Reference('mautic.http.client')]);
 
         foreach ($container->getDefinitions() as $definition) {
-            if (is_subclass_of($definition->getClass(), AbstractIntegration::class)) {
+            $class = (string) $definition->getClass();
+
+            if (str_starts_with($class, 'Mautic') && is_subclass_of($class, AbstractIntegration::class)) {
                 $definition->addMethodCall('setClientFactory', [new Reference(ClientFactory::class)]);
             }
         }

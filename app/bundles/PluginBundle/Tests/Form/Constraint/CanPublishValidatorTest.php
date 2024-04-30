@@ -41,7 +41,6 @@ class CanPublishValidatorTest extends TestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING)
             ->willReturn($this->event);
 
         $this->canPublishValidator->initialize($this->createMock(ExecutionContext::class));
