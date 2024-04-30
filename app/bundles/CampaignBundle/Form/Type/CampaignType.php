@@ -103,19 +103,21 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $builder->add('buttons', FormButtonsType::class, [
-            'pre_extra_buttons' => [
-                [
-                    'name'  => 'builder',
-                    'label' => 'mautic.campaign.campaign.launch.builder',
-                    'attr'  => [
-                        'class'   => 'btn btn-ghost btn-dnd',
-                        'icon'    => 'ri-organization-chart',
-                        'onclick' => 'Mautic.launchCampaignEditor();',
+        $builder->add('buttons', FormButtonsType::class,
+            [
+                'save_text'         => false,
+                'pre_extra_buttons' => [
+                    [
+                        'name'  => 'builder',
+                        'label' => 'mautic.campaign.campaign.launch.builder',
+                        'attr'  => [
+                            'class'   => 'btn btn-ghost btn-dnd',
+                            'icon'    => 'ri-organization-chart',
+                            'onclick' => 'Mautic.launchCampaignEditor();',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
 
         $builder->add('version', HiddenType::class, [
             'mapped' => false,
