@@ -166,7 +166,11 @@ class LeadType extends AbstractType
         );
 
         if (!$options['isShortForm']) {
-            $builder->add('buttons', FormButtonsType::class);
+            $builder->add('buttons', FormButtonsType::class,
+            [
+                'apply_text' => false,
+                'save_text'  => 'mautic.core.form.save',
+            ]);
         } else {
             $builder->add(
                 'buttons',
