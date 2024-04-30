@@ -409,8 +409,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             $keyedArrayCollection->set($event->getId(), $event);
         }
 
-        unset($events);
-
         return $keyedArrayCollection;
     }
 
