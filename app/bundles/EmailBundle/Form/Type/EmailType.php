@@ -512,6 +512,7 @@ class EmailType extends AbstractType
         $builder->add(
             'buttons',
             FormButtonsType::class,
+            ['save_text' => false],
             $extraButtons
         );
 
