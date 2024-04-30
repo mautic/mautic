@@ -15,12 +15,12 @@ class PluginIsPublishedEventTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('testIntegration', $pluginIsPublishedEvent->getIntegrationName());
         $this->assertSame(1, $pluginIsPublishedEvent->getValue());
         $this->assertSame('', $pluginIsPublishedEvent->getMessage());
-        $this->assertSame(true, $pluginIsPublishedEvent->isCanPublish());
+        $this->assertTrue($pluginIsPublishedEvent->isCanPublish());
 
         $pluginIsPublishedEvent->setMessage('This is test message.');
         $this->assertSame('This is test message.', $pluginIsPublishedEvent->getMessage());
 
         $pluginIsPublishedEvent->setCanPublish(false);
-        $this->assertSame(false, $pluginIsPublishedEvent->isCanPublish());
+        $this->assertFalse($pluginIsPublishedEvent->isCanPublish());
     }
 }

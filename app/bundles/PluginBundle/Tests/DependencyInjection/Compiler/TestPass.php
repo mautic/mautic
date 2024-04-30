@@ -20,6 +20,7 @@ class TestPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $definition) {
             $class = (string) $definition->getClass();
 
+            /** @phpstan-ignore-next-line  */
             if (str_starts_with($class, 'Mautic') && is_subclass_of($class, AbstractIntegration::class)) {
                 $definition->addMethodCall('setClientFactory', [new Reference(ClientFactory::class)]);
             }
