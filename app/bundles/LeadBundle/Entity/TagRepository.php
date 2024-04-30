@@ -114,4 +114,75 @@ class TagRepository extends CommonRepository
 
         return $existingTag ?? $tag;
     }
+
+    public function addTagsToLeads(array $leadIds, array $tagIds): array
+    {
+        return $this->updateTagsInLeads($leadIds, $tagIds);
+    }
+
+    public function updateTagsInLeads(array $leadIds, array $tagIds, string $addOrRemove = 'add'): array
+    {
+        $result = [];
+
+        if (empty($leadIds) || empty($tagIds)) {
+            return $result;
+        }
+
+        $tags = $this->getTagById($tagIds);
+
+        if (empty($tags)) {
+            return $result;
+        }
+
+        foreach ($leadIds as $leadId) {
+            $lead = $this->_em->find(Lead::class, $leadId);
+            foreach ($tags as $tag) {
+                if ('add' === $addOrRemove) {
+                    $lead->addTag($tag);
+                } else {
+                    $lead->removeTag($tag);
+                }
+                $result[$leadId][$tag->getId()] = true;
+            }
+            $this->_em->persist($lead);
+            $this->_em->flush();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Remove tags from leads.
+     */
+    public function removeTagsFromLeads(array $leadIds, array $tagIds): array
+    {
+        return $this->updateTagsInLeads($leadIds, $tagIds, 'remove');
+    }
+
+    /**
+     * Get tags by Id.
+     */
+    public function getTagById(array|int $tagIds): array
+    {
+        if (empty($tagIds)) {
+            return [];
+        }
+
+        if (!is_array($tagIds)) {
+            $tagIds = [$tagIds];
+        }
+
+        $qb         = $this->_em->getConnection()->createQueryBuilder();
+        $tagsIdName = $qb->select('lt.id,lt.tag')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 'lt')
+            ->where('lt.id IN (:tag)')
+            ->setParameter('tag', $tagIds, ArrayParameterType::INTEGER)
+            ->executeQuery()->fetchAllKeyValue();
+
+        if (empty($tagsIdName)) {
+            return [];
+        }
+
+        return $this->getTagsByName($tagsIdName);
+    }
 }
