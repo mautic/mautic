@@ -94,6 +94,8 @@ class CompanyType extends AbstractType
             'buttons',
             FormButtonsType::class,
             [
+                'apply_text' => false,
+                'save_text'  => 'mautic.core.form.save',
                 'post_extra_buttons' => [
                     [
                         'name'  => 'merge',
