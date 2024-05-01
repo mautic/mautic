@@ -51,10 +51,10 @@ class GroupType extends AbstractType
         ]);
 
         $builder->add('buttons', FormButtonsType::class,
-        [
-            'apply_text' => false,
-            'save_text'  => 'mautic.core.form.save',
-        ]);
+            [
+                'apply_text' => false,
+                'save_text'  => 'mautic.core.form.save',
+            ]);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
