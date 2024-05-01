@@ -318,19 +318,21 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class, [
-            'pre_extra_buttons' => [
-                [
-                    'name'  => 'builder',
-                    'label' => 'mautic.core.builder',
-                    'attr'  => [
-                        'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-interactive',
-                        'icon'    => 'ri-layout-line',
-                        'onclick' => "Mautic.launchBuilder('page');",
+        $builder->add('buttons', FormButtonsType::class,
+            [
+                'save_text'         => false,
+                'pre_extra_buttons' => [
+                    [
+                        'name'  => 'builder',
+                        'label' => 'mautic.core.builder',
+                        'attr'  => [
+                            'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-interactive',
+                            'icon'    => 'ri-layout-line',
+                            'onclick' => "Mautic.launchBuilder('page');",
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
