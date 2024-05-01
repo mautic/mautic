@@ -182,7 +182,7 @@ class AssetType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class, []);
+        $builder->add('buttons', FormButtonsType::class, ['save_text' => false]);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
