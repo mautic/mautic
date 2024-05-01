@@ -164,7 +164,10 @@ class NotificationType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                FormButtonsType::class
+                FormButtonsType::class,
+                [
+                    'save_text' => false,
+                ]
             );
         }
 
