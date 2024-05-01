@@ -226,6 +226,7 @@ class FocusType extends AbstractType
                 'buttons',
                 FormButtonsType::class,
                 [
+                    'save_text'         => false,
                     'pre_extra_buttons' => $customButtons,
                 ]
             );
