@@ -59,10 +59,14 @@
     top: 21px;
     right: 19px;
 }
+.dashboard-widgets .card-header .dropdown:hover .ri-more-2-fill {
+    color: var(--icon-primary);
+}
 .dashboard-widgets .card-header .dropdown-toggle .ri-more-2-fill {
     display: inline-block;
     font-size: 15px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--icon-secondary);
+    transition: var(--all);
     width: 30px;
     text-align: center;
     line-height: 30px;

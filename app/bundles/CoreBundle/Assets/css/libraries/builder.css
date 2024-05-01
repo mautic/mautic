@@ -2,6 +2,8 @@
   --timing: 0.3s ease;
   --all: all var(--timing);
   --layer: #f4f4f4;
+  --icon-primary: #161616;
+  --icon-secondary: #525252;
 }
 @media (prefers-reduced-motion: reduce) {
   :root {
