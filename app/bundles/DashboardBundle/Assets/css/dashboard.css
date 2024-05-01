@@ -29,8 +29,7 @@
 }
 .dashboard-widgets .card {
     margin: 5px;
-    background: #FEFEFE;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--layer);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
