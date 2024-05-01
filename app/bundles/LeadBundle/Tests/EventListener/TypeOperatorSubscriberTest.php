@@ -121,8 +121,9 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains(OperatorOptions::IN, $operators['text']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['boolean']['include']);
         $this->assertNotContains(OperatorOptions::IN, $operators['boolean']['include']);
-        $this->assertContains(OperatorOptions::IN, $operators['date']['exclude']);
-        $this->assertNotContains(OperatorOptions::EQUAL_TO, $operators['date']['exclude']);
+        $this->assertNotContains(OperatorOptions::IN, $operators['date']['include']);
+        $this->assertContains(OperatorOptions::EQUAL_TO, $operators['date']['include']);
+        $this->assertContains(OperatorOptions::DATE, $operators['date']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['number']['include']);
         $this->assertNotContains(OperatorOptions::IN, $operators['number']['include']);
         $this->assertContains(OperatorOptions::EMPTY, $operators['country']['include']);

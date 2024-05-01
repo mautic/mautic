@@ -13,6 +13,8 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
 
@@ -50,6 +52,100 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement(['categories']);
+    }
+
+    public function testCreateWithDynamicContent(): void
+    {
+        $segment = new LeadList();
+        $segment->setName('API segment');
+        $segment->setPublicName('API segment');
+        $segment->setAlias('API segment');
+
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        $payload = [
+            'name'           => 'test',
+            'subject'        => 'API test email',
+            'customHtml'     => '<h1>Hi there!</h1>',
+            'emailType'      => 'list',
+            'lists'          => [$segment->getId()],
+            'dynamicContent' => [
+                [
+                    'tokenName' => 'test content name',
+                    'content'   => 'Some default <strong>content</strong>',
+                    'filters'   => [
+                        [
+                            'content' => 'Variation 1',
+                            'filters' => [],
+                        ],
+                        [
+                            'content' => 'Variation 2',
+                            'filters' => [
+                                [
+                                    'glue'     => 'and',
+                                    'field'    => 'city',
+                                    'object'   => 'lead',
+                                    'type'     => 'text',
+                                    'filter'   => 'Prague',
+                                    'display'  => null,
+                                    'operator' => '=',
+                                ],
+                                [
+                                    'glue'     => 'and',
+                                    'field'    => 'email',
+                                    'object'   => 'lead',
+                                    'type'     => 'email',
+                                    'filter'   => null, // Doesn't matter what value is here, it will be null-ed in the response for the emtpy param since PR 13526.
+                                    'display'  => null,
+                                    'operator' => '!empty',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'tokenName' => 'test content name2',
+                    'content'   => 'Some default <strong>content2</strong>',
+                    'filters'   => [
+                        [
+                            'content' => 'Variation 3',
+                            'filters' => [],
+                        ],
+                        [
+                            'content' => 'Variation 4',
+                            'filters' => [
+                                [
+                                    'glue'     => 'and',
+                                    'field'    => 'city',
+                                    'object'   => 'lead',
+                                    'type'     => 'text',
+                                    'filter'   => 'Raleigh',
+                                    'display'  => null,
+                                    'operator' => '=',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertArrayHasKey('email', $response);
+
+        $response = $response['email'];
+
+        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        Assert::assertSame($payload['name'], $response['name']);
+        Assert::assertSame($payload['subject'], $response['subject']);
+        Assert::assertSame($payload['customHtml'], $response['customHtml']);
+        Assert::assertSame($payload['lists'][0], $response['lists'][0]['id']);
+        Assert::assertSame('API segment', $response['lists'][0]['name']);
+        Assert::assertSame($payload['dynamicContent'], $response['dynamicContent']);
     }
 
     public function testSingleEmailWorkflow(): void

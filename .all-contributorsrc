@@ -1282,6 +1282,16 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "juangadiel",
+      "name": "Juan Gadiel Rosado Colon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/706997?v=4",
+      "profile": "https://www.linkedin.com/in/juangadiel",
+      "contributions": [
+        "bug",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
