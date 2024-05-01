@@ -30,6 +30,7 @@
 .dashboard-widgets .card {
     margin: 5px;
     background: var(--layer);
+    padding: 15px 10px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -55,8 +56,8 @@
 }
 .dashboard-widgets .card-header .dropdown {
     position: absolute;
-    top: 6px;
-    right: 3px;
+    top: 21px;
+    right: 19px;
 }
 .dashboard-widgets .card-header .dropdown-toggle .ri-more-2-fill {
     display: inline-block;

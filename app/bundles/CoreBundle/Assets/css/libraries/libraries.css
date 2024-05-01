@@ -9726,6 +9726,7 @@ button.close {
 :root {
   --timing: 0.3s ease;
   --all: all var(--timing);
+  --layer: #f4f4f4;
 }
 @media (prefers-reduced-motion: reduce) {
   :root {
