@@ -2529,11 +2529,11 @@ label.list-group-item:focus {
   padding: 10px 0px;
 }
 .ds-list-group > li:not(:first-child) {
-  border-top: 1px solid var(--border-subtle-00);
+  border-top: 1px solid var(--border-subtle);
 }
 .ds-list-group > li:before {
   position: absolute;
-  background: var(--layer-01);
+  background: var(--layer);
   border-radius: 50%;
   left: -35px;
   width: 16px;
