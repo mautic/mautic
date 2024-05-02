@@ -39,10 +39,8 @@ class TagRepository extends CommonRepository
 
     /**
      * Get tag entities by name.
-     *
-     * @return array
      */
-    public function getTagsByName(array $tags)
+    public function getTagsByName(array $tags): array
     {
         if (empty($tags)) {
             return [];
@@ -120,6 +118,8 @@ class TagRepository extends CommonRepository
      *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
+     *
+     * @return array<mixed>
      */
     public function addTagsToLeads(array $leadIds, array $tagIds): array
     {
@@ -131,6 +131,8 @@ class TagRepository extends CommonRepository
      *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
+     *
+     * @return array<mixed>
      */
     public function updateTagsInLeads(array $leadIds, array $tagIds, string $addOrRemove = 'add'): array
     {
@@ -168,6 +170,8 @@ class TagRepository extends CommonRepository
      *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
+     *
+     * @return array<mixed>
      */
     public function removeTagsFromLeads(array $leadIds, array $tagIds): array
     {
@@ -178,6 +182,8 @@ class TagRepository extends CommonRepository
      * Get tags by Id.
      *
      * @param array<int>|int $tagIds
+     *
+     * @return array<mixed>
      */
     public function getTagById(array|int $tagIds): array
     {
