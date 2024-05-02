@@ -3,14 +3,22 @@
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 
 class BatchControllerTest extends MauticMysqlTestCase
 {
-    private $tagRepository;
+    private TagRepository $tagRepository;
 
+    /**
+     * @var array<int, Tag>
+     */
     private array $tags;
 
+    /**
+     * @var array<int, Lead>
+     */
     private array $leads;
 
     public function setUp(): void
@@ -57,7 +65,7 @@ class BatchControllerTest extends MauticMysqlTestCase
         $this->assertNotContains($this->tags[2], $lead1->getTags()->toArray());
     }
 
-    public function testAddAndRemoveBatchSetAction()
+    public function testAddAndRemoveBatchSetAction(): void
     {
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $this->leads[0]->addTag($this->tags[1]);
@@ -79,6 +87,11 @@ class BatchControllerTest extends MauticMysqlTestCase
         $this->assertContains($this->tags[2], $lead1->getTags()->toArray());
     }
 
+    /**
+     * @param array<string> $tags
+     *
+     * @return array<int, \Mautic\LeadBundle\Entity\Tag>
+     */
     public function addTags(array $tags): array
     {
         foreach ($tags as $tag) {
@@ -90,6 +103,9 @@ class BatchControllerTest extends MauticMysqlTestCase
         return $this->tags;
     }
 
+    /**
+     * @return array<int, \Mautic\LeadBundle\Entity\Lead>
+     */
     public function addLeads(): array
     {
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');

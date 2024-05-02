@@ -115,11 +115,23 @@ class TagRepository extends CommonRepository
         return $existingTag ?? $tag;
     }
 
+    /**
+     * Add tags to leads.
+     *
+     * @param array<int> $leadIds
+     * @param array<int> $tagIds
+     */
     public function addTagsToLeads(array $leadIds, array $tagIds): array
     {
         return $this->updateTagsInLeads($leadIds, $tagIds);
     }
 
+    /**
+     * Update tags in leads.
+     *
+     * @param array<int> $leadIds
+     * @param array<int> $tagIds
+     */
     public function updateTagsInLeads(array $leadIds, array $tagIds, string $addOrRemove = 'add'): array
     {
         $result = [];
@@ -153,6 +165,9 @@ class TagRepository extends CommonRepository
 
     /**
      * Remove tags from leads.
+     *
+     * @param array<int> $leadIds
+     * @param array<int> $tagIds
      */
     public function removeTagsFromLeads(array $leadIds, array $tagIds): array
     {
@@ -161,6 +176,8 @@ class TagRepository extends CommonRepository
 
     /**
      * Get tags by Id.
+     *
+     * @param array<int>|int $tagIds
      */
     public function getTagById(array|int $tagIds): array
     {

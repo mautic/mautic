@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class BatchTagController extends AbstractFormController
 {
@@ -40,7 +41,7 @@ class BatchTagController extends AbstractFormController
         parent::__construct($managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction()
+    public function indexAction(): Response
     {
         $model = $this->getModel('tagmanager.tag');
         \assert($model instanceof TagModel);
