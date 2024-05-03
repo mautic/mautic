@@ -3526,6 +3526,9 @@ ul.line-legend li {
   width: 1%;
   vertical-align: middle;
 }
+.panel-body {
+  flex-grow: 1;
+}
 .panel-group .panel {
   -webkit-box-shadow: none;
   box-shadow: none;
