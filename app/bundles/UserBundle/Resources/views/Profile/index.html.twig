@@ -50,27 +50,27 @@
                 <div class="pa-md bg-auto bg-light-xs bdr-b">
                     <h4 class="fw-sb">{% trans %}mautic.user.account.header.details{% endtrans %}</h4>
                 </div>
-                <div>
-                    <div class="pa-md">
-                        <div class="col-md-6">
-                            <h3 id="personal-info" class="pt-20">{% trans %}mautic.user.config.title.get_to_know_you{% endtrans %}</h3>
-                            <div class="text-muted small description pb-20">{% trans %}mautic.user.config.personalize.interface.helper{% endtrans %}</div>
-                            {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
-                            {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
-                            {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
-                            {{ form_row(userForm.signature) }}
-                            <h3 id="locale" class="pt-20">{% trans %}mautic.user.config.title.locale{% endtrans %}</h3>
-                            <div class="text-muted small description pb-20">{% trans %}mautic.user.config.region.preferences.helper{% endtrans %}</div>
-                            {{ form_row(userForm.timezone) }}
-                            {{ form_row(userForm.locale) }}
-                        </div>
-                        <div class="col-md-6">
-                            <h3 id="security" class="pt-20">{% trans %}mautic.user.config.title.account_data_security{% endtrans %}</h3>
-                            <div class="text-muted small description pb-20">{% trans %}mautic.user.config.account.security.helper{% endtrans %}</div>
-                            {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
-                            {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
-                            {{ form_row(userForm.plainPassword.password) }}
-                            {{ form_row(userForm.plainPassword.confirm) }}
+                <div class="pa-md">
+                    <div class="col-md-6">
+                        <h3 id="personal-info" class="pt-20">{% trans %}mautic.user.config.title.get_to_know_you{% endtrans %}</h3>
+                        <div class="text-muted small description pb-20">{% trans %}mautic.user.config.personalize.interface.helper{% endtrans %}</div>
+                        {{ permissions.editName ? form_row(userForm.firstName) : form_row(userForm.firstName_unbound) }}
+                        {{ permissions.editName ? form_row(userForm.lastName) : form_row(userForm.lastName_unbound) }}
+                        {{ permissions.editPosition ? form_row(userForm.position) : form_row(userForm.position_unbound) }}
+                        {{ form_row(userForm.signature) }}
+
+                        <h3 id="locale" class="pt-20">{% trans %}mautic.user.config.title.locale{% endtrans %}</h3>
+                        <div class="text-muted small description pb-20">{% trans %}mautic.user.config.region.preferences.helper{% endtrans %}</div>
+                        {{ form_row(userForm.timezone) }}
+                        {{ form_row(userForm.locale) }}
+                    </div>
+                    <div class="col-md-6">
+                        <h3 id="security" class="pt-20">{% trans %}mautic.user.config.title.account_data_security{% endtrans %}</h3>
+                        <div class="text-muted small description pb-20">{% trans %}mautic.user.config.account.security.helper{% endtrans %}</div>
+                        {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
+                        {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
+                        {{ form_row(userForm.plainPassword.password) }}
+                        {{ form_row(userForm.plainPassword.confirm) }}
                     </div>
                 </div>
                 {{ form_end(userForm) }}
