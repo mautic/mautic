@@ -76,7 +76,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 
     public function getRepository(): ?MessageRepository
     {
-        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
+        return $this->em->getRepository(Message::class);
     }
 
     public function getEntity($id = null): ?Message

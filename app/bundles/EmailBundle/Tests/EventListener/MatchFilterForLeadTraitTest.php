@@ -31,7 +31,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         ],
     ];
 
-    private \Mautic\EmailBundle\Tests\EventListener\MatchFilterForLeadTraitTestable $matchFilterForLeadTrait;
+    private MatchFilterForLeadTraitTestable $matchFilterForLeadTrait;
 
     protected function setUp(): void
     {

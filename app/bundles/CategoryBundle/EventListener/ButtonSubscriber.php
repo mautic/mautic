@@ -37,7 +37,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         'data-header' => $this->translator->trans('mautic.lead.batch.categories'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.lead.batch.categories'),
-                    'iconClass' => 'fa fa-cogs',
+                    'iconClass' => 'ri-folder-line',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );

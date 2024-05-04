@@ -1200,7 +1200,12 @@
       "contributions": [
         "code",
         "a11y",
-        "doc"
+        "doc",
+        "bug",
+        "review",
+        "userTesting",
+        "design",
+        "projectManagement"
       ]
     },
     {
@@ -1276,6 +1281,16 @@
       "profile": "https://github.com/markusVJH",
       "contributions": [
         "review"
+      ]
+    },
+    {
+      "login": "juangadiel",
+      "name": "Juan Gadiel Rosado Colon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/706997?v=4",
+      "profile": "https://www.linkedin.com/in/juangadiel",
+      "contributions": [
+        "bug",
+        "userTesting"
       ]
     }
   ],

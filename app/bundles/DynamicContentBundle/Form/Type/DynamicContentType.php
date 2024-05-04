@@ -204,7 +204,7 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\DynamicContentBundle\Entity\DynamicContent::class);
+        $transformer = new IdToEntityModelTransformer($this->em, DynamicContent::class);
         $builder->add(
             $builder->create(
                 'translationParent',
@@ -324,8 +324,21 @@ class DynamicContentType extends AbstractType
     private function filterFieldChoices(): void
     {
         unset($this->fieldChoices['company']);
-        $customFields               = $this->leadModel->getRepository()->getCustomFieldList('lead');
-        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], fn ($key): bool => in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true), ARRAY_FILTER_USE_KEY);
+
+        $customFields = $this->leadModel->getRepository()->getCustomFieldList('lead');
+
+        $this->fieldChoices['lead'] = array_filter(
+            $this->fieldChoices['lead'],
+            fn ($key): bool => in_array(
+                $key,
+                array_merge(
+                    array_keys($customFields[0]),
+                    ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags', 'leadlist']
+                ),
+                true
+            ),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     /**

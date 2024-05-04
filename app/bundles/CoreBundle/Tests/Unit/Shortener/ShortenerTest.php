@@ -15,9 +15,9 @@ class ShortenerTest extends TestCase
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
-    private \Mautic\CoreBundle\Shortener\Shortener $shortener;
+    private Shortener $shortener;
 
     protected function setUp(): void
     {
