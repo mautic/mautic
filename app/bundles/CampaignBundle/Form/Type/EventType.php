@@ -230,7 +230,7 @@ class EventType extends AbstractType
                         'mautic.campaign.form.type.trigger_window_day'   => OptimizedScheduler::OPTIMIZED_TIME,
                         'mautic.campaign.form.type.trigger_window_week'  => OptimizedScheduler::OPTIMIZED_DAY_AND_TIME,
                     ],
-                    'data'              => 0,
+                    'data'              => $options['data']['triggerWindow'] ?? 0,
                     'required'          => false,
                     'expanded'          => true,
                     'placeholder'       => false,
