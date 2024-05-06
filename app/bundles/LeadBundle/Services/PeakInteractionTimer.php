@@ -13,6 +13,15 @@ use Mautic\PageBundle\Entity\HitRepository;
 
 class PeakInteractionTimer
 {
+    public const DEFAULT_BEST_HOUR_START         = 9; // 9 AM
+    public const DEFAULT_BEST_HOUR_END           = 12; // 12 PM
+    public const DEFAULT_BEST_DAYS               = [2, 1, 4]; // Tuesday, Monday, Thursday
+    public const DEFAULT_FETCH_INTERACTIONS_FROM = '-60 days';
+    public const DEFAULT_FETCH_LIMIT             = 50;
+    public const DEFAULT_CACHE_TIMEOUT           = 43800; // in minutes ~ 1 month
+    public const MIN_INTERACTIONS                = 5;
+    public const DEFAULT_MAX_OPTIMAL_DAYS        = 3;
+
     private const MINUTES_START_OF_HOUR   = 0; // Start of the hour
     private const HOUR_FORMAT             = 'G'; // 0 through 23
     private const DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
@@ -30,7 +39,6 @@ class PeakInteractionTimer
     private array $bestDefaultDays;
     private string $fetchInteractionsFrom;
     private int $fetchLimit;
-    private int $minInteractions;
     private int $maxOptimalDays;
 
     public function __construct(
@@ -46,8 +54,7 @@ class PeakInteractionTimer
         $this->bestDefaultDays       = $this->coreParametersHelper->get('peak_interaction_timer_best_default_days');
         $this->fetchInteractionsFrom = $this->coreParametersHelper->get('peak_interaction_timer_fetch_interactions_from');
         $this->fetchLimit            = $this->coreParametersHelper->get('peak_interaction_timer_fetch_limit');
-        $this->minInteractions       = $this->coreParametersHelper->get('peak_interaction_timer_min_interactions');
-        $this->maxOptimalDays        = $this->coreParametersHelper->get('peak_interaction_timer_max_optimal_days');
+        $this->maxOptimalDays        = count($this->bestDefaultDays);
     }
 
     /**
@@ -59,7 +66,7 @@ class PeakInteractionTimer
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
-        if (count($interactions) > $this->minInteractions) {
+        if (count($interactions) > self::MIN_INTERACTIONS) {
             $hours                                     = array_column($interactions, 'hourOfDay');
             [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
         }
@@ -78,7 +85,7 @@ class PeakInteractionTimer
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
-        if (count($interactions) > $this->minInteractions) {
+        if (count($interactions) > self::MIN_INTERACTIONS) {
             $hours                                     = array_column($interactions, 'hourOfDay');
             $days                                      = array_column($interactions, 'dayOfWeek');
             [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
@@ -92,9 +99,11 @@ class PeakInteractionTimer
 
     private function resetBias(): void
     {
-        $this->bestHourStart = $this->bestDefaultHourStart;
-        $this->bestHourEnd   = $this->bestDefaultHourEnd;
-        $this->bestDays      = $this->bestDefaultDays;
+        $this->bestHourStart  = (int) $this->bestDefaultHourStart;
+        $this->bestHourEnd    = (int) $this->bestDefaultHourEnd;
+        $bestDays             = array_map('intval', $this->bestDefaultDays);
+        $this->bestDays       = !empty($bestDays) ? $bestDays : self::DEFAULT_BEST_DAYS;
+        $this->maxOptimalDays = count($this->bestDays);
     }
 
     private function isTimeOptimal(\DateTime $dateTime): bool

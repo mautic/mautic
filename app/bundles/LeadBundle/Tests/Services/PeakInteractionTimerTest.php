@@ -62,8 +62,6 @@ class PeakInteractionTimerTest extends TestCase
     private array $peakInteractionTimerBestDefaultDays        = [2, 1, 4];
     private string $peakInteractionTimerFetchInteractionsFrom = '-60 days';
     private int $peakInteractionTimerFetchLimit               = 50;
-    private int $peakInteractionTimerMinInteractions          = 5;
-    private int $peakInteractionTimerMaxOptimalDays           = 3;
 
     protected function setUp(): void
     {
@@ -82,8 +80,6 @@ class PeakInteractionTimerTest extends TestCase
                 ['peak_interaction_timer_best_default_days'],
                 ['peak_interaction_timer_fetch_interactions_from'],
                 ['peak_interaction_timer_fetch_limit'],
-                ['peak_interaction_timer_min_interactions'],
-                ['peak_interaction_timer_max_optimal_days'],
                 ['default_timezone'],
             )
             ->willReturnOnConsecutiveCalls(
@@ -93,8 +89,6 @@ class PeakInteractionTimerTest extends TestCase
                 $this->peakInteractionTimerBestDefaultDays,
                 $this->peakInteractionTimerFetchInteractionsFrom,
                 $this->peakInteractionTimerFetchLimit,
-                $this->peakInteractionTimerMinInteractions,
-                $this->peakInteractionTimerMaxOptimalDays,
                 $this->defaultTimezone,
             );
 
