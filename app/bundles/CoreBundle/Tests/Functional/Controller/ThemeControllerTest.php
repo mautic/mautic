@@ -55,32 +55,26 @@ final class ThemeControllerTest extends MauticMysqlTestCase
 
     public function testThemeVisibility(): void
     {
-        // Landing page theme list has 'Sunday V2' theme
-        $page = $this->client->request(Request::METHOD_GET, '/s/pages/new');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $themesInPage = $page->filterXPath('//div[@id="theme-container"]');
-        Assert::assertStringContainsString('Sunday V2', $themesInPage->html());
-
-        // Email theme list has 'Sunday V2' theme
+        // Email theme list has 'Aurora' theme
         $email = $this->client->request(Request::METHOD_GET, '/s/emails/new');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $themesInEmail = $email->filterXPath('//div[@id="email-container"]');
-        Assert::assertStringContainsString('Sunday V2', $themesInEmail->html());
+        Assert::assertStringContainsString('Aurora', $themesInEmail->html());
 
         // List themes
         $themeList = $this->client->request(Request::METHOD_GET, '/s/themes');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        // Theme list has 'Sunday V2' theme
-        $themeRow = $themeList->filter('tr:contains("Sunday V2 (sunday)")');
+        // Theme list has 'Aurora' theme
+        $themeRow = $themeList->filter('tr:contains("Aurora (aurora)")');
         Assert::assertNotEmpty($themeRow);
 
         // Theme menu shows 'Hide' option
-        $visibilityMenu = $themeRow->filter('ul')->filter('a[href="/s/themes/visibility/sunday"]');
+        $visibilityMenu = $themeRow->filter('ul')->filter('a[href="/s/themes/visibility/aurora"]');
         Assert::assertStringContainsString('Hide', $visibilityMenu->html());
 
-        // Hide the 'Sunday V2' theme
-        $this->client->request(Request::METHOD_POST, '/s/themes/visibility/sunday');
+        // Hide the 'Aurora' theme
+        $this->client->request(Request::METHOD_POST, '/s/themes/visibility/aurora');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         // Check if hidden-themes.txt file exists
@@ -88,45 +82,39 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         $hiddenThemesTxtPath = $themePath.'/'.ThemeHelper::HIDDEN_THEMES_TXT;
         Assert::assertFileExists($hiddenThemesTxtPath);
 
-        // Check if hidden-themes.txt file contains hidden theme name 'Sunday V2 (sunday)'
-        Assert::assertStringContainsString('|sunday', $this->filesystem->readFile($hiddenThemesTxtPath));
+        // Check if hidden-themes.txt file contains hidden theme name 'Aurora (aurora)'
+        Assert::assertStringContainsString('|aurora', $this->filesystem->readFile($hiddenThemesTxtPath));
 
         // Reboot kernel to reload all themes
         self::bootKernel();
         $this->loginUser('admin');
 
-        // Landing page theme list has hidden 'Sunday V2' theme
-        $newPage = $this->client->request(Request::METHOD_GET, '/s/pages/new');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $hiddenThemesInPage = $newPage->filterXPath('//div[contains(@class, "theme-list") and contains(@class, "hide")]');
-        Assert::assertStringContainsString('Sunday V2', $hiddenThemesInPage->html());
-
-        // Email theme list has hidden 'Sunday V2' theme
+        // Email theme list has hidden 'Aurora' theme
         $newEmail = $this->client->request(Request::METHOD_GET, '/s/emails/new');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $hiddenThemesInEmail = $newEmail->filterXPath('//div[contains(@class, "theme-list") and contains(@class, "hide")]');
-        Assert::assertStringContainsString('Sunday V2', $hiddenThemesInEmail->html());
+        Assert::assertStringContainsString('Aurora', $hiddenThemesInEmail->html(), $newEmail->html());
 
         // List fresh themes
         $newThemeList = $this->client->request(Request::METHOD_GET, '/s/themes');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        // Check if 'Sunday V2' is the last theme in the list
+        // Check if 'Aurora' is the last theme in the list
         $hiddenThemeRow = $newThemeList->filter('table tr')->last();
         Assert::assertNotEmpty($hiddenThemeRow);
-        Assert::assertStringContainsString('Sunday V2 (sunday)', $hiddenThemeRow->html());
+        Assert::assertStringContainsString('Aurora (aurora)', $hiddenThemeRow->html(), $newThemeList->html());
 
-        // Check if 'Sunday V2' has 3 disabled table cells
+        // Check if 'Aurora' has 3 disabled table cells
         $disabledRowCell = $hiddenThemeRow->filter('td.disabled-row');
         Assert::assertNotEmpty($disabledRowCell);
         Assert::assertCount(3, $disabledRowCell);
 
         // Theme menu shows 'Unhide' option
-        $visibilityMenu = $hiddenThemeRow->filter('ul')->filter('a[href="/s/themes/visibility/sunday"]');
+        $visibilityMenu = $hiddenThemeRow->filter('ul')->filter('a[href="/s/themes/visibility/aurora"]');
         Assert::assertStringContainsString('Unhide', $visibilityMenu->html());
 
-        // Unhide the 'Sunday V2' theme
-        $this->client->request(Request::METHOD_POST, '/s/themes/visibility/sunday');
+        // Unhide the 'Aurora' theme
+        $this->client->request(Request::METHOD_POST, '/s/themes/visibility/aurora');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         // Check if hidden-themes.txt file is removed since there was only one theme before

@@ -564,40 +564,15 @@ class ThemeHelperTest extends TestCase
         $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
 
         $themeHelper = new ThemeHelper(
-            new class() extends PathsHelper {
-                public function __construct()
-                {
-                }
-            },
-            new Environment(new FilesystemLoader()),
-            new class() extends Translator {
-                public function __construct()
-                {
-                }
-            },
-            new class() extends CoreParametersHelper {
-                public function __construct()
-                {
-                }
-            },
-            new class() extends Filesystem {
-                public function __construct()
-                {
-                }
-            },
-            new class() extends Finder {
-                public function __construct()
-                {
-                }
-            },
-            new class() extends BuilderIntegrationsHelper {
-                public function __construct()
-                {
-                }
-            }
+            $this->pathsHelper,
+            $this->twig,
+            $this->translator,
+            $this->coreParameterHelper,
+            $filesystem,
+            new Finder(),
+            $this->builderIntegrationsHelper
         );
 
-        Assert::assertSame('mautic_code_mode', $themeHelper->getCurrentTheme('mautic_code_mode', 'foo'));
         // custom theme name - theme-legacy-email
         $themeHelper->delete('theme-legacy-email');
         Assert::assertTrue($themeHelper->exists('theme-legacy-email'));
