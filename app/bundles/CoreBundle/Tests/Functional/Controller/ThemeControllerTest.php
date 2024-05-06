@@ -119,7 +119,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         // Check if 'Sunday V2' has 3 disabled table cells
         $disabledRowCell = $hiddenThemeRow->filter('td.disabled-row');
         Assert::assertNotEmpty($disabledRowCell);
-        Assert::assertSame(3, $disabledRowCell->count());
+        Assert::assertCount(3, $disabledRowCell);
 
         // Theme menu shows 'Unhide' option
         $visibilityMenu = $hiddenThemeRow->filter('ul')->filter('a[href="/s/themes/visibility/sunday"]');

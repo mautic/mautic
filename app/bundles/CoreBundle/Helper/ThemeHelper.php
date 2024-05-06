@@ -79,7 +79,7 @@ class ThemeHelper implements ThemeHelperInterface
     /**
      * @var array<int, string>
      */
-    private $hiddenThemes = [];
+    private array $hiddenThemes = [];
 
     public function __construct(
         private PathsHelper $pathsHelper,

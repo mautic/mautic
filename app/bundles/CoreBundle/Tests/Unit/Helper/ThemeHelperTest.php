@@ -312,10 +312,7 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
-                /**
-                 * @return \ArrayIterator<int,SplFileInfo>
-                 */
-                public function getIterator()
+                public function getIterator(): \Iterator
                 {
                     return new \ArrayIterator($this->dirs);
                 }
@@ -411,10 +408,7 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
-                /**
-                 * @return \ArrayIterator<int,SplFileInfo>
-                 */
-                public function getIterator(): \ArrayIterator
+                public function getIterator(): \Iterator
                 {
                     return new \ArrayIterator($this->dirs);
                 }
