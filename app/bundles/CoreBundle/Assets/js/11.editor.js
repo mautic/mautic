@@ -329,7 +329,17 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
                     }
                 }
             }
-        }
+        },
+        htmlSupport: {
+            allow: [
+                {
+                    name: /^(a)$/,
+                    attributes: true,
+                    classes: true,
+                    styles: true
+                }
+            ],
+        },
     };
 
 
