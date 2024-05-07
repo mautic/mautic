@@ -43,7 +43,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
-            'postAction'  => 'return',
+            'postAction'     => 'return',
+            'formAttributes' => 'class="foobar"',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -85,6 +86,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
         $this->assertSame(1, $formCrawler->count());
+        $this->assertStringContainsString(' class="foobar"', $crawler->html());
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => 'Australia',
