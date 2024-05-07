@@ -625,13 +625,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, MapModel
     }
 
     /**
-     * @param Email $entity
-     *
      * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCountryStats($entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
+    public function getCountryStats(Email $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
     {
         $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
 
