@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
-use Mautic\CoreBundle\Controller\AbstractCountryMapController;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
@@ -71,7 +70,7 @@ class MapHelperTest extends MauticMysqlTestCase
 
         $this->assertEquals(
             'Total: 4 (2 with country)',
-            MapHelper::getOptionLegendText(AbstractCountryMapController::LEGEND_TEXT, $legendValues)
+            MapHelper::getOptionLegendText(CampaignMapStatsController::LEGEND_TEXT, $legendValues)
         );
     }
 
@@ -80,7 +79,7 @@ class MapHelperTest extends MauticMysqlTestCase
         $results = MapHelper::buildMapData(
             $this->getStats(),
             CampaignMapStatsController::MAP_OPTIONS,
-            AbstractCountryMapController::LEGEND_TEXT
+            CampaignMapStatsController::LEGEND_TEXT
         );
 
         $this->assertCount(3, $results);

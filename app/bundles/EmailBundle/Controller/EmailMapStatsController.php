@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Controller;
 
 use Doctrine\DBAL\Exception;
-use Mautic\CoreBundle\Controller\AbstractCountryMapController;
+use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-/**
- * @extends AbstractCountryMapController<Email>
- */
-class EmailMapStatsController extends AbstractCountryMapController
+class EmailMapStatsController
 {
     public const MAP_OPTIONS = [
         'read_count' => [
@@ -26,19 +25,21 @@ class EmailMapStatsController extends AbstractCountryMapController
         ],
     ];
 
+    public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
+
+    protected EmailModel $model;
+
     public function __construct(EmailModel $model)
     {
         $this->model = $model;
     }
 
     /**
-     * @param Email $entity
-     *
      * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
+    public function getData(Email $entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
         // get A/B test information
         $parent = $entity->getVariantParent();
@@ -56,10 +57,7 @@ class EmailMapStatsController extends AbstractCountryMapController
         );
     }
 
-    /**
-     * @param Email $entity
-     */
-    public function hasAccess(CorePermissions $security, $entity): bool
+    public function hasAccess(CorePermissions $security, Email $entity): bool
     {
         return $security->hasEntityAccess(
             'email:emails:viewown',
@@ -69,11 +67,9 @@ class EmailMapStatsController extends AbstractCountryMapController
     }
 
     /**
-     * @param Email $entity
-     *
      * @return array<string, array<string, string>>
      */
-    public function getMapOptions($entity): array
+    public function getMapOptions(): array
     {
         return self::MAP_OPTIONS;
     }
@@ -81,5 +77,37 @@ class EmailMapStatsController extends AbstractCountryMapController
     public function getMapOptionsTitle(): string
     {
         return 'mautic.email.stats.options.title';
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function viewAction(
+        CorePermissions $security,
+        int $objectId,
+        string $dateFrom = '',
+        string $dateTo = ''
+    ): Response {
+        $entity = $this->model->getEntity($objectId);
+
+        if (empty($entity) || !$this->hasAccess($security, $entity)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $statsCountries = $this->getData($entity, new \DateTimeImmutable($dateFrom), new \DateTimeImmutable($dateTo));
+        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions($entity), self::LEGEND_TEXT);
+
+        return $this->render(
+            '@MauticCore/Helper/map.html.twig',
+            [
+                'data'           => $mapData[0]['data'],
+                'height'         => 315,
+                'optionsEnabled' => true,
+                'optionsTitle'   => $this->getMapOptionsTitle(),
+                'options'        => $mapData,
+                'legendEnabled'  => true,
+                'statUnit'       => $mapData[0]['unit'],
+            ]
+        );
     }
 }

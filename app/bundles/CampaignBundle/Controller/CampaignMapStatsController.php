@@ -7,13 +7,13 @@ namespace Mautic\CampaignBundle\Controller;
 use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Controller\AbstractCountryMapController;
+use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-/**
- * @extends AbstractCountryMapController<Campaign>
- */
-class CampaignMapStatsController extends AbstractCountryMapController
+class CampaignMapStatsController extends AbstractController
 {
     public const MAP_OPTIONS = [
         'contacts' => [
@@ -30,27 +30,26 @@ class CampaignMapStatsController extends AbstractCountryMapController
         ],
     ];
 
+    protected CampaignModel $model;
+
+    public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
+
     public function __construct(CampaignModel $model)
     {
         $this->model = $model;
     }
 
     /**
-     * @param Campaign $entity
-     *
      * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception
      */
-    public function getData($entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
+    public function getData(Campaign $entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
         return $this->model->getCountryStats($entity, $dateFromObject, $dateToObject);
     }
 
-    /**
-     * @param Campaign $entity
-     */
-    public function hasAccess(CorePermissions $security, $entity): bool
+    public function hasAccess(CorePermissions $security,Campaign $entity): bool
     {
         return $security->hasEntityAccess(
             'email:emails:viewown',
@@ -60,11 +59,9 @@ class CampaignMapStatsController extends AbstractCountryMapController
     }
 
     /**
-     * @param Campaign $entity
-     *
      * @return array<string,array<string, string>>
      */
-    public function getMapOptions($entity): array
+    public function getMapOptions(Campaign $entity): array
     {
         if ($entity->getEmailSendEvents()->count() > 0) {
             return self::MAP_OPTIONS;
@@ -78,5 +75,37 @@ class CampaignMapStatsController extends AbstractCountryMapController
     public function getMapOptionsTitle(): string
     {
         return '';
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function viewAction(
+        CorePermissions $security,
+        int $objectId,
+        string $dateFrom = '',
+        string $dateTo = ''
+    ): Response {
+        $entity = $this->model->getEntity($objectId);
+
+        if (empty($entity) || !$this->hasAccess($security, $entity)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $statsCountries = $this->getData($entity, new \DateTimeImmutable($dateFrom), new \DateTimeImmutable($dateTo));
+        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions($entity), self::LEGEND_TEXT);
+
+        return $this->render(
+            '@MauticCore/Helper/map.html.twig',
+            [
+                'data'           => $mapData[0]['data'],
+                'height'         => 315,
+                'optionsEnabled' => true,
+                'optionsTitle'   => $this->getMapOptionsTitle(),
+                'options'        => $mapData,
+                'legendEnabled'  => true,
+                'statUnit'       => $mapData[0]['unit'],
+            ]
+        );
     }
 }

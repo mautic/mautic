@@ -22,7 +22,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Model\MapModelInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -72,9 +71,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  * @extends FormModel<Email>
  *
  * @implements AjaxLookupModelInterface<Email>
- * @implements MapModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface, MapModelInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;

@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Model\MapModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Stat;
@@ -40,10 +39,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends CommonFormModel<Campaign>
- *
- * @implements MapModelInterface<Campaign>
  */
-class CampaignModel extends CommonFormModel implements MapModelInterface
+class CampaignModel extends CommonFormModel
 {
     public function __construct(
         protected ListModel $leadListModel,
