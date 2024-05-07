@@ -18,7 +18,6 @@
     "@ckeditor/ckeditor5-block-quote": "^41.3.1",
     "@ckeditor/ckeditor5-build-classic": "^41.3.1",
     "@ckeditor/ckeditor5-ckfinder": "^41.3.1",
-    "@ckeditor/ckeditor5-code-block": "^41.3.1",
     "@ckeditor/ckeditor5-core": "^41.3.1",
     "@ckeditor/ckeditor5-dev-translations": "^39.8.0",
     "@ckeditor/ckeditor5-dev-utils": "^39.8.0",
