@@ -26,7 +26,6 @@
     "@ckeditor/ckeditor5-essentials": "^41.3.1",
     "@ckeditor/ckeditor5-font": "^41.3.1",
     "@ckeditor/ckeditor5-heading": "^41.3.1",
-    "@ckeditor/ckeditor5-html-embed": "^41.3.1",
     "@ckeditor/ckeditor5-html-support": "^41.3.1",
     "@ckeditor/ckeditor5-image": "^41.3.1",
     "@ckeditor/ckeditor5-indent": "^41.3.1",
