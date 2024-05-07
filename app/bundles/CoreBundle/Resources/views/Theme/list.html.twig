@@ -40,13 +40,13 @@
 
                         {% if item.visibility is defined %}
                             {% set btnText         = 'mautic.core.theme.hide' %}
-                            {% set iconClass       = 'fa fa-eye-slash' %}
+                            {% set iconClass       = 'ri-eye-off-line' %}
                             {% set message         = 'mautic.core.theme.form.confirm.hide' %}
                             {% set confirmBtnClass = '' %}
 
                             {% if item.visibility.hidden|default(false) %}
                                 {% set btnText         = 'mautic.core.theme.unhide' %}
-                                {% set iconClass       = 'fa fa-eye' %}
+                                {% set iconClass       = 'ri-eye-line' %}
                                 {% set message         = 'mautic.core.theme.form.confirm.unhide' %}
                                 {% set confirmBtnClass = 'btn btn-success' %}
                                 {% set visibilityCss   = 'disabled-row' %}
@@ -77,7 +77,7 @@
                                         'data-target': '#theme-' ~ k,
                                     },
                                     'btnText': 'mautic.asset.asset.preview'|trans,
-                                    'iconClass': 'ri-eye-line',
+                                    'iconClass': 'ri-image-line',
                                     } %}
                                 {% set previewButton = hasThumbnail ? previewButtonSettings : [] %}
                                 {% set deleteButton = {
