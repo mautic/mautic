@@ -796,13 +796,11 @@ class CampaignModel extends CommonFormModel implements MapModelInterface
     }
 
     /**
-     * @param Campaign $entity
-     *
      * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception
      */
-    public function getCountryStats($entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
+    public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
     {
         $eventsEmailsSend     = $entity->getEmailSendEvents();
         $eventsIds            = $eventsEmailsSend->getKeys();
