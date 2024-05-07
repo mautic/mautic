@@ -28,14 +28,14 @@
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-@body-bg:               #fff;
+@body-bg:               var(--background);
 //** Global text color on `<body>`.
-@text-color:            @gray-dark;
+@text-color:            var(--text-primary);
 
 //** Global textual link color.
-@link-color:            @brand-primary;
+@link-color:            var(--link-primary);
 //** Link hover color set via `darken()` function.
-@link-hover-color:      darken(@link-color, 15%);
+@link-hover-color:      var(--link-primary-hover);
 //** Link hover decoration.
 @link-hover-decoration: underline;
 
@@ -71,7 +71,7 @@
 @headings-font-family:    inherit;
 @headings-font-weight:    400;
 @headings-line-height:    1.2;
-@headings-color:          inherit;
+@headings-color:          var(--text-primary);
 
 
 //== Iconography
@@ -112,7 +112,7 @@
 //** Global color for active items (e.g., navs or dropdowns).
 @component-active-color:    #fff;
 //** Global background color for active items (e.g., navs or dropdowns).
-@component-active-bg:       @brand-primary;
+@component-active-bg:       var(--brand-main);
 
 //** Width of the `border` for generating carets that indicate dropdowns.
 @caret-width-base:          4px;
@@ -147,28 +147,28 @@
 
 @btn-font-weight:                600;
 
-@btn-default-color:              lighten(@text-color, 10%);
+@btn-default-color:              var(--text-primary);
 @btn-default-border:             #ddd;
 @btn-default-bg:                 #fff;
 
-@btn-primary-color:              #fff;
-@btn-primary-bg:                 @brand-primary;
+@btn-primary-color:              var(--text-on-color);
+@btn-primary-bg:                 var(--button-primary);
 @btn-primary-border:             @brand-primary;
 
-@btn-success-color:              #fff;
-@btn-success-bg:                 @brand-success;
+@btn-success-color:              var(--text-on-color);
+@btn-success-bg:                 var(--support-success);
 @btn-success-border:             @brand-success;
 
-@btn-info-color:                 #fff;
-@btn-info-bg:                    @brand-info;
+@btn-info-color:                 var(--text-on-color);
+@btn-info-bg:                    var(--support-info);
 @btn-info-border:                @brand-info;
 
-@btn-warning-color:              #fff;
-@btn-warning-bg:                 @brand-warning;
+@btn-warning-color:              var(--text-on-color);
+@btn-warning-bg:                 var(--support-warning);
 @btn-warning-border:             @brand-warning;
 
-@btn-danger-color:               #fff;
-@btn-danger-bg:                  @brand-danger;
+@btn-danger-color:               var(--text-on-color);
+@btn-danger-bg:                  var(--button-danger);
 @btn-danger-border:              @brand-danger;
 
 @btn-link-disabled-color:        @gray-light;
@@ -184,12 +184,12 @@
 //##
 
 //** `<input>` background color
-@input-bg:                       #fff;
+@input-bg:                       var(--field);
 //** `<input disabled>` background color
 @input-bg-disabled:              @gray-lighter;
 
 //** Text color for `<input>`s
-@input-color:                    @gray;
+@input-color:                    var(--text-disabled);
 //** `<input>` border color
 @input-border:                   #d5d5d5;
 
@@ -206,7 +206,7 @@
 @input-border-focus:             darken(@input-border, 10%);
 
 //** Placeholder text color
-@input-color-placeholder:        #999;
+@input-color-placeholder:        var(--text-placeholder);
 
 //** Default `.form-control` height
 @input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2);
@@ -218,11 +218,11 @@
 //** `.form-group` margin
 @form-group-margin-bottom:       15px;
 
-@legend-color:                   @gray-dark;
+@legend-color:                   var(--text-helper);
 @legend-border-color:            #e5e5e5;
 
 //** Background color for textual input addons
-@input-group-addon-bg:           @gray-lighter;
+@input-group-addon-bg:           var(--field);
 //** Border color for textual input addons
 @input-group-addon-border-color: @input-border;
 
@@ -235,7 +235,7 @@
 //## Dropdown menu container and contents.
 
 //** Background for the dropdown menu.
-@dropdown-bg:                    #fff;
+@dropdown-bg:                    var(--field);
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,0.06);
 
@@ -245,22 +245,22 @@
 @dropdown-divider-bg:            #eaeaea;
 
 //** Dropdown link text color.
-@dropdown-link-color:            @text-color;
+@dropdown-link-color:            var(--text-secondary);
 //** Hover color for dropdown links.
-@dropdown-link-hover-color:      darken(@dropdown-link-color, 5%);
+@dropdown-link-hover-color:      var(--text-primary);
 //** Hover background for dropdown links.
-@dropdown-link-hover-bg:         #f5f5f5;
+@dropdown-link-hover-bg:         var(--field-hover);
 
 //** Active dropdown menu item text color.
-@dropdown-link-active-color:     @component-active-color;
+@dropdown-link-active-color:     var(--text-primary);
 //** Active dropdown menu item background color.
-@dropdown-link-active-bg:        @component-active-bg;
+@dropdown-link-active-bg:        var(--field-hover);
 
 //** Disabled dropdown menu item background color.
 @dropdown-link-disabled-color:   @gray-light;
 
 //** Text color for headers within dropdown menus.
-@dropdown-header-color:          @gray-light;
+@dropdown-header-color:          var(--text-secondary);
 
 //** Deprecated `@dropdown-caret-color` as of v3.1.0
 @dropdown-caret-color:           gray;
@@ -424,7 +424,7 @@
 
 //=== Shared nav styles
 @nav-link-padding:                          10px 18px;
-@nav-link-hover-bg:                         darken(@body-bg, 3%);
+@nav-link-hover-bg:                         var(--field);
 
 @nav-disabled-link-color:                   @gray-light;
 @nav-disabled-link-hover-color:             @gray-light;
@@ -432,7 +432,7 @@
 //== Tabs
 @nav-tabs-border-color:                     @hr-border;
 
-@nav-tabs-link-hover-border-color:          darken(@body-bg, 4%);
+@nav-tabs-link-hover-border-color:          var(--field-hover);
 
 @nav-tabs-active-link-hover-bg:             @body-bg;
 @nav-tabs-active-link-hover-color:          @gray;
@@ -451,21 +451,21 @@
 //
 //##
 
-@pagination-color:                     @link-color;
-@pagination-bg:                        #fff;
-@pagination-border:                    #ddd;
+@pagination-color:                     var(--text-secondary);
+@pagination-bg:                        transparent;
+@pagination-border:                    transparent;
 
-@pagination-hover-color:               @link-hover-color;
-@pagination-hover-bg:                  @gray-lighter;
-@pagination-hover-border:              #ddd;
+@pagination-hover-color:               var(--text-primary);
+@pagination-hover-bg:                  var(--field-hover);
+@pagination-hover-border:              transparent;
 
-@pagination-active-color:              @pagination-hover-color;
-@pagination-active-bg:                 @pagination-hover-bg;
-@pagination-active-border:             @pagination-hover-border;
+@pagination-active-color:              var(--link-primary);
+@pagination-active-bg:                 transparent;
+@pagination-active-border:             transparent;
 
-@pagination-disabled-color:            @gray-light;
-@pagination-disabled-bg:               #fff;
-@pagination-disabled-border:           #ddd;
+@pagination-disabled-color:            var(--text-disabled);
+@pagination-disabled-bg:               transparent;
+@pagination-disabled-border:           transparent;
 
 
 //== Pager
@@ -524,9 +524,9 @@
 //** Tooltip max width
 @tooltip-max-width:           200px;
 //** Tooltip text color
-@tooltip-color:               #fff;
+@tooltip-color:               var(--text-inverse);
 //** Tooltip background color
-@tooltip-bg:                  #000;
+@tooltip-bg:                  var(--background-inverse);
 @tooltip-opacity:             .9;
 
 //** Tooltip arrow width
@@ -600,20 +600,20 @@
 @modal-title-line-height:     @line-height-base;
 
 //** Background color of modal content area
-@modal-content-bg:                             #fff;
+@modal-content-bg:                             var(--layer);
 //** Modal content border color
-@modal-content-border-color:                   rgba(0, 0, 0, .2);
+@modal-content-border-color:                   transparent;
 //** Modal content border color **for IE8**
 @modal-content-fallback-border-color:          #999;
 
 //** Modal backdrop background color
-@modal-backdrop-bg:           #000;
+@modal-backdrop-bg:           var(--overlay);
 //** Modal backdrop opacity
 @modal-backdrop-opacity:      .5;
 //** Modal header border color
-@modal-header-border-color:   #e5e5e5;
+@modal-header-border-color:   transparent;
 //** Modal footer border color
-@modal-footer-border-color:   @modal-header-border-color;
+@modal-footer-border-color:   transparent;
 
 @modal-lg:                    900px;
 @modal-md:                    600px;
@@ -682,7 +682,7 @@
 @list-group-border-radius:      @border-radius-base;
 
 //** Background color of single list items on hover
-@list-group-hover-bg:           darken(@body-bg, 1%);
+@list-group-hover-bg:           transparent;
 //** Text color of active list items
 @list-group-active-color:       @text-color;
 //** Background color of active list items
@@ -690,7 +690,7 @@
 //** Border color of active list elements
 @list-group-active-border:      @hr-border;
 //** Text color for content within active list items
-@list-group-active-text-color:  lighten(@list-group-active-bg, 40%);
+@list-group-active-text-color:  transparent;
 
 //** Text color of disabled list items
 @list-group-disabled-color:      @gray-light;
@@ -716,11 +716,11 @@
 
 //** Border color for elements within panels
 @panel-inner-border:          @hr-border;
-@panel-footer-bg:             #f5f5f5;
+@panel-footer-bg:             transparent;
 
 @panel-default-text:          @gray-dark;
 @panel-default-border:        @hr-border;
-@panel-default-heading-bg:    #f5f5f5;
+@panel-default-heading-bg:    transparent;
 
 @panel-primary-text:          #fff;
 @panel-primary-border:        rgba(0,0,0,0.03);
@@ -872,4 +872,4 @@
 //** Point at which .dl-horizontal becomes horizontal
 @dl-horizontal-breakpoint:    @grid-float-breakpoint;
 //** Horizontal line color.
-@hr-border:                   @gray-lighter;
+@hr-border:                   transparent;

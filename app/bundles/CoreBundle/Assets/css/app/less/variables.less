@@ -108,6 +108,14 @@
     --focus-inset: #ffffff;
     --focus-inverse: #ffffff;
 
+    // Miscellaneous
+    --interactive: var(--brand-main, #4e5e9e);
+    --highlight: #d0e2ff;
+    --toggle-off: #8d8d8d;
+    --overlay: rgba(22, 22, 22, 0.5);
+    --skeleton-element: #c6c6c6;
+    --skeleton-background: #e5e5e5;
+
     // Tag
     --tag-background-gray: #e0e0e0;
     --tag-color-gray: #161616;
@@ -165,10 +173,6 @@
     }
 }
 
-//== Bootstrap variable
-//
-//## import bootstrap variable.
-@import "../../../../../../../node_modules/bootstrap/less/variables.less";
 
 //== Logo
 //
@@ -225,7 +229,7 @@
 //
 //## common footer variable.
 @footer-height:                             46px;
-@footer-bg:                                 lighten(@body-bg, 1%);
+@footer-bg:                                 transparent;
 @footer-zindex:                             @content-zindex;  // 1000
 
 
