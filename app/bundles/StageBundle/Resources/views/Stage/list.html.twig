@@ -37,7 +37,7 @@
 {% block listResults %}
     {% if items is defined and items is not empty %}
         <div class="table-responsive page-list">
-        <table class="table table-hover table-striped table-bordered stage-list" id="stageTable">
+        <table class="table table-hover stage-list" id="stageTable">
             <thead>
             <tr>
                 {{- include('@MauticCore/Helper/tableheader.html.twig',

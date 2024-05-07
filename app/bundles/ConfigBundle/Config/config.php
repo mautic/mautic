@@ -22,12 +22,14 @@ return [
                 'iconClass'       => 'ri-settings-5-line',
                 'id'              => 'mautic_config_index',
                 'access'          => 'admin',
+                'priority'        => 16,
             ],
             'mautic.sysinfo.menu.index' => [
                 'route'     => 'mautic_sysinfo_index',
                 'iconClass' => 'ri-information-2-fill',
                 'id'        => 'mautic_sysinfo_index',
                 'access'    => 'admin',
+                'priority'  => 04,
                 'checks'    => [
                     'parameters' => [
                         'sysinfo_disabled' => false,

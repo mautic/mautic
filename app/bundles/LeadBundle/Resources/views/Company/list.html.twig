@@ -24,14 +24,14 @@
           'attr': {
               'href': path('mautic_import_action', {'object': 'companies', 'objectAction': 'new'}),
           },
-          'iconClass': 'fa fa-upload',
+          'iconClass': 'ri-import-line',
           'btnText': 'mautic.lead.lead.import',
         },
         {
           'attr': {
               'href': path('mautic_import_index', {'object': 'companies'}),
           },
-          'iconClass': 'fa fa-history',
+          'iconClass': 'ri-history-line',
           'btnText': 'mautic.lead.lead.import.index',
         },
       ] %}
@@ -56,7 +56,7 @@
 
   {% if items|length > 0 %}
       <div class="table-responsive page-list">
-          <table class="table table-hover table-striped table-bordered company-list" id="companyTable">
+          <table class="table table-hover company-list" id="companyTable">
               <thead>
               <tr>
                   {{ include('@MauticCore/Helper/tableheader.html.twig', {
