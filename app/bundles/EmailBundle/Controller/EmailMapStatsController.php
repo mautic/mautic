@@ -9,10 +9,11 @@ use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailMapStatsController
+class EmailMapStatsController extends AbstractController
 {
     public const MAP_OPTIONS = [
         'read_count' => [
@@ -27,11 +28,8 @@ class EmailMapStatsController
 
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
-    protected EmailModel $model;
-
-    public function __construct(EmailModel $model)
+    public function __construct(protected EmailModel $model)
     {
-        $this->model = $model;
     }
 
     /**
@@ -95,7 +93,7 @@ class EmailMapStatsController
         }
 
         $statsCountries = $this->getData($entity, new \DateTimeImmutable($dateFrom), new \DateTimeImmutable($dateTo));
-        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions($entity), self::LEGEND_TEXT);
+        $mapData        = MapHelper::buildMapData($statsCountries, $this->getMapOptions(), self::LEGEND_TEXT);
 
         return $this->render(
             '@MauticCore/Helper/map.html.twig',

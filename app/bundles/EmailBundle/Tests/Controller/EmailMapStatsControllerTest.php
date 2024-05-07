@@ -96,7 +96,7 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        $result = $this->mapController->getMapOptions($email);
+        $result = $this->mapController->getMapOptions();
         $this->assertSame(EmailMapStatsController::MAP_OPTIONS, $result);
     }
 

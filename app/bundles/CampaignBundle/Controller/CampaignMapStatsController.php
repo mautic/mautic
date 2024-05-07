@@ -30,13 +30,10 @@ class CampaignMapStatsController extends AbstractController
         ],
     ];
 
-    protected CampaignModel $model;
-
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
-    public function __construct(CampaignModel $model)
+    public function __construct(protected CampaignModel $model)
     {
-        $this->model = $model;
     }
 
     /**
@@ -49,7 +46,7 @@ class CampaignMapStatsController extends AbstractController
         return $this->model->getCountryStats($entity, $dateFromObject, $dateToObject);
     }
 
-    public function hasAccess(CorePermissions $security,Campaign $entity): bool
+    public function hasAccess(CorePermissions $security, Campaign $entity): bool
     {
         return $security->hasEntityAccess(
             'email:emails:viewown',
