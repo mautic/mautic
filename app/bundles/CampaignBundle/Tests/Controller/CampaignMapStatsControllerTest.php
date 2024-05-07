@@ -189,13 +189,13 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
 
         $readOption = $crawler->filter('label.map-options__item')->filter('[data-stat-unit="Read"]');
         $this->assertCount(1, $readOption);
-        $this->assertSame('Total: 4 (3 with country)', $readOption->attr('data-legend-text'));
-        $this->assertSame('{"IT":1,"PL":2}', $readOption->attr('data-map-series'));
+        $this->assertSame('Total: 5 (3 with country)', $readOption->attr('data-legend-text'));
+        $this->assertSame('{"ES":3}', $readOption->attr('data-map-series'));
 
         $clickOption = $crawler->filter('label.map-options__item')->filter('[data-stat-unit="Click"]');
         $this->assertCount(1, $clickOption);
         $this->assertSame('Total: 3 (2 with country)', $clickOption->attr('data-legend-text'));
-        $this->assertSame('{"IT":1,"PL":1}', $clickOption->attr('data-map-series'));
+        $this->assertSame('{"ES":2}', $clickOption->attr('data-map-series'));
     }
 
     /**
@@ -226,7 +226,7 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<int, array<string, bool|string>| $leadsPayload
+     * @param array<int, array<string, bool|string>> $leadsPayload
      *
      * @throws ORMException
      * @throws OptimisticLockException
@@ -268,7 +268,7 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<int, array<string, bool|string>| $leadsPayload
+     * @param array<int, array<string, bool|string>> $leadsPayload
      *
      * @throws OptimisticLockException
      * @throws ORMException
