@@ -333,7 +333,7 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
         htmlSupport: {
             allow: [
                 {
-                    name: /^(a)$/,
+                    name: /^(a|span)$/,
                     attributes: true,
                     classes: true,
                     styles: true
