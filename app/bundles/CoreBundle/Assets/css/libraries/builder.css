@@ -350,8 +350,8 @@
   --no-border: 1px solid transparent;
   --border-bottom: 0 0 clamp(0px, calc(1px - var(--border-radius, 0px)), 1px) 0;
   --border-radius-sm: clamp(0px, var(--border-radius, 0px), 7px);
-  --border-radius-md: clamp(0px, calc(1.8 * var(--border-radius, 0px)), 15px);
-  --border-radius-lg: clamp(0px, calc(2.6 * var(--border-radius, 0px)), 30px);
+  --border-radius-md: clamp(0px, calc(1.6 * var(--border-radius, 0px)), 15px);
+  --border-radius-lg: clamp(0px, calc(2.4 * var(--border-radius, 0px)), 30px);
   --blur: blur(10px);
 }
 @media (prefers-reduced-motion: reduce) {
