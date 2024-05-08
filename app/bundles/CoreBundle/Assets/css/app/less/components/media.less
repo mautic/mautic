@@ -13,7 +13,7 @@ a.media {
   &.read {
     opacity: .8;
     a {
-      color: var(--text-secondary);
+      color: lighten(@text-color, 5%);
     }
   }
   &.new {
@@ -140,7 +140,7 @@ a.media {
         .media-text {
           display: inline-block;
           padding: 8px;
-          color: var(--text-secondary);
+          color: lighten(@text-color, 5%);
           background-color: lighten(#eee, 2%);
           border-radius: @border-radius-base;
         }
