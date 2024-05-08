@@ -1360,7 +1360,7 @@ hr.hr-w-3,
   top: -3px;
 }
 a {
-  transition: var(--all);
+  transition: var(--all-productive);
 }
 a:hover {
   cursor: pointer;
@@ -1702,7 +1702,7 @@ blockquote > p:after {
   right: 3px !important;
 }
 .btn {
-  transition: var(--all);
+  transition: var(--all-productive);
 }
 .btn,
 .btn:active,
@@ -2928,7 +2928,7 @@ ul.line-legend li {
   border-bottom: 0;
 }
 .table-hover > tbody > tr:hover {
-  transition: var(--all);
+  transition: var(--all-productive);
 }
 .progress {
   background-color: #ebedf0;
