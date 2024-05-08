@@ -198,10 +198,10 @@ Mautic.resetForm = function(form) {
  * @param callback
  */
 Mautic.postForm = function (form, callback) {
-    var form = mQuery(form);
+    form = mQuery(form);
 
     var modalParent = form.closest('.modal');
-    var inMain = mQuery(modalParent).length > 0 ? false : true;
+    var inMain = mQuery(modalParent).length === 0;
 
     var action = form.attr('action');
 
@@ -214,6 +214,7 @@ Mautic.postForm = function (form, callback) {
     form.ajaxSubmit({
         showLoadingBar: showLoading,
         success: function (data) {
+            form.trigger('submit:success', [action, data, inMain]);
             if (!inMain) {
                 Mautic.stopModalLoadingBar(modalTarget);
             }
