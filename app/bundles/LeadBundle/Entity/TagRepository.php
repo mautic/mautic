@@ -39,8 +39,10 @@ class TagRepository extends CommonRepository
 
     /**
      * Get tag entities by name.
+     *
+     * @return array
      */
-    public function getTagsByName(array $tags): array
+    public function getTagsByName(array $tags)
     {
         if (empty($tags)) {
             return [];
