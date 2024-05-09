@@ -71,8 +71,8 @@ class SmsType extends AbstractType
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-                'label' => 'mautic.core.status.available',
-            ]);
+            'label' => 'mautic.core.status.available',
+        ]);
 
         // add lead lists
         $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);

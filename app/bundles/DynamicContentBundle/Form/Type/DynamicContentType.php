@@ -144,8 +144,8 @@ class DynamicContentType extends AbstractType
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-                'label' => 'mautic.core.status.available',
-            ]);
+            'label' => 'mautic.core.status.available',
+        ]);
 
         $builder->add(
             'isCampaignBased',
