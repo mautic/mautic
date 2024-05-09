@@ -32,7 +32,7 @@
     .mauticform-field-hidden { display:none }
 </style>
 <div id="mauticform_wrapper{{ formName }}" class="mauticform_wrapper">
-    <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes }}>
+    <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes|raw }}>
         {%- if successfulSubmitAction == 'top' -%}
             <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
             <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
@@ -76,6 +76,7 @@
                         'mappedFields': mappedFields,
                         'inBuilder': inBuilder,
                         'fields': fields,
+                        'language': form.getLanguage()
                   }) -}}
               {%- endif -%}
 
@@ -110,6 +111,8 @@
                           'mappedFields': mappedFields,
                           'inBuilder': inBuilder,
                           'fields': fields,
+                          'language': form.getLanguage()
+
                   }) -}}
                   {%- else -%}
                   {{- include(template, {
@@ -120,6 +123,8 @@
                           'mappedFields': mappedFields,
                           'inBuilder': inBuilder,
                           'fields': fields,
+                          'language': form.getLanguage()
+
                   }) -}}
                 {%- endif -%}
                   <!-- end: "{{ theme }}{{ template }}" -->
