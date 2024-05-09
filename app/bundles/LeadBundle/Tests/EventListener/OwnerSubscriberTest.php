@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use PHPUnit\Framework\TestCase;
 
 class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -351,10 +352,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $event->getContent());
     }
 
-    /**
-     * @return User
-     */
-    protected function getUser()
+    protected function getUser(): User
     {
         $user = new class() extends User {
             public function setId(int $id): void
