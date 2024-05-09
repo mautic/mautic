@@ -671,18 +671,22 @@ var Mautic = {
 
     /**
      * Sets flashes
-     * @param flashes
+     * @param flashes The flash message HTML to append
+     * @param autoClose Optional boolean to determine if the flash should automatically close, defaults to true
      */
-    setFlashes: function (flashes) {
+    setFlashes: function (flashes, autoClose = true) {
         mQuery('#flashes').append(flashes);
 
         mQuery('#flashes .alert-new').each(function () {
             var me = this;
-            window.setTimeout(function () {
-                mQuery(me).fadeTo(500, 0).slideUp(500, function () {
-                    mQuery(this).remove();
-                });
-            }, 4000);
+            // Only set the timeout if autoClose is true
+            if (autoClose) {
+                window.setTimeout(function () {
+                    mQuery(me).fadeTo(500, 0).slideUp(500, function () {
+                        mQuery(this).remove();
+                    });
+                }, 4000);
+            }
 
             mQuery(this).removeClass('alert-new');
         });
