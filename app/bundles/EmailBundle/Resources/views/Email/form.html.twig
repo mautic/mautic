@@ -241,6 +241,9 @@
         'previewUrl'    : previewUrl,
     }, with_context=false) -}}
 
+    {% set typeTwoDifferences = ['mautic.email.type.segment.differences.1st', 'mautic.email.type.segment.differences.2nd', 'mautic.email.type.segment.differences.3rd', 'mautic.email.type.segment.differences.4th'] %}
+    {% set typeOneDifferences = ['mautic.email.type.template.differences.1st', 'mautic.email.type.template.differences.2nd', 'mautic.email.type.template.differences.3rd', 'mautic.email.type.template.differences.4th'] %}
+
     {% set type = email.emailType %}
     {% if (
             (
@@ -264,13 +267,11 @@
             'header'             : 'mautic.email.type.header',
             'typeOneHeader'      : 'mautic.email.type.template.header',
             'typeOneIconClass'   : 'ri-mail-send-fill',
-            'typeOneDescription' : 'mautic.email.type.template.description',
-            'typeOneDifferences' : '',
+            'typeOneDifferences' : typeOneDifferences,
             'typeOneOnClick'     : "Mautic.selectEmailType('template');",
             'typeTwoHeader'      : 'mautic.email.type.list.header',
             'typeTwoIconClass'   : 'ri-pie-chart-fill',
-            'typeTwoDescription' : 'mautic.email.type.list.description',
-            'typeTwoDifferences' : '',
+            'typeTwoDifferences' : typeTwoDifferences,
             'typeTwoOnClick'     : "Mautic.selectEmailType('list');",
         }) -}}
     {% endif %}
