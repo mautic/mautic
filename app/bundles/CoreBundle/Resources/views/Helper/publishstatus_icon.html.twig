@@ -29,10 +29,10 @@
 
 {%- if status is same as 'published' %}
   {%- set icon = 'fa-toggle-on text-success' %}
-  {%- set text = 'mautic.core.form.published'|trans %}
+  {%- set text = 'mautic.core.form.active'|trans %}
 {%- elseif status is same as 'unpublished' %}
   {%- set icon = 'fa-toggle-off text-danger' %}
-  {%- set text = 'mautic.core.form.unpublished'|trans %}
+  {%- set text = 'mautic.core.form.inactive'|trans %}
 {%- elseif status is same as 'expired' %}
   {%- set icon = 'fa-clock-o text-danger' %}
   {%- set text = 'mautic.core.form.expired_to'|trans({'%date%': dateToFull(item.publishDown)}) %}
