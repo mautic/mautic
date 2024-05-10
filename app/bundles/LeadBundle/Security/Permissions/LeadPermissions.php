@@ -25,6 +25,7 @@ class LeadPermissions extends AbstractPermissions
         $this->permissions = [
             'fields' => [
                 'full' => 1024,
+                'view' => 1,
             ],
         ];
 
