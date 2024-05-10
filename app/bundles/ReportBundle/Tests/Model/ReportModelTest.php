@@ -5,6 +5,7 @@ namespace Mautic\ReportBundle\Tests\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -61,7 +62,8 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
             $translatorMock,
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
-            $this->createMock(RequestStack::class)
+            $this->createMock(RequestStack::class),
+            $this->createMock(ExportHelper::class)
         );
 
         // Do this to build the initial set of data from the subscribers that get used in all other contexts

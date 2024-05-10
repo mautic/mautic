@@ -8,8 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -73,7 +72,8 @@ class ReportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        protected ExportHelper $exportHelper,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
@@ -383,8 +383,7 @@ class ReportModel extends FormModel
      */
     public function exportResults($format, Report $report, ReportDataResult $reportDataResult, $handle = null, $page = null)
     {
-        $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
+        $name = $this->exportHelper->getExportFilename($report->getName());
 
         switch ($format) {
             case 'csv':

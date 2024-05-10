@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -38,6 +39,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CampaignController extends AbstractStandardFormController
 {
@@ -1180,5 +1184,78 @@ class CampaignController extends AbstractStandardFormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function countryStatsAction(CampaignModel $model, int $objectId): Response
+    {
+        $entity = $model->getEntity($objectId);
+
+        if (empty($entity) || !$this->security->hasEntityAccess(
+            'campaign:campaigns:viewown',
+            'campaign:campaigns:viewother',
+            $entity->getCreatedBy()
+        )) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $statsCountries = $model->getCountryStats($entity);
+
+        return $this->render(
+            '@MauticCore/Helper/countries_table.html.twig',
+            [
+                'data'           => $statsCountries,
+                'object'         => $entity,
+            ]
+        );
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function exportCountriesStatsAction(CampaignModel $model, ExportHelper $exportHelper, int $objectId, string $format = 'csv'): StreamedResponse|Response
+    {
+        $entity = $model->getEntity($objectId);
+
+        if (empty($entity) || !$this->security->hasEntityAccess(
+            'campaign:campaigns:viewown',
+            'campaign:campaigns:viewother',
+            $entity->getCreatedBy()
+        )) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $filename       = $exportHelper->getExportFilename($entity->getName()).'.'.$format;
+        $headerRow      = $this->getCountriesTableExportHeader($entity);
+        $statsCountries = $model->getCountryStats($entity);
+
+        if (empty($statsCountries)) {
+            throw new NotFoundHttpException();
+        }
+
+        return $exportHelper->exportDataAs(array_values($statsCountries), $format, $filename, $headerRow);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getCountriesTableExportHeader(Campaign $entity): array
+    {
+        $headers = [
+            $this->translator->trans('mautic.lead.lead.thead.country'),
+            $this->translator->trans('mautic.lead.leads'),
+        ];
+
+        if ($entity->isEmailCampaign()) {
+            array_push($headers,
+                $this->translator->trans('mautic.email.graph.line.stats.sent'),
+                $this->translator->trans('mautic.email.graph.line.stats.read'),
+                $this->translator->trans('mautic.email.clicked')
+            );
+        }
+
+        return $headers;
     }
 }

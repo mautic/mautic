@@ -4578,6 +4578,15 @@ lesshat-selector { -lh-property: 0 ;
     margin-top: -41px;
   }
 }
+.download-toolbar {
+  max-width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin: 15px 0;
+}
+.download-toolbar .fa:before {
+  margin-right: 5px;
+}
 .va-t {
   vertical-align: top !important;
 }

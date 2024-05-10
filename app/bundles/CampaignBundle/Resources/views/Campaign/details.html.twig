@@ -153,6 +153,11 @@
                         {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>
+                <li class="">
+                    <a href="#countries-stats-container" role="tab" data-toggle="tab">
+                        {{ 'mautic.core.countries.stats'|trans }}
+                    </a>
+                </li>
                 {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
@@ -193,6 +198,28 @@
                 <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
+            <!-- #countries-stats-container -->
+            <div class="tab-pane bdr-w-0" id="countries-stats-container">
+                <div id="countries-stats"
+                     data-target-url="{{ path('mautic_campaign_countries_stats', {'objectId': campaign.id }) }}">
+                    <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                </div>
+                <div class="std-toolbar btn-group download-toolbar">
+                    <a class="btn btn-default disabled "
+                       href="{{ path('mautic_campaign_countries_stats_export', {'objectId': campaign.id, 'format': 'csv'}) }}"
+                       data-button="download"
+                    >
+                        <span><i class="fa fa-file-text-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.csv'|trans }}</span></span>
+                    </a>
+                    <a class="btn btn-default disabled "
+                       href="{{ path('mautic_campaign_countries_stats_export', {'objectId': campaign.id, 'format': 'xlsx'}) }}"
+                       data-button="download"
+                    >
+                        <span><i class="fa fa-file-excel-o"></i><span class="hidden-xs hidden-sm">{{ 'mautic.core.export.xlsx'|trans }}</span></span>
+                    </a>
+                </div>
+            </div>
+            <!--/ #countries-stats-container -->
             {{ customContent('tabs.content', _context) }}
         </div>
         <!--/ end: tab-content -->

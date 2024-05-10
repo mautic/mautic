@@ -19,6 +19,14 @@ return [
                 'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
+            'mautic_email_countries_stats'      => [
+                'path'       => '/email/countries-stats/preview/{objectId}',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::countryStatsAction',
+            ],
+            'mautic_email_countries_stats_export' => [
+                'path'         => '/email/countries-stats/export/{objectId}/{format}',
+                'controller'   => 'Mautic\EmailBundle\Controller\EmailController::exportCountriesStatsAction',
+            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [

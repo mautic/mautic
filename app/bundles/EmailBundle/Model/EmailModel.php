@@ -52,6 +52,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
@@ -621,6 +623,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @return array<int|string, array<string, int|string|null>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getCountryStats(Email $entity, bool $includeVariants = false): array
+    {
+        $emailIds      = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
+        $statRepo      = $this->em->getRepository(Stat::class);
+
+        return $statRepo->getStatsSummaryByCountry($emailIds);
+    }
+
+    /**
      * Get a stats for email by list.
      *
      * @param bool $includeVariants
@@ -651,8 +666,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository(DoNotContact::class);
 
-        /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
-        $trackableRepo = $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
+        /** @var TrackableRepository $trackableRepo */
+        $trackableRepo = $this->em->getRepository(Trackable::class);
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $key           = ($listCount > 1) ? 1 : 0;
 

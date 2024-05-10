@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,9 +51,8 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->configParams[self::CAMPAIGN_SUMMARY_PARAM] = in_array($this->getName(), $functionForUseSummary);
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
         parent::setUp();
-        $this->campaignModel                                           = static::getContainer()->get('mautic.model.factory')->getModel('campaign');
-        $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
-        $this->configParams['delete_campaign_event_log_in_background'] = false;
+        $this->campaignModel      = static::getContainer()->get('mautic.model.factory')->getModel('campaign');
+        $this->campaignLeadsLabel = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
     }
 
     public function testCampaignContactCountThroughStatsWithSummary(): void
@@ -315,5 +319,151 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->em->flush();
 
         return $leadEventLog;
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function createCampaignWithEmail(): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test campaign');
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        // Create email
+        $email = new Email();
+        $email->setName('Test email');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        // Create email events
+        $event = new Event();
+        $event->setName('Send email');
+        $event->setType('email.send');
+        $event->setEventType('action');
+        $event->setChannel('email');
+        $event->setChannelId($email->getId());
+        $event->setCampaign($campaign);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        // Add events to campaign
+        $campaign->addEvent(0, $event);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    private function addLeadsFromCountry(Campaign $campaign, int $leadCount, string $country): void
+    {
+        for ($i = 0; $i < $leadCount; ++$i) {
+            $lead = new Lead();
+            $lead->setCountry($country);
+            $this->em->persist($lead);
+            $this->em->flush();
+
+            $campaignLead = new CampaignLead();
+            $campaignLead->setLead($lead);
+            $campaignLead->setCampaign($campaign);
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($i, $campaignLead);
+        }
+
+        $this->em->flush();
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testCountryStatsAction(): void
+    {
+        $campaign = $this->createCampaignWithEmail();
+        $this->addLeadsFromCountry($campaign, 4, 'Finland');
+
+        $this->client->request(Request::METHOD_GET, 's/campaign/countries-stats/preview/'.$campaign->getId());
+        $clientResponse = $this->client->getResponse();
+
+        $contentDom      = new \DOMDocument();
+        $responseContent = $clientResponse->getContent();
+        $contentDom->loadHTML($responseContent);
+        $crawler             = new Crawler($contentDom);
+        $crawlerTable        = $crawler->filter('table')->first();
+        $crawlerTableHeaders = $crawlerTable->filter('thead tr td');
+        $crawlerTableValues  = $crawlerTable->filter('tbody tr td');
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame('Country', $crawlerTableHeaders->eq(0)->text());
+        $this->assertSame('Contacts', $crawlerTableHeaders->eq(1)->text());
+        $this->assertSame('Finland', $crawlerTableValues->eq(0)->text());
+        $this->assertSame('4', $crawlerTableValues->eq(1)->text());
+    }
+
+    private function getCountryTableExportContent(Campaign $campaign, string $format = 'xlsx'): false|string
+    {
+        ob_start();
+        $this->client->request(Request::METHOD_GET, 's/campaign/countries-stats/export/'.$campaign->getId().'/'.$format);
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        switch ($format) {
+            case 'csv':
+                $this->assertEquals('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
+                break;
+            case 'xlsx':
+            default:
+                $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        }
+
+        return $content;
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testExportCountryTableCampaignWithEmail(): void
+    {
+        $campaign = $this->createCampaignWithEmail();
+        $this->addLeadsFromCountry($campaign, 4, 'Finland');
+        $content =  $this->getCountryTableExportContent($campaign);
+
+        // We need to write to a temp file as PhpSpreadsheet can only read from files
+        file_put_contents('campaign.xlsx', $content);
+        $spreadsheet       = IOFactory::load('campaign.xlsx');
+        $rows              = $spreadsheet->getActiveSheet()->toArray();
+
+        $this->assertSame(['Country', 'Contacts', 'Sent', 'Read', 'Clicked'], $rows[0]);
+        $this->assertSame('Finland', $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame(4, $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function testExportCountryTableCampaignNoEmail(): void
+    {
+        $campaignNoEmail = $this->createCampaign();
+        $this->addLeadsFromCountry($campaignNoEmail, 12, 'Portugal');
+        $content =  $this->getCountryTableExportContent($campaignNoEmail, 'csv');
+
+        // We need to write to a temp file as PhpSpreadsheet can only read from files
+        file_put_contents('campaign.csv', $content);
+        $spreadsheet       = IOFactory::load('campaign.csv');
+        $rows              = $spreadsheet->getActiveSheet()->toArray();
+
+        $this->assertSame(['Country', 'Contacts'], $rows[0]);
+        $this->assertSame('Portugal', $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame(12, $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
     }
 }

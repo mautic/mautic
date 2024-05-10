@@ -2,12 +2,14 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -21,6 +23,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -84,7 +87,7 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     * @return LeadEventLogRepository
      */
     public function getCampaignLeadEventLogRepository()
     {
@@ -786,5 +789,46 @@ class CampaignModel extends CommonFormModel
     public function getCampaignIdsWithDependenciesOnEmail(int $emailId): array
     {
         return $this->getRepository()->getCampaignIdsWithDependenciesOnEmail($emailId);
+    }
+
+    /**
+     * @return array<int|string, array<string, int|string|null>>
+     *
+     * @throws Exception
+     */
+    public function getCountryStats(Campaign $entity): array
+    {
+        $eventsEmailsSend     = $entity->getEmailSendEvents();
+        $eventsIds            = $eventsEmailsSend->getKeys();
+
+        $statRepo            = $this->em->getRepository(Stat::class);
+        $contacts            =  $this->getCampaignMembersGroupByCountry($entity);
+
+        foreach ($contacts as $e) {
+            $results[$e['country']]['country']  = $e['country'];
+            $results[$e['country']]['contacts'] = $e['contacts'];
+        }
+
+        if ($entity->isEmailCampaign()) {
+            $emailStats            = $statRepo->getStatsSummaryByCountry($eventsIds, 'campaign');
+
+            foreach ($emailStats as $e) {
+                $results[$e['country']]['sent_count']            = $e['sent_count'];
+                $results[$e['country']]['read_count']            = $e['read_count'];
+                $results[$e['country']]['clicked_through_count'] = $e['clicked_through_count'];
+            }
+        }
+
+        return $results ?? [];
+    }
+
+    /**
+     * Get leads in a campaign grouped by country.
+     *
+     * @return array{}|array<int, array<string, string|null>>
+     */
+    public function getCampaignMembersGroupByCountry(Campaign $campaign): array
+    {
+        return $this->getCampaignLeadRepository()->getCampaignMembersGroupByCountry($campaign);
     }
 }

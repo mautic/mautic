@@ -27,6 +27,14 @@ return [
                 'path'       => '/campaign/preview/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
+            'mautic_campaign_countries_stats'      => [
+                'path'       => '/campaign/countries-stats/preview/{objectId}',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::countryStatsAction',
+            ],
+            'mautic_campaign_countries_stats_export' => [
+                'path'         => '/campaign/countries-stats/export/{objectId}/{format}',
+                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignController::exportCountriesStatsAction',
+            ],
         ],
         'api'  => [
             'mautic_api_campaignsstandard'            => [

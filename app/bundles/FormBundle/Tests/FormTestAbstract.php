@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -278,6 +279,7 @@ class FormTestAbstract extends TestCase
             $userHelper,
             $mockLogger,
             $this->coreParametersHelper,
+            $this->createMock(ExportHelper::class),
         );
 
         return $submissionModel;

@@ -13,9 +13,11 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -553,5 +555,57 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEmpty($response['subject']);
         $this->assertEquals($email->getSubject(), $response['subject']);
         $this->assertNotEmpty($response['body']);
+    }
+
+    private function getCountryTableExportContent(Email $email, string $format = 'xlsx'): false|string
+    {
+        ob_start();
+        $this->client->request(Request::METHOD_GET, 's/email/countries-stats/export/'.$email->getId().'/'.$format);
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        switch ($format) {
+            case 'csv':
+                $this->assertEquals('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
+                break;
+            case 'xlsx':
+            default:
+                $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        }
+
+        return $content;
+    }
+
+    public function testExportCountryTableEmail(): void
+    {
+        $segment = $this->createSegment('Test segment', 'test-segment');
+        $email   = $this->createEmail('Test email', 'Test message', 'list', 'blank', '<p>Test</p>', $segment);
+
+        $lead = new Lead();
+        $lead->setCountry('Poland');
+        $lead->setEmail('example@example.com');
+
+        $emailStat = new Stat();
+        $emailStat->setEmail($email);
+        $emailStat->setLead($lead);
+        $emailStat->setList($segment);
+        $emailStat->setEmailAddress($lead->getEmail());
+        $emailStat->setDateSent(new \DateTime());
+        $this->em->persist($lead);
+        $this->em->persist($emailStat);
+        $this->em->flush();
+
+        $content = $this->getCountryTableExportContent($email);
+
+        // We need to write to a temp file as PhpSpreadsheet can only read from files
+        file_put_contents('email.xlsx', $content);
+        $spreadsheet       = IOFactory::load('email.xlsx');
+        $rows              = $spreadsheet->getActiveSheet()->toArray();
+
+        $this->assertSame(['Country', 'Sent', 'Read', 'Clicked'], $rows[0]);
+        $this->assertSame('Poland', $spreadsheet->getActiveSheet()->getCell('A2')->getValue());
+        $this->assertSame(1, $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
     }
 }

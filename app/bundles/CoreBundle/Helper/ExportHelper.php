@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -44,9 +45,12 @@ class ExportHelper
     /**
      * Exports data as the given export type. You can get available export types with getSupportedExportTypes().
      *
-     * @param array|\Iterator $data
+     * @param array|\Iterator   $data
+     * @param array<int,string> $headerRow
+     *
+     * @throws Exception
      */
-    public function exportDataAs($data, string $type, string $filename): StreamedResponse
+    public function exportDataAs($data, string $type, string $filename, array $headerRow = []): StreamedResponse
     {
         if (is_array($data)) {
             $data = new \ArrayIterator($data);
@@ -57,11 +61,11 @@ class ExportHelper
         }
 
         if (self::EXPORT_TYPE_EXCEL === $type) {
-            return $this->exportAsExcel($data, $filename);
+            return $this->exportAsExcel($data, $filename, $headerRow);
         }
 
         if (self::EXPORT_TYPE_CSV === $type) {
-            return $this->exportAsCsv($data, $filename);
+            return $this->exportAsCsv($data, $filename, $headerRow);
         }
 
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_EXCEL]));
@@ -96,9 +100,14 @@ class ExportHelper
         throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
-    private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
+    /**
+     * @param array<int,string> $headerRow
+     *
+     * @throws Exception
+     */
+    private function exportAsExcel(\Iterator $data, string $filename, array $headerRow = []): StreamedResponse
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename, $headerRow);
 
         $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $objWriter->setPreCalculateFormulas(false);
@@ -118,7 +127,18 @@ class ExportHelper
         return $response;
     }
 
-    private function getSpreadsheetGeneric(\Iterator $data, string $filename): Spreadsheet
+    /**
+     * @param array<int,string> $headerRow
+     */
+    private function addHeaderToSheet(Spreadsheet $spreadsheet, array $headerRow): void
+    {
+        $spreadsheet->getActiveSheet()->fromArray($headerRow);
+    }
+
+    /**
+     * @param array<int,string> $headerRow
+     */
+    private function getSpreadsheetGeneric(\Iterator $data, string $filename, array $headerRow = []): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getProperties()->setTitle($filename);
@@ -126,9 +146,9 @@ class ExportHelper
 
         $rowCount = 2;
         foreach ($data as $key => $row) {
+            // Build the header row if defined
             if (0 === $key) {
-                // Build the header row from keys in the current row.
-                $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
+                $this->addHeaderToSheet($spreadsheet, empty($headerRow) ? array_keys($row) : $headerRow);
             }
 
             $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
@@ -140,9 +160,12 @@ class ExportHelper
         return $spreadsheet;
     }
 
-    private function exportAsCsv(\Iterator $data, string $filename): StreamedResponse
+    /**
+     * @param array<int,string> $headerRow
+     */
+    private function exportAsCsv(\Iterator $data, string $filename, array $headerRow = []): StreamedResponse
     {
-        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename, $headerRow);
         $objWriter   = new Csv($spreadsheet);
         $objWriter->setPreCalculateFormulas(false);
         // For UTF-8 support
@@ -216,5 +239,12 @@ class ExportHelper
         $leadExport['stage'] = $stage ? $stage->getName() : null;
 
         return $leadExport;
+    }
+
+    public function getExportFilename(string $objectName): string
+    {
+        $date = (new DateTimeHelper())->toLocalString();
+
+        return str_replace(' ', '_', $date).'_'.InputHelper::alphanum($objectName, false, '_');
     }
 }
