@@ -14,6 +14,7 @@ import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor5';
+import StorageService from "./storage.service";
 
 // for local dev
 // import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
@@ -30,6 +31,8 @@ export default class BuilderService {
   uploadPath;
 
   deletePath;
+
+  storageService;
 
   /**
    * @param {*} assets
@@ -97,6 +100,20 @@ export default class BuilderService {
         data: { filename: response.getFilename() },
       });
     });
+
+    const triggerBuilderHide = () => {
+      // trigger hide event on DOM element
+      mQuery('.builder').trigger('builder:hide', [this.editor]);
+      // trigger hide event on editor instance
+      this.editor.trigger('hide');
+    };
+    this.editor.on('run:mautic-editor-page-html-close', triggerBuilderHide);
+    this.editor.on('run:mautic-editor-email-html-close', triggerBuilderHide);
+    this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
+
+    // add offset to flashes container for better UI visibility when builder is on
+    this.editor.on('show', () => mQuery('#flashes').addClass('alert-offset'));
+    this.editor.on('hide', () => mQuery('#flashes').removeClass('alert-offset'));
   }
 
   /**
@@ -141,6 +158,7 @@ export default class BuilderService {
     codeModeButton.addCommand();
     codeModeButton.addButton();
 
+    this.storageService = new StorageService(this.editor, object);
     this.overrideCustomRteDisable();
     this.setListeners();
   }
