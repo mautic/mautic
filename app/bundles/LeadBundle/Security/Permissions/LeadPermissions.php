@@ -52,6 +52,7 @@ class LeadPermissions extends AbstractPermissions
             [
                 'choices' => [
                     'mautic.core.permissions.manage' => 'full',
+                    'mautic.core.permissions.view'   => 'view',
                 ],
                 'label'             => 'mautic.lead.permissions.fields',
                 'data'              => (!empty($data['fields']) ? $data['fields'] : []),
