@@ -2886,7 +2886,7 @@ ul.dropdown-menu-form {
   min-width: 30px;
   justify-content: center;
   align-items: center;
-  transition: var(--all);
+  transition: var(--all-productive);
 }
 .label.pa-10 {
   min-width: auto;
@@ -2903,164 +2903,164 @@ a.label:focus {
   position: relative;
   top: -1px;
 }
-.label.gray-tag {
-  background-color: var(--tag-background-gray);
-  color: var(--tag-color-gray);
+.label.label-gray {
+  background-color: var(--label-background-gray);
+  color: var(--label-color-gray);
 }
-.label.gray-tag > a {
-  color: var(--tag-color-gray);
+.label.label-gray > a {
+  color: var(--label-color-gray);
 }
-.label.gray-tag:hover {
-  background-color: var(--tag-hover-gray);
+.label.label-gray:hover {
+  background-color: var(--label-hover-gray);
 }
-.label.cool-gray-tag {
-  background-color: var(--tag-background-cool-gray);
-  color: var(--tag-color-cool-gray);
+.label.label-cool-gray {
+  background-color: var(--label-background-cool-gray);
+  color: var(--label-color-cool-gray);
 }
-.label.cool-gray-tag > a {
-  color: var(--tag-color-cool-gray);
+.label.label-cool-gray > a {
+  color: var(--label-color-cool-gray);
 }
-.label.cool-gray-tag:hover {
-  background-color: var(--tag-hover-cool-gray);
+.label.label-cool-gray:hover {
+  background-color: var(--label-hover-cool-gray);
 }
-.label.warm-gray-tag {
-  background-color: var(--tag-background-warm-gray);
-  color: var(--tag-color-warm-gray);
+.label.label-warm-gray {
+  background-color: var(--label-background-warm-gray);
+  color: var(--label-color-warm-gray);
 }
-.label.warm-gray-tag > a {
-  color: var(--tag-color-warm-gray);
+.label.label-warm-gray > a {
+  color: var(--label-color-warm-gray);
 }
-.label.warm-gray-tag:hover {
-  background-color: var(--tag-hover-warm-gray);
+.label.label-warm-gray:hover {
+  background-color: var(--label-hover-warm-gray);
 }
-.label.red-tag {
-  background-color: var(--tag-background-red);
-  color: var(--tag-color-red);
+.label.label-red {
+  background-color: var(--label-background-red);
+  color: var(--label-color-red);
 }
-.label.red-tag > a {
-  color: var(--tag-color-red);
+.label.label-red > a {
+  color: var(--label-color-red);
 }
-.label.red-tag:hover {
-  background-color: var(--tag-hover-red);
+.label.label-red:hover {
+  background-color: var(--label-hover-red);
 }
-.label.magenta-tag {
-  background-color: var(--tag-background-magenta);
-  color: var(--tag-color-magenta);
+.label.label-magenta {
+  background-color: var(--label-background-magenta);
+  color: var(--label-color-magenta);
 }
-.label.magenta-tag > a {
-  color: var(--tag-color-magenta);
+.label.label-magenta > a {
+  color: var(--label-color-magenta);
 }
-.label.magenta-tag:hover {
-  background-color: var(--tag-hover-magenta);
+.label.label-magenta:hover {
+  background-color: var(--label-hover-magenta);
 }
-.label.purple-tag {
-  background-color: var(--tag-background-purple);
-  color: var(--tag-color-purple);
+.label.label-purple {
+  background-color: var(--label-background-purple);
+  color: var(--label-color-purple);
 }
-.label.purple-tag > a {
-  color: var(--tag-color-purple);
+.label.label-purple > a {
+  color: var(--label-color-purple);
 }
-.label.purple-tag:hover {
-  background-color: var(--tag-hover-purple);
+.label.label-purple:hover {
+  background-color: var(--label-hover-purple);
 }
-.label.blue-tag {
-  background-color: var(--tag-background-blue);
-  color: var(--tag-color-blue);
+.label.label-blue {
+  background-color: var(--label-background-blue);
+  color: var(--label-color-blue);
 }
-.label.blue-tag > a {
-  color: var(--tag-color-blue);
+.label.label-blue > a {
+  color: var(--label-color-blue);
 }
-.label.blue-tag:hover {
-  background-color: var(--tag-hover-blue);
+.label.label-blue:hover {
+  background-color: var(--label-hover-blue);
 }
-.label.cyan-tag {
-  background-color: var(--tag-background-cyan);
-  color: var(--tag-color-cyan);
+.label.label-cyan {
+  background-color: var(--label-background-cyan);
+  color: var(--label-color-cyan);
 }
-.label.cyan-tag > a {
-  color: var(--tag-color-cyan);
+.label.label-cyan > a {
+  color: var(--label-color-cyan);
 }
-.label.cyan-tag:hover {
-  background-color: var(--tag-hover-cyan);
+.label.label-cyan:hover {
+  background-color: var(--label-hover-cyan);
 }
-.label.teal-tag {
-  background-color: var(--tag-background-teal);
-  color: var(--tag-color-teal);
+.label.label-teal {
+  background-color: var(--label-background-teal);
+  color: var(--label-color-teal);
 }
-.label.teal-tag > a {
-  color: var(--tag-color-teal);
+.label.label-teal > a {
+  color: var(--label-color-teal);
 }
-.label.teal-tag:hover {
-  background-color: var(--tag-hover-teal);
+.label.label-teal:hover {
+  background-color: var(--label-hover-teal);
 }
-.label.green-tag {
-  background-color: var(--tag-background-green);
-  color: var(--tag-color-green);
+.label.label-green {
+  background-color: var(--label-background-green);
+  color: var(--label-color-green);
 }
-.label.green-tag > a {
-  color: var(--tag-color-green);
+.label.label-green > a {
+  color: var(--label-color-green);
 }
-.label.green-tag:hover {
-  background-color: var(--tag-hover-green);
+.label.label-green:hover {
+  background-color: var(--label-hover-green);
 }
-.label.mautic-blue-tag {
-  background-color: var(--tag-background-mautic-blue);
-  color: var(--tag-color-mautic-blue);
+.label.label-mautic-blue {
+  background-color: var(--label-background-mautic-blue);
+  color: var(--label-color-mautic-blue);
 }
-.label.mautic-blue-tag > a {
-  color: var(--tag-color-mautic-blue);
+.label.label-mautic-blue > a {
+  color: var(--label-color-mautic-blue);
 }
-.label.mautic-blue-tag:hover {
-  background-color: var(--tag-hover-mautic-blue);
+.label.label-mautic-blue:hover {
+  background-color: var(--label-hover-mautic-blue);
 }
-.label.gold-tag {
-  background-color: var(--tag-background-gold);
-  color: var(--tag-color-gold);
+.label.label-gold {
+  background-color: var(--label-background-gold);
+  color: var(--label-color-gold);
 }
-.label.gold-tag > a {
-  color: var(--tag-color-gold);
+.label.label-gold > a {
+  color: var(--label-color-gold);
 }
-.label.gold-tag:hover {
-  background-color: var(--tag-hover-gold);
+.label.label-gold:hover {
+  background-color: var(--label-hover-gold);
 }
 .label.has-click-event {
   border: 1px solid #00000017;
 }
-.label.has-click-event.gray-tag {
-  border: 1px solid var(--tag-border-gray);
+.label.has-click-event.label-gray {
+  border: 1px solid var(--label-border-gray);
 }
-.label.has-click-event.cool-gray-tag {
-  border: 1px solid var(--tag-border-cool-gray);
+.label.has-click-event.label-cool-gray {
+  border: 1px solid var(--label-border-cool-gray);
 }
-.label.has-click-event.warm-gray-tag {
-  border: 1px solid var(--tag-border-warm-gray);
+.label.has-click-event.label-warm-gray {
+  border: 1px solid var(--label-border-warm-gray);
 }
-.label.has-click-event.red-tag {
-  border: 1px solid var(--tag-border-red);
+.label.has-click-event.label-red {
+  border: 1px solid var(--label-border-red);
 }
-.label.has-click-event.magenta-tag {
-  border: 1px solid var(--tag-border-magenta);
+.label.has-click-event.label-magenta {
+  border: 1px solid var(--label-border-magenta);
 }
-.label.has-click-event.purple-tag {
-  border: 1px solid var(--tag-border-purple);
+.label.has-click-event.label-purple {
+  border: 1px solid var(--label-border-purple);
 }
-.label.has-click-event.blue-tag {
-  border: 1px solid var(--tag-border-blue);
+.label.has-click-event.label-blue {
+  border: 1px solid var(--label-border-blue);
 }
-.label.has-click-event.cyan-tag {
-  border: 1px solid var(--tag-border-cyan);
+.label.has-click-event.label-cyan {
+  border: 1px solid var(--label-border-cyan);
 }
-.label.has-click-event.teal-tag {
-  border: 1px solid var(--tag-border-teal);
+.label.has-click-event.label-teal {
+  border: 1px solid var(--label-border-teal);
 }
-.label.has-click-event.green-tag {
-  border: 1px solid var(--tag-border-green);
+.label.has-click-event.label-green {
+  border: 1px solid var(--label-border-green);
 }
-.label.has-click-event.mautic-blue-tag {
-  border: 1px solid var(--tag-border-mautic-blue);
+.label.has-click-event.label-mautic-blue {
+  border: 1px solid var(--label-border-mautic-blue);
 }
-.label.has-click-event.gold-tag {
-  border: 1px solid var(--tag-border-gold);
+.label.has-click-event.label-gold {
+  border: 1px solid var(--label-border-gold);
 }
 .label-default {
   background-color: #a0acb8;
