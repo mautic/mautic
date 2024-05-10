@@ -1458,6 +1458,12 @@ blockquote > p:after {
 .btn-link:focus {
   text-decoration: none;
 }
+.btn-info {
+  color: #3c4650;
+}
+.btn-info:hover {
+  color: #3c4650;
+}
 .btn-group .btn ~ .btn,
 .btn-group .btn ~ .btn-group,
 .btn-group .btn-group ~ .btn,
