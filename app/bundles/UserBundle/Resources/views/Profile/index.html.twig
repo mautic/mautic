@@ -10,21 +10,16 @@
     <!-- step container -->
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
-            {% if me.getId() %}
-            <div class="media">
-                <div class="pull-left">
-                    <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}" alt="" width="65px">
-                </div>
-                <div class="media-body">
-                    <h4>{{ me.getName() }}</h4>
-                    <h5>{{ me.getPosition() }}</h5>
-                </div>
-            </div>
-            <hr />
-            {% endif %}
+            
 
             <ul class="list-group list-group-tabs">
                 <li class="list-group-item active">
+                    <a href="#overview" class="list-group-item-text steps" data-toggle="tab">
+                        {% trans %}mautic.user.account.header.overview{% endtrans %}
+                    </a>
+                </li>
+
+                <li class="list-group-item">
                     <a href="#profile" class="list-group-item-text steps" data-toggle="tab">
                         {% trans %}mautic.user.account.header.details{% endtrans %}
                     </a>
@@ -45,7 +40,27 @@
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-l">
         <div class="tab-content">
-            <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
+            <div class="tab-pane fade in active bdr-rds-0 bdr-w-0 pa-md" id="overview">
+                {% if me.getId() %}
+                <div class="account-overview-panel">
+                    <div class="account-overview-header" style="background-image: url('{{ gravatarGetImage(me.getEmail()) }}');"></div>
+                    <div class="account-overview-user">
+                        <img class="img-rounded img-bordered media-object" src="{{ gravatarGetImage(me.getEmail()) }}" alt="">
+                        <div class="small muted pt-sm">@{{ me.getUsername() }}</div>
+                        <h2 class="pt-xs">{{ me.getName() }}</h4>
+                        <h5 class="pt-xs">{{ me.getPosition() }}</h5>
+                    </div>
+                    <div class="pa-lg">
+                        <div class="row-no-gutters center pt-lg gap-sm">
+                            <a href="https://gravatar.com/">{{ 'mautic.user.account.gravatar.account'|trans }} <i class="ri-external-link-line ri-sm"></i></a>
+                            <a href="https://support.gravatar.com/profiles/avatars/">{{ 'mautic.user.account.gravatar.howto'|trans }} <i class="ri-external-link-line ri-sm"></i></a>
+                        </div>
+                    </div>
+                </div>
+            	 {% endif %}
+            </div>
+
+            <div class="tab-pane fade in bdr-rds-0 bdr-w-0" id="profile">
                 {{ form_start(userForm) }}
                 <div class="pa-md bg-auto bg-light-xs bdr-b">
                     <h4 class="fw-sb">{% trans %}mautic.user.account.header.details{% endtrans %}</h4>

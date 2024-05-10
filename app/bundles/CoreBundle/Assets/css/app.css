@@ -5003,6 +5003,16 @@ a.inline-token:focus {
 a.inline-token .text-muted {
   color: #8393a2;
 }
+[class*="row"] {
+  display: flex;
+  flex-wrap: wrap;
+}
+[class*="row"].center {
+  justify-content: center;
+}
+.gap-sm {
+  gap: 10px;
+}
 @media (min-width: 992px) {
   .modal-xl {
     width: 1140px;
@@ -5301,4 +5311,41 @@ ul.media-list.media-list-feed div.media-object {
 }
 .flip-vertically {
   transform: scaleY(-1);
+}
+.account-overview-panel {
+  background-color: var(--layer);
+  border-radius: var(--border-radius-md);
+}
+.account-overview-header {
+  position: relative;
+  overflow: hidden;
+  height: 170px;
+  background-size: cover;
+}
+.account-overview-header:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+.account-overview-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -100px;
+  position: relative;
+}
+.account-overview-user img {
+  border-radius: 100px;
+  border: 4px solid white;
+  width: 170px;
+  transition: var(--all-expressive);
+}
+.account-overview-user img:hover {
+  border-radius: 16px;
+  scale: 1.1;
 }

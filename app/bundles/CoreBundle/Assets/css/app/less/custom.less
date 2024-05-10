@@ -366,3 +366,44 @@ ul.media-list.media-list-feed div.media-object
 .flip-vertically {
   transform: scaleY(-1);
 }
+
+// User account
+.account-overview-panel {
+  background-color: var(--layer);
+  border-radius: var(--border-radius-md);
+}
+
+.account-overview-header {
+  position: relative;
+  overflow: hidden;
+  height: 170px;
+  background-size: cover;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+  }
+}
+
+.account-overview-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -100px;
+  position: relative;
+
+  img {
+    border-radius: 100px;
+    border: 4px solid white;
+    width: 170px;
+    transition: var(--all-expressive);
+
+    &:hover {
+      border-radius: 16px;
+      scale: 1.1;
+    }
+  }
+}
