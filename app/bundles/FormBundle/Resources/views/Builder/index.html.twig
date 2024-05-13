@@ -202,6 +202,9 @@
   </div>
   {{ form_end(form) }}
 
+  {% set typeOneDifferences = ['mautic.form.type.one.differences.1st', 'mautic.form.type.one.differences.2nd', 'mautic.form.type.one.differences.3rd'] %}
+  {% set typeTwoDifferences = ['mautic.form.type.two.differences.1st', 'mautic.form.type.two.differences.2nd', 'mautic.form.type.two.differences.3rd'] %}
+
   {% if activeForm.formType is null or (forceTypeSelection is defined and forceTypeSelection is not empty) %}
       {{ include('@MauticCore/Helper/form_selecttype.html.twig', {
               'item': activeForm,
@@ -214,11 +217,11 @@
               'header': 'mautic.form.type.header',
               'typeOneHeader': 'mautic.form.type.campaign.header',
               'typeOneIconClass': 'ri-megaphone-fill',
-              'typeOneDescription': 'mautic.form.type.campaign.description',
+              'typeOneDifferences': typeOneDifferences,
               'typeOneOnClick': "Mautic.selectFormType('campaign');",
               'typeTwoHeader': 'mautic.form.type.standalone.header',
               'typeTwoIconClass': 'ri-survey-fill',
-              'typeTwoDescription': 'mautic.form.type.standalone.description',
+              'typeTwoDifferences': typeTwoDifferences,
               'typeTwoOnClick': "Mautic.selectFormType('standalone');",
       }, with_context=false) }}
   {% endif %}

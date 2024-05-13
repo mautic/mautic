@@ -31,7 +31,14 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                {{ typeOneDescription|trans }}
+                                {% if typeOneDescription is defined and typeOneDescription is not empty %}
+                                    {{ typeOneDescription|trans }}
+                                {% endif %}
+                                <ul class="ds-list-group ds-list-check">
+                                    {% for difference in typeOneDifferences %}
+                                        <li>{{ difference|trans }}</li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                             <div class="hidden-xs panel-footer text-center">
                                 <button class="btn btn-lg btn-default btn-nospin text-success" onclick="{{ typeOneOnClick }}">
@@ -54,7 +61,14 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                {{ typeTwoDescription|trans }}
+                                {% if typeTwoDescription is defined and typeTwoDescription is not empty %}
+                                    {{ typeTwoDescription|trans }}
+                                {% endif %}
+                                <ul class="ds-list-group ds-list-check">
+                                    {% for difference in typeTwoDifferences %}
+                                        <li>{{ difference|trans }}</li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                             <div class="hidden-xs panel-footer text-center">
                                 <button class="btn btn-lg btn-default btn-nospin text-primary" onclick="{{ typeTwoOnClick }}">
