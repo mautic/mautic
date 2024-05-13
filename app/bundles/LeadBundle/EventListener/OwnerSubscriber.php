@@ -95,7 +95,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     {
         $tokens = [];
 
-        foreach (self::onwerColumns as $ownerColumn) {
+        foreach (self::OWNER_COLUMNS as $ownerColumn) {
             $tokens[$this->buildToken($ownerColumn)] = '';
         }
 
@@ -109,7 +109,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     {
         $tokens = [];
 
-        foreach (self::onwerColumns as $ownerColumn) {
+        foreach (self::OWNER_COLUMNS as $ownerColumn) {
             $tokens[$this->buildToken($ownerColumn)] = '['.$this->buildLabel($ownerColumn).']';
         }
 
