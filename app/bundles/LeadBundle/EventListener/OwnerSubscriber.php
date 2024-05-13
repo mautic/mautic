@@ -65,7 +65,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         if (empty($contact['id']) && $event->getEntity()) {
             return;
         }
-        $ownerTokens = $this->getOwnerTokens($contact);
+        $ownerTokens = $this->getOwnerTokens($contact, $event->getContent());
         $content     = str_replace(array_keys($ownerTokens), $ownerTokens, $event->getContent());
         $event->setContent($content);
     }
@@ -85,7 +85,7 @@ class OwnerSubscriber implements EventSubscriberInterface
 
         $contact = $event->getLead();
 
-        return $this->getOwnerTokens($contact);
+        return $this->getOwnerTokens($contact, $event->getCombinedContent());
     }
 
     /**
@@ -157,7 +157,7 @@ class OwnerSubscriber implements EventSubscriberInterface
      *
      * @return array|string[]
      */
-    private function getOwnerTokens($contact): array
+    private function getOwnerTokens($contact, string $content): array
     {
         if (empty($contact['owner_id'])) {
             return $this->getEmptyTokens();
@@ -170,8 +170,11 @@ class OwnerSubscriber implements EventSubscriberInterface
 
         $tokens = [];
         foreach (self::OWNER_COLUMNS as $ownerColumn) {
-            $ownerColumnNormalized                   = $this->getOwnerColumnNormalized($ownerColumn);
-            $tokens[$this->buildToken($ownerColumn)] = $owner[$ownerColumnNormalized] ?? null;
+            $token = $this->buildToken($ownerColumn);
+            if (str_contains($content, $token)) {
+                $ownerColumnNormalized = $this->getOwnerColumnNormalized($ownerColumn);
+                $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
+            }
         }
 
         return $tokens;
