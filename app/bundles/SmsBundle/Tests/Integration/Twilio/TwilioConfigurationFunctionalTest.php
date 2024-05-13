@@ -6,7 +6,6 @@ namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;
 use PHPUnit\Framework\Assert;

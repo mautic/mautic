@@ -204,8 +204,6 @@ class TrackableModel extends AbstractCommonModel
      * Returns a list of tokens and/or URLs that should not be converted to trackables.
      *
      * @param string|string[]|null $content
-     *
-     * @return array
      */
     public function getDoNotTrackList($content): array
     {

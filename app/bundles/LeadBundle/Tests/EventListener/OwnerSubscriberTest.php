@@ -20,13 +20,13 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use PHPUnit\Framework\TestCase;
 
-class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
+class OwnerSubscriberTest extends TestCase
 {
     protected $contacts = [
         [
