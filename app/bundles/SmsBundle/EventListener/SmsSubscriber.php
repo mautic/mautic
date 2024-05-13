@@ -105,6 +105,7 @@ class SmsSubscriber implements EventSubscriberInterface
                 }
             }
 
+            $content = str_replace(array_keys($tokens), array_values($tokens), $content);
             foreach ($tokens as $token => $value) {
                 $event->addToken($token, $value);
             }
