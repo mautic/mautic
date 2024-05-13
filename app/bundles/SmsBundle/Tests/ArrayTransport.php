@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Mautic\SmsBundle\Tests;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Sms\MMSTransportInterface;
 use Mautic\SmsBundle\Sms\TransportInterface;
 
-class ArrayTransport implements TransportInterface, MMSTransportInterface
+class ArrayTransport implements TransportInterface
 {
     /**
      * @var array<array{'contact': Lead, 'content': string}>
