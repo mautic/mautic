@@ -25,11 +25,4 @@ class ArrayTransport implements TransportInterface
 
         return true;
     }
-
-    public function sendMms(Lead $lead, string $content, array $media): bool
-    {
-        $this->mmses[] = ['contact' => $lead, 'content' => $content];
-
-        return true;
-    }
 }

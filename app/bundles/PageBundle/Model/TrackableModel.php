@@ -227,7 +227,7 @@ class TrackableModel extends AbstractCommonModel
      *                                           This is to ensure that URLs are built correctly with ? or & for
      *                                           URLs tracked that include query parameters
      *
-     * @return array{string|string[],Trackable[]}
+     * @return array{string|string[],Redirect[]|Trackable[]}
      */
     public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
     {
