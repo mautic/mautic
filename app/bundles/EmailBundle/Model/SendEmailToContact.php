@@ -111,8 +111,7 @@ class SendEmailToContact
         Email $email,
         array $channel = [],
         array $customHeaders = [],
-        array $assetAttachments = [],
-        string $emailType = null
+        array $assetAttachments = []
     ): SendEmailToContact {
         // Flush anything that's pending from a previous email
         $this->flush();
@@ -121,7 +120,6 @@ class SendEmailToContact
         $this->mailer->enableQueue();
 
         if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
-            $this->mailer->setEmailType($emailType);
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 

@@ -182,8 +182,7 @@ class EmailApiController extends CommonApiController
                 'tokens'            => $cleanTokens,
                 'assetAttachments'  => $assetsIds,
                 'return_errors'     => true,
-                'ignoreDNC'         => true,
-                'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+                'ignoreDNC'         => $entity->getSendToDnc(),
             ]
         );
 
@@ -243,7 +242,7 @@ class EmailApiController extends CommonApiController
         }
 
         if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
-            // use default value, incase of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
+            // use default value, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
             $parameters['sendToDnc'] = false;
         }
 

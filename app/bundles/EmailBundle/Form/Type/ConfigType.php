@@ -364,6 +364,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'disable_unsubscribe_link_header',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.disable.unsubscribe.link',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.mailer.disable.unsubscribe.link.tooltip',
+                ],
+                'data'       => !empty($options['data']['disable_unsubscribe_link_header']),
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
             'mailer_is_owner',
             YesNoButtonGroupType::class,
             [
@@ -377,6 +392,7 @@ class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
+
         $builder->add(
             'email_frequency_number',
             NumberType::class,

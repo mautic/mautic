@@ -223,7 +223,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getId')->will($this->returnValue(1));
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
         $emailMock->method('getSubject')->willReturn('Subject');
-        $emailMock->method('getCustomHtml')->willReturn('content');
+        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -419,7 +419,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
         $emailMock->method('getSubject')->willReturn('Subject');
-        $emailMock->method('getCustomHtml')->willReturn('content');
+        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -523,7 +523,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
         $emailMock->method('getSubject')->willReturn(''); // The subject must be empty for the email to fail.
-        $emailMock->method('getCustomHtml')->willReturn('content');
+        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);

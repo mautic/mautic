@@ -168,10 +168,11 @@ class BuilderSubscriberTest extends TestCase
 
         $leadArray                = $lead->convertToArray();
         $leadArray['companies'][] = ['companyname' => $company->getName(), 'is_primary' => true];
-
+        $email                    = new Email();
+        $email->setSendToDnc(false);
         $args = [
-            'lead' => $leadArray,
-            'email'=> (new Email()),
+            'lead'  => $leadArray,
+            'email' => $email,
         ];
         $event = new EmailSendEvent(null, $args);
 
@@ -189,10 +190,6 @@ class BuilderSubscriberTest extends TestCase
             ->method('trans')
             ->withConsecutive([$unsubscribeTokenizedText], [])
             ->willReturn($unsubscribeTokenizedText);
-
-        $this->mailHelperMock->expects($this->once())
-            ->method('isMarketingEmail')
-            ->willReturn(true);
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(
