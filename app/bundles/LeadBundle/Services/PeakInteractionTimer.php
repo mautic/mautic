@@ -66,7 +66,7 @@ class PeakInteractionTimer
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
-        if (count($interactions) > self::MIN_INTERACTIONS) {
+        if (count($interactions) >= self::MIN_INTERACTIONS) {
             $hours                                     = array_column($interactions, 'hourOfDay');
             [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
         }
@@ -85,7 +85,7 @@ class PeakInteractionTimer
         $currentDateTime = $this->getContactDateTime($contact);
 
         $interactions = $this->getContactInteractions($contact, $currentDateTime->getTimezone());
-        if (count($interactions) > self::MIN_INTERACTIONS) {
+        if (count($interactions) >= self::MIN_INTERACTIONS) {
             $hours                                     = array_column($interactions, 'hourOfDay');
             $days                                      = array_column($interactions, 'dayOfWeek');
             [$this->bestHourStart, $this->bestHourEnd] = $this->calculateOptimalTime($hours);
