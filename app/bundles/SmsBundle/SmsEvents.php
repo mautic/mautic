@@ -101,33 +101,5 @@ final class SmsEvents
      * The event listener receives a
      * Mautic\SmsBundle\Event\TokensBuildEvent
      */
-    public const DNC_FILTER_CONTACTS_ON_SEND = 'mautic.sms.dnc_filter_contacts_on_send';
-
-    /**
-     * The mautic.sms.queue_filter_contacts_on_send event is dispatched when sending an SMS
-     * and filtering out contacts based on frequency rules.
-     *
-     * The event listener receives a Mautic\SmsBundle\Event\QueueEvent
-     *
-     * @var string
-     */
-    public const QUEUE_FILTER_CONTACTS_ON_SEND = 'mautic.sms.queue_filter_contacts_on_send';
-
-    /**
-     * The mautic.sms.filter_contacts_on_send event is dispatched when sending an SMS
-     * and filtering out contacts after DNC and Queue rules have been applied.
-     *
-     * The event listener receives a Mautic\SmsBundle\Event\FilterEvent
-     *
-     * @var string
-     */
-    public const FILTER_CONTACTS_ON_SEND = 'mautic.sms.filter_contacts_on_send';
-
-    /**
-     * The mautic.sms.on_tokens_build event is dispatched when a contact generate tokens are build.
-     *
-     * The event listener receives a
-     * Mautic\SmsBundle\Event\TokensBuildEvent
-     */
     public const ON_SMS_TOKENS_BUILD = 'mautic.sms.on_tokens_build';
 }
