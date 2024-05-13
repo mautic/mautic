@@ -60,7 +60,9 @@ class ReportType extends AbstractType
                 ]
             );
 
-            $builder->add('isPublished', YesNoButtonGroupType::class);
+            $builder->add('isPublished', YesNoButtonGroupType::class, [
+                'label' => 'mautic.core.status.available',
+            ]);
 
             $data = $options['data']->getSystem();
             $builder->add(
