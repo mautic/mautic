@@ -1009,7 +1009,7 @@ hr,
   margin-top: 15px;
   margin-bottom: 15px;
   border: 0;
-  border-top: 1px solid #ebedf0;
+  border-top: 0;
 }
 hr.hr-w-2,
 .hr-expand.hr-w-2 {
