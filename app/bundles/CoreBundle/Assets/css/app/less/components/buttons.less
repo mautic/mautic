@@ -7,16 +7,29 @@
 // ---------------------
 .btn {
   transition: var(--all-productive);
+  border: var(--no-border);
+  display: inline-flex;
+  align-items: center;
+  height: var(--spacing-08);
+  padding: 0 16px;
+  gap: var(--spacing-03);
+
   &,
   &:active {
     outline: 0;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    background-color: var(--button-disabled);
+    color: var(--text-on-color-disabled);
   }
 
   span {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: var(--spacing-03);
   }
 
   // reset font awesome width
@@ -70,8 +83,104 @@
     &.btn-danger { color: @brand-danger; }
     &.btn-info { color: @brand-info; }
   }
+
+  // Hierarchy buttons
+  &.btn-primary {
+    background-color: var(--button-primary);
+
+    &:hover {
+      background-color: var(--button-primary-hover);
+      border: var(--no-border);
+    }
+
+    &:active {
+      background-color: var(--button-primary-active);
+    }
+
+    &:focus {
+      border-color: var(--focus);
+      box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);
+    }
+
+    &.btn-danger {
+
+    }
+  }
+
+  &.btn-ghost {
+    color: var(--link-primary);
+    background-color: transparent;
+
+    &:hover {
+      color: var(--link-primary-hover);
+      background-color: var(--background-hover);
+    }
+
+    &:active {
+      background-color: var(--background-active);
+    }
+
+    &:disabled {
+      color: var(--text-disabled);
+      background-color: var(--button-disabled);
+    }
+  }
+
+  &.btn-tertiary, 
+  &.btn-primary + .btn-primary, 
+  &.btn-primary + .btn-primary + .btn-secondary {
+    background-color: transparent;
+    color: var(--button-tertiary);
+    border-color: var(--button-tertiary);
+    margin-left: -1px;
+
+    &:hover {
+      color: var(--text-on-color);
+      background-color: var(--button-tertiary-hover);
+    }
+
+    &:active {
+      color: var(--text-inverse);
+      background-color: var(--button-tertiary-active); 
+    }
+  }
+
+  &.btn-secondary {
+    background-color: var(--button-secondary);
+    color: var(--text-on-color);
+
+    &:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    &:active {
+      background-color: var(--button-secondary-active);
+    }
+  }
+
+  &.btn-icon {
+    justify-content: center;
+
+    &.btn-small { .btn-icon-size(var(--spacing-07)) }
+    &.btn-medium { .btn-icon-size(var(--spacing-08)) }
+    &.btn-large { .btn-icon-size(var(--spacing-09)) }
+    &.btn-extra-large { .btn-icon-size(var(--spacing-10)) }
+    &.btn-2xl { .btn-icon-size(var(--spacing-11)) }
+  }
+
+  // Standard sizes
+  &.btn-small { height: var(--spacing-07) }
+  &.btn-medium { height: var(--spacing-08); }
+  &.btn-large { height: var(--spacing-09); }
+  &.btn-extra-large { height: var(--spacing-10); }
+  &.btn-2xl { height: var(--spacing-11); }
 }
 
+// Mixin for squared icon-only buttons
+.btn-icon-size(@size) {
+  width: @size;
+  height: @size;
+}
 
 // Link buttons
 // -------------------------
