@@ -170,7 +170,7 @@ class ButtonExtension extends AbstractExtension
                     [
                         'attr' => array_merge(
                             [
-                                'class'       => 'btn btn-default',
+                                'class'       => 'btn btn-primary',
                                 'href'        => $path,
                                 'data-toggle' => 'ajax',
                             ],
