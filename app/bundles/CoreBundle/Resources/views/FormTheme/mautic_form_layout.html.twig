@@ -510,7 +510,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
             ((child.vars.name == '0' and child.vars.checked is not empty) ? ' btn-danger' : '') ~
             ((child.vars.name == '1' and child.vars.checked is not empty) ? ' btn-success' : '')
         %}
-        <label class="btn btn-default {{ class }}">
+        <label class="btn btn-icon btn-small {{ class }}">
             {{ form_widget(child, {'attr': attr}) }}
             <span>{{ child.vars.label|trans }}</span>
         </label>
