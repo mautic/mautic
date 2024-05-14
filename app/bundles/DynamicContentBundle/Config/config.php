@@ -45,6 +45,15 @@ return [
     ],
     'services' => [
         'forms' => [
+            'mautic.form.type.dwc' => [
+                'class'     => \Mautic\DynamicContentBundle\Form\Type\DynamicContentType::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.list',
+                    'mautic.lead.data_transformer.field_filter',
+                    'mautic.lead.model.lead',
+                ],
+            ],
             'mautic.form.type.dwc_entry_filters' => [
                 'class'     => Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
                 'arguments' => [

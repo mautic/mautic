@@ -12,6 +12,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentListType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -20,7 +21,6 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentTypeTest extends TestCase
 {
@@ -28,7 +28,7 @@ class DynamicContentTypeTest extends TestCase
     {
         $entityManagerMock       = $this->createMock(EntityManager::class);
         $listModelMock           = $this->createMock(ListModel::class);
-        $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
+        $fieldFilterTransformer  = $this->createMock(FieldFilterTransformer::class);
         $leadModelMock           = $this->createMock(LeadModel::class);
 
         $listModelMock->expects($this->once())
@@ -54,7 +54,7 @@ class DynamicContentTypeTest extends TestCase
         $dynamicContentType = new DynamicContentType(
             $entityManagerMock,
             $listModelMock,
-            $translatorInterfaceMock,
+            $fieldFilterTransformer,
             $leadModelMock,
             new TypeList(),
         );

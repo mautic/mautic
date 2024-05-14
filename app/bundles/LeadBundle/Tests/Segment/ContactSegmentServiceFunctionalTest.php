@@ -115,6 +115,8 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'segment-membership-regexp'                                          => 11,
             'segment-company-only-fields'                                        => 6,
             'segment-including-segment-with-company-only-fields'                 => 14,
+            'segment-test-with-absolute-date-type'                                      => 54,
+            'segment-test-with-relative-date-type'                                      => 54,
             'name-is-not-equal-not-null-test'                                    => 54,
             'manually-unsubscribed-sms-test'                                     => 1,
             'clicked-link-in-any-email'                                          => 2,
