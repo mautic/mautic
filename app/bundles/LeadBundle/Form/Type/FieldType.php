@@ -538,7 +538,7 @@ class FieldType extends AbstractType
                 'disabled' => $options['data']->disablePublishChange(),
                 'attr'     => $attr,
                 'data'     => ('email' == $options['data']->getAlias()) ? true : $options['data']->getIsPublished(),
-                'label'    => 'mautic.core.status.available',
+                'label'    => 'mautic.core.form.available',
             ]
         );
 
