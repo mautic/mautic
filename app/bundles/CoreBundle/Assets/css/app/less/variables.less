@@ -428,12 +428,10 @@
 }
 
 /// High contrast
-@media (prefers-contrast: more) {
-    :root {
+    :root[high-contrast="enabled"] {
         --no-border: 1px solid var(--border-strong);
         --border-bottom: 1px solid var(--border-strong);
     }
-}
 
 /// No transparency and blur
 @media (prefers-reduced-transparency: reduce) {
