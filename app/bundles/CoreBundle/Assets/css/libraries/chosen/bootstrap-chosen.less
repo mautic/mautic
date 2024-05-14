@@ -145,7 +145,7 @@
     height: @chosen-height;
     overflow: hidden;
     line-height: @chosen-height;
-    padding: 0 0 0 8px;
+    padding: 0 0 0 var(--spacing-05);
     position: relative;
     text-decoration: none;
     white-space: nowrap;
@@ -333,7 +333,7 @@
   }
 
   &.chosen-with-drop .chosen-single {
-    background-color: @input-bg;
+    background-color: var(--field-hover);
     border: @chosen-focus-border;
     .border-bottom-radius(0);
     .box-shadow(@chosen-focus-box-shadow);

@@ -25,14 +25,34 @@ label {
 
 // form control
 // -------------------------
-.form-control {
+.form-control, .chosen-container-single .chosen-single {
+  background-color: var(--field);
+  color: var(--text-primary);
+  border-width: var(--border-bottom);
+  transition: var(--all-productive);
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  border-radius: var(--border-radius-md);
+
   .box-shadow(none);
-  .transition(~"border-color ease-in-out .15s");
   // Rounded
   // -------------------------
   &.form-control-rounded {
     border-radius: @input-height-base;
   }
+
+  &:hover {
+    background-color: var(--field-hover);
+  }
+
+  &:focus {
+    outline: 2px solid var(--focus);
+    box-shadow: none;
+  }
+}
+
+.form-control {
+  padding: var(--spacing-04) var(--spacing-05);
 }
 
 // stacked form

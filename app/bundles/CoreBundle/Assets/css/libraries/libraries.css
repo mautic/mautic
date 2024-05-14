@@ -17164,7 +17164,7 @@ a > .fa {
   margin-right: 2px;
 }
 .chosen-container .chosen-drop {
-  background: #fff;
+  background: var(--field);
   border: 1px solid #d5d5d5;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
@@ -17254,11 +17254,11 @@ a > .fa {
   background: url("chosen/chosen-sprite.png") no-repeat -22px -3px;
 }
 .chosen-container-single .chosen-single {
-  background-color: #fff;
+  background-color: var(--field);
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-  border: 1px solid #d5d5d5;
+  border: none;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
@@ -17270,7 +17270,7 @@ a > .fa {
   height: 32px;
   overflow: hidden;
   line-height: 32px;
-  padding: 0 0 0 8px;
+  padding: 0 0 0 var(--spacing-05);
   position: relative;
   text-decoration: none;
   white-space: nowrap;
@@ -17320,8 +17320,8 @@ a > .fa {
   z-index: 1000;
 }
 .chosen-container-single .chosen-search input[type="text"] {
-  background: url("chosen/chosen-sprite.png") no-repeat 100% -20px, #fff;
-  border: 1px solid #d5d5d5;
+  background: url("chosen/chosen-sprite.png") no-repeat 100% -20px, var(--field);
+  border: none;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
@@ -17346,8 +17346,8 @@ a > .fa {
   left: -9000px;
 }
 .chosen-container-multi .chosen-choices {
-  background-color: #fff;
-  border: 1px solid #d5d5d5;
+  background-color: var(--field);
+  border: none;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
@@ -17387,7 +17387,7 @@ a > .fa {
   -moz-background-clip: padding;
   background-clip: padding-box;
   background-color: #ebedf0;
-  border: 1px solid #d5d5d5;
+  border: none;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
@@ -17429,20 +17429,20 @@ a > .fa {
   display: none;
 }
 .chosen-container-active .chosen-single {
-  border: 1px solid #bcbcbc;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
+  border: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
   -webkit-transition: border linear .2s, box-shadow linear .2s;
   -o-transition: border linear .2s, box-shadow linear .2s;
   transition: border linear .2s, box-shadow linear .2s;
 }
 .chosen-container-active.chosen-with-drop .chosen-single {
-  background-color: #fff;
-  border: 1px solid #bcbcbc;
+  background-color: var(--field-hover);
+  border: none;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
+  -webkit-box-shadow: none;
+  box-shadow: none;
   -webkit-transition: border linear .2s, box-shadow linear .2s;
   -o-transition: border linear .2s, box-shadow linear .2s;
   transition: border linear .2s, box-shadow linear .2s;
@@ -17455,11 +17455,11 @@ a > .fa {
   background-position: -18px 7px;
 }
 .chosen-container-active .chosen-choices {
-  border: 1px solid #bcbcbc;
+  border: none;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, .075) inset, 0 0 8px rgba(82, 168, 236, .6);
+  -webkit-box-shadow: none;
+  box-shadow: none;
   -webkit-transition: border linear .2s, box-shadow linear .2s;
   -o-transition: border linear .2s, box-shadow linear .2s;
   transition: border linear .2s, box-shadow linear .2s;
@@ -17528,7 +17528,7 @@ a > .fa {
   border-right: none;
 }
 .chosen-rtl .chosen-search input[type="text"] {
-  background: url("chosen/chosen-sprite.png") no-repeat -28px -20px, #fff;
+  background: url("chosen/chosen-sprite.png") no-repeat -28px -20px, var(--field);
   direction: rtl;
   padding: 4px 5px 4px 20px;
 }

@@ -2896,15 +2896,33 @@ label {
 .control-label.text-left {
   text-align: left;
 }
-.form-control {
+.form-control,
+.chosen-container-single .chosen-single {
+  background-color: var(--field);
+  color: var(--text-primary);
+  border-width: var(--border-bottom);
+  transition: var(--all-productive);
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  border-radius: var(--border-radius-md);
   -webkit-box-shadow: none;
   box-shadow: none;
-  -webkit-transition: border-color ease-in-out .15s;
-  -o-transition: border-color ease-in-out .15s;
-  transition: border-color ease-in-out .15s;
 }
-.form-control.form-control-rounded {
+.form-control.form-control-rounded,
+.chosen-container-single .chosen-single.form-control-rounded {
   border-radius: 32px;
+}
+.form-control:hover,
+.chosen-container-single .chosen-single:hover {
+  background-color: var(--field-hover);
+}
+.form-control:focus,
+.chosen-container-single .chosen-single:focus {
+  outline: 2px solid var(--focus);
+  box-shadow: none;
+}
+.form-control {
+  padding: var(--spacing-04) var(--spacing-05);
 }
 .form-stack .form-control {
   position: relative;
@@ -3353,6 +3371,12 @@ ul.line-legend li {
 }
 .input-group .input-group-btn + .form-control {
   margin-left: -1px;
+}
+.input-group-addon {
+  border-width: var(--border-bottom);
+  border-radius: var(--border-radius-md);
+  background-color: var(--field-hover);
+  color: var(--text-secondary);
 }
 .img-wrapper {
   display: inline-block;
