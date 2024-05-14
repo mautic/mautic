@@ -60,7 +60,7 @@ class CampaignMapStatsController extends AbstractController
      */
     public function getMapOptions(Campaign $entity): array
     {
-        if ($entity->getEmailSendEvents()->count() > 0) {
+        if ($entity->isEmailCampaign()) {
             return self::MAP_OPTIONS;
         }
 

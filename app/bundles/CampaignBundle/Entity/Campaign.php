@@ -412,6 +412,14 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $keyedArrayCollection;
     }
 
+    public function isEmailCampaign(): bool
+    {
+        $criteria     = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'))->setMaxResults(1);
+        $emailEvent   = $this->getEvents()->matching($criteria);
+
+        return !$emailEvent->isEmpty();
+    }
+
     /**
      * Set publishUp.
      *
