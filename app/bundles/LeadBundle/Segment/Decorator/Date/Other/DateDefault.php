@@ -5,9 +5,12 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
 class DateDefault implements FilterDecoratorInterface
 {
+    use ParseDateFilterValueTrait;
+
     /**
      * @param string $originalValue
      */
@@ -53,7 +56,7 @@ class DateDefault implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
-        $filter = $this->originalValue;
+        $filter = $this->parseDateFilterValue($this->originalValue);
 
         return match ($contactSegmentFilterCrate->getOperator()) {
             'like', '!like' => !str_contains($filter, '%') ? '%'.$filter.'%' : $filter,

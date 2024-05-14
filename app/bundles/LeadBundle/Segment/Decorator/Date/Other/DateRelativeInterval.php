@@ -6,9 +6,12 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
 class DateRelativeInterval implements FilterDecoratorInterface
 {
+    use ParseDateFilterValueTrait;
+
     /**
      * @param string $originalValue
      */
@@ -63,7 +66,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         $date = $this->dateOptionParameters->getDefaultDate();
-        $date->modify($this->originalValue);
+        $date->modify($this->parseDateFilterValue($this->originalValue));
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';

@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Form\Type\SegmentDateFilterType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -52,6 +53,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE           => ['onTypeOperatorsCollect', 0],
             LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE => ['onTypeListCollect', 0],
             LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD          => [
+                ['onSegmentFilterFormHandleDate', 1200],
                 ['onSegmentFilterFormHandleTags', 1000],
                 ['onSegmentFilterFormHandleLookupId', 800],
                 ['onSegmentFilterFormHandleLookup', 600],
@@ -273,6 +275,26 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
             $event->stopPropagation();
         }
+    }
+
+    public function onSegmentFilterFormHandleDate(FormAdjustmentEvent $event): void
+    {
+        if (!$event->fieldTypeIsOneOf('date', 'datetime')) {
+            return;
+        }
+
+        $form = $event->getForm();
+
+        $form->add(
+            'filter',
+            SegmentDateFilterType::class,
+            [
+                'label'    => false,
+                'data'     => $form->getData()['filter'] ?? [],
+            ]
+        );
+
+        $event->stopPropagation();
     }
 
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
