@@ -1025,6 +1025,7 @@ body > #app-wrapper {
   font-size: 14px;
   min-width: 26px;
   display: block;
+  transition: var(--all-expressive);
 }
 .app-sidebar .nav-sidebar > .nav > li > a .arrow {
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -1148,7 +1149,7 @@ body > #app-wrapper {
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .icon {
     min-width: 0;
     width: 100%;
-    /* text-align: center; */
+    font-size: 17px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu {
     display: none;
