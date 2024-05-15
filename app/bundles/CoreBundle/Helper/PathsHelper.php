@@ -34,10 +34,6 @@ class PathsHelper
 
     private string $importLeadsDir;
 
-    /**
-     * PathsHelper constructor.
-     */
->>>>>>> 38683b16a9... Merge pull request #1134 from acquia/MAUT-4444-file-import
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
