@@ -181,16 +181,16 @@
         right: 0;
         left: 50px;
         bottom: 0;
-        border-bottom: 1px solid lighten(@bgcolor, 1.8%);
+        border-bottom: none;
       }
     }
 
     > a {
-      color: fade(contrast(@bgcolor), 50%);
+      color: var(--text-secondary);
       &:hover,
       &:focus {
-        background-color: @bgcolor;
-        color: fade(contrast(@bgcolor), 75%);
+        background-color: var(--layer-hover);
+        color: var(--text-primary);
       }
     }
 
@@ -198,33 +198,33 @@
     &.active,
     &.open {
       > a {
-        background-color: @bgcolor;
-        color: fade(contrast(@bgcolor), 75%);
+        background-color: var(--layer-selected);
+        color: var(--text-primary);
       }
 
       // `nav-submenu`
       > .nav-submenu {
-        background-color: darken(@bgcolor, 3%);
+        background-color: var(--layer-accent);
       }
     }
 
     // nav-submenu style
     > .nav-submenu {
-      background-color: darken(@bgcolor, 1.5%);
+      background-color: var(--layer-accent);
       &:after {
-        background-color: lighten(@bgcolor, 2%);
+        background-color: var(--layer-accent-alt);
       }
       > li {
         // the dot
         &:after {
-          background-color: lighten(@bgcolor, 2.5%);
-          box-shadow: 0 0 0 2px darken(@bgcolor, 1.5%);
+          background-color: var(--layer);
+          box-shadow: none;
         }
         > a {
-          color: fade(contrast(@bgcolor), 50%);
+          color: var(--text-secondary);
           &:hover,
           &:focus {
-            color: fade(contrast(@bgcolor), 80%);
+            color: var(--text-primary);
           }
         }
 
@@ -232,7 +232,7 @@
         &.active,
         &.open {
           > a {
-            color: fade(contrast(@bgcolor), 80%);
+            color: var(--text-primary);
           }
         }
       }

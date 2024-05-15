@@ -42,9 +42,9 @@
   &.sidebar-left {
     width: @sidebar-left-width;
     left: -@sidebar-left-width;
-    background-color: @sidebar-left-bg;
+    background-color: var(--layer);
     box-shadow: inset -1px 0 0 0 rgba(0, 0, 0, 0.05);
-    color: fade(contrast(@sidebar-left-bg), 55%);
+    color: var(--text-secondary);
     .transition(all .3s ease);
 
     // sidebar header & footer
@@ -84,7 +84,7 @@
     }
 
     .nav.sidebar-left-dark, .nav.sidebar-left-dark > li > a:hover {
-      background: @sidebar-left-dark;
+      background: var(--layer-accent);
     }
   }
 
@@ -93,16 +93,16 @@
   &.sidebar-right {
     width: @sidebar-right-width;
     right: -@sidebar-right-width;
-    background-color: @sidebar-right-bg;
+    background-color: var(--layer);
     box-shadow:inset 1px 0 0 0 rgba(0,0,0,0.05);
-    color: fade(contrast(@sidebar-right-bg), 55%);
+    color: var(--text-secondary);
     .transition(all .3s ease);
 
     // sidebar header & footer
     .sidebar-header,
     .sidebar-footer {
       width: @sidebar-right-width;
-      background-color: @sidebar-right-header-bg;
+      background-color: var(--layer);
     }
 
     // sidebar content
@@ -130,7 +130,7 @@
     .header-fixed & {
       position: absolute;
       top: 0;
-      box-shadow: 0 1px 0 0 rgba(0,0,0,0.06);
+      
       //box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
     }
 
@@ -151,7 +151,7 @@
     box-shadow: 0 -1px 0 0 rgba(0,0,0,0.07);
 
     .form-control {
-      color: darken(#fff, 40%);
+      color: transparent;
     }
 
     // add bottom space to `sidebar-content` if footer is present
@@ -179,11 +179,11 @@
           margin-right: 0;
           padding-top: 12px;
           padding-bottom: 12px;
-          color: fade(contrast(@sidebar-right-bg), 45%);
+          color: var(--text-secondary);
           background-color: transparent;
           &:hover,
           &:focus {
-            color: fade(contrast(@sidebar-right-bg), 85%);
+            color: var(--text-primary);
             background-color: transparent;
           }
         }
@@ -192,8 +192,8 @@
           &,
           &:hover,
           &:focus {
-            color: fade(contrast(@sidebar-right-bg), 85%);
-            background-color: rgba(0,0,0,0.06);
+            color: var(--text-primary);
+            background-color: var(--layer-hover);
           }
           &:after {
             top: auto;
@@ -221,6 +221,7 @@
             position: relative;
             top: -1px;
             display: block;
+            
             //font-weight: 600;
           }
           .icon {
@@ -252,7 +253,7 @@
               }
             }
             .icon {
-              color: @brand-warning;
+              color: var(--icon-interactive);
             }
           }
         }
@@ -261,6 +262,7 @@
         > .nav-submenu {
           position: relative;
           padding-left: 50px;
+          
 
           // the line
           &:after {
@@ -276,6 +278,10 @@
           > li {
             position: relative;
             list-style: none;
+
+            &:last-child {
+              padding-bottom: var(--spacing-05);
+            }
 
             // the dot
             &:after {
