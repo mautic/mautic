@@ -4,9 +4,7 @@
        <div class="offcanvas-main" id="OffCanvasMain">
             <!-- start: sidebar header -->
             <div class="sidebar-header box-layout"  id="OffCanvasMainHeader">
-                <div class="col-xs-12 pt-lg text-center">
-                    <h4>{% trans %}mautic.core.settings{% endtrans %}</h4>
-                </div>
+                <div class="col-xs-12 pt-lg text-center"></div>
 
                 <!-- start: loading bar -->
                 <div class="canvas-loading-bar">
@@ -20,7 +18,7 @@
             <div class="sidebar-content">
                 <!-- scroll-content -->
                 <div class="scroll-content slimscroll" id="OffCanvasMainContent">
-                    <nav class="nav-sidebar">
+                    <nav class="nav-sidebar" aria-label="{% trans %}mautic.core.settings{% endtrans %}">
                         {{ menuRender('admin') }}
                     </nav>
                 </div>
