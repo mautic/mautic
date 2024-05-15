@@ -2899,8 +2899,8 @@ label {
 .form-control,
 .chosen-container-single .chosen-single {
   background-color: var(--field);
-  color: var(--text-primary);
   border-width: var(--border-bottom);
+  border-color: var(--border-strong);
   transition: var(--all-productive);
   outline: 2px solid transparent;
   outline-offset: -2px;
@@ -2923,6 +2923,7 @@ label {
 }
 .form-control {
   padding: var(--spacing-04) var(--spacing-05);
+  color: var(--text-primary);
 }
 .search-container {
   position: relative;
@@ -3415,6 +3416,7 @@ ul.line-legend li {
   border-radius: var(--border-radius-md);
   background-color: var(--field-hover);
   color: var(--text-secondary);
+  border-color: var(--border-strong);
 }
 .img-wrapper {
   display: inline-block;
