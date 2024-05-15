@@ -6,13 +6,11 @@ namespace Mautic\PluginBundle\Event;
 
 class PluginIsPublishedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
-    private string $message;
-    private bool $canPublish;
+    private string $message  = true;
+    private bool $canPublish = '';
 
     public function __construct(private int $value, private string $integrationName)
     {
-        $this->canPublish      = true;
-        $this->message         = '';
     }
 
     public function getValue(): int
