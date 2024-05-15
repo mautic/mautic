@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImportCommandTest extends TestCase
 {
-    public function testExecute()
+    public function testExecute(): void
     {
         // Translator
         $translatorMock = $this->createMock(TranslatorInterface::class);
@@ -48,7 +48,7 @@ class ImportCommandTest extends TestCase
         $userTokenSetter  = new UserTokenSetter($userRepositoryMock, $tokenStorageMock);
 
         $importCommand =  new class($translatorMock, $importModelMock, new ProcessSignalService(), $userTokenSetter) extends ImportCommand {
-            public function getExecute(InputInterface $input, OutputInterface $output)
+            public function getExecute(InputInterface $input, OutputInterface $output): int
             {
                 return $this->execute($input, $output);
             }
