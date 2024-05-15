@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests\Form\Constraint;
 
 use Mautic\PluginBundle\Event\PluginIsPublishedEvent;
