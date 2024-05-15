@@ -3,7 +3,7 @@
 {% set modalView      = app.getRequest().get('modal', false) or block('inModal') is defined %}
 {% block mainFormContent %}
 <div class="box-layout">
-    <div class="col-md-{{ hasRightColumn and not modalView ? 9 : 12 }} bg-auto height-auto bdr-r">
+    <div class="col-md-{{ hasRightColumn and not modalView ? 9 : 12 }} height-auto bdr-r">
         <div class="pa-md">
             {{ block('primaryFormContent') }}
         </div>
