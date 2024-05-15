@@ -72,6 +72,17 @@ mQuery( document ).ready(function() {
             e.preventDefault();
         }
     });
+
+    // Try to keep alive the session.
+    setInterval(function() {
+        mQuery.get('/s/keep-alive')
+          .done(function() {
+              console.log('Keep-alive tick');
+          })
+          .fail(function(jqXHR, textStatus, errorThrown) {
+              console.error('Error with keep-alive:', errorThrown);
+          });
+    }, 1440 * 1000 / 2);
 });
 
 if (typeof history != 'undefined') {
