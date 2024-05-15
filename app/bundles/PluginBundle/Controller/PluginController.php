@@ -445,7 +445,7 @@ class PluginController extends FormController
      *
      * @return array <string,mixed>
      *
-     * @phpstan-ignore-next-line
+     * @phpstan-ignore-next-line Ignore as AbstractIntegration is deprecated
      */
     private function removeAuthData(array $keys, array $currentKeys, AbstractIntegration $integrationObject): array
     {

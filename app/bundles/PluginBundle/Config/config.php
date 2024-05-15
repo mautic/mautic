@@ -78,13 +78,6 @@ return [
                     'mautic.factory',
                 ],
             ],
-            'mautic.plugin.validator.can_publish_validator' => [
-                'class'     => Mautic\PluginBundle\Form\Constraint\CanPublishValidator::class,
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-                'tag'   => 'validator.constraint_validator',
-            ],
         ],
         'facades' => [
             'mautic.plugin.facade.reload' => [

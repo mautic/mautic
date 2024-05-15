@@ -17,8 +17,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class CanPublishValidatorTest extends TestCase
 {
-    private MockObject $dispatcher;
-    private MockObject $event;
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var MockObject|PluginIsPublishedEvent
+     */
+    private $event;
     private CanPublishValidator $canPublishValidator;
 
     protected function setUp(): void
