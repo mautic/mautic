@@ -212,17 +212,17 @@
       > li {
         > a {
           overflow: hidden;
-          padding: 12px 20px;
+          padding: 12px 22px;
           .transition(all .15s ease);
           .text {
-            .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+            .transition(~"opacity var(--duration-expressive) ease .1s, line-height");
             opacity: 1;
+            transition-delay: .1s;
             margin-left: 0;
             position: relative;
             top: -1px;
             display: block;
-            
-            //font-weight: 600;
+            line-height: 18px;
           }
           .icon {
             font-weight: normal;
@@ -384,8 +384,7 @@
           margin-top: 10px;
           > .nav > li {
             > a {
-              padding-top: 12px;
-              padding-bottom: 12px;
+              padding: 12px 22px;
             }
             &.nav-heading,
             > a .arrow,
@@ -393,10 +392,11 @@
             > a .text,
             > a .label {
               /* override default margin-left transition as any delay throws Chrome off */
-              .transition(none);
+              .transition(none); 
               /* hide everything but the icon; using margin and opacity since display can't be transitioned */
               margin-left: -500px;
               opacity: 0;
+              line-height: 0px;
             }
 
             > a .icon {

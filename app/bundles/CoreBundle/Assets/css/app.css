@@ -1003,20 +1003,22 @@ body > #app-wrapper {
 }
 .app-sidebar .nav-sidebar > .nav > li > a {
   overflow: hidden;
-  padding: 12px 20px;
+  padding: 12px 22px;
   -webkit-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .text {
-  -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
-  -o-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
-  transition: opacity .3s ease .1s, margin-left 0s ease .2s;
+  -webkit-transition: opacity var(--duration-expressive) ease .1s, line-height;
+  -o-transition: opacity var(--duration-expressive) ease .1s, line-height;
+  transition: opacity var(--duration-expressive) ease .1s, line-height;
   opacity: 1;
+  transition-delay: 0.1s;
   margin-left: 0;
   position: relative;
   top: -1px;
   display: block;
+  line-height: 18px;
 }
 .app-sidebar .nav-sidebar > .nav > li > a .icon {
   font-weight: normal;
@@ -1127,8 +1129,7 @@ body > #app-wrapper {
     margin-top: 10px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding: 12px 22px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li.nav-heading,
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .arrow,
@@ -1142,6 +1143,7 @@ body > #app-wrapper {
     /* hide everything but the icon; using margin and opacity since display can't be transitioned */
     margin-left: -500px;
     opacity: 0;
+    line-height: 0px;
   }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a .icon {
     min-width: 0;
