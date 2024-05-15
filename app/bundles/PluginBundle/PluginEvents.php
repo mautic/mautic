@@ -135,7 +135,7 @@ final class PluginEvents
     public const ON_PLUGIN_INSTALL = 'mautic.plugin.on_plugin_install';
 
     /**
-     * The mautic.plugin.is_published_state_changing event is dispatched when a user tries to changes plugin is published state.
+     * The mautic.plugin.is_published_state_changing event is dispatched when a user tries to change the published state of a plugin.
      *
      * The event listener receives a Mautic\PluginBundle\Event\PluginPublishedEvent instance.
      *
