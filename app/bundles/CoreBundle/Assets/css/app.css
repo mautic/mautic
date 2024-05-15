@@ -2924,6 +2924,44 @@ label {
 .form-control {
   padding: var(--spacing-04) var(--spacing-05);
 }
+.search-container {
+  position: relative;
+  line-height: 60px;
+  -webkit-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.search-container .search {
+  border: 1px solid #fff;
+  background-color: transparent;
+  position: absolute;
+  left: 0px;
+  width: 24px;
+  height: 34px;
+  padding: 0 0 0 32px;
+  margin: 12px 0 0 5px;
+  z-index: 1;
+  -webkit-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+.search-container a.search-button {
+  color: var(--icon-secondary);
+  position: absolute;
+  left: 12px;
+  z-index: 5;
+  transition: var(--all-productive);
+}
+.search-container a.search-button:hover {
+  color: var(--icon-primary);
+}
+.search-container.active .search {
+  width: 225px;
+  border: 1px solid #d5d5d5;
+}
+.search-container.active i {
+  color: var(--icon-interactive);
+}
 .form-stack .form-control {
   position: relative;
   border-radius: 0;
@@ -5662,39 +5700,6 @@ label.required:after {
 }
 #app-header .nav > li > a {
   padding: 10px 12px;
-}
-.search-container {
-  position: relative;
-  line-height: 60px;
-  -webkit-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-.search-container .search {
-  border: 1px solid #fff;
-  position: absolute;
-  left: 0px;
-  width: 24px;
-  height: 34px;
-  padding: 0 0 0 32px;
-  margin: 12px 0 0 5px;
-  z-index: 1;
-  -webkit-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-}
-.search-container a.search-button {
-  color: rgba(0, 0, 0, 0.6);
-  position: absolute;
-  left: 12px;
-  z-index: 5;
-}
-.search-container.active .search {
-  width: 225px;
-  border: 1px solid #d5d5d5;
-}
-.search-container.active i {
-  color: #4E5D9D;
 }
 .col-actions {
   width: 100px;
