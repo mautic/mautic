@@ -808,7 +808,7 @@ class CampaignModel extends CommonFormModel
             $eventsIds            = $eventsEmailsSend->getKeys();
             $emailIds             = [];
 
-            foreach ($eventsEmailsSend  as $event) {
+            foreach ($eventsEmailsSend as $event) {
                 $emailIds[] = $event->getChannelId();
             }
 
