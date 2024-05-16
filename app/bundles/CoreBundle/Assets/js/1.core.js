@@ -79,7 +79,7 @@ mQuery( document ).ready(function() {
           .fail(function(errorThrown) {
               console.error('Error with keep-alive:', errorThrown);
           });
-    }, mauticSessionLifetime * 1000 / 2);
+    }, mauticSessionLifetime / 2);
 });
 
 if (typeof history != 'undefined') {
