@@ -749,13 +749,14 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array<int> $entityIds
+     * @param array<int> $emailsIds
+     * @param array<int> $eventsIds
      *
      * @return array<int, array<string, int|string>>
      *
      * @throws Exception
      */
-    public function getStatsSummaryByCountry(\DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, array $entityIds, string $sourceType = 'email'): array
+    public function getStatsSummaryByCountry(\DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, array $emailsIds, string $sourceType = 'email', array $eventsIds = []): array
     {
         $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -781,6 +782,7 @@ class StatRepository extends CommonRepository
                 "{$cutAlias}.redirect_id = {$pageHitsAlias}.redirect_id AND {$cutAlias}.channel_id = {$pageHitsAlias}.source_id"
             )
             ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
+            ->andWhere("{$cutAlias}.channel_id in (:emails)")
             ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
 
         // main query
@@ -806,13 +808,14 @@ class StatRepository extends CommonRepository
                 $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
                     ->andWhere("{$statsAlias}.source_id in (:events)")
                     ->andWhere("{$statsAlias}.source = :source")
-                    ->setParameter('events', $entityIds, ArrayParameterType::INTEGER)
+                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER)
+                    ->setParameter('events', $eventsIds, ArrayParameterType::INTEGER)
                     ->setParameter('source', 'campaign.event');
                 break;
             case 'email':
                 $queryBuilder->addSelect("{$leadAlias}.country AS `country`")
                     ->andWhere("{$statsAlias}.email_id in (:emails)")
-                    ->setParameter('emails', $entityIds, ArrayParameterType::INTEGER);
+                    ->setParameter('emails', $emailsIds, ArrayParameterType::INTEGER);
         }
 
         $queryBuilder->groupBy("{$leadAlias}.country");

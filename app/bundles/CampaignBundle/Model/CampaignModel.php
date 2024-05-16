@@ -797,17 +797,22 @@ class CampaignModel extends CommonFormModel
      *
      * @throws Exception
      */
-    public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
+    public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo): array
     {
-        $eventsEmailsSend     = $entity->getEmailSendEvents();
-        $eventsIds            = $eventsEmailsSend->getKeys();
-
         /** @var StatRepository $statRepo */
         $statRepo            = $this->em->getRepository(Stat::class);
         $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
 
-        if ($eventsEmailsSend->count() > 0) {
-            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $eventsIds, 'campaign');
+        if ($entity->isEmailCampaign()) {
+            $eventsEmailsSend     = $entity->getEmailSendEvents();
+            $eventsIds            = $eventsEmailsSend->getKeys();
+            $emailIds             = [];
+
+            foreach ($eventsEmailsSend  as $event) {
+                $emailIds[] = $event->getChannelId();
+            }
+
+            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $eventsIds, 'campaign', $emailIds);
             $results['read_count'] = $results['clicked_through_count'] = [];
 
             foreach ($emailStats as $e) {
