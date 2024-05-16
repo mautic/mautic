@@ -2,11 +2,14 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -18,14 +21,16 @@ class RequestSubscriber implements EventSubscriberInterface
     public function __construct(
         private CsrfTokenManagerInterface $tokenManager,
         private TranslatorInterface $translator,
-        private Environment $twig
+        private Environment $twig,
+        private CoreParametersHelper $coreParametersHelper
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['validateCsrfTokenForAjaxPost', 0],
+            KernelEvents::REQUEST  => ['validateCsrfTokenForAjaxPost', 0],
+            KernelEvents::RESPONSE => ['onResponseSetCsrfCookie', 0],
         ];
     }
 
@@ -41,6 +46,30 @@ class RequestSubscriber implements EventSubscriberInterface
             $event->setResponse($response);
             $event->stopPropagation();
         }
+    }
+
+    public function onResponseSetCsrfCookie(ResponseEvent $event): void
+    {
+        $cookieName                   = 'csrf-mautic_ajax_post';
+        $tokenId                      = 'mautic_ajax_post';
+        $existingMauticAjaxCsrfCookie = $_COOKIE[$cookieName] ?? null;
+        $request                      = $event->getRequest();
+
+        if (!$this->isSecurePath($request) || $this->tokenManager->isTokenValid(new CsrfToken($tokenId, $existingMauticAjaxCsrfCookie))) {
+            return;
+        }
+
+        $cookie = Cookie::create(
+            $cookieName,
+            $this->tokenManager->getToken($tokenId),
+            0,
+            $this->coreParametersHelper->get('cookie_path'),
+            $this->coreParametersHelper->get('cookie_domain'),
+            $this->coreParametersHelper->get('cookie_secure'),
+            false
+        );
+
+        $event->getResponse()->headers->setCookie($cookie);
     }
 
     private function isAjaxPost(Request $request): bool

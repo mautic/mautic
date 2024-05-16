@@ -453,7 +453,7 @@ export default class BuilderService {
       embedAsBase64: false,
       openAssetsOnDrop: 1,
       autoAdd: 1,
-      headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
+      headers: { 'X-CSRF-Token': Mautic.getMauticAjaxCsrfToken() },
     };
   }
 

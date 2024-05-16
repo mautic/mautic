@@ -91,7 +91,7 @@ Mautic.initializeDropzone = function() {
     var preview = mQuery('.preview div.text-center');
 
     Mautic.assetDropzone.on("sending", function (file, request, formData) {
-        request.setRequestHeader('X-CSRF-Token', mauticAjaxCsrf);
+        request.setRequestHeader('X-CSRF-Token', Mautic.getMauticAjaxCsrfToken());
         formData.append('tempId', mQuery('#asset_tempId').val());
     }).on("addedfile", function (file) {
         preview.fadeOut('fast');

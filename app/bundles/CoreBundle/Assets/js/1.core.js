@@ -36,7 +36,7 @@ mQuery.ajaxSetup({
 
         // Set CSRF token to each AJAX POST request
         if (settings.type == 'POST') {
-            request.setRequestHeader('X-CSRF-Token', mauticAjaxCsrf);
+            request.setRequestHeader('X-CSRF-Token', Mautic.getMauticAjaxCsrfToken());
         }
 
         return true;
@@ -105,6 +105,10 @@ var Mautic = {
     loadedContent: {},
 
     keyboardShortcutHtml: {},
+
+    getMauticAjaxCsrfToken: function () {
+        return document.cookie.match('(^|;)\\s*csrf-mautic_ajax_post\\s*=\\s*([^;]+)')?.pop() || ''
+    },
 
     /**
      *
