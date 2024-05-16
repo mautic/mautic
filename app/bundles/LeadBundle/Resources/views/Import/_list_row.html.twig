@@ -31,7 +31,7 @@
     <td class="visible-md visible-lg">{{ item.progressPercentage }}%</td>
     <td class="visible-md visible-lg">
         {% if objectRoute is not null %}
-            <span class="mt-xs label mautic-blue-tag has-click-event">
+            <span class="mt-xs label label-mautic-blue has-click-event">
                 <a href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id}) }}">{{ item.lineCount }}</a>
             </span>
         {% else %}
@@ -40,7 +40,7 @@
     </td>
     <td class="visible-md visible-lg">
         {% if objectRoute is not null %}
-            <span class="mt-xs label teal-tag has-click-event">
+            <span class="mt-xs label label-teal has-click-event">
                 <a href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':inserted'}) }}">{{ item.insertedCount }}</a>
             </span>
         {% else %}
@@ -49,7 +49,7 @@
     </td>
     <td class="visible-md visible-lg">
         {% if objectRoute is not null %}
-            <span class="mt-xs label gold-tag has-click-event">
+            <span class="mt-xs label label-gold has-click-event">
                 <a href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':updated'}) }}">{{ item.updatedCount }}</a>
             </span>
         {% else %}

@@ -125,7 +125,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="visible-md visible-lg">
-                                    <a class="label mautic-blue-tag has-click-event" href="{{-  path('mautic_contact_index', {
+                                    <a class="label label-mautic-blue has-click-event" href="{{-  path('mautic_contact_index', {
                                         'search' : "#{'mautic.tagmanager.lead.searchcommand.list'|trans}:\"#{item.getTag()}\"",
                                     }) -}}" data-toggle="ajax" {{- 0 == tagsCount[item.getId()] ? 'disabled=disabled' : '' -}}>
                                     {{- 'mautic.lead.list.viewleads_count'|trans({'%count%': tagsCount[item.getId()]}) -}}

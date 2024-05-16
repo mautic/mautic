@@ -68,7 +68,7 @@
                         }) }}
                     </td>
                     <td>
-                        <span class="label gray-tag pa-10" style="background: {{ '#' not in item.color ? '#' : ''}}{{ item.color }};"> </span>
+                        <span class="label label-gray pa-10" style="background: {{ '#' not in item.color ? '#' : ''}}{{ item.color }};"> </span>
                     </td>
                     <td>
                         <div>
@@ -92,7 +92,7 @@
                         {% set catName = category.title|default('mautic.core.form.uncategorized'|trans) %}
                         {% set color = category ? '#' ~ category.color : 'inherit' %}
                         <span style="white-space: nowrap;">
-                          <span class="label gray-tag pa-10" style="background: {{ color }};"> </span>
+                          <span class="label label-gray pa-10" style="background: {{ color }};"> </span>
                           <span>{{ catName }}</span>
                         </span>
                     </td>
