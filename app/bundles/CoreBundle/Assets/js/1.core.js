@@ -73,13 +73,15 @@ mQuery( document ).ready(function() {
         }
     });
 
-    // Try to keep alive the session.
-    setInterval(function() {
-        mQuery.get('/s/keep-alive')
-          .fail(function(errorThrown) {
-              console.error('Error with keep-alive:', errorThrown);
-          });
-    }, mauticSessionLifetime * 1000 / 2);
+    // Try to keep alive the session only if csrf-mautic_ajax_post cookie exists
+    if (mQuery.cookie('csrf-mautic_ajax_post')) {
+        setInterval(function() {
+            mQuery.get('/s/keep-alive')
+            .fail(function(errorThrown) {
+                console.error('Error with keep-alive:', errorThrown);
+            });
+        }, mauticSessionLifetime * 1000 / 2);
+    }
 });
 
 if (typeof history != 'undefined') {
