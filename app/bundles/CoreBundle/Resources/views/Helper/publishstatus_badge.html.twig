@@ -7,6 +7,14 @@
         warning
     {%- endif -%}
 {% endset %}
-{% set status = entity.getPublishStatus() %}
-{% set labelText = ('mautic.core.form.' ~ (status == 'published' ? 'active' : 'inactive'))|trans %}
-<span title="{{ labelText }}" aria-label="{{ labelText }}" class="pa-10 bg-{{ labelColor }} mt-3 label label-{{ labelColor }}"> </span>
+{% set icon %}
+    {%- if entity.getPublishStatus() is same as('published') -%}
+        check
+    {%- elseif entity.getPublishStatus() is same as('unpublished') or entity.getPublishStatus() is same as('expired') -%}
+        close
+    {%- elseif entity.getPublishStatus() is same as('pending') -%}
+        more
+    {%- endif -%}
+{% endset %}
+{% set labelText = ('mautic.core.form.' ~ (entity.getPublishStatus() == 'published' ? 'active' : 'inactive'))|trans %}
+<span title="{{ labelText }}" aria-label="{{ labelText }}" class="pa-3 bg-{{ labelColor }} mt-3 label label-{{ labelColor }}"><i class="ri-{{ icon }}-line"></i></span>
