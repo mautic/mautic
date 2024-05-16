@@ -34,7 +34,40 @@
                 <tbody>
                     {% for k, item in items %}
                         {% set thumbnailUrl = asset('themes/' ~ k ~ '/thumbnail.png') %}
-                        {% set hasThumbnail =  (item['dir'] ~ '/thumbnail.png') is file  %}
+                        {% set hasThumbnail = (item['dir'] ~ '/thumbnail.png') is file %}
+                        {% set visibilityButton = [] %}
+                        {% set visibilityCss = '' %}
+
+                        {% if item.visibility is defined %}
+                            {% set btnText         = 'mautic.core.theme.hide' %}
+                            {% set iconClass       = 'ri-eye-off-line' %}
+                            {% set message         = 'mautic.core.theme.form.confirm.hide' %}
+                            {% set confirmBtnClass = '' %}
+
+                            {% if item.visibility.hidden|default(false) %}
+                                {% set btnText         = 'mautic.core.theme.unhide' %}
+                                {% set iconClass       = 'ri-eye-line' %}
+                                {% set message         = 'mautic.core.theme.form.confirm.unhide' %}
+                                {% set confirmBtnClass = 'btn btn-success' %}
+                                {% set visibilityCss   = 'disabled-row' %}
+                            {% endif %}
+
+                            {% set visibilityButton = {
+                                'attr': {
+                                    'data-toggle': 'confirmation',
+                                    'href': path('mautic_themes_action', {'objectAction': 'visibility', 'objectId': k}),
+                                    'data-message': message|trans({'%theme%': item.name ~ ' (' ~ k ~ ')'}),
+                                    'data-confirm-text': btnText|trans,
+                                    'data-confirm-callback': 'executeAction',
+                                    'data-cancel-text': 'mautic.core.form.cancel'|trans,
+                                    'data-confirm-btn-class': confirmBtnClass,
+                                },
+                                'btnText': btnText|trans,
+                                'iconClass': iconClass,
+                                'priority': -1,
+                            } %}
+                        {% endif %}
+
                         <tr>
                             <td>
                                 {% set item = item|merge({id: item.key}) %}
@@ -44,7 +77,7 @@
                                         'data-target': '#theme-' ~ k,
                                     },
                                     'btnText': 'mautic.asset.asset.preview'|trans,
-                                    'iconClass': 'ri-eye-line',
+                                    'iconClass': 'ri-image-line',
                                     } %}
                                 {% set previewButton = hasThumbnail ? previewButtonSettings : [] %}
                                 {% set deleteButton = {
@@ -71,6 +104,7 @@
                                                 'iconClass': 'ri-download-line',
                                             },
                                             previewButton,
+                                            visibilityButton,
                                         ],
                                     }
                                 ) }}
@@ -93,12 +127,12 @@
                                 </div>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="{{ visibilityCss }}">
                                 <div>
                                     {{ item['name']|e }} ({{ item['key']|e }})
                                 </div>
                             </td>
-                            <td>
+                            <td class="{{ visibilityCss }}">
                                 <div>
                                     {% if item['config']['authorUrl'] is defined and item['config']['authorUrl'] is not empty and item['config']['author'] is defined %}
                                         <a href="{{ inputUrl(item['config']['authorUrl']) }}" target="_blank">
@@ -109,7 +143,7 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td class="visible-md visible-lg">
+                            <td class="visible-md visible-lg {{ visibilityCss }}">
                                     {% for builder in item['config']['builder'] %}
                                     <span style="white-space: nowrap;">
                                         <span class="label label-primary pa-4">{{ builder }}</span>
@@ -125,7 +159,7 @@
                                     {% endfor %}
                                 {% endif %}
                             </td>
-                        <tr>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

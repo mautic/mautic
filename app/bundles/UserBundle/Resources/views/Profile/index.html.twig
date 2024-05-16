@@ -8,7 +8,7 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- step container -->
-    <div class="col-md-3 bg-white height-auto">
+    <div class="col-md-3 height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             {% if me.getId() %}
             <div class="media">
@@ -43,11 +43,11 @@
     <!--/ step container -->
 
     <!-- container -->
-    <div class="col-md-9 bg-auto height-auto bdr-l">
+    <div class="col-md-9 height-auto bdr-l">
         <div class="tab-content">
             <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
                 {{ form_start(userForm) }}
-                <div class="pa-md bg-auto bg-light-xs bdr-b">
+                <div class="pa-md bg-light-xs bdr-b">
                     <h4 class="fw-sb">{% trans %}mautic.user.account.header.details{% endtrans %}</h4>
                 </div>
                 <div class="pa-md">

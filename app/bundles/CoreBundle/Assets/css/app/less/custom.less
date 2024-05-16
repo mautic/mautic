@@ -20,7 +20,7 @@
 
 // Contact image
 form[name="lead"] {
-  .media-body {
+  .media-body, .contact-avatar {
     width: 100%;
   }
 }
@@ -365,4 +365,10 @@ ul.media-list.media-list-feed div.media-object
 
 .flip-vertically {
   transform: scaleY(-1);
+}
+
+.disabled-row {
+  opacity: 0.6;
+  pointer-events: none;
+  background-color: #f2f2f2;
 }

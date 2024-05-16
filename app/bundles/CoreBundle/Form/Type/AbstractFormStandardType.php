@@ -107,8 +107,8 @@ abstract class AbstractFormStandardType extends AbstractType
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.core.status.available',
-                    'data' => $data,
-                    'attr' => [
+                    'data'  => $data,
+                    'attr'  => [
                         'readonly' => $readonly,
                     ],
                 ]
