@@ -16,7 +16,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
-    public function testSuccessfulUpload()
+    public function testSuccessfulUpload(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
@@ -52,7 +52,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
-    public function testCouldNotCreateDirectory()
+    public function testCouldNotCreateDirectory(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
@@ -91,7 +91,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
-    public function testCouldNotMoveFile()
+    public function testCouldNotMoveFile(): void
     {
         $uploadDir = 'my/upload/dir';
         $fileName  = 'MyfileName';
@@ -131,7 +131,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
      *
      * @covers \Mautic\CoreBundle\Helper\FileUploader::delete
      */
-    public function testDeleteFile()
+    public function testDeleteFile(): void
     {
         $file = 'MyfileName';
 

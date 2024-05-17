@@ -8,14 +8,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReportHelper
 {
-    public function __construct(private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'report';
     }
@@ -25,23 +23,11 @@ final class ReportHelper
      */
     public function getReportBuilderFieldType($type)
     {
-        switch ($type) {
-            case 'number':
-                $type = 'int';
-                break;
-            case 'lookup':
-            case 'text':
-            case 'url':
-            case 'email':
-            case 'tel':
-            case 'region':
-            case 'country':
-            case 'locale':
-                $type = 'string';
-                break;
-        }
-
-        return $type;
+        return match ($type) {
+            'number' => 'int',
+            'lookup', 'text', 'url', 'email', 'tel', 'region', 'country', 'locale' => 'string',
+            default => $type,
+        };
     }
 
     /**
@@ -112,11 +98,9 @@ final class ReportHelper
             unset($columns[$prefix.'id']['link']);
         }
 
-        if (!empty($removeColumns)) {
-            foreach ($removeColumns as $c) {
-                if (isset($columns[$prefix.$c])) {
-                    unset($columns[$prefix.$c]);
-                }
+        foreach ($removeColumns as $c) {
+            if (isset($columns[$prefix.$c])) {
+                unset($columns[$prefix.$c]);
             }
         }
 

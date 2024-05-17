@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class WebhookController.
- */
 class WebhookController extends FormController
 {
     public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
@@ -43,7 +40,7 @@ class WebhookController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): \Symfony\Component\HttpFoundation\Response
     {
         return parent::indexStandard($request, $page);
     }

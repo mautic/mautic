@@ -11,25 +11,16 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Lead
-     */
-    private $contactMock5;
+    private Lead $contactMock5;
 
-    /**
-     * @var Lead
-     */
-    private $contactMock6;
+    private Lead $contactMock6;
 
     /**
      * @var MockObject|LeadModel
      */
-    private $contactModelMock;
+    private MockObject $contactModelMock;
 
-    /**
-     * @var ContactActionModel
-     */
-    private $actionModel;
+    private ContactActionModel $actionModel;
 
     protected function setUp(): void
     {
@@ -39,7 +30,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel      = new ContactActionModel($this->contactModelMock);
     }
 
-    public function testAddContactsToCategoriesEntityAccess()
+    public function testAddContactsToCategoriesEntityAccess(): void
     {
         $contacts   = [5, 6];
         $categories = [4, 5];
@@ -61,7 +52,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->addContactsToCategories($contacts, $categories);
     }
 
-    public function testRemoveContactsFromCategoriesEntityAccess()
+    public function testRemoveContactsFromCategoriesEntityAccess(): void
     {
         $contacts   = [5, 6];
         $categories = [1, 2];
@@ -88,7 +79,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $this->actionModel->removeContactsFromCategories($contacts, $categories);
     }
 
-    public function testAddContactsToCategories()
+    public function testAddContactsToCategories(): void
     {
         $contacts   = [5, 6];
         $categories = [1, 2];

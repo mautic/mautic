@@ -2,9 +2,6 @@
 
 namespace Mautic\CoreBundle;
 
-/**
- * Class CoreEvents.
- */
 final class CoreEvents
 {
     /**

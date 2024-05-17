@@ -5,12 +5,12 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Class ArrayLinebreakTransformer.
+ * @implements DataTransformerInterface<array<string>|null, string|null>
  */
 class ArrayLinebreakTransformer implements DataTransformerInterface
 {
     /**
-     * {@inheritdoc}
+     * @param array<string>|null $array
      *
      * @return string
      */
@@ -24,9 +24,9 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string|null $string
      *
-     * @return array
+     * @return array<string>
      */
     public function reverseTransform($string)
     {

@@ -12,15 +12,9 @@ use PHPUnit\Framework\TestCase;
 
 class BulkNotificationTest extends TestCase
 {
-    /**
-     * @var BulkNotification
-     */
-    private $bulkNotification;
+    private BulkNotification $bulkNotification;
 
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModelFake;
+    private NotificationModel $notificationModelFake;
 
     protected function setUp(): void
     {
@@ -77,7 +71,9 @@ class BulkNotificationTest extends TestCase
              */
             public $notifications = [];
 
-            /** @noinspection PhpMissingParentConstructorInspection */
+            /**
+             * @noinspection PhpMissingParentConstructorInspection
+             */
             public function __construct()
             {
             }

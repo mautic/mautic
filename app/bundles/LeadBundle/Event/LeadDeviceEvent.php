@@ -5,9 +5,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class LeadDeviceEvent.
- */
 class LeadDeviceEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class LeadDeviceEvent extends CommonEvent
     /**
      * Sets the LeadDevice entity.
      */
-    public function setDevice(LeadDevice $device)
+    public function setDevice(LeadDevice $device): void
     {
         $this->entity = $device;
     }

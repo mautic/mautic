@@ -36,10 +36,10 @@
             <!-- end: "{{ template }}" -->
         </div>
 
-        {% if ((field.showWhenValueExists is defined and false is same as field.showWhenValueExists) or field.showAfterXSubmissions) is not empty
-            or (field.alwaysDisplay is defined and true is same as field.alwaysDisplay)
-            or (field.leadField is defined and field.leadField is not empty)
-            or (field.conditions is defined and field.conditions is not empty)
+        {% if ((field.showWhenValueExists is defined and false is same as field.showWhenValueExists) or field.showAfterXSubmissions is not empty)
+            or (true is same as field.alwaysDisplay|default(null))
+            or (field.mappedField|default(null) is not empty)
+            or (field.conditions|default(null) is not empty)
         %}
             <div class="panel-footer">
                 {% if field.conditions.expr is defined and field.conditions.expr is not empty %}

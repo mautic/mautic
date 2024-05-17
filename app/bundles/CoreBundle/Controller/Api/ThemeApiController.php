@@ -28,11 +28,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class ThemeApiController extends CommonApiController
 {
-    /**
-     * @var ThemeHelper
-     */
-    protected $themeHelper;
-
     public function __construct(
         CorePermissions $security,
         Translator $translator,
@@ -40,7 +35,7 @@ class ThemeApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        ThemeHelper $themeHelper,
+        protected ThemeHelper $themeHelper,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
@@ -48,14 +43,13 @@ class ThemeApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         MauticFactory $factory
     ) {
-        $this->themeHelper = $themeHelper;
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * Accepts the zip file and installs the theme from it.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function newAction(Request $request, PathsHelper $pathsHelper)
     {
@@ -140,7 +134,7 @@ class ThemeApiController extends CommonApiController
     /**
      * List the folders (themes) in the /themes directory.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function listAction()
     {
@@ -164,7 +158,7 @@ class ThemeApiController extends CommonApiController
      *
      * @param string $theme
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteAction($theme)
     {
