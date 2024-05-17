@@ -73,15 +73,15 @@ mQuery( document ).ready(function() {
         }
     });
 
-    // Try to keep alive the session only if csrf-mautic_ajax_post cookie exists
-    if (mQuery.cookie('csrf-mautic_ajax_post')) {
-        setInterval(function() {
+    // Try to keep alive the session.
+    setInterval(function() {
+        if (window.location.pathname.startsWith('/s/') && window.location.pathname !== '/s/login') {
             mQuery.get('/s/keep-alive')
-            .fail(function(errorThrown) {
-                console.error('Error with keep-alive:', errorThrown);
-            });
-        }, mauticSessionLifetime * 1000 / 2);
-    }
+                .fail(function(errorThrown) {
+                    console.error('Error with keep-alive:', errorThrown);
+                });
+        }
+    }, mauticSessionLifetime * 1000 / 2);
 });
 
 if (typeof history != 'undefined') {
