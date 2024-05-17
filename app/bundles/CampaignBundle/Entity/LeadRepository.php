@@ -595,4 +595,38 @@ class LeadRepository extends CommonRepository
             sprintf('NOT EXISTS (%s)', $subq->getSQL())
         );
     }
+
+    /**
+     * @return array{}|array<int, array<string, string|null>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
+    {
+        $queryBuilder      = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $leadCampaignAlias = 'lc';
+        $leadAlias         = 'l';
+
+        $queryBuilder->select(
+            "$leadAlias.country",
+            'count(id) AS contacts'
+        )
+        ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', $leadCampaignAlias)
+        ->leftJoin(
+            $leadCampaignAlias,
+            MAUTIC_TABLE_PREFIX.'leads',
+            $leadAlias,
+            "$leadAlias.id = $leadCampaignAlias.lead_id"
+        )
+        ->andWhere("$leadCampaignAlias.campaign_id = :campaign")
+        ->andWhere("$leadCampaignAlias.manually_removed = :false")
+        ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
+        ->groupBy("$leadAlias.country")
+        ->setParameter('campaign', $campaign->getId())
+        ->setParameter('false', false)
+        ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
+        ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
+    }
 }

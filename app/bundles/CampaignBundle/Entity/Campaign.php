@@ -55,7 +55,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $category;
 
     /**
-     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
+     * @var ArrayCollection<int, Event>
      */
     private $events;
 
@@ -397,6 +397,33 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         unset($events);
 
         return $keyedArrayCollection;
+    }
+
+    /**
+     * @return ArrayCollection<int, Event>
+     */
+    public function getEmailSendEvents(): ArrayCollection
+    {
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'));
+        $events   = $this->getEvents()->matching($criteria);
+
+        // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
+        // @see https://github.com/doctrine/doctrine2/issues/4693
+        $keyedArrayCollection = new ArrayCollection();
+        /** @var Event $event */
+        foreach ($events as $event) {
+            $keyedArrayCollection->set($event->getId(), $event);
+        }
+
+        return $keyedArrayCollection;
+    }
+
+    public function isEmailCampaign(): bool
+    {
+        $criteria     = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'))->setMaxResults(1);
+        $emailEvent   = $this->getEvents()->matching($criteria);
+
+        return !$emailEvent->isEmpty();
     }
 
     /**

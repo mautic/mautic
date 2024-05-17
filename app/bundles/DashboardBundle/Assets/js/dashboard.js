@@ -116,7 +116,12 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('width', response.widgetWidth + '%')
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
-    Mautic.renderMaps(widgetHtml);
+
+    const map = widgetHtml.find('.vector-map').first();
+    if (map.length && !map.hasClass('map-rendered')) {
+        Mautic.initMap(widgetHtml, 'regions');
+    }
+
     Mautic.initWidgetRemoveEvents();
     Mautic.initWidgetSorting();
     Mautic.initDashboardFilter();
