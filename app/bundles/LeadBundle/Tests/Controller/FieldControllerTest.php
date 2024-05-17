@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FieldControllerTest extends MauticMysqlTestCase
 {
-    public function testLengthValidationOnLabelFieldWhenAddingCustomFieldFailure()
+    public function testLengthValidationOnLabelFieldWhenAddingCustomFieldFailure(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
 
@@ -23,7 +23,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $this->assertEquals($maxLengthErrorMessageTemplate, $labelErrorMessage);
     }
 
-    public function testLengthValidationOnLabelFieldWhenAddingCustomFieldSuccess()
+    public function testLengthValidationOnLabelFieldWhenAddingCustomFieldSuccess(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
 
