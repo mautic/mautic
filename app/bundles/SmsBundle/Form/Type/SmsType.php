@@ -71,7 +71,7 @@ class SmsType extends AbstractType
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'label' => 'mautic.core.status.available',
+            'label' => 'mautic.core.form.available',
         ]);
 
         // add lead lists
