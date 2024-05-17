@@ -511,6 +511,22 @@ class EmailType extends AbstractType
             )
         );
 
+        $builder->add(
+            $builder->create(
+                'preheaderText',
+                TextType::class,
+                [
+                    'label'      => 'mautic.email.preheader_text',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.email.preheader_text.tooltip',
+                    ],
+                    'required'    => false,
+                ]
+            )
+        );
+
         if (!empty($options['update_select'])) {
             $builder->add(
                 'updateSelect',
