@@ -1435,6 +1435,15 @@ class LeadController extends FormController
                     if (!empty($bodyCheck)) {
                         $mailer = $mailHelper->getMailer();
 
+                        // Set the email entity template so the email configuration like preheader would apply.
+                        if ($email['templates']) {
+                            $emailEntity = $this->getDoctrine()->getRepository(Email::class)->find($email['templates']);
+                            if ($emailEntity) {
+                                $mailer->setEmail($emailEntity);
+                            }
+                        }
+
+                        // Overwrite the mailer with the values from the form.
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
@@ -1451,6 +1460,7 @@ class LeadController extends FormController
                         );
 
                         // Set Content
+                        $mailer->setReplyTo($email['from']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
                         $mailer->setLead($leadFields);

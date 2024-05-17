@@ -23,6 +23,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -59,7 +60,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $useOwnerAsMailer;
 
     /**
+     * @Groups({"email:read", "email:write", "download:read"})
+     */
+    private ?string $preheaderText = null;
+
+    /**
      * @var string|null
+     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $fromAddress;
 
@@ -263,6 +270,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->addIdColumns();
         $builder->addNullableField('subject', Types::TEXT);
+        $builder->addNullableField('preheaderText', Types::STRING, 'preheader_text');
         $builder->addNullableField('fromAddress', Types::STRING, 'from_address');
         $builder->addNullableField('fromName', Types::STRING, 'from_name');
         $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
@@ -350,6 +358,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         );
 
         $metadata->addPropertyConstraint(
+            'subject',
+            new Length(
+                [
+                    'max'        => 190,
+                    'maxMessage' => 'mautic.email.subject.length',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'preheaderText',
+            new Length(
+                [
+                    'max'        => 130,
+                    'maxMessage' => 'mautic.email.preheader_text.length',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
             'fromAddress',
             new EmailOrEmailTokenList(),
         );
@@ -420,6 +448,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'bccAddress',
                     'useOwnerAsMailer',
                     'utmTags',
+                    'preheaderText',
                     'customHtml',
                     'plainText',
                     'template',
@@ -471,10 +500,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
+     * @param ?string $name
+     *
      * @return $this
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -489,12 +521,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @param mixed $description
+     * @param ?string $description
      *
      * @return Email
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -729,6 +762,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $this->isChanged('replyToAddress', $replyToAddress);
         $this->replyToAddress = $replyToAddress;
+
+        return $this;
+    }
+
+    public function getPreheaderText(): ?string
+    {
+        return $this->preheaderText;
+    }
+
+    public function setPreheaderText(?string $preheaderText): Email
+    {
+        $this->isChanged('preheaderText', $preheaderText);
+        $this->preheaderText = $preheaderText;
 
         return $this;
     }
