@@ -84,7 +84,7 @@ class EmailMapStatsControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
-        $this->assertSame('E-mails', $crawler->filter('.map-options__title')->innerText());
+        $this->assertSame('Emails', $crawler->filter('.map-options__title')->innerText());
         $this->assertCount(1, $crawler->filter('div.map-options'));
         $this->assertCount(1, $crawler->filter('div.vector-map'));
 

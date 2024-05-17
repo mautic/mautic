@@ -812,7 +812,7 @@ class CampaignModel extends CommonFormModel
                 $emailIds[] = $event->getChannelId();
             }
 
-            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $eventsIds, 'campaign', $emailIds);
+            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds, 'campaign', $eventsIds);
             $results['read_count'] = $results['clicked_through_count'] = [];
 
             foreach ($emailStats as $e) {
