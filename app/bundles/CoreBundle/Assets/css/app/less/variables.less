@@ -63,14 +63,14 @@
 
         /// Border
         --border-interactive: var(--primary-60);
-        --border-subtle: #e0e0e0;
-        --border-subtle-alt: #c6c6c6;
-        --border-subtle-selected: #c6c6c6;
-        --border-strong: #8d8d8d;
-        --border-tile: #c6c6c6;
-        --border-tile-alt: #a8a8a8;
-        --border-inverse: #161616;
-        --border-disabled: #c6c6c6;
+        --border-subtle: #12121221;
+        --border-subtle-alt: #0808083b;
+        --border-subtle-selected: #0808083b;
+        --border-strong: #03030373;
+        --border-tile: #0808083b;
+        --border-tile-alt: #05050559;
+        --border-inverse: #030303eb;
+        --border-disabled: #0808083b;
         --border-transparent: transparent;
 
         /// Text
@@ -237,15 +237,15 @@
 
         /// Border
         --border-interactive: var(--primary-50);
-        --border-subtle: #393939;
-        --border-subtle-alt: #525252;
-        --border-subtle-selected: #525252;
-        --border-subtle-selected-alt: #6f6f6f;
-        --border-strong: #6f6f6f;
-        --border-strong-alt: #8d8d8d;
-        --border-tile: #525252;
-        --border-tile-alt: #6f6f6f;
-        --border-inverse: #f4f4f4;
+        --border-subtle: #f2f2f229;
+        --border-subtle-alt: #fcfcfc42;
+        --border-subtle-selected: #fcfcfc42;
+        --border-subtle-selected-alt: #fafafa63;
+        --border-strong: #fafafa63;
+        --border-strong-alt: #fafafa85;
+        --border-tile: #fcfcfc42;
+        --border-tile-alt: #fafafa63;
+        --border-inverse: #fcfcfcf5;
         --border-disabled: #8d8d8d80;
 
         /// Text
@@ -444,8 +444,7 @@
 
 
     // Miscellaneous //
-    --no-border: 1px solid var(--no-border-color);
-    --no-border-color: transparent;
+    --no-border: 1px solid var(--border-transparent);
     --border-bottom: 0 0 clamp(0px, calc(1px - var(--border-radius, 0px)), 1px) 0;
     --border-radius-sm: clamp(0px, var(--border-radius, 0px), 7px);
     --border-radius-md: clamp(0px, calc(1.6 * var(--border-radius, 0px)), 15px);
@@ -529,7 +528,7 @@
 
 /// High contrast
 :root[high-contrast="enabled"] {
-    --no-border-color: var(--border-strong);
+    --border-transparent: var(--border-strong);
     --border-bottom: 1px solid var(--border-strong);
 }
 
