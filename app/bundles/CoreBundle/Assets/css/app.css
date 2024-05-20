@@ -6654,3 +6654,13 @@ ul.media-list.media-list-feed div.media-object {
 .features-container .logo {
   width: 130px;
 }
+.features-container .circles {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.features-container .target {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
