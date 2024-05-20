@@ -400,8 +400,14 @@
 .fd-row-reverse { flex-direction: row-reverse; }
 .fd-column { flex-direction: column; }
 .fd-column-reverse { flex-direction: column-reverse; }
-.fw-nowrap { flex-wrap: nowrap; }
+.fw-nowrap { flex-wrap: wrap; }
+@media (min-width: 769px) {
+  .fw-nowrap {
+    flex-wrap: nowrap;
+  }
+}
 .fw-wrap { flex-wrap: wrap; }
+.fw-neverwrap { flex-wrap: nowrap; }
 .fw-wrap-reverse { flex-wrap: wrap-reverse; }
 .jc-start { justify-content: flex-start; }
 .jc-end { justify-content: flex-end; }

@@ -1,6 +1,11 @@
 {% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
 
 {% block content %}
+<div class="row jc-space-between">
+<div class="col-lg-4 col-lg-offset-1 pb-lg">
+    <h1 class="fs-display-02 pb-sm">Reset password</h1>
+</div>
+<div class="col-lg-4 col-lg-pull-1">
     <div class="alert alert-warning">{% trans %}mautic.user.user.passwordreset.info{% endtrans %}</div>
         {{ form_start(form) }}
         {{ form_row(form.identifier) }}
@@ -9,4 +14,6 @@
     <div class="mt-sm">
         <a href="{{ path('login') }}">{% trans %}mautic.user.user.passwordreset.back{% endtrans %}</a>
     </div>
+    </div>
+</div>
 {% endblock %}
