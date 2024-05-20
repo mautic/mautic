@@ -403,16 +403,103 @@
     --spacing-12: 96px;
     --spacing-13: 160px;
 
+    // Typography //
+    /// Code, labels, helper text, legal etc
+    --utility-01: 12px;
+    --utility-02: 14px;
 
-    // Utilities //
+    /// Body
+    --body-01: 13px;
+    --body-02: 15px;
+
+    /// Headings
+    --fluid-heading-03: 20px;
+    --fluid-heading-04: 28px;
+    --fluid-heading-05: 32px;
+    --fluid-heading-06: 32px;
+    --fluid-display-01: 42px;
+    --fluid-display-02: 42px;
+    --fluid-display-03: 42px;
+    --fluid-display-04: 42px;
+
+    /// Other
+    --fluid-paragraph-01: 24px;
+    --fluid-quotation-01: 20px;
+    --fluid-quotation-02: 32px;
+
+
+    // Miscellaneous //
     --no-border: 1px solid transparent;
+    --no-border-color: transparent;
     --border-bottom: 0 0 clamp(0px, calc(1px - var(--border-radius, 0px)), 1px) 0;
     --border-radius-sm: clamp(0px, var(--border-radius, 0px), 7px);
     --border-radius-md: clamp(0px, calc(1.6 * var(--border-radius, 0px)), 15px);
     --border-radius-lg: clamp(0px, calc(2.4 * var(--border-radius, 0px)), 30px);
-    --blur: blur(10px);
 }
 
+@media (min-width: 672px) {
+:root {
+    --fluid-heading-03: 20px;
+    --fluid-heading-04: 28px;
+    --fluid-heading-05: 36px;
+    --fluid-heading-06: 36px;
+    --fluid-paragraph-01: 24px;
+    --fluid-quotation-01: 20px;
+    --fluid-quotation-02: 36px;
+    --fluid-display-01: 42px;
+    --fluid-display-02: 42px;
+    --fluid-display-03: 54px;
+    --fluid-display-04: 68px;
+}
+}
+
+@media (min-width: 1056px) {
+:root {
+    --fluid-heading-03: 20px;
+    --fluid-heading-04: 28px;
+    --fluid-heading-05: 42px;
+    --fluid-heading-06: 42px;
+    --fluid-paragraph-01: 28px;
+    --fluid-quotation-01: 24px;
+    --fluid-quotation-02: 42px;
+    --fluid-display-01: 54px;
+    --fluid-display-02: 54px;
+    --fluid-display-03: 60px;
+    --fluid-display-04: 92px;
+}
+}
+
+@media (min-width: 1312px) {
+:root {
+    --fluid-heading-03: 20px;
+    --fluid-heading-04: 32px;
+    --fluid-heading-05: 48px;
+    --fluid-heading-06: 48px;
+    --fluid-paragraph-01: 28px;
+    --fluid-quotation-01: 28px;
+    --fluid-quotation-02: 48px;
+    --fluid-display-01: 60px;
+    --fluid-display-02: 60px;
+    --fluid-display-03: 76px;
+    --fluid-display-04: 122px;
+}
+}
+
+@media (min-width: 1584px) {
+:root {
+    --fluid-heading-03: 24px;
+    --fluid-heading-04: 32px;
+    --fluid-heading-05: 60px;
+    --fluid-heading-06: 60px;
+    --fluid-paragraph-01: 32px;
+    --fluid-quotation-01: 32px;
+    --fluid-quotation-02: 60px;
+    --fluid-display-01: 76px;
+    --fluid-display-02: 76px;
+    --fluid-display-03: 84px;
+    --fluid-display-04: 156px;
+}
+}
 
 //
 // Accessibility features
