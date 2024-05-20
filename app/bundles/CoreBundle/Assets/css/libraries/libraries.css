@@ -8952,8 +8952,11 @@ button.close {
 :root {
     --primary-hue: 228;
     --primary-saturation: 34%;
+    --items-on-primary: #ffffff;
+    --items-on-primary-disabled: #8d8d8d;
     --secondary-hue: 40;
     --secondary-saturation: 98%;
+    --items-on-secondary: black;
     --border-radius: 8px;
 }
 // ----------------------------------------------- */
@@ -8965,8 +8968,8 @@ button.close {
   --background-selected-hover: #8d8d8d52;
   --background-inverse: #393939;
   --background-inverse-hover: #4c4c4c;
-  --background-brand: var(--primary-60);
-  --background-brand-alt: var(--secondary-60);
+  --background-brand: var(--primary-70);
+  --background-brand-alt: var(--secondary-70);
   --layer: #f4f4f4;
   --layer-alt: #ffffff;
   --layer-hover: #e8e8e8;
@@ -8999,8 +9002,8 @@ button.close {
   --text-primary: #161616;
   --text-secondary: #525252;
   --text-placeholder: #a8a8a8;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
+  --text-on-color: var(--items-on-primary, #ffffff);
+  --text-on-color-disabled: var(--items-on-primary, #8d8d8d);
   --text-helper: #6f6f6f;
   --text-error: #da1e28;
   --text-inverse: #ffffff;
@@ -9012,8 +9015,8 @@ button.close {
   --link-visited: #8a3ffc;
   --icon-primary: #161616;
   --icon-secondary: #525252;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
+  --icon-on-color: var(--items-on-primary, #ffffff);
+  --icon-on-color-disabled: var(--items-on-primary, #8d8d8d);
   --icon-interactive: var(--primary-60);
   --icon-inverse: #ffffff;
   --icon-disabled: #16161640;
@@ -9107,6 +9110,7 @@ button.close {
   --background-inverse: #f4f4f4;
   --background-inverse-hover: #e5e5e5;
   --background-brand: var(--primary-80);
+  --background-brand-alt: var(--secondary-80);
   --layer: #262626;
   --layer-alt: #393939;
   --layer-hover: #333333;
@@ -9144,8 +9148,8 @@ button.close {
   --text-primary: #f4f4f4;
   --text-secondary: #c6c6c6;
   --text-placeholder: #6f6f6f;
-  --text-on-color: #ffffff;
-  --text-on-color-disabled: #8d8d8d;
+  --text-on-color: var(--items-on-primary, #ffffff);
+  --text-on-color-disabled: var(--items-on-primary, #8d8d8d);
   --text-helper: #8d8d8d;
   --text-error: #ff8389;
   --text-inverse: #161616;
@@ -9157,8 +9161,8 @@ button.close {
   --link-visited: #be95ff;
   --icon-primary: #f4f4f4;
   --icon-secondary: #c6c6c6;
-  --icon-on-color: #ffffff;
-  --icon-on-color-disabled: #8d8d8d;
+  --icon-on-color: var(--items-on-primary, #ffffff);
+  --icon-on-color-disabled: var(--items-on-primary, #8d8d8d);
   --icon-interactive: #ffffff;
   --icon-inverse: #161616;
   --icon-disabled: #f4f4f4;
