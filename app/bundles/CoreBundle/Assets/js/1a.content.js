@@ -708,12 +708,33 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     Mautic.renderCharts(container);
-    Mautic.renderMaps(container);
     Mautic.stopIconSpinPostEvent();
 
     //stop loading bar
     if ((response && typeof response.stopPageLoading != 'undefined' && response.stopPageLoading) || container == '#app-content' || container == '.page-list') {
         Mautic.stopPageLoadingBar();
+    }
+
+    const maps= mQuery(container).find('[data-load="map"]');
+    if(maps.length) {
+        maps.each((index,map) => map.addEventListener('click', () => {
+            const scopeId = event.target.getAttribute('href');
+            const scope = mQuery(scopeId);
+
+            if (scope.length) {
+                // Check if map is not already rendered
+                if (scope.children('.map-rendered').length) {
+                    return;
+                }
+
+                // Loaded via AJAX not to block loading a whole page
+                const mapUrl = scope.attr('data-map-url');
+
+                scope.load(mapUrl, '', () => {
+                    const map = Mautic.initMap(scope, 'regions');
+                });
+            }
+        }, false));
     }
 };
 
@@ -852,8 +873,8 @@ Mautic.onPageUnload = function (container, response) {
 
         // trash created map objects to save some memory
         if (typeof Mautic.mapObjects !== 'undefined') {
-            mQuery.each(Mautic.mapObjects, function (i, map) {
-                Mautic.destroyMap(map);
+            mQuery.each(Mautic.mapObjects, (i, map) => {
+                map.destroyMap();
             });
             Mautic.mapObjects = [];
         }
