@@ -1564,6 +1564,34 @@ h6,
 .fs-56 {
   font-size: 56px !important;
 }
+.fs-heading-03 {
+  font-size: var(--fluid-heading-03);
+}
+.fs-heading-04 {
+  font-size: var(--fluid-heading-04);
+}
+.fs-heading-05 {
+  font-size: var(--fluid-heading-05);
+  font-weight: 300;
+}
+.fs-heading-06 {
+  font-size: var(--fluid-heading-06);
+  font-weight: 600;
+}
+.fs-display-01 {
+  font-size: var(--fluid-display-01);
+  font-weight: 300;
+}
+.fs-display-02 {
+  font-size: var(--fluid-display-02);
+  font-weight: 600;
+}
+.fs-display-03 {
+  font-size: var(--fluid-display-03);
+}
+.fs-display-04 {
+  font-size: var(--fluid-display-04);
+}
 .page-header {
   background-color: #ffffff;
   padding: 15px;
@@ -5907,7 +5935,7 @@ a.inline-token .text-muted {
   margin-bottom: 10px;
 }
 .map-options h5 {
-  color: #47535f;
+  color: #3c4650;
   font-size: 13px;
 }
 .map-options__cointainer {
