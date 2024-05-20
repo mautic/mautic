@@ -1,13 +1,15 @@
+/* Brand center ---------------------------------- //
 :root {
-  --primary-hue: 228;
-  --primary-saturation: 34%;
-  --items-on-primary: #ffffff;
-  --items-on-primary-disabled: #8d8d8d;
-  --secondary-hue: 40;
-  --secondary-saturation: 98%;
-  --items-on-secondary: black;
-  --border-radius: 8px;
+    --primary-hue: 228;
+    --primary-saturation: 50%;
+    --items-on-primary: #ffffff;
+    --items-on-primary-disabled: #8d8d8d;
+    --secondary-hue: 40;
+    --secondary-saturation: 98%;
+    --items-on-secondary: black;
+    --border-radius: 8px;
 }
+// ----------------------------------------------- */
 :root {
   --background: #ffffff;
   --background-hover: #8d8d8d1f;
@@ -288,14 +290,14 @@
   --label-border-green: #24a148;
 }
 :root {
-  --primary-20: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 95%);
-  --primary-30: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 85%);
-  --primary-40: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 75%);
-  --primary-50: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 65%);
-  --primary-60: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 55%);
-  --primary-70: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 45%);
-  --primary-80: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 35%);
-  --primary-90: hsl(var(--primary-hue, 228), var(--primary-saturation, 34%), 25%);
+  --primary-20: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 95%);
+  --primary-30: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 85%);
+  --primary-40: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 75%);
+  --primary-50: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 65%);
+  --primary-60: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 55%);
+  --primary-70: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 45%);
+  --primary-80: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 35%);
+  --primary-90: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 25%);
   --secondary-20: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 95%);
   --secondary-30: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 85%);
   --secondary-40: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 75%);
