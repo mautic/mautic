@@ -3062,6 +3062,9 @@ label {
   padding-left: 10px;
   padding-right: 28px;
 }
+input[type=file].form-control {
+  padding: 6px;
+}
 .btn-file {
   position: relative;
   overflow: hidden;
