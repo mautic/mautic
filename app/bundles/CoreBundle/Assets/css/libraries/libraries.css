@@ -8948,18 +8948,16 @@ button.close {
 .has-error select.form-control + .chosen-container-multi .chosen-choices {
   border-color: #a94442;
 }
-/* Brand center ---------------------------------- //
 :root {
-    --primary-hue: 228;
-    --primary-saturation: 34%;
-    --items-on-primary: #ffffff;
-    --items-on-primary-disabled: #8d8d8d;
-    --secondary-hue: 40;
-    --secondary-saturation: 98%;
-    --items-on-secondary: black;
-    --border-radius: 8px;
+  --primary-hue: 228;
+  --primary-saturation: 34%;
+  --items-on-primary: #ffffff;
+  --items-on-primary-disabled: #8d8d8d;
+  --secondary-hue: 40;
+  --secondary-saturation: 98%;
+  --items-on-secondary: black;
+  --border-radius: 8px;
 }
-// ----------------------------------------------- */
 :root {
   --background: #ffffff;
   --background-hover: #8d8d8d1f;

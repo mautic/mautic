@@ -15,12 +15,13 @@
 {% endblock %}
 
 {% block mainContent %}
+<div class="col-lg-12 space-between">
 	<div class="row">
-		<div class="col-lg-6">
-			<h1 class="fs-heading-06 pb-xs">Welcome back</h1>
+		<div class="col-lg-8">
+			<h1 class="fs-display-02 pb-xs">Welcome back</h1>
 			<div>Enter your login information</div>
 		</div>
-		<div class="col-lg-6">
+		<div class="col-lg-4">
 			<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
 				<div class="input-group mb-md">
 
@@ -56,20 +57,42 @@
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="col-lg-3">
-
+	<div class="row gap-xs fw-nowrap">
+		<div class="col-lg-3 jc-space-between gap-lg background-brand-alt pa-32 features-container">
+			<img class="logo" src="/app/assets/images/horizontal_logo.svg"></img>
+			<div class="fs-heading-03">Access a powerful set of features to enrich your strategies.</div>
 		</div>
 
-		<div class="col-lg-3">
-
+		<div class="col-lg-3 jc-end background-brand pa-32">
+			<ul class="ds-list-group ds-list-none">
+				<li>
+					E-mail marketing
+					<i class="ri-mail-send-line"></i>
+				</li>
+				<li>
+					Social monitoring
+					<i class="ri-chat-1-line"></i>
+				</li>
+				<li>
+					Forms
+					<i class="ri-survey-line"></i>
+				</li>
+				<li>
+					Landing pages
+					<i class="ri-pages-line"></i>
+				</li>
+			</ul>
 		</div>
 		
-		<div class="col-lg-6">
-
+		<div class="col-lg-6 jc-end background-brand pa-32">
+			<div class="row-no-gutters ai-center gap-lg">
+				<div class="fs-display-01">+200K</div>
+				<div>Companies using our tool to boost their digital marketing results.</div>
+			</div>
 		</div>
 	</div>
 
+</div>
 	
 	{% if integrations is not empty %}
 		<ul class="list-group">

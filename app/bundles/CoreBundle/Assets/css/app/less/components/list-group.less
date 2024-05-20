@@ -43,12 +43,16 @@ label.list-group-item {
   counter-reset: item;
   list-style-type: none;
   padding-inline-start: 35px;
+  display: flex;
+  flex-direction: column;
 
   > li {
+    display: inherit;
     @list-padding: 10px;
     counter-increment: item;
     position: relative;
     padding: @list-padding 0px;
+    justify-content: space-between;
 
     &:not(:first-child) {
       border-top: 1px solid var(--border-subtle);
