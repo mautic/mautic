@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FieldControllerTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testLengthValidationOnLabelFieldWhenAddingCustomFieldFailure(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
