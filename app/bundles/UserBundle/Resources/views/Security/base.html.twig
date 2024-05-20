@@ -28,7 +28,7 @@
                 <div class="row gap-sm fw-nowrap">
                     <div class="col-lg-3 jc-space-between gap-lg background-brand-alt pa-32 features-container">
                         <img class="logo" src="/app/assets/images/horizontal_logo.svg"></img>
-                        <div class="fs-heading-03">Access a powerful set of features to enrich your strategies.</div>
+                        <div class="fs-heading-03">{{ 'mautic.user.auth.card.features'|trans }}</div>
                     </div>
             
                     <div class="col-lg-3 jc-end background-brand pa-32 features-container fg-1">
@@ -71,22 +71,10 @@
                             </svg>
                             
                         <ul class="ds-list-group ds-list-none">
-                            <li>
-                                E-mail marketing
-                                <i class="ri-mail-send-line"></i>
-                            </li>
-                            <li>
-                                Social monitoring
-                                <i class="ri-chat-1-line"></i>
-                            </li>
-                            <li>
-                                Forms
-                                <i class="ri-survey-line"></i>
-                            </li>
-                            <li>
-                                Landing pages
-                                <i class="ri-pages-line"></i>
-                            </li>
+                            <li>{{ 'mautic.user.auth.card.features.email_marketing'|trans }}<i class="ri-mail-send-line"></i></li>
+                            <li>{{ 'mautic.user.auth.card.features.social_monitoring'|trans }}<i class="ri-chat-1-line"></i></li>
+                            <li>{{ 'mautic.user.auth.card.features.forms'|trans }}<i class="ri-survey-line"></i></li>
+                            <li>{{ 'mautic.user.auth.card.features.landing_pages'|trans }}<i class="ri-pages-line"></i></li>
                         </ul>
                     </div>
                     
@@ -109,8 +97,8 @@
                             </svg>
                             
                         <div class="row-no-gutters ai-center gap-lg">
-                            <div class="fs-display-01">+200K</div>
-                            <div>Companies using our tool to boost their digital marketing results.</div>
+                            <div class="fs-display-01">{{ 'mautic.user.auth.card.features.companies_using_tool'|trans }}</div>
+                            <div>{{ 'mautic.user.auth.card.features.companies_using_tool_description'|trans }}</div>
                         </div>
                     </div>
                 </div>
