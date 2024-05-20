@@ -8,8 +8,7 @@
 .btn {
   transition: var(--all-productive);
   &,
-  &:active,
-  &.active {
+  &:active {
     outline: 0;
   }
 
@@ -74,5 +73,13 @@
   &:hover,
   &:focus {
     text-decoration: none;
+  }
+}
+
+.btn-info {
+  color: @gray-dark;
+
+  &:hover {
+    color: @gray-dark;
   }
 }
