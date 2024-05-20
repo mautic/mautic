@@ -7,19 +7,24 @@ use Mautic\ReportBundle\Model\ReportCleanup;
 use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\Console\Command\Command;
+use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportSchedulerCommand extends Command
+class ExportSchedulerCommand extends ModeratedCommand
 {
     public function __construct(
         private ReportExporter $reportExporter,
         private ReportCleanup $reportCleanup,
-        private TranslatorInterface $translator
+        private TranslatorInterface $translator,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        parent::__construct();
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
@@ -27,6 +32,8 @@ class ExportSchedulerCommand extends Command
         $this
             ->setName('mautic:reports:scheduler')
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
+
+        parent::configure();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -41,6 +48,10 @@ class ExportSchedulerCommand extends Command
             return Command::SUCCESS;
         }
 
+        if (!$this->checkRunStatus($input, $output, $exportOption->getReportId())) {
+            return Command::FAILURE;
+        }
+
         try {
             if ($exportOption->getReportId()) {
                 $this->reportCleanup->cleanup($exportOption->getReportId());
@@ -51,11 +62,14 @@ class ExportSchedulerCommand extends Command
             $this->reportExporter->processExport($exportOption);
 
             $output->writeln('<info>'.$this->translator->trans('mautic.report.schedule.command.finished').'</info>');
+            $this->completeRun();
+
+            return Command::SUCCESS;
         } catch (FileIOException $e) {
             $output->writeln('<error>'.$e->getMessage().'</error>');
         }
 
-        return Command::SUCCESS;
+        return Command::FAILURE;
     }
 
     protected static $defaultDescription = 'Processes scheduler for report\'s export';
