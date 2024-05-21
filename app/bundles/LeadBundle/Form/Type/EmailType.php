@@ -135,7 +135,7 @@ class EmailType extends AbstractType
             'save_text'   => 'mautic.email.send',
             'save_class'  => 'btn btn-primary',
             'save_icon'   => 'fa fa-send',
-            'cancel_icon' => 'fa fa-times',
+            'cancel_icon' => 'ri-close-line',
         ]);
 
         if (!empty($options['action'])) {

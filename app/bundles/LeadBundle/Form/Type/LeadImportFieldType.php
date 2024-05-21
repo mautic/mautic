@@ -113,7 +113,7 @@ class LeadImportFieldType extends AbstractType
             ]
         );
 
-        $buttons = ['cancel_icon' => 'fa fa-times'];
+        $buttons = ['cancel_icon' => 'ri-close-line'];
 
         if (empty($options['line_count_limit'])) {
             $buttons = array_merge(
