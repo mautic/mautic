@@ -353,7 +353,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         var elementParent = thisTooltip.parent();
 
         if (elementParent.get(0).tagName === 'LABEL') {
-            elementParent.append('<i class="fa fa-question-circle"></i>');
+            elementParent.append('<i class="ri-question-line"></i>');
 
             elementParent.hover(function () {
                 thisTooltip.tooltip('show')
