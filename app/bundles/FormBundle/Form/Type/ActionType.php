@@ -68,7 +68,7 @@ class ActionType extends AbstractType
         $update = !empty($properties);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
-            $btnIcon  = 'fa fa-pencil';
+            $btnIcon  = 'ri-edit-line';
         } else {
             $btnValue = 'mautic.core.form.add';
             $btnIcon  = 'fa fa-plus';

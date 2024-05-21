@@ -21,7 +21,7 @@
             <div class="media-body col-xs-11 pa-10">
                 <div class="pull-right btn-group">
                     {% if permissions['edit'] %}
-                        <a class="btn btn-default btn-xs" href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-xs" href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="ri-edit-line"></i></a>
                     {% endif %}
                     {% if permissions['delete'] %}
                         <a class="btn btn-default btn-xs" data-toggle="confirmation"
