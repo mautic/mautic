@@ -1363,11 +1363,14 @@ blockquote > p:after {
 .btn {
   transition: var(--all-productive);
   border: var(--no-border);
+  border-radius: var(--border-radius-sm);
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   height: var(--spacing-08);
-  padding: 0 16px;
+  line-height: 1em;
+  padding: var(--spacing-04) var(--spacing-05);
   gap: var(--spacing-03);
+  justify-content: space-between;
 }
 .btn,
 .btn:active {
@@ -1545,6 +1548,26 @@ blockquote > p:after {
 }
 .btn-info:hover {
   color: #3c4650;
+}
+.modal-footer {
+  padding: var(--spacing-03) 0 0;
+}
+.modal-footer .modal-form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1px;
+}
+.modal-footer .modal-form-buttons .btn {
+  height: var(--spacing-10);
+  width: var(--spacing-13);
+}
+.modal-footer .modal-form-buttons .btn:first-child {
+  border-radius: var(--border-radius-md) 0 0 0;
+}
+.modal-footer .modal-form-buttons .btn + .btn {
+  border-radius: 0;
+  margin: 0;
+  margin-left: -1px;
 }
 .btn-group .btn ~ .btn,
 .btn-group .btn ~ .btn-group,

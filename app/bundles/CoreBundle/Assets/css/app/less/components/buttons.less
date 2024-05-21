@@ -8,11 +8,14 @@
 .btn {
   transition: var(--all-productive);
   border: var(--no-border);
+  border-radius: var(--border-radius-sm);
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   height: var(--spacing-08);
-  padding: 0 16px;
+  line-height: 1em;
+  padding: var(--spacing-04) var(--spacing-05);
   gap: var(--spacing-03);
+  justify-content: space-between;
 
   &,
   &:active {
@@ -201,4 +204,31 @@
   &:hover {
     color: @gray-dark;
   }
+}
+
+// Modal footer buttons
+
+.modal-footer {
+  padding: var(--spacing-03) 0 0;
+
+  .modal-form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1px;
+
+      .btn {
+        height: var(--spacing-10);
+        width: var(--spacing-13);
+
+        &:first-child {
+          border-radius: var(--border-radius-md) 0 0 0;
+        }
+      }
+
+      .btn + .btn {
+        border-radius: 0;
+        margin: 0;
+        margin-left: -1px;
+      }
+   }
 }
