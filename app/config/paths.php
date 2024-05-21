@@ -12,7 +12,7 @@ $paths = [
 ];
 
 $root        = $root ?? realpath(__DIR__.'/..');
-$projectRoot = $projectRoot ?? \Mautic\CoreBundle\Loader\ParameterLoader::getProjectDirByRoot($root);
+$projectRoot = $projectRoot ?? Mautic\CoreBundle\Loader\ParameterLoader::getProjectDirByRoot($root);
 
 // allow easy overrides of the above
 if (file_exists($projectRoot.'/config/paths_local.php')) {

@@ -131,14 +131,14 @@ Mautic.leadOnLoad = function (container, response) {
 
     var leadMap = [];
 
-    mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
-        leadMap = Mautic.renderMap(mQuery('#place-container .vector-map'));
+    mQuery(document).on('shown.bs.tab', 'a#load-lead-map',  () => {
+        leadMap = Mautic.initMap('#place-container', 'markers');
     });
 
     mQuery('a[data-toggle="tab"]').not('a#load-lead-map').on('shown.bs.tab', function (e) {
         if (leadMap.length) {
-            Mautic.destroyMap(leadMap);
-            leadMap = [];
+            leadMap.destroyMap();
+            leadMap = undefined;
         }
     });
 
@@ -1352,8 +1352,7 @@ Mautic.createLeadUtmTag = function (el) {
 
 Mautic.leadBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {
-
-        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length || mQuery('#contact_channels_ids').length) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length || mQuery('#contact_channels_ids').length || mQuery('#batch_tag_tags_add_tags').val() || mQuery('#batch_tag_tags_remove_tags').val()) {
             var ids = Mautic.getCheckedListIds(false, true);
 
             if (mQuery('#lead_batch_ids').length) {
@@ -1366,6 +1365,8 @@ Mautic.leadBatchSubmit = function() {
                 mQuery('#lead_batch_owner_ids').val(ids);
             } else if (mQuery('#contact_channels_ids').length) {
                 mQuery('#contact_channels_ids').val(ids);
+            } else if (mQuery('#batch_tag_ids').length) {
+                mQuery('#batch_tag_ids').val(ids);
             }
 
             return true;

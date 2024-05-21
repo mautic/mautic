@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\CoreBundle\EventListener\MaintenanceSubscriber $subscriber;
+    private MaintenanceSubscriber $subscriber;
 
     protected function setUp(): void
     {

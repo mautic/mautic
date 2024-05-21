@@ -74,7 +74,7 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class);
+            $integrationRepo = $this->em->getRepository(Integration::class);
             // get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
@@ -99,7 +99,7 @@ class IntegrationHelper
 
                     $id                  = $installedPlugins[$plugin['bundle']]['id'];
                     $this->byPlugin[$id] = [];
-                    $pluginReference     = $this->em->getReference(\Mautic\PluginBundle\Entity\Plugin::class, $id);
+                    $pluginReference     = $this->em->getReference(Plugin::class, $id);
                     $pluginNamespace     = str_replace('MauticPlugin', '', $plugin['bundle']);
 
                     foreach ($finder as $file) {
@@ -128,7 +128,7 @@ class IntegrationHelper
                             }
                         }
 
-                        /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                        /** @var Integration $settings */
                         $settings                          = $integrationSettings[$integrationName];
                         $this->available[$integrationName] = [
                             'isPlugin'    => true,
@@ -190,7 +190,7 @@ class IntegrationHelper
                             }
                         }
 
-                        /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                        /** @var Integration $settings */
                         $settings                          = $coreIntegrationSettings[$integrationName] ?? $newIntegration;
                         $this->available[$integrationName] = [
                             'isPlugin'    => false,
@@ -384,12 +384,12 @@ class IntegrationHelper
      */
     public function getIntegrationSettings()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getIntegrations();
+        return $this->em->getRepository(Integration::class)->getIntegrations();
     }
 
     public function getCoreIntegrationSettings()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getCoreIntegrations();
+        return $this->em->getRepository(Integration::class)->getCoreIntegrations();
     }
 
     /**
@@ -504,11 +504,11 @@ class IntegrationHelper
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
 
             /**
-             * @var string                                               $integration
-             * @var \Mautic\PluginBundle\Integration\AbstractIntegration $details
+             * @var string              $integration
+             * @var AbstractIntegration $details
              */
             foreach ($socialIntegrations as $integration => $details) {
-                /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                /** @var Integration $settings */
                 $settings = $details->getIntegrationSettings();
 
                 $featureSettings = $settings->getFeatureSettings();

@@ -50,7 +50,7 @@ class SubmissionEvent extends CommonEvent
      */
     private array $feedback = [];
 
-    private ?\Mautic\FormBundle\Entity\Action $action = null;
+    private ?Action $action = null;
 
     private ?string $context = null;
 
