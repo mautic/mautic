@@ -198,8 +198,6 @@ class EmailRepository extends CommonRepository
             $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
         }
 
-        error_log('here '.(true === $this->segmentEmailOnceToEmailAddress).PHP_EOL, 3,'/tmp/debug');
-
         if (true === $this->segmentEmailOnceToEmailAddress) {
             $statQb2 = clone $statQb;
             $statQb2->innerJoin('stat', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = stat.lead_id');
