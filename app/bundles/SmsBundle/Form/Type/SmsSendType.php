@@ -86,7 +86,7 @@ class SmsSendType extends AbstractType
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardSmsUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($options['data']['sms']),
-                        'icon'     => 'fa fa-edit',
+                        'icon'     => 'ri-edit-line',
                     ],
                     'label' => 'mautic.sms.send.edit.sms',
                 ]

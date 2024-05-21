@@ -111,7 +111,7 @@ class EmailSendType extends AbstractType
                         'class'    => 'btn btn-default btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
-                        'icon'     => 'fa fa-edit',
+                        'icon'     => 'ri-edit-line',
                     ],
                     'label' => 'mautic.email.send.edit.email',
                 ]
