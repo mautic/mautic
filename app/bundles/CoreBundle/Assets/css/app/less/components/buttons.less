@@ -12,10 +12,10 @@
   display: inline-flex;
   align-items: flex-start;
   height: var(--spacing-08);
-  line-height: 1em;
+  line-height: var(--spacing-08);
   font-weight: normal;
   font-size: 14px;
-  padding: var(--spacing-04) var(--spacing-05);
+  padding: 0 var(--spacing-05);
   gap: var(--spacing-03);
   justify-content: space-between;
 
@@ -176,9 +176,9 @@
   }
 
   // Standard sizes
-  &.btn-small { height: var(--spacing-07) }
-  &.btn-medium { height: var(--spacing-08); }
-  &.btn-large { height: var(--spacing-09); }
+  &.btn-small { height: var(--spacing-07); line-height: var(--spacing-07);}
+  &.btn-medium { height: var(--spacing-08); line-height: var(--spacing-08);}
+  &.btn-large { height: var(--spacing-09); line-height: var(--spacing-09);}
   &.btn-extra-large { height: var(--spacing-10); }
   &.btn-2xl { height: var(--spacing-11); }
 }
