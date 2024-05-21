@@ -46,7 +46,7 @@
                       <li id="fields-tab" class="text-danger">
                           <a class="{% if fieldsTabError %}text-danger{% endif %}" href="#fields-container" role="tab" data-toggle="tab">
                             {{- 'mautic.form.tab.fields'|trans }}
-                            {% if fieldsTabError %}<i class="fa fa-warning"></i>{% endif -%}
+                            {% if fieldsTabError %}<i class="ri-alert-line"></i>{% endif -%}
                           </a>
                       </li>
                       <li id="actions-tab"><a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a></li>

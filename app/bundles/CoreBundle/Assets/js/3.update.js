@@ -49,7 +49,7 @@ Mautic.processUpdate = function (container, step, state) {
                             Mautic.processUpdate(container, step + 1, state);
                         } else {
                             console.log(response.errors);
-                            mQuery('td[id=update-step-running-checks-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-running-checks-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend(`<div class="alert alert-danger">
                                 <p>${response.message}</p>
@@ -83,7 +83,7 @@ Mautic.processUpdate = function (container, step, state) {
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-extracting-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                             Mautic.processUpdate(container, step + 1, state);
                         } else {
-                            mQuery('td[id=update-step-downloading-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-downloading-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         }
@@ -112,7 +112,7 @@ Mautic.processUpdate = function (container, step, state) {
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-moving-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                             Mautic.processUpdate(container, step + 1, state);
                         } else {
-                            mQuery('td[id=update-step-extracting-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-extracting-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         }
@@ -137,7 +137,7 @@ Mautic.processUpdate = function (container, step, state) {
                         mQuery('td[id=update-step-moving-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                         if (response.error) {
-                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
                             // If an error state, we cannot move on
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
@@ -174,7 +174,7 @@ Mautic.processUpdate = function (container, step, state) {
 
                         if (response.error) {
                             // If an error state, we cannot move on
-                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         } else if (response.complete) {
@@ -210,7 +210,7 @@ Mautic.processUpdate = function (container, step, state) {
 
                         if (response.error) {
                             // If an error state, we cannot move on
-                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         } else if (response.complete) {
@@ -245,7 +245,7 @@ Mautic.processUpdate = function (container, step, state) {
                         mQuery('td[id=update-step-cache-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                         if (response.error) {
-                            mQuery('td[id=update-step-cache-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-cache-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
 
                             // If an error state, we cannot move on
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
@@ -292,7 +292,7 @@ Mautic.processUpdate = function (container, step, state) {
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-finalization-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                             Mautic.processUpdate(container, step + 1, state);
                         } else {
-                            mQuery('td[id=update-step-database-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-database-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
 
                             // If an error state, we cannot move on
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
@@ -325,7 +325,7 @@ Mautic.processUpdate = function (container, step, state) {
                             }
                         } else {
                             mQuery('td[id=update-step-finalization-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
-                            mQuery('td[id=update-step-finalization-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-warning text-danger'));
+                            mQuery('td[id=update-step-finalization-status]').append(mQuery('<i></i>').addClass('pull-right ri-alert-line text-danger'));
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         }

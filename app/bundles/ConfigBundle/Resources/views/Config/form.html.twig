@@ -38,7 +38,7 @@
                         <a href="#{{ key }}" aria-controls="{{ key }}" role="tab" data-toggle="tab" class="steps {% if formContainsErrors(form[key]) %}text-danger{% endif %}">
                             {{ ('mautic.config.tab.' ~ key)|trans }}
                             {% if formContainsErrors(form[key]) %}
-                                <i class="fa fa-warning"></i>
+                                <i class="ri-alert-line"></i>
                             {% endif %}
                         </a>
                     </li>
