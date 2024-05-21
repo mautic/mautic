@@ -2897,8 +2897,9 @@ label {
   text-align: left;
 }
 .form-control,
-.chosen-container-single .chosen-single {
-  background-color: var(--field);
+.chosen-container-single .chosen-single,
+.form-control.search.tt-input {
+  background-color: var(--field) !important;
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
   transition: var(--all-productive);
@@ -2909,15 +2910,18 @@ label {
   box-shadow: none;
 }
 .form-control.form-control-rounded,
-.chosen-container-single .chosen-single.form-control-rounded {
+.chosen-container-single .chosen-single.form-control-rounded,
+.form-control.search.tt-input.form-control-rounded {
   border-radius: 32px;
 }
 .form-control:hover,
-.chosen-container-single .chosen-single:hover {
-  background-color: var(--field-hover);
+.chosen-container-single .chosen-single:hover,
+.form-control.search.tt-input:hover {
+  background-color: var(--field-hover) !important;
 }
 .form-control:focus,
-.chosen-container-single .chosen-single:focus {
+.chosen-container-single .chosen-single:focus,
+.form-control.search.tt-input:focus {
   outline: 2px solid var(--focus);
   box-shadow: none;
 }

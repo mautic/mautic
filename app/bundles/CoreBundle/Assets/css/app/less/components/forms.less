@@ -25,8 +25,8 @@ label {
 
 // form control
 // -------------------------
-.form-control, .chosen-container-single .chosen-single {
-  background-color: var(--field);
+.form-control, .chosen-container-single .chosen-single, .form-control.search.tt-input {
+  background-color: var(--field) !important;
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
   transition: var(--all-productive);
@@ -42,7 +42,7 @@ label {
   }
 
   &:hover {
-    background-color: var(--field-hover);
+    background-color: var(--field-hover) !important;
   }
 
   &:focus {
