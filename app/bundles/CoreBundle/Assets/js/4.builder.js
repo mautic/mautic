@@ -767,7 +767,7 @@ Mautic.initSectionListeners = function() {
                     classes: 'fa fa-arrows-v'
                 },
                 'delete': {
-                    classes: 'fa fa-remove',
+                    classes: 'ri-close-line',
                     onClick: function() {
                         if (confirm(parent.Mautic.translate('mautic.core.builder.section_delete_warning'))) {
                             var deleteBtn = mQuery(this);
