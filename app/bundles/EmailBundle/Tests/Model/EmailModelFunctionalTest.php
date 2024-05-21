@@ -407,18 +407,17 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
       /** @var EmailModel $emailModel */
       $emailModel = self::$container->get('mautic.email.model.email');
 
-      [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email);
+      [$sentCount] = $emailModel->sendEmailToLists($email);
 
       self::assertEquals(2, $sentCount, $email->getCustomHtml());
 
-      $this->connection->executeQuery("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
       $this->setUpSymfony(['segment_email_once_to_email_address' => true]);
 
       /** @var EmailModel $emailModel */
       $emailModel = self::$container->get('mautic.email.model.email');
 
-      [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email2);
+      [$sentCount] = $emailModel->sendEmailToLists($email2);
 
-      self::assertEquals(1, $sentCount);
+      self::assertEquals(1, $sentCount, $email2->getCustomHtml());
     }
 }
