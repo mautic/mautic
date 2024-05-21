@@ -44,7 +44,7 @@ Mautic.processUpdate = function (container, step, state) {
                         mQuery('td[id=update-step-running-checks-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                         if (response.success) {
-                            mQuery('td[id=update-step-running-checks-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+                            mQuery('td[id=update-step-running-checks-status]').append(mQuery('<i></i>').addClass('pull-right ri-check-line text-success'));
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-downloading-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                             Mautic.processUpdate(container, step + 1, state);
                         } else {
@@ -79,7 +79,7 @@ Mautic.processUpdate = function (container, step, state) {
                         mQuery('td[id=update-step-downloading-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                         if (response.success) {
-                            mQuery('td[id=update-step-downloading-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+                            mQuery('td[id=update-step-downloading-status]').append(mQuery('<i></i>').addClass('pull-right ri-check-line text-success'));
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-extracting-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                             Mautic.processUpdate(container, step + 1, state);
                         } else {
@@ -108,7 +108,7 @@ Mautic.processUpdate = function (container, step, state) {
                         mQuery('td[id=update-step-extracting-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                         if (response.success) {
-                            mQuery('td[id=update-step-extracting-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+                            mQuery('td[id=update-step-extracting-status]').append(mQuery('<i></i>').addClass('pull-right ri-check-line text-success'));
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-moving-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
                             Mautic.processUpdate(container, step + 1, state);
                         } else {
@@ -214,7 +214,7 @@ Mautic.processUpdate = function (container, step, state) {
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         } else if (response.complete) {
-                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+                            mQuery('td[id=update-step-moving-status]').append(mQuery('<i></i>').addClass('pull-right ri-check-line text-success'));
 
                             // If complete then we go into the next step
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-cache-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
@@ -251,7 +251,7 @@ Mautic.processUpdate = function (container, step, state) {
                             mQuery('div[id=main-update-panel]').removeClass('panel-default').addClass('panel-danger');
                             mQuery('div#main-update-panel div.panel-body').prepend('<div class="alert alert-danger">' + response.message + '</div>');
                         } else if (response.complete) {
-                            mQuery('td[id=update-step-cache-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+                            mQuery('td[id=update-step-cache-status]').append(mQuery('<i></i>').addClass('pull-right ri-check-line text-success'));
 
                             // If complete then we go into the next step
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-database-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
@@ -286,7 +286,7 @@ Mautic.processUpdate = function (container, step, state) {
                         mQuery('td[id=update-step-database-status]').html('<span class="hidden-xs">' + response.stepStatus + '</span>');
 
                         if (response.success) {
-                            mQuery('td[id=update-step-database-status]').append(mQuery('<i></i>').addClass('pull-right fa fa-check text-success'));
+                            mQuery('td[id=update-step-database-status]').append(mQuery('<i></i>').addClass('pull-right ri-check-line text-success'));
 
                             // If complete then we go into the next step
                             mQuery('#updateTable tbody').append('<tr><td>' + response.nextStep + '</td><td id="update-step-finalization-status"><span class="hidden-xs">' + response.nextStepStatus + '</span><i class="pull-right fa fa-spinner fa-spin"></i></td></tr>');
