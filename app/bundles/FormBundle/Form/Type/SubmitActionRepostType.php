@@ -69,7 +69,7 @@ class SubmitActionRepostType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.action.repost.failure_email.tooltip',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                 ],
                 'required'    => false,
                 'constraints' => new Email(
