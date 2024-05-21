@@ -56,7 +56,7 @@ class MessageSendType extends AbstractType
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
                         'onclick' => 'Mautic.loadNewWindow({windowUrl: \''.$windowUrl.'\'})',
-                        'icon'    => 'fa fa-plus',
+                        'icon'    => 'ri-add-line',
                     ],
                     'label' => 'mautic.channel.create.new.message',
                 ]
