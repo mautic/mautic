@@ -970,5 +970,6 @@ return [
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
         'contact_allow_multiple_companies'                                                      => true,
+        'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
     ],
 ];
