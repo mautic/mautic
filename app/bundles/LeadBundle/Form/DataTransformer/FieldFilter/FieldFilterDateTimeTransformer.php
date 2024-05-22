@@ -6,13 +6,13 @@ namespace Mautic\LeadBundle\Form\DataTransformer\FieldFilter;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Form\Type\SegmentDateFilterType;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldFilterDateTimeTransformer implements DataTransformerInterface
 {
     use FieldFilterDateTransformerTrait;
-    private TranslatorInterface $translator;
 
     /**
      * @var string[]
@@ -21,10 +21,10 @@ class FieldFilterDateTimeTransformer implements DataTransformerInterface
 
     public function __construct(TranslatorInterface $translator)
     {
-        $this->translator          = $translator;
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
+
         foreach ($this->relativeDateStrings as &$string) {
-            $string = $this->translator->trans($string);
+            $string = $translator->trans($string);
         }
     }
 
@@ -39,7 +39,8 @@ class FieldFilterDateTimeTransformer implements DataTransformerInterface
 
         if ($this->isRelativeDateFormat($filterVal) || $isRelativeDateType) {
             // to support old date filter values
-            if (!$isRelativeDateType && !isset($value['properties']['filter']['absoluteDate'])) {
+            if (!$isRelativeDateType && $this->isAbsoluteRelativeDateFilterAllowed($value)
+                && !isset($value['properties']['filter']['absoluteDate'])) {
                 $value['properties']['filter'] = ['absoluteDate' => $filterVal];
             }
 
@@ -48,10 +49,14 @@ class FieldFilterDateTimeTransformer implements DataTransformerInterface
 
         $dt = new DateTimeHelper($filterVal, 'Y-m-d H:i');
 
-        if (isset($value['properties']['filter']['absoluteDate'])) {
-            $value['properties']['filter']['absoluteDate'] = $dt->toLocalString();
+        if ($this->isAbsoluteRelativeDateFilterAllowed($value)) {
+            if (isset($value['properties']['filter']['absoluteDate'])) {
+                $value['properties']['filter']['absoluteDate'] = $dt->toLocalString();
+            } else {
+                $value['properties']['filter'] = ['absoluteDate' => $dt->toLocalString()];
+            }
         } else {
-            $value['properties']['filter'] = ['absoluteDate' => $dt->toLocalString()];
+            $value['properties']['filter'] = $dt->toLocalString();
         }
 
         return $value;
@@ -71,10 +76,14 @@ class FieldFilterDateTimeTransformer implements DataTransformerInterface
 
         $dt = new DateTimeHelper($filterVal, 'Y-m-d H:i', 'local');
 
-        if (is_string($value['properties']['filter'])) {
-            $value['properties']['filter'] = ['absoluteDate' => $dt->toUtcString()];
+        if ($this->isAbsoluteRelativeDateFilterAllowed($value)) {
+            if (is_string($value['properties']['filter'])) {
+                $value['properties']['filter'] = ['absoluteDate' => $dt->toUtcString()];
+            } else {
+                $value['properties']['filter']['absoluteDate'] = $dt->toUtcString();
+            }
         } else {
-            $value['properties']['filter']['absoluteDate'] = $dt->toUtcString();
+            $value['properties']['filter'] = $dt->toUtcString();
         }
 
         return $value;
@@ -102,7 +111,7 @@ class FieldFilterDateTimeTransformer implements DataTransformerInterface
             return $filterVal;
         }
 
-        if ('absolute' === $filterVal['dateTypeMode']) {
+        if (SegmentDateFilterType::ABSOLUTE_DATE_TYPE === $filterVal['dateTypeMode']) {
             $filterVal = $filterVal['absoluteDate'];
         } else {
             $filterVal = $filterVal['relativeDateInterval'].' '.$filterVal['relativeDateIntervalUnit'];
@@ -127,6 +136,6 @@ class FieldFilterDateTimeTransformer implements DataTransformerInterface
     {
         $filter = $value['properties']['filter'] ?? null;
 
-        return is_array($filter) && 'relative' === $filter['dateTypeMode'];
+        return is_array($filter) && SegmentDateFilterType::RELATIVE_DATE_TYPE === $filter['dateTypeMode'];
     }
 }

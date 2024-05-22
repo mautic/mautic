@@ -5,15 +5,19 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class SegmentDateFilterType extends AbstractType
 {
+    public const ABSOLUTE_DATE_TYPE = 'absolute';
+    public const RELATIVE_DATE_TYPE = 'relative';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $dateTypeMode             = 'absolute';
+        $dateTypeMode             = self::ABSOLUTE_DATE_TYPE;
         $absoluteDate             = '';
         $relativeDateInterval     = '1';
         $relativeDateIntervalUnit = 'd';
@@ -31,8 +35,8 @@ class SegmentDateFilterType extends AbstractType
         }
 
         $choices = [
-            'absolute'  => 'Absolute',
-            'relative'  => 'Relative',
+            self::ABSOLUTE_DATE_TYPE  => 'Absolute',
+            self::RELATIVE_DATE_TYPE  => 'Relative',
         ];
 
         $builder->add(
@@ -63,14 +67,19 @@ class SegmentDateFilterType extends AbstractType
 
         $builder->add(
             'relativeDateInterval',
-            NumberType::class,
+            IntegerType::class,
             [
                 'label' => false,
                 'attr'  => [
                     'class'    => 'form-control',
                     'preaddon' => 'symbol-hashtag',
+                    'step'     => 1,
+                    'min'      => 1,
                 ],
-                'data'  => $relativeDateInterval,
+                'constraints' => [
+                    new Assert\Positive(),
+                ],
+                'data'  => (int) $relativeDateInterval,
             ]
         );
 

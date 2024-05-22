@@ -494,14 +494,9 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                 'field'       => 'date_added',
                 'object'      => 'lead',
                 'type'        => 'date',
-                'operator'    => 'gt',
+                'operator'    => 'like',
                 'properties'  => [
-                    'filter' => [
-                        'dateTypeMode'             => 'absolute',
-                        'absoluteDate'             => '-1 day',
-                        'relativeDateInterval'     => '1',
-                        'relativeDateIntervalUnit' => 'day',
-                    ],
+                    'filter' => (new \DateTime())->format('Y-m-d'),
                 ],
             ],
             [
@@ -513,7 +508,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                 'properties'  => [
                     'filter' => [
                         'dateTypeMode'             => 'absolute',
-                        'absoluteDate'             => 'yesterday',
+                        'absoluteDate'             => '-1 day',
                         'relativeDateInterval'     => '1',
                         'relativeDateIntervalUnit' => 'day',
                     ],

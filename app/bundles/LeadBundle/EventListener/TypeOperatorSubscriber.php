@@ -279,7 +279,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     public function onSegmentFilterFormHandleDate(FormAdjustmentEvent $event): void
     {
-        if (!$event->fieldTypeIsOneOf('date', 'datetime')) {
+        if (!$event->fieldTypeIsOneOf('date', 'datetime')
+            || !$event->operatorIsOneOf(OperatorOptions::GREATER_THAN, OperatorOptions::GREATER_THAN_OR_EQUAL, OperatorOptions::LESS_THAN, OperatorOptions::LESS_THAN_OR_EQUAL)) {
             return;
         }
 

@@ -77,7 +77,10 @@ class DateOptionParameters
      */
     private function parseTimeFrame(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
     {
-        $filterVal = $this->parseDateFilterValue($leadSegmentFilterCrate->getFilter());
+        $filterVal = $this->parseDateFilterValue(
+            $leadSegmentFilterCrate->getFilter(),
+            $leadSegmentFilterCrate->getOperator()
+        );
 
         $key = array_search($filterVal, $relativeDateStrings, true);
 

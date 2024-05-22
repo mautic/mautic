@@ -405,7 +405,18 @@ Mautic.attachJsUiOnFilterForms = function() {
         Mautic.activateChosenSelect(selector + '_properties select');
         var fieldType = mQuery(selector + '_type').val();
         var fieldAlias = mQuery(selector + '_field').val();
+        const operator = mQuery(selector + '_operator').val();
         var filterFieldEl = mQuery(selector + '_properties_filter');
+        let isDatePickerAllowed = true;
+
+        if (['datetime', 'date'].includes(fieldType) && ['gt', 'gte', 'lt', 'lte'].includes(operator)) {
+            filterFieldEl = mQuery(selector + '_properties_filter_absoluteDate');
+        }
+
+        if (['datetime', 'date'].includes(fieldType)
+            && ['like', '!like', 'regexp', '!regexp', 'startsWith', 'endsWith', 'contains'].includes(operator)) {
+            isDatePickerAllowed = false;
+        }
 
         if (filterValue) {
             filterFieldEl.val(filterValue);
@@ -416,8 +427,8 @@ Mautic.attachJsUiOnFilterForms = function() {
 
         if (fieldType === 'lookup') {
             Mautic.activateLookupTypeahead(filterFieldEl.parent());
-        } else if (fieldType === 'datetime') {
-            mQuery(selector + '_properties_filter_absoluteDate').datetimepicker({
+        } else if (fieldType === 'datetime' && isDatePickerAllowed) {
+            filterFieldEl.datetimepicker({
                 format: 'Y-m-d H:i',
                 lazyInit: true,
                 validateOnBlur: false,
@@ -425,8 +436,8 @@ Mautic.attachJsUiOnFilterForms = function() {
                 scrollMonth: false,
                 scrollInput: false
             });
-        } else if (fieldType === 'date') {
-            mQuery(selector + '_properties_filter_absoluteDate').datetimepicker({
+        } else if (fieldType === 'date' && isDatePickerAllowed) {
+            filterFieldEl.datetimepicker({
                 timepicker: false,
                 format: 'Y-m-d',
                 lazyInit: true,

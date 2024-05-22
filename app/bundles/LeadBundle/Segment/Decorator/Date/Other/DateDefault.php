@@ -56,7 +56,7 @@ class DateDefault implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
-        $filter = $this->parseDateFilterValue($this->originalValue);
+        $filter = $this->parseDateFilterValue($this->originalValue, $contactSegmentFilterCrate->getOperator());
 
         return match ($contactSegmentFilterCrate->getOperator()) {
             'like', '!like' => !str_contains($filter, '%') ? '%'.$filter.'%' : $filter,
