@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Form\DataTransformer\FieldFilter\FieldFilterDefaultValueTransformer;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
@@ -23,15 +24,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @extends AbstractType<LeadList>
- */
 final class ListType extends AbstractType
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private readonly FieldFilterTransformer,
         private readonly ListModel $listModel,
         private readonly RelativeDate $relativeDate,
         TypeOperatorProviderInterface $typeOperatorProvider,
@@ -130,7 +127,7 @@ final class ListType extends AbstractType
         $builder->add('projects', ProjectType::class);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate, ['object' => 'lead']);
+        $filterModalTransformer = new FieldFilterDefaultValueTransformer($this->fieldFilterTransformer, ['object' => 'lead']);
         $builder->add(
             $builder->create(
                 'filters',
