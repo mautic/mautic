@@ -19,7 +19,7 @@ class FieldFilterDateTransformer implements DataTransformerInterface
         $bcFilter    = $value['filter'] ?? '';
         $filterVal   = $value['properties']['filter'] ?? $bcFilter;
 
-        if (!is_array($filterVal)) {
+        if (!is_array($filterVal) && $this->isAbsoluteRelativeDateFilterAllowed($value)) {
             $value['properties']['filter'] = ['absoluteDate' => $filterVal];
         }
 

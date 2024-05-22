@@ -35,6 +35,7 @@ final class FieldFilterTransformerTest extends TestCase
         $filters = $this->transformer->transform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'gt',
                 'properties' => [
                     'filter' => '2020-03-17 17:22:34',
                 ],
@@ -45,6 +46,7 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'gt',
                     'properties' => [
                         'filter' => [
                             'absoluteDate' => '2020-03-17 18:22',
@@ -56,12 +58,15 @@ final class FieldFilterTransformerTest extends TestCase
         );
     }
 
-    public function testTransformWithBcFilter(): void
+    public function testTransformWithoutAbsoluteRelativeDateFilter(): void
     {
         $filters = $this->transformer->transform([
             [
-                'type'   => 'datetime',
-                'filter' => '2020-03-17 17:22:34',
+                'type'       => 'datetime',
+                'operator'   => 'eq',
+                'properties' => [
+                    'filter' => '2020-03-17 17:22:34',
+                ],
             ],
         ]);
 
@@ -69,6 +74,31 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'eq',
+                    'properties' => [
+                        'filter' => '2020-03-17 17:22',
+                    ],
+                ],
+            ],
+            $filters
+        );
+    }
+
+    public function testTransformWithBcFilter(): void
+    {
+        $filters = $this->transformer->transform([
+            [
+                'type'       => 'datetime',
+                'operator'   => 'gte',
+                'filter'     => '2020-03-17 17:22:34',
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                [
+                    'type'       => 'datetime',
+                    'operator'   => 'gte',
                     'filter'     => '2020-03-17 17:22:34',
                     'properties' => [
                         'filter' => [
@@ -86,6 +116,7 @@ final class FieldFilterTransformerTest extends TestCase
         $filters = $this->transformer->reverseTransform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'eq',
                 'properties' => [
                     'filter' => '2020-03-17 17:22:34',
                 ],
@@ -96,10 +127,9 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'eq',
                     'properties' => [
-                        'filter' => [
-                            'absoluteDate' => '2020-03-17 17:22',
-                        ],
+                        'filter' => '2020-03-17 17:22',
                     ],
                 ],
             ],
@@ -111,8 +141,9 @@ final class FieldFilterTransformerTest extends TestCase
     {
         $filters = $this->transformer->reverseTransform([
             [
-                'type'   => 'datetime',
-                'filter' => '2020-03-17 17:22:34',
+                'type'       => 'datetime',
+                'operator'   => 'lt',
+                'filter'     => '2020-03-17 17:22:34',
             ],
         ]);
 
@@ -120,6 +151,7 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'lt',
                     'filter'     => '2020-03-17 17:22:34',
                     'properties' => [
                         'filter' => [
@@ -137,6 +169,7 @@ final class FieldFilterTransformerTest extends TestCase
         $filters = $this->transformer->transform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'lt',
                 'properties' => [
                     'filter'   => [
                         'dateTypeMode'             => 'absolute',
@@ -152,6 +185,7 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'lt',
                     'properties' => [
                         'filter' => [
                             'dateTypeMode'             => 'absolute',
@@ -171,6 +205,7 @@ final class FieldFilterTransformerTest extends TestCase
         $filters = $this->transformer->transform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'gt',
                 'properties' => [
                     'filter'   => [
                         'dateTypeMode'             => 'relative',
@@ -186,6 +221,7 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'gt',
                     'properties' => [
                         'filter' => [
                             'dateTypeMode'             => 'relative',
@@ -205,6 +241,7 @@ final class FieldFilterTransformerTest extends TestCase
         $filters = $this->transformer->reverseTransform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'gt',
                 'properties' => [
                     'filter'   => [
                         'dateTypeMode'             => 'absolute',
@@ -220,6 +257,7 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'gt',
                     'properties' => [
                         'filter'   => [
                             'dateTypeMode'             => 'absolute',
@@ -239,6 +277,7 @@ final class FieldFilterTransformerTest extends TestCase
         $filters = $this->transformer->reverseTransform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'gte',
                 'properties' => [
                     'filter'   => [
                         'dateTypeMode'             => 'relative',
@@ -254,6 +293,7 @@ final class FieldFilterTransformerTest extends TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'gte',
                     'properties' => [
                         'filter'   => [
                             'dateTypeMode'             => 'relative',
