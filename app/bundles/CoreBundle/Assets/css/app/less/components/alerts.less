@@ -14,6 +14,69 @@
   }
 }
 
+.alert {
+  border-width: 0 0 0 3px;
+  color: var(--text-primary);
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 3px;
+  background-color: var(--layer);
+  border-radius: var(--border-radius-sm);
+
+  &.alert-success,
+  &.alert-info,
+  &.alert-warning,
+  &.alert-danger {
+    &:not([class*="col-"]):before {
+      font-family: 'remixicon';
+      display: inline-flex;
+      position: relative;
+      font-size: 22px;
+      padding: 0px 3px;
+      margin-right: 10px;
+      line-height: .5em;
+      top: .15em;
+    }
+  }
+
+  &.alert-success { 
+    border-color: var(--support-success);
+
+    &:not([class*="col-"]):before {
+      content: '\EB80';
+      color: var(--support-success);
+    }
+  }
+  
+  &.alert-info {
+    border-color: var(--support-info);
+
+    &:not([class*="col-"]):before {
+      content: '\F448';
+      color: var(--support-info);
+    }
+  }
+  
+  &.alert-warning {
+    border-color: var(--support-warning);
+
+    &:not([class*="col-"]):before {
+      content: '\ECA0';
+      color: var(--support-warning);
+    }
+  }
+  
+  &.alert-danger {
+    border-color: var(--support-error);
+
+    &:not([class*="col-"]):before {
+      content: '\ED94';
+      color: var(--support-error);
+    }
+  }
+  
+}
+
 .alert-primary {
   background: lighten(@mautic-primary, 30%);
 }
