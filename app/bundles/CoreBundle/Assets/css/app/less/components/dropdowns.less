@@ -43,6 +43,8 @@
     position: relative;
     z-index: 1;
     padding: 0 var(--spacing-05);
+    outline: 2px solid transparent;
+    outline-offset: -2px;
 
     span {
       display: flex;
@@ -73,6 +75,10 @@
   &:hover,
   &:focus {
     z-index: 2;
+  }
+
+  &:focus {
+    outline: 2px solid var(--focus);
   }
 
   &:active {
