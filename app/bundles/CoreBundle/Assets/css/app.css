@@ -2614,6 +2614,11 @@ label.list-group-item:focus {
   color: #596776;
   background-color: #f7f7f7;
 }
+.dropdown-menu > li a.danger:hover,
+.dropdown-menu > li a.danger:focus {
+  background-color: var(--support-error);
+  color: var(--text-on-color);
+}
 .scrollable-menu {
   height: auto;
   max-height: 200px;
