@@ -1770,6 +1770,8 @@ a.media {
 .row-no-gutters {
   margin-right: 0;
   margin-left: 0;
+  display: flex;
+  flex-wrap: wrap;
 }
 .row-no-gutters [class*="col-"] {
   padding-right: 0;
@@ -5546,6 +5548,9 @@ lesshat-selector { -lh-property: 0 ;
   background-color: var(--background-brand);
   color: var(--text-on-color);
 }
+.background-brand a {
+  color: var(--text-on-color);
+}
 .background-brand-alt {
   background-color: var(--background-brand-alt);
   color: var(--items-on-secondary);
@@ -5566,11 +5571,21 @@ lesshat-selector { -lh-property: 0 ;
 .fd-column-reverse {
   flex-direction: column-reverse;
 }
-.fw-nowrap {
-  flex-wrap: wrap;
+.fw-nowrap-xs {
+  flex-wrap: nowrap;
 }
-@media (min-width: 769px) {
-  .fw-nowrap {
+@media (min-width: 768px) {
+  .fw-nowrap-sm {
+    flex-wrap: nowrap;
+  }
+}
+@media (min-width: 992px) {
+  .fw-nowrap-md {
+    flex-wrap: nowrap;
+  }
+}
+@media (min-width: 1200px) {
+  .fw-nowrap-lg {
     flex-wrap: nowrap;
   }
 }
