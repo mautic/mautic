@@ -6104,7 +6104,11 @@ lesshat-selector { -lh-property: 0 ;
   background-color: var(--background-brand);
   color: var(--text-on-color);
 }
-.background-brand a {
+.background-brand a,
+.background-brand div,
+.background-brand .card-title,
+.background-brand .card-text,
+.background-brand .card-link {
   color: var(--text-on-color);
 }
 .background-brand-alt {
