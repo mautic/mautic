@@ -592,7 +592,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa fa-globe',
+                            'iconClass' => 'ri-globe-line',
                         ]
                     );
                     break;

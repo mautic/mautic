@@ -28,7 +28,7 @@ class SubmitActionRepostType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-globe',
+                    'preaddon' => 'ri-globe-line',
                 ],
                 'constraints' => [
                     new NotBlank(

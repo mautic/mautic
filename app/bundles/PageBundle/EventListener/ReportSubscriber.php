@@ -477,7 +477,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-bookmark-o',
+                            'iconClass' => 'ri-information-2-line',
                         ]
                     );
                     break;
