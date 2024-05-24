@@ -22,7 +22,7 @@ class ContactTracker
 {
     use DefaultValueTrait;
 
-    private ?\Mautic\LeadBundle\Entity\Lead $systemContact = null;
+    private ?Lead $systemContact = null;
 
     /**
      * @var Lead|null

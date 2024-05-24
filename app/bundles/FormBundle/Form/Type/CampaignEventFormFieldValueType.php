@@ -57,7 +57,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $choices,
-                ]
+            ]
         );
 
         // function to add 'template' choice field dynamically

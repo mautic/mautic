@@ -21,7 +21,6 @@
 } %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
-{% set mauticTemplateVars = mauticTemplateVars|default({'mauticTemplate': '@MauticEmail/Email/form.html.twig', 'email': email}) %}
 
 {% block headerTitle %}
   {% if email.id is not empty %}
@@ -53,7 +52,7 @@
                         <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
                             <a href="#dynamic-content-container" role="tab" data-toggle="tab">{{ 'mautic.core.dynamicContent'|trans }}</a>
                         </li>
-                        {{ customContent('email.tabs', mauticTemplateVars) }}
+                        {{ customContent('email.tabs', _context) }}
                     </ul>
                     <!--/ tabs controls -->
 
@@ -75,7 +74,7 @@
                                     {{ form_row(form.fromAddress) }}
                                     {{ form_row(form.replyToAddress) }}
                                     {{ form_row(form.bccAddress) }}
-                                    {{ customContent('email.settings.advanced', mauticTemplateVars) }}
+                                    {{ customContent('email.settings.advanced', _context) }}
                                     <div>
                                         <div class="pull-left">
                                             {{ form_label(form.assetAttachments) }}
@@ -146,7 +145,7 @@
                                 </div>
                             </div>
                         </div>
-                        {{ customContent('email.tabs.content', mauticTemplateVars) }}
+                        {{ customContent('email.tabs.content', _context) }}
                     </div>
                 </div>
             </div>
@@ -242,6 +241,9 @@
         'previewUrl'    : previewUrl,
     }, with_context=false) -}}
 
+    {% set typeTwoDifferences = ['mautic.email.type.segment.differences.1st', 'mautic.email.type.segment.differences.2nd', 'mautic.email.type.segment.differences.3rd', 'mautic.email.type.segment.differences.4th'] %}
+    {% set typeOneDifferences = ['mautic.email.type.template.differences.1st', 'mautic.email.type.template.differences.2nd', 'mautic.email.type.template.differences.3rd', 'mautic.email.type.template.differences.4th'] %}
+
     {% set type = email.emailType %}
     {% if (
             (
@@ -265,11 +267,11 @@
             'header'             : 'mautic.email.type.header',
             'typeOneHeader'      : 'mautic.email.type.template.header',
             'typeOneIconClass'   : 'ri-mail-send-fill',
-            'typeOneDescription' : 'mautic.email.type.template.description',
+            'typeOneDifferences' : typeOneDifferences,
             'typeOneOnClick'     : "Mautic.selectEmailType('template');",
             'typeTwoHeader'      : 'mautic.email.type.list.header',
             'typeTwoIconClass'   : 'ri-pie-chart-fill',
-            'typeTwoDescription' : 'mautic.email.type.list.description',
+            'typeTwoDifferences' : typeTwoDifferences,
             'typeTwoOnClick'     : "Mautic.selectEmailType('list');",
         }) -}}
     {% endif %}

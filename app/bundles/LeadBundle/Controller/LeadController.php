@@ -59,7 +59,7 @@ class LeadController extends FormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction(
         Request $request,
@@ -89,7 +89,7 @@ class LeadController extends FormController
 
         $this->setListFilters();
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model   = $this->getModel('lead');
         $session = $request->getSession();
         // set limits
@@ -238,7 +238,28 @@ class LeadController extends FormController
 
     public function quickAddAction(Request $request): Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (
+            !$permissions['lead:leads:viewown']
+            && !$permissions['lead:leads:viewother']
+            && !$permissions['lead:leads:create']
+            && !$permissions['lead:leads:editown']
+            && !$permissions['lead:leads:editother']
+        ) {
+            return $this->accessDenied();
+        }
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
 
         // Get the quick add form
@@ -298,11 +319,11 @@ class LeadController extends FormController
     /**
      * Loads a specific lead into the detailed panel.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
 
         $lead = $model->getEntity($objectId);
@@ -334,19 +355,19 @@ class LeadController extends FormController
             );
         }
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $model->getRepository()->refetchEntity($lead);
 
         // set some permissions
         $permissions = $this->security->isGranted(
             [
-              'lead:leads:viewown',
-              'lead:leads:viewother',
-              'lead:leads:create',
-              'lead:leads:editown',
-              'lead:leads:editother',
-              'lead:leads:deleteown',
-              'lead:leads:deleteother',
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother',
             ],
             'RETURN_ARRAY'
         );
@@ -383,9 +404,9 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
 
         $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
@@ -400,25 +421,26 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'              => $lead,
-                    'avatarPanelState'  => $request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
-                    'fields'            => $fields,
-                    'companies'         => $companies,
-                    'lists'             => $lists,
-                    'socialProfiles'    => $socialProfiles,
-                    'socialProfileUrls' => $socialProfileUrls,
-                    'places'            => $this->getPlaces($lead),
-                    'permissions'       => $permissions,
-                    'events'            => $this->getEngagements($lead),
-                    'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
-                    'engagementData'    => $this->getEngagementData($lead),
-                    'noteCount'         => $leadNoteModel->getNoteCount($lead, true),
-                    'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
-                    'devices'           => $leadDeviceRepository->getLeadDevices($lead),
-                    'auditlog'          => $this->getAuditlogs($lead),
-                    'doNotContact'      => end($dnc),
-                    'doNotContactSms'   => end($dncSms),
-                    'pointGroups'       => $pointGroupModel->getEntities(),
+                    'lead'                   => $lead,
+                    'avatarPanelState'       => $request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
+                    'fields'                 => $fields,
+                    'companies'              => $companies,
+                    'lists'                  => $lists,
+                    'socialProfiles'         => $socialProfiles,
+                    'socialProfileUrls'      => $socialProfileUrls,
+                    'places'                 => $this->getPlaces($lead),
+                    'permissions'            => $permissions,
+                    'events'                 => $this->getEngagements($lead),
+                    'upcomingEvents'         => $this->getScheduledCampaignEvents($lead),
+                    'engagementData'         => $this->getEngagementData($lead),
+                    'noteCount'              => $leadNoteModel->getNoteCount($lead, true),
+                    'integrations'           => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'devices'                => $leadDeviceRepository->getLeadDevices($lead),
+                    'auditlog'               => $this->getAuditlogs($lead),
+                    'doNotContact'           => end($dnc),
+                    'doNotContactSms'        => end($dncSms),
+                    'pointGroups'            => $pointGroupModel->getEntities(),
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
                     // 'leadNotes'         => $this->forward(
                     //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
                     //    [
@@ -447,7 +469,7 @@ class LeadController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper)
     {
@@ -622,7 +644,7 @@ class LeadController extends FormController
      *
      * @param bool|false $ignorePost
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false)
     {
@@ -827,11 +849,11 @@ class LeadController extends FormController
     /**
      * Generates merge form and action.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function mergeAction(Request $request, ContactMerger $contactMerger, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model    = $this->getModel('lead');
         $mainLead = $model->getEntity($objectId);
         $page     = $request->getSession()->get('mautic.lead.page', 1);
@@ -1009,7 +1031,7 @@ class LeadController extends FormController
     /**
      * Generates contact frequency rules form and action.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactFrequencyAction(Request $request, $objectId)
     {
@@ -1230,7 +1252,7 @@ class LeadController extends FormController
      */
     public function listAction($objectId): Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
@@ -1241,7 +1263,7 @@ class LeadController extends FormController
                 $lead->getPermissionUser()
             )
         ) {
-            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+            /** @var ListModel $listModel */
             $listModel = $this->getModel('lead.list');
             $lists     = $listModel->getUserLists();
 
@@ -1268,7 +1290,7 @@ class LeadController extends FormController
      */
     public function companyAction($objectId): Response
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
 
@@ -1351,10 +1373,10 @@ class LeadController extends FormController
     {
         $valid = $cancelled = false;
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead');
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead = $model->getEntity($objectId);
 
         if (null === $lead
@@ -1398,7 +1420,7 @@ class LeadController extends FormController
         }
 
         // Check if lead has a bounce status
-        $dnc    = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
@@ -1531,7 +1553,7 @@ class LeadController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0)
     {
@@ -1539,7 +1561,7 @@ class LeadController extends FormController
         $campaignModel = $this->getModel('campaign');
 
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
@@ -1656,12 +1678,12 @@ class LeadController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function batchDncAction(Request $request, \Mautic\LeadBundle\Model\DoNotContact $doNotContact, $objectId = 0)
     {
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
 
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
@@ -1741,12 +1763,12 @@ class LeadController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function batchStagesAction(Request $request, $objectId = 0)
     {
         if ('POST' === $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
@@ -1847,12 +1869,16 @@ class LeadController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function batchOwnersAction(Request $request, $objectId = 0)
     {
+        if (!$this->security->isGranted('user:users:view')) {
+            return $this->accessDenied();
+        }
+
         if ('POST' == $request->getMethod()) {
-            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
             $ids   = json_decode($data['ids'], true);
@@ -1961,6 +1987,8 @@ class LeadController extends FormController
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
         }
 
         $fileType = $request->get('filetype', 'csv');
@@ -1969,7 +1997,7 @@ class LeadController extends FormController
             return $this->contactExportCSVScheduler($dispatcher, $permissions);
         }
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model      = $this->getModel('lead');
         $session    = $request->getSession();
         $search     = $session->get('mautic.lead.filter', '');
@@ -2034,6 +2062,8 @@ class LeadController extends FormController
         );
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
@@ -2102,14 +2132,14 @@ class LeadController extends FormController
     /**
      * Loads a specific lead statistic info.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function contactStatsAction(int $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead = $model->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess(
