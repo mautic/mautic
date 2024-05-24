@@ -642,7 +642,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-building';
+                    $graphData['iconClass'] = 'ri-building-2-line';
                     $event->setGraph($g, $graphData);
                     break;
             }

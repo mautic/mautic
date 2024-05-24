@@ -172,9 +172,9 @@ Mautic.addDwcFilter = function (elId, elObj) {
     }
 
     if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('fa-building');
+        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
     } else {
-        prototype.find(".object-icon").removeClass('fa-building').addClass('ri-user-6-fill');
+        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
     }
     prototype.find(".inline-spacer").append(fieldObject);
 
