@@ -73,11 +73,11 @@
                 {% endif %}
 
                 {% if field.alwaysDisplay is defined and field.alwaysDisplay %}
-                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  <i class="ri-eye-line" aria-hidden="true"></i>
                   <span class="inline-spacer">{{ 'mautic.form.field.form.always_display'|trans }}</span>
                 {% else %}
                   {% if field.showWhenValueExists is defined and false is same as field.showWhenValueExists %}
-                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                    <i class="ri-eye-line-slash" aria-hidden="true"></i>
                     <span class="inline-spacer">{{ 'mautic.form.field.hide.if.value'|trans }}</span>
                   {% endif %}
 
