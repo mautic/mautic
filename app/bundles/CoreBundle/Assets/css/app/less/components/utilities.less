@@ -417,6 +417,10 @@
 .background-brand { 
   background-color: var(--background-brand); 
   color: var(--text-on-color);
+
+  a {
+    color: var(--text-on-color);
+  }
 }
 .background-brand-alt { 
   background-color: var(--background-brand-alt); 
@@ -429,12 +433,10 @@
 .fd-row-reverse { flex-direction: row-reverse; }
 .fd-column { flex-direction: column; }
 .fd-column-reverse { flex-direction: column-reverse; }
-.fw-nowrap { flex-wrap: wrap; }
-@media (min-width: 769px) {
-  .fw-nowrap {
-    flex-wrap: nowrap;
-  }
-}
+.fw-nowrap-xs { flex-wrap: nowrap; }
+@media (min-width: @screen-sm-min) { .fw-nowrap-sm { flex-wrap: nowrap; } }
+@media (min-width: @screen-md-min) { .fw-nowrap-md { flex-wrap: nowrap; } }
+@media (min-width: @screen-lg-min) { .fw-nowrap-lg { flex-wrap: nowrap; } }
 .fw-wrap { flex-wrap: wrap; }
 .fw-neverwrap { flex-wrap: nowrap; }
 .fw-wrap-reverse { flex-wrap: wrap-reverse; }
