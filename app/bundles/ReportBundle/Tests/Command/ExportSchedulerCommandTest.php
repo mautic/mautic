@@ -5,30 +5,45 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Process\Process;
 
 class ExportSchedulerCommandTest extends MauticMysqlTestCase
 {
     public function testCommand(): void
     {
-        $commandTester = $this->testSymfonyCommand('mautic:reports:scheduler');
+        $commandTester = $this->testSymfonyCommand(ExportSchedulerCommand::NAME);
 
         Assert::assertSame(0, $commandTester->getStatusCode());
         Assert::assertSame("Scheduler has finished\n", $commandTester->getDisplay());
     }
 
-    public function testSchedulerCommandThrowErrorIfAlreadyRunning(): void
+    public function testSchedulerCommandThrowErrorIfAlreadyRunning()
     {
-        // Run the first instance of the command
-        $commandTester1 = $this->testSymfonyCommand('mautic:reports:scheduler');
+        $kernel      = self::bootKernel();
+        $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
 
-        // Run the second instance of the command
-        $commandTester2 = $this->testSymfonyCommand('mautic:reports:scheduler');
+        $command = $application->find(ExportSchedulerCommand::NAME);
 
-        // Assertions
-        $this->assertSame(0, $commandTester1->getStatusCode());
-        $this->assertSame(1, $commandTester2->getStatusCode());
-        $this->assertSame("Scheduler has finished\n", $commandTester1->getDisplay());
-        $this->assertSame("Script in progress\n", $commandTester2->getDisplay());
+        // Start the first command in a process
+        $process1 = new Process(['php', 'bin/console', ExportSchedulerCommand::NAME]);
+        $process1->start();
+
+        usleep(500);
+
+        // Start the second command in another process
+        $process2 = new Process(['php', 'bin/console', ExportSchedulerCommand::NAME]);
+        $process2->start();
+
+        $process1->wait();
+        $process2->wait();
+
+        $this->assertSame(Command::SUCCESS, $process1->getExitCode());
+        $this->assertNotSame(Command::SUCCESS, $process2->getExitCode());
+
+        $this->assertStringContainsString('Scheduler has finished', $process1->getOutput());
+        $this->assertStringContainsString('Script in progress', $process2->getOutput());
     }
 }

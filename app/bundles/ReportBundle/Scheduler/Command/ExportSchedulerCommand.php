@@ -17,6 +17,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends ModeratedCommand
 {
+    public const NAME = 'mautic:reports:scheduler';
+
     public function __construct(
         private ReportExporter $reportExporter,
         private ReportCleanup $reportCleanup,
@@ -30,7 +32,7 @@ class ExportSchedulerCommand extends ModeratedCommand
     protected function configure()
     {
         $this
-            ->setName('mautic:reports:scheduler')
+            ->setName(self::NAME)
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
 
         parent::configure();
