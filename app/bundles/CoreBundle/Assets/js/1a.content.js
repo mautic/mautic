@@ -1469,10 +1469,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
         if (mQuery(el).val()) {
             mQuery(btn).attr('data-livesearch-action', 'clear');
-            mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
+            mQuery(btn + ' i').removeClass('fa-search').addClass('ri-eraser-line');
         } else {
             mQuery(btn).attr('data-livesearch-action', 'search');
-            mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
+            mQuery(btn + ' i').removeClass('ri-eraser-line').addClass('fa-search');
         }
     }
 };
