@@ -182,7 +182,7 @@ Mautic.leadTimelineOnLoad = function (container, response) {
                     mQuery(this).addClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('fa-level-up');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('ri-corner-right-up-line');
         } else {
             mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
@@ -191,7 +191,7 @@ Mautic.leadTimelineOnLoad = function (container, response) {
                     mQuery(this).removeClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('fa-level-up').addClass('ri-corner-right-down-line');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-up-line').addClass('ri-corner-right-down-line');
         }
     });
     mQuery("#contact-timeline a[data-activate-details!='all']").on('click', function() {
@@ -224,7 +224,7 @@ Mautic.leadAuditlogOnLoad = function (container, response) {
                     mQuery(this).addClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('fa-level-up');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('ri-corner-right-up-line');
         } else {
             mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
@@ -233,7 +233,7 @@ Mautic.leadAuditlogOnLoad = function (container, response) {
                     mQuery(this).removeClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('fa-level-up').addClass('ri-corner-right-down-line');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-up-line').addClass('ri-corner-right-down-line');
         }
     });
     mQuery("#contact-auditlog a[data-activate-details!='all']").on('click', function() {
