@@ -33,7 +33,7 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
             $event,
             'lead.source.created',
             'mautic.lead.timeline.created_source',
-            'fa-user-secret',
+            'ri-spy-line',
             null,
             null,
             'created_contact'
