@@ -102,7 +102,7 @@
 
 
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {%- if theme is empty -%}
+                  {%- if theme is not empty -%}
                   {{- include(theme ~ f.type ~ '.html.twig', {
                           'field': f.convertToArray,
                           'id': f.alias,
