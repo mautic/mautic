@@ -411,7 +411,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         self::assertEquals(2, $sentCount, $email->getCustomHtml());
 
-        $this->connection->executeQuery("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+        $this->connection->executeQuery("SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
 
         $this->setUpSymfony(['segment_email_once_to_email_address' => true]);
 
