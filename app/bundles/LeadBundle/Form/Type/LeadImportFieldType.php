@@ -124,7 +124,7 @@ class LeadImportFieldType extends AbstractType
                     'apply_icon'  => 'fa fa-history',
                     'save_text'   => 'mautic.lead.import.start',
                     'save_class'  => 'btn btn-primary',
-                    'save_icon'   => 'fa fa-upload',
+                    'save_icon'   => 'ri-import-line',
                 ]
             );
         } else {
@@ -134,7 +134,7 @@ class LeadImportFieldType extends AbstractType
                     'apply_text' => false,
                     'save_text'  => 'mautic.lead.import',
                     'save_class' => 'btn btn-primary',
-                    'save_icon'  => 'fa fa-upload',
+                    'save_icon'  => 'ri-import-line',
                 ]
             );
         }
