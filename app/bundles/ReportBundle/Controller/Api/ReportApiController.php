@@ -55,7 +55,7 @@ class ReportApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (!$entity instanceof $this->entityClass) {
+        if (!$entity instanceof $this->entityClass || !$entity->isPublished()) {
             return $this->notFound();
         }
 
