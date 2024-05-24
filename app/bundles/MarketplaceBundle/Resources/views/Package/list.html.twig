@@ -34,6 +34,28 @@
                 {% trans %}marketplace.composer.required{% endtrans %}
             </div>
         {% endif %}
+        <div class="row-no-gutters gap-lg fw-nowrap-lg mb-lg">
+            <div class="background-brand card col-xs-12 col-md-6 gap-sm">
+                <div class="card-body">
+                    <div class="h3 card-title">{{ 'marketplace.need_help'|trans }}</div>
+                    <p class="card-text">{{ 'marketplace.access_docs'|trans }}</p>
+                    <div class="row-no-gutters gap-sm mt-lg">
+                        <a class="card-link" href="https://mau.tc/">{{ 'marketplace.read_docs'|trans }}</a>
+                        <a class="card-link" href="https://mau.tc/">{{ 'marketplace.visit_forum'|trans }}</a>
+                    </div>
+                </div>
+            </div>
+                <div class="card col-xs-12 col-md-6">
+                    <div class="card-body">
+                        <div class="h3 card-title">{{ 'marketplace.are_you_developer'|trans }}</div>
+                        <p class="card-text">{{ 'marketplace.join_us'|trans }}</p>
+                        <div class="row-no-gutters gap-sm mt-lg">
+                            <a class="card-link" href="https://mau.tc/">{{ 'marketplace.get_started'|trans }}</a>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
         <div class="panel panel-default bdr-t-wdh-0 mb-0">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
