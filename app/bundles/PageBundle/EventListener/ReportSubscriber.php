@@ -455,7 +455,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-clock-o',
+                            'iconClass' => 'ri-time-line',
                         ]
                     );
                     break;

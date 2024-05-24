@@ -123,7 +123,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'timestamp'       => $log['dateTriggered'],
                         'extra'           => $extra,
                         'contentTemplate' => $template,
-                        'icon'            => 'fa-clock-o',
+                        'icon'            => 'ri-time-line',
                         'contactId'       => $log['lead_id'],
                     ]
                 );
