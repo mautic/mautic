@@ -1269,7 +1269,7 @@ Mautic.getSlotToolbar = function(type) {
 
 Mautic.getSlotDeleteLink = function() {
     if (typeof Mautic.deleteLink == 'undefined') {
-        Mautic.deleteLink = mQuery('<a><i class="fa fa-lg fa-times"></i></a>')
+        Mautic.deleteLink = mQuery('<a><i class="fa fa-lg ri-close-line"></i></a>')
             .attr('data-slot-action', 'delete')
             .attr('alt', 'delete')
             .addClass('btn btn-delete btn-default');

@@ -1141,7 +1141,7 @@ Mautic.reloadLeadImportProgress = function() {
 };
 
 Mautic.removeBounceStatus = function (el, dncId, channel) {
-    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+    mQuery(el).removeClass('ri-close-line').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
@@ -1150,7 +1150,7 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
 };
 
 Mautic.removeTagFromLead = function (el, leadId, tagId) {
-    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+    mQuery(el).removeClass('ri-close-line').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
         mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });
