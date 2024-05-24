@@ -137,7 +137,7 @@ class ImportModel extends FormModel
                     'info',
                     false,
                     $this->translator->trans('mautic.lead.import.failed'),
-                    'fa-download',
+                    'ri-download-line',
                     null,
                     $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
                 );
@@ -234,7 +234,7 @@ class ImportModel extends FormModel
                 'info',
                 false,
                 $this->translator->trans('mautic.lead.import.completed'),
-                'fa-download',
+                'ri-download-line',
                 null,
                 $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
             );

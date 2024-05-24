@@ -641,7 +641,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             ),
                         ] : $eventLabel,
                         'timestamp'       => $import['date_added'],
-                        'icon'            => 'fa-download',
+                        'icon'            => 'ri-download-line',
                         'extra'           => $import,
                         'contentTemplate' => '@MauticLead/SubscribedEvents/Timeline/import.html.twig',
                         'contactId'       => $import['lead_id'],
