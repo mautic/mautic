@@ -43,7 +43,7 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
             $event,
             'lead.source.identified',
             'mautic.lead.timeline.identified_source',
-            'fa-user',
+            'ri-user-6-fill',
             null,
             null,
             'identified_contact'

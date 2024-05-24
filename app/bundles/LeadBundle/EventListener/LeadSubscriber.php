@@ -459,7 +459,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         [
                             'event'         => $eventTypeKey,
                             'eventId'       => $eventTypeKey.$event->getLead()->getId(),
-                            'icon'          => 'fa-user',
+                            'icon'          => 'ri-user-6-fill',
                             'eventType'     => $eventTypeName,
                             'eventPriority' => -4, // A lead is created prior to being identified
                             'timestamp'     => $dateIdentified,
