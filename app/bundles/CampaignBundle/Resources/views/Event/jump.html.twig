@@ -7,7 +7,7 @@
     <div class="campaign-event-content">
         <div><span class="campaign-event-name ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span></div>
         <a class="btn btn-primary btn-nospin btn-xs highlight-jump-target" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="{{ event['properties']['jumpToEvent'] }}">
-            <i class="fa fa-refresh" style="margin-top:4px;"></i>
+            <i class="ri-refresh-line" style="margin-top:4px;"></i>
         </a>
     </div>
 
