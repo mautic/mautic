@@ -60,4 +60,45 @@ class PlainTextHelperTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider getPreviewProvider
+     */
+    public function testGetPreview(?int $previewLength, string $htmlContent, string $expectedPlainText)
+    {
+        $options = [];
+        if ($previewLength) {
+            $options['preview_length'] = $previewLength;
+        }
+        $plainTextHelper = new PlainTextHelper($options);
+        $plainTextHelper->setHtml($htmlContent);
+        $actualPlainText = $plainTextHelper->getPreview();
+
+        $this->assertEquals($expectedPlainText, $actualPlainText);
+    }
+
+    public function getPreviewProvider()
+    {
+        return [
+            // Test case 1: Simple paragraph, with default options
+            [
+                null,
+                '<p>This is a simple paragraph.</p>',
+                'This is a simple paragraph.',
+            ],
+            // Test case 2: Simple paragraph, with length set to 10 (whitespace truncated)
+            [
+                10,
+                '<p>This is a simple paragraph.</p>',
+                'This is a...',
+            ],
+            // Test case 5: Full html body
+            [
+                25,
+                '<h1>Welcome to Our Newsletter</h1>
+    <p>This is an example paragraph in our email content.</p>',
+                'WELCOME TO OUR NEWSLETTER...',
+            ],
+        ];
+    }
 }

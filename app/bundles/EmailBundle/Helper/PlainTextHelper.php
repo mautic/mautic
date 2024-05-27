@@ -250,7 +250,7 @@ class PlainTextHelper
     public function getPreview(): string
     {
         $textContent = $this->getText();
-        $preview     = substr($textContent, 0, $this->options['preview_length']);
+        $preview     = trim(substr($textContent, 0, $this->options['preview_length']));
 
         // If the text is longer than the preview length, append an ellipsis
         if (strlen($textContent) > $this->options['preview_length']) {
