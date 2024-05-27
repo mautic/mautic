@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Command;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\ReportBundle\Model\ReportCleanup;
+use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand;
 use PHPUnit\Framework\Assert;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Process\Process;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommandTest extends MauticMysqlTestCase
 {
@@ -20,21 +26,31 @@ class ExportSchedulerCommandTest extends MauticMysqlTestCase
         Assert::assertSame("Scheduler has finished\n", $commandTester->getDisplay());
     }
 
-    public function testSchedulerCommandThrowErrorIfAlreadyRunning()
+    public function testSchedulerCommandThrowErrorIfAlreadyRunning(): void
     {
         $kernel      = self::bootKernel();
-        $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
+        $application = new Application($kernel);
 
-        $command = $application->find(ExportSchedulerCommand::NAME);
+        $reportExporterMock       = $this->createMock(ReportExporter::class);
+        $reportCleanupMock        = $this->createMock(ReportCleanup::class);
+        $translatorMock           = $this->createMock(TranslatorInterface::class);
+        $pathsHelperMock          = $this->createMock(PathsHelper::class);
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
-        // Start the first command in a process
-        $process1 = new Process(['php', 'bin/console', ExportSchedulerCommand::NAME]);
+        // Use the mock dependencies in the command constructor
+        $command = new MockExportSchedulerCommand(
+            $reportExporterMock,
+            $reportCleanupMock,
+            $translatorMock,
+            $pathsHelperMock,
+            $coreParametersHelperMock
+        );
+        $application->find(MockExportSchedulerCommand::NAME);
+
+        $process1 = new Process(['php', 'bin/console', MockExportSchedulerCommand::NAME]);
         $process1->start();
 
-        usleep(500);
-
-        // Start the second command in another process
-        $process2 = new Process(['php', 'bin/console', ExportSchedulerCommand::NAME]);
+        $process2 = new Process(['php', 'bin/console', MockExportSchedulerCommand::NAME]);
         $process2->start();
 
         $process1->wait();
