@@ -10,7 +10,7 @@ class PlainTextHelperTest extends TestCase
     /**
      * @dataProvider emailContentProvider
      */
-    public function testGetText($htmlContent, $expectedPlainText)
+    public function testGetText(string $htmlContent, string $expectedPlainText): void
     {
         $plainTextHelper = new PlainTextHelper();
         $plainTextHelper->setHtml($htmlContent);
@@ -19,7 +19,10 @@ class PlainTextHelperTest extends TestCase
         $this->assertEquals($expectedPlainText, $actualPlainText);
     }
 
-    public function emailContentProvider()
+    /**
+     * @return array<int, array<int, string>>
+     */
+    public function emailContentProvider(): array
     {
         return [
             // Test case 1: Simple paragraph
@@ -64,7 +67,7 @@ class PlainTextHelperTest extends TestCase
     /**
      * @dataProvider getPreviewProvider
      */
-    public function testGetPreview(?int $previewLength, string $htmlContent, string $expectedPlainText)
+    public function testGetPreview(?int $previewLength, string $htmlContent, string $expectedPlainText): void
     {
         $options = [];
         if ($previewLength) {
@@ -77,6 +80,9 @@ class PlainTextHelperTest extends TestCase
         $this->assertEquals($expectedPlainText, $actualPlainText);
     }
 
+    /**
+     * @return array<int, array<int, string|int|null>>
+     */
     public function getPreviewProvider()
     {
         return [
@@ -92,7 +98,7 @@ class PlainTextHelperTest extends TestCase
                 '<p>This is a simple paragraph.</p>',
                 'This is a...',
             ],
-            // Test case 5: Full html body
+            // Test case 3: Full html body
             [
                 25,
                 '<h1>Welcome to Our Newsletter</h1>
