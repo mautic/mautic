@@ -253,7 +253,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-globe-line';
+                    $graphData['iconClass'] = 'ri-earth-line';
                     $event->setGraph($g, $graphData);
                     break;
             }

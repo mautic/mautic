@@ -498,7 +498,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'ri-globe-line',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
@@ -518,7 +518,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'ri-globe-line',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
