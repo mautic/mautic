@@ -966,7 +966,7 @@ class Asset extends FormEntity
         }
 
         // File extension is unknown, display general file icon.
-        return 'fa fa-file-o';
+        return 'ri-file-line';
     }
 
     /**
