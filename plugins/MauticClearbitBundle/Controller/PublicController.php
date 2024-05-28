@@ -158,7 +158,7 @@ class PublicController extends FormController
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
                             'Clearbit Plugin',
-                            'fa-search',
+                            'ri-search-line',
                             $user
                         );
                     }
@@ -248,7 +248,7 @@ class PublicController extends FormController
                             $this->addNewNotification(
                                 sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
                                 'Clearbit Plugin',
-                                'fa-search',
+                                'ri-search-line',
                                 $user
                             );
                         }

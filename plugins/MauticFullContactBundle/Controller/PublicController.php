@@ -198,7 +198,7 @@ class PublicController extends FormController
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.contact_retrieved'), $lead->getEmail()),
                         'FullContact Plugin',
-                        'fa-search',
+                        'ri-search-line',
                         $user
                     );
                 }
@@ -355,7 +355,7 @@ class PublicController extends FormController
                     $this->addNewNotification(
                         sprintf($this->translator->trans('mautic.plugin.fullcontact.company_retrieved'), $company->getName()),
                         'FullContact Plugin',
-                        'fa-search',
+                        'ri-search-line',
                         $user
                     );
                 }
