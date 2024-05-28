@@ -10,6 +10,8 @@ class ApiErrorException extends \Exception
 
     private ?Lead $contact = null;
 
+    private string $shortMessage = '';
+
     /**
      * @param string $message
      * @param int    $code
@@ -53,6 +55,18 @@ class ApiErrorException extends \Exception
     public function setContact(Lead $contact)
     {
         $this->contact = $contact;
+
+        return $this;
+    }
+
+    public function getShortMessage(): string
+    {
+        return $this->shortMessage;
+    }
+
+    public function setShortMessage(string $shortMessage): ApiErrorException
+    {
+        $this->shortMessage = $shortMessage;
 
         return $this;
     }
