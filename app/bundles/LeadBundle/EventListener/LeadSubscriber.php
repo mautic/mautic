@@ -545,7 +545,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 $row['reason'] = $this->dncReasonHelper->toText((int) $row['reason']);
 
                 $template = '@MauticLead/SubscribedEvents/Timeline/donotcontact.html.twig';
-                $icon     = 'fa-ban';
+                $icon     = 'ri-prohibited-line';
 
                 if (!empty($row['channel'])) {
                     if ($channelModel = $this->getChannelModel($row['channel'])) {
