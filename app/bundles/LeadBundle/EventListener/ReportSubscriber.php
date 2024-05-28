@@ -558,7 +558,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-calendar';
+                    $graphData['iconClass'] = 'ri-calendar-line';
                     $event->setGraph($g, $graphData);
                     break;
 
