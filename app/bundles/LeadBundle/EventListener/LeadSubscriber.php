@@ -496,13 +496,13 @@ class LeadSubscriber implements EventSubscriberInterface
                             break;
                         case 'banner':
                         case 'ad':
-                            $icon = 'fa-bullseye';
+                            $icon = 'ri-focus-2-line';
                             break;
                         case 'cpc':
-                            $icon = 'fa-money';
+                            $icon = 'ri-cash-line';
                             break;
                         case 'location':
-                            $icon = 'fa-map-marker';
+                            $icon = 'ri-map-pin-2-line';
                             break;
                         case 'device':
                             $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');

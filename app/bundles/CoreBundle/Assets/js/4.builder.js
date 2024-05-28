@@ -715,7 +715,7 @@ Mautic.toggleBuilderButton = function (hide) {
                 .addClass('hide btn-standard-toolbar')
                 .appendTo('.toolbar-form-buttons')
 
-            mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().addClass('hide');
+            mQuery('.toolbar-form-buttons .toolbar-dropdown i.ri-instance-fill').parent().addClass('hide');
         } else {
             if (!mQuery('.btn-standard-toolbar.btn-builder').length) {
                 mQuery('.toolbar-form-buttons .toolbar-standard .btn-builder').addClass('btn-standard-toolbar')
@@ -725,7 +725,7 @@ Mautic.toggleBuilderButton = function (hide) {
                     .prependTo('.toolbar-form-buttons .toolbar-standard')
                     .removeClass('hide');
 
-                mQuery('.toolbar-form-buttons .toolbar-dropdown i.fa-cube').parent().removeClass('hide');
+                mQuery('.toolbar-form-buttons .toolbar-dropdown i.ri-instance-fill').parent().removeClass('hide');
             }
         }
     }

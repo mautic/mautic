@@ -6,11 +6,11 @@
 #}
 {% set icon = 'fa-file-text' %}
 {% if 'email' == note.type %}
-    {% set icon = 'fa-send' %}
+    {% set icon = 'ri-send-plane-line' %}
 {% elseif 'call' == note.type %}
-    {% set icon = 'fa-phone' %}
+    {% set icon = 'ri-phone-line' %}
 {% elseif 'meeting' == note.type %}
-    {% set icon = 'fa-group' %}
+    {% set icon = 'ri-team-line' %}
 {% endif %}
 <li id="LeadNote{{ note.id }}">
     <div class="panel ">
