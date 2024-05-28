@@ -34,6 +34,10 @@ return [
                 'path'       => '/themes/{objectAction}/{objectId}',
                 'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
             ],
+            'mautic_core_keep_alive' => [
+                'path'       => '/keep-alive',
+                'controller' => 'Mautic\CoreBundle\Controller\KeepAliveController::keepAliveAction',
+            ],
         ],
         'public' => [
             'mautic_js' => [
