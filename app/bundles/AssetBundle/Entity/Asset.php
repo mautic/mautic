@@ -953,7 +953,7 @@ class Asset extends FormEntity
 
         // return missing file icon if file type is empty
         if (!$fileType) {
-            return 'fa fa-ban';
+            return 'ri-prohibited-line';
         }
 
         $fileTypes = $this->getFileExtensions();
