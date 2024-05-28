@@ -1301,6 +1301,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "luk4s",
+      "name": "Lukas Pokorny",
+      "avatar_url": "https://avatars.githubusercontent.com/u/635997?v=4",
+      "profile": "https://github.com/luk4s",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
