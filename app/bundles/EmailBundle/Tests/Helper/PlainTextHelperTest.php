@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\EmailBundle\Helper\PlainTextHelper;
@@ -83,7 +85,7 @@ class PlainTextHelperTest extends TestCase
     /**
      * @return array<int, array<int, string|int|null>>
      */
-    public function getPreviewProvider()
+    public function getPreviewProvider(): array
     {
         return [
             // Test case 1: Simple paragraph, with default options
