@@ -31,6 +31,7 @@ class LeadPermissions extends AbstractPermissions
         $this->addExtendedPermissions('leads', false);
         $this->addExtendedPermissions('lists', false);
         $this->addStandardPermissions('imports');
+        $this->addCustomPermission('export', ['enable' => 1024]);
     }
 
     public function getName(): string
@@ -40,7 +41,7 @@ class LeadPermissions extends AbstractPermissions
 
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
-        $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
+        $this->addExtendedFormFields($this->getName(), 'leads', $builder, $data, false);
 
         $this->addExtendedFormFields('lead', 'lists', $builder, $data, false);
 
@@ -58,6 +59,14 @@ class LeadPermissions extends AbstractPermissions
             ]
         );
 
+        $this->addCustomFormFields(
+            $this->getName(),
+            'export',
+            $builder,
+            'mautic.core.permissions.export',
+            ['mautic.core.permissions.enable' => 'enable'],
+            $data
+        );
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }
 
@@ -68,8 +77,8 @@ class LeadPermissions extends AbstractPermissions
         // make sure the user has access to own leads as well if they have access to lists, notes or fields
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
-            (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
-            (isset($permissions['lists']) || isset($permissions['fields']))
+            (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms))
+            && (isset($permissions['lists']) || isset($permissions['fields']))
         ) {
             $permissions['leads'][] = 'viewown';
         }

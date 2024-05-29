@@ -51,7 +51,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugin_integration_settings')
-            ->setCustomRepositoryClass(\Mautic\PluginBundle\Entity\IntegrationRepository::class);
+            ->setCustomRepositoryClass(IntegrationRepository::class);
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()

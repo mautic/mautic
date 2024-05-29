@@ -12,7 +12,7 @@ class MonthStatTest extends TestCase
 
     private $day    = 11;
 
-    private \Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat $monthStat;
+    private MonthStat $monthStat;
 
     private $dayStat;
 

@@ -122,7 +122,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $builder->setTable('dynamic_content')
             ->addIndex(['is_campaign_based'], 'is_campaign_based_index')
             ->addIndex(['slot_name'], 'slot_name_index')
-            ->setCustomRepositoryClass(\Mautic\DynamicContentBundle\Entity\DynamicContentRepository::class)
+            ->setCustomRepositoryClass(DynamicContentRepository::class)
             ->addLifecycleEvent('cleanSlotName', Events::prePersist)
             ->addLifecycleEvent('cleanSlotName', Events::preUpdate);
 

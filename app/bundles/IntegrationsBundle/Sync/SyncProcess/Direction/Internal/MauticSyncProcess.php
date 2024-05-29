@@ -19,9 +19,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MauticSyncProcess
 {
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO $inputOptionsDAO = null;
+    private ?InputOptionsDAO $inputOptionsDAO = null;
 
-    private ?\Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO $mappingManualDAO = null;
+    private ?MappingManualDAO $mappingManualDAO = null;
 
     private ?MauticSyncDataExchange $syncDataExchange = null;
 

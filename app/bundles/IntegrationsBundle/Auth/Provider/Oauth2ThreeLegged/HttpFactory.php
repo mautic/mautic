@@ -33,11 +33,11 @@ class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth2_three_legged';
 
-    private ?\Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface $credentials = null;
+    private ?AuthCredentialsInterface $credentials = null;
 
     private ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface|null $config = null;
 
-    private ?\GuzzleHttp\Client $reAuthClient = null;
+    private ?Client $reAuthClient = null;
 
     /**
      * Cache of initialized clients.
@@ -71,12 +71,17 @@ class HttpFactory implements AuthProviderInterface
         $this->credentials = $credentials;
         $this->config      = $config;
 
-        $this->initializedClients[$credentials->getClientId()] = new Client(
-            [
-                'handler' => $this->getStackHandler(),
-                'auth'    => 'oauth',
-            ]
-        );
+        $options = [
+            'handler' => $this->getStackHandler(),
+            'auth'    => 'oauth',
+        ];
+
+        // Set up base URI if it's configured.
+        if (method_exists($credentials, 'getBaseUri') && ($baseUri = $credentials->getBaseUri()) !== null) {
+            $options['base_uri'] = $baseUri;
+        }
+
+        $this->initializedClients[$credentials->getClientId()] = new Client($options);
 
         return $this->initializedClients[$credentials->getClientId()];
     }
@@ -139,11 +144,11 @@ class HttpFactory implements AuthProviderInterface
         ];
 
         if ($this->credentials instanceof ScopeInterface) {
-            $config['scope']  = $this->credentials->getScope();
+            $config['scope'] = $this->credentials->getScope();
         }
 
         if ($this->credentials instanceof RedirectUriInterface) {
-            $config['redirect_uri']  = $this->credentials->getRedirectUri();
+            $config['redirect_uri'] = $this->credentials->getRedirectUri();
         }
 
         if ($this->credentials instanceof CodeInterface) {

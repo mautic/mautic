@@ -17,12 +17,12 @@ class PreUpdateChecksStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|UpdateHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $updateHelper;
+    private MockObject $updateHelper;
 
     private PreUpdateChecksStep $step;
 
