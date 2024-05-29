@@ -3,7 +3,7 @@
 setup_mautic() {
     [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}"
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
-    [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
+    [ -z "${MAILPIT_URL}" ] && MAILPIT_URL="https://${DDEV_HOSTNAME}:8026"
 
     printf "Installing Mautic Composer dependencies...\n"
     composer install
@@ -24,7 +24,7 @@ setup_mautic() {
     printf "🔒 The default login is admin / Maut1cR0cks!\n"
     printf "🌐 To open the Mautic instance, go to ${MAUTIC_URL} in your browser.\n"
     printf "🌐 To open PHPMyAdmin for managing the database, go to ${PHPMYADMIN_URL} in your browser.\n"
-    printf "🌐 To open Mailpit for seeing all emails that Mautic sent, go to ${MAILHOG_URL} in your browser.\n"
+    printf "🌐 To open Mailpit for seeing all emails that Mautic sent, go to ${MAILPIT_URL} in your browser.\n"
     printf "🚀 Run \"ddev exec composer test\" to run PHPUnit tests.\n"
     printf "🚀 Run \"ddev exec bin/console COMMAND\" (like mautic:segments:update) to use the Mautic CLI. For an overview of all available CLI commands, go to https://mau.tc/cli\n"
     printf "🔴 If you want to stop the instance, simply run \"ddev stop\".\n"
