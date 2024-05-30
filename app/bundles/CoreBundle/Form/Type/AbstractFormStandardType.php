@@ -106,8 +106,9 @@ abstract class AbstractFormStandardType extends AbstractType
                 'isPublished',
                 YesNoButtonGroupType::class,
                 [
-                    'data' => $data,
-                    'attr' => [
+                    'label' => 'mautic.core.form.available',
+                    'data'  => $data,
+                    'attr'  => [
                         'readonly' => $readonly,
                     ],
                 ]
@@ -115,10 +116,10 @@ abstract class AbstractFormStandardType extends AbstractType
 
             if (!$builder->has('publishUp') && method_exists($options['data'], 'getPublishUp')) {
                 $builderOptions = [
-                  'attr' => [
-                      'class'       => 'form-control',
-                      'data-toggle' => 'datetime',
-                      'readonly'    => $readonly,
+                    'attr' => [
+                        'class'       => 'form-control',
+                        'data-toggle' => 'datetime',
+                        'readonly'    => $readonly,
                     ],
                 ];
                 $builder->add('publishUp', PublishUpDateType::class, $builderOptions);

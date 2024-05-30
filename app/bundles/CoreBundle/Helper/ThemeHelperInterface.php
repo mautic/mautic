@@ -132,4 +132,6 @@ interface ThemeHelperInterface
     public function zip($themeName);
 
     public function getCurrentTheme(string $template, string $specificFeature): string;
+
+    public function toggleVisibility(string $themeName): void;
 }

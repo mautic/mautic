@@ -20,7 +20,7 @@
               'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
               'data-header': 'mautic.lead.lead.menu.quickadd'|trans,
           },
-          'iconClass': 'fa fa-bolt',
+          'iconClass': 'ri-flashlight-line',
           'btnText': 'mautic.lead.lead.menu.quickadd',
           'primary': true,
       }]) %}
@@ -30,7 +30,7 @@
               'attr': {
                   'href': path('mautic_import_action', {'object': 'contacts', 'objectAction': 'new'}),
               },
-              'iconClass': 'fa fa-upload',
+              'iconClass': 'ri-import-line',
               'btnText': 'mautic.lead.lead.import',
           }]) %}
       {% endif %}
@@ -40,7 +40,7 @@
               'attr': {
                   'href': path('mautic_import_index', {'object': 'contacts'}),
               },
-              'iconClass': 'fa fa-history',
+              'iconClass': 'ri-history-line',
               'btnText': 'mautic.lead.lead.import.index',
           }]) %}
       {% endif %}

@@ -24,7 +24,7 @@ class RelationsHelperTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
-    private \Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper $relationsHelper;
+    private RelationsHelper $relationsHelper;
 
     /**
      * @var ReportDAO|\PHPUnit\Framework\MockObject\MockObject

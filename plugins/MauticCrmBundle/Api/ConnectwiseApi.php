@@ -11,6 +11,7 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 class ConnectwiseApi extends CrmApi
 {
     /**
+     * @param string $endpoint
      * @param array  $parameters
      * @param string $method
      *
@@ -28,7 +29,7 @@ class ConnectwiseApi extends CrmApi
             $url,
             $parameters,
             $method,
-            ['encode_parameters' => 'json', 'cw-app-id' => $this->integration->getCompanyCookieKey()]
+            ['encode_parameters' => 'json']
         );
 
         $errors = [];

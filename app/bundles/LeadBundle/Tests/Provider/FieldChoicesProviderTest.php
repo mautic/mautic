@@ -16,9 +16,9 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
-    private \Mautic\LeadBundle\Provider\FieldChoicesProvider $provider;
+    private FieldChoicesProvider $provider;
 
     protected function setUp(): void
     {
