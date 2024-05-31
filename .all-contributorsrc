@@ -1292,6 +1292,34 @@
         "bug",
         "userTesting"
       ]
+    },
+    {
+      "login": "abhisekmazumdar",
+      "name": "Abhisek Mazumdar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12195330?v=4",
+      "profile": "https://abhisek.xyz/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "luk4s",
+      "name": "Lukas Pokorny",
+      "avatar_url": "https://avatars.githubusercontent.com/u/635997?v=4",
+      "profile": "https://github.com/luk4s",
+      "contributions": [
+        "doc",
+        "code"
+      ]
+    },
+    {
+      "login": "Oluwatos94",
+      "name": "Tosin Akinbowa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/111003311?v=4",
+      "profile": "https://github.com/Oluwatos94",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -72,6 +72,16 @@ mQuery( document ).ready(function() {
             e.preventDefault();
         }
     });
+
+    // Try to keep alive the session.
+    setInterval(function() {
+        if (window.location.pathname.startsWith('/s/') && window.location.pathname !== '/s/login') {
+            mQuery.get('/s/keep-alive')
+                .fail(function(errorThrown) {
+                    console.error('Error with keep-alive:', errorThrown);
+                });
+        }
+    }, mauticSessionLifetime * 1000 / 2);
 });
 
 if (typeof history != 'undefined') {
