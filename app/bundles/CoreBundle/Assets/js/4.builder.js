@@ -753,7 +753,7 @@ Mautic.initSectionListeners = function() {
                 'bottom': {},
                 'left': {},
                 'clone': {
-                    classes: 'fa fa-copy',
+                    classes: 'ri-file-copy-line',
                     onClick: function() {
                         var cloneBtn = mQuery(this);
                         var clonedElem = cloneBtn.closest('[data-section-wrapper]');
@@ -764,7 +764,7 @@ Mautic.initSectionListeners = function() {
                     }
                 },
                 'handle': {
-                    classes: 'fa fa-arrows-v'
+                    classes: 'ri-expand-height-line'
                 },
                 'delete': {
                     classes: 'ri-close-line',
@@ -1280,7 +1280,7 @@ Mautic.getSlotDeleteLink = function() {
 
 Mautic.getSlotCloneLink = function() {
     if (typeof Mautic.cloneLink == 'undefined') {
-        Mautic.cloneLink = mQuery('<a><i class="fa fa-lg fa-copy"></i></a>')
+        Mautic.cloneLink = mQuery('<a><i class="fa fa-lg ri-file-copy-line"></i></a>')
             .attr('data-slot-action', 'clone')
             .attr('alt', 'clone')
             .addClass('btn btn-clone btn-clone');

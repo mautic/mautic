@@ -87,7 +87,7 @@
           <tbody>
           {% for event in events.events %}
               {% set counter = loop.index0 + 1 %}
-              {% set icon = event.icon|default('fa-history') %}
+              {% set icon = event.icon|default('ri-history-line') %}
               {% set eventLabel = event.eventLabel|default(event.eventType) %}
               {% if eventLabel is iterable %}
                   {% set linkType = eventLabel.isExternal is defined ? 'data-toggle="ajax"' : 'target="_new"' %}
