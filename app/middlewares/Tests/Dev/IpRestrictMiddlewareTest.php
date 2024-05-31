@@ -19,7 +19,7 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true)
             {
                 return new Response();
             }
@@ -42,7 +42,7 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true)
             {
                 $this->handleWasCalled = true;
             }
@@ -69,7 +69,7 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+            public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true)
             {
                 return new Response();
             }

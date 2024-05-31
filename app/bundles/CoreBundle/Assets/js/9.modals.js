@@ -299,6 +299,8 @@ Mautic.showConfirmation = function (el) {
     var confirmCallback = mQuery(el).data('confirm-callback');
     var cancelText = mQuery(el).data('cancel-text');
     var cancelCallback = mQuery(el).data('cancel-callback');
+    const confirmBtnClass = mQuery(el).data('confirm-btn-class')
+        ? mQuery(el).data('confirm-btn-class') : 'btn btn-danger';
 
     var confirmContainer = mQuery("<div />").attr({"class": "modal fade confirmation-modal"});
     var confirmDialogDiv = mQuery("<div />").attr({"class": "modal-dialog"});
@@ -307,7 +309,7 @@ Mautic.showConfirmation = function (el) {
     var confirmHeaderDiv = mQuery("<div />").attr({"class": "modal-header"});
     confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(message));
     var confirmButton = mQuery('<button type="button" />')
-        .addClass("btn btn-danger")
+        .addClass(confirmBtnClass)
         .css("marginRight", "5px")
         .css("marginLeft", "5px")
         .click(function () {
