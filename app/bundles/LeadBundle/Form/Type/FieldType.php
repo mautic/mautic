@@ -76,7 +76,7 @@ class FieldType extends AbstractType
             [
                 'label'      => 'mautic.lead.field.label',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'length' => 50],
+                'attr'       => ['class' => 'form-control', 'length' => 191],
             ]
         );
 
@@ -538,6 +538,7 @@ class FieldType extends AbstractType
                 'disabled' => $options['data']->disablePublishChange(),
                 'attr'     => $attr,
                 'data'     => ('email' == $options['data']->getAlias()) ? true : $options['data']->getIsPublished(),
+                'label'    => 'mautic.core.form.available',
             ]
         );
 

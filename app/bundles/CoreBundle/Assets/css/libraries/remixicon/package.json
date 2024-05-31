@@ -1,0 +1,31 @@
+{
+  "name": "remixicon",
+  "version": "4.2.0",
+  "description": "Remix Icon is a set of open source neutral style system symbols elaborately crafted for designers and developers. All of the icons are free to use for both personal and commercial.",
+  "homepage": "https://remixicon.com",
+  "keywords": [
+    "remixicon",
+    "remix",
+    "icon",
+    "icon library",
+    "icon pack"
+  ],
+  "files": [
+    "fonts/",
+    "icons/",
+    "License",
+    "package.json",
+    "README_CN.md",
+    "README.md"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Remix-Design/remixicon.git"
+  },
+  "bugs": "https://github.com/Remix-Design/remixicon/issues",
+  "contributors": [
+    "Wendy Gao <wendygaoyuan@163.com>",
+    "Jimmy Cheung <jimmy@remixdesign.cn>"
+  ]
+}

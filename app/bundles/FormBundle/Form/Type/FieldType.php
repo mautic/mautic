@@ -437,7 +437,7 @@ class FieldType extends AbstractType
                         'tooltip' => 'mautic.form.field.help.mapped.field',
                     ],
                     'required' => false,
-                    'data'     => $mappedField ?? $this->getDefaultMappedField((string) $type),
+                    'data'     => $mappedField ?? (empty($options['data']['id']) ? $this->getDefaultMappedField((string) $type) : ''),
                 ]
             );
 
@@ -537,9 +537,18 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'number':
+                    $builder->add(
+                        'properties',
+                        FormFieldNumberType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
                 case 'date':
                 case 'email':
-                case 'number':
                 case 'text':
                 case 'url':
                 case 'tel':

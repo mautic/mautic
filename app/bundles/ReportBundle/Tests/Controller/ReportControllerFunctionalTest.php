@@ -43,9 +43,9 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->createHit(null);
 
         $report = $this->createReport('Report Most Visited Pages', 'page.hits', [
-                        'mautic.page.table.most.visited.unique',
-                        'mautic.page.table.most.visited',
-                    ]);
+            'mautic.page.table.most.visited.unique',
+            'mautic.page.table.most.visited',
+        ]);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -424,6 +424,9 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
     }
 
+    /**
+     * @param string[] $graphs
+     */
     private function createReport(string $name, string $source, array $graphs): Report
     {
         $report = new Report();
@@ -438,7 +441,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         return $report;
     }
 
-    private function createPage($title): Page
+    private function createPage(string $title): Page
     {
         $page = new Page();
         $page->setTitle($title);

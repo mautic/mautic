@@ -24,7 +24,7 @@
 {% block content %}
 {{ form_start(form) }}
     <div class="box-layout">
-        <div class="col-md-3 bg-white height-auto">
+        <div class="col-md-3 height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
                 <ul class="list-group list-group-tabs">
                     {% for g in groups %}
@@ -41,7 +41,7 @@
 
             </div>
         </div>
-        <div class="col-md-9 bg-auto height-auto bdr-l">
+        <div class="col-md-9 height-auto bdr-l">
             <div class="tab-content">
                 {{ include('@MauticLead/Company/form_fields.html.twig', {
                     'form': form,

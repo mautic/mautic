@@ -34,6 +34,10 @@ return [
                 'path'       => '/themes/{objectAction}/{objectId}',
                 'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
             ],
+            'mautic_core_keep_alive' => [
+                'path'       => '/keep-alive',
+                'controller' => 'Mautic\CoreBundle\Controller\KeepAliveController::keepAliveAction',
+            ],
         ],
         'public' => [
             'mautic_js' => [
@@ -122,6 +126,12 @@ return [
                 'iconClass' => 'ri-palette-fill',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
+                'priority'  => 18,
+            ],
+            'mautic.core.integrations' => [
+                'id'        => 'mautic_integrations_root',
+                'iconClass' => 'ri-plug-fill',
+                'priority'  => 15,
             ],
         ],
         'extra' => [
