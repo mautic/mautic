@@ -89,8 +89,8 @@
 
     <div class="campaign-event-type">
     {% if event['eventType'] == 'decision' %}
-    <div class="campaign-event-content fw-neverwrap gap-xs ai-center fd-row d-flex">
-        <div class="campaign-event-icon"><i class="{{ icon }}"></i></div>
+    <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex">
+        <div class="campaign-event-icon mr-5"><i class="{{ icon }}"></i></div>
         <span class="h5 fw-b">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         <span class="campaign-event-name label ml-5 mr-lg ellipsis">
@@ -100,18 +100,19 @@
     </div>
 
     {% elseif event['eventType'] == 'action' %}
-        <div class="campaign-event-icon pa-sm mb-md"><i class="{{ icon }}"></i></div>
-        <span class="h5 fw-b"><i class="ri-thumb-up-line"></i> {{ 'mautic.campaign.do'|trans }}</span>
-        <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-        <div class="campaign-event-content mt-5">
+        
+        <div class="campaign-event-content d-flex fw-nowrap ai-center gap-sm">
+            <div class="campaign-event-icon pa-sm mr-5"><i class="{{ icon }}"></i></div>
+            <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             <span class="campaign-event-name label label-primary ellipsis">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
             </span>
+            <i class="ri-thumb-up-fill ml-md"></i>
         </div>
 
     {% elseif event['eventType'] == 'condition' %}
-    <div class="campaign-event-content fw-neverwrap gap-xs ai-center fd-row d-flex">
-         <div class="campaign-event-icon"><i class="{{ icon }}"></i></div>
+    <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex">
+         <div class="campaign-event-icon mr-5"><i class="{{ icon }}"></i></div>
         <span class="h5 fw-b">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             <span class="campaign-event-name label ml-5 mr-lg ellipsis">
