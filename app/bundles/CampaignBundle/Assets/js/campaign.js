@@ -1398,7 +1398,7 @@ Mautic.campaignBuilderRegisterEndpoint = function (name, params) {
     if (params.connectorStyle) {
         connectorStyle = params.connectorStyle;
     } else {
-        connectorStyle = [ "Flowchart", { cornerRadius: 5, stub: 20, gap: 0 } ];
+        connectorStyle = ["Bezier", {curviness: 125}];
     }
 
     isTarget = params.isTarget;
