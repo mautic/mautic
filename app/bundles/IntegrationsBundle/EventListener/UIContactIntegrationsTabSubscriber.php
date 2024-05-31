@@ -13,14 +13,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ObjectMappingRepository $objectMappingRepository)
-    {
+    public function __construct(
+        private ObjectMappingRepository $objectMappingRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE => ['onTemplateRender', 0],

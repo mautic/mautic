@@ -46,19 +46,23 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
-    /**
-     * @var array
-     */
-    private $fields;
+    private ?array $fields = null;
 
-    public function __construct(private IpLookupHelper $ipLookupHelper, private LeadModel $leadModel, private FieldModel $leadFieldModel, private ListModel $listModel, private CompanyModel $companyModel, private CampaignModel $campaignModel, private CoreParametersHelper $coreParametersHelper, private DoNotContact $doNotContact, private PointGroupModel $groupModel, private FilterOperatorProvider $filterOperatorProvider)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private LeadModel $leadModel,
+        private FieldModel $leadFieldModel,
+        private ListModel $listModel,
+        private CompanyModel $companyModel,
+        private CampaignModel $campaignModel,
+        private CoreParametersHelper $coreParametersHelper,
+        private DoNotContact $doNotContact,
+        private PointGroupModel $groupModel,
+        private FilterOperatorProvider $filterOperatorProvider
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild', 0],
@@ -626,15 +630,29 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerActionSetManipulator(CampaignExecutionEvent $event): void
     {
-        $event->getLead()->setManipulator(new LeadManipulator('campaign', 'trigger-action'));
+        $lead = $event->getLead();
+
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
+        $campaign      = $event->getLogEntry()->getCampaign();
+        $campaignEvent = $event->getLogEntry()->getEvent();
+
+        $lead->setManipulator(
+            new LeadManipulator(
+                'campaign',
+                'trigger-action',
+                $campaignEvent->getId(),
+                sprintf('%s (%s)', $campaignEvent->getName(), $campaign->getName())
+            )
+        );
     }
 
     /**
      * Function to compare date value.
-     *
-     * @return bool
      */
-    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate)
+    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
     {
         return $this->leadFieldModel->getRepository()->compareDateValue(
             $lead->getId(),

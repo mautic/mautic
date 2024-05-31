@@ -8,9 +8,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ConfiguratorPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('mautic.configurator')) {

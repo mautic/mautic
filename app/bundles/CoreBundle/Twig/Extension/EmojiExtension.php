@@ -8,15 +8,16 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 class EmojiExtension extends AbstractExtension
 {
-    public function __construct(protected EmojiHelper $emojiHelper)
-    {
+    public function __construct(
+        protected EmojiHelper $emojiHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
@@ -26,6 +27,8 @@ class EmojiExtension extends AbstractExtension
 
     /**
      * Convert to html.
+     *
+     * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
      */
     public function toHtml(string $text, string $from = 'emoji'): string
     {

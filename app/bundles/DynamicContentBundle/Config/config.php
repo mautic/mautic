@@ -39,16 +39,17 @@ return [
                 'standard_entity' => true,
                 'name'            => 'dynamicContents',
                 'path'            => '/dynamiccontents',
-                'controller'      => \Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController::class,
+                'controller'      => Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController::class,
             ],
         ],
     ],
     'services' => [
         'forms' => [
             'mautic.form.type.dwc_entry_filters' => [
-                'class'     => \Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
+                'class'     => Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [
@@ -57,16 +58,9 @@ return [
                 ],
             ],
         ],
-        'repositories' => [
-            'mautic.dynamicContent.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\DynamicContentBundle\Entity\Stat::class,
-            ],
-        ],
         'other' => [
             'mautic.helper.dynamicContent' => [
-                'class'     => \Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class,
+                'class'     => Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class,
                 'arguments' => [
                     'mautic.dynamicContent.model.dynamicContent',
                     'mautic.campaign.executioner.realtime',

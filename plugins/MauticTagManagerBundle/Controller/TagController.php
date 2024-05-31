@@ -238,6 +238,10 @@ class TagController extends FormController
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
+        if (!$this->security->isGranted('tagManager:tagManager:edit')) {
+            return $this->accessDenied();
+        }
+
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
@@ -280,7 +284,7 @@ class TagController extends FormController
         /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
 
-        /** @var FormInterface<FormInterface> $form */
+        /** @var FormInterface<FormInterface<Tag>> $form */
         $form = $tagModel->createForm($tag, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
@@ -425,11 +429,11 @@ class TagController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\TagModel $model */
+        /** @var TagModel $model */
         $model    = $this->getModel('lead.tag');
         $security = $this->security;
 

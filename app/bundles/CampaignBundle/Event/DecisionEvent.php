@@ -9,18 +9,16 @@ class DecisionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
-    /**
-     * @var bool
-     */
-    private $applicable = false;
+    private bool $applicable = false;
 
     /**
-     * DecisionEvent constructor.
-     *
      * @param mixed $passthrough
      */
-    public function __construct(private AbstractEventAccessor $eventConfig, private LeadEventLog $eventLog, private $passthrough = null)
-    {
+    public function __construct(
+        private AbstractEventAccessor $eventConfig,
+        private LeadEventLog $eventLog,
+        private $passthrough = null
+    ) {
         // @deprecated support for pre 2.13.0; to be removed in 3.0
         parent::__construct(
             [
@@ -68,10 +66,7 @@ class DecisionEvent extends CampaignExecutionEvent
         $this->applicable = true;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasDecisionApplicable()
+    public function wasDecisionApplicable(): bool
     {
         return $this->applicable;
     }
@@ -88,10 +83,8 @@ class DecisionEvent extends CampaignExecutionEvent
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @return bool
      */
-    public function getResult()
+    public function getResult(): bool
     {
         return $this->applicable;
     }

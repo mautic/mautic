@@ -13,14 +13,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SmsModel $smsModel, private TransportChain $transportChain)
-    {
+    public function __construct(
+        private SmsModel $smsModel,
+        private TransportChain $transportChain
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],

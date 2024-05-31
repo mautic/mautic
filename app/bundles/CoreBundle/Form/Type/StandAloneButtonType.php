@@ -5,11 +5,11 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class StandAloneButtonType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
@@ -19,9 +19,6 @@ class StandAloneButtonType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'standalone_button';

@@ -50,13 +50,11 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\NotificationBundle\Entity\NotificationRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\NotificationBundle\Entity\Notification::class);
+        return $this->em->getRepository(Notification::class);
     }
 
     /**
@@ -64,12 +62,9 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\Mautic\NotificationBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'notification:notifications';
@@ -104,8 +99,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Notification|null $entity
      * @param string|null       $action
      * @param array             $options
@@ -129,10 +122,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Notification|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Notification
     {
         if (null === $id) {
             $entity = new Notification();
@@ -160,9 +151,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -218,10 +207,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -273,10 +260,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Get an array of tracked links.
-     *
-     * @return array
      */
-    public function getNotificationClickStats($notificationId)
+    public function getNotificationClickStats($notificationId): array
     {
         return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
     }

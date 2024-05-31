@@ -10,14 +10,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class StageSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             StageEvents::STAGE_POST_SAVE   => ['onStagePostSave', 0],

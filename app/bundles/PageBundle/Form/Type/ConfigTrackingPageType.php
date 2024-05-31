@@ -7,6 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class ConfigTrackingPageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -26,7 +29,8 @@ class ConfigTrackingPageType extends AbstractType
                 'label' => 'mautic.page.config.form.anonymize_ip',
                 'data'  => isset($options['data']['anonymize_ip']) && (bool) $options['data']['anonymize_ip'],
                 'attr'  => [
-                    'tooltip' => 'mautic.page.config.form.anonymize_ip.tooltip',
+                    'tooltip'  => 'mautic.page.config.form.anonymize_ip.tooltip',
+                    'onchange' => 'Mautic.showAnonymizeWarningMessage(this.value)',
                 ],
             ]
         );
@@ -129,9 +133,6 @@ class ConfigTrackingPageType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'trackingconfig';

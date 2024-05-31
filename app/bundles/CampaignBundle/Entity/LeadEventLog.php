@@ -10,6 +10,8 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
 class LeadEventLog implements ChannelInterface
 {
+    public const TABLE_NAME = 'campaign_lead_event_log';
+
     /**
      * @var string|null
      */
@@ -101,8 +103,8 @@ class LeadEventLog implements ChannelInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaign_lead_event_log')
-            ->setCustomRepositoryClass(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(LeadEventLogRepository::class)
             ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
@@ -117,7 +119,7 @@ class LeadEventLog implements ChannelInterface
 
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('log')
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('event_id', 'id', false, false)
             ->build();
 
         $builder->addLead(false, 'CASCADE');

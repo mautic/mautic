@@ -3,6 +3,7 @@
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\FilterTrait;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -11,15 +12,21 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DwcEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private ListModel $listModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -64,7 +71,7 @@ class DwcEntryFiltersType extends AbstractType
     }
 
     /**
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws AccessException
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -79,6 +86,7 @@ class DwcEntryFiltersType extends AbstractType
                 'deviceBrands',
                 'deviceOs',
                 'tags',
+                'lists',
             ]
         );
 
@@ -86,13 +94,12 @@ class DwcEntryFiltersType extends AbstractType
             [
                 'label'          => false,
                 'error_bubbling' => false,
+                // @see \Mautic\LeadBundle\Controller\AjaxController::loadSegmentFilterFormAction()
+                'lists'          => $this->listModel->getChoiceFields()['lead']['leadlist']['properties']['list'],
             ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields'] = $options['fields'];

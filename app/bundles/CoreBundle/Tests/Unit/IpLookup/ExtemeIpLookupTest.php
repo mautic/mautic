@@ -10,7 +10,7 @@ class ExtemeIpLookupTest extends \PHPUnit\Framework\TestCase
 {
     private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
-    public function testIpLookupSuccessful()
+    public function testIpLookupSuccessful(): void
     {
         // Mock http connector
         $mockHttp = $this->createMock(Client::class);

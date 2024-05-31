@@ -8,25 +8,31 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class LeadPermissions extends AbstractPermissions
 {
+    public const LISTS_VIEW         = 'lead:lists:view';
+    public const LISTS_VIEW_OWN     = 'lead:lists:viewown';
+    public const LISTS_VIEW_OTHER   = 'lead:lists:viewother';
+    public const LISTS_EDIT_OWN     = 'lead:lists:editown';
+    public const LISTS_EDIT_OTHER   = 'lead:lists:editother';
+    public const LISTS_CREATE       = 'lead:lists:create';
+    public const LISTS_DELETE_OWN   = 'lead:lists:deleteown';
+    public const LISTS_DELETE_OTHER = 'lead:lists:deleteother';
+    public const LISTS_FULL         = 'lead:lists:full';
+
     public function __construct($params)
     {
         parent::__construct($params);
 
         $this->permissions = [
-            'lists' => [
-                'viewother'   => 2,
-                'viewown'     => 4,
-                'editother'   => 8,
-                'deleteother' => 64,
-                'full'        => 1024,
-            ],
             'fields' => [
                 'full' => 1024,
                 'view' => 1,
             ],
         ];
+
         $this->addExtendedPermissions('leads', false);
+        $this->addExtendedPermissions('lists', false);
         $this->addStandardPermissions('imports');
+        $this->addCustomPermission('export', ['enable' => 1024]);
     }
 
     public function getName(): string
@@ -36,24 +42,9 @@ class LeadPermissions extends AbstractPermissions
 
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
-        $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
+        $this->addExtendedFormFields($this->getName(), 'leads', $builder, $data, false);
 
-        $builder->add(
-            'lead:lists',
-            PermissionListType::class,
-            [
-                'choices' => [
-                    'mautic.core.permissions.viewother'   => 'viewother',
-                    'mautic.core.permissions.editother'   => 'editother',
-                    'mautic.core.permissions.deleteother' => 'deleteother',
-                    'mautic.core.permissions.full'        => 'full',
-                ],
-                'label'             => 'mautic.lead.permissions.lists',
-                'data'              => (!empty($data['lists']) ? $data['lists'] : []),
-                'bundle'            => 'lead',
-                'level'             => 'lists',
-            ]
-        );
+        $this->addExtendedFormFields('lead', 'lists', $builder, $data, false);
 
         $builder->add(
             'lead:fields',
@@ -70,6 +61,14 @@ class LeadPermissions extends AbstractPermissions
             ]
         );
 
+        $this->addCustomFormFields(
+            $this->getName(),
+            'export',
+            $builder,
+            'mautic.core.permissions.export',
+            ['mautic.core.permissions.enable' => 'enable'],
+            $data
+        );
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }
 
@@ -80,8 +79,8 @@ class LeadPermissions extends AbstractPermissions
         // make sure the user has access to own leads as well if they have access to lists, notes or fields
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
-            (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
-            (isset($permissions['lists']) || isset($permissions['fields']))
+            (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms))
+            && (isset($permissions['lists']) || isset($permissions['fields']))
         ) {
             $permissions['leads'][] = 'viewown';
         }
@@ -100,15 +99,6 @@ class LeadPermissions extends AbstractPermissions
                 case 'publishown':
                 case 'publishother':
                     $level = 'full';
-                    break;
-            }
-        }
-
-        if ('lists' === $name) {
-            switch ($level) {
-                case 'view':
-                case 'viewown':
-                    $name = 'leads';
                     break;
             }
         }

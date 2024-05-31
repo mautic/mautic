@@ -9,16 +9,15 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 
 class SubmissionResultLoader implements MauticModelInterface
 {
-    public function __construct(private EntityManager $entityManager)
-    {
+    public function __construct(
+        private EntityManager $entityManager
+    ) {
     }
 
     /**
      * @param int $id
-     *
-     * @return Submission|null
      */
-    public function getSubmissionWithResult($id)
+    public function getSubmissionWithResult($id): ?Submission
     {
         $repository = $this->getRepository();
 

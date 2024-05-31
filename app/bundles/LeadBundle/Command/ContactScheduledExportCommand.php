@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ContactScheduledExportCommand extends Command
 {
     private const PICK_SCHEDULED_EXPORTS_LIMIT = 10;
+
     public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
 
     public function __construct(
@@ -64,7 +65,8 @@ class ContactScheduledExportCommand extends Command
 
         $output->writeln('Contact export email(s) sent: '.$count);
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Export contacts which are scheduled in `contact_export_scheduler` table.';
 }

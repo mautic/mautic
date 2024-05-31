@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -11,11 +12,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private TranslatorInterface $translator, private RouterInterface $router)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private CorePermissions $security
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
@@ -25,6 +29,10 @@ class ButtonSubscriber implements EventSubscriberInterface
     public function injectViewButtons(CustomButtonEvent $event): void
     {
         if (!str_contains($event->getRoute(), 'mautic_contact_index')) {
+            return;
+        }
+
+        if (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
             return;
         }
 
@@ -46,7 +54,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
-                'iconClass' => 'fa fa-file-excel-o',
+                'iconClass' => 'ri-file-excel-line',
             ],
             ButtonHelper::LOCATION_BULK_ACTIONS
         );
@@ -67,7 +75,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.csv'),
-                'iconClass' => 'fa fa-file-text-o',
+                'iconClass' => 'ri-file-text-line',
             ],
             ButtonHelper::LOCATION_BULK_ACTIONS
         );
@@ -79,7 +87,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-toggle' => null,
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
-                'iconClass' => 'fa fa-file-excel-o',
+                'iconClass' => 'ri-file-excel-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
         );
@@ -91,7 +99,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'data-toggle' => null,
                 ],
                 'btnText'   => $this->translator->trans('mautic.core.export.csv'),
-                'iconClass' => 'fa fa-file-text-o',
+                'iconClass' => 'ri-file-text-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
         );

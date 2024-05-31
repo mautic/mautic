@@ -28,8 +28,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class NoteModel extends FormModel
 {
-    public function __construct(EntityManagerInterface $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper, private RequestStack $requestStack)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private RequestStack $requestStack
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -38,9 +47,6 @@ class NoteModel extends FormModel
         return $this->em->getRepository(LeadNote::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:notes';
@@ -48,10 +54,8 @@ class NoteModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadNote
     {
         if (null === $id) {
             return new LeadNote();
@@ -61,8 +65,6 @@ class NoteModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|null $action
      * @param array       $options
      *
@@ -82,9 +84,7 @@ class NoteModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

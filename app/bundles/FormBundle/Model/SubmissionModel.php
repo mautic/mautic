@@ -225,7 +225,7 @@ class SubmissionModel extends CommonFormModel
                 $params = $components['fields'][$f->getType()];
                 if (!empty($value)) {
                     if (isset($params['valueFilter'])) {
-                        if (is_string($params['valueFilter']) && is_callable([\Mautic\CoreBundle\Helper\InputHelper::class, $params['valueFilter']])) {
+                        if (is_string($params['valueFilter']) && is_callable([InputHelper::class, $params['valueFilter']])) {
                             $value = InputHelper::_($value, $params['valueFilter']);
                         } elseif (is_callable($params['valueFilter'])) {
                             $value = call_user_func_array($params['valueFilter'], [$f, $value]);
@@ -395,9 +395,6 @@ class SubmissionModel extends CommonFormModel
         parent::deleteEntity($submission);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         return $this->getRepository()->getEntities($args);
@@ -408,7 +405,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    public function getEntitiesByPage(array $args = [])
+    public function getEntitiesByPage(array $args = []): array
     {
         return $this->getRepository()->getEntitiesByPage($args);
     }
@@ -748,8 +745,6 @@ class SubmissionModel extends CommonFormModel
      * @param string      $dateFormat
      * @param array       $filter
      * @param bool        $canViewOthers
-     *
-     * @return array
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
@@ -758,7 +753,7 @@ class SubmissionModel extends CommonFormModel
         $dateFormat = null,
         $filter = [],
         $canViewOthers = true
-    ) {
+    ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $q     = $query->prepareTimeDataQuery('form_submissions', 'date_submitted', $filter);
@@ -953,7 +948,7 @@ class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getLeadsByUniqueFields(
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(Lead::class)->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
         ) : [];
@@ -962,7 +957,7 @@ class SubmissionModel extends CommonFormModel
         if (count($leads)) {
             $this->logger->debug(count($leads).' found based on unique identifiers');
 
-            /** @var \Mautic\LeadBundle\Entity\Lead $foundLead */
+            /** @var Lead $foundLead */
             $foundLead = $leads[0];
 
             $this->logger->debug('FORM: Testing contact ID# '.$foundLead->getId().' for conflicts');

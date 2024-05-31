@@ -13,8 +13,12 @@ class SchedulerEntity implements SchedulerInterface
      * @param string|null $scheduleDay
      * @param string|null $scheduleMonthFrequency
      */
-    public function __construct(private $isScheduled, private $scheduleUnit, private $scheduleDay, private $scheduleMonthFrequency)
-    {
+    public function __construct(
+        private $isScheduled,
+        private $scheduleUnit,
+        private $scheduleDay,
+        private $scheduleMonthFrequency
+    ) {
     }
 
     /**

@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class FormListType extends AbstractType
 {
     private $viewOther;
@@ -59,7 +62,7 @@ class FormListType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string
      */
     public function getParent()
     {

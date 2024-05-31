@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
@@ -21,10 +20,7 @@ class SendEmailToContact
      */
     private $singleEmailMode;
 
-    /**
-     * @var array
-     */
-    private $failedContacts = [];
+    private array $failedContacts = [];
 
     /**
      * @var array
@@ -51,23 +47,21 @@ class SendEmailToContact
      */
     private $emailEntityId;
 
-    /**
-     * @var int|null
-     */
-    private $listId;
+    private ?int $listId = null;
 
-    /**
-     * @var int
-     */
-    private $statBatchCounter = 0;
+    private int $statBatchCounter = 0;
 
     /**
      * @var array
      */
     private $contact = [];
 
-    public function __construct(private MailHelper $mailer, private StatHelper $statHelper, private DoNotContact $dncModel, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private MailHelper $mailer,
+        private StatHelper $statHelper,
+        private DoNotContact $dncModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**

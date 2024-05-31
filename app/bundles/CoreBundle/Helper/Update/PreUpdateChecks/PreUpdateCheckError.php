@@ -12,7 +12,9 @@ class PreUpdateCheckError
      * @param string               $key        The translation key (e.g. mautic.core.update.check.phpversion)
      * @param array<string,string> $parameters Optional parameters that you want to pass to the translation key, e.g. ['%currentversion%' => '7.4.2']
      */
-    public function __construct(public string $key, public array $parameters = [])
-    {
+    public function __construct(
+        public string $key,
+        public array $parameters = []
+    ) {
     }
 }

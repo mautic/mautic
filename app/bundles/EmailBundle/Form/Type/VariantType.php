@@ -11,10 +11,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class VariantType extends AbstractType
 {
-    public function __construct(private EmailModel $emailModel)
-    {
+    public function __construct(
+        private EmailModel $emailModel
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

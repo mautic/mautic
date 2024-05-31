@@ -6,7 +6,6 @@ use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\BouncedHelper;
 use Mautic\EmailBundle\Stats\Helper\ClickedHelper;
 use Mautic\EmailBundle\Stats\Helper\FailedHelper;
-use Mautic\EmailBundle\Stats\Helper\FilterTrait;
 use Mautic\EmailBundle\Stats\Helper\OpenedHelper;
 use Mautic\EmailBundle\Stats\Helper\SentHelper;
 use Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper;
@@ -15,12 +14,11 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 class StatsCollectionHelper
 {
-    use FilterTrait;
-
     public const GENERAL_STAT_PREFIX = 'email';
 
-    public function __construct(private StatHelperContainer $helperContainer)
-    {
+    public function __construct(
+        private StatHelperContainer $helperContainer
+    ) {
     }
 
     /**

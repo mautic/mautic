@@ -28,8 +28,24 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FieldController extends CommonFormController
 {
-    public function __construct(private FormModel $formModel, private FieldModel $formFieldModel, FormFieldHelper $fieldHelper, FormFactoryInterface $formFactory, private MappedObjectCollectorInterface $mappedObjectCollector, private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine, MauticFactory $factory, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
-    {
+    public function __construct(
+        private FormModel $formModel,
+        private FieldModel $formFieldModel,
+        FormFieldHelper $fieldHelper,
+        FormFactoryInterface $formFactory,
+        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 
@@ -65,9 +81,9 @@ class FieldController extends CommonFormController
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$fieldType] ?? false;
         // ajax only for form fields
-        if (!$fieldType ||
-            !$request->isXmlHttpRequest() ||
-            !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
+        if (!$fieldType
+            || !$request->isXmlHttpRequest()
+            || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->modalAccessDenied();
         }
@@ -218,9 +234,9 @@ class FieldController extends CommonFormController
             $fieldType = $formField['type'];
 
             // ajax only for form fields
-            if (!$fieldType ||
-                !$request->isXmlHttpRequest() ||
-                !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
+            if (!$fieldType
+                || !$request->isXmlHttpRequest()
+                || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
             ) {
                 return $this->modalAccessDenied();
             }
@@ -361,8 +377,8 @@ class FieldController extends CommonFormController
         $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', []);
 
         // ajax only for form fields
-        if (!$request->isXmlHttpRequest() ||
-            !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
+        if (!$request->isXmlHttpRequest()
+            || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }

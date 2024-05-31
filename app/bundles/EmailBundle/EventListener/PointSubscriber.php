@@ -18,11 +18,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PointModel $pointModel, private EntityManager $entityManager)
-    {
+    public function __construct(
+        private PointModel $pointModel,
+        private EntityManager $entityManager
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
@@ -67,12 +69,12 @@ class PointSubscriber implements EventSubscriberInterface
         $event->addEvent('email.send', $sendEvent);
 
         $sendToOwnerEvent = [
-          'group'           => 'mautic.email.point.trigger',
-          'label'           => 'mautic.email.point.trigger.send_email_to_user',
-          'formType'        => EmailToUserType::class,
-          'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
-          'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/email_to_user_row.html.twig',
-          'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
+            'group'           => 'mautic.email.point.trigger',
+            'label'           => 'mautic.email.point.trigger.send_email_to_user',
+            'formType'        => EmailToUserType::class,
+            'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
+            'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/email_to_user_row.html.twig',
+            'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
         ];
 
         $event->addEvent('email.send_to_user', $sendToOwnerEvent);

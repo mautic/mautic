@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<Channel>
+ */
 class ChannelType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -62,11 +65,11 @@ class ChannelType extends AbstractType
                         'multiple'    => false,
                         'label'       => 'mautic.channel.message.form.message',
                         'constraints' => ($enabled) ? [
-                             new NotBlank(
-                                 [
+                            new NotBlank(
+                                [
                                     'message' => 'mautic.core.value.required',
-                                 ]
-                             ),
+                                ]
+                            ),
                         ] : [],
                     ]
                 );

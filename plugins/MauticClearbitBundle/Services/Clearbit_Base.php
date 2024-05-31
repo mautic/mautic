@@ -8,17 +8,23 @@ namespace MauticPlugin\MauticClearbitBundle\Services;
 class Clearbit_Base
 {
     public const REQUEST_LATENCY = 0.2;
+
     public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
     private \DateTime $_next_req_time;
 
     protected $_baseUri     = '';
+
     protected $_resourceUri = '';
+
     protected $_version     = 'v2';
+
     protected $_webhookId;
 
     public $response_obj;
+
     public $response_code;
+
     public $response_json;
 
     /**
@@ -51,8 +57,9 @@ class Clearbit_Base
      *
      * @param string $api_key
      */
-    public function __construct(protected $api_key)
-    {
+    public function __construct(
+        protected $api_key
+    ) {
         $this->_next_req_time = new \DateTime('@0');
     }
 

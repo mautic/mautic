@@ -11,26 +11,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BroadcastExecutioner
 {
-    /**
-     * @var ContactLimiter
-     */
-    private $contactLimiter;
+    private ?ContactLimiter $contactLimiter = null;
 
-    /**
-     * @var BroadcastResult
-     */
-    private $result;
+    private ?BroadcastResult $result = null;
 
-    public function __construct(private SmsModel $smsModel, private BroadcastQuery $broadcastQuery, private TranslatorInterface $translator, private LeadRepository $leadRepository)
-    {
+    public function __construct(
+        private SmsModel $smsModel,
+        private BroadcastQuery $broadcastQuery,
+        private TranslatorInterface $translator,
+        private LeadRepository $leadRepository
+    ) {
     }
 
     public function execute(ChannelBroadcastEvent $event): void
     {
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $smses = $this->smsModel->getRepository()->getPublishedBroadcasts($event->getId());
-        while (false !== ($next = $smses->next())) {
-            $sms                  = reset($next);
+        $smses = $this->smsModel->getRepository()->getPublishedBroadcastsIterable($event->getId());
+        foreach ($smses as $sms) {
             $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], $event->getThreadId(), $event->getMaxThreads(), $event->getLimit());
             $this->result         = new BroadcastResult();
             try {

@@ -44,10 +44,24 @@ trait OperatorListTrait
             ],
         ],
         'default' => [
-            'exclude' => [
-                OperatorOptions::IN,
-                OperatorOptions::NOT_IN,
-                OperatorOptions::DATE,
+            'include' => [
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::GREATER_THAN,
+                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                OperatorOptions::LESS_THAN,
+                OperatorOptions::LESS_THAN_OR_EQUAL,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::BETWEEN,
+                OperatorOptions::NOT_BETWEEN,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
             ],
         ],
         'multiselect' => [
@@ -59,9 +73,25 @@ trait OperatorListTrait
             ],
         ],
         'date' => [
-            'exclude' => [
-                OperatorOptions::IN,
-                OperatorOptions::NOT_IN,
+            'include' => [
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::GREATER_THAN,
+                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                OperatorOptions::LESS_THAN,
+                OperatorOptions::LESS_THAN_OR_EQUAL,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::BETWEEN,
+                OperatorOptions::NOT_BETWEEN,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::DATE,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
             ],
         ],
         'lookup_id' => [
@@ -123,7 +153,7 @@ trait OperatorListTrait
             return $processedTypes[$type];
         }
 
-        $this->normalizeType($type);
+        $type = $this->normalizeType($type);
 
         if (null === $type) {
             foreach ($this->typeOperators as $type => $def) {
@@ -179,29 +209,33 @@ trait OperatorListTrait
 
     /**
      * @deprecated These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary. To be removed in next Mautic version.
-     *
-     * Normalize type operator.
-     *
-     * @param string|null $type
-     *
-     * @return void
      */
-    protected function normalizeType(&$type)
+    protected function normalizeType(mixed $type): mixed
     {
         if (null === $type) {
-            return;
+            return $type;
         }
 
         if ('boolean' === $type) {
-            $type = 'bool';
-        } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
-            $type = 'select';
-        } elseif (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
-            $type = 'text';
-        } elseif ('datetime' === $type) {
-            $type = 'date';
-        } elseif (!array_key_exists($type, $this->typeOperators)) {
-            $type = 'default';
+            return 'bool';
         }
+
+        if (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
+            return 'select';
+        }
+
+        if (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
+            return 'text';
+        }
+
+        if ('datetime' === $type) {
+            return 'date';
+        }
+
+        if (!array_key_exists($type, $this->typeOperators)) {
+            return 'default';
+        }
+
+        return $type;
     }
 }

@@ -17,10 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SummaryModel extends AbstractCommonModel
 {
-    /**
-     * @var array
-     */
-    private $logData = [];
+    private array $logData = [];
 
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.

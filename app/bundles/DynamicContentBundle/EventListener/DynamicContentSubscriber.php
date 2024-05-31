@@ -14,7 +14,9 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -28,14 +30,22 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
-    public function __construct(private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper, private FormTokenHelper $formTokenHelper, private FocusTokenHelper $focusTokenHelper, private AuditLogModel $auditLogModel, private DynamicContentHelper $dynamicContentHelper, private DynamicContentModel $dynamicContentModel, private CorePermissions $security, private ContactTracker $contactTracker)
-    {
+    public function __construct(
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private FormTokenHelper $formTokenHelper,
+        private FocusTokenHelper $focusTokenHelper,
+        private AuditLogModel $auditLogModel,
+        private DynamicContentHelper $dynamicContentHelper,
+        private DynamicContentModel $dynamicContentModel,
+        private CorePermissions $security,
+        private ContactTracker $contactTracker,
+        private CompanyModel $companyModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
@@ -86,9 +96,15 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
-        if ($content) {
+        if ($lead instanceof Lead && $content) {
+            $leadArray = $lead->getProfileFields();
+            try {
+                $primaryCompany         = $this->companyModel->getCompanyLeadRepository()->getPrimaryCompanyByLeadId($lead->getId());
+                $leadArray['companies'] = [$primaryCompany];
+            } catch (PrimaryCompanyNotFoundException) {
+            }
             $tokens = array_merge(
-                TokenHelper::findLeadTokens($content, $lead->getProfileFields()),
+                TokenHelper::findLeadTokens($content, $leadArray),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough),
                 $this->formTokenHelper->findFormTokens($content),
@@ -124,7 +140,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function decodeTokens(PageDisplayEvent $event): void
     {
-        $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        if (!$lead = $event->getLead()) {
+            $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        }
+
         if (!$lead) {
             return;
         }
@@ -135,8 +154,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        $result    = [];
+        $leadArray = [];
+        if ($lead instanceof Lead) {
+            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
+        }
+
+        $result = [];
         foreach ($tokens as $token => $dwc) {
             $result[$token] = '';
             if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
@@ -147,12 +170,13 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
-        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
         $xpath = new \DOMXPath($dom);
 
-        $divContent = $xpath->query('//*[@data-slot="dwc"]');
-        for ($i = 0; $i < $divContent->length; ++$i) {
-            $slot = $divContent->item($i);
+        $contentSlots = $xpath->query('//*[@data-slot="dwc"]');
+
+        for ($i = 0; $i < $contentSlots->length; ++$i) {
+            $slot = $contentSlots->item($i);
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
                 continue;
             }
@@ -162,7 +186,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
+            $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 

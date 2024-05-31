@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
@@ -13,8 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class LeadField extends FormEntity
+class LeadField extends FormEntity implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE    = 'LeadField';
+
     /**
      * @var int
      */
@@ -87,6 +90,8 @@ class LeadField extends FormEntity
      */
     private $isUniqueIdentifier = false;
 
+    private ?int $charLengthLimit = 64;
+
     /**
      * @var int|null
      */
@@ -101,6 +106,8 @@ class LeadField extends FormEntity
      * @var array
      */
     private $properties = [];
+
+    private ?bool $isIndex = false;
 
     /**
      * The column in lead_fields table was not created yet if this property is true.
@@ -137,7 +144,7 @@ class LeadField extends FormEntity
 
         $builder->setTable('lead_fields')
             ->setCustomRepositoryClass(LeadFieldRepository::class)
-            ->addIndex(['object'], 'search_by_object');
+            ->addIndex(['object', 'field_order', 'is_published'], 'idx_object_field_order_is_published');
 
         $builder->addId();
 
@@ -184,6 +191,12 @@ class LeadField extends FormEntity
             ->build();
 
         $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
+        $builder->addNullableField('isIndex', 'boolean', 'is_index');
+
+        $builder->createField('charLengthLimit', 'integer')
+            ->columnName('char_length_limit')
+            ->nullable()
+            ->build();
 
         $builder->createField('order', 'integer')
             ->columnName('field_order')
@@ -214,6 +227,11 @@ class LeadField extends FormEntity
         $metadata->addPropertyConstraint('label', new Assert\NotBlank(
             ['message' => 'mautic.lead.field.label.notblank']
         ));
+
+        $metadata->addPropertyConstraint('label', new Assert\Length([
+            'max'        => 191,
+            'maxMessage' => 'mautic.lead.field.label.maxlength',
+        ]));
 
         $metadata->addConstraint(new UniqueEntity([
             'fields'  => ['alias'],
@@ -265,6 +283,11 @@ class LeadField extends FormEntity
                 ]
             )
             ->build();
+    }
+
+    public function setId(?int $id = null): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -492,10 +515,20 @@ class LeadField extends FormEntity
         return $this->object;
     }
 
-    /**
-     * @return string
-     */
-    public function getCustomFieldObject()
+    public function setCharLengthLimit(?int $charLengthLimit): LeadField
+    {
+        $this->isChanged('charLengthLimit', $charLengthLimit);
+        $this->charLengthLimit = $charLengthLimit;
+
+        return $this;
+    }
+
+    public function getCharLengthLimit(): ?int
+    {
+        return $this->charLengthLimit;
+    }
+
+    public function getCustomFieldObject(): string
     {
         if (!$this->customFieldObject) {
             $this->customFieldObject = new CustomFieldObject($this);
@@ -618,6 +651,10 @@ class LeadField extends FormEntity
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
     {
+        if ($isUniqueIdentifer) {
+            $this->isIndex = true;
+        }
+
         $this->isUniqueIdentifer = $this->isUniqueIdentifier = $isUniqueIdentifer;
 
         return $this;
@@ -779,5 +816,20 @@ class LeadField extends FormEntity
     public function getOriginalIsPublishedValue(): bool
     {
         return (bool) $this->originalIsPublishedValue;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
+    }
+
+    public function isIsIndex(): bool
+    {
+        return $this->isIndex;
+    }
+
+    public function setIsIndex(bool $indexable): void
+    {
+        $this->isIndex = $indexable;
     }
 }

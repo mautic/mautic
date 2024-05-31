@@ -13,18 +13,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
+ * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper()
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
     public const PAGESIZE = 200;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'Connectwise';
     }
@@ -49,61 +44,48 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Get the array key for application cookie.
-     *
-     * @return string
      */
-    public function getCompanyCookieKey()
+    public function getClientId(): string
     {
         return 'appcookie';
     }
 
     /**
      * Get the array key for companyid.
-     *
-     * @return string
      */
-    public function getCompanyIdKey()
+    public function getCompanyIdKey(): string
     {
         return 'companyid';
     }
 
     /**
      * Get the array key for client id.
-     *
-     * @return string
      */
-    public function getIntegrator()
+    public function getIntegrator(): string
     {
         return 'username';
     }
 
     /**
      * Get the array key for client id.
-     *
-     * @return string
      */
-    public function getConnectwiseUrl()
+    public function getConnectwiseUrl(): string
     {
         return 'site';
     }
 
     /**
      * Get the array key for client secret.
-     *
-     * @return string
      */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'password';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecretKeys(): array
     {
         return [
-            'password',
+            'password', 'appcookie',
         ];
     }
 
@@ -113,8 +95,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthLoginUrl()
@@ -155,11 +135,26 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
+     * Append ClientID into header to enable authentication.
      *
-     * @return string
+     * @param string       $url
+     * @param array<mixed> $parameters
+     * @param string       $method
+     * @param array<mixed> $settings
+     * @param string       $authType
+     *
+     * @return array<mixed>
      */
-    public function getAuthenticationType()
+    public function prepareRequest($url, $parameters, $method, $settings, $authType): array
+    {
+        [$parameters,$headers] = parent::prepareRequest($url, $parameters, $method, $settings, $authType);
+
+        $headers['clientId'] = $this->keys['appcookie'];    // Even though it is called appcookie it is ClientID
+
+        return [$parameters, $headers];
+    }
+
+    public function getAuthenticationType(): string
     {
         return 'basic';
     }
@@ -424,7 +419,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * Get Contacts from connectwise.
      *
      * @param array $params
-     * @param null  $query
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact'): int
     {
@@ -473,7 +467,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
 
                 if ($integrationEntities) {
-                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                    $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
                     $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
 
@@ -546,7 +540,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
             $this->getName(),
             $object,
@@ -574,11 +568,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array|Lead $lead
      * @param array      $config
      *
-     * @return array|bool
-     *
      * @throws ApiErrorException
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
@@ -625,7 +617,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+                $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
                 $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
 
                 $leadPushed = true;
@@ -640,10 +632,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $leadPushed;
     }
 
-    /**
-     * @return array
-     */
-    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = [])
+    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = []): array
     {
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
@@ -796,7 +785,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param null   $object
      * @param string $priorityObject
      *
      * @return mixed
@@ -925,7 +913,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         if ($persistEntities) {
-            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
+            $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
             $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
             unset($persistEntities);
         }

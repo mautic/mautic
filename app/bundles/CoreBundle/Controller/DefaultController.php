@@ -7,9 +7,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class DefaultController.
- *
- * Almost all other Mautic Bundle controllers extend this default controller
+ * Almost all other Mautic Bundle controllers extend this default controller.
  */
 class DefaultController extends CommonController
 {
@@ -39,10 +37,7 @@ class DefaultController extends CommonController
         }
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function globalSearchAction(Request $request)
+    public function globalSearchAction(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $searchStr = $request->get('global_search', $request->getSession()->get('mautic.global_search', ''));
         $request->getSession()->set('mautic.global_search', $searchStr);
@@ -66,7 +61,7 @@ class DefaultController extends CommonController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function notificationsAction()
+    public function notificationsAction(): \Symfony\Component\HttpFoundation\Response
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');

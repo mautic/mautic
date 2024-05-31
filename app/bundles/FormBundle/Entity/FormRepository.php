@@ -10,15 +10,12 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class FormRepository extends CommonRepository
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
         $sq = $this->_em->createQueryBuilder()
             ->select('count(fs.id)')
-            ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
+            ->from(Submission::class, 'fs')
             ->where('fs.form = f');
 
         $q = $this->createQueryBuilder('f');
@@ -35,7 +32,6 @@ class FormRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
-     * @param null   $formType
      */
     public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
     {
@@ -68,10 +64,7 @@ class FormRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'f.name',
@@ -79,9 +72,6 @@ class FormRepository extends CommonRepository
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
@@ -119,8 +109,8 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.hasresults', [], null, 'en_US'):
                 $sq       = $this->getEntityManager()->createQueryBuilder();
                 $subquery = $sq->select('count(s.id)')
-                    ->from(\Mautic\FormBundle\Entity\Submission::class, 's')
-                    ->leftJoin(\Mautic\FormBundle\Entity\Form::class, 'f2',
+                    ->from(Submission::class, 's')
+                    ->leftJoin(Form::class, 'f2',
                         Join::WITH,
                         $sq->expr()->eq('s.form', 'f2')
                     )
@@ -157,12 +147,10 @@ class FormRepository extends CommonRepository
     /**
      * Fetch the form results.
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getFormResults(Form $form, array $options = [])
+    public function getFormResults(Form $form, array $options = []): array
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
 
@@ -208,9 +196,9 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -227,9 +215,6 @@ class FormRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDefaultOrder(): array
     {
         return [
@@ -237,9 +222,6 @@ class FormRepository extends CommonRepository
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTableAlias(): string
     {
         return 'f';

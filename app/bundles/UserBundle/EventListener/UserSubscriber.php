@@ -10,14 +10,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UserSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private IpLookupHelper $ipLookupHelper, private AuditLogModel $auditLogModel)
-    {
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserEvents::USER_POST_SAVE   => ['onUserPostSave', 0],

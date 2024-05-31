@@ -7,8 +7,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileFieldCrate
 {
-    public function __construct(private UploadedFile $uploadedFile, private Field $field)
-    {
+    public function __construct(
+        private UploadedFile $uploadedFile,
+        private Field $field
+    ) {
     }
 
     /**

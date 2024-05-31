@@ -10,13 +10,11 @@ use Twig\TwigFunction;
 
 class GravatarExtension extends AbstractExtension
 {
-    public function __construct(protected GravatarHelper $gravatarHelper)
-    {
+    public function __construct(
+        protected GravatarHelper $gravatarHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

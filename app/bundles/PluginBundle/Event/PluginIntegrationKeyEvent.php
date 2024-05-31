@@ -6,8 +6,10 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 {
-    public function __construct(UnifiedIntegrationInterface $integration, private ?array $keys = null)
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private ?array $keys = null
+    ) {
         $this->integration = $integration;
     }
 

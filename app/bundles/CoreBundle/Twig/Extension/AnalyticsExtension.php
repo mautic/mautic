@@ -10,13 +10,11 @@ use Twig\TwigFunction;
 
 class AnalyticsExtension extends AbstractExtension
 {
-    public function __construct(protected AnalyticsHelper $helper)
-    {
+    public function __construct(
+        protected AnalyticsHelper $helper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [

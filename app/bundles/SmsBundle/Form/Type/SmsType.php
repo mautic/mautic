@@ -21,10 +21,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Sms>
+ */
 class SmsType extends AbstractType
 {
-    public function __construct(private EntityManager $em)
-    {
+    public function __construct(
+        private EntityManager $em
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -66,7 +70,9 @@ class SmsType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
 
         // add lead lists
         $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);

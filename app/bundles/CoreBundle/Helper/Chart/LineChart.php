@@ -3,9 +3,7 @@
 namespace Mautic\CoreBundle\Helper\Chart;
 
 /**
- * Class LineChart.
- *
- * Line chart requires the same data as Bar chart
+ * Line chart requires the same data as Bar chart.
  */
 class LineChart extends AbstractChart implements ChartInterface
 {
@@ -35,8 +33,12 @@ class LineChart extends AbstractChart implements ChartInterface
      * @param \DateTime   $dateTo
      * @param string      $dateFormat
      */
-    public function __construct(?string $unit = null, $dateFrom = null, $dateTo = null, protected $dateFormat = null)
-    {
+    public function __construct(
+        ?string $unit = null,
+        $dateFrom = null,
+        $dateTo = null,
+        protected $dateFormat = null
+    ) {
         $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);
         $this->setDateRange($dateFrom, $dateTo);
@@ -117,7 +119,7 @@ class LineChart extends AbstractChart implements ChartInterface
         return [
             'backgroundColor'           => $color->toRgba(0.1),
             'borderColor'               => $color->toRgba(0.8),
-            'pointHoverBackgroundColor' => $color->toRgba(0.75),
+            'pointHoverBackgroundColor' => $color->toRgba(1),
             'pointHoverBorderColor'     => $color->toRgba(1),
         ];
     }

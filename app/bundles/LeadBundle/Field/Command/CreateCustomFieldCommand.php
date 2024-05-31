@@ -99,23 +99,7 @@ EOT
             $output->writeln('<error>'.$this->translator->trans('mautic.lead.field.column_creation_aborted').'</error>');
 
             return Command::SUCCESS;
-        } catch (CustomFieldLimitException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return Command::FAILURE;
-        } catch (DriverException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return Command::FAILURE;
-        } catch (SchemaException $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return Command::FAILURE;
-        } catch (\Doctrine\DBAL\Exception $e) {
-            $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
-
-            return Command::FAILURE;
-        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (CustomFieldLimitException|DriverException|SchemaException|\Doctrine\DBAL\Exception|\Mautic\CoreBundle\Exception\SchemaException $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
             return Command::FAILURE;

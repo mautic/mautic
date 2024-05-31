@@ -13,14 +13,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ChannelSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private TransportChain $transportChain)
-    {
+    public function __construct(
+        private TransportChain $transportChain
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 90],

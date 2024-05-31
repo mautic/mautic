@@ -18,26 +18,19 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method ZohoApi getApiHelper
+ * @method ZohoApi getApiHelper()
  */
 class ZohoIntegration extends CrmAbstractIntegration
 {
     /**
      * Returns the name of the social integration that must match the name of the file.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'Zoho';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -53,34 +46,22 @@ class ZohoIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getClientIdKey()
+    public function getClientIdKey(): string
     {
         return 'client_id';
     }
 
-    /**
-     * @return string
-     */
-    public function getClientSecretKey()
+    public function getClientSecretKey(): string
     {
         return 'client_secret';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthScope()
+    public function getAuthScope(): string
     {
         return 'ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.bulk.all,ZohoCRM.users.all,ZohoCRM.org.all';
     }
@@ -100,22 +81,12 @@ class ZohoIntegration extends CrmAbstractIntegration
         return sprintf('https://accounts.%s', $this->getDatacenter());
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return $this->getApiUrl().'/oauth/v2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return $this->getApiUrl().'/oauth/v2/auth';
     }
@@ -136,9 +107,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepareResponseForExtraction($data)
     {
         // Extract expiry and set expires for zoho
@@ -169,7 +137,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (isset($data['data'])) {
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
-            $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+            $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
             $objects               = $data['data'];
             $integrationEntities   = [];
             /** @var array $objects */
@@ -427,7 +395,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
+            $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
             $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
             unset($integrationEntities);
         }
@@ -511,8 +479,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     * @param null  $query
-     * @param null  $executed
      * @param array $result
      */
     public function getCompanies($params = [], $query = null, &$executed = null, &$result = []): int
@@ -580,11 +546,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param array $data
      * @param array $config
-     * @param null  $object
      */
     public function populateMauticLeadData($data, $config = [], $object = 'Leads'): array
     {
@@ -825,7 +788,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $params['end']   = null;
         }
         $config                = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated = $totalErrors = 0;
@@ -922,7 +885,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
                         $lead['integration_entity'] = 'Leads';
                         $leadsToUpdateInZ[$key]     = $lead;
-                        $integrationEntity          = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
+                        $integrationEntity          = $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
                         $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
                     }
                 }
@@ -939,7 +902,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $lead['internal_entity_id']
             );
             if (count($integrationId)) { // lead exists, then update
-                $integrationEntity     = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
+                $integrationEntity     = $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
                 $integrationEntity->setLastSyncDate(new \DateTime());
                 $integrationEntity->setInternalEntity('lead-converted');
                 $integrationEntities[] = $integrationEntity;
@@ -1071,7 +1034,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $mapper = new Mapper($availableFields);
         $mapper->setObject($zObject);
 
-        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $zObject, 'lead', $lead->getId());
 
         $counter      = 0;
@@ -1188,10 +1151,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param string $seachColumn
      * @param string $searchValue
      * @param string $object
-     *
-     * @return array
      */
-    private function getExistingRecord($seachColumn, $searchValue, $object = 'Leads')
+    private function getExistingRecord($seachColumn, $searchValue, $object = 'Leads'): array
     {
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
         $records         = $this->getApiHelper()->getSearchRecords($seachColumn, $searchValue, $object);

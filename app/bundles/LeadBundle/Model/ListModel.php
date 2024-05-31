@@ -32,12 +32,14 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -54,7 +56,7 @@ class ListModel extends FormModel
     /**
      * @var mixed[]
      */
-    private $choiceFieldsCache = [];
+    private array $choiceFieldsCache = [];
 
     public function __construct(
         protected CategoryModel $categoryModel,
@@ -76,14 +78,10 @@ class ListModel extends FormModel
 
     /**
      * Used by addLead and removeLead functions.
-     *
-     * @var array
      */
-    private $leadChangeLists = [];
+    private array $leadChangeLists = [];
 
     /**
-     * {@inheritdoc}
-     *
      * @return LeadListRepository
      */
     public function getRepository()
@@ -107,17 +105,12 @@ class ListModel extends FormModel
         return $this->em->getRepository(ListLead::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'lead:lists';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $unlock
      *
      * @throws \Doctrine\DBAL\Exception
@@ -164,14 +157,14 @@ class ListModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|null $action
      * @param array       $options
      *
+     * @return FormInterface<LeadList>
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -186,10 +179,8 @@ class ListModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return object|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadList
     {
         if (null === $id) {
             return new LeadList();
@@ -199,9 +190,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -345,6 +334,11 @@ class ListModel extends FormModel
             return 0;
         } catch (SegmentNotFoundException) {
             // A segment from filter does not exist anymore. Do not rebuild.
+            return 0;
+        } catch (TableNotFoundException $e) {
+            // Invalid filter table, filter definition is not well asset or it is deleted.  Do not rebuild but log.
+            $this->logger->error($e->getMessage());
+
             return 0;
         }
 
@@ -543,7 +537,7 @@ class ListModel extends FormModel
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         } else {
             $leadId = $lead->getId();
         }
@@ -629,7 +623,7 @@ class ListModel extends FormModel
                 }
             } else {
                 $listLead = new ListLead();
-                $listLead->setList($this->leadChangeLists[$listId]);
+                $listLead->setList($this->em->getReference(LeadList::class, $listId));
                 $listLead->setLead($lead);
                 $listLead->setManuallyAdded($manuallyAdded);
                 $listLead->setDateAdded($dateManipulated);
@@ -803,7 +797,7 @@ class ListModel extends FormModel
         }
 
         if ($leadSleepTime < 1) {
-            usleep($leadSleepTime * 1000000);
+            usleep($leadSleepTime * 1_000_000);
         } else {
             sleep($leadSleepTime);
         }
@@ -909,10 +903,8 @@ class ListModel extends FormModel
 
     /**
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName)
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -943,7 +935,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1005,7 +996,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param null  $dateFormat
      * @param array $filter
      * @param bool  $canViewOthers
      */
@@ -1075,23 +1065,16 @@ class ListModel extends FormModel
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
-     *
-     * @return array
      */
-    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
 
         // added line everytime
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));
-
-        // Just if we have event log data
-        // Added in 2.15 , then we can' display just from data from date range with event logs
-        if ($query->isStatsFromEventLog()) {
-            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
-            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
-        }
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
 
         return $chart->render();
     }
@@ -1119,8 +1102,7 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param      $segmentId      *
-     * @param null $returnProperty property of entity in returned array, null return all entity
+     * @param $segmentId *
      *
      * @return array
      */
@@ -1156,6 +1138,42 @@ class ListModel extends FormModel
         }
 
         return $dependents;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getSegmentIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $entities = $this->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        [
+                            'column' => 'l.filters',
+                            'expr'   => 'LIKE',
+                            'value'  => '%"lead_email_%',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $emailFilterTypes = ['lead_email_received', 'lead_email_sent'];
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                // BC support for old filters where the field existed outside of properties.
+                $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
+                if ($filter && in_array($entityFilter['type'], $emailFilterTypes) && in_array($emailId, $filter)) {
+                    $dependents[] = $entity->getId();
+                    break;
+                }
+            }
+        }
+
+        return array_unique($dependents);
     }
 
     /**

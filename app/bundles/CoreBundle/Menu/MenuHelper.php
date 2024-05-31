@@ -11,13 +11,15 @@ class MenuHelper
 {
     /**
      * Stores items that are assigned to another parent outside it's bundle.
-     *
-     * @var array
      */
-    private $orphans = [];
+    private array $orphans = [];
 
-    public function __construct(protected CorePermissions $security, protected RequestStack $requestStack, private CoreParametersHelper $coreParametersHelper, protected IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        protected CorePermissions $security,
+        protected RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
+        protected IntegrationHelper $integrationHelper
+    ) {
     }
 
     /**

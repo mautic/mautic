@@ -6,10 +6,8 @@ class LeadManipulator
 {
     /**
      * If true then the manipulator was logged and should not be logged for the second time.
-     *
-     * @var bool
      */
-    private $logged = false;
+    private bool $logged = false;
 
     /**
      * @param ?string $bundleName
@@ -17,8 +15,12 @@ class LeadManipulator
      * @param ?int    $objectId
      * @param ?string $objectDescription
      */
-    public function __construct(private $bundleName = null, private $objectName = null, private $objectId = null, private $objectDescription = null)
-    {
+    public function __construct(
+        private $bundleName = null,
+        private $objectName = null,
+        private $objectId = null,
+        private $objectDescription = null
+    ) {
     }
 
     /**
@@ -55,10 +57,8 @@ class LeadManipulator
 
     /**
      * Check if the manipulator was logged already or not.
-     *
-     * @return bool
      */
-    public function wasLogged()
+    public function wasLogged(): bool
     {
         return $this->logged;
     }
@@ -69,5 +69,30 @@ class LeadManipulator
     public function setAsLogged(): void
     {
         $this->logged = true;
+    }
+
+    public function getManipulatedBy(): string
+    {
+        if ($this->objectDescription) {
+            return (string) $this->objectDescription;
+        }
+
+        return $this->getManipulatorKey();
+    }
+
+    public function getManipulatorKey(): string
+    {
+        $objectParts = [];
+        if ($this->bundleName) {
+            $objectParts[] = $this->bundleName;
+        }
+        if ($this->objectName) {
+            $objectParts[] = $this->objectName;
+        }
+        if ($this->objectId) {
+            $objectParts[] = $this->objectId;
+        }
+
+        return implode(':', $objectParts);
     }
 }

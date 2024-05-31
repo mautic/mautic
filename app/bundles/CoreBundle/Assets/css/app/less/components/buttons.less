@@ -6,15 +6,21 @@
 // Base styles
 // ---------------------
 .btn {
+  transition: var(--all);
   &,
-  &:active,
-  &.active {
+  &:active {
     outline: 0;
   }
 
   // reset font awesome width
   .fa { min-width: 13px; }
-  
+
+  // remix icon
+  [class^="ri-"], [class*=" ri-"] {
+    font-size: 12px;
+    vertical-align: -.05em;
+  }
+
   // caret
   // ---------------------
   > .caret {
@@ -67,5 +73,13 @@
   &:hover,
   &:focus {
     text-decoration: none;
+  }
+}
+
+.btn-info {
+  color: @gray-dark;
+
+  &:hover {
+    color: @gray-dark;
   }
 }

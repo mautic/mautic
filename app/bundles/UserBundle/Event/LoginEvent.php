@@ -7,12 +7,13 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class LoginEvent extends Event
 {
-    public function __construct(private User $user)
-    {
+    public function __construct(
+        private User $user
+    ) {
     }
 
     /**
-     * @return \Mautic\UserBundle\Entity\User|null
+     * @return User|null
      */
     public function getUser()
     {

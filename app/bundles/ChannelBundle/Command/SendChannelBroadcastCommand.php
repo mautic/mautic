@@ -19,8 +19,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
-    public function __construct(private TranslatorInterface $translator, private EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private EventDispatcherInterface $dispatcher,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
@@ -102,12 +106,30 @@ EOT
         }
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
-        $event->setLimit($limit);
-        $event->setBatch($batch);
-        $event->setMinContactIdFilter($minContactId);
-        $event->setMaxContactIdFilter($maxContactId);
-        $event->setThreadId($threadId);
-        $event->setMaxThreads($maxThreads);
+
+        if ($limit) {
+            $event->setLimit((int) $limit);
+        }
+
+        if ($batch) {
+            $event->setBatch((int) $batch);
+        }
+
+        if ($minContactId) {
+            $event->setMinContactIdFilter((int) $minContactId);
+        }
+
+        if ($maxContactId) {
+            $event->setMaxContactIdFilter((int) $maxContactId);
+        }
+
+        if ($threadId) {
+            $event->setThreadId((int) $threadId);
+        }
+
+        if ($maxThreads) {
+            $event->setMaxThreads((int) $maxThreads);
+        }
 
         $this->dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
 
@@ -132,5 +154,6 @@ EOT
 
         return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Process contacts pending to receive a channel broadcast.';
 }

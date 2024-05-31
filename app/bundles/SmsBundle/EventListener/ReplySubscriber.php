@@ -23,10 +23,7 @@ class ReplySubscriber implements EventSubscriberInterface
         $this->eventLogRepository = $eventLogRepository;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::ON_REPLY              => ['onReply', 0],
@@ -53,6 +50,7 @@ class ReplySubscriber implements EventSubscriberInterface
 
         $this->eventLogRepository->saveEntity($log);
         $this->eventLogRepository->detachEntity($log);
+        $event->setEventLog($log);
     }
 
     public function onTimelineGenerate(LeadTimelineEvent $event): void

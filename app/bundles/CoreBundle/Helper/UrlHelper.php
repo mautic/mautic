@@ -243,7 +243,7 @@ class UrlHelper
     private static function removeTrailingNonAlphaNumeric($string)
     {
         // Special handling of closing bracket
-        if ('}' === substr($string, -1) && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
+        if (str_ends_with($string, '}') && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
             $string = substr($string, 0, -1);
 
             return self::removeTrailingNonAlphaNumeric($string);

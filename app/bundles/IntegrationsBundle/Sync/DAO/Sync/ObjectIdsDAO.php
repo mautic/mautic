@@ -20,7 +20,7 @@ class ObjectIdsDAO
      *
      * @var array[]
      */
-    private $objects = [];
+    private array $objects = [];
 
     /**
      * Expected $cliOptions structure:
@@ -68,5 +68,13 @@ class ObjectIdsDAO
         }
 
         return $this->objects[$objectType];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getObjectTypes(): array
+    {
+        return array_keys($this->objects);
     }
 }

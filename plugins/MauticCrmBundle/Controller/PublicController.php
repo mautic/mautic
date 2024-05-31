@@ -9,9 +9,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class class PublicController extends CommonController.
- */
 class PublicController extends CommonController
 {
     public function contactDataAction(Request $request, LoggerInterface $mauticLogger, IntegrationHelper $integrationHelper): Response

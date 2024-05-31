@@ -11,8 +11,9 @@ class ContactExportSchedulerEvent extends Event
 {
     private string $filePath;
 
-    public function __construct(private ContactExportScheduler $contactExportScheduler)
-    {
+    public function __construct(
+        private ContactExportScheduler $contactExportScheduler
+    ) {
     }
 
     public function getContactExportScheduler(): ContactExportScheduler

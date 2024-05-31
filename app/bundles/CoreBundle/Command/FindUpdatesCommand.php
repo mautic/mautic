@@ -13,8 +13,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FindUpdatesCommand extends Command
 {
-    public function __construct(private TranslatorInterface $translator, private UpdateHelper $updateHelper)
-    {
+    public function __construct(
+        private TranslatorInterface $translator,
+        private UpdateHelper $updateHelper
+    ) {
         parent::__construct();
     }
 
@@ -42,7 +44,8 @@ EOT
             $output->writeln($this->translator->trans('mautic.core.updater.cli.update'));
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetches updates for Mautic';
 }

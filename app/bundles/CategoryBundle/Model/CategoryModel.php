@@ -26,14 +26,31 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class CategoryModel extends FormModel
 {
-    public function __construct(protected RequestStack $requestStack, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger, CoreParametersHelper $coreParametersHelper)
-    {
+    /**
+     * @var array<string,mixed[]>
+     */
+    private array $categoriesByBundleCache = [];
+
+    public function __construct(
+        protected RequestStack $requestStack,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): CategoryRepository
     {
-        return $this->em->getRepository(Category::class);
+        $repository = $this->em->getRepository(Category::class);
+        \assert($repository instanceof CategoryRepository);
+
+        return $repository;
     }
 
     public function getNameGetter(): string
@@ -83,8 +100,6 @@ class CategoryModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string|null $action
      * @param array       $options
      *
@@ -104,10 +119,8 @@ class CategoryModel extends FormModel
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @return Category|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Category
     {
         if (null === $id) {
             return new Category();
@@ -117,9 +130,7 @@ class CategoryModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -160,16 +171,21 @@ class CategoryModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
+     *
+     * @param string $bundle
+     * @param string $filter
+     * @param int    $limit
+     *
+     * @return mixed[]
      */
     public function getLookupResults($bundle, $filter = '', $limit = 10): array
     {
-        static $results = [];
-
         $key = $bundle.$filter.$limit;
-        if (!isset($results[$key])) {
-            $results[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+
+        if (!empty($this->categoriesByBundleCache[$key])) {
+            return $this->categoriesByBundleCache[$key];
         }
 
-        return $results[$key];
+        return $this->categoriesByBundleCache[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
     }
 }

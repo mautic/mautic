@@ -12,9 +12,6 @@ use Mautic\ReportBundle\Entity\Report;
 
 class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_install', 'group_mautic_install_data'];
@@ -43,9 +40,6 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
         $manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 5;

@@ -14,7 +14,6 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -26,35 +25,26 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $campaign;
 
-    /**
-     * @var ContactLimiter
-     */
-    private $limiter;
+    private ?ContactLimiter $limiter = null;
 
-    /**
-     * @var OutputInterface
-     */
-    private $output;
+    private ?OutputInterface $output = null;
 
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
+    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    /**
-     * @var Counter
-     */
-    private $counter;
+    private ?Counter $counter = null;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $decisions;
+    private ?ArrayCollection $decisions = null;
 
     protected ?\DateTime $now = null;
 
-    public function __construct(private InactiveContactFinder $inactiveContactFinder, private LoggerInterface $logger, private TranslatorInterface $translator, private EventScheduler $scheduler, private InactiveHelper $helper, private EventExecutioner $executioner)
-    {
+    public function __construct(
+        private InactiveContactFinder $inactiveContactFinder,
+        private LoggerInterface $logger,
+        private TranslatorInterface $translator,
+        private EventScheduler $scheduler,
+        private InactiveHelper $helper,
+        private EventExecutioner $executioner
+    ) {
     }
 
     /**
@@ -138,6 +128,10 @@ class InactiveExecutioner implements ExecutionerInterface
         if (!$this->campaign->isPublished()) {
             throw new NoEventsFoundException();
         }
+
+        if ($this->campaign->isDeleted()) {
+            throw new NoEventsFoundException();
+        }
     }
 
     /**
@@ -195,13 +189,13 @@ class InactiveExecutioner implements ExecutionerInterface
             try {
                 // We need the parent ID of the decision in order to fetch the time the contact executed this event
                 $parentEvent   = $decisionEvent->getParent();
-                $parentEventId = ($parentEvent) ? $parentEvent->getId() : null;
+                $parentEventId = $parentEvent && !$parentEvent->isDeleted() ? $parentEvent->getId() : null;
 
                 // Ge the first batch of contacts
                 $contacts = $this->inactiveContactFinder->getContacts($this->campaign->getId(), $decisionEvent, $this->limiter);
 
                 // Loop over all contacts till we've processed all those applicable for this decision
-                while ($contacts && $contacts->count()) {
+                while ($contacts->count()) {
                     // Get the max contact ID before any are removed
                     $batchMinContactId = max($contacts->getKeys()) + 1;
 
@@ -250,10 +244,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws Dispatcher\Exception\LogNotProcessedException
+     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws Exception\CannotProcessEventException
+     * @throws Scheduler\Exception\NotSchedulableException
      */
     private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
     {

@@ -51,10 +51,7 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         $this->validCORSDomains    = array_key_exists('cors_valid_domains', $this->config) ? (array) $this->config['cors_valid_domains'] : [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true)
     {
         $this->corsHeaders['Access-Control-Allow-Origin'] = $this->getAllowOriginHeaderValue($request);
 
@@ -107,8 +104,13 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
         // Check the domains using shell wildcard patterns
         $validCorsDomainFilter = function ($validCorsDomain) use ($origin) {
+            if (null === $origin) {
+                return null;
+            }
+
             return fnmatch($validCorsDomain, $origin, FNM_CASEFOLD);
         };
+
         if (array_filter($this->validCORSDomains, $validCorsDomainFilter)) {
             $this->requestOriginIsValid = true;
             $this->corsHeaders['Vary']  = 'Origin';
@@ -121,9 +123,6 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

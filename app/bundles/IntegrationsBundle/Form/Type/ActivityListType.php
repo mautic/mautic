@@ -9,10 +9,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ActivityListType extends AbstractType
 {
-    public function __construct(private LeadModel $leadModel)
-    {
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -32,7 +36,7 @@ class ActivityListType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string
      */
     public function getParent()
     {

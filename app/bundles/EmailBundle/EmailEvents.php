@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle;
 
 /**
- * Class EmailEvents
  * Events available for EmailBundle.
  */
 final class EmailEvents
@@ -47,6 +46,16 @@ final class EmailEvents
      * @var string
      */
     public const EMAIL_ON_SEND = 'mautic.email_on_send';
+
+    /**
+     * The mautic.email_pre_send event is dispatched when an email is clicked.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailSendEvent instance.
+     *
+     * @var string
+     */
+    public const EMAIL_PRE_SEND = 'mautic.email_pre_send';
 
     /**
      * The mautic.email_on_display event is dispatched when an email is viewed via a browser.
@@ -255,4 +264,20 @@ final class EmailEvents
      * @var string
      */
     public const ON_DETERMINE_CLICKTHROUGH_RATE_WINNER = 'mautic.email.on_clickthrough_rate_winner';
+
+    /**
+     * The mautic.email.on_email_stat_pre_save event is fired before an email stat batch is saved.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailStatEvent
+     */
+    public const ON_EMAIL_STAT_PRE_SAVE = 'mautic.email.on_email_stat_pre_save';
+
+    /**
+     * The mautic.email.on_email_stat_post_save event is fired after an email stat batch is saved.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailStatEvent
+     */
+    public const ON_EMAIL_STAT_POST_SAVE = 'mautic.email.on_email_stat_post_save';
 }

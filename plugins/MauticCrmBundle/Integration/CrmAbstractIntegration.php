@@ -13,13 +13,14 @@ use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
+
     protected $helper;
 
     public function setIntegrationSettings(Integration $settings): void
     {
         // make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (isset($keys['url']) && '/' == substr($keys['url'], -1)) {
+        if (isset($keys['url']) && str_ends_with($keys['url'], '/')) {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
@@ -28,8 +29,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getAuthenticationType()
@@ -200,7 +199,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         foreach ($leadIds as $leadId) {
             $i        = 0;
             $activity = [];
-            $lead     = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
+            $lead     = $this->em->getReference(Lead::class, $leadId);
             $page     = 1;
 
             while (true) {
@@ -239,7 +238,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 ++$page;
 
                 // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
-                $entityToNotDetach = [\Mautic\PluginBundle\Entity\Integration::class, \Mautic\PluginBundle\Entity\Plugin::class];
+                $entityToNotDetach = [Integration::class, \Mautic\PluginBundle\Entity\Plugin::class];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
                 foreach ($loadedEntities as $name => $loadedEntitySet) {
                     if (!in_array($name, $entityToNotDetach, true)) {
@@ -263,8 +262,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null $object
-     *
      * @return Company|null
      */
     public function getMauticCompany($data, $object = null)
@@ -383,7 +380,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)
+            $existingLeads = $this->em->getRepository(Lead::class)
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
             if (!empty($existingLeads)) {
                 $lead = array_shift($existingLeads);
@@ -471,7 +468,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -485,7 +481,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -505,7 +500,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     protected function getFieldsByPriority(array $config, $priorityObject, $direction)
     {
-        return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields']);
+        return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields'] ?? []);
     }
 
     /**

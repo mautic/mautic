@@ -13,13 +13,16 @@ use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    /**
-     * @var \DateTimeInterface
-     */
-    private $earliestInactiveDate;
+    private ?\DateTimeInterface $earliestInactiveDate = null;
 
-    public function __construct(private EventScheduler $scheduler, private InactiveContactFinder $inactiveContactFinder, private LeadEventLogRepository $eventLogRepository, private EventRepository $eventRepository, private LoggerInterface $logger, private DecisionHelper $decisionHelper)
-    {
+    public function __construct(
+        private EventScheduler $scheduler,
+        private InactiveContactFinder $inactiveContactFinder,
+        private LeadEventLogRepository $eventLogRepository,
+        private EventRepository $eventRepository,
+        private LoggerInterface $logger,
+        private DecisionHelper $decisionHelper
+    ) {
     }
 
     /**
@@ -108,8 +111,9 @@ class InactiveHelper
     {
         $collection = new ArrayCollection();
 
-        /** @var Event $decision */
-        if ($decision = $this->eventRepository->find($decisionId)) {
+        /** @var Event|null $decision */
+        $decision = $this->eventRepository->find($decisionId);
+        if ($decision && !$decision->isDeleted()) {
             $collection->set($decision->getId(), $decision);
         }
 
@@ -117,11 +121,9 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTimeInterface|null
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTime $lastActiveDate)
+    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface
     {
         $earliestDate = null;
         foreach ($negativeChildren as $event) {
@@ -135,9 +137,9 @@ class InactiveHelper
     }
 
     /**
-     * @return array|ArrayCollection
+     * @return array<string, \DateTimeInterface>|null
      */
-    private function getLastActiveDates($lastActiveEventId, array $contactIds)
+    private function getLastActiveDates($lastActiveEventId, array $contactIds): ?array
     {
         // If there is a parent ID, get last active dates based on when that event was executed for the given contact
         // Otherwise, use when the contact was added to the campaign for comparison

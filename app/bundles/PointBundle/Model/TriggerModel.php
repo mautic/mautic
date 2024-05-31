@@ -63,8 +63,6 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PointBundle\Entity\TriggerRepository
      */
     public function getRepository()
@@ -82,17 +80,12 @@ class TriggerModel extends CommonFormModel
         return $this->em->getRepository(TriggerEvent::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:triggers';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -109,10 +102,8 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param \Mautic\PointBundle\Entity\Trigger $entity
-     * @param bool                               $unlock
+     * @param Trigger $entity
+     * @param bool    $unlock
      */
     public function saveEntity($entity, $unlock = true): void
     {
@@ -200,12 +191,7 @@ class TriggerModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Trigger|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Trigger
     {
         if (null === $id) {
             return new Trigger();
@@ -215,8 +201,6 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -382,10 +366,10 @@ class TriggerModel extends CommonFormModel
     private function invokeCallback($event, Lead $lead, array $settings)
     {
         $args = [
-          'event'   => $event,
-          'lead'    => $lead,
-          'factory' => $this->mauticFactory,
-          'config'  => $event['properties'],
+            'event'   => $event,
+            'lead'    => $lead,
+            'factory' => $this->mauticFactory,
+            'config'  => $event['properties'],
         ];
 
         if (is_array($settings['callback'])) {

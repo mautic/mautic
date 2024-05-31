@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class PointActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

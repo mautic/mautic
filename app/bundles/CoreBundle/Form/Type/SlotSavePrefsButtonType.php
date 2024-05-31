@@ -9,8 +9,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SlotSavePrefsButtonType extends SlotType
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -63,7 +64,7 @@ class SlotSavePrefsButtonType extends SlotType
                     'M' => 1,
                     'L' => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(
@@ -82,7 +83,7 @@ class SlotSavePrefsButtonType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                ]
+            ]
         );
 
         $builder->add(

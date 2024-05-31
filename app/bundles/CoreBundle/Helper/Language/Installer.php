@@ -7,25 +7,18 @@ use Symfony\Component\Finder\Finder;
 
 class Installer
 {
-    /**
-     * @var string
-     */
-    private $sourceDirectory;
+    private ?string $sourceDirectory = null;
+
+    private ?string $installDirectory = null;
+
+    private Filesystem $filesystem;
 
     /**
-     * @var string
-     */
-    private $installDirectory;
-
-    private \Symfony\Component\Filesystem\Filesystem $filesystem;
-
-    /**
-     * Installer constructor.
-     *
      * @param string $translationsDirectory
      */
-    public function __construct(private $translationsDirectory)
-    {
+    public function __construct(
+        private $translationsDirectory
+    ) {
         $this->filesystem            = new Filesystem();
     }
 

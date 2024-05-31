@@ -58,25 +58,17 @@ class FocusModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return string
-     */
-    public function getActionRouteBase()
+    public function getActionRouteBase(): string
     {
         return 'focus';
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'focus:items';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
@@ -97,33 +89,25 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Focus::class);
+        return $this->em->getRepository(Focus::class);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \MauticPlugin\MauticFocusBundle\Entity\StatRepository
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\MauticPlugin\MauticFocusBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param int|null $id
-     *
-     * @return Focus|null
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Focus
     {
         if (null === $id) {
             return new Focus();
@@ -133,8 +117,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Focus      $entity
      * @param bool|false $unlock
      */
@@ -339,7 +321,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -379,17 +361,14 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param null $dateFormat
      * @param bool $canViewOthers
-     *
-     * @return array
      */
-    public function getStats(Focus $focus, $unit, \DateTime $dateFrom = null, \DateTime $dateTo = null, $dateFormat = null, $canViewOthers = true)
+    public function getStats(Focus $focus, $unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
 
-        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['focus_id' => $focus->getId()]);
+        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_NOTIFICATION, 'focus_id' => $focus->getId()]);
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }

@@ -49,7 +49,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -101,7 +101,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -170,7 +170,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -243,7 +243,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -324,7 +324,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 
@@ -410,7 +410,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function getEntity($id = null)
+            public function getEntity($id = null): ?Stage
             {
                 Assert::assertSame(123, $id);
 

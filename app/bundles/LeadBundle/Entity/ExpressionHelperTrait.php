@@ -9,7 +9,7 @@ trait ExpressionHelperTrait
 {
     /**
      * @param QueryBuilder|\Doctrine\ORM\QueryBuilder $q
-     * @param $includeIsNull    true/false or null to auto determine based on operator
+     * @param                                         $includeIsNull true/false or null to auto determine based on operator
      *
      * @return mixed
      */
@@ -26,7 +26,7 @@ trait ExpressionHelperTrait
         }
 
         if ($includeIsNull) {
-            $expr = $q->expr()->orX(
+            $expr = $q->expr()->or(
                 $q->expr()->$operator($column, $parameter),
                 $q->expr()->isNull($column)
             );

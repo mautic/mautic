@@ -13,17 +13,15 @@ class TagManagerIntegration extends AbstractIntegration
         return self::PLUGIN_NAME;
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Tag Manager';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         // Just use none for now and I'll build in "basic" later
         return 'none';

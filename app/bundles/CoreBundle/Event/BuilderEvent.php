@@ -9,18 +9,26 @@ use Symfony\Contracts\EventDispatcher\Event;
 class BuilderEvent extends Event
 {
     protected $slotTypes            = [];
+
     protected $sections             = [];
+
     protected $tokens               = [];
+
     protected $abTestWinnerCriteria = [];
 
     /**
      * @var string|string[]
      */
     protected string|array $tokenFilterText;
+
     protected string $tokenFilterTarget;
 
-    public function __construct(protected $translator, protected $entity = null, protected $requested = 'all', protected string $tokenFilter = '')
-    {
+    public function __construct(
+        protected $translator,
+        protected $entity = null,
+        protected $requested = 'all',
+        protected string $tokenFilter = ''
+    ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
@@ -205,10 +213,8 @@ class BuilderEvent extends Event
      * Pass in string or array of tokens to filter against if filterType == token.
      *
      * @param string|array|null $tokenKeys
-     *
-     * @return bool
      */
-    public function tokensRequested($tokenKeys = null)
+    public function tokensRequested($tokenKeys = null): bool
     {
         if ($requested = $this->getRequested('tokens')) {
             if (!empty($this->tokenFilter) && 'token' == $this->tokenFilterTarget) {
@@ -320,30 +326,24 @@ class BuilderEvent extends Event
 
     /**
      * Check if AB Test Winner Criteria has been requested.
-     *
-     * @return bool
      */
-    public function abTestWinnerCriteriaRequested()
+    public function abTestWinnerCriteriaRequested(): bool
     {
         return $this->getRequested('abTestWinnerCriteria');
     }
 
     /**
      * Check if Slot types has been requested.
-     *
-     * @return bool
      */
-    public function slotTypesRequested()
+    public function slotTypesRequested(): bool
     {
         return $this->getRequested('slotTypes');
     }
 
     /**
      * Check if Sections has been requested.
-     *
-     * @return bool
      */
-    public function sectionsRequested()
+    public function sectionsRequested(): bool
     {
         return $this->getRequested('sections');
     }

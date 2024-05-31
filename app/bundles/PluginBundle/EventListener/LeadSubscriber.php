@@ -2,22 +2,26 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PluginModel $pluginModel)
-    {
+    private const FEATURE_PUSH_LEAD = 'push_lead';
+
+    public function __construct(
+        private PluginModel $pluginModel,
+        private IntegrationRepository $integrationRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_PRE_DELETE    => ['onLeadDelete', 0],
@@ -31,7 +35,7 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadDelete(LeadEvent $event): bool
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
@@ -57,9 +61,26 @@ class LeadSubscriber implements EventSubscriberInterface
     */
     public function onLeadSave(LeadEvent $event): void
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
-        $integrationEntityRepo->updateErrorLeads('lead-error', $lead->getId());
+        if ($this->isAnyIntegrationEnabled()) {
+            $integrationEntityRepo->updateErrorLeads('lead-error', $lead->getId());
+        }
+    }
+
+    private function isAnyIntegrationEnabled(): bool
+    {
+        $integrations = $this->integrationRepository->getIntegrations();
+        foreach ($integrations as $integration) {
+            /** @var Integration $integration */
+            $supportedFeatures = $integration->getSupportedFeatures();
+
+            if ($integration->getIsPublished() && !empty($integration->getApiKeys()) && in_array(self::FEATURE_PUSH_LEAD, $supportedFeatures)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

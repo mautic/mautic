@@ -10,10 +10,8 @@ class AjaxController extends CommonAjaxController
 {
     /**
      * Get updated data for context.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function getSourceDataAction(Request $request)
+    public function getSourceDataAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $model = $this->getModel('report');
         \assert($model instanceof ReportModel);

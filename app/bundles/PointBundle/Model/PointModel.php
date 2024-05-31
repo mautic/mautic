@@ -59,26 +59,19 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return PointRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\PointBundle\Entity\Point::class);
+        return $this->em->getRepository(Point::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'point:points';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
@@ -98,12 +91,7 @@ class PointModel extends CommonFormModel
         return $formFactory->create(PointType::class, $entity, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return Point|null
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Point
     {
         if (null === $id) {
             return new Point();
@@ -113,8 +101,6 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
@@ -204,7 +190,7 @@ class PointModel extends CommonFormModel
         }
 
         // find all the actions for published points
-        /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
+        /** @var PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
@@ -326,10 +312,8 @@ class PointModel extends CommonFormModel
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -345,5 +329,31 @@ class PointModel extends CommonFormModel
         $chart->setDataset($this->translator->trans('mautic.point.changes'), $data);
 
         return $chart->render();
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getPointActionIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'p.type', 'expr' => 'in', 'value' => ['email.send', 'email.open']],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $pointActionIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (in_array($emailId, $properties['emails'] ?? [])) {
+                $pointActionIds[] = $entity->getId();
+            }
+        }
+
+        return array_unique($pointActionIds);
     }
 }

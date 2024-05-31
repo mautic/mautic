@@ -14,14 +14,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentFilterSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private GroupRepository $groupRepository, private TypeOperatorProviderInterface $typeOperatorProvider, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private GroupRepository $groupRepository,
+        private TypeOperatorProviderInterface $typeOperatorProvider,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => [

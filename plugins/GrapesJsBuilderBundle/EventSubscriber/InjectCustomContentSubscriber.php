@@ -17,11 +17,16 @@ use Twig\Environment;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config, private GrapesJsBuilderModel $grapesJsBuilderModel, private Environment $twig, private RequestStack $requestStack, private RouterInterface $router)
-    {
+    public function __construct(
+        private Config $config,
+        private GrapesJsBuilderModel $grapesJsBuilderModel,
+        private Environment $twig,
+        private RequestStack $requestStack,
+        private RouterInterface $router
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_CONTENT => ['injectViewCustomContent', 0],
@@ -54,7 +59,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
 
             $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
             if ('POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
-                if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getClonedId()) {
+                if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getIsClone()) {
                     $grapesJsBuilder = $this->grapesJsBuilderModel->getGrapesJsFromEmailId(
                         $parameters['email']->getClonedId()
                     );

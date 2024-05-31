@@ -70,10 +70,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * View for batch action.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');
 

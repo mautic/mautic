@@ -8,6 +8,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 class WidgetFormEvent extends CommonEvent
 {
     protected $form;
+
     protected $type;
 
     /**
@@ -42,8 +43,6 @@ class WidgetFormEvent extends CommonEvent
 
     /**
      * Returns the widget edit form.
-     *
-     * @param string $form
      */
     public function getForm()
     {

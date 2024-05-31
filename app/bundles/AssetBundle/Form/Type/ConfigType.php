@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -21,7 +24,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.asset.config.form.upload.dir.tooltip',
-                    ],
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'mautic.core.value.required',
@@ -39,7 +42,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.asset.config.form.max.size.tooltip',
-                    ],
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'mautic.core.value.required',
@@ -66,9 +69,6 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'assetconfig';

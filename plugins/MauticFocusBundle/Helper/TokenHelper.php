@@ -9,10 +9,13 @@ use Symfony\Component\Routing\RouterInterface;
 
 class TokenHelper
 {
-    private $regex = '{focus=(.*?)}';
+    private string $regex = '{focus=(.*?)}';
 
-    public function __construct(protected FocusModel $model, protected RouterInterface $router, protected CorePermissions $security)
-    {
+    public function __construct(
+        protected FocusModel $model,
+        protected RouterInterface $router,
+        protected CorePermissions $security
+    ) {
     }
 
     public function findFocusTokens($content): array

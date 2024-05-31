@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -18,16 +19,35 @@ use Twig\Environment;
 
 class IntegrationHelper
 {
-    private $integrations = [];
+    /**
+     * @var array<string, mixed>
+     */
+    private array $integrations = [];
 
-    private $available = [];
+    /**
+     * @var mixed[]
+     */
+    private array $available = [];
 
-    private $byFeatureList = [];
+    /**
+     * @var array<string, mixed>
+     */
+    private array $byFeatureList = [];
 
-    private $byPlugin = [];
+    /**
+     * @var array<int, mixed>
+     */
+    private array $byPlugin = [];
 
-    public function __construct(private ContainerInterface $container, protected EntityManager $em, protected PathsHelper $pathsHelper, protected BundleHelper $bundleHelper, protected CoreParametersHelper $coreParametersHelper, protected Environment $twig, protected PluginModel $pluginModel)
-    {
+    public function __construct(
+        private ContainerInterface $container,
+        protected EntityManager $em,
+        protected PathsHelper $pathsHelper,
+        protected BundleHelper $bundleHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected Environment $twig,
+        protected PluginModel $pluginModel
+    ) {
     }
 
     /**
@@ -46,9 +66,7 @@ class IntegrationHelper
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
     {
         // Build the service classes
-        if (empty($this->available)) {
-            $this->available = [];
-
+        if ([] === $this->available) {
             // Get currently installed integrations
             $integrationSettings = $this->getIntegrationSettings();
 
@@ -56,12 +74,13 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class);
+            $integrationRepo = $this->em->getRepository(Integration::class);
             // get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
                     'hydration_mode' => 'hydrate_array',
                     'index'          => 'bundle',
+                    'result_cache'   => new ResultCacheOptions(Plugin::CACHE_NAMESPACE),
                 ]
             );
 
@@ -80,7 +99,7 @@ class IntegrationHelper
 
                     $id                  = $installedPlugins[$plugin['bundle']]['id'];
                     $this->byPlugin[$id] = [];
-                    $pluginReference     = $this->em->getReference(\Mautic\PluginBundle\Entity\Plugin::class, $id);
+                    $pluginReference     = $this->em->getReference(Plugin::class, $id);
                     $pluginNamespace     = str_replace('MauticPlugin', '', $plugin['bundle']);
 
                     foreach ($finder as $file) {
@@ -109,7 +128,7 @@ class IntegrationHelper
                             }
                         }
 
-                        /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                        /** @var Integration $settings */
                         $settings                          = $integrationSettings[$integrationName];
                         $this->available[$integrationName] = [
                             'isPlugin'    => true,
@@ -171,7 +190,7 @@ class IntegrationHelper
                             }
                         }
 
-                        /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                        /** @var Integration $settings */
                         $settings                          = $coreIntegrationSettings[$integrationName] ?? $newIntegration;
                         $this->available[$integrationName] = [
                             'isPlugin'    => false,
@@ -365,12 +384,12 @@ class IntegrationHelper
      */
     public function getIntegrationSettings()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getIntegrations();
+        return $this->em->getRepository(Integration::class)->getIntegrations();
     }
 
     public function getCoreIntegrationSettings()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getCoreIntegrations();
+        return $this->em->getRepository(Integration::class)->getCoreIntegrations();
     }
 
     /**
@@ -485,11 +504,11 @@ class IntegrationHelper
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
 
             /**
-             * @var string                                               $integration
-             * @var \Mautic\PluginBundle\Integration\AbstractIntegration $details
+             * @var string              $integration
+             * @var AbstractIntegration $details
              */
             foreach ($socialIntegrations as $integration => $details) {
-                /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                /** @var Integration $settings */
                 $settings = $details->getIntegrationSettings();
 
                 $featureSettings = $settings->getFeatureSettings();

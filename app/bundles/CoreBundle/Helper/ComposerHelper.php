@@ -16,8 +16,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class ComposerHelper
 {
-    public function __construct(private KernelInterface $kernel, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private KernelInterface $kernel,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
@@ -143,7 +145,7 @@ class ComposerHelper
             $input, [
                 '--no-interaction',
                 '--working-dir' => $this->kernel->getProjectDir(),
-        ]));
+            ]));
 
         $application = new Application();
         // We don't want our script to stop after running a Composer command

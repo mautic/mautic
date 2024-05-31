@@ -10,13 +10,15 @@ use Psr\Log\LoggerInterface;
 
 class ContactFinder
 {
-    public function __construct(private StatRepository $statRepository, private LeadRepository $leadRepository, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private StatRepository $statRepository,
+        private LeadRepository $leadRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
      * @param string $returnPathEmail
-     * @param null   $contactEmail
      *
      * @return Result
      */
@@ -36,6 +38,9 @@ class ContactFinder
         return $this->findByAddress($contactEmail);
     }
 
+    /**
+     * @param string $hash
+     */
     public function findByHash($hash): Result
     {
         $result = new Result();

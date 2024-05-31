@@ -11,8 +11,10 @@ class DateDefault implements FilterDecoratorInterface
     /**
      * @param string $originalValue
      */
-    public function __construct(private DateDecorator $dateDecorator, private $originalValue)
-    {
+    public function __construct(
+        private DateDecorator $dateDecorator,
+        private $originalValue
+    ) {
     }
 
     /**
@@ -23,10 +25,7 @@ class DateDefault implements FilterDecoratorInterface
         return $this->dateDecorator->getField($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return $this->dateDecorator->getTable($contactSegmentFilterCrate);
     }
@@ -65,10 +64,7 @@ class DateDefault implements FilterDecoratorInterface
         };
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
     }

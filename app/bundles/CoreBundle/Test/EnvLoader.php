@@ -13,7 +13,7 @@ final class EnvLoader
      */
     public static function load(): void
     {
-        $reflection     = new \ReflectionClass(\Symfony\Component\Dotenv\Dotenv::class);
+        $reflection     = new \ReflectionClass(Dotenv::class);
         $vendorRootPath = dirname($reflection->getFileName(), 4);
 
         (new Dotenv())->loadEnv($vendorRootPath.'/.env');

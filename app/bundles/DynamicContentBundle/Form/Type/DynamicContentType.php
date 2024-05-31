@@ -33,6 +33,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<DynamicContent>
+ */
 class DynamicContentType extends AbstractType
 {
     private $fieldChoices;
@@ -66,13 +69,20 @@ class DynamicContentType extends AbstractType
      */
     private array $deviceOsChoices;
 
-    private $tagChoices = [];
+    /**
+     * @var array<string, string>
+     */
+    private array $tagChoices = [];
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function __construct(private EntityManager $em, ListModel $listModel, private TranslatorInterface $translator, private LeadModel $leadModel)
-    {
+    public function __construct(
+        private EntityManager $em,
+        ListModel $listModel,
+        private TranslatorInterface $translator,
+        private LeadModel $leadModel
+    ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
@@ -123,19 +133,19 @@ class DynamicContentType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'description',
-                TextareaType::class,
-                [
-                    'label'      => 'mautic.dynamicContent.description',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
-                    'required'   => false,
-                ]
-            )
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.dynamicContent.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
 
         $builder->add(
             'isCampaignBased',
@@ -196,7 +206,7 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\DynamicContentBundle\Entity\DynamicContent::class);
+        $transformer = new IdToEntityModelTransformer($this->em, DynamicContent::class);
         $builder->add(
             $builder->create(
                 'translationParent',
@@ -300,9 +310,6 @@ class DynamicContentType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['fields']       = $this->fieldChoices;
@@ -319,8 +326,21 @@ class DynamicContentType extends AbstractType
     private function filterFieldChoices(): void
     {
         unset($this->fieldChoices['company']);
-        $customFields               = $this->leadModel->getRepository()->getCustomFieldList('lead');
-        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], fn ($key): bool => in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true), ARRAY_FILTER_USE_KEY);
+
+        $customFields = $this->leadModel->getRepository()->getCustomFieldList('lead');
+
+        $this->fieldChoices['lead'] = array_filter(
+            $this->fieldChoices['lead'],
+            fn ($key): bool => in_array(
+                $key,
+                array_merge(
+                    array_keys($customFields[0]),
+                    ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags', 'leadlist']
+                ),
+                true
+            ),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     /**

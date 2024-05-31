@@ -11,22 +11,23 @@ use Psr\Log\LoggerInterface;
 
 class DeviceTracker
 {
-    /**
-     * @var bool
-     */
-    private $deviceWasChanged = false;
+    private bool $deviceWasChanged = false;
 
     /**
      * @var LeadDevice[]
      */
-    private $trackedDevice = [];
+    private array $trackedDevice = [];
 
-    public function __construct(private DeviceCreatorServiceInterface $deviceCreatorService, private DeviceDetectorFactoryInterface $deviceDetectorFactory, private DeviceTrackingServiceInterface $deviceTrackingService, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
+     * @return LeadDevice|null
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {
@@ -44,11 +45,9 @@ class DeviceTracker
 
         if ( // Do not create a new device if
             // ... the device is new
-            $trackedDevice && $trackedDevice->getId()
-            && // ... the device is the same
-            $trackedDevice->getSignature() === $currentDevice->getSignature()
-            && // ... the contact given is the same as the owner of the device tracked
-            $trackedDevice->getLead()->getId() === $trackedContact->getId()
+            $trackedDevice && $trackedDevice->getId() // ... the device is the same
+            && $trackedDevice->getSignature() === $currentDevice->getSignature() // ... the contact given is the same as the owner of the device tracked
+            && $trackedDevice->getLead()->getId() === $trackedContact->getId()
         ) {
             return $trackedDevice;
         }
@@ -62,7 +61,7 @@ class DeviceTracker
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadDevice|null
+     * @return LeadDevice|null
      */
     public function getTrackedDevice()
     {
@@ -75,10 +74,7 @@ class DeviceTracker
         return $trackedDevice;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasDeviceChanged()
+    public function wasDeviceChanged(): bool
     {
         return $this->deviceWasChanged;
     }

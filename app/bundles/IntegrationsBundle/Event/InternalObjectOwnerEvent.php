@@ -11,16 +11,16 @@ class InternalObjectOwnerEvent extends Event
 {
     /**
      * Format: [object_id => owner_id].
-     *
-     * @var array
      */
-    private $owners = [];
+    private array $owners = [];
 
     /**
      * @param int[] $objectIds
      */
-    public function __construct(private ObjectInterface $object, private array $objectIds)
-    {
+    public function __construct(
+        private ObjectInterface $object,
+        private array $objectIds
+    ) {
     }
 
     public function getObject(): ObjectInterface

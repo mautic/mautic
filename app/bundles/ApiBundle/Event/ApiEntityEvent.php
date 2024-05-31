@@ -10,8 +10,11 @@ class ApiEntityEvent extends CommonEvent
     /**
      * @param object $entity
      */
-    public function __construct(protected $entity, protected array $entityRequestParameters, private Request $request)
-    {
+    public function __construct(
+        protected $entity,
+        protected array $entityRequestParameters,
+        private Request $request
+    ) {
     }
 
     /**

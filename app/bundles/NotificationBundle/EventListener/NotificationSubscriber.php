@@ -16,14 +16,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class NotificationSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private AuditLogModel $auditLogModel, private TrackableModel $trackableModel, private PageTokenHelper $pageTokenHelper, private AssetTokenHelper $assetTokenHelper)
-    {
+    public function __construct(
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             NotificationEvents::NOTIFICATION_POST_SAVE   => ['onPostSave', 0],

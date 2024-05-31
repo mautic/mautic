@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
+use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -41,11 +42,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private Campaign $campaign;
-
-            public function __construct(Campaign $campaign)
-            {
-                $this->campaign = $campaign;
+            public function __construct(
+                private Campaign $campaign
+            ) {
             }
 
             public function getEntities(array $args = [])
@@ -100,11 +99,19 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
         };
+
+        $eventScheduler = new class() extends EventScheduler {
+            public function __construct()
+            {
+            }
+        };
+
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $eventRepository,
             $eventExecutioner,
             $translator,
-            $leadRepository
+            $leadRepository,
+            $eventScheduler
         );
 
         $event->setProperties(['jumpToEvent' => 123]);
@@ -150,11 +157,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
         $leadLog->setLead($contact);
 
         $eventRepository = new class($campaign) extends EventRepository {
-            private Campaign $campaign;
-
-            public function __construct(Campaign $campaign)
-            {
-                $this->campaign = $campaign;
+            public function __construct(
+                private Campaign $campaign
+            ) {
             }
 
             public function getEntities(array $args = [])
@@ -219,11 +224,32 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 Assert::assertSame(111, $campaignId);
             }
         };
+
+        $eventScheduler = new class() extends EventScheduler {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @return \DateTime
+             */
+            public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null): \DateTimeInterface
+            {
+                return new \DateTime();
+            }
+
+            public function shouldScheduleEvent(Event $event, \DateTimeInterface $executionDate, \DateTimeInterface $now): bool
+            {
+                return false;
+            }
+        };
+
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $eventRepository,
             $eventExecutioner,
             $translator,
-            $leadRepository
+            $leadRepository,
+            $eventScheduler
         );
 
         $event->setProperties(['jumpToEvent' => 123]);

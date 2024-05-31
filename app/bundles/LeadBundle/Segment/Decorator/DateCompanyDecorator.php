@@ -7,8 +7,9 @@ use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilde
 
 class DateCompanyDecorator implements FilterDecoratorInterface
 {
-    public function __construct(private FilterDecoratorInterface $dateDecorator)
-    {
+    public function __construct(
+        private FilterDecoratorInterface $dateDecorator
+    ) {
     }
 
     /**
@@ -53,10 +54,7 @@ class DateCompanyDecorator implements FilterDecoratorInterface
         return $this->dateDecorator->getParameterValue($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return ComplexRelationValueFilterQueryBuilder::getServiceId();
     }

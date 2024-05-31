@@ -21,15 +21,16 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Report>
+ */
 class ReportType extends AbstractType
 {
-    public function __construct(private ReportModel $reportModel)
-    {
+    public function __construct(
+        private ReportModel $reportModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -59,7 +60,9 @@ class ReportType extends AbstractType
                 ]
             );
 
-            $builder->add('isPublished', YesNoButtonGroupType::class);
+            $builder->add('isPublished', YesNoButtonGroupType::class, [
+                'label' => 'mautic.core.form.available',
+            ]);
 
             $data = $options['data']->getSystem();
             $builder->add(
@@ -259,7 +262,7 @@ class ReportType extends AbstractType
                             'mautic.core.form.yes'     => 1,
                             'mautic.core.filter.clear' => 2,
                         ],
-                        ]
+                    ]
                 );
 
                 $graphList = $this->reportModel->getGraphList($source);
@@ -387,7 +390,8 @@ class ReportType extends AbstractType
                     $data    = $event->getData();
                     $graphs  = $data['graphs'] ?? [];
                     $columns = $data['columns'] ?? [];
-                    $formModifier($event->getForm(), $data['source'], $columns, $graphs, $data);
+                    $source  = $data['source'] ?? null;
+                    $formModifier($event->getForm(), $source, $columns, $graphs, $data);
                 }
             );
 

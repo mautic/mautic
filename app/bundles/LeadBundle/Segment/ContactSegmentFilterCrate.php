@@ -5,7 +5,9 @@ namespace Mautic\LeadBundle\Segment;
 class ContactSegmentFilterCrate
 {
     public const CONTACT_OBJECT   = 'lead';
+
     public const COMPANY_OBJECT   = 'company';
+
     public const BEHAVIORS_OBJECT = 'behaviors';
 
     /**
@@ -42,16 +44,22 @@ class ContactSegmentFilterCrate
 
     private $nullValue;
 
+    /**
+     * @var array|mixed[]
+     */
+    private array $mergedProperty;
+
     public function __construct(array $filter)
     {
-        $bcFilter          = $filter['filter'] ?? null;
-        $this->glue        = $filter['glue'] ?? null;
-        $this->field       = $filter['field'] ?? null;
-        $this->object      = $filter['object'] ?? self::CONTACT_OBJECT;
-        $this->type        = $filter['type'] ?? null;
-        $this->filter      = $filter['properties']['filter'] ?? $bcFilter;
-        $this->nullValue   = $filter['null_value'] ?? null;
-        $this->sourceArray = $filter;
+        $bcFilter               = $filter['filter'] ?? null;
+        $this->glue             = $filter['glue'] ?? null;
+        $this->field            = $filter['field'] ?? null;
+        $this->object           = $filter['object'] ?? self::CONTACT_OBJECT;
+        $this->type             = $filter['type'] ?? null;
+        $this->filter           = $filter['properties']['filter'] ?? $bcFilter;
+        $this->nullValue        = $filter['null_value'] ?? null;
+        $this->mergedProperty   = $filter['merged_property'] ?? [];
+        $this->sourceArray      = $filter;
 
         $this->setOperator($filter);
     }
@@ -183,5 +191,21 @@ class ContactSegmentFilterCrate
     public function getObject(): ?string
     {
         return $this->object;
+    }
+
+    /**
+     * @return array|mixed[]
+     */
+    public function getMergedProperty(): array
+    {
+        return $this->mergedProperty;
+    }
+
+    /**
+     * @param array|mixed[] $mergedProperty
+     */
+    public function setMergedProperty(array $mergedProperty): void
+    {
+        $this->mergedProperty = $mergedProperty;
     }
 }

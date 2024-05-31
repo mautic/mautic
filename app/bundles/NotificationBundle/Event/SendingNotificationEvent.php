@@ -6,6 +6,9 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 
+/**
+ * @deprecated since Mautic 5.0, to be removed in 6.0 with no replacement.
+ */
 class SendingNotificationEvent extends CommonEvent
 {
     /**
@@ -13,8 +16,10 @@ class SendingNotificationEvent extends CommonEvent
      */
     protected $entity;
 
-    public function __construct(Notification $notification, protected Lead $lead)
-    {
+    public function __construct(
+        Notification $notification,
+        protected Lead $lead
+    ) {
         $this->entity = $notification;
     }
 

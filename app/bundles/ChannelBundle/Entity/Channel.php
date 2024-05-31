@@ -63,7 +63,7 @@ class Channel extends CommonEntity
                 ->columnName('is_enabled')
                 ->build();
 
-        $builder->createManyToOne('message', Message::class, 'channels')
+        $builder->createManyToOne('message', Message::class)
                 ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
                 ->inversedBy('channels')
                 ->build();

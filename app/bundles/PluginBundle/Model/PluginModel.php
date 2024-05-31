@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PluginBundle\Entity\Plugin;
 use Psr\Log\LoggerInterface;
@@ -21,19 +22,28 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PluginModel extends FormModel
 {
-    public function __construct(protected FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, private BundleHelper $bundleHelper, EntityManager $em, CorePermissions $security, EventDispatcherInterface $dispatcher, UrlGeneratorInterface $router, Translator $translator, UserHelper $userHelper, LoggerInterface $mauticLogger)
-    {
+    public function __construct(
+        protected FieldModel $leadFieldModel,
+        private FieldList $fieldList,
+        CoreParametersHelper $coreParametersHelper,
+        private BundleHelper $bundleHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger
+    ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\PluginBundle\Entity\PluginRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Plugin::class);
+        return $this->em->getRepository(Plugin::class);
     }
 
     public function getIntegrationEntityRepository()
@@ -41,9 +51,6 @@ class PluginModel extends FormModel
         return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase(): string
     {
         return 'plugin:plugins';
@@ -51,18 +58,22 @@ class PluginModel extends FormModel
 
     /**
      * Get lead fields used in selects/matching.
+     *
+     * @return mixed[]
      */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
-        return $this->leadFieldModel->getFieldList();
+        return $this->fieldList->getFieldList();
     }
 
     /**
      * Get Company fields.
+     *
+     * @return mixed[]
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
-        return $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+        return $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 
     public function saveFeatureSettings($entity): void
@@ -123,7 +134,7 @@ class PluginModel extends FormModel
      */
     public function getInstalledPluginTables(array $pluginsMetadata): array
     {
-        $currentSchema          = $this->em->getConnection()->getSchemaManager()->createSchema();
+        $currentSchema          = $this->em->getConnection()->createSchemaManager()->introspectSchema();
         $installedPluginsTables = [];
 
         foreach ($pluginsMetadata as $bundleName => $pluginMetadata) {

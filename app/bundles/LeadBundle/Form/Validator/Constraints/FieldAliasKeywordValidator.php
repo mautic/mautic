@@ -22,8 +22,13 @@ class FieldAliasKeywordValidator extends ConstraintValidator
         'company_id',
     ];
 
-    public function __construct(private ListModel $listModel, private FieldAliasHelper $aliasHelper, private EntityManager $em, private TranslatorInterface $translator, private ContactSegmentFilterDictionary $contactSegmentFilterDictionary)
-    {
+    public function __construct(
+        private ListModel $listModel,
+        private FieldAliasHelper $aliasHelper,
+        private EntityManager $em,
+        private TranslatorInterface $translator,
+        private ContactSegmentFilterDictionary $contactSegmentFilterDictionary
+    ) {
     }
 
     /**

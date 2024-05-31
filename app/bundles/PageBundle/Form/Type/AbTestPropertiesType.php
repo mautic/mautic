@@ -6,11 +6,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class AbTestPropertiesType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $options = ['label' => false];
@@ -20,9 +20,6 @@ class AbTestPropertiesType extends AbstractType
         $builder->add('properties', $options['formType'], $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined([
@@ -31,9 +28,6 @@ class AbTestPropertiesType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'page_abtest_settings';

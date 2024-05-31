@@ -8,12 +8,9 @@ use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
 class StatCollection
 {
-    private \Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO $stats;
+    private StatsDAO $stats;
 
-    /**
-     * @var Calculator
-     */
-    private $calculator;
+    private ?Calculator $calculator = null;
 
     public function __construct()
     {
