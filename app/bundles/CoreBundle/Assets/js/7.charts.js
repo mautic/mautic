@@ -74,6 +74,15 @@ Mautic.renderLineChart = function(canvas) {
                 xAxes: [{
                     gridLines: {
                         display: false
+                    },
+                    ticks: {
+                        maxRotation: 0,
+                        callback: function(value, index, values) {
+                            if (index === 0 || index === values.length - 1) {
+                                return value;
+                            }
+                            return '';
+                        }
                     }
                 }],
                 yAxes: [{

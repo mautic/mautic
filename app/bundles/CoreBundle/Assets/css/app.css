@@ -3596,17 +3596,6 @@ ul.line-legend li {
   position: static;
   padding: 0;
 }
-.box-layout > [class*=" col-"].height-auto:before,
-.box-layout > [class^="col-"].height-auto:before {
-  content: "";
-  position: absolute;
-  width: inherit;
-  top: 60px;
-  bottom: 0;
-  z-index: -1;
-  background-color: inherit;
-  border: inherit;
-}
 .box-layout > [class*=" col-"] > .panel-body,
 .box-layout > [class^="col-"] > .panel-body {
   white-space: nowrap;
@@ -5516,7 +5505,7 @@ a.inline-token .text-muted {
   margin-bottom: 10px;
 }
 .map-options h5 {
-  color: #47535f;
+  color: #262d33;
   font-size: 13px;
 }
 .map-options__cointainer {
