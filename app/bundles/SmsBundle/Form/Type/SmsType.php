@@ -64,8 +64,10 @@ class SmsType extends AbstractType
                 'label'      => 'mautic.sms.form.message',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => 6,
+                    'class'                => 'form-control',
+                    'data-token-activator' => '{',
+                    'data-token-visual'    => 'false',
+                    'rows'                 => 6,
                 ],
             ]
         );
