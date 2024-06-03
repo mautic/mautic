@@ -1,5 +1,5 @@
 {% if field.defaultValue is defined and field.defaultValue is not empty %}
-
+{% set hiddenField = field|merge({inputAttributes: "value='#{ field.defaultValue }'"}) %}
 {#
     This field relies on the `hidden.html.twig` implementation.
 
@@ -9,7 +9,7 @@
     This eliminates the need to copy twig templates into themes that just rely on one base template file.
 #}
     {{- include([theme|default('') ~ 'hidden.html.twig', '@MauticForm/Field/hidden.html.twig'], {
-            'field': field,
+            'field': hiddenField,
             'fields': fields|default([]),
             'inForm': inForm|default(false),
             'id': id,
@@ -17,8 +17,6 @@
             'type': 'checkbox',
             'formName': formName|default(''),
             'mappedFields': mappedFields|default([]),
-    })|replace({
-            '<input': '<input value="' ~ field.defaultValue ~ '"',
     }) -}}
 {% endif %}
 {#
