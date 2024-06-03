@@ -128,6 +128,7 @@
                   <div class="box-layout">
                       <div class="col-xs-10">
                           <div>{{ email.subject }}</div>
+                          <div class="text-muted">{{ emailPreview }}</div>
                           {% if email.isVariant(true) %}
                             <div class="small">
                               <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}) }}" data-toggle="ajax">
