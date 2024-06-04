@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\IntegrationsBundle\Event\ConfigAuthUrlEvent;
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\IntegrationsBundle\Event\FormLoadEvent;
+use Mautic\IntegrationsBundle\Event\KeysSaveEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Form\Type\IntegrationConfigType;
 use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
@@ -105,11 +106,16 @@ class ConfigController extends AbstractFormController
         }
 
         // Get the fields before the form binds partial data due to pagination
-        $settings      = $this->integrationConfiguration->getFeatureSettings();
-        $fieldMappings = $settings['sync']['fieldMappings'] ?? [];
+        $settings          = $this->integrationConfiguration->getFeatureSettings();
+        $fieldMappings     = $settings['sync']['fieldMappings'] ?? [];
+        $oldApiKeys        = $this->integrationConfiguration->getApiKeys();
 
         // Submit the form
         $form->handleRequest($request);
+
+        $configEvent = new KeysSaveEvent($this->integrationConfiguration, $oldApiKeys);
+        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_API_KEYS_BEFORE_SAVE);
+
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
@@ -182,16 +188,16 @@ class ConfigController extends AbstractFormController
         $integrationObject = $this->integrationObject;
         $formView          = $form->createView();
 
-        $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface ||
-            $integrationObject instanceof ConfigFormSyncInterface ||
-            $integrationObject instanceof ConfigFormFeatureSettingsInterface;
+        $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface
+            || $integrationObject instanceof ConfigFormSyncInterface
+            || $integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
         $hasFeatureErrors = (
-            $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
-            $formExtension->containsErrors($formView['featureSettings']['integration'])
+            $integrationObject instanceof ConfigFormFeatureSettingsInterface
+            && $formExtension->containsErrors($formView['featureSettings']['integration'])
         ) || (
-            isset($formView['featureSettings']['sync']['integration']) &&
-            $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
+            isset($formView['featureSettings']['sync']['integration'])
+            && $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
         );
 
         $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);

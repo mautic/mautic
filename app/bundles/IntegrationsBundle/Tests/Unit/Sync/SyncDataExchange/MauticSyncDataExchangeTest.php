@@ -12,6 +12,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
+use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
@@ -27,34 +28,39 @@ class MauticSyncDataExchangeTest extends TestCase
     /**
      * @var MockObject|FieldChangeRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
+    private MockObject $fieldChangeRepository;
 
     /**
      * @var MockObject|FieldHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    private MockObject $fieldHelper;
 
     /**
      * @var MockObject|MappingHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
+    private MockObject $mappingHelper;
 
     /**
      * @var MockObject|FullObjectReportBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fullObjectReportBuilder;
+    private MockObject $fullObjectReportBuilder;
 
     /**
      * @var MockObject|PartialObjectReportBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $partialObjectReportBuilder;
+    private MockObject $partialObjectReportBuilder;
 
     /**
      * @var MockObject|OrderExecutioner
      */
-    private \PHPUnit\Framework\MockObject\MockObject $orderExecutioner;
+    private MockObject $orderExecutioner;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange $mauticSyncDataExchange;
+    private MauticSyncDataExchange $mauticSyncDataExchange;
+
+    /**
+     * @var SyncDateHelper&MockObject
+     */
+    private MockObject $syncDateHelper;
 
     protected function setUp(): void
     {
@@ -64,6 +70,7 @@ class MauticSyncDataExchangeTest extends TestCase
         $this->fullObjectReportBuilder    = $this->createMock(FullObjectReportBuilder::class);
         $this->partialObjectReportBuilder = $this->createMock(PartialObjectReportBuilder::class);
         $this->orderExecutioner           = $this->createMock(OrderExecutioner::class);
+        $this->syncDateHelper             = $this->createMock(SyncDateHelper::class);
 
         $this->mauticSyncDataExchange = new MauticSyncDataExchange(
             $this->fieldChangeRepository,
@@ -71,7 +78,8 @@ class MauticSyncDataExchangeTest extends TestCase
             $this->mappingHelper,
             $this->fullObjectReportBuilder,
             $this->partialObjectReportBuilder,
-            $this->orderExecutioner
+            $this->orderExecutioner,
+            $this->syncDateHelper
         );
     }
 

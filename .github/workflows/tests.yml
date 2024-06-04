@@ -81,7 +81,7 @@ jobs:
 
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v2"
+      uses: "ramsey/composer-install@v3"
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
@@ -96,11 +96,12 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Save test results for future steps
       if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
@@ -184,7 +185,7 @@ jobs:
 
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v2"
+      uses: "ramsey/composer-install@v3"
       env:
         NPM_CONFIG_CACHE: ./var/cache/js/npm
 

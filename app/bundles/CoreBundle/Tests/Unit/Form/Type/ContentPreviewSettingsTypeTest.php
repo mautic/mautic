@@ -296,19 +296,19 @@ class ContentPreviewSettingsTypeTest extends TestCase
     {
         return [
             'contact',
-                LookupType::class,
-                [
-                    'attr' => [
-                        'class'                   => 'form-control',
-                        'data-callback'           => 'activateContactLookupField',
-                        'data-toggle'             => 'field-lookup',
-                        'data-lookup-callback'    => 'updateContactLookupListFilter',
-                        'data-chosen-lookup'      => 'lead:contactList',
-                        'placeholder'             => 'startTyping',
-                        'data-no-record-message'  => 'nomatches',
-                    ],
+            LookupType::class,
+            [
+                'attr' => [
+                    'class'                   => 'form-control',
+                    'data-callback'           => 'activateContactLookupField',
+                    'data-toggle'             => 'field-lookup',
+                    'data-lookup-callback'    => 'updateContactLookupListFilter',
+                    'data-chosen-lookup'      => 'lead:contactList',
+                    'placeholder'             => 'startTyping',
+                    'data-no-record-message'  => 'nomatches',
                 ],
-            ];
+            ],
+        ];
     }
 
     private function createEmail(): Email

@@ -11,6 +11,10 @@ return [
                 'path'       => '/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailGraphStatsController::viewAction',
             ],
+            'mautic_email_map_stats' => [
+                'path'       => '/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailMapStatsController::viewAction',
+            ],
             'mautic_email_action' => [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::executeAction',
@@ -25,7 +29,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'emails',
                 'path'            => '/emails',
-                'controller'      => \Mautic\EmailBundle\Controller\Api\EmailApiController::class,
+                'controller'      => Mautic\EmailBundle\Controller\Api\EmailApiController::class,
             ],
             'mautic_api_sendemail' => [
                 'path'       => '/emails/{id}/send',
@@ -99,11 +103,11 @@ return [
     'services' => [
         'other' => [
             'mautic.di.env_processor.mailerdsn' => [
-                'class' => \Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class,
+                'class' => Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
             'mautic.message.search.contact' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
+                'class'     => Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
                 'arguments' => [
                     'mautic.email.repository.stat',
                     'mautic.lead.repository.lead',
@@ -111,7 +115,7 @@ return [
                 ],
             ],
             'mautic.message.processor.unsubscribe' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
+                'class'     => Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
                 'arguments' => [
                     'mailer.default_transport',
                     'mautic.message.search.contact',
@@ -121,7 +125,7 @@ return [
                 ],
             ],
             'mautic.message.processor.feedbackloop' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
+                'class'     => Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
                 'arguments' => [
                     'mautic.message.search.contact',
                     'translator',
@@ -130,14 +134,14 @@ return [
                 ],
             ],
             'mautic.validator.email' => [
-                'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
+                'class'     => Mautic\EmailBundle\Helper\EmailValidator::class,
                 'arguments' => [
                     'translator',
                     'event_dispatcher',
                 ],
             ],
             'mautic.email.fetcher' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
+                'class'     => Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
                 'arguments' => [
                     'mautic.helper.mailbox',
                     'event_dispatcher',
@@ -145,16 +149,16 @@ return [
                 ],
             ],
             'mautic.email.helper.stats_collection' => [
-                'class'     => \Mautic\EmailBundle\Helper\StatsCollectionHelper::class,
+                'class'     => Mautic\EmailBundle\Helper\StatsCollectionHelper::class,
                 'arguments' => [
                     'mautic.email.stats.helper_container',
                 ],
             ],
             'mautic.email.stats.helper_container' => [
-                'class' => \Mautic\EmailBundle\Stats\StatHelperContainer::class,
+                'class' => Mautic\EmailBundle\Stats\StatHelperContainer::class,
             ],
             'mautic.email.stats.helper_bounced' => [
-                'class'     => \Mautic\EmailBundle\Stats\Helper\BouncedHelper::class,
+                'class'     => Mautic\EmailBundle\Stats\Helper\BouncedHelper::class,
                 'arguments' => [
                     'mautic.stats.aggregate.collector',
                     'doctrine.dbal.default_connection',
@@ -164,7 +168,7 @@ return [
                 'tag' => 'mautic.email_stat_helper',
             ],
             'mautic.email.stats.helper_clicked' => [
-                'class'     => \Mautic\EmailBundle\Stats\Helper\ClickedHelper::class,
+                'class'     => Mautic\EmailBundle\Stats\Helper\ClickedHelper::class,
                 'arguments' => [
                     'mautic.stats.aggregate.collector',
                     'doctrine.dbal.default_connection',
@@ -174,7 +178,7 @@ return [
                 'tag' => 'mautic.email_stat_helper',
             ],
             'mautic.email.stats.helper_failed' => [
-                'class'     => \Mautic\EmailBundle\Stats\Helper\FailedHelper::class,
+                'class'     => Mautic\EmailBundle\Stats\Helper\FailedHelper::class,
                 'arguments' => [
                     'mautic.stats.aggregate.collector',
                     'doctrine.dbal.default_connection',
@@ -184,7 +188,7 @@ return [
                 'tag' => 'mautic.email_stat_helper',
             ],
             'mautic.email.stats.helper_opened' => [
-                'class'     => \Mautic\EmailBundle\Stats\Helper\OpenedHelper::class,
+                'class'     => Mautic\EmailBundle\Stats\Helper\OpenedHelper::class,
                 'arguments' => [
                     'mautic.stats.aggregate.collector',
                     'doctrine.dbal.default_connection',
@@ -194,7 +198,7 @@ return [
                 'tag' => 'mautic.email_stat_helper',
             ],
             'mautic.email.stats.helper_sent' => [
-                'class'     => \Mautic\EmailBundle\Stats\Helper\SentHelper::class,
+                'class'     => Mautic\EmailBundle\Stats\Helper\SentHelper::class,
                 'arguments' => [
                     'mautic.stats.aggregate.collector',
                     'doctrine.dbal.default_connection',
@@ -204,7 +208,7 @@ return [
                 'tag' => 'mautic.email_stat_helper',
             ],
             'mautic.email.stats.helper_unsubscribed' => [
-                'class'     => \Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class,
+                'class'     => Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class,
                 'arguments' => [
                     'mautic.stats.aggregate.collector',
                     'doctrine.dbal.default_connection',
@@ -216,14 +220,14 @@ return [
         ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
-                'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
+                'class'     => Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
                 'arguments' => [
                     'mautic.validator.email',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
             'mautic.email.validator.email_or_token_list_validator' => [
-                'class'     => \Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
+                'class'     => Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
                 'arguments' => [
                     'mautic.validator.email',
                     'mautic.lead.validator.custom_field',
@@ -234,7 +238,7 @@ return [
         'fixtures' => [
             'mautic.email.fixture.email' => [
                 'class'     => Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.email.model.email'],
             ],
         ],
@@ -306,6 +310,6 @@ return [
         'disable_trackable_urls'                                            => false,
         'theme_email_default'                                               => 'blank',
         'mailer_memory_msg_limit'                                           => 100,
-        \Mautic\EmailBundle\Form\Type\ConfigType::MINIFY_EMAIL_HTML         => false,
+        Mautic\EmailBundle\Form\Type\ConfigType::MINIFY_EMAIL_HTML          => false,
     ],
 ];

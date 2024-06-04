@@ -10,7 +10,7 @@
 
 {% block actions %}
   {%- set buttons = [] -%}
-  {% if data is not empty or graphs is not empty %}
+  {% if (data is not empty or graphs is not empty) and enableExportPermission is not empty %}
       {%- set buttons = buttons|merge([{
           'attr': {
               'target': '_new',
@@ -19,7 +19,7 @@
               'href': path('mautic_report_export', {'objectId': report.id, 'format': 'html'}),
           },
           'btnText': 'mautic.form.result.export.html'|trans,
-          'iconClass': 'fa fa-file-code-o',
+          'iconClass': 'ri-file-code-line',
       }]) -%}
 
       {% if data is not empty %}

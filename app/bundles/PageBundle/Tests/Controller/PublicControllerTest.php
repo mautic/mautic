@@ -47,61 +47,61 @@ use Symfony\Component\Routing\RouterInterface;
 class PublicControllerTest extends MauticMysqlTestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Container
+     * @var MockObject|Container
      */
-    private \PHPUnit\Framework\MockObject\MockObject $internalContainer;
+    private MockObject $internalContainer;
 
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
     /**
      * @var ModelFactory<object>&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $modelFactory;
+    private MockObject $modelFactory;
 
     /**
      * @var RedirectModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $redirectModel;
+    private MockObject $redirectModel;
 
     /**
      * @var Redirect
      */
-    private \PHPUnit\Framework\MockObject\MockObject $redirect;
+    private MockObject $redirect;
 
-    private \Symfony\Component\HttpFoundation\Request $request;
+    private Request $request;
 
     /**
      * @var IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var IpAddress
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipAddress;
+    private MockObject $ipAddress;
 
     /**
      * @var LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var PageModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pageModel;
+    private MockObject $pageModel;
 
     /**
      * @var PrimaryCompanyHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $primaryCompanyHelper;
+    private MockObject $primaryCompanyHelper;
 
     /**
      * @var ContactRequestHelper&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactRequestHelper;
+    private MockObject $contactRequestHelper;
 
     protected function setUp(): void
     {
