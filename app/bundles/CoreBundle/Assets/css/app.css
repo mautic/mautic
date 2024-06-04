@@ -5847,10 +5847,8 @@ ul.media-list.media-list-feed div.media-object {
 }
 .characters-count {
   z-index: 100;
-  top: 20px;
   float: right;
   position: relative;
-  right: 10px;
 }
 .ui-sortable-handle {
   cursor: grab;
