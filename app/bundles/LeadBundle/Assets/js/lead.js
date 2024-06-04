@@ -328,23 +328,8 @@ Mautic.leadlistOnLoad = function(container, response) {
             }
         });
 
-        mQuery('#' + prefix + '_filters .remove-selected').each( function (index, el) {
-            mQuery(el).on('click', function () {
-                mQuery(this).closest('.panel').animate(
-                    {'opacity': 0},
-                    'fast',
-                    function () {
-                        mQuery(this).remove();
-                        Mautic.reorderSegmentFilters();
-                    }
-                );
-
-                if (!mQuery('#' + prefix + '_filters li:not(.placeholder)').length) {
-                    mQuery('#' + prefix + '_filters li.placeholder').removeClass('hide');
-                } else {
-                    mQuery('#' + prefix + '_filters li.placeholder').addClass('hide');
-                }
-            });
+        mQuery('#' + prefix + '_filters .segment-filter').each( function (index, filter) {
+            Mautic.segmentFilter().attachEvents(mQuery(filter));
         });
 
         var bodyOverflow = {};
@@ -373,13 +358,9 @@ Mautic.leadlistOnLoad = function(container, response) {
                 // Restore original overflow
                 mQuery('body').css(bodyOverflow);
 
-                // First in the list should be an "and"
-                ui.item.find('select.glue-select').first().val('and');
-
                 Mautic.reorderSegmentFilters();
             }
         });
-
     }
 
     // segment contact filters
@@ -482,11 +463,16 @@ Mautic.reorderSegmentFilters = function() {
         prefix = parent.attr('id');
     }
 
-    mQuery('#' + prefix + '_filters .panel').each(function() {
-        Mautic.updateFilterPositioning(mQuery(this).find('select.glue-select').first());
-        mQuery(this).find('[id^="' + prefix + '_filters_"]').each(function() {
-            var id     = mQuery(this).attr('id');
-            var name   = mQuery(this).attr('name');
+    const $filters = mQuery('#' + prefix + '_filters .panel');
+
+    $filters.each(function() {
+        const $filter = mQuery(this);
+        $filter.attr('id',prefix + '_filters_'+counter);
+        Mautic.updateFilterPositioning($filter.find('select.glue-select').first());
+        $filter.find('[id^="' + prefix + '_filters_"]').each(function() {
+            const $element = mQuery(this);
+            var id     = $element.attr('id');
+            var name   = $element.attr('name');
             var suffix = id.split(/[_]+/).pop();
 
             var isProperties = id.includes("_properties_");
@@ -496,42 +482,64 @@ Mautic.reorderSegmentFilters = function() {
             }
 
             if (name) {
-                if (isProperties){
-                    var newName    = prefix + '[filters][' + counter + '][properties][' + suffix + ']';
-                    var properties = 'properties_';
-                }
-                else {
-                    var newName = prefix + '[filters][' + counter + '][' + suffix + ']';
-                    var properties = '';
-                }
-                if (name.slice(-2) === '[]') {
-                    newName += '[]';
-                }
+                if (isProperties) {
+                    const suffixIdMatch = id.match(/_properties_(.*)$/);
+                    const suffixNameMatch = name.match(/\[properties\](.*)$/);
+                    const suffixId = suffixIdMatch ? suffixIdMatch[1] : suffix;
+                    const suffixName = suffixNameMatch ? suffixNameMatch[1] : suffix;
+                    var newName = prefix + '[filters][' + counter + '][properties]' + suffixName;
+                    if (name.slice(-2) === '[]') {
+                        newName += '[]';
+                    }
 
-                mQuery(this).attr('name', newName);
-                mQuery(this).attr('id', prefix + '_filters_' + counter + '_' + properties + suffix);
+                    $element.attr('name', newName);
+                    $element.attr('id', prefix + '_filters_' + counter + '_properties_' + suffixId);
+                } else {
+                    var newName = prefix + '[filters][' + counter + '][' + suffix + ']';
+                    if (name.slice(-2) === '[]') {
+                        newName += '[]';
+                    }
+
+                    $element.attr('name', newName);
+                    $element.attr('id', prefix + '_filters_' + counter + '_' + suffix);
+                }
+            } else {
+                $element.attr('name', newName);
+                $element.attr('id', prefix + '_filters_'+counter+'_'+suffix);
             }
 
             mQuery(this).attr('name', newName);
             mQuery(this).attr('id', prefix + '_filters_'+counter+'_'+suffix);
 
             // Destroy the chosen and recreate
-            if (mQuery(this).is('select') && suffix == "filter") {
-                Mautic.destroyChosen(mQuery(this));
-                Mautic.activateChosenSelect(mQuery(this));
+            if ($element.is('select') && suffix == "filter") {
+                Mautic.destroyChosen($element);
+                Mautic.activateChosenSelect($element);
+            }
+
+            Mautic.segmentFilter().showCopyBasedOnGlue($filter);
+
+            if (mQuery(this).is(':radio') && id.includes("_dateTypeMode_")) {
+                if (mQuery(this).closest('label').hasClass('active')) {
+                    mQuery(this).click();
+                }
             }
         });
+
+        $filter.find('.panel-heading').css('width', ''); // Something is setting width. Remove it.
 
         ++counter;
     });
 
-    mQuery('#' + prefix + '_filters .panel-heading').removeClass('hide');
-    mQuery('#' + prefix + '_filters .panel-heading').first().addClass('hide');
+    const panelClass = prefix === 'leadlist' ? '.panel-glue' : '.panel-heading';
+    mQuery('#'+prefix+'_filters '+panelClass).removeClass('hide');
+    const $firstPanel = $filters.first();
+    $firstPanel.find(panelClass).addClass('hide');
+    $firstPanel.find('.copy-filter-group').removeClass('hide');
 };
 
 Mautic.convertLeadFilterInput = function(el) {
     var operatorSelect = mQuery(el);
-
     // Extract the filter number
     var regExp = /_filters_(\d+)_operator/;
     var matches = regExp.exec(operatorSelect.attr('id'));
@@ -635,9 +643,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
 
     // Create a new filter
 
-    var filterNum = parseInt(mQuery('.available-filters').data('index'));
-    mQuery('.available-filters').data('index', filterNum + 1);
-
+    var filterNum = Mautic.segmentFilter().getFilterCount();
     var prototypeStr = mQuery('.available-filters').data('prototype');
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
@@ -659,7 +665,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
 
     if (mQuery('#' + prefix + '_filters div.panel').length == 0) {
         // First filter so hide the glue footer
-        prototype.find(".panel-heading").addClass('hide');
+        prototype.find(".panel-heading .panel-glue").addClass('hide');
     }
 
     if (fieldObject == 'company') {
@@ -669,16 +675,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     }
     prototype.find(".inline-spacer").append(fieldObject);
 
-    prototype.find("a.remove-selected").on('click', function() {
-        mQuery(this).closest('.panel').animate(
-            {'opacity': 0},
-            'fast',
-            function () {
-                mQuery(this).remove();
-                Mautic.reorderSegmentFilters();
-            }
-        );
-    });
+    Mautic.segmentFilter().attachEvents(prototype);
 
     prototype.find("input[name='" + filterBase + "[field]']").val(elId);
     prototype.find("input[name='" + filterBase + "[type]']").val(fieldType);
@@ -697,7 +694,115 @@ Mautic.addLeadListFilter = function (elId, elObj) {
 
     // Reposition if applicable
     Mautic.updateFilterPositioning(mQuery('#' + filterIdBase + 'glue'));
+
+    Mautic.segmentFilter().showCopyBasedOnGlue(prototype);
 };
+
+Mautic.segmentFilter = function() {
+
+    const attachEvents = function($filter) {
+        _attachCopyEvents($filter);
+        _attachRemoveEvents($filter);
+        _attachGlueEvents($filter);
+    };
+
+    const getFilterCount = function() {
+        return mQuery('.selected-filters').children('.segment-filter').length;
+    };
+
+    const showCopyBasedOnGlue = function($filter) {
+        const $glue = $filter.find('select.glue-select');
+        const $copyButton = $filter.find('.copy-filter-group');
+        if ($glue.val() === 'and' && !_isFirstFilter($filter)) {
+            $copyButton.addClass('hide');
+        } else {
+            $copyButton.removeClass('hide');
+        }
+    };
+
+    const _attachGlueEvents = function($filter) {
+        showCopyBasedOnGlue($filter);
+        $filter.find('select.glue-select').on('change', function () {
+            showCopyBasedOnGlue($filter);
+        });
+    };
+
+    const _isFirstFilter = function($filter) {
+        return $filter.prev().length === 0;
+    }
+
+    const _attachRemoveEvents = function($filter) {
+        $filter.find('a.remove-selected').each(function (index, el) {
+            mQuery(el).on('click', function () {
+                $filter.animate(
+                    {'opacity': 0},
+                    'fast',
+                    function () {
+                        mQuery(this).remove();
+                        Mautic.reorderSegmentFilters();
+                    }
+                );
+            });
+        });
+    };
+
+    const _attachCopyEvents = function($filter) {
+        $filter.find('.copy-filter-group').on('click', function(event) {
+            event.preventDefault();
+            $copyButton = mQuery(this);
+            $filter = $copyButton.closest('.segment-filter');
+            _cloneFilter($filter);
+            let groupEnded = false;
+            $filter.nextAll().each(function(i, element) {
+                $nextFilter = mQuery(element);
+                if (!$nextFilter.hasClass('in-group')) {
+                    groupEnded = true;
+                }
+                if (groupEnded) {
+                    return;
+                }
+                _cloneFilter($nextFilter);
+            });
+        });
+    };
+
+    /**
+     * Set selected param for options otherwise they won't be cloned as selected.
+     */
+    const _setSelectedOptions = function($filter) {
+        $filter.find('select option').each(function() {
+            const $option = mQuery(this);
+            $option.attr('selected',  $option.is(':selected') ? 'selected' : null);
+        });
+    }
+
+    const _cloneFilter = function($origin) {
+        $origin.find('.properties-form .choice-wrapper select').chosen('destroy');
+        _setSelectedOptions($origin);
+        const $clone = $origin.clone(false);
+
+        if (!$origin.hasClass('in-group')) {
+            const $glueWrapper = $clone.find('.panel-glue');
+            $glueWrapper.find('select').val('or');
+            $glueWrapper.removeClass('hide');
+        }
+
+        const $filters = $origin.closest('.selected-filters');
+
+        $filters.append($clone);
+        Mautic.reorderSegmentFilters();
+        Mautic.triggerOnPropertiesFormLoadedEvent('#' + $clone.attr('id'));
+        attachEvents($clone);
+    }
+
+    return {
+        attachEvents,
+        getFilterCount,
+        showCopyBasedOnGlue,
+    };
+}
+
+
 
 Mautic.leadfieldOnLoad = function (container) {
     if (mQuery(container + ' .leadfield-list').length) {

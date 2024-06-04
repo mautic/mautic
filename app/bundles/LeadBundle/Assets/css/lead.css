@@ -20,6 +20,18 @@
     color: #7D5B71;
 }
 
+.segment-filter {
+    position: relative;
+}
+
+.segment-filter .filter-buttons {
+    position: absolute;
+    right: -1px;
+    top: -1px;
+    min-width: 100px;
+    padding-right: 0;
+}
+
 .leadlist-filter a {
     text-decoration: none;
 }
@@ -54,7 +66,12 @@
 
 
 .selected-filters .glue-select {
-    margin-top:2px;
+    margin-top:-1px;
+    margin-left:-1px;
+}
+.selected-filters .btn-group {
+    margin-top:-1px;
+    margin-right:-1px;
 }
 
 .selected-filters .panel {
