@@ -203,7 +203,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Returns a list of tokens and/or URLs that should not be converted to trackables.
      *
-     * @param mixed|null $content
+     * @param string|string[]|null $content
      */
     public function getDoNotTrackList($content): array
     {
@@ -219,11 +219,15 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Extract URLs from content and return as trackables.
      *
-     * @param mixed      $content
-     * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
-     *                                      or & for URLs tracked that include query parameters
+     * @param string|string[] $content
+     * @param string[]        $contentTokens
+     * @param ?string         $channel
+     * @param ?int            $channelId
+     * @param bool            $usingClickthrough Set to false if not using a clickthrough parameter.
+     *                                           This is to ensure that URLs are built correctly with ? or & for
+     *                                           URLs tracked that include query parameters
      *
-     * @return array{0: mixed, 1: array<int|string, Redirect|Trackable>}
+     * @return array{string|string[],Redirect[]|Trackable[]}
      */
     public function parseContentForTrackables($content, array $contentTokens = [], $channel = null, $channelId = null, $usingClickthrough = true): array
     {
