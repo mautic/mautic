@@ -428,6 +428,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'emailType',
                     'publishUp',
                     'publishDown',
+                    'publicPreview',
                     'readCount',
                     'sentCount',
                     'revision',
