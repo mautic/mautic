@@ -208,6 +208,8 @@ class PlainTextHelper
         //  and not constrain text to a fixed-width column.
 
         'base_url' => '',
+
+        'preview_length' => 119, // Maximum length of the preview text
     ];
 
     /**
@@ -243,6 +245,19 @@ class PlainTextHelper
         }
 
         return trim($this->text);
+    }
+
+    public function getPreview(): string
+    {
+        $textContent = $this->getText();
+        $preview     = trim(substr($textContent, 0, $this->options['preview_length']));
+
+        // If the text is longer than the preview length, append an ellipsis
+        if (strlen($textContent) > $this->options['preview_length']) {
+            $preview .= '...';
+        }
+
+        return $preview;
     }
 
     protected function convert()

@@ -14,7 +14,6 @@ use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -55,11 +54,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $auditLogModel;
 
     /**
-     * @var MockObject|LeadModel
-     */
-    private MockObject $leadModel;
-
-    /**
      * @var MockObject|DynamicContentHelper
      */
     private MockObject $dynamicContentHelper;
@@ -96,7 +90,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
         $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
         $this->auditLogModel             = $this->createMock(AuditLogModel::class);
-        $this->leadModel                 = $this->createMock(LeadModel::class);
+        $this->contactTracker            = $this->createMock(ContactTracker::class);
         $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
         $this->security                  = $this->createMock(CorePermissions::class);
