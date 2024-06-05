@@ -4,16 +4,8 @@ namespace Mautic\EmailBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class EmailValidationEvent.
- */
 class EmailValidationEvent extends Event
 {
-    /**
-     * @var string
-     */
-    protected $address;
-
     /**
      * @var bool
      */
@@ -25,11 +17,11 @@ class EmailValidationEvent extends Event
     protected $invalidReason;
 
     /**
-     * EmailValidationEvent constructor.
+     * @param string $address
      */
-    public function __construct($address)
-    {
-        $this->address = $address;
+    public function __construct(
+        protected $address
+    ) {
     }
 
     /**
@@ -40,7 +32,7 @@ class EmailValidationEvent extends Event
         return $this->address;
     }
 
-    public function setInvalid($reason)
+    public function setInvalid($reason): void
     {
         $this->isValid       = false;
         $this->invalidReason = $reason;

@@ -22,25 +22,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
-    /**
-     * @var ChannelActionModel
-     */
-    private $channelActionModel;
-
-    /**
-     * @var FrequencyActionModel
-     */
-    private $frequencyActionModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
     public function __construct(
-        ChannelActionModel $channelActionModel,
-        FrequencyActionModel $frequencyActionModel,
-        LeadModel $leadModel,
+        private ChannelActionModel $channelActionModel,
+        private FrequencyActionModel $frequencyActionModel,
+        private LeadModel $contactModel,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -52,25 +37,20 @@ class BatchContactController extends AbstractFormController
         RequestStack $requestStack,
         CorePermissions $security
     ) {
-        $this->channelActionModel   = $channelActionModel;
-        $this->frequencyActionModel = $frequencyActionModel;
-        $this->contactModel         = $leadModel;
         parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * Execute the batch action.
-     *
-     * @return JsonResponse
      */
-    public function setAction(Request $request)
+    public function setAction(Request $request): JsonResponse
     {
         $params = $request->get('contact_channels', []);
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $subscribedChannels = isset($params['subscribed_channels']) ? $params['subscribed_channels'] : [];
-            $preferredChannel   = isset($params['preferred_channel']) ? $params['preferred_channel'] : null;
+            $subscribedChannels = $params['subscribed_channels'] ?? [];
+            $preferredChannel   = $params['preferred_channel'] ?? null;
 
             $this->channelActionModel->update($ids, $subscribedChannels);
             $this->frequencyActionModel->update($ids, $params, $preferredChannel);
@@ -90,10 +70,8 @@ class BatchContactController extends AbstractFormController
 
     /**
      * View for batch action.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(): \Symfony\Component\HttpFoundation\Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');
 

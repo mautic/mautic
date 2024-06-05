@@ -31,15 +31,12 @@ class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected LeadModel $leadModel;
 
     /**
      * @var PointModel|null
      */
-    protected $model = null;
+    protected $model;
 
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
@@ -81,7 +78,7 @@ class PointApiController extends CommonApiController
      * @param string $operator
      * @param int    $delta
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta)
     {
@@ -102,7 +99,6 @@ class PointApiController extends CommonApiController
     /**
      * Log the lead points change.
      *
-     * @param int $leadId
      * @param int $delta
      */
     protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator)

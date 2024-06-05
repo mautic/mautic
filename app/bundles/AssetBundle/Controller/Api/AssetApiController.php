@@ -25,17 +25,26 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class AssetApiController extends CommonApiController
 {
-    private CoreParametersHelper $parametersHelper;
-
     /**
      * @var AssetModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, CoreParametersHelper $parametersHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
-    {
-        $this->parametersHelper = $parametersHelper;
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        private CoreParametersHelper $parametersHelper,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        MauticFactory $factory
+    ) {
         $assetModel = $modelFactory->getModel('asset');
         \assert($assetModel instanceof AssetModel);
 

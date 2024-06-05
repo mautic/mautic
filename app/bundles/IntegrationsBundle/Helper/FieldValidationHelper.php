@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Helper;
 
-use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
@@ -16,29 +15,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldValidationHelper
 {
-    /**
-     * @var FieldHelper
-     */
-    private $fieldHelper;
+    private ?ConfigFormSyncInterface $integrationObject = null;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ConfigFormSyncInterface|BasicInterface
-     */
-    private $integrationObject;
-
-    public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
-    {
-        $this->fieldHelper = $fieldHelper;
-        $this->translator  = $translator;
+    public function __construct(
+        private FieldHelper $fieldHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
-     * @param FormInterface<FormInterface> $form
+     * @param FormInterface<mixed> $form
      */
     public function validateRequiredFields(FormInterface $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
     {

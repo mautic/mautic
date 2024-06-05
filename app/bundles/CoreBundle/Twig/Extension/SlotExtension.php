@@ -10,14 +10,9 @@ use Twig\TwigFunction;
 
 class SlotExtension extends AbstractExtension
 {
-    /**
-     * @var SlotsHelper
-     */
-    protected $helper;
-
-    public function __construct(SlotsHelper $slotsHelper)
-    {
-        $this->helper = $slotsHelper;
+    public function __construct(
+        protected SlotsHelper $helper
+    ) {
     }
 
     /**
@@ -36,10 +31,7 @@ class SlotExtension extends AbstractExtension
         return 'slot';
     }
 
-    /**
-     * @return string|false
-     */
-    public function getSlot(string $name, string $default = '')
+    public function getSlot(string $name, string $default = ''): string|bool
     {
         ob_start();
 
@@ -50,10 +42,8 @@ class SlotExtension extends AbstractExtension
 
     /**
      * @param string|array<string, mixed> $name
-     *
-     * @return bool
      */
-    public function slotHasContent($name)
+    public function slotHasContent($name): bool
     {
         return $this->helper->hasContent($name);
     }
