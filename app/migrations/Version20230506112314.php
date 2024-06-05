@@ -20,6 +20,11 @@ final class Version20230506112314 extends PreUpAssertionMigration
     {
         $this->addSql(sprintf('CREATE INDEX %s ON %s (date_added)', $this->getIndexName(), $this->getTableName()));
     }
+    
+    public function down(Schema $schema): void
+    {
+        $this->addSql("DROP INDEX {$this->getIndexName()} ON {$this->getTableName()}");
+    }
 
     private function getTableName(): string
     {
