@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
@@ -383,6 +384,10 @@ class EmailController extends FormController
             'children' => $translationChildren,
         ];
 
+        $plainTextHelper = new PlainTextHelper();
+        $plainTextHelper->setHtml($email->getCustomHtml());
+        $emailPreview = $plainTextHelper->getPreview();
+
         return $this->delegateView(
             [
                 'returnUrl' => $this->generateUrl(
@@ -394,6 +399,7 @@ class EmailController extends FormController
                 ),
                 'viewParameters' => [
                     'email'        => $email,
+                    'emailPreview' => $emailPreview,
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
                     'isEmbedded'   => $request->get('isEmbedded') ?: false,
