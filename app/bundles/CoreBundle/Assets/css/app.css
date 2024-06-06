@@ -5878,3 +5878,36 @@ ul.media-list.media-list-feed div.media-object {
   pointer-events: none;
   background-color: #f2f2f2;
 }
+.publishstatus_pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+}
+.publishstatus_pulse:after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  -webkit-animation: circle-pulse 2s infinite;
+  animation: circle-pulse 3s infinite;
+  border-radius: 50%;
+  background-color: inherit;
+}
+@keyframes circle-pulse {
+  0% {
+    -webkit-transform: scale(0.55);
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: scale(1);
+    transform: scale(3);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: scale(0.95);
+    transform: scale(1);
+    opacity: 0;
+  }
+}

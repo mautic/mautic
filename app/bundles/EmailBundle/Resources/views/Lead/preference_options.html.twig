@@ -34,7 +34,7 @@
                     <h4>{{ leadName }}</h4>
                     <small>{{ 'mautic.lead.message.preferences.descr'|trans }}</small>
                 </div>
-                <table class="table table-striped">
+                <table class="table table-hover">
                     {% if showContactFrequency %}
                         {% for key, channel in form.lead_channels.subscribed_channels.vars.choices %}
                             {% set contactMe = leadChannels[channel.value] is defined %}
