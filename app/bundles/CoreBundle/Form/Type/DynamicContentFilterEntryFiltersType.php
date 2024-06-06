@@ -86,7 +86,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                 'label'          => false,
                 'error_bubbling' => false,
                 // @see \Mautic\LeadBundle\Controller\AjaxController::loadSegmentFilterFormAction()
-                'lists'          => $this->listModel->getChoiceFields()['lead']['leadlist']['properties']['list'],
+                'lists'          => $this->listModel->getChoiceFields()['lead']['leadlist']['properties']['list'] ?? [],
             ]
         );
     }
