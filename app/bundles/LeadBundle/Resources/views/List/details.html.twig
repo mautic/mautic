@@ -43,8 +43,8 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- page detail header -->
             <!-- segment detail collapseable toggler -->
             <div class="pr-md pl-md pt-lg pb-lg">
@@ -79,7 +79,7 @@
             </div>
         </div>
         <!--/ segment detail collapseable toggler -->
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#segment-details">
@@ -200,7 +200,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         {{ include('@MauticCore/Helper/usage.html.twig', {
             'title': 'mautic.lead.segments.usages'|trans,
             'stats': usageStats,

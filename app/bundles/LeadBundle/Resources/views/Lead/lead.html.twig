@@ -137,8 +137,8 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!--/ lead detail header -->
 
             <!-- lead detail collapseable -->
@@ -164,7 +164,7 @@
                 </ul>
 
                 <!-- start: tab-content -->
-                <div class="tab-content pa-md bg-white">
+                <div class="tab-content pa-md">
                     {% for group in groups %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
                             <div class="pr-md pl-md pb-md">
@@ -222,7 +222,7 @@
             <!--/ lead detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
@@ -373,7 +373,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
             {% if not lead.isAnonymous %}

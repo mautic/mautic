@@ -29,8 +29,8 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 bg-white height-auto">
-          <div class="bg-auto">
+      <div class="col-md-9 height-auto">
+          <div>
               <!-- monitoring detail header -->
               <div class="pr-md pl-md pt-lg pb-lg">
                   <div class="box-layout">
@@ -58,7 +58,7 @@
               <!--/  monitoring collapseable -->
           </div>
 
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- stats -->
               <div class="pa-md">
                   <div class="row">
@@ -109,7 +109,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bg-white bdr-l height-auto">
+      <div class="col-md-3 bdr-l height-auto">
           <!-- recent activity -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
       </div>

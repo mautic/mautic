@@ -23,7 +23,7 @@
     <div class="box-layout">
         <!-- left section -->
         <div class="col-md-9 height-auto">
-            <div class="bg-auto">
+            <div>
                 <!-- form detail header -->
                 <div class="pr-md pl-md pt-lg pb-lg">
                     <div class="box-layout">
@@ -50,7 +50,7 @@
             </div>
 
         <!--/ form detail collapseable toggler -->
-            <div class="bg-auto bg-dark-xs">
+            <div>
                 <!-- form detail collapseable toggler -->
                 <div class="hr-expand nm">
                         <span data-toggle="tooltip" title="{% trans %}mautic.core.details{% endtrans %}">
@@ -114,7 +114,7 @@
             </div>
         </div>
         <!-- right section -->
-        <div class="col-md-3 bg-white bdr-l height-auto">
+        <div class="col-md-3 bdr-l height-auto">
             <!-- recent activity -->
             {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
             {% block rightFormContent %}
