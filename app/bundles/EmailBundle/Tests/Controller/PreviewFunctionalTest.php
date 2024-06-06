@@ -71,33 +71,34 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $segment1 = $this->createSegment('Segment 1');
         $segment2 = $this->createSegment('Segment 2');
         $lead     = $this->createLead();
+        $email    = $this->createEmail();
+
         $this->addLeadToSegment($lead, $segment1);
-        $email = $this->createEmail();
 
         $email->setDynamicContent([
-            0 => [
-                    'tokenName' => 'Dynamic Content 1',
-                    'content'   => '<p>Default Dynamic Content</p>',
-                    'filters'   => [
-                            0 => [
-                                    'content' => '<p>Variation 1</p>',
-                                    'filters' => [
-                                            0 => [
-                                                    'glue'   => 'and',
-                                                    'field'  => 'leadlist',
-                                                    'object' => 'lead',
-                                                    'type'   => 'leadlist',
-                                                    'filter' => [
-                                                            0 => $segment1->getId(),
-                                                            1 => $segment2->getId(),
-                                                        ],
-                                                    'display'  => 'Segment Membership',
-                                                    'operator' => 'in',
-                                                ],
-                                        ],
+            [
+                'tokenName' => 'Dynamic Content 1',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => '<p>Variation 1</p>',
+                        'filters' => [
+                            [
+                                'glue'   => 'and',
+                                'field'  => 'leadlist',
+                                'object' => 'lead',
+                                'type'   => 'leadlist',
+                                'filter' => [
+                                    $segment1->getId(),
+                                    $segment2->getId(),
                                 ],
+                                'display'  => 'Segment Membership',
+                                'operator' => 'in',
+                            ],
                         ],
+                    ],
                 ],
+            ],
         ]);
         $email->setCustomHtml('{dynamiccontent="Dynamic Content 1"}');
         $this->em->persist($email);

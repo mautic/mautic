@@ -19,19 +19,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
-     * @var ListModel|MockObject
+     * @var ListModel&MockObject
      */
-    private $listModel;
+    private MockObject $listModel;
 
-    /**
-     * @var DynamicContentFilterEntryFiltersType
-     */
-    private $form;
+    private DynamicContentFilterEntryFiltersType $form;
 
     protected function setUp(): void
     {
@@ -39,8 +36,7 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->listModel  = $this->createMock(ListModel::class);
-
-        $this->form =  new DynamicContentFilterEntryFiltersType($this->translator, $this->listModel);
+        $this->form       =  new DynamicContentFilterEntryFiltersType($this->translator, $this->listModel);
     }
 
     public function testBuildForm(): void
@@ -53,12 +49,12 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
                     'glue',
                     ChoiceType::class,
                     [
-                        'label'             => false,
-                        'choices'           => [
+                        'label'   => false,
+                        'choices' => [
                             'mautic.lead.list.form.glue.and' => 'and',
                             'mautic.lead.list.form.glue.or'  => 'or',
                         ],
-                        'attr'              => [
+                        'attr' => [
                             'class'    => 'form-control not-chosen glue-select',
                             'onchange' => 'Mautic.updateFilterPositioning(this)',
                         ],

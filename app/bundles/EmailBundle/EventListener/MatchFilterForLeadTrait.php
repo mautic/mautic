@@ -199,7 +199,7 @@ trait MatchFilterForLeadTrait
      *
      * @see \Mautic\LeadBundle\EventListener\DynamicContentSubscriber::isContactSegmentRelationshipValid
      *
-     * @param string $operator empty, !empty, in, !in
+     * @param string $operator   empty, !empty, in, !in
      * @param int[]  $segmentIds
      */
     private function isContactSegmentRelationshipValid(LeadListRepository $segmentRepository, int $contactId, string $operator, array $segmentIds = null): bool
