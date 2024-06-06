@@ -153,7 +153,19 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertSame($expected, $trait->match($filter, $lead));
     }
 
-    public function testIsContactSegmentRelationshipValidEmpty(): void
+    /**
+     * @return iterable<string, string[]>
+     */
+    public function segmentMembershipFilterProvider(): iterable
+    {
+        yield 'Classic Segment Membership Filter' => ['leadlist'];
+        yield 'Static Segment Membership Filter' => ['leadlist_static'];
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testIsContactSegmentRelationshipValidEmpty(string $filterField): void
     {
         $lead['id'] = 1;
         $segmentId  = 1;
@@ -168,7 +180,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $filter = [
             0 => [
                 'display' => 'Segment Membership',
-                'field'   => 'leadlist',
+                'field'   => $filterField,
                 'filter'  => [
                     0 => $segmentId,
                 ],
@@ -180,8 +192,9 @@ class MatchFilterForLeadTraitTest extends TestCase
         ];
 
         $trait = new MatchFilterForLeadTraitTestable();
+        $trait->setRepository($segmentRepository);
 
-        $this->assertSame($expected, $trait->match($filter, $lead));
+        self::assertTrue($trait->match($filter, $lead));
     }
 
     /**
@@ -277,9 +290,6 @@ class MatchFilterForLeadTraitTest extends TestCase
         } catch (\Exception $e) {
             $this->fail($e->getMessage());
         }
-        $trait->setRepository($segmentRepository);
-
-        self::assertSame(true, $trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidNotEmpty(): void
@@ -311,7 +321,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertSame(true, $trait->match($filter, $lead));
+        self::assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidIn(): void
@@ -343,7 +353,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertSame(true, $trait->match($filter, $lead));
+        self::assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidNotIn(): void
@@ -375,7 +385,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $trait = new MatchFilterForLeadTraitTestable();
         $trait->setRepository($segmentRepository);
 
-        self::assertSame(true, $trait->match($filter, $lead));
+        self::assertTrue($trait->match($filter, $lead));
     }
 
     public function testIsContactSegmentRelationshipValidInvalidOperator(): void
@@ -413,7 +423,9 @@ class MatchFilterForLeadTraitTestable
 {
     use MatchFilterForLeadTrait;
 
-    public function setRepository($segmentRepository): void
+    private LeadListRepository $segmentRepository;
+
+    public function setRepository(LeadListRepository $segmentRepository): void
     {
         $this->segmentRepository = $segmentRepository;
     }

@@ -78,6 +78,8 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
                 ]
             );
 
+        $formModifier = function (FormEvent $event, $eventName) {};
+
         $builder->expects($this->exactly(2))
             ->method('addEventListener')
             ->withConsecutive(

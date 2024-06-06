@@ -136,7 +136,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $listLead = new ListLead();
         $listLead->setLead($lead);
         $listLead->setList($segment);
-        $listLead->setDateAdded(new DateTime());
+        $listLead->setDateAdded(new \DateTime());
         $this->em->persist($listLead);
         $this->em->flush();
 
