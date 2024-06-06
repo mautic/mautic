@@ -56,7 +56,7 @@
             <div class="collapse" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                                 {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
 
@@ -182,7 +182,7 @@
         <div class="tab-content pa-md preview-detail">
         {% if failedRows is not empty and failedRows|length > 0 %}
         <h3>{{ 'mautic.lead.import.failed.rows'|trans }}</h3>
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                       <th>{{ 'mautic.lead.import.csv.line.number'|trans }}</th>
