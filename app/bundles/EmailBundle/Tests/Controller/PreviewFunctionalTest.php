@@ -124,6 +124,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName($name);
+        $segment->setPublicName($name);
         $segment->setAlias(strtolower($name));
         $segment->isPublished(true);
         $this->em->persist($segment);
