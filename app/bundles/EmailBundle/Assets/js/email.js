@@ -746,3 +746,28 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     // Convert based on first option in list
     Mautic.convertDwcFilterInput('#' + filterIdBase + '_operator', mQuery);
 };
+
+Mautic.copySubjectToName = function(elemSubject) {
+    let elemName = mQuery("#emailform_name");
+    if (elemName.val() === "") {
+        elemName.val(elemSubject.val());
+    }
+};
+
+Mautic.loadEmailDeliveredStat = function($el) {
+    var emailId = $el.data('email-stat-delivered-for');
+    Mautic.ajaxActionRequest('email:getEmailDeliveredCount', {id: emailId}, function(response){
+        if (response.success) {
+            var delivered = response.delivered;
+            $el.html(delivered);
+        }
+    }, false, true, "GET");
+};
+
+Mautic.loadEmailUsages = function($el) {
+    var emailId = $el.data('fetch-email-usages');
+    Mautic.ajaxActionRequest('email:getEmailUsages', {id: emailId}, function(response){
+        var usagesHtml = response.usagesHtml;
+        $el.html(usagesHtml);
+    }, false, true, "GET");
+};
