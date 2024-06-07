@@ -67,7 +67,7 @@
           {% if lead is defined %}{{ 'mautic.lead.timeline.displaying_events_for_contact'|trans({'%contact%': lead.name, '%id%': lead.id}) }}{% endif %}
           (<span class="tl-new">{{ newCount }}</span> {{ 'mautic.lead.timeline.events_new'|trans }})
       </div>
-      <table class="table table-hover table-bordered" id="contact-timeline">
+      <table class="table table-hover" id="contact-timeline">
           <thead>
           <tr>
               <th class="timeline-icon">

@@ -81,7 +81,7 @@ jobs:
 
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v2"
+      uses: "ramsey/composer-install@v3"
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
@@ -185,7 +185,7 @@ jobs:
 
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v2"
+      uses: "ramsey/composer-install@v3"
       env:
         NPM_CONFIG_CACHE: ./var/cache/js/npm
 
