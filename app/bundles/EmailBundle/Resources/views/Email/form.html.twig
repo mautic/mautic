@@ -158,8 +158,8 @@
                     {{ form_row(form.variantSettings) }}
                     {{ form_row(form.isPublished) }}
                     <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp) }}
-                        {{ form_row(form.publishDown) }}
+                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
+                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
                     </div>
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
@@ -179,8 +179,8 @@
                 {% if not isVariant %}
                     {{ form_row(form.isPublished) }}
                     <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp) }}
-                        {{ form_row(form.publishDown) }}
+                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
+                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
                     </div>
                     
                 {% endif %}
