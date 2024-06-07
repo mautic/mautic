@@ -73,7 +73,7 @@
 {% block rightFormContent %}
 {{ form_row(form.category) }}
 {{ form_row(form.isPublished) }}
-{{ form_row(form.publishUp) }}
-{{ form_row(form.publishDown) }}
+{{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+{{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
 {% endblock %}
 {% block _content %}{% endblock %}
