@@ -100,10 +100,8 @@
                       {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif -%}
 
-
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {%- if theme is empty -%}
-                  {{- include(theme ~ f.type ~ '.html.twig', {
+                  {{- include([theme ~ f.type ~ '.html.twig', template], {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -112,21 +110,7 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                           'language': form.getLanguage()
-
                   }) -}}
-                  {%- else -%}
-                  {{- include(template, {
-                          'field': f.convertToArray,
-                          'id': f.alias,
-                          'formName': formName,
-                          'fieldPage': (pageCount - 1),
-                          'mappedFields': mappedFields,
-                          'inBuilder': inBuilder,
-                          'fields': fields,
-                          'language': form.getLanguage()
-
-                  }) -}}
-                {%- endif -%}
                   <!-- end: "{{ theme }}{{ template }}" -->
                 {%- endif -%}
               {%- endfor -%}
