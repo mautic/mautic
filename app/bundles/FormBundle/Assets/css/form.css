@@ -30,13 +30,6 @@
 }
 
 /* Mautic Forms Fields and Actions */
-#mauticforms_fields .mauticform-row, 
-#mauticforms_actions .mauticform-row {
-    padding: 10px;
-}
-#mauticforms_fields .mauticform-row {
-    margin-bottom: 0 !important;
-}
 #mauticforms_actions .mauticform-row .action-label {
     font-size: 1.1em;
     font-weight: bold;
@@ -46,22 +39,12 @@
     font-size: 0.9em;
     display: block;
 }
-#mauticforms_actions .form-buttons {
-    float: right;
-    margin-top: 3px;
-}
-#mauticforms_fields .form-buttons {
+@media (min-width: 768px) { .form-buttons { top: 8px; }}
+.form-buttons {
     position: absolute;
     right: 8px;
-    top: 8px;
-}
-#mauticforms_fields input, 
-#mauticforms_fields textarea, 
-#mauticforms_fields select {
-    background-color: #fff;
-    box-shadow: 0px 0px 0px #fff inset;
-    padding: 0.5em 0.5em;
-    width: 50%;
+    bottom: 10px;
+    z-index: 1;
 }
 #mauticforms_fields .chosen-container-single .chosen-search input[type="text"] {
     width: 100%;
@@ -136,7 +119,9 @@ textarea.form-html {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    position: relative;
     min-height: 60px;
+    padding: 10px;
 }
 .mauticform-label {
     font-size: 1.1em;
@@ -162,17 +147,26 @@ textarea.form-html {
 .mauticform-selectbox, 
 .mauticform-input, 
 .mauticform-textarea {
-    width: 100%;
+    width: 75%;
+    max-width: 500px;
     padding: 0.5em 0.5em;
     border: 1px solid #CCC;
-    background: #fff;
-    box-shadow: 0px 0px 0px #fff inset;
     border-radius: 4px;
     box-sizing: border-box;
 }
-.mauticform-checkboxgrp-row {}
+.mauticform-checkboxgrp-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.mauticform-checkboxgrp-row input[type="radio"], 
+.mauticform-checkboxgrp-row input[type="checkbox"] {
+    margin: 0;
+}
 .mauticform-checkboxgrp-label {
     font-weight: normal;
+    line-height: 1em;
 }
 .mauticform-checkboxgrp-checkbox {}
 .mauticform-radiogrp-row {}
