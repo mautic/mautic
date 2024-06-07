@@ -4703,12 +4703,12 @@
             "version": "v5.2.13",
             "source": {
                 "type": "git",
-                "url": "https://github.com/justinrainbow/json-schema.git",
+                "url": "https://github.com/jsonrainbow/json-schema.git",
                 "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/fbbe7e5d79f618997bc3332a6f49246036c45793",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/fbbe7e5d79f618997bc3332a6f49246036c45793",
                 "reference": "fbbe7e5d79f618997bc3332a6f49246036c45793",
                 "shasum": ""
             },
@@ -5388,7 +5388,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/SpBundle.git",
-                "reference": "91f36a54b223d5405e6e41ea612d640360d35554"
+                "reference": "083bf6d62cb03443372068e0ea1b1c3183eed05a"
             },
             "require": {
                 "lightsaml/symfony-bridge": "dev-symfony5",
@@ -5422,7 +5422,7 @@
             ],
             "description": "Light SAML2 SP Symfony Bundle",
             "homepage": "http://www.lightsaml.com/SP-Bundle/",
-            "time": "2023-11-24T16:00:46+00:00"
+            "time": "2024-05-31T13:23:54+00:00"
         },
         {
             "name": "lightsaml/symfony-bridge",
@@ -6003,7 +6003,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "d25d52459cb506b9997bcba8d16c6ee6870492fc"
+                "reference": "ff04262752d9b0a30c80be568ceeb5a585fc3cda"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6144,6 +6144,7 @@
                 },
                 "files": [
                     "AppKernel.php",
+                    "AppTestKernel.php",
                     "AppCache.php"
                 ]
             },
