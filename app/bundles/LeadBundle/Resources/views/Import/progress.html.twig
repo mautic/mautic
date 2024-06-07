@@ -27,34 +27,77 @@
 
 <div class="row ma-lg" id="{{ id }}">
     <div class="col-sm-offset-3 col-sm-6 text-center">
-        <div class="panel panel-{% if complete %}success{% else %}danger{% endif %}">
+        <div class="panel">
             <div class="panel-heading">
-                <h4 class="panel-title">{{ header|trans({'object': object}) }}</h4>
+                <div class="progress mt-md" style="height:3px;">
+                    <div class="progress-bar-import progress-bar {% if not complete %}active{% endif %}"
+                         role="progressbar"
+                         aria-valuenow="{{ progress.done }}"
+                         aria-valuemin="0"
+                         aria-valuemax="{{ progress.total }}"
+                         style="width: {{ percent }}%; height: 3px;"><span class="sr-only">{{ percent }}%</span>
+                    </div>
+                </div>
+                <div class="row mb-lg">
+                    <div class="col-md-8 ai-start">
+                        <h2 class="pb-xs">{{ header|trans({'object': object}) }}</h2>
+                        <div class="row-no-gutters">
+                            <span class="muted">Contacts database</span><span class="muted">• Now</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 ai-end jc-center">
+                        <a class="btn btn-tertiary btn-small">Import again <i class="ri-import-line"></i></a>
+                    </div>
+                </div>
+                
             </div>
             <div class="panel-body">
                 {% if not complete %}
                     <h4>{{ 'mautic.lead.import.inprogress'|trans }}</h4>
                 {% else %}
-                    <h4>{{ 'mautic.lead.import.stats'|trans({'%merged%': import.updatedCount, '%created%': import.insertedCount, '%ignored%': import.ignoredCount}) }}</h4>
-                {% endif %}
-                <div class="progress mt-md" style="height:50px;">
-                    <div class="progress-bar-import progress-bar progress-bar-striped {% if not complete %}active{% endif %}"
-                         role="progressbar"
-                         aria-valuenow="{{ progress.done }}"
-                         aria-valuemin="0"
-                         aria-valuemax="{{ progress.total }}"
-                         style="width: {{ percent }}%; height: 50px;"><span class="sr-only">{{ percent }}%</span>
+                <div class="col-md-6 pa-sm mb-lg">
+                    <div class="row-no-gutters d-flex jc-space-between">
+                        <div class="row-no-gutters fw-nowrap gap-xs ai-center">
+                            <i class="ri-file-list-line"></i>
+                            <h5>MOCK_DATA.csv</h5>
+                        </div>
+                        <i class="ri-check-line text-success"></i>
                     </div>
                 </div>
+
+                <div class="col-md-12 mb-32">
+                    <h4 class="mb-sm as-start">Imported to database</h4>
+
+                        <div class="row-no-gutters jc-space-between ai-center mb-sm">
+                            <span class="d-flex gap-xs"><i class="ri-user-add-line ri-lg"></i>{{'mautic.lead.import.stats.created'|trans}}</span>
+                            <span class="fw-b">{{ import.insertedCount }}</span>
+                        </div>
+                        <div class="row-no-gutters jc-space-between ai-center mb-sm">
+                            <span class="d-flex gap-xs"><i class="ri-exchange-2-line ri-lg"></i>{{ 'mautic.lead.import.stats.merged'|trans}}</span>
+                            <span class="fw-b">{{ import.updatedCount }}</span>
+                        </div>
+                        <div class="row-no-gutters jc-space-between ai-center mb-sm">
+                            <span class="d-flex gap-xs"><i class="ri-user-follow-line ri-lg"></i>{{'mautic.lead.import.stats.ignored'|trans}}</span>
+                            <span class="fw-b">{{ import.ignoredCount }}</span>
+                        </div>
+                        <hr>
+                        <div class="row jc-space-between">
+                            <span>Total</span>
+                            <span>212</span>
+                        </div>
+
+                </div>
+                {% endif %}
+                
             </div>
             {% if failedRows is not empty %}
                 <ul class="list-group">
                     {% for row in failedRows %}
                         {% set lineNumber = row.properties.line|default('N/A') %}
                         {% set failure = row.properties.error|default('N/A') %}
-                        <li class="list-group-item text-left">
+                        <div class="alert alert-danger text-left">
                             <a target="_new" class="text-danger">(#{{ lineNumber }}) {{ failure }}</a>
-                        </li>
+                        </div>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -74,14 +117,14 @@
                         {% set indexRouteParams = indexRouteParams|merge({
                             'search': 'mautic.lead.lead.searchcommand.import_id'|trans ~ ':' ~ import.id
                         }) %}
-                        <a class="btn btn-secondary" href="{{ path(indexRoute, indexRouteParams) }}" data-toggle="ajax">
-                            {{ 'mautic.lead.list.view'|trans({'%objects%': objectName}) }}
+                        <a class="btn btn-ghost" href="{{ path('mautic_import_action', {'objectAction': 'view', 'objectId': import.id, 'object': object}) }}" data-toggle="ajax">
+                            {{ 'mautic.lead.import.result.info'|trans({'%import%': import.name()}) }}
                         </a>
-                        <a class="btn btn-secondary" href="{{ path('mautic_import_index', {'object': object}) }}" data-toggle="ajax">
+                        <a class="btn btn-ghost" href="{{ path('mautic_import_index', {'object': object}) }}" data-toggle="ajax">
                             {{ 'mautic.lead.view.imports'|trans }}
                         </a>
-                        <a class="btn btn-secondary" href="{{ path('mautic_import_action', {'objectAction': 'view', 'objectId': import.id, 'object': object}) }}" data-toggle="ajax">
-                            {{ 'mautic.lead.import.result.info'|trans({'%import%': import.name()}) }}
+                        <a class="btn btn-primary" href="{{ path(indexRoute, indexRouteParams) }}" data-toggle="ajax">
+                            {{ 'mautic.lead.list.view'|trans({'%objects%': objectName}) }}
                         </a>
                     </div>
                 {% endif %}
