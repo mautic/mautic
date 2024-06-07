@@ -472,6 +472,14 @@
 :root[high-contrast="enabled"] {
   --no-border-color: var(--border-strong);
   --border-bottom: 1px solid var(--border-strong);
+  --support-error: var(--text-primary);
+  --support-success: var(--text-primary);
+  --support-warning: var(--text-primary);
+  --support-info: var(--text-primary);
+  --support-error-inverse: var(--text-secondary);
+  --support-success-inverse: var(--text-secondary);
+  --support-warning-inverse: var(--text-secondary);
+  --support-info-inverse: var(--text-secondary);
 }
 @media (prefers-reduced-transparency: reduce) {
   :root {
@@ -5896,7 +5904,7 @@ a.inline-token .text-muted {
   margin-bottom: 10px;
 }
 .map-options h5 {
-  color: #262d33;
+  color: #3c4650;
   font-size: 13px;
 }
 .map-options__cointainer {
