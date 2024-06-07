@@ -18,7 +18,7 @@ class SalesforceApi extends CrmApi
      *
      * @var string
      */
-    const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+\nNo\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
+    public const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+\nNo\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
 
     protected $object          = 'Lead';
 
@@ -347,16 +347,14 @@ class SalesforceApi extends CrmApi
     /**
      * Perform queryAll request and retry if HasOptedOutOfEmail is not accessible.
      *
-     * @param string $queryUrl
-     * @param array  $fields
-     * @param        $object
-     * @param array  $query
+     * @param array<mixed> $fields
+     * @param array<mixed> $query
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    private function requestQueryAllAndHandle(string $queryUrl, array $fields, string $object, array $query)
+    private function requestQueryAllAndHandle(string $queryUrl, array $fields, $object, array $query)
     {
         $config = $this->integration->mergeConfigToFeatureSettings([]);
         if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
@@ -653,11 +651,9 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $errorMessage
-     *
-     * @return array
+     * @return array<mixed>|null[]
      */
-    private function parseMissingField($errorMessage)
+    private function parseMissingField(string $errorMessage)
     {
         $matches = [];
         preg_match(self::REGEXP_MISSING_FIELD, $errorMessage, $matches);
