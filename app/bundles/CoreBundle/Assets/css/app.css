@@ -1767,6 +1767,12 @@ a.media {
   margin-right: -15px;
   margin-left: -15px;
 }
+.row > * {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+}
 .row-no-gutters {
   margin-right: 0;
   margin-left: 0;
