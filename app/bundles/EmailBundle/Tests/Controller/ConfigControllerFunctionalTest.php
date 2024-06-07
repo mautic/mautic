@@ -109,7 +109,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
                 'config[emailconfig][mailer_dsn][scheme]' => 'smtp',
                 'config[emailconfig][mailer_dsn][host]'   => '',
             ],
-            'The "smtp://" mailer DSN is invalid.',
+            'The mailer DSN is invalid.',
         ];
     }
 

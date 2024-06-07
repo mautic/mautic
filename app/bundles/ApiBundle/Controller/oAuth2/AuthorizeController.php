@@ -21,57 +21,20 @@ use Twig\Environment;
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
     /**
-     * @var Form
-     */
-    private $authorizeForm;
-
-    /**
-     * @var AuthorizeFormHandler
-     */
-    private $authorizeFormHandler;
-
-    /**
-     * @var OAuth2
-     */
-    private $oAuth2Server;
-
-    /**
-     * @var Environment
-     */
-    private $twig;
-
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * This constructor must be duplicated from the extended class so our custom code could access the properties.
      */
     public function __construct(
         RequestStack $requestStack,
-        Form $authorizeForm,
-        AuthorizeFormHandler $authorizeFormHandler,
-        OAuth2 $oAuth2Server,
-        TokenStorageInterface $tokenStorage,
+        private Form $authorizeForm,
+        private AuthorizeFormHandler $authorizeFormHandler,
+        private OAuth2 $oAuth2Server,
+        private TokenStorageInterface $tokenStorage,
         UrlGeneratorInterface $router,
         ClientManagerInterface $clientManager,
-        EventDispatcherInterface $eventDispatcher,
-        Environment $twig,
+        private EventDispatcherInterface $eventDispatcher,
+        private Environment $twig,
         SessionInterface $session = null
     ) {
-        $this->authorizeForm        = $authorizeForm;
-        $this->authorizeFormHandler = $authorizeFormHandler;
-        $this->oAuth2Server         = $oAuth2Server;
-        $this->twig                 = $twig;
-        $this->tokenStorage         = $tokenStorage;
-        $this->eventDispatcher      = $eventDispatcher;
-
         parent::__construct(
             $requestStack,
             $authorizeForm,
@@ -87,7 +50,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
     }
 
     /**
-     * @return \FOS\OAuthServerBundle\Controller\Response|\Symfony\Component\HttpFoundation\Response
+     * @return \FOS\OAuthServerBundle\Controller\Response|Response
      *
      * @throws \OAuth2\OAuth2RedirectException
      * @throws AccessDeniedException

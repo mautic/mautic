@@ -21,23 +21,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallServiceTest extends \PHPUnit\Framework\TestCase
 {
-    private $configurator;
+    private MockObject $configurator;
 
-    private $cacheHelper;
-    private $pathsHelper;
+    private MockObject $cacheHelper;
 
-    /** @var EntityManager&MockObject */
-    private $entityManager;
+    private MockObject $pathsHelper;
 
-    private $translator;
-    private $kernel;
-    private $validator;
+    /**
+     * @var EntityManager&MockObject
+     */
+    private MockObject $entityManager;
+
+    private MockObject $translator;
+
+    private MockObject $kernel;
+
+    private MockObject $validator;
+
     private UserPasswordHasher $hasher;
 
     /**
      * @var MockObject&FixturesLoaderInterface
      */
-    private $fixtureLoader;
+    private MockObject $fixtureLoader;
 
     private InstallService $installer;
 
@@ -72,9 +78,9 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->pathsHelper->expects($this->once())
             ->method('getSystemPath')
-            ->with('local_config', false)
+            ->with('root', false)
             ->willReturn(
-                null
+                __DIR__.'/../../../../../',
             );
 
         $this->assertFalse($this->installer->checkIfInstalled());
@@ -84,12 +90,12 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->pathsHelper->expects($this->once())
             ->method('getSystemPath')
-            ->with('local_config', false)
+            ->with('root', false)
             ->willReturn(
-                null
+                __DIR__.'/../../../../../',
             );
 
-        $this->configurator->expects($this->once())
+        $this->configurator->expects($this->exactly(2))
             ->method('getParameters')
             ->willReturn(
                 []
@@ -110,12 +116,12 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->pathsHelper->expects($this->once())
             ->method('getSystemPath')
-            ->with('local_config', false)
+            ->with('root', false)
             ->willReturn(
-                null
+                __DIR__.'/../../../../../',
             );
 
-        $this->configurator->expects($this->once())
+        $this->configurator->expects($this->exactly(2))
             ->method('getParameters')
             ->willReturn(
                 ['db_driver' => 'test']

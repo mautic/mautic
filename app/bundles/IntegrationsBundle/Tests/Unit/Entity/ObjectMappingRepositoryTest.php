@@ -20,7 +20,7 @@ final class ObjectMappingRepositoryTest extends TestCase
     /**
      * @var MockObject&AbstractQuery<mixed>
      */
-    private $query;
+    private MockObject $query;
 
     private ObjectMappingRepository $repository;
 

@@ -4,53 +4,35 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
 
-/**
- * Class ConstantContactIntegration.
- */
 class ConstantContactIntegration extends EmailAbstractIntegration
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'ConstantContact';
     }
 
-    /**
-     * @return string
-     */
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Constant Contact';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
 
     /**
      * Get the URL required to obtain an oauth2 access token.
-     *
-     * @return string
      */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://oauth2.constantcontact.com/oauth2/oauth/token';
     }
 
     /**
      * Get the authentication/login URL for oauth2 access.
-     *
-     * @return string
      */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://oauth2.constantcontact.com/oauth2/oauth/siteowner/authorize';
     }
@@ -72,9 +54,9 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
@@ -121,7 +103,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         return $leadFields;
     }
 
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -143,10 +125,10 @@ class ConstantContactIntegration extends EmailAbstractIntegration
                 $addresses    = [];
                 $customfields = [];
                 foreach ($mappedData as $k => $v) {
-                    if (0 === strpos($v, 'address_')) {
+                    if (str_starts_with($v, 'address_')) {
                         $addresses[str_replace('address_', '', $k)] = $v;
                         unset($mappedData[$k]);
-                    } elseif (0 === strpos($v, 'customfield_')) {
+                    } elseif (str_starts_with($v, 'customfield_')) {
                         $key            = str_replace('customfield_', 'CustomField', $k);
                         $customfields[] = [
                             'name'  => $key,
@@ -180,12 +162,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string|null
-     */
-    public function getFormType()
+    public function getFormType(): string
     {
         return ConstantContactType::class;
     }

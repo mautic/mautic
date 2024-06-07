@@ -16,12 +16,14 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +39,7 @@ class EmailApiController extends CommonApiController
     /**
      * @var EmailModel|null
      */
-    protected $model = null;
+    protected $model;
 
     /**
      * @var array<string, mixed>
@@ -108,7 +110,7 @@ class EmailApiController extends CommonApiController
         $limit = $request->request->get('limit', null);
         $batch = $request->request->get('batch', null);
 
-        list($count, $failed) = $this->model->sendEmailToLists($entity, $lists, $limit, $batch);
+        [$count, $failed] = $this->model->sendEmailToLists($entity, $lists, $limit, $batch);
 
         $view = $this->view(
             [
@@ -135,64 +137,65 @@ class EmailApiController extends CommonApiController
     public function sendLeadAction(Request $request, $id, $leadId)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
-            if (!$this->checkEntityAccess($entity)) {
-                return $this->accessDenied();
-            }
 
-            /** @var Lead $lead */
-            $lead = $this->checkLeadAccess($leadId, 'edit');
-            if ($lead instanceof Response) {
-                return $lead;
-            }
-
-            $post       = $request->request->all();
-            $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
-            $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
-            $response   = ['success' => false];
-
-            $cleanTokens = [];
-
-            foreach ($tokens as $token => $value) {
-                $value = InputHelper::clean($value);
-                if (!preg_match('/^{.*?}$/', $token)) {
-                    $token = '{'.$token.'}';
-                }
-
-                $cleanTokens[$token] = $value;
-            }
-
-            $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
-            // Set owner_id to support the "Owner is mailer" feature
-            if ($lead->getOwner()) {
-                $leadFields['owner_id'] = $lead->getOwner()->getId();
-            }
-
-            $result = $this->model->sendEmail(
-                $entity,
-                $leadFields,
-                [
-                    'source'            => ['api', 0],
-                    'tokens'            => $cleanTokens,
-                    'assetAttachments'  => $assetsIds,
-                    'return_errors'     => true,
-                    'ignoreDNC'         => true,
-                    'email_type'        => 'transactional',
-                ]
-            );
-
-            if (is_bool($result)) {
-                $response['success'] = $result;
-            } else {
-                $response['failed'] = $result;
-            }
-
-            $view = $this->view($response, Response::HTTP_OK);
-
-            return $this->handleView($view);
+        if (!$entity) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        if (!$this->checkEntityAccess($entity)) {
+            return $this->accessDenied();
+        }
+
+        /** @var Lead $lead */
+        $lead = $this->checkLeadAccess($leadId, 'edit');
+        if ($lead instanceof Response) {
+            return $lead;
+        }
+
+        $post       = $request->request->all();
+        $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
+        $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+        $response   = ['success' => false];
+
+        $cleanTokens = [];
+
+        foreach ($tokens as $token => $value) {
+            $value = InputHelper::html($value);
+            if (!preg_match('/^{.*?}$/', $token)) {
+                $token = '{'.$token.'}';
+            }
+
+            $cleanTokens[$token] = $value;
+        }
+
+        $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
+        // Set owner_id to support the "Owner is mailer" feature
+        if ($lead->getOwner()) {
+            $leadFields['owner_id'] = $lead->getOwner()->getId();
+        }
+
+        $result = $this->model->sendEmail(
+            $entity,
+            $leadFields,
+            [
+                'source'            => ['api', 0],
+                'tokens'            => $cleanTokens,
+                'assetAttachments'  => $assetsIds,
+                'return_errors'     => true,
+                'ignoreDNC'         => true,
+                'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+            ]
+        );
+
+        if (is_bool($result)) {
+            $response['success'] = $result;
+        } else {
+            $response['failed'] = $result;
+        }
+
+        $view = $this->view($response, Response::HTTP_OK);
+
+        return $this->handleView($view);
     }
 
     /**
@@ -211,5 +214,14 @@ class EmailApiController extends CommonApiController
         return $this->handleView(
             $this->view(['success' => true], Response::HTTP_CREATED)
         );
+    }
+
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    {
+        if (isset($params['publicPreview']) && $entity instanceof Email) {
+            $entity->setPublicPreview(InputHelper::boolean($params['publicPreview']) ?? false);
+            unset($params['publicPreview']);
+        }
+        parent::prepareParametersFromRequest($form, $params, $entity, $masks, $fields);
     }
 }

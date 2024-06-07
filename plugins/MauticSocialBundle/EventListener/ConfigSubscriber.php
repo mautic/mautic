@@ -6,14 +6,16 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use MauticPlugin\MauticSocialBundle\Form\Type\ConfigType;
+use MauticPlugin\MauticSocialBundle\Integration\Config;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public function __construct(private Config $config)
+    {
+    }
+
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
@@ -21,8 +23,11 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
         $event->addForm(
             [
                 'formAlias'  => 'social_config',
@@ -33,7 +38,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         /** @var array $values */
         $values = $event->getConfig();

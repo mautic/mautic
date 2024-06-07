@@ -11,43 +11,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class DncReasonHelper
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
      * Convert DNC reason ID to text.
      *
-     * @param int $reasonId
-     *
-     * @return string
-     *
      * @throws UnknownDncReasonException
      */
-    public function toText($reasonId)
+    public function toText(int $reasonId): string
     {
-        switch ($reasonId) {
-            case DoNotContact::IS_CONTACTABLE:
-                $reasonKey = 'mautic.lead.event.donotcontact_contactable';
-                break;
-            case DoNotContact::UNSUBSCRIBED:
-                $reasonKey = 'mautic.lead.event.donotcontact_unsubscribed';
-                break;
-            case DoNotContact::BOUNCED:
-                $reasonKey = 'mautic.lead.event.donotcontact_bounced';
-                break;
-            case DoNotContact::MANUAL:
-                $reasonKey = 'mautic.lead.event.donotcontact_manual';
-                break;
-            default:
-                throw new UnknownDncReasonException(sprintf("Unknown DNC reason ID '%c'", $reasonId));
-        }
+        $reasonKey = match ($reasonId) {
+            DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',
+            DoNotContact::UNSUBSCRIBED   => 'mautic.lead.event.donotcontact_unsubscribed',
+            DoNotContact::BOUNCED        => 'mautic.lead.event.donotcontact_bounced',
+            DoNotContact::MANUAL         => 'mautic.lead.event.donotcontact_manual',
+            default                      => throw new UnknownDncReasonException(sprintf("Unknown DNC reason ID '%c'", $reasonId)),
+        };
 
         return $this->translator->trans($reasonKey);
     }
@@ -57,7 +39,7 @@ final class DncReasonHelper
      *
      * @return string The canonical name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'lead_dnc_reason';
     }

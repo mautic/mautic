@@ -44,7 +44,7 @@
 
   {% if items|length > 0 %}
       <div class="table-responsive">
-          <table class="table table-hover table-striped table-bordered leadfield-list" id="leadFieldTable" class="overflow:auto">
+          <table class="table table-hover leadfield-list" id="leadFieldTable" class="overflow:auto">
               <thead>
               <tr>
                   <th class="col-leadfield-orderhandle"></th>
@@ -69,7 +69,7 @@
               <tbody>
               {% for item in items %}
                   <tr id="field_{{ item.id }}">
-                      <td><i class="fa fa-fw fa-ellipsis-v"></i></td>
+                      <td><i class="ri-xl ri-draggable text-muted"></i></td>
                       <td>
                           {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                   'item': item,
@@ -117,6 +117,9 @@
                           {% endif %}
                           {% if item.isUniqueIdentifer %}
                               <i class="fa fa-key " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isuniqueidentifer'|trans }}"></i>
+                          {% endif %}
+                          {% if item.isIsIndex %}
+                              <i class="fa fa-key " data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.field.tooltip.isindex'|trans }}"></i>
                           {% endif %}
                       </td>
                   </tr>

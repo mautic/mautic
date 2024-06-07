@@ -25,10 +25,7 @@ class MessageRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'm';
     }
@@ -66,19 +63,16 @@ class MessageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getMessageChannels($messageId)
+    public function getMessageChannels($messageId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
             ->select('id, channel, channel_id, properties')
             ->where($q->expr()->eq('message_id', ':messageId'))
             ->setParameter('messageId', $messageId)
-            ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
+            ->andWhere($q->expr()->eq('is_enabled', true));
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $channels = [];
         foreach ($results as $result) {
@@ -99,8 +93,8 @@ class MessageRepository extends CommonRepository
             ->select('id, channel, channel_id, properties, message_id')
             ->where($q->expr()->eq('id', ':channelId'))
             ->setParameter('channelId', $channelId)
-            ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
+            ->andWhere($q->expr()->eq('is_enabled', true));
 
-        return $q->execute()->fetchAssociative();
+        return $q->executeQuery()->fetchAssociative();
     }
 }

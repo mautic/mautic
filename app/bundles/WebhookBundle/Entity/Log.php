@@ -6,9 +6,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Log.
- */
 class Log
 {
     /**
@@ -36,9 +33,9 @@ class Log
      */
     private $runtime;
 
-    private ?string $note;
+    private ?string $note = null;
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')

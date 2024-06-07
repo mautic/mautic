@@ -34,7 +34,7 @@
                 {% set hasThumbnail = is_file(themeInfo.dir ~ '/' ~ thumbnailName) %}
             {% endif %}
             {% set thumbnailUrl = getAssetUrl(themeInfo.themesLocalDir ~ '/' ~ themeKey ~ '/' ~ thumbnailName) %}
-            <div class="col-md-3 theme-list">
+            <div class="col-md-3 theme-list {{ themeInfo.visibility.hidden|default(false) is empty ? '' : 'hide' }}">
                 <div class="panel panel-default {% if isSelected %}theme-selected{% endif %}">
                     <div class="panel-body text-center">
                         <h3>{{ themeInfo.name }}</h3>

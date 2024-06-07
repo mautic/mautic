@@ -85,6 +85,59 @@ class HttpFactoryTest extends TestCase
         (new HttpFactory())->getClient($credentials);
     }
 
+    public function testBaseURISetOnBaseUriAwareCredentials(): void
+    {
+        $credentials = new class() implements CredentialsInterface {
+            public function getAuthorizationUrl(): string
+            {
+                return 'http://auth.url';
+            }
+
+            public function getTokenUrl(): string
+            {
+                return 'http://token.url';
+            }
+
+            public function getClientId(): ?string
+            {
+                return 'bar';
+            }
+
+            public function getClientSecret(): ?string
+            {
+                return 'foo';
+            }
+
+            public function getCode(): ?string
+            {
+                return 'auth_code';
+            }
+
+            public function getRedirectUri(): string
+            {
+                return 'http://redirect.url';
+            }
+
+            public function getScope(): ?string
+            {
+                return 'scope';
+            }
+
+            public function getBaseUri(): ?string
+            {
+                return 'https://mautic.com';
+            }
+        };
+
+        $client = (new HttpFactory())->getClient($credentials);
+        /**
+         * Even though the method getConfig is deprecated it won't get deprecated
+         * https://github.com/guzzle/guzzle/issues/3114#issuecomment-1627228395.
+         */
+        /** @phpstan-ignore-next-line */
+        $this->assertEquals('https://mautic.com', (string) $client->getConfig('base_uri'));
+    }
+
     public function testMissingClientIdThrowsException(): void
     {
         $this->expectException(PluginNotConfiguredException::class);
@@ -267,6 +320,7 @@ class HttpFactoryTest extends TestCase
      */
     private function extractMiddleware(ClientInterface $client): OAuth2Middleware
     {
+        /** @phpstan-ignore-next-line */
         $handler = $client->getConfig()['handler'];
 
         $reflection = new \ReflectionClass($handler);

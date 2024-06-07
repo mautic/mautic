@@ -32,32 +32,29 @@ class OrderExecutionerTest extends TestCase
     /**
      * @var MappingHelper|MockObject
      */
-    private $mappingHelper;
+    private MockObject $mappingHelper;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var ObjectProvider|MockObject
      */
-    private $objectProvider;
+    private MockObject $objectProvider;
 
-    /**
-     * @var OrderExecutioner
-     */
-    private $orderExecutioner;
+    private OrderExecutioner $orderExecutioner;
 
     /**
      * @var ReferenceResolverInterface|MockObject
      */
-    private $referenceResolver;
+    private MockObject $referenceResolver;
 
     /**
      * @var FieldValidatorInterface|MockObject
      */
-    private $fieldValidator;
+    private MockObject $fieldValidator;
 
     protected function setup(): void
     {

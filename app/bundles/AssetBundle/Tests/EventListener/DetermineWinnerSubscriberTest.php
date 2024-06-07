@@ -17,17 +17,14 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EntityManagerInterface
      */
-    private $em;
+    private MockObject $em;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -38,7 +35,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
     }
 
-    public function testOnDetermineDownloadRateWinner()
+    public function testOnDetermineDownloadRateWinner(): void
     {
         $parentMock    = $this->createMock(Page::class);
         $childMock     = $this->createMock(Page::class);
@@ -57,13 +54,13 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
                 'id'    => 1,
                 'name'  => 'Test 5',
                 'total' => 100,
-                ],
+            ],
             2 => [
                 'count' => 25,
                 'id'    => 2,
                 'name'  => 'Test 6',
                 'total' => 150,
-                ],
+            ],
         ];
 
         $this->translator->method('trans')
@@ -103,7 +100,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $expectedData = [
             $transDownloads => [$counts[1]['count'], $counts[2]['count']],
             $transHits      => [$counts[1]['total'], $counts[2]['total']],
-         ];
+        ];
 
         $abTestResults = $event->getAbTestResults();
 

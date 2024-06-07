@@ -97,7 +97,7 @@
   {% set required = true %}
   {% set validationMessage = field.validationMessage %}
   {% if validationMessage is empty %}
-        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) %}
   {% endif %}
   {% set containerAttributes = containerAttributes|merge({
           'class': containerAttributes.class|default([])|merge([
@@ -106,7 +106,7 @@
           'data-validate': field.alias,
           'data-validation-type': field.type,
   }) %}
-  {% if field.properties.multiple is not empty %}
+  {% if field.properties.multiple is defined and field.properties.multiple is not empty %}
     {% set containerAttributes = containerAttributes|merge({
             'data-validate-multiple': 'true',
     }) %}

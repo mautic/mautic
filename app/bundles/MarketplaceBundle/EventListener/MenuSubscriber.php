@@ -13,11 +13,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class MenuSubscriber implements EventSubscriberInterface
 {
-    private Config $config;
-
-    public function __construct(Config $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        private Config $config
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -40,8 +38,9 @@ final class MenuSubscriber implements EventSubscriberInterface
                     'marketplace.title' => [
                         'id'        => 'marketplace',
                         'route'     => RouteProvider::ROUTE_LIST,
-                        'iconClass' => 'fa-plus',
                         'access'    => MarketplacePermissions::CAN_VIEW_PACKAGES,
+                        'parent'    => 'mautic.core.integrations',
+                        'priority'  => 16,
                     ],
                 ],
             ]

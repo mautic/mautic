@@ -14,12 +14,12 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ContactHelper|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $contactHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $contactHelper;
 
     /**
      * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $configuration;
+    private \PHPUnit\Framework\MockObject\MockObject $configuration;
 
     protected function setUp(): void
     {
@@ -29,14 +29,14 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
             ->willReturn('123');
     }
 
-    public function testMissingFromThrowsBadRequestException()
+    public function testMissingFromThrowsBadRequestException(): void
     {
         $this->expectException(BadRequestHttpException::class);
 
         $request          = $this->createMock(Request::class);
         $inputBag         = new InputBag([
-          'AccountSid' => '123',
-          'From'       => '',
+            'AccountSid' => '123',
+            'From'       => '',
         ]);
 
         $request->request = $inputBag;
@@ -44,15 +44,15 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->getCallback()->getMessage($request);
     }
 
-    public function testMissingBodyThrowsBadRequestException()
+    public function testMissingBodyThrowsBadRequestException(): void
     {
         $this->expectException(BadRequestHttpException::class);
 
         $request          = $this->createMock(Request::class);
         $inputBag         = new InputBag([
-          'AccountSid' => '123',
-          'From'       => '321',
-          'Body'       => '',
+            'AccountSid' => '123',
+            'From'       => '321',
+            'Body'       => '',
         ]);
 
         $request->request = $inputBag;
@@ -60,13 +60,13 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->getCallback()->getMessage($request);
     }
 
-    public function testMismatchedAccountSidThrowsBadRequestException()
+    public function testMismatchedAccountSidThrowsBadRequestException(): void
     {
         $this->expectException(BadRequestHttpException::class);
 
         $request          = $this->createMock(Request::class);
         $inputBag         = new InputBag([
-          'AccountSid' => '321',
+            'AccountSid' => '321',
         ]);
 
         $request->request = $inputBag;
@@ -74,16 +74,16 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->getCallback()->getMessage($request);
     }
 
-    public function testMessageIsReturned()
+    public function testMessageIsReturned(): void
     {
         $request      = $this->createMock(Request::class);
         $request->method('get')
             ->willReturn('Hello');
 
         $inputBag = new InputBag([
-          'AccountSid' => '123',
-          'From'       => '321',
-          'Body'       => 'Hello',
+            'AccountSid' => '123',
+            'From'       => '321',
+            'Body'       => 'Hello',
         ]);
 
         $request->request = $inputBag;

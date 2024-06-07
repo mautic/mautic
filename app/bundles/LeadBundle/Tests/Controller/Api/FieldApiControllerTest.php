@@ -30,7 +30,7 @@ class FieldApiControllerTest extends TestCase
         ],
     ];
 
-    public function testgetWhereFromRequestWithNoWhere()
+    public function testgetWhereFromRequestWithNoWhere(): void
     {
         $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
@@ -41,7 +41,7 @@ class FieldApiControllerTest extends TestCase
         $this->assertEquals($this->defaultWhere, $result);
     }
 
-    public function testgetWhereFromRequestWithSomeWhere()
+    public function testgetWhereFromRequestWithSomeWhere(): void
     {
         $where = [
             [

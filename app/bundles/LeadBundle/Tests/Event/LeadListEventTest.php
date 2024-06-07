@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Event\LeadListEvent;
 
 class LeadListEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructGettersSetters()
+    public function testConstructGettersSetters(): void
     {
         $segment = new LeadList();
         $event   = new LeadListEvent($segment);
