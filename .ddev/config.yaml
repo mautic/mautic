@@ -19,5 +19,4 @@ hooks:
     # Fix line endings on Windows
     - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh
     - exec: sed -i -e 's/\r$//' ./.git/hooks/*
-    - exec: "chmod +x ./.ddev/mautic-setup.sh"
     - exec: "yes | ./.ddev/mautic-setup.sh"
