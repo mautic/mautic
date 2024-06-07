@@ -7,6 +7,7 @@
     var mauticBaseUrl                   = "{{ path('mautic_base_index') }}";
     var mauticAjaxUrl                   = "{{ path('mautic_core_ajax') }}";
     var mauticAjaxCsrf                  = '{{ securityGetCsrfToken("mautic_ajax_post") }}';
+    var mauticSessionLifetime           = "{{ ini_get('session.gc_maxlifetime') }}";
     var mauticImagesPath                = '{{ assetsGetImagesPath() }}';
     var mauticAssetPrefix               = '{{ assetsGetPrefix(true) }}';
     var mauticContent                   = '{{ mautic_content }}';

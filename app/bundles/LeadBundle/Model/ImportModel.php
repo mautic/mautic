@@ -571,9 +571,7 @@ class ImportModel extends FormModel
      */
     public function getImportDir(): string
     {
-        $tmpDir = $this->pathsHelper->getSystemPath('tmp', true);
-
-        return $tmpDir.'/imports';
+        return $this->pathsHelper->getImportLeadsPath();
     }
 
     /**

@@ -1074,7 +1074,7 @@ class MailHelperTest extends TestCase
         $email  = new Email();
 
         // We should use a local image to avoid network requests.
-        $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.png';
+        $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.svg';
 
         $mailer->setIdHash('IDHASH');
         $email->setSubject('Test');
