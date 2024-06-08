@@ -5,30 +5,49 @@ namespace Mautic\LeadBundle\Segment;
 class OperatorOptions
 {
     public const EQUAL_TO              = '=';
+
     public const NOT_EQUAL_TO          = '!=';
+
     public const GREATER_THAN          = 'gt';
+
     public const GREATER_THAN_OR_EQUAL = 'gte';
+
     public const LESS_THAN             = 'lt';
+
     public const LESS_THAN_OR_EQUAL    = 'lte';
+
     public const EMPTY                 = 'empty';
+
     public const NOT_EMPTY             = '!empty';
+
     public const LIKE                  = 'like';
+
     public const NOT_LIKE              = '!like';
+
     public const BETWEEN               = 'between';
+
     public const NOT_BETWEEN           = '!between';
+
     public const IN                    = 'in';
+
     public const NOT_IN                = '!in';
+
     public const REGEXP                = 'regexp';
+
     public const NOT_REGEXP            = '!regexp';
+
     public const DATE                  = 'date';
+
     public const STARTS_WITH           = 'startsWith';
+
     public const ENDS_WITH             = 'endsWith';
+
     public const CONTAINS              = 'contains';
 
     /**
      * @var array<string,array<string,string|bool>>
      */
-    private static $operatorOptions = [
+    private static array $operatorOptions = [
         self::EQUAL_TO => [
             'label'       => 'mautic.lead.list.form.operator.equals',
             'expr'        => 'eq',
@@ -61,12 +80,12 @@ class OperatorOptions
         ],
         self::EMPTY => [
             'label'       => 'mautic.lead.list.form.operator.isempty',
-            'expr'        => 'empty', //special case
+            'expr'        => 'empty', // special case
             'negate_expr' => 'notEmpty',
         ],
         self::NOT_EMPTY => [
             'label'       => 'mautic.lead.list.form.operator.isnotempty',
-            'expr'        => 'notEmpty', //special case
+            'expr'        => 'notEmpty', // special case
             'negate_expr' => 'empty',
         ],
         self::LIKE => [
@@ -81,13 +100,13 @@ class OperatorOptions
         ],
         self::BETWEEN => [
             'label'       => 'mautic.lead.list.form.operator.between',
-            'expr'        => 'between', //special case
+            'expr'        => 'between', // special case
             'negate_expr' => 'notBetween',
             'hide'        => true,
         ],
         self::NOT_BETWEEN => [
             'label'       => 'mautic.lead.list.form.operator.notbetween',
-            'expr'        => 'notBetween', //special case
+            'expr'        => 'notBetween', // special case
             'negate_expr' => 'between',
             'hide'        => true,
         ],
@@ -103,17 +122,17 @@ class OperatorOptions
         ],
         self::REGEXP => [
             'label'       => 'mautic.lead.list.form.operator.regexp',
-            'expr'        => 'regexp', //special case
+            'expr'        => 'regexp', // special case
             'negate_expr' => 'notRegexp',
         ],
         self::NOT_REGEXP => [
             'label'       => 'mautic.lead.list.form.operator.notregexp',
-            'expr'        => 'notRegexp', //special case
+            'expr'        => 'notRegexp', // special case
             'negate_expr' => 'regexp',
         ],
         self::DATE => [
             'label'       => 'mautic.lead.list.form.operator.date',
-            'expr'        => 'date', //special case
+            'expr'        => 'date', // special case
             'negate_expr' => 'date',
             'hide'        => true,
         ],

@@ -72,6 +72,16 @@ mQuery( document ).ready(function() {
             e.preventDefault();
         }
     });
+
+    // Try to keep alive the session.
+    setInterval(function() {
+        if (window.location.pathname.startsWith('/s/') && window.location.pathname !== '/s/login') {
+            mQuery.get('/s/keep-alive')
+                .fail(function(errorThrown) {
+                    console.error('Error with keep-alive:', errorThrown);
+                });
+        }
+    }, mauticSessionLifetime * 1000 / 2);
 });
 
 if (typeof history != 'undefined') {
@@ -547,10 +557,7 @@ var Mautic = {
      * @param errorThrown
      */
     processAjaxError: function (request, textStatus, errorThrown, mainContent) {
-        if (textStatus === 'abort' || textStatus.includes('error')) {
-            const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.core.request.error'));
-            Mautic.setFlashes(flashMessage);
-
+        if (textStatus == 'abort') {
             Mautic.stopPageLoadingBar();
             Mautic.stopCanvasLoadingBar();
             Mautic.stopIconSpinPostEvent();
@@ -566,6 +573,9 @@ var Mautic = {
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
         } else if (typeof(request.responseText) !== 'undefined') {
+            const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.core.request.error'));
+            Mautic.setFlashes(flashMessage);
+
             //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
             //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
             var errorStart = request.responseText.indexOf('{"newContent');
@@ -671,18 +681,22 @@ var Mautic = {
 
     /**
      * Sets flashes
-     * @param flashes
+     * @param flashes The flash message HTML to append
+     * @param autoClose Optional boolean to determine if the flash should automatically close, defaults to true
      */
-    setFlashes: function (flashes) {
+    setFlashes: function (flashes, autoClose = true) {
         mQuery('#flashes').append(flashes);
 
         mQuery('#flashes .alert-new').each(function () {
             var me = this;
-            window.setTimeout(function () {
-                mQuery(me).fadeTo(500, 0).slideUp(500, function () {
-                    mQuery(this).remove();
-                });
-            }, 4000);
+            // Only set the timeout if autoClose is true
+            if (autoClose) {
+                window.setTimeout(function () {
+                    mQuery(me).fadeTo(500, 0).slideUp(500, function () {
+                        mQuery(this).remove();
+                    });
+                }, 4000);
+            }
 
             mQuery(this).removeClass('alert-new');
         });
@@ -710,6 +724,16 @@ var Mautic = {
         elDiv.append(elSpan);
 
         return elDiv;
+    },
+
+    addErrorFlashMessage: function(message) {
+        return this.addFlashMessage(message);
+    },
+
+    addInfoFlashMessage: function(message) {
+        const el = this.addFlashMessage(message);
+        el.classList.remove('alert-growl--error');
+        return el;
     },
 
     /**

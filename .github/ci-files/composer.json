@@ -65,6 +65,22 @@
     "mautic/theme-vibrant": "*",
     "mautic/theme-trulypersonal": "*"
   },
+  "scripts": {
+    "post-install-cmd": [
+      "@fix-permissions",
+      "@generate-assets"
+    ],
+    "post-update-cmd": [
+      "@fix-permissions",
+      "@generate-assets"
+    ],
+    "fix-permissions": "chmod 750 ./bin/console",
+    "generate-assets": [
+      "npm ci",
+      "npx patch-package",
+      "bin/console mautic:assets:generate"
+    ]
+  },
   "repositories": [
     {
       "type": "git",

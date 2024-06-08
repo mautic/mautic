@@ -5,15 +5,14 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-/**
- * Class Hit.
- */
 class Hit
 {
+    public const TABLE_NAME = 'page_hits';
     /**
      * @var string
      */
@@ -29,10 +28,7 @@ class Hit
      */
     private $dateLeft;
 
-    /**
-     * @var Page|null
-     */
-    private $page;
+    private ?Page $page = null;
 
     /**
      * @var Redirect|null
@@ -40,17 +36,17 @@ class Hit
     private $redirect;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Email|null
+     * @var Email|null
      */
     private $email;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress|null
      */
     private $ipAddress;
 
@@ -138,12 +134,12 @@ class Hit
      */
     private $device;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('page_hits')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\HitRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(HitRepository::class)
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')
@@ -169,13 +165,13 @@ class Hit
             ->addJoinColumn('redirect_id', 'id', true, false, 'SET NULL')
             ->build();
 
-        $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
+        $builder->createManyToOne('email', Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->createField('country', 'string')
             ->nullable()
@@ -247,7 +243,7 @@ class Hit
 
         $builder->addNullableField('query', 'array');
 
-        $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
+        $builder->createManyToOne('device', LeadDevice::class)
             ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
             ->cascadePersist()
             ->build();
@@ -255,10 +251,8 @@ class Hit
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('hit')
             ->addProperties(
@@ -295,10 +289,8 @@ class Hit
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return (int) $this->id;
     }
@@ -615,8 +607,6 @@ class Hit
     /**
      * Set page.
      *
-     * @param Page $page
-     *
      * @return Hit
      */
     public function setPage(Page $page = null)
@@ -627,9 +617,7 @@ class Hit
     }
 
     /**
-     * Get page.
-     *
-     * @return Page
+     * @return ?Page
      */
     public function getPage()
     {
@@ -637,11 +625,9 @@ class Hit
     }
 
     /**
-     * Set ipAddress.
-     *
      * @return Hit
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
 
@@ -649,9 +635,7 @@ class Hit
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -661,7 +645,7 @@ class Hit
     /**
      * @param string $trackingId
      *
-     * @return Page
+     * @return Hit
      */
     public function setTrackingId($trackingId)
     {
@@ -671,7 +655,9 @@ class Hit
     }
 
     /**
-     * @return string
+     * Get trackingId.
+     *
+     * @return string|null
      */
     public function getTrackingId()
     {
@@ -813,7 +799,7 @@ class Hit
     /**
      * @param mixed $email
      */
-    public function setEmail(Email $email)
+    public function setEmail(Email $email): void
     {
         $this->email = $email;
     }

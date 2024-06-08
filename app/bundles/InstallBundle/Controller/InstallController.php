@@ -3,26 +3,44 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class InstallController extends CommonController
 {
-    private Configurator $configurator;
-
-    private InstallService $installer;
-
-    public function __construct(Configurator $configurator, InstallService $installer)
-    {
-        $this->configurator = $configurator;
-        $this->installer    = $installer;
+    public function __construct(
+        private Configurator $configurator,
+        private InstallService $installer,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -199,10 +217,10 @@ class InstallController extends CommonController
                     'tmpl'           => $tmpl,
                     'majors'         => $this->configurator->getRequirements(),
                     'minors'         => $this->configurator->getOptionalSettings(),
-                    'appRoot'        => $this->coreParametersHelper->get('kernel.project_dir').'/app',
+                    'appRoot'        => $this->coreParametersHelper->get('mautic.application_dir').'/app',
                     'cacheDir'       => $this->coreParametersHelper->get('kernel.cache_dir'),
                     'logDir'         => $this->coreParametersHelper->get('kernel.logs_dir'),
-                    'configFile'     => $pathsHelper->getSystemPath('local_config'),
+                    'configFile'     => ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app'),
                     'completedSteps' => $completedSteps,
                 ],
                 'contentTemplate' => $step->getTemplate(),
@@ -220,7 +238,7 @@ class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    public function finalAction(Request $request, PathsHelper $pathsHelper)
+    public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $session = $request->getSession();
 
@@ -251,7 +269,7 @@ class InstallController extends CommonController
                 'viewParameters' => [
                     'welcome_url' => $welcomeUrl,
                     'parameters'  => $this->configurator->render(),
-                    'config_path' => $pathsHelper->getSystemPath('local_config'),
+                    'config_path' => ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app'),
                     'is_writable' => $this->configurator->isFileWritable(),
                     'version'     => MAUTIC_VERSION,
                     'tmpl'        => $tmpl,
@@ -269,20 +287,13 @@ class InstallController extends CommonController
     /**
      * Handle installer errors.
      */
-    private function handleInstallerErrors(Form $form, array $messages)
+    private function handleInstallerErrors(Form $form, array $messages): void
     {
         foreach ($messages as $type => $message) {
-            switch ($type) {
-                case 'warning':
-                case 'error':
-                case 'notice':
-                    $this->addFlashMessage($message, [], $type);
-                    break;
-                default:
-                    // If type not a flash type, assume form field error
-                    $form[$type]->addError(new FormError($message));
-                    break;
-            }
+            match ($type) {
+                'warning', 'error', 'notice' => $this->addFlashMessage($message, [], $type),
+                default => $form[$type]->addError(new FormError($message)),
+            };
         }
     }
 }

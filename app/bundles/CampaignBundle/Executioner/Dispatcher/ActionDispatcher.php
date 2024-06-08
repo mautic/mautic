@@ -14,62 +14,25 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ActionDispatcher
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var EventScheduler
-     */
-    private $scheduler;
-
-    /**
-     * @var NotificationHelper
-     */
-    private $notificationHelper;
-
-    /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
-    /**
-     * EventDispatcher constructor.
-     */
     public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger,
-        EventScheduler $scheduler,
-        NotificationHelper $notificationHelper,
-        LegacyEventDispatcher $legacyDispatcher
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private LegacyEventDispatcher $legacyDispatcher
     ) {
-        $this->dispatcher         = $dispatcher;
-        $this->logger             = $logger;
-        $this->scheduler          = $scheduler;
-        $this->notificationHelper = $notificationHelper;
-        $this->legacyDispatcher   = $legacyDispatcher;
     }
 
     /**
-     * @return PendingEvent
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null)
+    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, PendingEvent $pendingEvent = null): PendingEvent
     {
         if (!$pendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);
@@ -89,7 +52,7 @@ class ActionDispatcher
             }
 
             if ($failed) {
-                $this->dispatchedFailedEvent($config, $failed);
+                $this->dispatchFailedEvent($config, $failed);
             }
 
             // Dispatch legacy ON_EVENT_EXECUTION event for BC
@@ -98,12 +61,12 @@ class ActionDispatcher
 
         // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
         // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent), $pendingEvent);
+        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, $customEvent, $pendingEvent);
 
         return $pendingEvent;
     }
 
-    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -122,7 +85,7 @@ class ActionDispatcher
         );
     }
 
-    private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
+    private function dispatchFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -131,15 +94,13 @@ class ActionDispatcher
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $this->logger->debug(
-                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
+                'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType() ?? 'unknown event').' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()
             );
 
             $this->dispatcher->dispatch(
                 new FailedEvent($config, $log),
                 CampaignEvents::ON_EVENT_FAILED
             );
-
-            $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
         }
 
         $this->scheduler->rescheduleFailures($logs);
@@ -149,7 +110,7 @@ class ActionDispatcher
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed)
+    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed): void
     {
         foreach ($pending as $log) {
             if (!$success->contains($log) && !$failed->contains($log)) {

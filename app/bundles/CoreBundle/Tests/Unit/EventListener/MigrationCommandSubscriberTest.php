@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\MySqlSchemaManager;
+use Doctrine\DBAL\Schema\MySQLSchemaManager;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\EventListener\MigrationCommandSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -22,47 +22,41 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private $versionProvider;
+    private MockObject $versionProvider;
 
     /**
      * @var MockObject|GeneratedColumnsProviderInterface
      */
-    private $generatedColumnsProvider;
+    private MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Connection
      */
-    private $connection;
+    private MockObject $connection;
 
-    /**
-     * @var MockObject|ConsoleCommandEvent
-     */
-    private $event;
+    private ConsoleTerminateEvent $event;
 
     /**
      * @var MockObject|Command
      */
-    private $command;
+    private MockObject $command;
 
     /**
-     * @var MockObject|MySqlSchemaManager
+     * @var MockObject|MySQLSchemaManager
      */
-    private $schemaManager;
+    private MockObject $schemaManager;
 
     /**
      * @var MockObject|OutputInterface
      */
-    private $output;
+    private MockObject $output;
 
     /**
      * @var GeneratedColumns<GeneratedColumn>
      */
-    private $generatedColumns;
+    private GeneratedColumns $generatedColumns;
 
-    /**
-     * @var MigrationCommandSubscriber
-     */
-    private $subscriber;
+    private MigrationCommandSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -73,7 +67,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->connection               = $this->createMock(Connection::class);
         $this->command                  = $this->createMock(Command::class);
         $this->output                   = $this->createMock(OutputInterface::class);
-        $this->schemaManager            = $this->createMock(MySqlSchemaManager::class);
+        $this->schemaManager            = $this->createMock(MySQLSchemaManager::class);
         $this->generatedColumns         = new GeneratedColumns();
         $this->subscriber               = new MigrationCommandSubscriber(
             $this->versionProvider,
@@ -83,9 +77,9 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $input = $this->createMock(InputInterface::class);
 
-        $this->event = new ConsoleCommandEvent($this->command, $input, $this->output);
+        $this->event = new ConsoleTerminateEvent($this->command, $input, $this->output, 0);
 
-        $this->connection->method('getSchemaManager')->willReturn($this->schemaManager);
+        $this->connection->method('createSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
 
@@ -133,7 +127,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->schemaManager->expects($this->once())
             ->method('listTableColumns')
-            ->willReturn(['generated_hit_date' => new \StdClass()]);
+            ->willReturn(['generated_hit_date' => new \stdClass()]);
 
         $this->connection->expects($this->never())
             ->method('executeQuery');
@@ -157,7 +151,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->schemaManager->expects($this->once())
             ->method('listTableColumns')
-            ->willReturn(['id' => new \StdClass()]);
+            ->willReturn(['id' => new \stdClass()]);
 
         $this->connection->expects($this->once())
             ->method('executeQuery');

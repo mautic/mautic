@@ -12,6 +12,8 @@ class Fixtures
     public static function getValidReportResult(): array
     {
         return [
+            'dateFrom'     => Fixtures::getDateFrom(),
+            'dateTo'       => Fixtures::getDateTo(),
             'totalResults' => '11',
             'data'         => self::getValidReportData(),
             'dataColumns'  => [
@@ -49,6 +51,7 @@ class Fixtures
                     'alias' => 'email',
                 ],
             ],
+            'page'  => 1,
             'limit' => 10000,
         ];
     }
@@ -253,6 +256,8 @@ class Fixtures
     public static function getValidReportResultWithAggregatedColumns(): array
     {
         return [
+            'dateFrom'     => Fixtures::getDateFrom(),
+            'dateTo'       => Fixtures::getDateTo(),
             'totalResults' => '2',
             'data'         => self::getValidReportDataAggregatedColumns(),
             'dataColumns'  => [
@@ -319,6 +324,18 @@ class Fixtures
     }
 
     /**
+     * @return array<float>
+     */
+    public static function getValidReportDataAggregatedTotals(): array
+    {
+        return [
+            'SUM es.is_read' => 60,
+            'AVG es.is_read' => 0.3333,
+            'COUNT l.id'     => 160,
+        ];
+    }
+
+    /**
      * @return array<int, string>
      */
     public static function getValidReportWithAggregatedColumnsHeaders(): array
@@ -332,8 +349,101 @@ class Fixtures
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
+    public static function getValidReportWithAggregatedColumnsKeys(): array
+    {
+        return [
+            'e_id',
+            'e_name',
+            'SUM es.is_read',
+            'AVG es.is_read',
+            'COUNT l.id',
+        ];
+    }
+
     public static function getValidReportWithAggregatedColumnsTotalResult(): int
     {
         return 2;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function getValidReportResultWithNoGraphs(): array
+    {
+        $validReportResult           = Fixtures::getValidReportResult();
+        $validReportResult['graphs'] = [];
+
+        return $validReportResult;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function getValidReportResultWithGraphs(): array
+    {
+        return [
+            'dateFrom'     => Fixtures::getDateFrom(),
+            'dateTo'       => Fixtures::getDateTo(),
+            'totalResults' => '2',
+            'data'         => [
+                [
+                    'e_id'           => '1',
+                    'e_name'         => 'Test 123',
+                    'e_date_added'   => '2023-02-27 10:00:00',
+                ],
+                [
+                    'e_id'           => '2',
+                    'e_name'         => 'Test abc',
+                    'e_date_added'   => '2023-01-15 9:00:00',
+                ],
+            ],
+            'dataColumns'  => [
+                'e_id'         => 'e.id',
+                'subject'      => 'vp.subject',
+                'bounced'      => 'bounced',
+                'e_name'       => 'e.name',
+                'e_date_added' => 'e.date_added',
+            ],
+            'columns' => [
+                'e.id' => [
+                    'label' => 'ID',
+                    'type'  => self::getIntegerType(),
+                    'link'  => 'mautic_email_action',
+                    'alias' => 'e_id',
+                ],
+                'e.name' => [
+                    'label' => 'Name',
+                    'type'  => self::getStringType(),
+                    'alias' => 'e_name',
+                ],
+                'e.date_added' => [
+                    'label' => 'Date created',
+                    'type'  => 'datetime',
+                    'alias' => 'e_date_added',
+                ],
+            ],
+            'page'   => 1,
+            'limit'  => 10,
+            'graphs' => [
+                'mautic.email.graph.line.stats' => [
+                    'options'        => [],
+                    'dynamicFilters' => [],
+                    'paginate'       => true,
+                ],
+            ],
+        ];
+    }
+
+    public static function getDateFrom(): \DateTime
+    {
+        return new \DateTime('2023-02-24 00:00');
+    }
+
+    public static function getDateTo(): \DateTime
+    {
+        return new \DateTime('2023-03-24 00:00');
     }
 }

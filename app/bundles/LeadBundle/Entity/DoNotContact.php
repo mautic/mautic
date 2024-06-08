@@ -7,9 +7,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 
-/**
- * Class DoNotContact.
- */
 class DoNotContact
 {
     /**
@@ -64,13 +61,13 @@ class DoNotContact
 
     private $channelId;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_donotcontact')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\DoNotContactRepository')
-            ->addIndex(['reason'], 'dnc_reason_search');
+            ->setCustomRepositoryClass(DoNotContactRepository::class)
+            ->addIndex(['lead_id', 'channel', 'reason'], 'leadid_reason_channel');
 
         $builder->addId();
 
@@ -93,10 +90,8 @@ class DoNotContact
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('doNotContact')
             ->addListProperties(
@@ -196,7 +191,7 @@ class DoNotContact
      */
     public function setComments($comments)
     {
-        $this->comments = InputHelper::string($comments);
+        $this->comments = InputHelper::string((string) $comments);
 
         return $this;
     }

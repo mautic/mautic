@@ -5,11 +5,13 @@ namespace Mautic\CoreBundle\Model;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @template T of object
+ *
  * @extends AbstractCommonModel<T>
  */
 class FormModel extends AbstractCommonModel
@@ -19,9 +21,9 @@ class FormModel extends AbstractCommonModel
      *
      * @param object $entity
      */
-    public function lockEntity($entity)
+    public function lockEntity($entity): void
     {
-        //lock the row if applicable
+        // lock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
             if ($this->userHelper->getUser()->getId()) {
                 $entity->setCheckedOut(new \DateTime());
@@ -36,10 +38,8 @@ class FormModel extends AbstractCommonModel
      * Check to see if the entity is locked.
      *
      * @param object $entity
-     *
-     * @return bool
      */
-    public function isLocked($entity)
+    public function isLocked($entity): bool
     {
         if (method_exists($entity, 'getCheckedOut')) {
             $checkedOut = $entity->getCheckedOut();
@@ -54,12 +54,12 @@ class FormModel extends AbstractCommonModel
                     $lockValidityDate = false;
                 }
 
-                //is lock expired ?
+                // is lock expired ?
                 if (false !== $lockValidityDate && (new \DateTime()) > $lockValidityDate) {
                     return false;
                 }
 
-                //is it checked out by the current user?
+                // is it checked out by the current user?
                 if (!empty($checkedOutBy) && ($checkedOutBy !== $this->userHelper->getUser()->getId())) {
                     return true;
                 }
@@ -75,11 +75,11 @@ class FormModel extends AbstractCommonModel
      * @param object $entity
      * @param        $extra  Can be used by model to determine what to unlock
      */
-    public function unlockEntity($entity, $extra = null)
+    public function unlockEntity($entity, $extra = null): void
     {
-        //unlock the row if applicable
+        // unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
-            //flush any potential changes
+            // flush any potential changes
             $this->em->refresh($entity);
 
             $entity->setCheckedOut(null);
@@ -98,11 +98,11 @@ class FormModel extends AbstractCommonModel
      *
      * @phpstan-param T $entity
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = $this->isNewEntity($entity);
 
-        //set some defaults
+        // set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
 
         $event = $this->dispatchEvent('pre_save', $entity, $isNew);
@@ -113,10 +113,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Create/edit entity then detach to preserve RAM.
      *
-     * @param      $entity
      * @param bool $unlock
      */
-    public function saveAndDetachEntity($entity, $unlock = true)
+    public function saveAndDetachEntity($entity, $unlock = true): void
     {
         $this->saveEntity($entity, $unlock);
 
@@ -128,18 +127,16 @@ class FormModel extends AbstractCommonModel
      *
      * @param iterable<T> $entities
      * @param bool        $unlock
-     *
-     * @return array
      */
-    public function saveEntities($entities, $unlock = true)
+    public function saveEntities($entities, $unlock = true): void
     {
-        //iterate over the results so the events are dispatched on each delete
+        // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
             $isNew = $this->isNewEntity($entity);
 
-            //set some defaults
+            // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
             $event = $this->dispatchEvent('pre_save', $entity, $isNew);
@@ -186,7 +183,7 @@ class FormModel extends AbstractCommonModel
      *
      * @return bool Force browser refresh
      */
-    public function togglePublishStatus($entity)
+    public function togglePublishStatus($entity): bool
     {
         if (method_exists($entity, 'setIsPublished')) {
             $status = $entity->getPublishStatus();
@@ -198,12 +195,12 @@ class FormModel extends AbstractCommonModel
                 case 'published':
                 case 'expired':
                 case 'pending':
-                    $event = $this->dispatchEvent('pre_unpublish', $entity);
+                    $this->dispatchEvent('pre_unpublish', $entity);
                     $entity->setIsPublished(false);
                     break;
             }
 
-            //set timestamp changes
+            // set timestamp changes
             $this->setTimestamps($entity, false, false);
         } elseif (method_exists($entity, 'setIsEnabled')) {
             $enabled    = $entity->getIsEnabled();
@@ -211,7 +208,7 @@ class FormModel extends AbstractCommonModel
             $entity->setIsEnabled($newSetting);
         }
 
-        //hit up event listeners
+        // hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, false, $event);
@@ -226,7 +223,7 @@ class FormModel extends AbstractCommonModel
      * @param bool   $isNew
      * @param bool   $unlock
      */
-    public function setTimestamps(&$entity, $isNew, $unlock = true)
+    public function setTimestamps(&$entity, $isNew, $unlock = true): void
     {
         if ($isNew) {
             if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
@@ -268,7 +265,7 @@ class FormModel extends AbstractCommonModel
             }
         }
 
-        //unlock the row if applicable
+        // unlock the row if applicable
         if ($unlock && method_exists($entity, 'setCheckedOut')) {
             $entity->setCheckedOut(null);
             $entity->setCheckedOutBy(null);
@@ -280,14 +277,14 @@ class FormModel extends AbstractCommonModel
      *
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
-        //take note of ID before doctrine wipes it out
+        // take note of ID before doctrine wipes it out
         $id    = $entity->getId();
         $event = $this->dispatchEvent('pre_delete', $entity);
         $this->getRepository()->deleteEntity($entity);
 
-        //set the id for use in events
+        // set the id for use in events
         $entity->deletedId = $id;
         $this->dispatchEvent('post_delete', $entity, false, $event);
     }
@@ -295,14 +292,14 @@ class FormModel extends AbstractCommonModel
     /**
      * Delete an array of entities.
      *
-     * @param array $ids
+     * @param mixed[] $ids
      *
-     * @return array
+     * @return mixed[]
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities = [];
-        //iterate over the results so the events are dispatched on each delete
+        // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         foreach ($ids as $k => $id) {
             $entity        = $this->getEntity($id);
@@ -310,7 +307,7 @@ class FormModel extends AbstractCommonModel
             if (null !== $entity) {
                 $event = $this->dispatchEvent('pre_delete', $entity);
                 $this->getRepository()->deleteEntity($entity, false);
-                //set the id for use in events
+                // set the id for use in events
                 $entity->deletedId = $id;
                 $this->dispatchEvent('post_delete', $entity, false, $event);
             }
@@ -319,7 +316,8 @@ class FormModel extends AbstractCommonModel
             }
         }
         $this->em->flush();
-        //retrieving the entities while here so may as well return them so they can be used if needed
+
+        // retrieving the entities while here so may as well return them so they can be used if needed
         return $entities;
     }
 
@@ -330,11 +328,11 @@ class FormModel extends AbstractCommonModel
      * @param string|null $action
      * @param array       $options
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface<mixed>
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }
@@ -345,12 +343,10 @@ class FormModel extends AbstractCommonModel
      * @param string $action
      * @param object $entity
      * @param bool   $isNew
-     *
-     * @return Event|null
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
-        //...
+        // ...
 
         return $event;
     }
@@ -360,19 +356,13 @@ class FormModel extends AbstractCommonModel
      *
      * @param string $subject
      * @param object $entity
-     *
-     * @return mixed
      */
-    public function getUserContactSubject($subject, $entity)
+    public function getUserContactSubject($subject, $entity): string
     {
-        switch ($subject) {
-            case 'locked':
-                $msg = 'mautic.user.user.contact.locked';
-                break;
-            default:
-                $msg = 'mautic.user.user.contact.regarding';
-                break;
-        }
+        $msg = match ($subject) {
+            'locked' => 'mautic.user.user.contact.locked',
+            default  => 'mautic.user.user.contact.regarding',
+        };
 
         $nameGetter = $this->getNameGetter();
 
@@ -384,10 +374,8 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Returns the function used to name the entity.
-     *
-     * @return string
      */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getName';
     }
@@ -396,22 +384,25 @@ class FormModel extends AbstractCommonModel
      * Cleans a string to be used as an alias. The returned string will be alphanumeric or underscore, less than 25 characters
      * and if it is a reserved SQL keyword, it will be prefixed with f_.
      *
-     * @param string   $alias
-     * @param string   $prefix         Used when the alias is a reserved keyword by the database platform
-     * @param int|bool $maxLength      Maximum number of characters used; 0 to disable
-     * @param string   $spaceCharacter Character to replace spaces with
-     *
-     * @return string
+     * @param string   $prefix            Used when the alias is a reserved keyword by the database platform
+     * @param int      $maxLength         Maximum number of characters used; 0 to disable
+     * @param string   $spaceCharacter    Character to replace spaces with
+     * @param string[] $allowedCharacters Allowed characters in alias
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function cleanAlias($alias, $prefix = '', $maxLength = false, $spaceCharacter = '_')
-    {
+    public function cleanAlias(
+        string $alias,
+        string $prefix = '',
+        int $maxLength = 0,
+        string $spaceCharacter = '_',
+        array $allowedCharacters = []
+    ): string {
         // Transliterate to latin characters
         $alias = InputHelper::transliterate(trim($alias));
 
         // Some labels are quite long if a question so cut this short
-        $alias = strtolower(InputHelper::alphanum($alias, false, $spaceCharacter));
+        $alias = strtolower(InputHelper::alphanum($alias, false, $spaceCharacter, $allowedCharacters));
 
         // Ensure we have something
         if (empty($alias)) {
@@ -423,7 +414,7 @@ class FormModel extends AbstractCommonModel
             $alias = substr($alias, 0, $maxLength);
         }
 
-        if ('_' == substr($alias, -1)) {
+        if (str_ends_with($alias, '_')) {
             $alias = substr($alias, 0, -1);
         }
 

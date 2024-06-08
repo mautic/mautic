@@ -17,22 +17,16 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|Filesystem
      */
-    private $filesystemMock;
+    private MockObject $filesystemMock;
 
     /**
      * @var MockObject|UploadedFile
      */
-    private $fileMock;
+    private MockObject $fileMock;
 
-    /**
-     * @var InputHelper
-     */
-    private $inputHelper;
+    private InputHelper $inputHelper;
 
-    /**
-     * @var FilePathResolver
-     */
-    private $filePathResolver;
+    private FilePathResolver $filePathResolver;
 
     protected function setUp(): void
     {

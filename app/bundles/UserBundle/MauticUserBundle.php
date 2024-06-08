@@ -6,12 +6,9 @@ use Mautic\UserBundle\DependencyInjection\Firewall\Factory\PluginFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Class MauticUserBundle.
- */
 class MauticUserBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

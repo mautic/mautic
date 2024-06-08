@@ -15,10 +15,7 @@ class CustomFieldValueHelper
 
     public const TYPE_MULTISELECT = 'multiselect';
 
-    /**
-     * @return array
-     */
-    public static function normalizeValues(array $customFields)
+    public static function normalizeValues(array $customFields): array
     {
         if (isset($customFields['core'])) {
             foreach ($customFields as $group => $fields) {

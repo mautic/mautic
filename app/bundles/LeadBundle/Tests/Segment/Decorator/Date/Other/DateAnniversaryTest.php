@@ -14,7 +14,7 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getOperator
      */
-    public function testGetOperator()
+    public function testGetOperator(): void
     {
         $dateDecorator             = $this->createMock(DateDecorator::class);
         $timezoneResolver          = $this->createMock(TimezoneResolver::class);
@@ -35,14 +35,14 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getParameterValue
      */
-    public function testGetParameterValue()
+    public function testGetParameterValue(): void
     {
         /**
          * Today in '%-m-d' format.
          *
          * @var string
          */
-        $expectedResult = '%'.(new \DateTime(null, new \DateTimeZone('UTC')))->format('-m-d');
+        $expectedResult = '%'.(new \DateTime('now', new \DateTimeZone('UTC')))->format('-m-d');
 
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -70,7 +70,7 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getParameterValue
      */
-    public function testGetParameterValueWithRelativeDate()
+    public function testGetParameterValueWithRelativeDate(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);

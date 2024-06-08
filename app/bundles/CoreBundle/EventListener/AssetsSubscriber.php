@@ -12,35 +12,22 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    private $assetsHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    public function __construct(AssetsHelper $assetsHelper, EventDispatcherInterface $dispatcher)
-    {
-        $this->assetsHelper = $assetsHelper;
-        $this->dispatcher   = $dispatcher;
+    public function __construct(
+        private AssetsHelper $assetsHelper,
+        private EventDispatcherInterface $dispatcher
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['fetchCustomAssets', 0],
         ];
     }
 
-    public function fetchCustomAssets(RequestEvent $event)
+    public function fetchCustomAssets(RequestEvent $event): void
     {
-        if ($event->isMasterRequest() && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_ASSETS)) {
+        if ($event->isMainRequest() && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_ASSETS)) {
             $this->dispatcher->dispatch(
                 new CustomAssetsEvent($this->assetsHelper),
                 CoreEvents::VIEW_INJECT_CUSTOM_ASSETS

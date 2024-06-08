@@ -8,15 +8,9 @@ use Mautic\StageBundle\Form\Type\StageActionType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory)
+    public function getActionFormAction(Request $request, FormFactoryInterface $formFactory): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $dataArray = [
             'success' => 0,
@@ -25,7 +19,7 @@ class AjaxController extends CommonAjaxController
         $type = InputHelper::clean($request->request->get('actionType'));
 
         if (!empty($type)) {
-            //get the HTML for the form
+            // get the HTML for the form
             /** @var \Mautic\StageBundle\Model\StageModel $model */
             $model   = $this->getModel('stage');
             $actions = $model->getStageActions();

@@ -8,8 +8,6 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 class DynamicContentEvent extends CommonEvent
 {
     /**
-     * DynamicContentEvent constructor.
-     *
      * @param bool $isNew
      */
     public function __construct(DynamicContent $entity, $isNew = false)
@@ -26,7 +24,7 @@ class DynamicContentEvent extends CommonEvent
         return $this->entity;
     }
 
-    public function setDynamicContent(DynamicContent $entity)
+    public function setDynamicContent(DynamicContent $entity): void
     {
         $this->entity = $entity;
     }

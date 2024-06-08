@@ -7,40 +7,28 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 
 class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getGroups(): array
     {
         return ['group_mautic_install_data'];
     }
 
-    /**
-     * @var UserPasswordEncoder
-     */
-    private $encoder;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(UserPasswordEncoder $encoder)
-    {
-        $this->encoder = $encoder;
+    public function __construct(
+        private UserPasswordHasher $hasher
+    ) {
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = new User();
         $user->setFirstName('Admin');
         $user->setLastName('User');
         $user->setUsername('admin');
         $user->setEmail('admin@yoursite.com');
-        $encoder = $this->encoder;
-        $user->setPassword($encoder->encodePassword($user, 'mautic'));
+        $user->setPassword($this->hasher->hashPassword($user, 'Maut1cR0cks!'));
         $user->setRole($this->getReference('admin-role'));
         $manager->persist($user);
         $manager->flush();
@@ -52,8 +40,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $user->setLastName('User');
         $user->setUsername('sales');
         $user->setEmail('sales@yoursite.com');
-        $encoder = $this->encoder;
-        $user->setPassword($encoder->encodePassword($user, 'mautic'));
+        $user->setPassword($this->hasher->hashPassword($user, 'Maut1cR0cks!'));
         $user->setRole($this->getReference('sales-role'));
         $manager->persist($user);
         $manager->flush();
@@ -61,9 +48,6 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->addReference('sales-user', $user);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOrder()
     {
         return 2;

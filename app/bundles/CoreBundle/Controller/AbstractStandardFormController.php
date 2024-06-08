@@ -3,42 +3,57 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
-    protected FormFactoryInterface $formFactory;
-
-    protected FormFieldHelper $fieldHelper;
-
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $managerRegistry)
-    {
-        $this->formFactory = $formFactory;
-        $this->fieldHelper = $fieldHelper;
-
-        parent::__construct($security, $userHelper, $managerRegistry);
+    public function __construct(
+        protected FormFactoryInterface $formFactory,
+        protected FormFieldHelper $fieldHelper,
+        ManagerRegistry $managerRegistry,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
+        parent::__construct($managerRegistry, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
      * Get this controller's model name.
      */
-    abstract protected function getModelName();
+    abstract protected function getModelName(): string;
 
     /**
      * Support non-index pages such as modal forms.
-     *
-     * @return bool|string
      */
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
@@ -52,9 +67,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Modify the cloned entity prior to sending through editAction.
      *
-     * @param $newEntity
-     * @param $entity
-     *
      * @return array of arguments for editAction
      */
     protected function afterEntityClone($newEntity, $entity)
@@ -64,10 +76,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
-     *
-     * @param      $entity
-     * @param      $action
-     * @param null $pass
      */
     protected function afterEntitySave($entity, Form $form, $action, $pass = null)
     {
@@ -75,11 +83,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Called after the form is validated on POST.
-     *
-     * @param $isValid
-     * @param $entity
-     * @param $action
-     * @param $isClone
      */
     protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false)
     {
@@ -141,7 +144,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             $this->getPostActionRedirectArguments(
@@ -159,37 +162,21 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Modify entity prior to persisting or perform custom validation on the form.
      *
-     * @param $entity
-     * @param $form
-     * @param $action
-     * @param $objectId
-     * @param $isClone
-     *
      * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false)
+    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, $isClone = false): bool
     {
         return true;
     }
 
     /**
      * Do anything necessary before the form is checked for POST and processed.
-     *
-     * @param $entity
-     * @param $action
-     * @param $isPost
-     * @param $objectId
-     * @param $isClone
      */
     protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, $isClone = false)
     {
     }
 
     /**
-     * @param      $action
-     * @param null $entity
-     * @param null $objectId
-     *
      * @return bool|mixed
      */
     protected function checkActionPermission($action, $entity = null, $objectId = null)
@@ -201,64 +188,44 @@ abstract class AbstractStandardFormController extends AbstractFormController
         }
 
         if ($entity) {
-            switch ($action) {
-                case 'new':
-                    return $this->security->isGranted($this->getPermissionBase().':create');
-                case 'view':
-                case 'index':
-                    return ($entity) ? $this->security->hasEntityAccess(
-                        $this->getPermissionBase().':viewown',
-                        $this->getPermissionBase().':viewother',
-                        $permissionUser
-                    ) : $this->security->isGranted($this->getPermissionBase().':view');
-                case 'clone':
-                    return
-                        $this->security->isGranted($this->getPermissionBase().':create')
-                        && $this->security->hasEntityAccess(
-                            $this->getPermissionBase().':viewown',
-                            $this->getPermissionBase().':viewother',
-                            $permissionUser
-                        );
-                case 'delete':
-                case 'batchDelete':
-                    return $this->security->hasEntityAccess(
-                        $this->getPermissionBase().':deleteown',
-                        $this->getPermissionBase().':deleteother',
-                        $permissionUser
-                    );
-                default:
-                    return $this->security->hasEntityAccess(
-                        $this->getPermissionBase().':'.$action.'own',
-                        $this->getPermissionBase().':'.$action.'other',
-                        $permissionUser
-                    );
-            }
+            return match ($action) {
+                'new' => $this->security->isGranted($this->getPermissionBase().':create'),
+                'view', 'index' => ($entity) ? $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':viewown',
+                    $this->getPermissionBase().':viewother',
+                    $permissionUser
+                ) : $this->security->isGranted($this->getPermissionBase().':view'),
+                'clone' => $this->security->isGranted($this->getPermissionBase().':create')
+                && $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':viewown',
+                    $this->getPermissionBase().':viewother',
+                    $permissionUser
+                ),
+                'delete', 'batchDelete' => $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':deleteown',
+                    $this->getPermissionBase().':deleteother',
+                    $permissionUser
+                ),
+                default => $this->security->hasEntityAccess(
+                    $this->getPermissionBase().':'.$action.'own',
+                    $this->getPermissionBase().':'.$action.'other',
+                    $permissionUser
+                ),
+            };
         } else {
-            switch ($action) {
-                case 'new':
-                    return $this->security->isGranted($this->getPermissionBase().':create');
-                case 'view':
-                case 'index':
-                    return $this->security->isGranted($this->getPermissionBase().':view');
-                case 'clone':
-                    return
-                        $this->security->isGranted($this->getPermissionBase().':create')
-                        && $this->security->isGranted($this->getPermissionBase().':view');
-                case 'delete':
-                case 'batchDelete':
-                    return $this->security->isGranted($this->getPermissionBase().':delete');
-                default:
-                    return $this->security->isGranted($this->getPermissionBase().':'.$action);
-            }
+            return match ($action) {
+                'new' => $this->security->isGranted($this->getPermissionBase().':create'),
+                'view', 'index' => $this->security->isGranted($this->getPermissionBase().':view'),
+                'clone' => $this->security->isGranted($this->getPermissionBase().':create')
+                && $this->security->isGranted($this->getPermissionBase().':view'),
+                'delete', 'batchDelete' => $this->security->isGranted($this->getPermissionBase().':delete'),
+                default => $this->security->isGranted($this->getPermissionBase().':'.$action),
+            };
         }
-
-        return false;
     }
 
     /**
      * Clone an entity.
-     *
-     * @param $objectId
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -275,13 +242,15 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $newEntity = clone $entity;
 
             if ($arguments = $this->afterEntityClone($newEntity, $entity)) {
+                array_unshift($arguments, $request);
+
                 return call_user_func_array([$this, 'editAction'], $arguments);
             } else {
                 return $this->editAction($request, $newEntity, true);
             }
         }
 
-        return $this->newAction();
+        return $this->newAction($request);
     }
 
     /**
@@ -333,7 +302,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             $this->getPostActionRedirectArguments(
@@ -349,10 +318,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param      $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -361,12 +329,12 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $isClone = false;
         $model   = $this->getModel($this->getModelName());
         if (!$model instanceof FormModel) {
-            throw new \Exception(get_class($model).' must extend '.FormModel::class);
+            throw new \Exception($model::class.' must extend '.FormModel::class);
         }
 
         $entity = $this->getFormEntity('edit', $objectId, $isClone);
 
-        //set the return URL
+        // set the return URL
         $returnUrl      = $this->generateUrl($this->getIndexRoute());
         $page           = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
         $viewParameters = ['page' => $page];
@@ -383,7 +351,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'entity' => $entity,
         ];
 
-        //form not found
+        // form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 $this->getPostActionRedirectArguments(
@@ -403,10 +371,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 )
             );
         } elseif ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
-            //deny access if the entity is not a clone and don't have permission to edit or is a clone and don't have permission to create
+            // deny access if the entity is not a clone and don't have permission to edit or is a clone and don't have permission to create
             return $this->accessDenied();
         } elseif (!$isClone && $model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, $this->getModelName());
         }
 
@@ -416,13 +384,14 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $isPost = !$ignorePost && 'POST' == $request->getMethod();
         $this->beforeFormProcessed($entity, $form, 'edit', $isPost, $objectId, $isClone);
+        $this->setOptimisticLockVersion($entity, $form);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ($isPost) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    if ($valid = $this->beforeEntitySave($entity, $form, 'edit', $objectId, $isClone)) {
+                    if ($valid = $this->checkOptimisticLockVersion($entity, $form, $isClone) && $this->beforeEntitySave($entity, $form, 'edit', $objectId, $isClone)) {
                         $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         $this->afterEntitySave($entity, $form, 'edit', $valid);
@@ -458,7 +427,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 }
             } else {
                 if (!$isClone) {
-                    //unlock the entity
+                    // unlock the entity
                     $model->unlockEntity($entity);
                 }
 
@@ -483,6 +452,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 $action = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
                 $form   = $model->createForm($entity, $this->formFactory, $action);
                 $this->beforeFormProcessed($entity, $form, 'edit', false, $isClone);
+                $this->setOptimisticLockVersion($entity, $form);
             }
         } elseif (!$isClone) {
             $model->lockEntity($entity);
@@ -543,8 +513,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param      $objectId
-     * @param      $action
      * @param bool $isClone
      */
     protected function getFormEntity($action, &$objectId = null, &$isClone = false)
@@ -561,7 +529,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     $entity   = $objectId;
                     $isClone  = true;
                     $objectId = (!empty($this->sessionId)) ? $this->sessionId : 'mautic_'.sha1(uniqid(mt_rand(), true));
-                } elseif (false !== strpos($objectId, 'mautic_')) {
+                } elseif (str_contains($objectId, 'mautic_')) {
                     $isClone = true;
                     $entity  = $model->getEntity();
                 } else {
@@ -575,25 +543,14 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Set custom form themes, etc.
-     *
-     * @param $action
-     *
-     * @return \Symfony\Component\Form\FormView
      */
-    protected function getFormView(Form $form, $action)
+    protected function getFormView(FormInterface $form, $action): FormView
     {
         return $form->createView();
     }
 
     /**
      * Get items for index list.
-     *
-     * @param $start
-     * @param $limit
-     * @param $filter
-     * @param $orderBy
-     * @param $orderByDir
-     * @param $args
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
@@ -647,19 +604,13 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Amend the parameters sent through postActionRedirect.
-     *
-     * @param $action
-     *
-     * @return array
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         return $args;
     }
 
     /**
-     * @param $action
-     *
      * @return string
      */
     protected function getPostActionControllerAction($action)
@@ -698,8 +649,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param null $objectId
-     *
      * @return mixed
      */
     protected function getSessionBase($objectId = null)
@@ -715,8 +664,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Get the template file.
-     *
-     * @param $file
      *
      * @return string
      */
@@ -749,8 +696,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Get custom or core translation.
      *
-     * @param $string
-     *
      * @return string
      */
     protected function getTranslatedString($string)
@@ -771,12 +716,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Amend the parameters sent through delegateView.
-     *
-     * @param $action
-     *
-     * @return array
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         return $args;
     }
@@ -817,10 +758,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param        $objectId
-     * @param        $returnUrl
      * @param string $timezone
-     * @param null   $dateRangeForm
      *
      * @return array
      */
@@ -849,12 +787,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function indexStandard(Request $request, $page = null)
+    protected function indexStandard(Request $request, $page = null): Response
     {
-        //set some permissions
+        // set some permissions
         $permissions = $this->security->isGranted(
             [
                 $this->getPermissionBase().':view',
@@ -887,7 +823,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $page = $session->get('mautic.'.$this->getSessionBase().'.page', 1);
         }
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.'.$this->getSessionBase().'.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -912,7 +848,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
+            // the number of entities are now less then the current page so redirect to the last page
             $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
 
             $session->set('mautic.'.$this->getSessionBase().'.page', $lastPage);
@@ -933,7 +869,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
+        // set what page currently on so that we can return here after form submission/cancellation
         $session->set('mautic.'.$this->getSessionBase().'.page', $page);
 
         $viewParameters = [
@@ -970,7 +906,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -984,17 +920,17 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $model = $this->getModel($this->getModelName());
         if (!$model instanceof FormModel) {
-            throw new \Exception(get_class($model).' must extend '.FormModel::class);
+            throw new \Exception($model::class.' must extend '.FormModel::class);
         }
 
-        //set the page we came from
+        // set the page we came from
         $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
         $form    = $model->createForm($entity, $this->formFactory, $action, $options);
 
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         $isPost = 'POST' === $request->getMethod();
         $this->beforeFormProcessed($entity, $form, 'new', $isPost);
 
@@ -1055,7 +991,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     )
                 );
             } elseif ($valid && $this->isFormApplied($form)) {
-                return $this->editAction($entity->getId(), true);
+                return $this->editAction($request, $entity->getId(), true);
             }
         }
 
@@ -1078,7 +1014,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'route'         => $this->generateUrl(
                     $this->getActionRoute(),
                     [
-                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
+                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
                         'objectId'     => ($entity) ? $entity->getId() : 0,
                     ]
                 ),
@@ -1098,17 +1034,16 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function setListFilters($name = null)
     {
-        return parent::setListFilters(($name) ? $name : $this->getSessionBase());
+        return parent::setListFilters($name ?: $this->getSessionBase());
     }
 
     /**
-     * @param $objectId
      * @param string|null $logObject
      * @param string|null $logBundle
      * @param string|null $listPage
      * @param string      $itemName
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
     {
@@ -1200,5 +1135,53 @@ abstract class AbstractStandardFormController extends AbstractFormController
     protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, ?int $start = 0)
     {
         return parent::getDataForExport($model, $args, $resultsCallback, $start);
+    }
+
+    /**
+     * If the $entity supports optimistic locking, entity's current version is set to the $form for a later comparison.
+     *
+     * @param mixed $entity
+     */
+    protected function setOptimisticLockVersion($entity, FormInterface $form): void
+    {
+        if (!$entity instanceof OptimisticLockInterface) {
+            return;
+        }
+
+        $form->get($entity->getVersionField())
+            ->setData($entity->getVersion());
+    }
+
+    /**
+     * If the $entity supports optimistic locking, entity's current version is compared to the value in the $form.
+     *
+     * @param mixed $entity
+     */
+    protected function checkOptimisticLockVersion($entity, FormInterface $form, bool $isClone): bool
+    {
+        if ($isClone || !$entity instanceof OptimisticLockInterface) {
+            return true;
+        }
+
+        $version = (int) $form->get($entity->getVersionField())
+            ->getData();
+
+        if (!$version) {
+            throw new \LogicException(sprintf('A version is required for entities that implement "%s"', OptimisticLockInterface::class));
+        }
+
+        if ($version !== $entity->getVersion()) {
+            $form->addError(
+                new FormError(
+                    $this->translator->trans('mautic.core.optimistic_lock.changed_by_someone_else_error')
+                )
+            );
+
+            return false;
+        }
+
+        $entity->markForVersionIncrement();
+
+        return true;
     }
 }

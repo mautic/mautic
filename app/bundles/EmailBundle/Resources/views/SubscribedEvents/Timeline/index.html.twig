@@ -15,13 +15,13 @@
                 {{ 'mautic.email.timeline.event.failed'|trans }}
             {% endif %}
         {% elseif item.dateRead is empty %}
-            {{ 'mautic.email.timeline.event.not.read'|trans|raw }}
+            {{ 'mautic.email.timeline.event.not.read'|trans|purify }}
         {% else %}
             {{ ('mautic.email.timeline.event.' ~ event['extra']['type'])|trans({
                     '%date%': dateToFull(event.timestamp),
                     '%interval%': dateFormatRange(item.dateSent.diff(event.timestamp)),
                     '%sent%': dateToFull(item.dateSent),
-            })|raw }}
+            })|purify }}
         {% endif %}
 
         {% if item.viewedInBrowser is not empty and item.viewedInBrowser %}
@@ -40,7 +40,7 @@
       {% if item.openDetails is not empty %}
         <h6 class="mt-lg mb-sm"><strong>{{ 'mautic.email.timeline.open_details'|trans }}</strong></h6>
         {% for key, detail in item.openDetails %}
-            {% if 'bouces' != key %}
+            {% if 'bounces' != key %}
               {% if showMore is not defined and loop.index > 5 %}
                   {% set showMore = true %}
                   <div style="display:none">

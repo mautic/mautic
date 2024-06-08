@@ -8,12 +8,9 @@ use Predis\Replication\ReplicationStrategy;
 
 class MasterOnlyStrategy extends ReplicationStrategy
 {
-    private StrategyConfig $config;
-
-    public function __construct(StrategyConfig $config)
-    {
-        $this->config = $config;
-
+    public function __construct(
+        private StrategyConfig $config
+    ) {
         parent::__construct();
     }
 

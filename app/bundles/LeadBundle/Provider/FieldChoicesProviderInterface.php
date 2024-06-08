@@ -9,9 +9,9 @@ use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 interface FieldChoicesProviderInterface
 {
     /**
-     * @throws ChoicesNotFoundException
-     *
      * @return mixed[]
+     *
+     * @throws ChoicesNotFoundException
      */
     public function getChoicesForField(string $fieldType, string $fieldAlias, string $search = ''): array;
 }

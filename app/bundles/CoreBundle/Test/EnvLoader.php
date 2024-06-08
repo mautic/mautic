@@ -13,6 +13,9 @@ final class EnvLoader
      */
     public static function load(): void
     {
-        (new Dotenv())->loadEnv(__DIR__.'/../../../../.env');
+        $reflection     = new \ReflectionClass(Dotenv::class);
+        $vendorRootPath = dirname($reflection->getFileName(), 4);
+
+        (new Dotenv())->loadEnv($vendorRootPath.'/.env');
     }
 }

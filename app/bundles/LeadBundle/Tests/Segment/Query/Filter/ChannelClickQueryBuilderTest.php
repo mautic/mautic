@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -23,31 +24,30 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ChannelClickQueryBuilderTest extends TestCase
 {
+    use MockedConnectionTrait;
+
     /**
      * @var MockObject|RandomParameterName
      */
-    private $randomParameterMock;
+    private MockObject $randomParameterMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
      */
-    private $connectionMock;
+    private MockObject $connectionMock;
 
-    /**
-     * @var ChannelClickQueryBuilder
-     */
-    private $queryBuilder;
+    private ChannelClickQueryBuilder $queryBuilder;
 
     public function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
-        $this->connectionMock      = $this->createMock(Connection::class);
+        $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
             $this->dispatcherMock
@@ -125,7 +125,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     /**
      * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
      *
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
@@ -145,7 +145,7 @@ class ChannelClickQueryBuilderTest extends TestCase
     }
 
     /**
-     *  @param array<string, mixed> $batchLimiters
+     * @param array<string, mixed> $batchLimiters
      */
     private function getContactSegmentFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
@@ -158,8 +158,8 @@ class ChannelClickQueryBuilderTest extends TestCase
                     'object'     => 'behaviors',
                     'type'       => 'boolean',
                     'properties' => [
-                            'filter' => $parameterValue,
-                        ],
+                        'filter' => $parameterValue,
+                    ],
                 ]
             ),
             new BaseDecorator(new ContactSegmentFilterOperator(

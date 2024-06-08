@@ -6,24 +6,13 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class StageBuilderEvent.
- */
 class StageBuilderEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $actions = [];
+    private array $actions = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -51,20 +40,20 @@ class StageBuilderEvent extends Event
      *
      * @throws InvalidArgumentException
      */
-    public function addAction($key, array $action)
+    public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['group', 'label'],
             ['callback'],
             $action
         );
 
-        //translate the label and group
+        // translate the label and group
         $action['label'] = $this->translator->trans($action['label']);
         $action['group'] = $this->translator->trans($action['group']);
 
@@ -78,20 +67,16 @@ class StageBuilderEvent extends Event
      */
     public function getActions()
     {
-        uasort($this->actions, function ($a, $b) {
-            return strnatcasecmp(
-                $a['label'], $b['label']);
-        });
+        uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
+            $a['label'], $b['label']));
 
         return $this->actions;
     }
 
     /**
      * Gets a list of actions supported by the choice form field.
-     *
-     * @return array
      */
-    public function getActionList()
+    public function getActionList(): array
     {
         $list    = [];
         $actions = $this->getActions();
@@ -102,10 +87,13 @@ class StageBuilderEvent extends Event
         return $list;
     }
 
-    public function getActionChoices()
+    /**
+     * @return mixed[]
+     */
+    public function getActionChoices(): array
     {
         $choices = [];
-        $actions = $this->getActions();
+        $this->getActions();
         foreach ($this->actions as $k => $c) {
             $choices[$c['group']][$k] = $c['label'];
         }
@@ -116,7 +104,7 @@ class StageBuilderEvent extends Event
     /**
      * @throws InvalidArgumentException
      */
-    private function verifyComponent(array $keys, array $methods, array $component)
+    private function verifyComponent(array $keys, array $methods, array $component): void
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {

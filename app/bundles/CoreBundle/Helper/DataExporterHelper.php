@@ -13,6 +13,7 @@ class DataExporterHelper
      *
      * @param int|null               $start
      * @param AbstractCommonModel<T> $model
+     *
      * @template T of object
      *
      * @return array
@@ -41,9 +42,7 @@ class DataExporterHelper
 
         if (is_callable($resultsCallback)) {
             foreach ($items as $item) {
-                $row = array_map(function ($itemEncode) {
-                    return html_entity_decode($itemEncode, ENT_QUOTES);
-                }, $resultsCallback($item));
+                $row = array_map(fn ($itemEncode) => html_entity_decode((string) $itemEncode, ENT_QUOTES), $resultsCallback($item));
 
                 $toExport[] = $this->secureAgainstCsvInjection($row);
             }
@@ -58,10 +57,7 @@ class DataExporterHelper
         return $toExport;
     }
 
-    /**
-     * @return array
-     */
-    private function secureAgainstCsvInjection(array $row)
+    private function secureAgainstCsvInjection(array $row): array
     {
         foreach ($row as $colNum => $colVal) {
             if ($colVal && in_array(substr($colVal, 0, 1), ['+', '-', '=', '@'])) {

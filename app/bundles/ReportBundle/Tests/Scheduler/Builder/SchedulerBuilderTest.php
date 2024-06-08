@@ -12,7 +12,7 @@ use Recurr\RecurrenceCollection;
 
 class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetNextEvent()
+    public function testGetNextEvent(): void
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
         $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
@@ -30,7 +30,7 @@ class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDate, $event->getStart());
     }
 
-    public function testGetNextEvents()
+    public function testGetNextEvents(): void
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
         $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
@@ -56,7 +56,7 @@ class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDate, $event->getStart());
     }
 
-    public function testNoScheduler()
+    public function testNoScheduler(): void
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
         $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);

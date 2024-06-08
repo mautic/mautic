@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -12,22 +11,16 @@ use Mautic\ReportBundle\Model\ReportModel;
 class ReportGeneratorEvent extends AbstractReportEvent
 {
     public const CATEGORY_PREFIX         = 'c';
+
     public const CONTACT_PREFIX          = 'l';
+
     public const COMPANY_PREFIX          = 'comp';
+
     public const COMPANY_LEAD_PREFIX     = 'companies_lead';
+
     public const IP_ADDRESS_PREFIX       = 'i';
 
-    /**
-     * @var array
-     */
-    private $selectColumns = [];
-
-    /**
-     * QueryBuilder object.
-     *
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
+    private array $selectColumns = [];
 
     /**
      * contentTemplate.
@@ -36,33 +29,20 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     private $contentTemplate;
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    private ?ExpressionBuilder $filterExpression = null;
 
-    /**
-     * @var ExpressionBuilder|null
-     */
-    private $filterExpression;
+    private ?array $sortedFilters = null;
 
-    /**
-     * @var ChannelListHelper
+    public function __construct(
+        Report $report,
+        private array $options, /**
+     * QueryBuilder object.
      */
-    private $channelListHelper;
-
-    /**
-     * @var array|null
-     */
-    private $sortedFilters;
-
-    public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
-    {
+        private QueryBuilder $queryBuilder,
+        private ChannelListHelper $channelListHelper
+    ) {
         $this->report            = $report;
         $this->context           = $report->getSource();
-        $this->options           = $options;
-        $this->queryBuilder      = $qb;
-        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -360,33 +340,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @param CompositeExpression|null $groupExpr
-     * @param array<string, mixed>     $filter
-     */
-    public function applyTagFilter($groupExpr, array $filter): CompositeExpression
-    {
-        $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
-        $tagSubQuery->select('DISTINCT lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
-
-        if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
-            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
-        }
-
-        if (in_array($filter['condition'], ['in', 'notEmpty'])) {
-            $groupExpr = $groupExpr->with(
-                $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
-            );
-        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
-            $groupExpr = $groupExpr->with(
-                $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
-            );
-        }
-
-        return $groupExpr;
-    }
-
     public function hasColumnWithPrefix(string $prefix): bool
     {
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
@@ -425,10 +378,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Check if the report has a specific column.
      *
      * @param array|string $column
-     *
-     * @return bool
      */
-    public function hasColumn($column)
+    public function hasColumn($column): bool
     {
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
 
@@ -449,10 +400,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Check if the report has a specific filter.
      *
      * @param array|string $column
-     *
-     * @return bool
      */
-    public function hasFilter($column)
+    public function hasFilter($column): bool
     {
         $this->buildSortedFilters();
 
@@ -488,21 +437,17 @@ class ReportGeneratorEvent extends AbstractReportEvent
      *
      * @param string $column
      *
-     * @return array
-     *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValues($column)
+    public function getFilterValues($column): array
     {
         return $this->getReport()->getFilterValues($column);
     }
 
     /**
      * Check if the report has a groupBy columns selected.
-     *
-     * @return bool
      */
-    public function hasGroupBy()
+    public function hasGroupBy(): bool
     {
         if (!empty($this->getReport()->getGroupBy())) {
             return true;
@@ -511,10 +456,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return false;
     }
 
-    /**
-     * @return string
-     */
-    public function createParameterName()
+    public function createParameterName(): string
     {
         $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -539,7 +481,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         $queryParts = $query->getQueryParts();
         $joins      =   !empty($queryParts) && $queryParts['join'] ? $queryParts['join'] : null;
-        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { //@phpstan-ignore-line
+        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { // @phpstan-ignore-line
             return false;
         }
         foreach ($joins[$fromAlias] as $join) {

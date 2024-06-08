@@ -11,8 +11,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class StatRepository extends CommonRepository
 {
     /**
-     * @param $trackingHash
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -36,13 +34,8 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param      $notificationId
-     * @param null $listId
-     *
-     * @return array
      */
-    public function getSentStats($notificationId, $listId = null)
+    public function getSentStats($notificationId, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
@@ -55,9 +48,9 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAllAssociative();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
-        //index by lead
+        // index by lead
         $stats = [];
         foreach ($result as $r) {
             $stats[$r['lead_id']] = $r['lead_id'];
@@ -97,7 +90,7 @@ class StatRepository extends CommonRepository
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -130,7 +123,7 @@ class StatRepository extends CommonRepository
 
         $q->andWhere('is_read = :true')
             ->setParameter('true', true, 'boolean');
-        $results = $q->execute()->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['read_count'] : 0;
     }
@@ -150,7 +143,7 @@ class StatRepository extends CommonRepository
         $query = $this->createQueryBuilder('s');
 
         $query->select('IDENTITY(s.notification) AS notification_id, s.id, s.dateRead, s.dateSent, e.title, s.isRead, s.retryCount, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash, s.clickDetails')
-            ->leftJoin(\Mautic\NotificationBundle\Entity\Notification::class, 'e', 'WITH', 'e.id = s.notification')
+            ->leftJoin(Notification::class, 'e', 'WITH', 'e.id = s.notification')
             ->leftJoin(\Mautic\LeadBundle\Entity\LeadList::class, 'l', 'WITH', 'l.id = s.list')
             ->where(
                 $query->expr()->andX(
@@ -165,17 +158,12 @@ class StatRepository extends CommonRepository
         }
 
         if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
+            [$orderBy, $orderByDir] = $options['order'];
 
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = 'e.title';
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = 'e.dateRead, e.dateSent';
-                    break;
-            }
+            $orderBy = match ($orderBy) {
+                'eventLabel' => 'e.title',
+                default      => 'e.dateRead, e.dateSent',
+            };
 
             $query->orderBy($orderBy, $orderByDir);
         }
@@ -225,10 +213,8 @@ class StatRepository extends CommonRepository
      * Get sent counts based grouped by notification Id.
      *
      * @param array $notificationIds
-     *
-     * @return array
      */
-    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null)
+    public function getSentCounts($notificationIds = [], \DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')
@@ -238,7 +224,7 @@ class StatRepository extends CommonRepository
             );
 
         if (null !== $fromDate) {
-            //make sure the date is UTC
+            // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
                 $q->expr()->gte('s.date_read', $q->expr()->literal($dt->toUtcString()))
@@ -246,8 +232,8 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('s.notification_id');
 
-        //get a total number of sent notifications first
-        $results = $q->execute()->fetchAllAssociative();
+        // get a total number of sent notifications first
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $counts = [];
 
@@ -260,33 +246,25 @@ class StatRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'push_notification_stats')
             ->set('notification_id', (int) $toLeadId)
             ->where('notification_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * Delete a stat.
-     *
-     * @param $id
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'push_notification_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }

@@ -32,7 +32,6 @@ trait TranslationEntityTrait
 
     /**
      * @param ClassMetadata $builder
-     * @param               $entityClass
      * @param string        $languageColumnName
      */
     protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
@@ -54,8 +53,6 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Add translation.
-     *
      * @return $this
      */
     public function addTranslationChild(TranslationEntityInterface $child)
@@ -67,10 +64,7 @@ trait TranslationEntityTrait
         return $this;
     }
 
-    /**
-     * Remove translation.
-     */
-    public function removeTranslationChild(TranslationEntityInterface $child)
+    public function removeTranslationChild(TranslationEntityInterface $child): void
     {
         $this->translationChildren->removeElement($child);
     }
@@ -78,7 +72,7 @@ trait TranslationEntityTrait
     /**
      * Get translated items.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ?Collection
      */
     public function getTranslationChildren()
     {
@@ -86,8 +80,6 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Set translation parent.
-     *
      * @return $this
      */
     public function setTranslationParent(TranslationEntityInterface $parent = null)
@@ -102,19 +94,14 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Get translation parent.
-     *
-     * @return mixed
+     * @return ?TranslationEntityInterface
      */
     public function getTranslationParent()
     {
         return $this->translationParent;
     }
 
-    /**
-     * Remove translation parent.
-     */
-    public function removeTranslationParent()
+    public function removeTranslationParent(): void
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('translationParent', '');
@@ -124,8 +111,6 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Set language.
-     *
      * @param string $language
      *
      * @return $this
@@ -142,8 +127,6 @@ trait TranslationEntityTrait
     }
 
     /**
-     * Get language.
-     *
      * @return string
      */
     public function getLanguage()
@@ -170,20 +153,15 @@ trait TranslationEntityTrait
 
     /**
      * Check if this entity has translations.
-     *
-     * @return int
      */
-    public function hasTranslations()
+    public function hasTranslations(): int
     {
         $children = $this->getTranslationChildren();
 
         return count($children);
     }
 
-    /**
-     * Clear translations.
-     */
-    public function clearTranslations()
+    public function clearTranslations(): void
     {
         $this->translationChildren = new ArrayCollection();
         $this->translationParent   = null;
@@ -194,7 +172,7 @@ trait TranslationEntityTrait
      *
      * @param bool $onlyChildren
      *
-     * @return array|\Doctrine\Common\Collections\ArrayCollection
+     * @return array|ArrayCollection
      */
     public function getTranslations($onlyChildren = false)
     {
@@ -204,10 +182,10 @@ trait TranslationEntityTrait
             $parent = $this;
         }
 
-        if ($children = $parent->getTranslationChildren()) {
-            if ($children instanceof Collection) {
-                $children = $children->toArray();
-            }
+        $children = $parent->getTranslationChildren();
+
+        if ($children instanceof Collection) {
+            $children = $children->toArray();
         }
 
         if (!is_array($children)) {
@@ -222,15 +200,16 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param $getter
+     * @param string                      $getter
+     * @param ?TranslationEntityInterface $variantParent
      *
-     * @return mixed
+     * @return int
      */
     protected function getAccumulativeTranslationCount($getter, $variantParent = null)
     {
         $count = 0;
 
-        list($parent, $children) = $this->getTranslations();
+        [$parent, $children] = $this->getTranslations();
         if ($variantParent != $parent) {
             $count = $parent->$getter();
         }

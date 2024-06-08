@@ -55,9 +55,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      */
     private $valueNormalizer;
 
-    /**
-     * ExampleSyncDataExchange constructor.
-     */
     public function __construct()
     {
         // Using the default normalizer for this example but each integration may need it's own if
@@ -149,7 +146,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                     );
 
                     break;
-                case 201: //created
+                case 201: // created
                     $syncOrderDAO->addObjectMapping(
                         $changeObject,
                         $result['object'],
@@ -217,7 +214,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
                     // If we know for certain that this specific field was modified at a specific date/time, set the change timestamp
                     // on the field itself for the judge to weigh certain versus possible changes
-                    //$reportFieldDAO->setChangeTimestamp($fieldChangeTimestamp);
+                    // $reportFieldDAO->setChangeTimestamp($fieldChangeTimestamp);
 
                     $objectDAO->addField($reportFieldDAO);
                 }
@@ -238,8 +235,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param $object
-     *
      * @return mixed
      */
     private function getReportPayload($object, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, array $mappedFields)

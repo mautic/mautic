@@ -6,41 +6,16 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageSchedule
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FileProperties
-     */
-    private $fileProperties;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
     public function __construct(
-        TranslatorInterface $translator,
-        FileProperties $fileProperties,
-        CoreParametersHelper $coreParametersHelper,
-        Router $router
+        private TranslatorInterface $translator,
+        private FileProperties $fileProperties,
+        private CoreParametersHelper $coreParametersHelper,
+        private UrlGeneratorInterface $router
     ) {
-        $this->translator           = $translator;
-        $this->fileProperties       = $fileProperties;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->router               = $router;
     }
 
     /**
@@ -108,11 +83,9 @@ class MessageSchedule
      *
      * @param string $filePath
      *
-     * @return bool
-     *
      * @throws \Mautic\CoreBundle\Exception\FileInvalidException
      */
-    public function fileCouldBeSend($filePath)
+    public function fileCouldBeSend($filePath): bool
     {
         $filesize    = $this->fileProperties->getFileSize($filePath);
         $maxFileSize = $this->coreParametersHelper->get('report_export_max_filesize_in_bytes');

@@ -2,10 +2,9 @@
 
 namespace FormBundle\Tests\EventListener;
 
-use Generator;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Entity\Action;
@@ -37,9 +36,9 @@ class FormSubscriberTest extends TestCase
         $ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $auditLogModel        = $this->createMock(AuditLogModel::class);
         $this->mailer         = $this->createMock(MailHelper::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $translator           = $this->createMock(TranslatorInterface::class);
         $router               = $this->createMock(RouterInterface::class);
+        $languageHelper       = $this->createMock(LanguageHelper::class);
 
         $this->mailer->expects($this->once())
             ->method('getMailer')
@@ -49,17 +48,18 @@ class FormSubscriberTest extends TestCase
             $ipLookupHelper,
             $auditLogModel,
             $this->mailer,
-            $coreParametersHelper,
             $translator,
-            $router
+            $router,
+            $languageHelper
         );
     }
 
     public function testOnFormSubmitActionRepost(): void
     {
         $postData = [
-            'first_name' => "Test's Name",
-            'notes'      => 'A & B < dy >',
+            'first_name' => "Test's Name un être> and être",
+            'notes'      => 'A & B < dy >
+New line',
             'formId'     => '1',
             'return'     => '',
             'formName'   => 'form190122',
@@ -67,8 +67,8 @@ class FormSubscriberTest extends TestCase
         ];
 
         $resultData = [
-            'first_name' => 'Test&#39;s Name',
-            'notes'      => 'A &#38; B &#60; dy &#62;',
+            'first_name' => 'Test&#39;s Name un &ecirc;tre&gt; and être',
+            'notes'      => 'A &#38; B &#60; dy &#62;&#10;New line',
         ];
 
         $request         = new Request();
@@ -189,7 +189,7 @@ class FormSubscriberTest extends TestCase
         $this->subscriber->onFormSubmitActionSendEmail($submissionEvent);
     }
 
-    public function toCcBccProvider(): Generator
+    public static function toCcBccProvider(): \Generator
     {
         yield ['to@email.email, to2@email.email', null, null];
         yield [null, 'cc@email.email, cc2@email.email', null];

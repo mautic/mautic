@@ -58,7 +58,7 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $translatorMock        = $this->createMock(TranslatorInterface::class);
         $channelListHelperMock = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
-        $reportHelperMock      = new ReportHelper();
+        $reportHelperMock      = new ReportHelper($this->createMock(EventDispatcher::class));
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock = $this->createMock(CompanyReportData::class);
 

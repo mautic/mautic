@@ -6,11 +6,9 @@ namespace Mautic\CoreBundle\Predis\Replication;
 
 final class StrategyConfig
 {
-    private bool $primaryOnly = false;
-
-    public function __construct(bool $primaryOnly)
-    {
-        $this->primaryOnly = $primaryOnly;
+    public function __construct(
+        private bool $primaryOnly
+    ) {
     }
 
     /**

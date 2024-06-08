@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
-use DateTimeImmutable;
-use DateTimeZone;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 use Mautic\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -27,24 +32,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class ContactExportSchedulerModel extends AbstractCommonModel
 {
     private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
-    private SessionInterface $session;
-    private RequestStack $requestStack;
-    private LeadModel $leadModel;
-    private ExportHelper $exportHelper;
-    private MailHelper $mailHelper;
 
     public function __construct(
-        SessionInterface $session,
-        RequestStack $requestStack,
-        LeadModel $leadModel,
-        ExportHelper $exportHelper,
-        MailHelper $mailHelper
+        private SessionInterface $session,
+        private RequestStack $requestStack,
+        private LeadModel $leadModel,
+        private ExportHelper $exportHelper,
+        private MailHelper $mailHelper,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->session      = $session;
-        $this->requestStack = $requestStack;
-        $this->leadModel    = $leadModel;
-        $this->exportHelper = $exportHelper;
-        $this->mailHelper   = $mailHelper;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): ContactExportSchedulerRepository
@@ -86,7 +90,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
                 ],
             ];
         } else {
-            if ('list' !== $indexMode || (false === strpos($search, $anonymous))) {
+            if ('list' !== $indexMode || (!str_contains($search, $anonymous))) {
                 // Remove anonymous leads unless requested to prevent clutter.
                 $filter['force'] = [
                     [
@@ -126,7 +130,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $contactExportScheduler = new ContactExportScheduler();
         $contactExportScheduler
             ->setUser($this->userHelper->getUser())
-            ->setScheduledDateTime(new DateTimeImmutable('now', new DateTimeZone('UTC')))
+            ->setScheduledDateTime(new \DateTimeImmutable())
             ->setData($data);
 
         $this->em->persist($contactExportScheduler);
@@ -139,16 +143,14 @@ class ContactExportSchedulerModel extends AbstractCommonModel
     {
         $data            = $contactExportScheduler->getData();
         $fileType        = $data['fileType'];
-        $resultsCallback = function ($contact) {
-            return $contact->getProfileFields();
-        };
-        $iterator = new IteratorExportDataModel(
+        $resultsCallback = fn ($contact) => $contact->getProfileFields();
+        $iterator        = new IteratorExportDataModel(
             $this->leadModel,
             $contactExportScheduler->getData(),
             $resultsCallback,
             true
         );
-        /** @var DateTimeImmutable $scheduledDateTime */
+        /** @var \DateTimeImmutable $scheduledDateTime */
         $scheduledDateTime = $contactExportScheduler->getScheduledDateTime();
         $fileName          = 'contacts_export_'.$scheduledDateTime->format(self::EXPORT_FILE_NAME_DATE_FORMAT);
 
@@ -222,7 +224,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         $csvFilePath = $this->exportHelper
             ->exportDataIntoFile($iterator, $fileType, strtolower($fileName.'.'.$fileType));
 
-        return $this->exportHelper->zipFile($csvFilePath);
+        return $this->exportHelper->zipFile($csvFilePath, 'contacts_export.csv');
     }
 
     private function getContactExportFileContentType(string $fileName): string

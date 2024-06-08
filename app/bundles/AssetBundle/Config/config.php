@@ -21,7 +21,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => 'Mautic\AssetBundle\Controller\Api\AssetApiController',
+                'controller'      => Mautic\AssetBundle\Controller\Api\AssetApiController::class,
             ],
         ],
         'public' => [
@@ -55,7 +55,7 @@ return [
     'services' => [
         'permissions' => [
             'mautic.asset.permissions' => [
-                'class'     => \Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
+                'class'     => Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
@@ -63,30 +63,24 @@ return [
         ],
         'others' => [
             'mautic.asset.upload.error.handler' => [
-                'class'     => \Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
+                'class'     => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
                 'arguments' => 'mautic.factory',
             ],
             // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => \Mautic\AssetBundle\Controller\UploadController::class,
+            'oneup_uploader.controller.dropzone.class' => Mautic\AssetBundle\Controller\UploadController::class,
         ],
         'fixtures' => [
             'mautic.asset.fixture.asset' => [
-                'class'     => \Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-            ],
-        ],
-        'repositories' => [
-            'mautic.asset.repository.download' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => \Mautic\AssetBundle\Entity\Download::class,
+                'class'     => Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
         ],
     ],
 
     'parameters' => [
-        'upload_dir'         => '%kernel.project_dir%/media/files',
-        'max_size'           => '6',
-        'allowed_extensions' => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav'],
+        'upload_dir'          => '%mautic.application_dir%/media/files',
+        'max_size'            => '6',
+        'allowed_extensions'  => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav'],
+        'streamed_extensions' => ['gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'pdf', 'png', 'wav'],
     ],
 ];

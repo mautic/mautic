@@ -15,10 +15,7 @@ class ObjectMapping
      */
     private $id;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateCreated;
+    private ?\DateTimeInterface $dateCreated;
 
     /**
      * @var string
@@ -45,10 +42,7 @@ class ObjectMapping
      */
     private $integrationObjectId;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $lastSyncDate;
+    private ?\DateTimeInterface $lastSyncDate;
 
     /**
      * @var array
@@ -74,6 +68,7 @@ class ObjectMapping
             ->setCustomRepositoryClass(ObjectMappingRepository::class)
             ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')
             ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'integration_reference')
+            ->addIndex(['integration', 'internal_object_name', 'last_sync_date'], 'integration_integration_object_name_last_sync_date')
             ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
         $builder->addId();
@@ -128,8 +123,6 @@ class ObjectMapping
     }
 
     /**
-     * ObjectMapping constructor.
-     *
      * @throws \Exception
      */
     public function __construct(?\DateTime $dateCreated = null)
@@ -210,10 +203,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getInternalObjectId()
+    public function getInternalObjectId(): int
     {
         return (int) $this->internalObjectId;
     }
@@ -317,9 +307,6 @@ class ObjectMapping
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @return $this
      */
     public function appendToInternalStorage($key, $value)

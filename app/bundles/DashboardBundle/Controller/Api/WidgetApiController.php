@@ -2,16 +2,27 @@
 
 namespace Mautic\DashboardBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Mautic\DashboardBundle\Model\DashboardModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Widget>
@@ -21,11 +32,11 @@ class WidgetApiController extends CommonApiController
     /**
      * @var DashboardModel|null
      */
-    protected $model = null;
+    protected $model;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $dashboardModel = $this->getModel('dashboard');
+        $dashboardModel = $modelFactory->getModel('dashboard');
         \assert($dashboardModel instanceof DashboardModel);
 
         $this->model            = $dashboardModel;
@@ -34,13 +45,13 @@ class WidgetApiController extends CommonApiController
         $this->entityNameMulti  = 'widgets';
         $this->serializerGroups = [];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * Obtains a list of available widget types.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getTypesAction()
     {
@@ -58,7 +69,7 @@ class WidgetApiController extends CommonApiController
      *
      * @param string $type of the widget
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getDataAction(Request $request, $type)
     {
@@ -105,10 +116,7 @@ class WidgetApiController extends CommonApiController
         $widget->setParams($params);
         $widget->setType($type);
         $widget->setHeight($widgetHeight);
-
-        if (null !== $cacheTimeout) {
-            $widget->setCacheTimeout($cacheTimeout);
-        }
+        $widget->setCacheTimeout($cacheTimeout);
 
         $this->model->populateWidgetContent($widget);
         $data = $widget->getTemplateData();

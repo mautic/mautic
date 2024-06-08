@@ -15,25 +15,16 @@ class DateTimeHelper
      */
     private $string;
 
-    /**
-     * @var string
-     */
-    private $format;
+    private string $format;
 
     /**
      * @var string
      */
     private $timezone;
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $utc;
+    private \DateTimeZone $utc;
 
-    /**
-     * @var \DateTimeZone
-     */
-    private $local;
+    private \DateTimeZone $local;
 
     /**
      * @var \DateTimeInterface
@@ -53,10 +44,8 @@ class DateTimeHelper
 
     /**
      * @param \DateTimeInterface|string $datetime
-     * @param string                    $fromFormat
-     * @param string                    $timezone
      */
-    public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
+    public function setDateTime($datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
     {
         if ('local' == $timezone) {
             $timezone = self::$defaultLocalTimezone;
@@ -73,11 +62,11 @@ class DateTimeHelper
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
             $this->timezone = $datetime->getTimezone()->getName();
-            $this->string   = $this->datetime->format($fromFormat);
+            $this->string   = $fromFormat ? $this->datetime->format($fromFormat) : $datetime;
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
-            $this->string   = $this->datetime->format($fromFormat);
-        } elseif (null == $fromFormat) {
+            $this->string   = $fromFormat ? $this->datetime->format($fromFormat) : $datetime;
+        } elseif (null === $fromFormat) {
             $this->string   = $datetime;
             $this->datetime = new \DateTime($datetime, new \DateTimeZone($this->timezone));
         } else {
@@ -90,7 +79,7 @@ class DateTimeHelper
             );
 
             if (false === $this->datetime) {
-                //the format does not match the string so let's attempt to fix that
+                // the format does not match the string so let's attempt to fix that
                 $this->string   = date($this->format, strtotime($datetime));
                 $this->datetime = \DateTime::createFromFormat(
                     $this->format,
@@ -157,10 +146,8 @@ class DateTimeHelper
 
     /**
      * @param string|null $format
-     *
-     * @return string
      */
-    public function getString($format = null)
+    public function getString($format = null): string
     {
         if (empty($format)) {
             $format = $this->format;
@@ -208,16 +195,15 @@ class DateTimeHelper
     /**
      * Gets a difference.
      *
-     * @param string     $compare
-     * @param null       $format
-     * @param bool|false $resetTime
+     * @param string|\DateTime $compare
+     * @param bool|false       $resetTime
      *
      * @return bool|\DateInterval|string
      */
     public function getDiff($compare = 'now', $format = null, $resetTime = false)
     {
         if ('now' == $compare) {
-            $compare = new \DateTime();
+            $compare = new \DateTime('now', $this->datetime->getTimezone());
         }
 
         $with = clone $this->datetime;
@@ -235,8 +221,7 @@ class DateTimeHelper
     /**
      * Add to datetime.
      *
-     * @param            $intervalString
-     * @param bool|false $clone          If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone If true, return a new \DateTime rather than update current one
      *
      * @return \DateTimeInterface
      */
@@ -257,8 +242,7 @@ class DateTimeHelper
     /**
      * Subtract from datetime.
      *
-     * @param            $intervalString
-     * @param bool|false $clone          If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone If true, return a new \DateTime rather than update current one
      *
      * @return \DateTimeInterface
      */
@@ -282,11 +266,9 @@ class DateTimeHelper
      * @param int    $interval
      * @param string $unit
      *
-     * @return \DateInterval
-     *
      * @throws \Exception
      */
-    public function buildInterval($interval, $unit)
+    public function buildInterval($interval, $unit): \DateInterval
     {
         $possibleUnits = ['Y', 'M', 'D', 'I', 'H', 'S'];
         $unit          = strtoupper($unit);
@@ -295,17 +277,11 @@ class DateTimeHelper
             throw new \InvalidArgumentException($unit.' is invalid unit for DateInterval');
         }
 
-        switch ($unit) {
-            case 'I':
-                $spec = "PT{$interval}M";
-                break;
-            case 'H':
-            case 'S':
-                $spec = "PT{$interval}{$unit}";
-                break;
-            default:
-                $spec = "P{$interval}{$unit}";
-        }
+        $spec = match ($unit) {
+            'I' => "PT{$interval}M",
+            'H', 'S' => "PT{$interval}{$unit}",
+            default => "P{$interval}{$unit}",
+        };
 
         return new \DateInterval($spec);
     }
@@ -313,8 +289,7 @@ class DateTimeHelper
     /**
      * Modify datetime.
      *
-     * @param            $string
-     * @param bool|false $clone  If true, return a new \DateTime rather than update current one
+     * @param bool|false $clone If true, return a new \DateTime rather than update current one
      *
      * @return \DateTimeInterface
      */
@@ -333,8 +308,6 @@ class DateTimeHelper
     /**
      * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow.
      *
-     * @param $interval
-     *
      * @return bool|string
      */
     public function getTextDate($interval = null)
@@ -345,16 +318,12 @@ class DateTimeHelper
 
         $diffDays = (int) $interval->format('%R%a');
 
-        switch ($diffDays) {
-            case 0:
-                return 'today';
-            case -1:
-                return 'yesterday';
-            case +1:
-                return 'tomorrow';
-            default:
-                return false;
-        }
+        return match ($diffDays) {
+            0       => 'today',
+            -1      => 'yesterday',
+            +1      => 'tomorrow',
+            default => false,
+        };
     }
 
     /**
@@ -390,7 +359,7 @@ class DateTimeHelper
      *
      * @throws \InvalidArgumentException
      */
-    public static function validateMysqlDateTimeUnit($unit)
+    public static function validateMysqlDateTimeUnit($unit): void
     {
         $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
 
