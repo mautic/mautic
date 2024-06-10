@@ -283,6 +283,9 @@ class UserController extends FormController
                     // form is valid so process the data
                     $user->setPassword($password);
                     $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    if (!empty($submittedPassword)) {
+                        $model->sendChangePasswordEmail($user);
+                    }
 
                     // check if the user's locale has been downloaded already, fetch it if not
                     $installedLanguages = $languageHelper->getSupportedLanguages();
