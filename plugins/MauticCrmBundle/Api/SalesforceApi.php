@@ -354,7 +354,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    private function requestQueryAllAndHandle(string $queryUrl, array $fields, $object, array $query)
+    private function requestQueryAllAndHandle(string $queryUrl, array $fields, string $object, array $query)
     {
         $config = $this->integration->mergeConfigToFeatureSettings([]);
         if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
