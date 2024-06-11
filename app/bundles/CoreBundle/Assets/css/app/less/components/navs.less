@@ -46,8 +46,8 @@
   border-top-right-radius: @nav-pills-border-radius;
   border-top-left-radius: @nav-pills-border-radius;
   //background-color: @body-bg;
-  flex-wrap: nowrap;
   display: flex;
+  flex-wrap: wrap;
   text-wrap: nowrap;
 
   > li {
@@ -69,6 +69,12 @@
         background-color: @nav-pills-active-link-hover-bg;
       }
     }
+  }
+}
+
+@media (min-width: @screen-lg-min) {
+  .nav-tabs {
+    flex-wrap: nowrap;
   }
 }
 

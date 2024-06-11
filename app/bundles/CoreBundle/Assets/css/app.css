@@ -2668,8 +2668,8 @@ ul.dropdown-menu-form {
 .nav-tabs {
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
-  flex-wrap: nowrap;
   display: flex;
+  flex-wrap: wrap;
   text-wrap: nowrap;
 }
 .nav-tabs > li > a {
@@ -2687,6 +2687,11 @@ ul.dropdown-menu-form {
   right: 0;
   height: 2px;
   background-color: #4E5D9D;
+}
+@media (min-width: 1200px) {
+  .nav-tabs {
+    flex-wrap: nowrap;
+  }
 }
 /*
 .tab-content {
