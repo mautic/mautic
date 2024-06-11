@@ -5,15 +5,18 @@
 {% set uploadMaxFilesize = ini_get('upload_max_filesize')|replace({'M': ''}) %}
 <div class="row">
     <div class="col-sm-offset-3 col-sm-6">
-        <div class="ml-lg mr-lg mt-md pa-lg">
-            <div class="panel panel-info">
+        <div class="pt-40">
+            <div class="panel">
                 <div class="panel-heading">
-                    <div class="panel-title">{{ 'mautic.lead.import.start.instructions'|trans({'%size%': uploadMaxFilesize}) }}</div>
+                    <h2>Choose your file</h2>
+                    <div class="muted">{{ 'mautic.lead.import.start.instructions.upload_size'|trans({'%size%': uploadMaxFilesize}) }}</div>
                 </div>
                 <div class="panel-body">
                     {{ form_start(form) }}
-                    <div class="input-group well mt-lg">
-                        {{ form_widget(form.file) }}
+                    <div class="small muted"> {{ 'mautic.lead.import.start.instructions.format'|trans }}: CSV</div>
+                    <div class="input-group well mt-xs">
+                        {{ form_widget(form.file, {'label': 'mautic.lead.import.csv.parser.config'}) }}
+
                         <span class="input-group-btn">
                             {{ form_widget(form.start) }}
                         </span>
@@ -37,6 +40,17 @@
                         </div>
                     </div>
                     {{ form_end(form) }}
+                    <div class="tile mt-lg">
+                        <div class="row gap-sm fw-nowrap-md">
+                            <div class="col-md-6 gap-xs">
+                                <h5 class="fw-b"> {{'mautic.lead.import.start.instructions.sample'|trans }}</h5>
+                                <span> {{ 'mautic.lead.import.start.instructions.sample.description'|trans }}</span>
+                            </div>
+                            <div class="col-md-6 ai-end jc-center">
+                                <div class="btn btn-tertiary btn-small">{{ 'mautic.core.download'|trans }} <i class="ri-download-line"></i></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
