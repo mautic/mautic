@@ -36,7 +36,7 @@
 {% set actionUrl = path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) %}
 {% set isCurrent = (variant.id is same as activeEntity.id) %}
 
-<li class="list-group-item bg-auto bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
+<li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
     <div class="box-layout">
         <div class="col-md-8 va-m">
             <div class="row">

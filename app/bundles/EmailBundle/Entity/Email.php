@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\EmailBundle\Validator\EmailLists;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\FormBundle\Entity\Form;
@@ -373,6 +374,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         );
 
         $metadata->addConstraint(new EmailLists());
+        $metadata->addConstraint(new EntityEvent());
 
         $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context): void {
@@ -426,6 +428,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'emailType',
                     'publishUp',
                     'publishDown',
+                    'publicPreview',
                     'readCount',
                     'sentCount',
                     'revision',
