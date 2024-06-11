@@ -9,19 +9,21 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class <className> extends PreUpAssertionMigration
 {
+    private const TABLE_NAME = 'table_name';
+
     protected function preUpAssertions(): void
     {
         // Please add an assertion for every SQL you define in the `up()` method.
-        // The order does matter!
-        // E.g.:
+        // The order does matter! Examples:
+
         /*
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->hasTable("{$this->prefix}table_name"),
-            "Table {$this->prefix}table_name already exists"
+            fn (Schema $schema) => $schema->hasTable($this->getPrefixedTableName(self::TABLE_NAME)),
+            "Table {$this->getPrefixedTableName(self::TABLE_NAME)} already exists"
         );
 
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable("{$this->prefix}table_name")->hasIndex('index_name'),
+            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex('index_name'),
             'Index index_name already exists'
         );
         */
@@ -29,6 +31,20 @@ final class <className> extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        // Please modify to your needs
+        // Add queries to modify the database schema. Examples:
+
+        /**
+        $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
+        $table->addColumn('column_a', Types::DATETIME_IMMUTABLE)->setNotnull(false);
+        */
+
+        /**
+        $this->addSql("CREATE INDEX index_a ON {$this->getPrefixedTableName(self::TABLE_NAME)} (column_a, column_b);");
+        */
+    }
+
+    public function down(Schema $schema): void
+    {
+        // Undo what was done in the up() method here.
     }
 }
