@@ -647,9 +647,6 @@ class SalesforceApi extends CrmApi
         return false;
     }
 
-    /**
-     * @return array<mixed>|null[]
-     */
     private function parseMissingField(string $errorMessage)
     {
         $matches = [];
