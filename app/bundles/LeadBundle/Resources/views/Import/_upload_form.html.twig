@@ -8,7 +8,7 @@
         <div class="pt-40">
             <div class="panel">
                 <div class="panel-heading">
-                    <h2>Choose your file</h2>
+                    <h2 class="mt-lg">Choose your file</h2>
                     <div class="muted">{{ 'mautic.lead.import.start.instructions.upload_size'|trans({'%size%': uploadMaxFilesize}) }}</div>
                 </div>
                 <div class="panel-body">
@@ -47,7 +47,7 @@
                                 <span> {{ 'mautic.lead.import.start.instructions.sample.description'|trans }}</span>
                             </div>
                             <div class="col-md-6 ai-end jc-center">
-                                <div class="btn btn-tertiary btn-small">{{ 'mautic.core.download'|trans }} <i class="ri-download-line"></i></div>
+                                <a class="btn btn-tertiary btn-small" href="/app/bundles/LeadBundle/Assets/contacts_sample.csv" download>{{ 'mautic.core.download'|trans }} <i class="ri-download-line"></i></a>
                             </div>
                         </div>
                     </div>
