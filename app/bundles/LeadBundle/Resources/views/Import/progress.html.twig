@@ -28,7 +28,7 @@ Variables
 <div class="row ma-lg" id="{{ id }}">
     <div class="col-sm-offset-3 col-sm-6 text-center">
         <div class="panel">
-            <div class="panel-heading">
+            <div class="panel-heading mt-sm">
                 <div class="progress mt-lg" style="height:3px;">
                     <div class="progress-bar-import progress-bar {% if not complete %}active{% endif %} bg-{% if complete %}success{% else %}danger{% endif %}"
                         role="progressbar" aria-valuenow="{{ progress.done }}" aria-valuemin="0"
@@ -73,7 +73,7 @@ Variables
                         </div>
                     </div>
                 </div>
-                <h4 class="mb-md text-left fw-md">{{ 'mautic.lead.segments.contacts.imported_database'|trans }}</h4>
+                <h4 class="mb-md text-left fw-sb">{{ 'mautic.lead.segments.contacts.imported_database'|trans }}</h4>
                 <div class="row-no-gutters jc-space-between ai-center mb-sm">
                     <span class="d-flex gap-xs"><i class="ri-user-add-line ri-lg"></i>{{'mautic.lead.import.stats.created'|trans}}</span>
                     <span class="fw-b">{{ import.insertedCount }}</span>
