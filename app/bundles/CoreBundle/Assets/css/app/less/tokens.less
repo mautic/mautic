@@ -1,26 +1,13 @@
 //
-// Variables
+// Brand center
 // --------------------------------------------------
+@primary-color: #4e5e9e;
+@secondary-color: #fdb933;
+@border-radius: 3px;
 
-
-
-// Brand center ---------------------------------- //
-:root {
-    --primary-hue: 228;
-    --primary-saturation: 34%;
-    --items-on-primary: #ffffff;
-    --items-on-primary-disabled: #8d8d8d;
-    --secondary-hue: 40;
-    --secondary-saturation: 98%;
-    --items-on-secondary: black;
-    --border-radius: 3px;
-}
-// ----------------------------------------------- */ 
-
-
+ 
 
 // Themes
-
 /// Light theme
 :root {
     // Colors //
@@ -33,8 +20,8 @@
     --background-selected-hover: #8d8d8d52;
     --background-inverse: #393939;
     --background-inverse-hover: #4c4c4c;
-    --background-brand: var(--primary-70);
-    --background-brand-alt: var(--secondary-70);
+    --background-brand: var(--primary-60);
+    --background-brand-alt: var(--secondary-60);
 
     /// Layer
     --layer: #f4f4f4;
@@ -77,8 +64,8 @@
     --text-primary: #161616;
     --text-secondary: #525252;
     --text-placeholder: #a8a8a8;
-    --text-on-color: var(--items-on-primary, #ffffff);
-    --text-on-color-disabled: var(--items-on-primary, #8d8d8d);
+    --text-on-color: contrast(@primary-60);
+    --text-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d);
     --text-helper: #6f6f6f;
     --text-error: #da1e28;
     --text-inverse: #ffffff;
@@ -94,8 +81,8 @@
     /// Icons
     --icon-primary: #161616;
     --icon-secondary: #525252;
-    --icon-on-color: var(--items-on-primary, #ffffff);;
-    --icon-on-color-disabled: var(--items-on-primary, #8d8d8d);
+    --icon-on-color: contrast(@primary-60);
+    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d); 
     --icon-interactive: var(--primary-60);
     --icon-inverse: #ffffff;
     --icon-disabled: #16161640;
@@ -252,8 +239,8 @@
     --text-primary: #f4f4f4;
     --text-secondary: #c6c6c6;
     --text-placeholder: #6f6f6f;
-    --text-on-color: var(--items-on-primary, #ffffff);
-    --text-on-color-disabled: var(--items-on-primary, #8d8d8d);
+    --text-on-color: contrast(@primary-80);
+    --text-on-color-disabled: contrast(@primary-80, #16161640, #8d8d8d);
     --text-helper: #8d8d8d;
     --text-error: #ff8389;
     --text-inverse: #161616;
@@ -269,8 +256,8 @@
     /// Icons
     --icon-primary: #f4f4f4;
     --icon-secondary: #c6c6c6;
-    --icon-on-color: var(--items-on-primary, #ffffff);
-    --icon-on-color-disabled: var(--items-on-primary, #8d8d8d);
+    --icon-on-color: contrast(@primary-80);
+    --icon-on-color-disabled: contrast(@primary-80, #16161640, #8d8d8d);
     --icon-interactive: #ffffff;
     --icon-inverse: #161616;
     --icon-disabled: #f4f4f4;
@@ -360,25 +347,40 @@
 
 // General
 //
-:root {
 // Brand palette //
---primary-20: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 95%);
---primary-30: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 85%);
---primary-40: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 75%);
---primary-50: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 65%);
---primary-60: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 55%);
---primary-70: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 45%);
---primary-80: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 35%);
---primary-90: hsl(var(--primary-hue, 228), var(--primary-saturation, 50%), 25%);
---secondary-20: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 95%);
---secondary-30: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 85%);
---secondary-40: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 75%);
---secondary-50: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 65%);
---secondary-60: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 55%);
---secondary-70: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 45%);
---secondary-80: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 35%);
---secondary-90: hsl(var(--secondary-hue, 40), var(--secondary-saturation, 98%), 25%);
-
+@primary-20: lighten(@primary-color, 40%);
+@primary-30: lighten(@primary-color, 30%);
+@primary-40: lighten(@primary-color, 20%);
+@primary-50: lighten(@primary-color, 10%);
+@primary-60: @primary-color;
+@primary-70: darken(@primary-color, 10%);
+@primary-80: darken(@primary-color, 20%);
+@primary-90: darken(@primary-color, 30%);
+@secondary-20: lighten(@secondary-color, 40%);
+@secondary-30: lighten(@secondary-color, 30%);
+@secondary-40: lighten(@secondary-color, 20%);
+@secondary-50: lighten(@secondary-color, 10%);
+@secondary-60: @secondary-color;
+@secondary-70: darken(@secondary-color, 10%);
+@secondary-80: darken(@secondary-color, 20%);
+@secondary-90: darken(@secondary-color, 30%);
+:root {
+--primary-20: @primary-20;
+--primary-30: @primary-30;
+--primary-40: @primary-40;
+--primary-50: @primary-50;
+--primary-60: @primary-60;
+--primary-70: @primary-70;
+--primary-80: @primary-80;
+--primary-90: @primary-90;
+--secondary-20: @secondary-20;
+--secondary-30: @secondary-30;
+--secondary-40: @secondary-40;
+--secondary-50: @secondary-50;
+--secondary-60: @secondary-60;
+--secondary-70: @secondary-70;
+--secondary-80: @secondary-80;
+--secondary-90: @secondary-90;
 
 // Motion //
 
@@ -439,9 +441,9 @@
 --no-border: 1px solid var(--no-border-color);
 --no-border-color: transparent;
 --border-bottom: 0 0 clamp(0px, calc(1px - var(--border-radius, 0px)), 1px) 0;
---border-radius-sm: clamp(0px, var(--border-radius, 0px), 7px);
---border-radius-md: clamp(0px, calc(1.8 * var(--border-radius, 0px)), 14px);
---border-radius-lg: clamp(0px, calc(2.6 * var(--border-radius, 0px)), 21px);
+--border-radius-sm: clamp(0px, @border-radius, 7px);
+--border-radius-md: clamp(0px, calc(1.8 * @border-radius), 14px);
+--border-radius-lg: clamp(0px, calc(2.6 * @border-radius), 21px);
 }
 
 @media (min-width: 672px) {
@@ -521,6 +523,7 @@
 
 /// High contrast
 :root[high-contrast="enabled"] {
+    outline-style: dotted;
 --no-border-color: var(--border-strong);
 --border-bottom: 1px solid var(--border-strong);
 --support-error: var(--text-primary);
