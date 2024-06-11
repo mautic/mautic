@@ -4737,10 +4737,10 @@ button.list-group-item-danger.active:focus {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 .panel-body {
-  padding: 15px;
+  padding: 25px;
 }
 .panel-heading {
-  padding: 10px 15px;
+  padding: 0 25px;
   border-bottom: 1px solid transparent;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
@@ -4762,7 +4762,7 @@ button.list-group-item-danger.active:focus {
   color: inherit;
 }
 .panel-footer {
-  padding: 10px 15px;
+  padding: var(--spacing-06) 0 0;
   background-color: #f5f5f5;
   border-top: 1px solid #ebedf0;
   border-bottom-right-radius: 2px;
@@ -4807,8 +4807,8 @@ button.list-group-item-danger.active:focus {
 .panel > .table caption,
 .panel > .table-responsive > .table caption,
 .panel > .panel-collapse > .table caption {
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 25px;
+  padding-left: 25px;
 }
 .panel > .table:first-child,
 .panel > .table-responsive:first-child > .table:first-child {
