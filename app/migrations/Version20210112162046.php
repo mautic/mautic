@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20210112162046 extends AbstractMauticMigration
 {
     protected const TABLE_NAME = 'sync_object_mapping';
-    private const INDEX_NAME = 'integration_integration_object_name_last_sync_date';
+    private const INDEX_NAME   = 'integration_integration_object_name_last_sync_date';
 
     public function preUp(Schema $schema): void
     {
