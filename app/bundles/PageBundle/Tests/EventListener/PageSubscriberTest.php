@@ -19,6 +19,7 @@ use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageSubscriberTest extends TestCase
@@ -78,7 +79,7 @@ EOF
     {
         /** @var Packages&MockObject $packagesMock */
         $packagesMock = $this->createMock(Packages::class);
-      
+
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
