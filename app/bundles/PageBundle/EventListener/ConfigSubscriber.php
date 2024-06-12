@@ -4,7 +4,6 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
-use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
 use Mautic\PageBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -61,15 +60,5 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'do_not_track_404_anonymous'            => false,
             ],
         ]);
-    }
-
-    public function onConfigSave(ConfigEvent $event): void
-    {
-        $values = $event->getConfig();
-
-        if (!empty($values['pageconfig']['google_analytics'])) {
-            $values['pageconfig']['google_analytics'] = htmlspecialchars($values['pageconfig']['google_analytics']);
-            $event->setConfig($values);
-        }
     }
 }
