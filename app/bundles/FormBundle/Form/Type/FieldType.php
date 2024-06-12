@@ -457,10 +457,10 @@ class FieldType extends AbstractType
         $update = (!empty($options['data']['id'])) ? true : false;
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
-            $btnIcon  = 'fa fa-pencil';
+            $btnIcon  = 'ri-edit-line';
         } else {
             $btnValue = 'mautic.core.form.add';
-            $btnIcon  = 'fa fa-plus';
+            $btnIcon  = 'ri-add-line';
         }
 
         $builder->add(

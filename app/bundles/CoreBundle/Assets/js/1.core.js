@@ -714,7 +714,7 @@ var Mautic = {
         elButton.ariaLabel = "Close";
 
         const elI = document.createElement('i');
-        elI.className = 'fa fa-times';
+        elI.className = 'ri-close-line';
 
         const elSpan = document.createElement('span');
         elSpan.innerHTML = message;

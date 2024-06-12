@@ -34,10 +34,10 @@
   {%- set icon = 'fa-toggle-off text-danger' %}
   {%- set text = 'mautic.core.form.inactive'|trans %}
 {%- elseif status is same as 'expired' %}
-  {%- set icon = 'fa-clock-o text-danger' %}
+  {%- set icon = 'ri-time-line text-danger' %}
   {%- set text = 'mautic.core.form.expired_to'|trans({'%date%': dateToFull(item.publishDown)}) %}
 {%- elseif status is same as 'pending' %}
-  {%- set icon = 'fa-clock-o text-warning' %}
+  {%- set icon = 'ri-time-line text-warning' %}
   {%- set text = 'mautic.core.form.pending.start_at'|trans({'%date%': dateToFull(item.publishUp)}) %}
 {%- endif %}
 
