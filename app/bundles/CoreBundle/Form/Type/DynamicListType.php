@@ -47,7 +47,7 @@ class DynamicListType extends AbstractType
                 'remove_onclick'  => 'Mautic.removeFormListOption(this);',
                 'option_required' => true,
                 'option_notblank' => true,
-                'remove_icon'     => 'fa fa-times',
+                'remove_icon'     => 'ri-close-line',
                 'sortable'        => 'fa fa-ellipsis-v handle',
                 'label'           => false,
                 'entry_options'   => [
