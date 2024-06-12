@@ -34,7 +34,7 @@ class PageSubscriberTest extends TestCase
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
 
-    public function testOnPageDisplayBodyTagRegex()
+    public function testOnPageDisplayBodyTagRegex(): void
     {
         $dummyPageContent = <<<EOF
 <html>
