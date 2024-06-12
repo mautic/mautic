@@ -87,7 +87,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-user',
+                    'preaddon' => 'ri-user-6-fill',
                     'tooltip'  => 'mautic.email.from_name.tooltip',
                 ],
                 'required' => false,

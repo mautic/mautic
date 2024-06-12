@@ -53,7 +53,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         'data-header' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                    'iconClass' => 'fa fa-search',
+                    'iconClass' => 'ri-search-line',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );
@@ -73,7 +73,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         ),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                    'iconClass' => 'fa fa-search',
+                    'iconClass' => 'ri-search-line',
                 ];
 
                 $event
@@ -107,7 +107,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                             ),
                         ],
                         'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                        'iconClass' => 'fa fa-search',
+                        'iconClass' => 'ri-search-line',
                     ],
                     ButtonHelper::LOCATION_BULK_ACTIONS
                 );
@@ -127,7 +127,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                             ),
                         ],
                         'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                        'iconClass' => 'fa fa-search',
+                        'iconClass' => 'ri-search-line',
                     ];
 
                     $event
