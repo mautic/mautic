@@ -221,6 +221,7 @@ class UserController extends FormController
         $model = $this->getModel('user.user');
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
+        $oldEmail = $user->getEmail();
 
         /** @var AuditLogModel $auditLogModel */
         $auditLogModel      = $this->getModel('core.auditlog');
@@ -278,13 +279,18 @@ class UserController extends FormController
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
+                $newEmail          = $formUser['email'];
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
                     $user->setPassword($password);
                     $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                     if (!empty($submittedPassword)) {
-                        $model->sendChangePasswordEmail($user);
+                        $model->sendChangePasswordInfo($user);
+                    }
+
+                    if ($newEmail !== $oldEmail) {
+                        $model->sendChangeEmailInfo($oldEmail, $user);
                     }
 
                     // check if the user's locale has been downloaded already, fetch it if not

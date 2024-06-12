@@ -292,11 +292,8 @@ class UserModel extends FormModel
     /**
      * @throws \RuntimeException
      */
-    public function sendChangePasswordEmail(User $user): void
+    public function sendChangePasswordInfo(User $user): void
     {
-        $mailer = $this->mailHelper->getMailer();
-        $mailer->setTo([$user->getEmail() => $user->getName()]);
-        $mailer->setSubject($this->translator->trans('mautic.user.user.passwordchange.subject'));
         $text = $this->translator->trans(
             'mautic.user.user.passwordchange.email.body',
             ['%name%' => $user->getFirstName()]
@@ -309,6 +306,25 @@ class UserModel extends FormModel
             $this->translator->trans('mautic.user.user.passwordchange.subject'),
             $html
         );
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function sendChangeEmailInfo(string $oldEmail, User $user): void
+    {
+        $mailer = $this->mailHelper->getMailer();
+        $text = $this->translator->trans(
+            'mautic.user.user.emailchange.email.body',
+            ['%name%' => $user->getFirstName()]
+        );
+        $text = str_replace('\\n', "\n", $text);
+        $html = nl2br($text);
+
+        $mailer->setTo([$oldEmail => $user->getName()]);
+        $mailer->setBody($html);
+        $mailer->setSubject($this->translator->trans('mautic.user.user.emailchange.subject'));
+        $mailer->send();
     }
 
     public function emailUser(User $user, string $subject, string $content): void

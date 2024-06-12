@@ -38,6 +38,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $userModel->method('getEntity')->willReturn($user);
+        $userModel->expects($this->exactly(0))->method('sendChangePasswordInfo');
 
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/users/edit/1');
         $clientResponse = $this->client->getResponse();
