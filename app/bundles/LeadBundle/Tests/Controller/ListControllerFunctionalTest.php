@@ -408,6 +408,51 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @dataProvider relativeDateInvalidIntervalValues
+     */
+    public function testSegmentRelativeDateFilterOnlySupportPositiveNumber(string $interval, string $message): void
+    {
+        $filter = [[
+            'glue'        => 'and',
+            'field'       => 'date_identified',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => 'gt',
+            'properties'  => [
+                'filter' => [
+                    'dateTypeMode'             => 'relative',
+                    'absoluteDate'             => null,
+                    'relativeDateInterval'     => '1',
+                    'relativeDateIntervalUnit' => 'day',
+                ],
+            ],
+        ]];
+        $list = $this->saveSegment('s1', 's1', $filter);
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list->getId()]);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list->getId());
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[filters][0][properties][filter][relativeDateInterval]']->setValue($interval);
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+
+        $rows = $this->listRepo->findAll();
+        $this->assertCount(1, $rows);
+    }
+
+    public function relativeDateInvalidIntervalValues(): \Generator
+    {
+        yield ['-1', 'This value should be positive.'];
+        yield ['foo', 'This value is not valid.'];
+        yield ['4.5', 'This value is not valid.'];
+    }
+
+    /**
      * @return array<int, array<int, bool|string|null>>
      */
     public static function dateFieldProvider(): array

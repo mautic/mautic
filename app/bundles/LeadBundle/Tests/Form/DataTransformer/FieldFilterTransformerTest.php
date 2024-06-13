@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\DataTransformer;
 
+use Mautic\LeadBundle\Form\DataTransformer\FieldFilter;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
+final class FieldFilterTransformerTest extends TestCase
 {
     /**
      * @var MockObject|TranslatorInterface
@@ -21,8 +23,11 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->transformer = new FieldFilterTransformer($this->translator);
+        $serviceLocator = new ServiceLocator([
+            'date'     => fn () => new FieldFilter\FieldFilterDateTransformer(),
+            'datetime' => fn () => new FieldFilter\FieldFilterDateTimeTransformer($this->createMock(TranslatorInterface::class)),
+        ]);
+        $this->transformer = new FieldFilterTransformer($serviceLocator);
     }
 
     public function testTransform(): void
@@ -30,6 +35,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
         $filters = $this->transformer->transform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'gt',
                 'properties' => [
                     'filter' => '2020-03-17 17:22:34',
                 ],
@@ -40,8 +46,37 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'gt',
                     'properties' => [
-                        'filter' => '2020-03-17 18:22',
+                        'filter' => [
+                            'absoluteDate' => '2020-03-17 18:22',
+                        ],
+                    ],
+                ],
+            ],
+            $filters
+        );
+    }
+
+    public function testTransformWithoutAbsoluteRelativeDateFilter(): void
+    {
+        $filters = $this->transformer->transform([
+            [
+                'type'       => 'datetime',
+                'operator'   => 'eq',
+                'properties' => [
+                    'filter' => '2020-03-17 17:22:34',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                [
+                    'type'       => 'datetime',
+                    'operator'   => 'eq',
+                    'properties' => [
+                        'filter' => '2020-03-17 17:22',
                     ],
                 ],
             ],
@@ -53,8 +88,9 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     {
         $filters = $this->transformer->transform([
             [
-                'type'   => 'datetime',
-                'filter' => '2020-03-17 17:22:34',
+                'type'       => 'datetime',
+                'operator'   => 'gte',
+                'filter'     => '2020-03-17 17:22:34',
             ],
         ]);
 
@@ -62,9 +98,12 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'gte',
                     'filter'     => '2020-03-17 17:22:34',
                     'properties' => [
-                        'filter' => '2020-03-17 18:22',
+                        'filter' => [
+                            'absoluteDate' => '2020-03-17 18:22',
+                        ],
                     ],
                 ],
             ],
@@ -77,6 +116,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
         $filters = $this->transformer->reverseTransform([
             [
                 'type'       => 'datetime',
+                'operator'   => 'eq',
                 'properties' => [
                     'filter' => '2020-03-17 17:22:34',
                 ],
@@ -87,6 +127,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'eq',
                     'properties' => [
                         'filter' => '2020-03-17 17:22',
                     ],
@@ -100,8 +141,9 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     {
         $filters = $this->transformer->reverseTransform([
             [
-                'type'   => 'datetime',
-                'filter' => '2020-03-17 17:22:34',
+                'type'       => 'datetime',
+                'operator'   => 'lt',
+                'filter'     => '2020-03-17 17:22:34',
             ],
         ]);
 
@@ -109,9 +151,156 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
             [
                 [
                     'type'       => 'datetime',
+                    'operator'   => 'lt',
                     'filter'     => '2020-03-17 17:22:34',
                     'properties' => [
-                        'filter' => '2020-03-17 17:22',
+                        'filter' => [
+                            'absoluteDate' => '2020-03-17 17:22',
+                        ],
+                    ],
+                ],
+            ],
+            $filters
+        );
+    }
+
+    public function testTransformWithAbsoluteDateFilter(): void
+    {
+        $filters = $this->transformer->transform([
+            [
+                'type'       => 'datetime',
+                'operator'   => 'lt',
+                'properties' => [
+                    'filter'   => [
+                        'dateTypeMode'             => 'absolute',
+                        'absoluteDate'             => '2020-03-17 17:22:34',
+                        'relativeDateInterval'     => '1',
+                        'relativeDateIntervalUnit' => 'day',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                [
+                    'type'       => 'datetime',
+                    'operator'   => 'lt',
+                    'properties' => [
+                        'filter' => [
+                            'dateTypeMode'             => 'absolute',
+                            'absoluteDate'             => '2020-03-17 17:22',
+                            'relativeDateInterval'     => '1',
+                            'relativeDateIntervalUnit' => 'day',
+                        ],
+                    ],
+                ],
+            ],
+            $filters
+        );
+    }
+
+    public function testTransformWithRelativeDateFilter(): void
+    {
+        $filters = $this->transformer->transform([
+            [
+                'type'       => 'datetime',
+                'operator'   => 'gt',
+                'properties' => [
+                    'filter'   => [
+                        'dateTypeMode'             => 'relative',
+                        'absoluteDate'             => null,
+                        'relativeDateInterval'     => '1',
+                        'relativeDateIntervalUnit' => 'day',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                [
+                    'type'       => 'datetime',
+                    'operator'   => 'gt',
+                    'properties' => [
+                        'filter' => [
+                            'dateTypeMode'             => 'relative',
+                            'absoluteDate'             => null,
+                            'relativeDateInterval'     => '1',
+                            'relativeDateIntervalUnit' => 'day',
+                        ],
+                    ],
+                ],
+            ],
+            $filters
+        );
+    }
+
+    public function testReverseTransformWithAbsoluteDate(): void
+    {
+        $filters = $this->transformer->reverseTransform([
+            [
+                'type'       => 'datetime',
+                'operator'   => 'gt',
+                'properties' => [
+                    'filter'   => [
+                        'dateTypeMode'             => 'absolute',
+                        'absoluteDate'             => '2020-03-17 17:22:34',
+                        'relativeDateInterval'     => '1',
+                        'relativeDateIntervalUnit' => 'day',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                [
+                    'type'       => 'datetime',
+                    'operator'   => 'gt',
+                    'properties' => [
+                        'filter'   => [
+                            'dateTypeMode'             => 'absolute',
+                            'absoluteDate'             => '2020-03-17 17:22',
+                            'relativeDateInterval'     => '1',
+                            'relativeDateIntervalUnit' => 'day',
+                        ],
+                    ],
+                ],
+            ],
+            $filters
+        );
+    }
+
+    public function testReverseTransformWithRelativeDate(): void
+    {
+        $filters = $this->transformer->reverseTransform([
+            [
+                'type'       => 'datetime',
+                'operator'   => 'gte',
+                'properties' => [
+                    'filter'   => [
+                        'dateTypeMode'             => 'relative',
+                        'absoluteDate'             => null,
+                        'relativeDateInterval'     => '2',
+                        'relativeDateIntervalUnit' => 'day',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                [
+                    'type'       => 'datetime',
+                    'operator'   => 'gte',
+                    'properties' => [
+                        'filter'   => [
+                            'dateTypeMode'             => 'relative',
+                            'absoluteDate'             => null,
+                            'relativeDateInterval'     => '2',
+                            'relativeDateIntervalUnit' => 'day',
+                        ],
                     ],
                 ],
             ],
