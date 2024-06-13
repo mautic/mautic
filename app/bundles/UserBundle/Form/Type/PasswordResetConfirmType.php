@@ -29,7 +29,7 @@ class PasswordResetConfirmType extends AbstractType
                 'label_attr' => ['class' => 'sr-only'],
                 'attr'       => [
                     'class'       => 'form-control',
-                    'preaddon'    => 'fa fa-user',
+                    'preaddon'    => 'ri-user-6-fill',
                     'placeholder' => 'mautic.user.auth.form.loginusername',
                 ],
                 'required'    => true,

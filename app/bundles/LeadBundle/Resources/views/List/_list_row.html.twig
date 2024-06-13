@@ -28,7 +28,7 @@
                             'data-toggle': 'ajax',
                             'href': path('mautic_contact_index', {'search': listCommand ~ ':' ~ item.alias}),
                         },
-                        'icon': 'fa-users',
+                        'icon': 'ri-team-line',
                         'label': 'mautic.lead.list.view_contacts',
                     },
                 ],
@@ -48,7 +48,7 @@
                 <br/>
                 <span class="small">({{ item.createdByUser }})</span>
             {% endif %}
-            {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans }}" class="fa fa-fw fa-globe"></i>{% endif %}
+            {% if item.isGlobal %}<i title="{{ 'mautic.lead.list.form.isglobal'|trans }}" class="ri-group-2-fill"></i>{% endif %}
             {% if item.getFilters() is not empty %}<i title="{{ 'mautic.core.filters'|trans }}" class="fa fa-fw fa-filter"></i>{% endif %}
             {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
@@ -60,7 +60,7 @@
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""
                        data-original-title="{{ 'mautic.lead.list.form.config.segment_build_time.message'|trans({'%count%': item.lastBuiltTime}) }}">
-                    <i class="fa text-danger fa-clock-o"></i></label>
+                    <i class="text-danger ri-time-line"></i></label>
             {% endif %}
             {{ customContent('segment.name', mauticTemplateVars) }}
         </div>

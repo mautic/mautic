@@ -152,12 +152,12 @@ class FlashBagTest extends TestCase
 
     public function testAddTypeNotice(): void
     {
-        $this->assertAddTypeCases(FlashBag::LEVEL_NOTICE, 'fa-info-circle');
+        $this->assertAddTypeCases(FlashBag::LEVEL_NOTICE, 'ri-information-2-line');
     }
 
     public function testAddTypeDefault(): void
     {
-        $this->assertAddTypeCases('default', 'fa-info-circle');
+        $this->assertAddTypeCases('default', 'ri-information-2-line');
     }
 
     private function assertReadStatus(int $mauticUserLastActive, bool $isRead): void
@@ -200,7 +200,7 @@ class FlashBagTest extends TestCase
         $this->notificationModel
             ->expects($this->once())
             ->method('addNotification')
-            ->with($message, $level, $isRead, null, 'fa-info-circle');
+            ->with($message, $level, $isRead, null, 'ri-information-2-line');
 
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
