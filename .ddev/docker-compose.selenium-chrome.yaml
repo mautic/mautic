@@ -1,0 +1,34 @@
+#ddev-generated
+# Remove the line above if you don't want this file to be overwritten when you run
+# ddev get ddev/ddev-selenium-standalone-chrome
+#
+# This file comes from https://github.com/ddev/ddev-selenium-standalone-chrome
+#
+version: '3.6'
+services:
+  selenium-chrome:
+    image: seleniarm/standalone-chromium:4.1.4-20220429
+    container_name: ddev-${DDEV_SITENAME}-selenium-chrome
+    expose:
+      #      The internal noVNC port, which operates over HTTP so it can be exposed
+      #      through the router.
+      - 7900
+    environment:
+      - VIRTUAL_HOST=$DDEV_HOSTNAME
+      - HTTPS_EXPOSE=7900:7900
+      - HTTP_EXPOSE=7910:7900
+    external_links:
+      - ddev-router:${DDEV_SITENAME}.${DDEV_TLD}
+    # To enable VNC access for traditional VNC clients like macOS "Screen Sharing",
+    # uncomment the following two lines.
+    #ports:
+    #  - "5900:5900"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    volumes:
+      - ".:/mnt/ddev_config"
+
+  web:
+    links:
+      - selenium-chrome

@@ -1,9 +1,9 @@
 {
-  "name": "mautic/mautic",
-  "license": "GPL-3.0",
-  "type": "project",
-  "description": "Mautic Open Source Distribution",
-  "funding": [
+    "name": "mautic/mautic",
+    "license": "GPL-3.0",
+    "type": "project",
+    "description": "Mautic Open Source Distribution",
+    "funding": [
         {
             "type": "opencollective",
             "url": "https://www.opencollective.com/mautic"
@@ -13,169 +13,173 @@
             "url": "https://github.com/sponsors/mautic"
         }
     ],
-  "support": {
+    "support": {
         "forum": "https://forum.mautic.org/c/support",
         "docs": "https://docs.mautic.org",
         "chat": "https://mautic.org/slack",
         "issues": "https://github.com/mautic/mautic/issues",
         "source": "https://github.com/mautic/mautic"
     },
-  "require": {
-    "composer/installers": "^1.11",
-    "mautic/core-lib": "^5.0"
-  },
-  "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.14",
-    "http-interop/http-factory-guzzle": "^1.0",
-    "liip/functional-test-bundle": "^4.3",
-    "liip/test-fixtures-bundle": "^2.6",
-    "mautic/transifex": "^5.0",
-    "phpstan/extension-installer": "^1.3",
-    "phpstan/phpstan": "^1.10.47",
-    "phpstan/phpstan-deprecation-rules": "^1.1",
-    "phpstan/phpstan-doctrine": "^1.3.40",
-    "phpstan/phpstan-phpunit": "^1.3",
-    "phpstan/phpstan-symfony": "^1.3",
-    "phpunit/phpunit": "^9.5",
-    "rector/rector": "^0.18.12",
-    "symfony/browser-kit": "~5.4.0",
-    "symfony/dom-crawler": "~5.4.0",
-    "symfony/maker-bundle": "^1.38",
-    "symfony/phpunit-bridge": "~5.4.0",
-    "symfony/var-dumper": "~5.4.0",
-    "symfony/web-profiler-bundle": "~5.4.0",
-    "symplify/easy-coding-standard": "^12.0.13"
-  },
-  "replace": {
-    "mautic/grapes-js-builder-bundle": "self.version",
-    "mautic/plugin-clearbit": "self.version",
-    "mautic/plugin-cloudstorage": "self.version",
-    "mautic/plugin-crm": "self.version",
-    "mautic/plugin-emailmarketing": "self.version",
-    "mautic/plugin-focus": "self.version",
-    "mautic/plugin-fullcontact": "self.version",
-    "mautic/plugin-gmail": "self.version",
-    "mautic/plugin-outlook": "self.version",
-    "mautic/plugin-social": "self.version",
-    "mautic/plugin-zapier": "self.version",
-    "mautic/plugin-tagmanager": "self.version",
-    "mautic/theme-coffee": "self.version",
-    "mautic/theme-mauve": "self.version",
-    "mautic/theme-nature": "self.version",
-    "mautic/theme-aurora": "self.version",
-    "mautic/theme-blank": "self.version",
-    "mautic/theme-brienz": "self.version",
-    "mautic/theme-cards": "self.version",
-    "mautic/theme-confirmme": "self.version",
-    "mautic/theme-fresh-center": "self.version",
-    "mautic/theme-fresh-fixed": "self.version",
-    "mautic/theme-fresh-left": "self.version",
-    "mautic/theme-fresh-wide": "self.version",
-    "mautic/theme-goldstar": "self.version",
-    "mautic/theme-neopolitan": "self.version",
-    "mautic/theme-oxygen": "self.version",
-    "mautic/theme-paprika": "self.version",
-    "mautic/theme-skyline": "self.version",
-    "mautic/theme-sparse": "self.version",
-    "mautic/theme-sunday": "self.version",
-    "mautic/theme-vibrant": "self.version"
-  },
-  "autoload": {
-    "psr-4": {
-      "MauticPlugin\\": "plugins/"
-    }
-  },
-  "repositories": [
-    {
-      "type": "path",
-      "url": "app",
-      "options": {
-        "versions": {
-            "mautic/core-lib": "5.0.0-dev"
+    "require": {
+        "composer/installers": "^1.11",
+        "mautic/core-lib": "^5.0"
+    },
+    "require-dev": {
+        "codeception/codeception": "^4.2",
+        "codeception/module-asserts": "^2.0",
+        "codeception/module-webdriver": "^2.0",
+        "friendsofphp/php-cs-fixer": "^3.14",
+        "http-interop/http-factory-guzzle": "^1.0",
+        "liip/functional-test-bundle": "^4.3",
+        "liip/test-fixtures-bundle": "^2.6",
+        "mautic/transifex": "^5.0",
+        "phpstan/extension-installer": "^1.3",
+        "phpstan/phpstan": "^1.10.47",
+        "phpstan/phpstan-deprecation-rules": "^1.1",
+        "phpstan/phpstan-doctrine": "^1.3.40",
+        "phpstan/phpstan-phpunit": "^1.3",
+        "phpstan/phpstan-symfony": "^1.3",
+        "phpunit/phpunit": "^9.5",
+        "rector/rector": "^0.18.12",
+        "symfony/browser-kit": "~5.4.0",
+        "symfony/dom-crawler": "~5.4.0",
+        "symfony/maker-bundle": "^1.38",
+        "symfony/phpunit-bridge": "~5.4.0",
+        "symfony/var-dumper": "~5.4.0",
+        "symfony/web-profiler-bundle": "~5.4.0",
+        "symplify/easy-coding-standard": "^12.0.13",
+        "codeception/module-phpbrowser": "^1.0.0"
+    },
+    "replace": {
+        "mautic/grapes-js-builder-bundle": "self.version",
+        "mautic/plugin-clearbit": "self.version",
+        "mautic/plugin-cloudstorage": "self.version",
+        "mautic/plugin-crm": "self.version",
+        "mautic/plugin-emailmarketing": "self.version",
+        "mautic/plugin-focus": "self.version",
+        "mautic/plugin-fullcontact": "self.version",
+        "mautic/plugin-gmail": "self.version",
+        "mautic/plugin-outlook": "self.version",
+        "mautic/plugin-social": "self.version",
+        "mautic/plugin-zapier": "self.version",
+        "mautic/plugin-tagmanager": "self.version",
+        "mautic/theme-coffee": "self.version",
+        "mautic/theme-mauve": "self.version",
+        "mautic/theme-nature": "self.version",
+        "mautic/theme-aurora": "self.version",
+        "mautic/theme-blank": "self.version",
+        "mautic/theme-brienz": "self.version",
+        "mautic/theme-cards": "self.version",
+        "mautic/theme-confirmme": "self.version",
+        "mautic/theme-fresh-center": "self.version",
+        "mautic/theme-fresh-fixed": "self.version",
+        "mautic/theme-fresh-left": "self.version",
+        "mautic/theme-fresh-wide": "self.version",
+        "mautic/theme-goldstar": "self.version",
+        "mautic/theme-neopolitan": "self.version",
+        "mautic/theme-oxygen": "self.version",
+        "mautic/theme-paprika": "self.version",
+        "mautic/theme-skyline": "self.version",
+        "mautic/theme-sparse": "self.version",
+        "mautic/theme-sunday": "self.version",
+        "mautic/theme-vibrant": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "MauticPlugin\\": "plugins/"
         }
-      }
     },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/SpBundle.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
-    }
-  ],
-  "conflict": {
-    "mautic/core": "*"
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
-  "scripts": {
-    "githooks": [
-      "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');} if(file_exists('./.git')&&file_exists('./build/hooks/post-checkout')){copy('./build/hooks/post-checkout','./.git/hooks/post-checkout');}\"",
-      "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);} if(file_exists('./.git/hooks/post-checkout')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/post-checkout',0755);}\""
+    "repositories": [
+        {
+            "type": "path",
+            "url": "app",
+            "options": {
+                "versions": {
+                    "mautic/core-lib": "5.0.0-dev"
+                }
+            }
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/mautic/SpBundle.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
+        }
     ],
-    "post-install-cmd": [
-      "@githooks",
-      "@npm-ci",
-      "@npx-patch-package",
-      "@generate-assets"
-    ],
-    "post-update-cmd": [
-      "@githooks",
-      "@npm-ci",
-      "@npx-patch-package",
-      "@generate-assets"
-    ],
-    "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-    "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=4G bin/phpstan analyse --ansi",
-    "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
-    "fixcs": "bin/php-cs-fixer fix -v",
-    "rector": "bin/rector process --ansi",
-    "npm-ci": "npm ci --prefer-offline --no-audit",
-    "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate"
-  },
-  "config": {
-    "platform": {
-      "php": "8.0.2"
+    "conflict": {
+        "mautic/core": "*"
     },
-    "bin-dir": "bin",
-    "component-dir": "media/assets",
-    "process-timeout": 5000,
-    "sort-packages": true,
-    "allow-plugins": {
-      "composer/installers": true,
-      "composer/package-versions-deprecated": true,
-      "symfony/flex": true,
-      "phpstan/extension-installer": true,
-      "php-http/discovery": true,
-      "cweagans/composer-patches": true
-    }
-  },
-  "extra": {
-    "installer-paths": {
-      "app": [
-        "type:mautic-core"
-      ],
-      "plugins/{$name}": [
-        "type:mautic-plugin"
-      ],
-      "themes/{$name}": [
-        "type:mautic-theme"
-      ]
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "githooks": [
+            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');} if(file_exists('./.git')&&file_exists('./build/hooks/post-checkout')){copy('./build/hooks/post-checkout','./.git/hooks/post-checkout');}\"",
+            "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);} if(file_exists('./.git/hooks/post-checkout')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/post-checkout',0755);}\""
+        ],
+        "post-install-cmd": [
+            "@githooks",
+            "@npm-ci",
+            "@npx-patch-package",
+            "@generate-assets"
+        ],
+        "post-update-cmd": [
+            "@githooks",
+            "@npm-ci",
+            "@npx-patch-package",
+            "@generate-assets"
+        ],
+        "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
+        "phpstan": "[ ! -f var/cache/test/AppKernelTestDebugContainer.xml ] && (echo 'Building test cache ...'; APP_ENV=test APP_DEBUG=1 bin/console > /dev/null 2>&1);  php -d memory_limit=4G bin/phpstan analyse --ansi",
+        "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
+        "fixcs": "bin/php-cs-fixer fix -v",
+        "rector": "bin/rector process --ansi",
+        "npm-ci": "npm ci --prefer-offline --no-audit",
+        "npx-patch-package": "npx patch-package",
+        "generate-assets": "bin/console mautic:assets:generate"
     },
-    "symfony-app-dir": "app",
-    "symfony-bin-dir": "bin",
-    "symfony-web-dir": "../",
-    "symfony-var-dir": "var",
-    "symfony-tests-dir": "tests",
-    "symfony-assets-install": "relative",
-    "incenteev-parameters": {
-      "file": "app/config/parameters.yml"
+    "config": {
+        "platform": {
+            "php": "8.0.2"
+        },
+        "bin-dir": "bin",
+        "component-dir": "media/assets",
+        "process-timeout": 5000,
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "composer/package-versions-deprecated": true,
+            "symfony/flex": true,
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true,
+            "cweagans/composer-patches": true
+        }
+    },
+    "extra": {
+        "installer-paths": {
+            "app": [
+                "type:mautic-core"
+            ],
+            "plugins/{$name}": [
+                "type:mautic-plugin"
+            ],
+            "themes/{$name}": [
+                "type:mautic-theme"
+            ]
+        },
+        "symfony-app-dir": "app",
+        "symfony-bin-dir": "bin",
+        "symfony-web-dir": "../",
+        "symfony-var-dir": "var",
+        "symfony-tests-dir": "tests",
+        "symfony-assets-install": "relative",
+        "incenteev-parameters": {
+            "file": "app/config/parameters.yml"
+        }
     }
-  }
 }
