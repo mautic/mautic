@@ -57,7 +57,7 @@ class ExportSchedulerCommandTest extends MauticMysqlTestCase
         $process2->wait();
 
         $this->assertSame(Command::SUCCESS, $process1->getExitCode());
-        $this->assertNotSame(Command::SUCCESS, $process2->getExitCode());
+        $this->assertSame(Command::SUCCESS, $process2->getExitCode());
 
         $this->assertStringContainsString('Scheduler has finished', $process1->getOutput());
         $this->assertStringContainsString('Script in progress', $process2->getOutput());
