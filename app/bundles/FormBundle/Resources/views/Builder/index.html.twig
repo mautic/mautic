@@ -46,7 +46,7 @@
                       <li id="fields-tab" class="text-danger">
                           <a class="{% if fieldsTabError %}text-danger{% endif %}" href="#fields-container" role="tab" data-toggle="tab">
                             {{- 'mautic.form.tab.fields'|trans }}
-                            {% if fieldsTabError %}<i class="fa fa-warning"></i>{% endif -%}
+                            {% if fieldsTabError %}<i class="ri-alert-line"></i>{% endif -%}
                           </a>
                       </li>
                       <li id="actions-tab"><a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a></li>
@@ -68,7 +68,6 @@
                           </div>
                       </div>
                       <div class="tab-pane fade bdr-w-0" id="fields-container">
-                          {{ include('@MauticForm/Builder/_style.html.twig') }}
                           <div id="mauticforms_fields">
                               <div class="row">
                                   <div class="available-fields mb-md col-sm-4">

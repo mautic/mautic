@@ -316,7 +316,7 @@ class ReportType extends AbstractType
                     'required'   => false,
                     'attr'       => [
                         'class'    => 'form-control',
-                        'preaddon' => 'fa fa-envelope',
+                        'preaddon' => 'ri-mail-line',
                         'tooltip'  => 'mautic.report.schedule.toAddress.tooltip',
                     ],
                 ]

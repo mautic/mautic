@@ -1,5 +1,5 @@
 {
-  "version": "5.0.4",
+  "version": "5.1.0",
   "stability": "stable",
   "minimum_php_version": "8.0.2",
   "maximum_php_version": "8.2.99",
@@ -7,5 +7,5 @@
   "minimum_mariadb_version": "10.2.7",
   "show_php_version_warning_if_under": "8.0.2",
   "minimum_mautic_version": "4.4.10",
-  "announcement_url": "https://github.com/mautic/mautic/releases/tag/5.0.4"
+  "announcement_url": "https://github.com/mautic/mautic/releases/tag/5.1.0"
 }
