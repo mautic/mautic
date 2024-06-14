@@ -3,10 +3,13 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 {
+    public const COUNT_ID = 'count(id)';
+
     public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.special.sessions';
@@ -20,8 +23,13 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
         $expressionValueAlias = $this->generateRandomParameterName();
 
         $expressionOperator = $filter->getOperator();
-        $expression         = $queryBuilder->expr()->$expressionOperator('count(id)',
-            $filter->getParameterHolder($expressionValueAlias));
+        if (OperatorOptions::isBetween($expressionOperator)) {
+            $expression         = $queryBuilder->expr()->$expressionOperator(self::COUNT_ID,
+                array_values($filter->getParameterValue()));
+        } else {
+            $expression         = $queryBuilder->expr()->$expressionOperator(self::COUNT_ID,
+                $filter->getParameterHolder($expressionValueAlias));
+        }
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
 
@@ -42,7 +50,7 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $sessionQueryBuilder = $queryBuilder->createQueryBuilder();
         $sessionQueryBuilder
-            ->select('count(id)')
+            ->select(self::COUNT_ID)
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $pageHitsAlias)
             ->where(
                 $queryBuilder->expr()->and(

@@ -119,6 +119,8 @@ trait OperatorListTrait
                 OperatorOptions::STARTS_WITH,
                 OperatorOptions::ENDS_WITH,
                 OperatorOptions::CONTAINS,
+                OperatorOptions::BETWEEN,
+                OperatorOptions::NOT_BETWEEN,
             ],
         ],
     ];
@@ -217,19 +219,17 @@ trait OperatorListTrait
         }
 
         if ('boolean' === $type) {
-            return 'bool';
-        }
-
-        if (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
-            return 'select';
-        }
-
-        if (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
-            return 'text';
-        }
-
-        if ('datetime' === $type) {
-            return 'date';
+            $type = 'bool';
+        } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
+            $type = 'select';
+        } elseif (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
+            $type = 'text';
+        } elseif ('datetime' === $type) {
+            $type = 'date';
+        } elseif ('int' === $type || 'integer' === $type) {
+            $type = 'number';
+        } elseif (!array_key_exists($type, $this->typeOperators)) {
+            $type = 'default';
         }
 
         if (!array_key_exists($type, $this->typeOperators)) {

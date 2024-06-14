@@ -43,6 +43,9 @@ class OperatorOptions
     public const ENDS_WITH             = 'endsWith';
 
     public const CONTAINS              = 'contains';
+    public const IN_LAST               = 'inLast';
+    public const IN_NEXT               = 'inNext';
+    public const NOTBETWEEN            = 'notBetween';
 
     /**
      * @var array<string,array<string,string|bool>>
@@ -167,5 +170,12 @@ class OperatorOptions
     public function getFilterExpressionFunctionsNonStatic()
     {
         return self::$operatorOptions;
+    }
+
+    public static function isBetween(?string $operator): bool
+    {
+        return OperatorOptions::BETWEEN === $operator
+            || OperatorOptions::NOT_BETWEEN === $operator
+            || self::NOTBETWEEN === $operator;
     }
 }

@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
@@ -546,6 +547,332 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($clientResponse->isOk());
         $this->assertCount(1, $response['lists']);
+    }
+
+    public function testAbsoluteDateFilter(): void
+    {
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'date_added',
+                'object'      => 'lead',
+                'type'        => 'date',
+                'operator'    => 'like',
+                'properties'  => [
+                    'filter' => (new \DateTime())->format('Y-m-d'),
+                ],
+            ],
+            [
+                'glue'        => 'and',
+                'field'       => 'date_identified',
+                'object'      => 'lead',
+                'type'        => 'datetime',
+                'operator'    => 'gt',
+                'properties'  => [
+                    'filter' => [
+                        'dateTypeMode'             => 'absolute',
+                        'absoluteDate'             => '-1 day',
+                        'relativeDateInterval'     => '1',
+                        'relativeDateIntervalUnit' => 'day',
+                    ],
+                ],
+            ],
+        ];
+
+        $segment = $this->createSegment($filters);
+
+        $contactA = new Lead();
+        $contactA->setDateIdentified(new \DateTime('-2 day')); // 2 days before the date_identified - won't get to the segment
+        $contactA->setDateAdded(new \DateTime('-2 day'));
+
+        $contactB = new Lead();
+        $contactB->setDateIdentified(new \DateTime('+1 hour'));
+        $contactB->setDateAdded(new \DateTime());
+
+        $contactC = new Lead();
+        $contactC->setDateIdentified(new \DateTime('+1 hour'));
+        $contactC->setDateAdded(new \DateTime());
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segment->getId()]);
+
+        Assert::assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+
+        Assert::assertCount(2, $members);
+
+        $expectedMembers = [$contactB->getId(), $contactC->getId()];
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        Assert::assertSame($expectedMembers, $actualMembers);
+    }
+
+    /**
+     * @dataProvider errorProvider
+     */
+    public function testBetweenFilterErrorsForNumberType(string $value, string $errorMessage): void
+    {
+        $filters = [[
+            'glue'       => 'and',
+            'field'      => 'points',
+            'object'     => 'lead',
+            'type'       => 'number',
+            'operator'   => 'between',
+            'properties' => [
+                'filter' => [
+                    'number_from' => 0,
+                    'number_to'   => $value,
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Points range filter', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+        Assert::assertStringContainsString($errorMessage, $clientResponse->getContent(), 'The error message was not found in the response');
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function errorProvider(): array
+    {
+        return [
+            'invalid_value'         => ['abc', 'This value should be a valid number.'],
+            'empty_value'           => ['', 'A value is required.'],
+        ];
+    }
+
+    /**
+     * @param int|float $lowerLimit
+     * @param int|float $upperLimit
+     *
+     * @dataProvider limitProvider
+     */
+    public function testBetweenFilterForNumberType(string $operator, $lowerLimit, $upperLimit, int $memberCount): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'points',
+            'object'      => 'lead',
+            'type'        => 'number',
+            'operator'    => $operator,
+            'properties'  => [
+                'filter' => [
+                    'number_from' => $lowerLimit,
+                    'number_to'   => $upperLimit,
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Points range filter', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
+
+        $leadWithLessThanLowerLimitPoints = new Lead();
+        $leadWithLessThanLowerLimitPoints->setPoints($lowerLimit - 5);
+
+        $leadWithMoreThanUpperLimitPoints = new Lead();
+        $leadWithMoreThanUpperLimitPoints->setPoints($upperLimit + 5);
+
+        $leadWithLowerLimitPoints = new Lead();
+        $leadWithLowerLimitPoints->setPoints($lowerLimit);
+
+        $leadWithUpperLimitPoints = new Lead();
+        $leadWithUpperLimitPoints->setPoints($upperLimit);
+
+        $leadWithMeanOfLimitPoints = new Lead();
+        $leadWithMeanOfLimitPoints->setPoints(($lowerLimit + $upperLimit) / 2);
+
+        $this->em->persist($leadWithLessThanLowerLimitPoints);
+        $this->em->persist($leadWithMoreThanUpperLimitPoints);
+        $this->em->persist($leadWithLowerLimitPoints);
+        $this->em->persist($leadWithUpperLimitPoints);
+        $this->em->persist($leadWithMeanOfLimitPoints);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segmentId]);
+
+        Assert::assertSame(0, $commandTester->getStatusCode(), 'Update lead lists command was not successful');
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]);
+
+        Assert::assertCount($memberCount, $members, 'The segment does not have the expected number of members');
+
+        $leadsWithinRange = [$leadWithMeanOfLimitPoints->getId(), $leadWithUpperLimitPoints->getId(), $leadWithLowerLimitPoints->getId()];
+        $leadsOutOfRange  = [$leadWithLessThanLowerLimitPoints->getId(), $leadWithMoreThanUpperLimitPoints->getId()];
+
+        if (0 === $memberCount) {
+            $expectedMembers = [];
+        } elseif (5 === $memberCount) {
+            $expectedMembers = array_merge($leadsWithinRange, $leadsOutOfRange);
+        } else {
+            $expectedMembers = OperatorOptions::BETWEEN === $operator ? $leadsWithinRange : $leadsOutOfRange;
+        }
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        Assert::assertSame($expectedMembers, $actualMembers, 'The expected amd the actual members in the segment do not match');
+    }
+
+    /**
+     * @return array<string, array<int, float|int|string>>
+     */
+    public function limitProvider(): array
+    {
+        return [
+            'both_positive_between'                                    => [OperatorOptions::BETWEEN, 5, 15, 3],
+            'both_negative_between'                                    => [OperatorOptions::BETWEEN, -15, -5, 3],
+            'negative_positive_between'                                => [OperatorOptions::BETWEEN, -5, 5, 3],
+            'both_positive_not_between'                                => [OperatorOptions::NOT_BETWEEN, 5, 15, 2],
+            'both_negative_not_between'                                => [OperatorOptions::NOT_BETWEEN, -15, -5, 2],
+            'negative_positive_not_between'                            => [OperatorOptions::NOT_BETWEEN, -5, 5, 2],
+            'first_number_greater_than_second_between'                 => [OperatorOptions::BETWEEN, 15, 5, 0],
+            'first_number_greater_than_second_not_between'             => [OperatorOptions::NOT_BETWEEN, 15, 5, 5],
+            'float_numbers_between'                                    => [OperatorOptions::BETWEEN, 5.0, 15.5, 3],
+            'float_numbers_not_between'                                => [OperatorOptions::NOT_BETWEEN, 5.0, 15.5, 2],
+            'int_max_between'                                          => [OperatorOptions::BETWEEN, IntHelper::MIN_INTEGER_VALUE + 5, IntHelper::MAX_INTEGER_VALUE - 5, 3],
+            'int_max_not_between'                                      => [OperatorOptions::NOT_BETWEEN, IntHelper::MIN_INTEGER_VALUE + 5, IntHelper::MAX_INTEGER_VALUE - 5, 2],
+        ];
+    }
+
+    /**
+     * @dataProvider operatorProvider
+     */
+    public function testInTheLastAndInTheNextFilter(string $operator, int $expected): void
+    {
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'date_modified',
+                'object'      => 'lead',
+                'type'        => 'datetime',
+                'operator'    => $operator,
+                'properties'  => [
+                    'filter' => [
+                        'interval' => '1',
+                        'unit'     => 'day',
+                    ],
+                ],
+            ],
+        ];
+
+        $segment = $this->createSegment($filters);
+
+        $contactA = new Lead();
+        $contactA->setDateModified(new \DateTime('-1 hour'));
+
+        $contactB = new Lead();
+        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+
+        $contactC = new Lead();
+        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+
+        $contactD = new Lead();
+        $contactD->setDateModified((new \DateTime())->modify('-2 day'));
+
+        $contactE = new Lead();
+        $contactE->setDateModified((new \DateTime())->modify('+2 day'));
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->persist($contactD);
+        $this->em->persist($contactE);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segment->getId()]);
+
+        Assert::assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+
+        Assert::assertCount($expected, $members);
+
+        $expectedMembersForOperator = [
+            OperatorOptions::IN_LAST => [$contactA->getId(), $contactC->getId()],
+            OperatorOptions::IN_NEXT => [$contactA->getId(), $contactB->getId()],
+        ];
+
+        $expectedMembers = $expectedMembersForOperator[$operator];
+
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        Assert::assertSame($expectedMembers, $actualMembers);
+    }
+
+    /**
+     * @dataProvider operatorProvider
+     */
+    public function testInLastAndInNextFilterForCompanyCustomField(string $operator, int $expectedCount): void
+    {
+        $company = $this->createCompanyWithDateCustomField('CompanyABC', $operator);
+
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'company_created_at',
+                'object'      => 'company',
+                'type'        => 'datetime',
+                'operator'    => $operator,
+                'properties'  => [
+                    'filter' => [
+                        'interval' => '1',
+                        'unit'     => 'day',
+                    ],
+                ],
+            ],
+        ];
+        $segment = $this->createSegment($filters);
+
+        $contactA = new Lead();
+        $contactA->setDateModified(new \DateTime('-1 hour'));
+
+        $contactB = new Lead();
+        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+
+        $contactC = new Lead();
+        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+
+        $this->createCompanyLeadRelation($company, $contactB);
+        $this->createCompanyLeadRelation($company, $contactC);
+
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segment->getId()]);
+
+        Assert::assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+
+        Assert::assertCount($expectedCount, $members);
+
+        $expectedMembers = [$contactB->getId(), $contactC->getId()];
+
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        Assert::assertSame($expectedMembers, $actualMembers);
+    }
+
+    public function operatorProvider(): \Generator
+    {
+        yield [OperatorOptions::IN_LAST, 2];
+        yield [OperatorOptions::IN_NEXT, 2];
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList

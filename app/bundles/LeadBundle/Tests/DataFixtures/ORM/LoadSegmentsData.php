@@ -1060,6 +1060,191 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 61
+                'name'    => 'Segment membership with excluded segment without other filters',
+                'alias'   => 'segment-test-exclude-static-segment-without-other-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist_static',
+                        'operator' => '!in',
+                        'filter'   => [9],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 62
+                'name'    => 'Segment membership with including segment that has a contact thats been removed from non-related segment',
+                'alias'   => 'segment-test-include-static-segment-with-unrelated-segment-manual-removal',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist_static',
+                        'operator' => 'in',
+                        'filter'   => [21],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 63
+                'name'    => 'Segment membership with excluded segment without other filters',
+                'alias'   => 'segment-including-static-segment-with-company-only-fields',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'company',
+                        'field'    => 'companyindustry',
+                        'operator' => 'in',
+                        'filter'   => ['Software', 'Hardware'],
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist_static',
+                        'operator' => '!in',
+                        'filter'   => [21],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 64
+                'name'    => 'Include segment membership with or',
+                'alias'   => 'segment-test-include-static-segment-with-or',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'or',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist_static',
+                        'operator' => 'in',
+                        'filter'   => [8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 65
+                'name'    => 'segment with absolute date type filter',
+                'alias'   => 'segment-test-with-absolute-date-type',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'gt',
+                        'filter'   => [
+                            'dateTypeMode'             => 'absolute',
+                            'absoluteDate'             => '-1 day',
+                            'relativeDateInterval'     => '',
+                            'relativeDateIntervalUnit' => '',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 66
+                'name'    => 'segment with relative date type filter',
+                'alias'   => 'segment-test-with-relative-date-type',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'gt',
+                        'filter'   => [
+                            'dateTypeMode'             => 'relative',
+                            'absoluteDate'             => '',
+                            'relativeDateInterval'     => '-1',
+                            'relativeDateIntervalUnit' => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 67
+                'name'    => 'segment with In The Last Filter',
+                'alias'   => 'segment-test-with-in-the-last-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inLast',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 68
+                'name'    => 'segment with In The Next Filter',
+                'alias'   => 'segment-test-with-in-the-next-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inNext',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 69
+                'name'    => 'segment has X number of browsing sessions',
+                'alias'   => 'segment-has-x-number-of-browsing-sessions',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'behaviors',
+                        'type'     => 'number',
+                        'field'    => 'sessions',
+                        'operator' => 'between',
+                        'filter'   => [
+                            'from' => '0',
+                            'to'   => '5',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

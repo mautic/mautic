@@ -130,7 +130,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'lt',
             'lte',
             'in',
-            'between', // Used only for date with week combination (EQUAL [this week, next week, last week])
+            'between',
             'regexp',
             'notRegexp' // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
         )) {
@@ -138,9 +138,10 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         }
 
         $leadsTableAlias = $event->getLeadsTableAlias();
+        $operator        = $event->getFilter()->getOperator();
 
         $event->addExpression(
-            $event->getQueryBuilder()->expr()->{$event->getFilter()->getOperator()}(
+            $event->getQueryBuilder()->expr()->{$operator}(
                 $leadsTableAlias.'.'.$event->getFilter()->getField(),
                 $event->getParameterHolder()
             )

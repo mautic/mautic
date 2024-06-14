@@ -105,6 +105,8 @@ class ContactSegmentFilterCrate
             OperatorOptions::NOT_IN,
             OperatorOptions::REGEXP,
             OperatorOptions::NOT_REGEXP,
+            OperatorOptions::BETWEEN,
+            OperatorOptions::NOT_BETWEEN,
         ];
 
         if (!in_array($this->operator, $excludeTypecastOperators)) {

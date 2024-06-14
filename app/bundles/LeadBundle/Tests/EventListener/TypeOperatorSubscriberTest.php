@@ -7,6 +7,8 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Form\Type\NumberRangeType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
@@ -116,6 +118,8 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $operators = $event->getOperatorsForAllFieldTypes();
 
+        $this->assertEquals($operators['int'], $operators['number']);
+
         // Test for random operators:
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['text']['include']);
         $this->assertNotContains(OperatorOptions::IN, $operators['text']['include']);
@@ -129,6 +133,8 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertContains(OperatorOptions::EMPTY, $operators['country']['include']);
         $this->assertContains(OperatorOptions::IN, $operators['country']['include']);
         $this->assertNotContains(OperatorOptions::STARTS_WITH, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::BETWEEN, $operators['int']['include']);
+        $this->assertContains(OperatorOptions::NOT_BETWEEN, $operators['int']['include']);
     }
 
     public function testOnTypeListCollect(): void
@@ -509,5 +515,82 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->subscriber->onSegmentFilterFormHandleDefault($event);
+    }
+
+    /**
+     * @dataProvider operatorProvider
+     */
+    public function testOnSegmentFilterFormHandleDate(string $operator): void
+    {
+        $alias    = 'email_clicked_link_date';
+        $object   = 'behaviors';
+        $details  = [
+            'properties'  => [
+                'type'   => 'datetime',
+                'filter' => [
+                    'date_from' => 'May 7, 2024',
+                    'date_to'   => 'May 9, 2024',
+                ],
+            ],
+        ];
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                DateRangeType::class,
+                [
+                    'label'              => false,
+                    'data'               => $event->getForm()->getData()['filter'] ?? [],
+                    'show_apply_button'  => false,
+                    'set_default_values' => false,
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleDate($event);
+    }
+
+    /**
+     * @dataProvider operatorProvider
+     */
+    public function testOnSegmentFilterFormHandleNumber(string $operator): void
+    {
+        $alias    = 'number_a';
+        $object   = 'lead';
+        $details  = [
+            'properties'  => [
+                'type'   => 'number',
+                'filter' => [
+                    'number_from' => 5,
+                    'number_to'   => 10,
+                ],
+            ],
+        ];
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                NumberRangeType::class,
+                [
+                    'label'              => false,
+                    'data'               => $event->getForm()->getData()['filter'] ?? [],
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleNumber($event);
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function operatorProvider(): array
+    {
+        return [
+            'between'     => [OperatorOptions::BETWEEN],
+            'not_between' => [OperatorOptions::NOT_BETWEEN],
+        ];
     }
 }

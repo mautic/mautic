@@ -19,6 +19,60 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
+    private OperatorOptions $operatorOptions;
+
+    private LeadFieldRepository $leadFieldRepository;
+
+    private TypeOperatorProviderInterface $typeOperatorProvider;
+
+    private FieldChoicesProviderInterface $fieldChoicesProvider;
+
+    private TranslatorInterface $translator;
+
+    private CoreParametersHelper $coreParametersHelper;
+
+    /**
+     * @var array<mixed>
+     */
+    private array $behaviorOperators = [
+        'datetime' => [
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::NOT_EQUAL_TO,
+            OperatorOptions::GREATER_THAN,
+            OperatorOptions::LESS_THAN,
+            OperatorOptions::GREATER_THAN_OR_EQUAL,
+            OperatorOptions::LESS_THAN_OR_EQUAL,
+            OperatorOptions::BETWEEN,
+            OperatorOptions::NOT_BETWEEN,
+            OperatorOptions::IN_LAST,
+            OperatorOptions::IN_NEXT,
+        ],
+        'number' => [
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::GREATER_THAN,
+            OperatorOptions::LESS_THAN,
+            OperatorOptions::GREATER_THAN_OR_EQUAL,
+            OperatorOptions::LESS_THAN_OR_EQUAL,
+            OperatorOptions::BETWEEN,
+            OperatorOptions::NOT_BETWEEN,
+        ],
+        'text' => [
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::NOT_EQUAL_TO,
+            OperatorOptions::LIKE,
+            OperatorOptions::NOT_LIKE,
+            OperatorOptions::REGEXP,
+            OperatorOptions::NOT_REGEXP,
+            OperatorOptions::STARTS_WITH,
+            OperatorOptions::ENDS_WITH,
+            OperatorOptions::CONTAINS,
+        ],
+        'lead_email_received' => [
+            OperatorOptions::IN,
+            OperatorOptions::NOT_IN,
+        ],
+    ];
+
     public function __construct(
         private OperatorOptions $operatorOptions,
         private LeadFieldRepository $leadFieldRepository,
@@ -141,7 +195,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'points' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.event.points'),
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('number'),
                 'object'     => 'lead',
             ],
             'campaign' => [

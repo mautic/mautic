@@ -10,6 +10,9 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\Type\AlertType;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Form\Type\DateSpanType;
+use Mautic\CoreBundle\Form\Type\NumberRangeType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
@@ -56,6 +59,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE           => ['onTypeOperatorsCollect', 0],
             LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE => ['onTypeListCollect', 0],
             LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD          => [
+                ['onSegmentFilterFormHandleNumber', 1400],
+                ['onSegmentFilterFormHandleDate', 1200],
                 ['onSegmentFilterFormHandleTags', 1000],
                 ['onSegmentFilterFormHandleLookupId', 800],
                 ['onSegmentFilterFormHandleLookup', 600],
@@ -75,6 +80,8 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         // Subscribe aliases
         $event->setOperatorsForFieldType('boolean', $this->typeOperators['bool']);
         $event->setOperatorsForFieldType('datetime', $this->typeOperators['date']);
+        $event->setOperatorsForFieldType('int', $this->typeOperators['number']);
+        $event->setOperatorsForFieldType('integer', $this->typeOperators['number']);
 
         foreach (['country', 'timezone', 'region', 'locale'] as $selectAlias) {
             $event->setOperatorsForFieldType($selectAlias, $this->typeOperators['select']);
@@ -297,6 +304,25 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             ]
         );
         $this->showOperatorsBasedAlertMessages($event);
+
+        $event->stopPropagation();
+    }
+
+    public function onSegmentFilterFormHandleNumber(FormAdjustmentEvent $event): void
+    {
+        if (!$event->fieldTypeIsOneOf('number', 'int') || !OperatorOptions::isBetween($event->getOperator())) {
+            return;
+        }
+
+        $event->getForm()->add(
+            'filter',
+            NumberRangeType::class,
+            [
+                'label'              => false,
+                'data'               => $event->getForm()->getData()['filter'] ?? [],
+            ]
+        );
+
         $event->stopPropagation();
     }
 
