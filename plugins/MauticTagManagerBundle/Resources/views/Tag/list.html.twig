@@ -35,7 +35,7 @@
         }) -}}
             {% if items is defined and items is not empty %}
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped table-bordered" id="tagsTable">
+                    <table class="table table-hover" id="tagsTable">
                         <thead>
                         <tr>
                             {{ include(
@@ -98,7 +98,7 @@
                                                     'data-toggle': 'ajax',
                                                     href: '',
                                                 },
-                                                icon: 'fa-users',
+                                                icon: 'ri-team-line',
                                                 label: 'mautic.lead.list.view_contacts'
                                             }
                                         }

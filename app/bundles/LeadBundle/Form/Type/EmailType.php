@@ -53,7 +53,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-user',
+                    'preaddon' => 'ri-user-6-fill',
                 ],
                 'required'   => false,
                 'data'       => $default,
@@ -69,7 +69,7 @@ class EmailType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                 ],
                 'required'    => false,
                 'data'        => $default,
@@ -92,7 +92,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
                 ],
                 'required' => false,
@@ -135,7 +135,7 @@ class EmailType extends AbstractType
             'save_text'   => 'mautic.email.send',
             'save_class'  => 'btn btn-primary',
             'save_icon'   => 'fa fa-send',
-            'cancel_icon' => 'fa fa-times',
+            'cancel_icon' => 'ri-close-line',
         ]);
 
         if (!empty($options['action'])) {

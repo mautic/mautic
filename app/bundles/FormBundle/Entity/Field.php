@@ -987,6 +987,7 @@ class Field
     public function setMappedObject(?string $mappedObject): void
     {
         $this->mappedObject = $mappedObject;
+        $this->resetLeadFieldIfValueIsEmpty($mappedObject);
     }
 
     public function getMappedField(): ?string
@@ -997,5 +998,15 @@ class Field
     public function setMappedField(?string $mappedField): void
     {
         $this->mappedField = $mappedField;
+        $this->resetLeadFieldIfValueIsEmpty($mappedField);
+    }
+
+    private function resetLeadFieldIfValueIsEmpty(?string $value): void
+    {
+        if ($value) {
+            return;
+        }
+
+        $this->leadField = null;
     }
 }
