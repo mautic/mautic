@@ -46,7 +46,9 @@
   border-top-right-radius: @nav-pills-border-radius;
   border-top-left-radius: @nav-pills-border-radius;
   //background-color: @body-bg;
-  .box-shadow(inset 0 -3px 8px -3px rgba(0,0,0,0.05));
+  display: flex;
+  flex-wrap: wrap;
+  text-wrap: nowrap;
 
   > li {
     > a {
@@ -67,6 +69,12 @@
         background-color: @nav-pills-active-link-hover-bg;
       }
     }
+  }
+}
+
+@media (min-width: @screen-lg-min) {
+  .nav-tabs {
+    flex-wrap: nowrap;
   }
 }
 

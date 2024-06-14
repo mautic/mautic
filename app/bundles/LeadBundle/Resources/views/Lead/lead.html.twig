@@ -137,8 +137,8 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!--/ lead detail header -->
 
             <!-- lead detail collapseable -->
@@ -164,12 +164,12 @@
                 </ul>
 
                 <!-- start: tab-content -->
-                <div class="tab-content pa-md bg-white">
+                <div class="tab-content pa-md">
                     {% for group in groups %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">
-                                    <table class="table table-bordered table-striped mb-0">
+                                    <table class="table table-hover mb-0">
                                         <tbody>
                                         {% if 'core' == group %}
                                           {{ include('@MauticCore/Helper/details.html.twig', {'entity': lead}) }}
@@ -222,7 +222,7 @@
             <!--/ lead detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
@@ -244,7 +244,7 @@
                                         <h5 class="text-white dark-md fw-sb mb-xs">{{ 'mautic.lead.field.header.engagements'|trans }}</h5>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
-                                        <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                                        <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                                     </div>
                                 </div>
                                 {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
@@ -373,7 +373,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
             {% if not lead.isAnonymous %}
@@ -491,7 +491,7 @@
                                           '%link%': '<a href="'~path('mautic_campaign_action', {'objectAction': 'view', 'objectId': event.campaign_id})~'" data-toggle="ajax">'~event.campaign_name~'</a>',
                                     })|purify }}
                                     {% if errors is not empty %}
-                                      <i class="fa fa-warning text-danger" data-toggle="tooltip" title="{{ errors|purify }}"></i>
+                                      <i class="ri-alert-line text-danger" data-toggle="tooltip" title="{{ errors|purify }}"></i>
                                     {% endif %}
                                     <p class="fs-12 dark-sm timeline-campaign-event-date-{{ event.event_id }}">
                                       {{ dateToFull(event.trigger_date, 'utc') }}
@@ -511,7 +511,7 @@
                             <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
                                 {{ tag.tag|purify }}
                             </a>
-                            <i class="fa fa-times has-click-event" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
+                            <i class="ri-close-line has-click-event" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
                         </span>
                     </h5>
                 </div>
@@ -525,7 +525,7 @@
             {% for key, company in companies %}
             <h5 class="pull-left mt-xs mr-xs">
                 <span class="label label-success">
-                    <i id="company-{{ company.id }}" class="fa fa-check {% if 1 == company.is_primary %}primary{% endif %}" onclick="Mautic.setAsPrimaryCompany({{ company.id }}, {{ lead.id }});" title="{{ 'mautic.lead.company.set.primary'|trans }}"></i>
+                    <i id="company-{{ company.id }}" class="ri-check-line {% if 1 == company.is_primary %}primary{% endif %}" onclick="Mautic.setAsPrimaryCompany({{ company.id }}, {{ lead.id }});" title="{{ 'mautic.lead.company.set.primary'|trans }}"></i>
                     <a href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax" style="color: white;">
                         {{ company.companyname|purify }}
                     </a>
