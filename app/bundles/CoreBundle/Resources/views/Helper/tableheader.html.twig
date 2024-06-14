@@ -54,7 +54,7 @@
         <a href="javascript: void(0);" onclick="Mautic.reorderTableData('{{ sessionVar }}','{{ orderBy }}','{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});">
             <span>{{ text|trans }}</span>
             {% if order == orderBy %}
-            <i class="fa fa-sort-amount-{{ dir|lower }}"></i>
+            <i class="ri-sort-{{ dir|lower }}"></i>
             {% endif %}
         </a>
         {% else %}

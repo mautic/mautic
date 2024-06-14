@@ -145,7 +145,7 @@ Mautic.leadOnLoad = function (container, response) {
     Mautic.initUniqueIdentifierFields();
 
     if (mQuery(container + ' .panel-companies').length) {
-        mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
+        mQuery(container + ' .panel-companies .ri-check-line').tooltip({html: true});
     }
 
     // Adding behavior to be able to create new tags by pressing the `Escape` key

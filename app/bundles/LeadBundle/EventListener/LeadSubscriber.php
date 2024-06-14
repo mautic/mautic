@@ -492,7 +492,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             break;
                         case 'email':
                         case 'newsletter':
-                            $icon = 'fa-envelope-o';
+                            $icon = 'ri-mail-open-line';
                             break;
                         case 'banner':
                         case 'ad':
@@ -691,7 +691,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventType'  => $eventTypeName,
                         'eventLabel' => $eventTypeName,
                         'timestamp'  => $apiEvent['date_added'],
-                        'icon'       => 'fa-cogs',
+                        'icon'       => 'ri-list-settings-line',
                         'extra'      => $apiEvent,
                         'contactId'  => $apiEvent['lead_id'],
                     ]

@@ -18,7 +18,7 @@ class TwitterCustomType extends TwitterAbstractType
             'attr'       => [
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.social.monitoring.twitter.custom.tooltip',
-                'preaddon' => 'fa fa-crosshairs',
+                'preaddon' => 'ri-focus-3-line',
             ],
         ]);
 
