@@ -6,11 +6,12 @@ namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
+use Mautic\LeadBundle\Event\OverrideOperatorLabelEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class TypeOperatorProvider implements TypeOperatorProviderInterface
+final class TypeOperatorProvider implements TypeOperatorProviderInterface, TypeOperatorProviderWithFieldTypeInterface
 {
     use OperatorListTrait;
 
@@ -28,6 +29,13 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         private EventDispatcherInterface $dispatcher,
         private FilterOperatorProviderInterface $filterOperatorProvider,
     ) {
+    }
+
+    public function getOperatorsIncludingFieldType(array $operators, string $fieldType): array
+    {
+        $typeOperatorsChoices = $this->getOperatorsIncluding($operators);
+
+        return $this->getOverriddenOperators($typeOperatorsChoices, $fieldType);
     }
 
     public function getOperatorsIncluding(array $operators): array
@@ -50,10 +58,15 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         $typeOperators = $this->getAllTypeOperators();
 
         if (array_key_exists($fieldType, $typeOperators)) {
-            $this->cachedTypeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators[$fieldType]);
+            $typeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators[$fieldType]);
         } else {
-            $this->cachedTypeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators['default']);
+            $typeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators['default']);
         }
+
+        $this->cachedTypeOperatorsChoices[$fieldType] = $this->getOverriddenOperators(
+            $typeOperatorsChoices[$fieldType],
+            $fieldType
+        );
 
         return $this->cachedTypeOperatorsChoices[$fieldType];
     }
@@ -103,5 +116,22 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         $operatorOptions = $this->filterOperatorProvider->getAllOperators();
 
         return (null === $operator) ? $operatorOptions : $operatorOptions[$operator];
+    }
+
+    /**
+     * @param array<string,mixed[]> $typeOperatorsChoices
+     *
+     * @return array<string,mixed[]>
+     */
+    private function getOverriddenOperators(array $typeOperatorsChoices, string $fieldType): array
+    {
+        $event = new OverrideOperatorLabelEvent(
+            $typeOperatorsChoices,
+            $fieldType
+        );
+
+        $this->dispatcher->dispatch(LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE, $event);
+
+        return $event->getTypeOperatorsChoices();
     }
 }

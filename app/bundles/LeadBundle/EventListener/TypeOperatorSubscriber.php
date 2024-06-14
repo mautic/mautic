@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
+use Mautic\LeadBundle\Event\OverrideOperatorLabelEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
@@ -61,6 +62,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleSelect', 200],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
+            LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE => ['onOverrideTypeOperatorLabel', 100],
         ];
     }
 
@@ -426,5 +428,28 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         }
 
         return $choices;
+    }
+
+    public function onOverrideTypeOperatorLabel(OverrideOperatorLabelEvent $event): void
+    {
+        if (in_array($event->getFieldType(), ['date', 'datetime'])) {
+            $typeOperatorsChoices = $event->getTypeOperatorsChoices();
+
+            $typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.after')]
+                = OperatorOptions::GREATER_THAN;
+            $typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.afterincludingday')]
+                = OperatorOptions::GREATER_THAN_OR_EQUAL;
+            $typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.before')]
+                = OperatorOptions::LESS_THAN;
+            $typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.beforeincludingday')]
+                = OperatorOptions::LESS_THAN_OR_EQUAL;
+
+            unset($typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.greaterthan')]);
+            unset($typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.greaterthanequals')]);
+            unset($typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.lessthan')]);
+            unset($typeOperatorsChoices[$this->translator->trans('mautic.lead.list.form.operator.lessthanequals')]);
+
+            $event->setTypeOperatorsChoices($typeOperatorsChoices);
+        }
     }
 }

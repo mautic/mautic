@@ -669,6 +669,16 @@ final class LeadEvents
     public const COLLECT_OPERATORS_FOR_FIELD_TYPE = 'mautic.collect_operators_for_field_type';
 
     /**
+     * The mautic.override_operator_label_for_field_type event is dispatched when some operators label need to change.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\OverrideOperatorLabelEvent
+     *
+     * @var string
+     */
+    public const OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE = 'mautic.override_operator_label_for_field_type';
+
+    /**
      * The mautic.collect_operators_for_field event is dispatched when some filter needs operators for a specific field.
      *
      * The event listener receives a
