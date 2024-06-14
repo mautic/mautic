@@ -86,7 +86,7 @@
 <!--/ tabs controls -->
 
 {{- form_start(form) -}}
-<div class="tab-content pa-md bg-white">
+<div class="tab-content pa-md">
     <div class="tab-pane fade {% if 'details-container' == activeTab %}in active{% endif %} bdr-w-0" id="details-container">
         {{- form_row(form.isPublished) -}}
         {%- if form.virtual is defined %}{{ form_row(form.virtual) }}{% endif %}

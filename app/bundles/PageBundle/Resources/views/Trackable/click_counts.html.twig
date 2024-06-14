@@ -1,7 +1,7 @@
 {% set showConversionRate = showConversionRate is defined ? showConversionRate : false %}
 {% if trackables is not empty %}
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered click-list"
+        <table class="table table-hover click-list"
                 {% if showConversionRate %} data-conversion-rate-table data-entity-id="{{ entity.id }}"{% endif %}>
             <thead>
             <tr>

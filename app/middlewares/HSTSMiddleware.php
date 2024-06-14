@@ -34,12 +34,12 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         $this->expireTime        = $this->config['headers_sts_expire_time'] ?? 60;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         $response = $this->app->handle($request, $type, $catch);
 
         // Do not include the header in the sub-request response
-        if (self::MASTER_REQUEST !== $type) {
+        if (self::MAIN_REQUEST !== $type) {
             return $response;
         }
 

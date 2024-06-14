@@ -32,8 +32,8 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 bg-white height-auto">
-          <div class="bg-auto">
+      <div class="col-md-9 height-auto">
+          <div>
               <!-- page detail header -->
               <div class="pr-md pl-md pt-lg pb-lg">
                   <div class="box-layout">
@@ -66,7 +66,7 @@
               <div class="collapse" id="page-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-bordered table-striped mb-0">
+                          <table class="table table-hover mb-0">
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': entity}) }}
                               <tr>
@@ -86,7 +86,7 @@
               </div>
               <!--/ page detail collapseable -->
           </div>
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- page detail collapseable toggler -->
               <div class="hr-expand nm">
                   <span data-toggle="tooltip" title="Detail">
@@ -161,7 +161,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bg-white bdr-l height-auto">
+      <div class="col-md-3 bdr-l height-auto">
           <hr class="hr-w-2" style="width:50%">
           <!-- recent activity -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
