@@ -165,7 +165,7 @@ trait FieldsTypeTrait
                             [
                                 'choices' => [
                                     '<btn class="btn-nospin ri-arrow-left-circle-line"></btn>'    => 0,
-                                    '<btn class="btn-nospin ri-arrow-right-circle-line"></btn>' => 1,
+                                    '<btn class="btn-nospin ri-arrow-right-circle-line"></btn>'   => 1,
                                 ],
                                 'label'             => false,
                                 'data'              => $data,
