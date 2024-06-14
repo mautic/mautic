@@ -14,22 +14,136 @@
 {% set eventName = ('dev' == constant('MAUTIC_ENV')) ? event['name']~' <small>'~event.id~'</small>' : event['name'] %}
 
 {% if update is not defined or update is empty %}
-<div id="CampaignEvent_{{ event['id'] }}" data-type="{{ event['eventType'] }}" class="draggable list-campaign-event list-campaign-{{ event['eventType'] }}" data-event="{{ event['type'] }}" data-event-id="{{ event['id'] }}">
+<div id="CampaignEvent_{{ event['id'] }}"
+data-type="{{ event['eventType'] }}"
+class="draggable list-campaign-event list-campaign-{{ event['eventType'] }}"
+data-event="{{ event['type'] }}"
+data-event-id="{{ event['id'] }}">
+{% endif %}
+{% if event['type'] == 'lead.adddnc' %}
+ {% set icon = 'ri-add-line' %}
+{% elseif event['type'] == 'lead.scorecontactscompanies' %}
+ {% set icon = 'ri-add-line' %}
+{% elseif event['type'] == 'lead.addtocompany' %}
+ {% set icon = 'ri-add-line' %}
+{% elseif event['type'] == 'lead.changepoints' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'campaign.addremovelead' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'stage.change' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'lead.deletecontact' %}
+ {% set icon = 'ri-delete-bin-line' %}
+{% elseif event['type'] == 'lead.changelist' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'lead.changetags' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'lead.removednc' %}
+ {% set icon = 'ri-close-line' %}
+{% elseif event['type'] == 'campaign.sendwebhook' %}
+ {% set icon = 'ri-webhook-line' %}
+{% elseif event['type'] == 'email.send' %}
+ {% set icon = 'ri-mail-send-line' %}
+{% elseif event['type'] == 'email.send.to.user' %}
+ {% set icon = 'ri-mail-send-line' %}
+{% elseif event['type'] == 'message.send' %}
+ {% set icon = 'ri-send-plane-line' %}
+{% elseif event['type'] == 'lead.updatelead' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'lead.updatecompany' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'lead.changeowner' %}
+ {% set icon = 'ri-edit-line' %}
+{% elseif event['type'] == 'email.open' %}
+ {% set icon = 'ri-mail-open-line' %}
+{% elseif event['type'] == 'email.click' %}
+ {% set icon = 'ri-cursor-line' %}
+{% elseif event['type'] == 'email.reply' %}
+ {% set icon = 'ri-mail-unread-line' %}
+{% elseif event['type'] == 'page.devicehit' %}
+ {% set icon = 'ri-device-line' %}
+{% elseif event['type'] == 'asset.download' %}
+ {% set icon = 'ri-file-download-line' %}
+{% elseif event['type'] == 'dwc.decision' %}
+ {% set icon = 'ri-download-cloud-2-line' %}
+{% elseif event['type'] == 'form.submit' %}
+ {% set icon = 'ri-survey-line' %}
+{% elseif event['type'] == 'page.pagehit' %}
+ {% set icon = 'ri-pages-line' %}
+{% elseif event['type'] == 'lead.device' %}
+ {% set icon = 'ri-device-line' %}
+{% elseif event['type'] == 'lead.field_value' %}
+ {% set icon = 'ri-input-field' %}
+{% elseif event['type'] == 'lead.owner' %}
+ {% set icon = 'ri-user-2-line' %}
+{% elseif event['type'] == 'lead.points' %}
+ {% set icon = 'ri-focus-2-line' %}
+{% elseif event['type'] == 'lead.segments' %}
+ {% set icon = 'ri-pie-chart-line' %}
+{% elseif event['type'] == 'lead.stages' %}
+ {% set icon = 'ri-filter-line' %}
+{% elseif event['type'] == 'lead.tags' %}
+ {% set icon = 'ri-hashtag' %}
+{% elseif event['type'] == 'notification.has.active' %}
+ {% set icon = 'ri-notification-badge-line' %}
+{% elseif event['type'] == 'email.validate.address' %}
+ {% set icon = 'ri-mail-check-line' %}
+{% elseif event['type'] == 'lead.dnc' %}
+ {% set icon = 'ri-prohibited-line' %}
+{% elseif event['type'] == 'lead.pageHit' %}
+ {% set icon = 'ri-pages-line' %}
+{% else %}
+ {% set icon = 'ri-shapes-line' %}
 {% endif %}
 
-    <div class="campaign-event-content">
-        <div><span class="campaign-event-name ellipsis">{{ eventName|purify }}</span></div>
-        <span class="campaign-event-logic">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-    </div>
+<div class="campaign-event-type">
+{% if event['eventType'] == 'decision' %}
+<div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex">
+ <div class="campaign-event-icon mr-5"><i class="{{ icon }}"></i></div>
+ <span class="h5 fw-b">{{ 'mautic.campaign.when'|trans }}</span>
+ <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
+ <span class="campaign-event-name label ml-5 mr-lg ellipsis">
+     {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
+ </span>
+ <i class="ri-route-line ml-a"></i>
+</div>
 
-{% if update is not defined or update is empty %}
-    <div class="campaign-event-buttons hide">
-        <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-primary btn-xs btn-edit">
-            <i class="ri-edit-line"></i>
-        </a>
-        <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}"  class="btn btn-delete btn-danger btn-xs">
-            <i class="ri-close-line"></i>
-        </a>
-    </div>
+{% elseif event['eventType'] == 'action' %}
+ 
+ <div class="campaign-event-content d-flex fw-nowrap ai-center gap-sm">
+     <div class="campaign-event-icon pa-sm mr-5"><i class="{{ icon }}"></i></div>
+     <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
+     <span class="campaign-event-name label label-primary ellipsis">
+     {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
+     </span>
+     <i class="ri-thumb-up-fill ml-md"></i>
+ </div>
+
+{% elseif event['eventType'] == 'condition' %}
+<div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex">
+  <div class="campaign-event-icon mr-5"><i class="{{ icon }}"></i></div>
+ <span class="h5 fw-b">{{ 'mautic.campaign.if'|trans }}</span>
+ <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
+     <span class="campaign-event-name label ml-5 mr-lg ellipsis">
+     {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
+     </span>
+ <i class="ri-filter-3-line ml-a"></i>
+</div>
+{% endif %}
+</div>
+
+
+{% if update is not defined %}
+<div class="campaign-event-buttons hide">
+ <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'clone', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-secondary btn-clone btn-xs" title="{{ 'mautic.campaign.event.clone.btn.tooltip'|trans }}">
+     <i class="ri-file-copy-line"></i>
+ </a>
+ <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-secondary btn-xs btn-edit" title="{{ 'mautic.campaign.event.edit.btn.tooltip'|trans }}">
+     <i class="ri-pencil-line"></i>
+ </a>
+ <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-delete btn-danger btn-xs" title="{{ 'mautic.campaign.event.remove.btn.tooltip'|trans }}">
+     <i class="ri-delete-bin-line"></i>
+ </a>
+</div>
 </div>
 {% endif %}
