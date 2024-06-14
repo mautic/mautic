@@ -51,7 +51,7 @@ class ExportSchedulerCommand extends ModeratedCommand
         }
 
         if (!$this->checkRunStatus($input, $output, $exportOption->getReportId())) {
-            return Command::FAILURE;
+            return Command::SUCCESS;
         }
 
         try {
