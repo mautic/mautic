@@ -792,7 +792,7 @@ class ReportController extends FormController
                 function () use ($model, $entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;
-                    $options['limit']           = (int) $this->coreParametersHelper->getParameter('report_export_batch_size', 1000);
+                    $options['limit']           = (int) $this->coreParametersHelper->get('report_export_batch_size', 1000);
                     $options['page']            = 1;
                     $handle                     = fopen('php://output', 'r+');
                     $batchTotals                = [];
