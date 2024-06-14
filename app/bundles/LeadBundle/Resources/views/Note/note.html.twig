@@ -21,7 +21,7 @@
             <div class="media-body col-xs-11 pa-10">
                 <div class="pull-right btn-group">
                     {% if permissions['edit'] %}
-                        <a class="btn btn-default btn-xs" href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-xs" href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="ri-edit-line"></i></a>
                     {% endif %}
                     {% if permissions['delete'] %}
                         <a class="btn btn-default btn-xs" data-toggle="confirmation"
@@ -30,14 +30,14 @@
                            data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}"
                            data-confirm-callback="executeAction"
                            data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
-                            <i class="fa fa-trash text-danger"></i>
+                            <i class="ri-delete-bin-line text-danger"></i>
                         </a>
                     {% endif %}
                 </div>
                 {{ note.text|purify }}
                 <div class="mt-15 text-muted">
-                  <i class="fa fa-clock-o fa-fw"></i> <span class="small">{{ dateToFullConcat(note.dateTime) }}</span>
-                  <i class="fa fa-user fa-fw"></i> <span class="small">{{ note.createdByUser }}</span>
+                  <i class="ri-time-line fa-fw"></i> <span class="small">{{ dateToFullConcat(note.dateTime) }}</span>
+                  <i class="ri-user-6-line fa-fw"></i> <span class="small">{{ note.createdByUser }}</span>
                 </div>
             </div>
         </div>

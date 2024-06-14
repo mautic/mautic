@@ -251,7 +251,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-sign-in';
+                    $graphData['iconClass'] = 'ri-login-box-line';
                     $graphData['link']      = 'mautic_form_action';
                     $event->setGraph($g, $graphData);
                     break;
