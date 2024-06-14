@@ -6222,7 +6222,7 @@ ul.media-list.media-list-feed div.media-object {
   --fluid-quotation-02: 32px;
   --no-border: 1px solid var(--no-border-color);
   --no-border-color: transparent;
-  --border-bottom: 0 0 clamp(0px, calc(1px - var(--border-radius, 0px)), 1px) 0;
+  --border-bottom: 0 0 clamp(0px, calc(1px - 0px), 1px) 0;
   --border-radius-sm: clamp(0px, 0px, 7px);
   --border-radius-md: clamp(0px, calc(1.8 * 0px), 14px);
   --border-radius-lg: clamp(0px, calc(2.6 * 0px), 21px);
