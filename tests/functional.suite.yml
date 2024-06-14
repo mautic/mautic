@@ -7,7 +7,7 @@
 
 actor: FunctionalTester
 modules:
-    enabled:
-        # add a framework module here
-        - \Helper\Functional
-    step_decorators: ~        
+  enabled:
+    # add a framework module here
+    - \Helper\Functional
+  step_decorators: ~

@@ -14,5 +14,5 @@ modules:
         capabilities:
           chromeOptions:
             args:
-              - '--ignore-certificate-errors'
-              - '--disable-dev-shm-usage'
+              - "--ignore-certificate-errors"
+              - "--disable-dev-shm-usage"
