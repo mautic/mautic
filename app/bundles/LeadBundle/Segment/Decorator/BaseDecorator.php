@@ -57,9 +57,9 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param array|string $argument
+     * @param mixed[]|string $argument
      *
-     * @return array|string
+     * @return mixed[]|string
      */
     public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
     {

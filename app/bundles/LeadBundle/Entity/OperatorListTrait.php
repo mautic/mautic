@@ -55,8 +55,6 @@ trait OperatorListTrait
                 OperatorOptions::NOT_EMPTY,
                 OperatorOptions::LIKE,
                 OperatorOptions::NOT_LIKE,
-                OperatorOptions::BETWEEN,
-                OperatorOptions::NOT_BETWEEN,
                 OperatorOptions::REGEXP,
                 OperatorOptions::NOT_REGEXP,
                 OperatorOptions::STARTS_WITH,

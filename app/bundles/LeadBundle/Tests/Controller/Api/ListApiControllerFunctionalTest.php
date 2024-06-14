@@ -462,7 +462,145 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
     }
 
-    public function testUnpublishUsedBatchSegment(): void
+    public function testBetweenDatesFilterWithInvalidFields(): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'last_active',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => 'between',
+            'properties'  => [
+                'filter' => [
+                    'date_from' => '',        // cannot be empty
+                    'date_to'   => 'unicorn', // should be a date with valid format
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Between Dates', 'filters' => $filters]);
+        $expectedErrorMessage = "date_from: This value should not be blank., date_to: The date must be in the format 'M j, Y' (e.g. 'Jan 1, 2021'). Use the date picker to select a date.";
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+        Assert::assertSame($expectedErrorMessage, $response['errors'][0]['message']);
+    }
+
+    public function testBetweenDatesFilter(): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'last_active',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => 'between',
+            'properties'  => [
+                'filter' => [
+                    'date_from' => 'Jan 3, 2024',
+                    'date_to'   => 'Feb 3, 2024',
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Between Dates', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
+
+        $contactA = new Lead();
+        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59')); // 1 second before the date_from - won't get to the segment
+
+        $contactB = new Lead();
+        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00')); // 1 second after the date_from - will get to the segment
+
+        $contactC = new Lead();
+        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59')); // 1 second before the date_to - will get to the segment
+
+        $contactD = new Lead();
+        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00')); // 1 second after the date_to - won't get to the segment
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->persist($contactD);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segmentId]);
+
+        Assert::assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]);
+
+        Assert::assertCount(2, $members);
+
+        $expectedMembers = [$contactB->getId(), $contactC->getId()];
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        Assert::assertSame($expectedMembers, $actualMembers);
+    }
+
+    public function testNotBetweenDatesFilter(): void
+    {
+        $filters = [[
+            'glue'        => 'and',
+            'field'       => 'last_active',
+            'object'      => 'lead',
+            'type'        => 'datetime',
+            'operator'    => '!between',
+            'properties'  => [
+                'filter' => [
+                    'date_from' => 'Jan 3, 2024',
+                    'date_to'   => 'Feb 3, 2024',
+                ],
+            ],
+        ]];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Between Dates', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
+
+        $contactA = new Lead();
+        $contactA->setLastActive(new \DateTime('2024-01-02 23:59:59')); // 1 second before the date_from - will get to the segment
+
+        $contactB = new Lead();
+        $contactB->setLastActive(new \DateTime('2024-01-03 00:00:00')); // 1 second after the date_from - won't get to the segment
+
+        $contactC = new Lead();
+        $contactC->setLastActive(new \DateTime('2024-02-03 23:59:59')); // 1 second before the date_to - won't get to the segment
+
+        $contactD = new Lead();
+        $contactD->setLastActive(new \DateTime('2024-02-04 00:00:00')); // 1 second after the date_to - will get to the segment
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->persist($contactD);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segmentId]);
+
+        Assert::assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]);
+
+        Assert::assertCount(2, $members);
+
+        $expectedMembers = [$contactA->getId(), $contactD->getId()];
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        Assert::assertSame($expectedMembers, $actualMembers);
+    }
+
+    /**
+     * @dataProvider segmentMembershipFilterProvider
+     */
+    public function testUnpublishUsedBatchSegment(string $filterName): void
     {
         $filter = [[
             'glue'     => 'and',
@@ -546,6 +684,74 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($clientResponse->isOk());
         $this->assertCount(1, $response['lists']);
+    }
+
+    public function testAbsoluteDateFilter(): void
+    {
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'date_added',
+                'object'      => 'lead',
+                'type'        => 'date',
+                'operator'    => 'like',
+                'properties'  => [
+                    'filter' => (new \DateTime())->format('Y-m-d'),
+                ],
+            ],
+            [
+                'glue'        => 'and',
+                'field'       => 'date_identified',
+                'object'      => 'lead',
+                'type'        => 'datetime',
+                'operator'    => 'gt',
+                'properties'  => [
+                    'filter' => [
+                        'dateTypeMode'             => 'absolute',
+                        'absoluteDate'             => '-1 day',
+                        'relativeDateInterval'     => '1',
+                        'relativeDateIntervalUnit' => 'day',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', '/api/segments/new', ['name' => 'Between Dates', 'filters' => $filters]);
+
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $segmentId = json_decode($clientResponse->getContent(), true)['list']['id'];
+
+        $contactA = new Lead();
+        $contactA->setDateIdentified(new \DateTime('-2 day')); // 2 days before the date_identified - won't get to the segment
+        $contactA->setDateAdded(new \DateTime('-2 day'));
+
+        $contactB = new Lead();
+        $contactB->setDateIdentified(new \DateTime('+1 hour'));
+        $contactB->setDateAdded(new \DateTime());
+
+        $contactC = new Lead();
+        $contactC->setDateIdentified(new \DateTime('+1 hour'));
+        $contactC->setDateAdded(new \DateTime());
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segmentId]);
+
+        Assert::assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentId]);
+
+        Assert::assertCount(2, $members);
+
+        $expectedMembers = [$contactB->getId(), $contactC->getId()];
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        Assert::assertSame($expectedMembers, $actualMembers);
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], LeadList $segment = null): LeadList

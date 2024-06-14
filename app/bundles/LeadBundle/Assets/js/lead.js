@@ -392,11 +392,42 @@ Mautic.triggerOnPropertiesFormLoadedEvent = function(selector, filterValue) {
     mQuery('#leadlist_filters').trigger('filter.properties.form.loaded', [selector, filterValue]);
 };
 
+Mautic.initSegmentFilterDateRangePicker = function(selector) {
+    const dateFrom = mQuery(selector + '_properties_filter_date_from');
+    const dateTo = mQuery(selector + '_properties_filter_date_to');
+    const config = {
+        format: 'M j, Y',
+        timepicker: false,
+        scrollMonth: false,
+        scrollInput: false
+    };
+
+    dateFrom.datetimepicker({
+        ...config,
+        onShow: function () {
+            this.setOptions({
+                maxDate: dateTo.val() ? new Date(dateTo.val()) : false
+            });
+        }
+    });
+
+    dateTo.datetimepicker({
+        ...config,
+        onShow: function () {
+            this.setOptions({
+                minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
+            });
+        },
+    });
+}
+
 Mautic.attachJsUiOnFilterForms = function() {
     mQuery('#leadlist_filters').on('filter.properties.form.loaded', function(event, selector, filterValue) {
         Mautic.activateChosenSelect(selector + '_properties select');
         var fieldType = mQuery(selector + '_type').val();
         var fieldAlias = mQuery(selector + '_field').val();
+        const operator = mQuery(selector + '_operator').val();
+        const isDateRange = operator === 'between' || operator === '!between';
         var filterFieldEl = mQuery(selector + '_properties_filter');
 
         if (filterValue) {
@@ -408,26 +439,34 @@ Mautic.attachJsUiOnFilterForms = function() {
 
         if (fieldType === 'lookup') {
             Mautic.activateLookupTypeahead(filterFieldEl.parent());
-        } else if (fieldType === 'datetime') {
-            filterFieldEl.datetimepicker({
-                format: 'Y-m-d H:i',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false
-            });
-        } else if (fieldType === 'date') {
-            filterFieldEl.datetimepicker({
-                timepicker: false,
-                format: 'Y-m-d',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false,
-                closeOnDateSelect: true
-            });
+        } else if (fieldType === 'datetime' && isDatePickerAllowed) {
+            if (isDateRange) {
+                Mautic.initSegmentFilterDateRangePicker(selector);
+            } else {
+                filterFieldEl.datetimepicker({
+                    format: 'Y-m-d H:i',
+                    lazyInit: true,
+                    validateOnBlur: false,
+                    allowBlank: true,
+                    scrollMonth: false,
+                    scrollInput: false
+                });
+            }
+        } else if (fieldType === 'date' && isDatePickerAllowed) {
+            if (isDateRange) {
+                Mautic.initSegmentFilterDateRangePicker(selector);
+            } else {
+                filterFieldEl.datetimepicker({
+                    timepicker: false,
+                    format: 'Y-m-d',
+                    lazyInit: true,
+                    validateOnBlur: false,
+                    allowBlank: true,
+                    scrollMonth: false,
+                    scrollInput: false,
+                    closeOnDateSelect: true
+                });
+            }
         } else if (fieldType === 'time') {
             filterFieldEl.datetimepicker({
                 datepicker: false,

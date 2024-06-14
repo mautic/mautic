@@ -79,7 +79,6 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'label'       => 'mautic.lead.list.form.operator.notbetween',
                 'expr'        => 'notBetween',
                 'negate_expr' => 'between',
-                'hide'        => true,
             ],
             $operators['!between']
         );

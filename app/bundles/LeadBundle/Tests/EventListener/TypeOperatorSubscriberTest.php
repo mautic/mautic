@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
@@ -117,6 +118,10 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $operators = $event->getOperatorsForAllFieldTypes();
 
         // Test for random operators:
+        $this->assertContains(OperatorOptions::BETWEEN, $operators['datetime']['include']);
+        $this->assertContains(OperatorOptions::NOT_BETWEEN, $operators['datetime']['include']);
+        $this->assertContains(OperatorOptions::BETWEEN, $operators['date']['include']);
+        $this->assertContains(OperatorOptions::NOT_BETWEEN, $operators['date']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['text']['include']);
         $this->assertNotContains(OperatorOptions::IN, $operators['text']['include']);
         $this->assertContains(OperatorOptions::EQUAL_TO, $operators['boolean']['include']);
@@ -509,5 +514,50 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->subscriber->onSegmentFilterFormHandleDefault($event);
+    }
+
+    /**
+     * @dataProvider operatorProvider
+     */
+    public function testOnSegmentFilterFormHandleDate(string $operator): void
+    {
+        $alias    = 'email_clicked_link_date';
+        $object   = 'behaviors';
+        $details  = [
+            'properties'  => [
+                'type'   => 'datetime',
+                'filter' => [
+                    'date_from' => 'May 7, 2024',
+                    'date_to'   => 'May 9, 2024',
+                ],
+            ],
+        ];
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                DateRangeType::class,
+                [
+                    'label'              => false,
+                    'data'               => $event->getForm()->getData()['filter'] ?? [],
+                    'show_apply_button'  => false,
+                    'set_default_values' => false,
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleDate($event);
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function operatorProvider(): array
+    {
+        return [
+            'between'     => [OperatorOptions::BETWEEN],
+            'not_between' => [OperatorOptions::NOT_BETWEEN],
+        ];
     }
 }

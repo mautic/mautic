@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthLast;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
+use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAbsoluteInterval;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval;
@@ -20,6 +21,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
 class DateOptionFactory
@@ -42,7 +44,11 @@ class DateOptionFactory
             return new DateDefault($this->dateDecorator, $originalValue);
         }
 
-        switch ($timeframe) {
+        if (in_array($leadSegmentFilterCrate->getOperator(), [OperatorOptions::BETWEEN, OperatorOptions::NOT_BETWEEN], true)) {
+            return new DateAbsoluteInterval($this->dateDecorator, $originalValue);
+        }
+
+        switch (strtolower($timeframe)) {
             case 'birthday':
             case 'anniversary':
             case $timeframe && (

@@ -63,7 +63,9 @@ class FieldFilterTransformer implements DataTransformerInterface
     }
 
     /**
-     * Form format to database format.
+     * @param mixed[]                                              $value
+     * @param callable(DataTransformerInterface, mixed[]): mixed[] $transform
+     *                                                                        From format to database format
      *
      * @param mixed $rawFilters
      *
