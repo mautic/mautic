@@ -81,6 +81,9 @@ EOT
             ]
         ).'</info>');
 
+        $currentTimezone = date_default_timezone_get();
+        date_default_timezone_set($this->getContainer()->get('mautic.helper.core_parameters')->get('default_timezone', 'UTC'));
+
         try {
             $this->importModel->beginImport($import, $progress, $limit);
         } catch (ImportFailedException) {
@@ -91,6 +94,8 @@ EOT
                 ]
             ).'</error>');
 
+            date_default_timezone_set($currentTimezone);
+
             return Command::FAILURE;
         } catch (ImportDelayedException) {
             $output->writeln('<info>'.$this->translator->trans(
@@ -100,8 +105,12 @@ EOT
                 ]
             ).'</info>');
 
+            date_default_timezone_set($currentTimezone);
+
             return Command::FAILURE;
         }
+
+        date_default_timezone_set($currentTimezone);
 
         // Success
         $output->writeln('<info>'.$this->translator->trans(
