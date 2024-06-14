@@ -49,7 +49,7 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'preaddon'     => 'fa fa-user',
+                    'preaddon'     => 'ri-user-6-fill',
                     'autocomplete' => 'off',
                 ],
             ]
@@ -98,7 +98,7 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                 ],
             ]
         );
@@ -217,9 +217,7 @@ class UserType extends AbstractType
                 )
             );
 
-            $builder->add('isPublished', YesNoButtonGroupType::class, [
-                'label' => 'mautic.user.active',
-            ]);
+            $builder->add('isPublished', YesNoButtonGroupType::class);
 
             $builder->add('buttons', FormButtonsType::class);
         } else {

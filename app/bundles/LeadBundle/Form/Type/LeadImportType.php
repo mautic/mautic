@@ -120,7 +120,7 @@ class LeadImportType extends AbstractType
             [
                 'attr' => [
                     'class'   => 'btn btn-primary',
-                    'icon'    => 'fa fa-upload',
+                    'icon'    => 'ri-import-line',
                     'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'lead_import\']').submit();",
                 ],
                 'label' => 'mautic.lead.import.upload',

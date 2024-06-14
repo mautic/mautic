@@ -77,7 +77,7 @@
                 <button
                     class="btn btn-default btn-xs"
                     onclick="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',{{ value is defined and value is not empty ? "''," : "mQuery(this).parent().prev().val()," }}'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"                >
-                    <i class="fa fa-fw fa-lg {{ value is defined and value is not empty ? 'fa-times' : 'fa-filter' }}"></i>
+                    <i class="fa fa-fw fa-lg {{ value is defined and value is not empty ? 'ri-close-line' : 'fa-filter' }}"></i>
                 </button>
             </span>
         </div>
