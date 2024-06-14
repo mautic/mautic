@@ -203,7 +203,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 <label {% for k, v in label_attr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
 {% endfor %}{{ tooltip ? 'data-toggle="tooltip" data-container="body" data-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
-{{ label_html ? label|trans({}, translation_domain)|purify : label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="fa fa-question-circle"></i>' : '' }}</label>
+{{ label_html ? label|trans({}, translation_domain)|purify : label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="ri-question-line"></i>' : '' }}</label>
 {% endif %}
 {% endblock form_label %}
 
