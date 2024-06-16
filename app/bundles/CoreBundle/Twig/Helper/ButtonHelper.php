@@ -480,7 +480,7 @@ final class ButtonHelper
         if (!empty($addTo['btnClass'])) {
             $addTo['attr']['class'] = $addTo['btnClass'];
         } elseif (!isset($button['attr']['class'])) {
-            $addTo['attr']['class'] = 'btn btn-default';
+            $addTo['attr']['class'] = 'btn btn-tertiary';
         } elseif (!strstr($addTo['attr']['class'], 'btn-')) {
             $addTo['attr']['class'] .= ' btn btn-default';
         }

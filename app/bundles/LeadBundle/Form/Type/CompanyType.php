@@ -99,7 +99,7 @@ class CompanyType extends AbstractType
                         'name'  => 'merge',
                         'label' => 'mautic.lead.merge',
                         'attr'  => [
-                            'class'       => 'btn btn-default btn-dnd',
+                            'class'       => 'btn btn-tertiary btn-dnd',
                             'icon'        => 'ri-exchange-2-line',
                             'data-toggle' => 'ajaxmodal',
                             'data-target' => '#MauticSharedModal',

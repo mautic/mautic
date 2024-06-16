@@ -91,29 +91,34 @@
     &.btn-info { color: @brand-info; }
   }
 
-  // Hierarchy buttons
+  // Hierarchycal buttons
+  /// Primary
   &.btn-primary {
     background-color: var(--button-primary);
-
-    &:hover {
-      background-color: var(--button-primary-hover);
-      border: var(--no-border);
-    }
-
-    &:active {
-      background-color: var(--button-primary-active);
-    }
-
+    &:hover {background-color: var(--button-primary-hover);}
+    &:active {background-color: var(--button-primary-active);}
     &:focus {
       border-color: var(--focus);
       box-shadow: inset 0 0 0 1px var(--focus),inset 0 0 0 2px var(--background,#ffffff);
     }
 
     &.btn-danger {
-
+      background-color: var(--button-danger-primary);
+      &:hover {background-color: var(--button-danger-hover);}
+      &:active {background-color: var(--button-danger-active);}
     }
   }
 
+  /// Secondary
+  &.btn-secondary {
+    background-color: var(--button-secondary);
+    color: var(--text-inverse);
+
+    &:hover {background-color: var(--button-secondary-hover);}
+    &:active {background-color: var(--button-secondary-active);}
+  }
+
+  /// Ghost
   &.btn-ghost {
     color: var(--link-primary);
     background-color: transparent;
@@ -123,18 +128,33 @@
       background-color: var(--background-hover);
     }
 
-    &:active {
-      background-color: var(--background-active);
-    }
+    &:active {background-color: var(--background-active);}
 
     &:disabled {
       color: var(--text-disabled);
       background-color: var(--button-disabled);
     }
+
+    //// Ghost Danger
+    &.btn-danger {
+      color: var(--button-danger-secondary);
+
+      &:hover {
+        background-color: var(--button-danger-hover);
+        color: var(--link-on-color);
+      }
+      &:active {
+        background-color: var(--button-danger-active);
+        color: var(--link-on-color);
+      }
+    }
   }
 
+  /// Tertiary + automatic error fixes
   &.btn-tertiary, 
-  &.btn-primary + .btn-primary, 
+  &.btn-tertiary + .dropdown-toggle,
+  &.btn-primary + .btn-primary:not(.dropdown-toggle), 
+  &.btn-primary + .btn-primary + .btn-primary,
   &.btn-primary + .btn-primary + .btn-secondary {
     background-color: transparent;
     color: var(--button-tertiary);
@@ -150,18 +170,21 @@
       color: var(--text-inverse);
       background-color: var(--button-tertiary-active); 
     }
-  }
 
-  &.btn-secondary {
-    background-color: var(--button-secondary);
-    color: var(--text-on-color);
+    /// Danger Tertiary
+    &.btn-danger {
+      border-color: var(--button-danger-secondary);
+      color: var(--button-danger-secondary);
 
-    &:hover {
-      background-color: var(--button-secondary-hover);
-    }
+      &:hover {
+        background-color: var(--button-danger-hover);
+        color: var(--text-inverse);
+      }
 
-    &:active {
-      background-color: var(--button-secondary-active);
+      &:active {
+        background-color: var(--button-danger-active);
+        color: var(--text-inverse);
+      }
     }
   }
 
@@ -169,12 +192,7 @@
     justify-content: center;
     padding: 0;
     align-items: center;
-
-    &.btn-small { .btn-icon-size(var(--spacing-07)) }
-    &.btn-medium { .btn-icon-size(var(--spacing-08)) }
-    &.btn-large { .btn-icon-size(var(--spacing-09)) }
-    &.btn-extra-large { .btn-icon-size(var(--spacing-10)) }
-    &.btn-2xl { .btn-icon-size(var(--spacing-11)) }
+    aspect-ratio: 1 / 1;
   }
 
   // Standard sizes
@@ -183,12 +201,6 @@
   &.btn-large { height: var(--spacing-09); line-height: var(--spacing-09);}
   &.btn-extra-large { height: var(--spacing-10); }
   &.btn-2xl { height: var(--spacing-11); }
-}
-
-// Mixin for squared icon-only buttons
-.btn-icon-size(@size) {
-  width: @size;
-  height: @size;
 }
 
 // Link buttons

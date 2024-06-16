@@ -110,19 +110,15 @@ class ButtonExtension extends AbstractExtension
             if (!$enabled) {
                 continue;
             }
-
+        
             $path     = false;
             $primary  = false;
             $priority = 0;
-
+        
             switch ($action) {
                 case 'clone':
                 case 'abtest':
                     $actionQuery = [
-                        /**
-                         * If the item has the getVariantParent(), it probably implements VariantEntityInterface,
-                         * but that doesn't have a getId() method so we can't do $item instanceof VariantEntityInterface here.
-                         */
                         'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
                             ? $item->getVariantParent()->getId() : $item->getId(),
                     ];
@@ -163,14 +159,16 @@ class ButtonExtension extends AbstractExtension
                     );
                     break;
             }
-
+        
             if ($path) {
                 $mergeAttr = (!in_array($action, ['edit', 'new'])) ? [] : $editAttr;
+                $btnClass = in_array($action, ['new', 'edit']) ? 'btn btn-primary' : 'btn btn-tertiary';
+        
                 $this->buttonHelper->addButton(
                     [
                         'attr' => array_merge(
                             [
-                                'class'       => 'btn btn-primary',
+                                'class'       => $btnClass,
                                 'href'        => $path,
                                 'data-toggle' => 'ajax',
                             ],
@@ -184,6 +182,6 @@ class ButtonExtension extends AbstractExtension
                     ]
                 );
             }
-        }
+        }        
     }
 }
