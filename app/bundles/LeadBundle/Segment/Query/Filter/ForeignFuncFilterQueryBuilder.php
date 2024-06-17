@@ -125,8 +125,17 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             $queryBuilder->addGroupBy($leadsTableAlias.'.id');
         } else {
             if ($filterAggr) {
-                $expression = $queryBuilder->expr()->exists('SELECT '.$expressionArg.' FROM '.$filter->getTable().' '.
-                $tableAlias.' WHERE '.$leadsTableAlias.'.id='.$tableAlias.'.'.$foreignContactColumn.' HAVING '.$expression);
+                $subQueryBuilder = $queryBuilder->createQueryBuilder();
+                $subQueryBuilder->select($expressionArg)
+                    ->from($filter->getTable(), $tableAlias)
+                    ->andWhere($leadsTableAlias.'.id='.$tableAlias.'.'.$foreignContactColumn)
+                    ->andHaving($expression);
+
+                if ($where = $filter->getWhere()) {
+                    $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $where));
+                }
+
+                $expression = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
             } else { // This should never happen
                 $queryBuilder->addGroupBy($leadsTableAlias.'.id');
             }
