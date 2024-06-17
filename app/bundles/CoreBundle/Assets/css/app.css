@@ -3670,6 +3670,7 @@ ul.line-legend li {
 }
 .progress {
   background-color: #ebedf0;
+  border-radius: var(--border-radius-sm);
   -webkit-box-shadow: none;
   box-shadow: none;
 }
