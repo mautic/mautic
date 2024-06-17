@@ -2893,6 +2893,10 @@ label {
   white-space: normal;
   text-align: left;
 }
+.control-label {
+  font-weight: normal;
+  font-size: var(--utility-01);
+}
 .control-label.text-left {
   text-align: left;
 }
