@@ -5567,6 +5567,10 @@ a.inline-token .text-muted {
 .modal-content .tab-content {
   background-color: var(--layer-alt);
 }
+.modal-content .tab-content .form-control,
+.modal-content .tab-content .form-control:hover {
+  background-color: initial;
+}
 .form-type-modal-backdrop {
   background-color: var(--background) !important;
   opacity: 1 !important;
