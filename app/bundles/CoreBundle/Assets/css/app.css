@@ -2933,6 +2933,11 @@ label {
   padding: var(--spacing-04) var(--spacing-05);
   color: var(--text-primary);
 }
+.form-control + .help-text,
+.form-control + p {
+  margin-top: 5px;
+  font-size: var(--utility-01);
+}
 .form-control.not-chosen {
   padding: var(--spacing-01) var(--spacing-04);
 }
