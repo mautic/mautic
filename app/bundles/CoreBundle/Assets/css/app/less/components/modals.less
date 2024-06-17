@@ -10,3 +10,30 @@
 }
 
 .modal-backdrop { backdrop-filter: blur(4px); }
+
+// Modal footer buttons
+
+.modal-footer {
+    padding: var(--spacing-03) 0 0;
+  
+    .modal-form-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1px;
+  
+        .btn {
+          height: var(--spacing-10);
+          display: inherit;
+  
+          &:first-child { border-radius: var(--border-radius-md) 0 0 0; }
+        }
+  
+        .btn + .btn {
+          border-radius: 0;
+          margin: 0;
+        }
+  
+        &:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn { flex-grow: 0.5; }
+        &:has(.btn:nth-child(3)) .btn { min-width: 25%; }
+    }
+}
