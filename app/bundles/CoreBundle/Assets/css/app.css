@@ -5579,6 +5579,18 @@ a.inline-token .text-muted {
 .map-options__item.btn.active:focus {
   outline: 0 !important;
 }
+.modal-content {
+  border-radius: var(--border-radius-lg);
+  box-shadow: none;
+}
+.form-type-modal-backdrop {
+  background-color: var(--background) !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(10px);
+}
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
 @media (min-width: 992px) {
   .modal-xl {
     width: 1140px;
@@ -6150,7 +6162,7 @@ ul.media-list.media-list-feed div.media-object {
   --interactive: var(--primary-50);
   --highlight: var(--primary-90);
   --toggle-off: #6f6f6f;
-  --overlay: #161616;
+  --overlay: #17171780;
   --skeleton-element: #525252;
   --skeleton-background: #353535;
   --label-background-gray: #525252;
