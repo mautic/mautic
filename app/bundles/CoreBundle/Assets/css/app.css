@@ -5573,7 +5573,7 @@ a.inline-token .text-muted {
   backdrop-filter: blur(4px);
 }
 .modal-footer {
-  padding: var(--spacing-03) 0 0;
+  padding: var(--spacing-04) 0 0;
 }
 .modal-footer .modal-form-buttons {
   display: flex;
