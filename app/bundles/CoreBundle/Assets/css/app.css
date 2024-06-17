@@ -1430,6 +1430,31 @@ blockquote > p:after {
 .btn-info:hover {
   color: #3c4650;
 }
+.modal-footer {
+  padding: var(--spacing-03) 0 0;
+}
+.modal-footer .modal-form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1px;
+}
+.modal-footer .modal-form-buttons .btn {
+  height: var(--spacing-10);
+  display: inherit;
+}
+.modal-footer .modal-form-buttons .btn:first-child {
+  border-radius: var(--border-radius-md) 0 0 0;
+}
+.modal-footer .modal-form-buttons .btn + .btn {
+  border-radius: 0;
+  margin: 0;
+}
+.modal-footer .modal-form-buttons:has(.btn:nth-child(2)):not(:has(.btn:nth-child(3))) .btn {
+  flex-grow: 0.5;
+}
+.modal-footer .modal-form-buttons:has(.btn:nth-child(3)) .btn {
+  min-width: 25%;
+}
 .btn-group .btn ~ .btn,
 .btn-group .btn ~ .btn-group,
 .btn-group .btn-group ~ .btn,
