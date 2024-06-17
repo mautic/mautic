@@ -3360,8 +3360,7 @@ input[type=file].form-control {
 .radio-inline.custom-danger label:hover input:checked + span {
   border: 1px solid #F86B4F;
 }
-input[type="radio"],
-input[type="checkbox"] {
+input[type="radio"] {
   width: 16px;
   height: 16px;
   vertical-align: -3px;
@@ -3382,6 +3381,12 @@ input[type="checkbox"] {
 .checkbox-inline[class^="custom"] label,
 .radio-inline[class^="custom"] label {
   padding-left: 4px;
+}
+input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  vertical-align: -3px;
+  accent-color: var(--text-primary);
 }
 .time-input select {
   margin: 0 3px 0 3px;
