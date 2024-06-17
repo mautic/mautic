@@ -7,7 +7,8 @@
 // Restyle and baseline non-control form elements.
 
 label {
-  font-weight: 600;
+  font-weight: normal;
+  font-size: var(--utility-01);
 }
 
 .label-tag {
@@ -18,9 +19,6 @@ label {
 // control label
 // -------------------------
 .control-label {
-  font-weight: normal;
-  font-size: var(--utility-01);
-  
   &.text-left {
     text-align: left;
   }
@@ -355,6 +353,13 @@ input[type=file].form-control {
   &.custom-danger {
     .checkbox-radio-color(@brand-danger);
   }
+}
+
+input[type="radio"], input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  margin-right: 4px;
 }
 
 // radio radius reset

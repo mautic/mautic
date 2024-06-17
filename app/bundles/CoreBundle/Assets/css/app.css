@@ -2887,15 +2887,12 @@ ul.dropdown-menu-form {
   fill: #ffffff;
 }
 label {
-  font-weight: 600;
+  font-weight: normal;
+  font-size: var(--utility-01);
 }
 .label-tag {
   white-space: normal;
   text-align: left;
-}
-.control-label {
-  font-weight: normal;
-  font-size: var(--utility-01);
 }
 .control-label.text-left {
   text-align: left;
@@ -3362,6 +3359,13 @@ input[type=file].form-control {
 .checkbox-inline.custom-danger label:hover input:checked + span,
 .radio-inline.custom-danger label:hover input:checked + span {
   border: 1px solid #F86B4F;
+}
+input[type="radio"],
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  margin-right: 4px;
 }
 .radio-inline[class*=" custom"] label input + span,
 .radio[class*=" custom"] label input + span,
