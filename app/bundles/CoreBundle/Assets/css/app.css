@@ -5558,6 +5558,12 @@ a.inline-token .text-muted {
   border-radius: var(--border-radius-lg);
   box-shadow: none;
 }
+.modal-content .form-control {
+  background-color: var(--field-alt);
+}
+.modal-content .form-control:hover {
+  background-color: var(--field-hover-alt);
+}
 .form-type-modal-backdrop {
   background-color: var(--background) !important;
   opacity: 1 !important;
