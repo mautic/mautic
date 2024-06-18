@@ -303,8 +303,12 @@ class TrackableModel extends AbstractCommonModel
         if ('html' == $type) {
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
+                // Make the search regular expression match both "&" and "&amp;".
+                $search  = preg_quote($search, '/');
+                $search  = str_replace('&amp;', '&', $search);
+                $search  = str_replace('&', '(?:&|&amp;)', $search);
                 $content = preg_replace(
-                    '/<(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
+                    '/<(.*?) href=(["\'])'.$search.'(.*?)\\2(.*?)>/i',
                     '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
