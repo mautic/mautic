@@ -97,7 +97,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
                 if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed']) || !empty($log['fail_reason'])) {
                     $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error')
-                        .'" class="fa fa-warning text-danger"></i>';
+                        .'" class="ri-alert-line text-danger"></i>';
                 }
 
                 $extra = [
@@ -123,7 +123,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'timestamp'       => $log['dateTriggered'],
                         'extra'           => $extra,
                         'contentTemplate' => $template,
-                        'icon'            => 'fa-clock-o',
+                        'icon'            => 'ri-time-line',
                         'contactId'       => $log['lead_id'],
                     ]
                 );

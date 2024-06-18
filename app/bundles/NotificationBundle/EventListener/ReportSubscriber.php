@@ -299,7 +299,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_mobile_notification_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -314,7 +314,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-tachometer';
+                    $graphData['iconClass'] = 'ri-speed-up-line';
                     $graphData['link']      = 'mautic_mobile_notification_action';
                     $event->setGraph($g, $graphData);
                     break;

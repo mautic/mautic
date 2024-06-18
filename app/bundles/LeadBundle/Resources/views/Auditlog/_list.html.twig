@@ -7,7 +7,7 @@
 <form method="post" action="{{ path('mautic_contact_auditlog_action', {'leadId': lead.id}) }}" class="panel" id="auditlog-filters">
     <div class="form-control-icon pa-xs">
         <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events['filters']['search']|e }}">
-        <span class="the-icon fa fa-search text-muted mt-xs"></span>
+        <span class="the-icon ri-search-line text-muted mt-xs"></span>
     </div>
     {% if events.types is defined and events.types is iterable %}
         <div class="history-search panel-footer text-muted">
@@ -35,7 +35,7 @@
                 <div class="col-sm-2 mt-lg">
                     <a class="btn btn-default btn-block mt-lg" href="{{ url('mautic_contact_auditlog_export_action', {'leadId': lead.id}) }}" data-toggle="download">
                         <span>
-                            <i class="fa fa-download"></i> <span>{{ 'mautic.core.export'|trans }}</span>
+                            <i class="ri-download-line"></i> <span>{{ 'mautic.core.export'|trans }}</span>
                         </span>
                     </a>
                 </div>
@@ -56,7 +56,7 @@
           <tr>
               <th class="timeline-icon">
                   <a class="btn btn-sm btn-nospin btn-default" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
-                      <span class="fa fa-fw fa-level-down"></span>
+                      <span class="fa fa-fw ri-corner-right-down-line"></span>
                   </a>
               </th>
               {{ include('@MauticCore/Helper/tableheader.html.twig', {

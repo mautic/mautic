@@ -37,8 +37,8 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- asset detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
@@ -52,7 +52,7 @@
             <div class="collapse" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                             {{- include(
                                 '@MauticCore/Helper/details.html.twig',
@@ -87,7 +87,7 @@
             <!--/ asset detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
@@ -105,7 +105,7 @@
                             <div class="panel-body box-layout">
                                 <div class="col-md-2 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-download"></span>
+                                        <span class="ri-download-line"></span>
                                         {% trans %}mautic.asset.graph.line.downloads{% endtrans %}
                                     </h5>
                                 </div>
@@ -145,7 +145,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
@@ -158,7 +158,7 @@
                 <span class="input-group-btn">
                     <button class="btn btn-default btn-nospin"
                             onclick="window.open('{{ assetDownloadUrl }}', '_blank');">
-                        <i class="fa fa-external-link"></i>
+                        <i class="ri-external-link-line"></i>
                     </button>
                 </span>
                 </div>
