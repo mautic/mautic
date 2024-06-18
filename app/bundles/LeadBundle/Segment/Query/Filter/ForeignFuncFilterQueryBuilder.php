@@ -132,7 +132,7 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                     ->andHaving($expression);
 
                 if ($where = $filter->getWhere()) {
-                    $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $where));
+                    $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX ?? '', '', $filter->getTable()).'.', $tableAlias.'.', $where));
                 }
 
                 $expression = $queryBuilder->expr()->exists($subQueryBuilder->getSQL());
