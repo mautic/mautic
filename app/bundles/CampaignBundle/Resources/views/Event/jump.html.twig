@@ -8,7 +8,7 @@
     <i class="ri-skip-forward-line"></i>
 </div>
 <div class="campaign-event-type mb-xs">
-    <span class="h5 fw-b"><i class="ri-thumb-up-line"></i> Do</span>
+    <span class="h5 fw-b"><i class="ri-thumb-up-line"></i> {{ 'mautic.campaign.do'|trans }}</span>
     <span>{{ 'mautic.campaign.event.jump_to_event'|trans }}</span>
     <a class="label label-primary has-click-event highlight-jump-target ml-sm" href="javascript:void(0)" onClick="Mautic.highlightJumpTarget(event, this)" data-jump-target="{{ event['properties']['jumpToEvent'] }}">
         {{ 'mautic.campaign.locate'|trans }}
