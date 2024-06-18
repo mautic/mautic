@@ -1767,6 +1767,12 @@ a.media {
   margin-right: -15px;
   margin-left: -15px;
 }
+.row > * {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+}
 .row-no-gutters {
   margin-right: 0;
   margin-left: 0;
@@ -2662,8 +2668,9 @@ ul.dropdown-menu-form {
 .nav-tabs {
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
-  -webkit-box-shadow: inset 0 -3px 8px -3px rgba(0, 0, 0, 0.05);
-  box-shadow: inset 0 -3px 8px -3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-wrap: wrap;
+  text-wrap: nowrap;
 }
 .nav-tabs > li > a {
   line-height: 20px;
@@ -2680,6 +2687,11 @@ ul.dropdown-menu-form {
   right: 0;
   height: 2px;
   background-color: #4E5D9D;
+}
+@media (min-width: 1200px) {
+  .nav-tabs {
+    flex-wrap: nowrap;
+  }
 }
 /*
 .tab-content {
