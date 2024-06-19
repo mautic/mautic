@@ -867,7 +867,7 @@ class PageModel extends FormModel
             $this->limitQueryToCreator($allQ);
         }
 
-        $allQ->resetQueryPart('select')->select('t.id');
+        $allQ->resetQueryPart('select')->select('t.lead_id');
         $allQ->groupBy('t.lead_id');
 
         // fetch all group by lead_id
