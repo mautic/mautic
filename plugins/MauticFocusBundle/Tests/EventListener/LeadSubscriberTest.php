@@ -23,22 +23,22 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @var Translator|MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var RouterInterface|MockObject
      */
-    private $router;
+    private MockObject $router;
 
     /**
      * @var FocusModel|(FocusModel&MockObject)|MockObject
      */
-    private $focusModel;
+    private MockObject $focusModel;
 
     /**
      * @var StatRepository|(StatRepository&MockObject)|MockObject
      */
-    private $statRepository;
+    private MockObject $statRepository;
 
     /**
      * @var string
@@ -217,7 +217,7 @@ class LeadSubscriberTest extends CommonMocks
             ],
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,
-            'icon'            => 'fa-search',
+            'icon'            => 'ri-search-line',
             'contactId'       => $lead?->getId(),
         ];
     }

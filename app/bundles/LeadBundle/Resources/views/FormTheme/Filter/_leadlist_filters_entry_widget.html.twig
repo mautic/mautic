@@ -9,7 +9,7 @@
   {% set filterType = form.field.vars.value %}
   {% set inGroup = form.vars.data is defined and form.vars.data.glue is defined and 'and' == form.vars.data.glue %}
   {% set isBehavior = fields.behaviors[filterType].label is defined %}
-  {% set class = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'fa-building' : 'fa-user' %}
+  {% set class = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'ri-building-2-line' : 'ri-user-6-fill' %}
 
   {% if isBehavior %}
       {% set object = 'behaviors' %}
@@ -42,7 +42,7 @@
             </div>
 
             <div class="col-xs-2 col-sm-1">
-                <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>
+                <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="ri-delete-bin-line"></i></a>
             </div>
             {{ form_widget(form.field) }}
             {{ form_widget(form.type) }}

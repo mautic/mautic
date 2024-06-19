@@ -25,11 +25,11 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- step container -->
-      <div class="col-md-3 bg-white height-auto">
+      <div class="col-md-3 height-auto">
           <div class="pr-lg pl-lg pt-md pb-md">
               <div class="media">
                   <div class="media-body">
-                      <img class="img-rounded img-bordered img-responsive media-object" src="{{ img }}" alt="">
+                      <img class="img-rounded img-bordered img-responsive media-object contact-avatar" src="{{ img }}" alt="">
                   </div>
               </div>
 
@@ -64,7 +64,7 @@
       <!--/ step container -->
 
       <!-- container -->
-      <div class="col-md-9 bg-auto height-auto bdr-l">
+      <div class="col-md-9 height-auto bdr-l">
           <div class="tab-content">
               <!-- pane -->
               {% for group in groups %}
@@ -72,7 +72,7 @@
                       {% set groupFields = fields[group] %}
                       {% if groupFields is not empty %}
                           <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">
-                              <div class="pa-md bg-auto bg-light-xs bdr-b">
+                              <div class="pa-md bg-light-xs bdr-b">
                                   <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
                               </div>
                               <div class="pa-md">
@@ -171,12 +171,13 @@
                                       {% endif %}
                                       {% if form.attribution is defined and form.attribution_date is defined %}
                                           <div class="form-group mb-0">
-                                              <label class="control-label mb-xs">{{ 'mautic.lead.attribution'|trans }}</label>
                                               <div class="row">
                                                   <div class="col-sm-4">
+                                                    <label class="control-label mb-xs" data-toggle="tooltip" data-placement="top" title="{{ 'mautic.lead.attribution.tooltip'|trans }}">{{ 'mautic.lead.attribution'|trans }} <i class="ri-question-line"></i></label>
                                                       {{ form_widget(form.attribution, {'attr': {'placeholder': form.attribution.vars.label, 'preaddon': 'fa fa-money'}}) }}
                                                   </div>
                                                   <div class="col-sm-4">
+                                                    <label class="control-label mb-xs" data-toggle="tooltip" data-placement="top" title="{{ 'mautic.lead.attribution_date.tooltip'|trans }}">{{ 'mautic.lead.attribution_date'|trans }} <i class="ri-question-line"></i></label>
                                                       {{ form_widget(form.attribution_date, {'attr': {'placeholder': form.attribution_date.vars.label}}) }}
                                                   </div>
                                               </div>

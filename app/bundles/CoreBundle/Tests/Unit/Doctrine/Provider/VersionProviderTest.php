@@ -14,17 +14,14 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var Connection|MockObject
      */
-    private $connection;
+    private MockObject $connection;
 
     /**
      * @var MockObject&Result
      */
-    private $result;
+    private MockObject $result;
 
-    /**
-     * @var VersionProvider
-     */
-    private $provider;
+    private VersionProvider $provider;
 
     protected function setUp(): void
     {
@@ -35,7 +32,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider             = new VersionProvider($this->connection);
     }
 
-    public function testGetVersionForMySql()
+    public function testGetVersionForMySql(): void
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -53,7 +50,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isMySql());
     }
 
-    public function testGetVersionForMariaDb()
+    public function testGetVersionForMariaDb(): void
     {
         $this->connection->expects($this->once())
             ->method('executeQuery')

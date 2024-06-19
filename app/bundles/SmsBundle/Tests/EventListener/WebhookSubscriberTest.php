@@ -17,12 +17,9 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|WebhookModel
      */
-    private $webhookModel;
+    private MockObject $webhookModel;
 
-    /**
-     * @var WebhookSubscriber
-     */
-    private $subscriber;
+    private WebhookSubscriber $subscriber;
 
     protected function setUp(): void
     {

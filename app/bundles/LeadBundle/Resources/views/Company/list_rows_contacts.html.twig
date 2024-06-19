@@ -34,7 +34,7 @@
                 'data-header': 'mautic.lead.batch.stages'|trans,
             },
             'btnText': 'mautic.lead.batch.stages'|trans,
-            'iconClass': 'fa fa-tachometer',
+            'iconClass': 'ri-speed-up-line',
         },
         {
             'attr': {
@@ -45,7 +45,7 @@
                 'data-header': 'mautic.lead.batch.campaigns'|trans,
             },
             'btnText': 'mautic.lead.batch.campaigns'|trans,
-            'iconClass': 'fa fa-clock-o',
+            'iconClass': 'ri-time-line',
         },
         {
             'attr': {
@@ -56,7 +56,7 @@
                 'data-header': 'mautic.lead.batch.owner'|trans,
             },
             'btnText': 'mautic.lead.batch.owner'|trans,
-            'iconClass': 'fa fa-user',
+            'iconClass': 'ri-user-6-line',
         },
         {
             'attr': {
@@ -74,7 +74,7 @@
 
 {% if contacts|length > 0 %}
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered" id="leadTable">
+        <table class="table table-hover" id="leadTable">
             <thead>
                 <tr>
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
@@ -163,11 +163,11 @@
                                     'data-method': 'POST',
                                 },
                                 'btnText': 'mautic.lead.lead.remove.fromlist',
-                                'iconClass': 'fa fa-remove',
+                                'iconClass': 'ri-close-line',
                             }]) %}
                         {% endif %}
 
-                        {% if fields.core.email.value is not empty %}
+                        {% if fields.core.email is defined %}
                             {% set custom = custom|merge([{
                                 'attr': {
                                     'data-toggle': 'ajaxmodal',
@@ -198,17 +198,17 @@
                     </td>
                     <td class="visible-md visible-lg">{{ fields.core.email.value|purify }}</td>
                     <td class="visible-md visible-lg">
-                        {% set flag = fields.core.country is not empty and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+                        {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
                         {% if flag is not empty %}
                           <img src="{{ flag }}" style="max-height: 24px;" class="mr-sm" />
                         {% endif %}
                         {% set location = [] %}
-                        {% if fields.core.city.value is not empty %}
+                        {% if fields.core.city is defined %}
                             {% set location = location|merge([fields.core.city.value]) %}
                         {% endif %}
-                        {% if fields.core.state.value is not empty %}
+                        {% if fields.core.state is defined %}
                             {% set location = location|merge([fields.core.state.value]) %}
-                        {% elseif fields.core.country.value is not empty %}
+                        {% elseif fields.core.country is defined %}
                             {% set location = location|merge([fields.core.country.value]) %}
                         {% endif %}
                         {{ location|join(', ') }}

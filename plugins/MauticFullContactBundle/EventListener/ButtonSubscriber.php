@@ -13,39 +13,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    private $helper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     public function __construct(
-        IntegrationHelper $helper,
-        TranslatorInterface $translator,
-        RouterInterface $router
+        private IntegrationHelper $helper,
+        private TranslatorInterface $translator,
+        private RouterInterface $router
     ) {
-        $this->helper     = $helper;
-        $this->translator = $translator;
-        $this->router     = $router;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
         ];
     }
 
-    public function injectViewButtons(CustomButtonEvent $event)
+    public function injectViewButtons(CustomButtonEvent $event): void
     {
         // get api_key from plugin settings
         /** @var FullContactIntegration $myIntegration */
@@ -55,7 +37,7 @@ class ButtonSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (0 === strpos($event->getRoute(), 'mautic_contact_')) {
+        if (str_starts_with($event->getRoute(), 'mautic_contact_')) {
             $event->addButton(
                 [
                     'attr' => [
@@ -71,7 +53,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         'data-header' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                    'iconClass' => 'fa fa-search',
+                    'iconClass' => 'ri-search-line',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );
@@ -91,7 +73,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         ),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                    'iconClass' => 'fa fa-search',
+                    'iconClass' => 'ri-search-line',
                 ];
 
                 $event
@@ -107,7 +89,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     );
             }
         } else {
-            if (0 === strpos($event->getRoute(), 'mautic_company_')) {
+            if (str_starts_with($event->getRoute(), 'mautic_company_')) {
                 $event->addButton(
                     [
                         'attr' => [
@@ -125,7 +107,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                             ),
                         ],
                         'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                        'iconClass' => 'fa fa-search',
+                        'iconClass' => 'ri-search-line',
                     ],
                     ButtonHelper::LOCATION_BULK_ACTIONS
                 );
@@ -145,7 +127,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                             ),
                         ],
                         'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
-                        'iconClass' => 'fa fa-search',
+                        'iconClass' => 'ri-search-line',
                     ];
 
                     $event

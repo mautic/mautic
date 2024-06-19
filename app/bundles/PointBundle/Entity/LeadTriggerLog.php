@@ -4,9 +4,11 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 class LeadTriggerLog
 {
+    public const TABLE_NAME = 'point_lead_event_log';
     /**
      * @var TriggerEvent
      **/
@@ -18,7 +20,7 @@ class LeadTriggerLog
     private $lead;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress|null
+     * @var IpAddress|null
      **/
     private $ipAddress;
 
@@ -27,11 +29,11 @@ class LeadTriggerLog
      **/
     private $dateFired;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_lead_event_log')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadTriggerLogRepository::class);
 
         $builder->createManyToOne('event', 'TriggerEvent')
@@ -60,13 +62,13 @@ class LeadTriggerLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired($dateFired)
+    public function setDateFired($dateFired): void
     {
         $this->dateFired = $dateFired;
     }
 
     /**
-     * @return mixed
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -74,9 +76,9 @@ class LeadTriggerLog
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param IpAddress $ipAddress
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress($ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
@@ -92,7 +94,7 @@ class LeadTriggerLog
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -108,7 +110,7 @@ class LeadTriggerLog
     /**
      * @param mixed $event
      */
-    public function setEvent($event)
+    public function setEvent($event): void
     {
         $this->event = $event;
     }
