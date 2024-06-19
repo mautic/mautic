@@ -1005,7 +1005,7 @@ class PageModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
         // IF NULL in select statement is 3 times faster like where condition
-        $q->select('t.url_title, t.url, IFNULL(t.page_id AND t.email_id  AND t.redirect_id AND t.CODE = 200, COUNT(t.id)) AS hits')
+        $q->select('t.url_title, t.url, COUNT(CASE WHEN t.page_id IS NOT NULL AND t.email_id IS NOT NULL AND t.redirect_id IS NOT NULL AND t.CODE = 200 THEN 1 ELSE NULL END) AS hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
             ->orderBy('hits', 'DESC')
             ->groupBy('t.url_title')

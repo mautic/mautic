@@ -28,7 +28,7 @@ class DashboardBestTrackingPagesType extends AbstractType
                 'label'       => 'mautic.email.companyId.filter',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
-                'empty_data'  => '',
+                'empty_data'  => null,
                 'required'    => false,
                 'multiple'    => false,
                 'modal_route' => null, // disable "Add new" option in ajax lookup
@@ -41,7 +41,7 @@ class DashboardBestTrackingPagesType extends AbstractType
                 'label'       => 'mautic.email.campaignId.filter',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
-                'empty_data'  => '',
+                'empty_data'  => null,
                 'placeholder' => '',
                 'required'    => false,
                 'multiple'    => false,
@@ -54,7 +54,7 @@ class DashboardBestTrackingPagesType extends AbstractType
                 'label'      => 'mautic.email.segmentId.filter',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
-                'empty_data' => '',
+                'empty_data' => null,
                 'required'   => false,
             ]
         );
