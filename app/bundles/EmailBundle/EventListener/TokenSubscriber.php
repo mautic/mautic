@@ -7,6 +7,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -17,7 +18,8 @@ class TokenSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private PrimaryCompanyHelper $primaryCompanyHelper
+        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private LeadListRepository $segmentRepository
     ) {
     }
 
