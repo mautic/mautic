@@ -173,9 +173,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
         $xpath = new \DOMXPath($dom);
 
-        $divContent = $xpath->query('//*[@data-slot="dwc"]');
-        for ($i = 0; $i < $divContent->length; ++$i) {
-            $slot = $divContent->item($i);
+        $contentSlots = $xpath->query('//*[@data-slot="dwc"]');
+
+        for ($i = 0; $i < $contentSlots->length; ++$i) {
+            $slot = $contentSlots->item($i);
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
                 continue;
             }

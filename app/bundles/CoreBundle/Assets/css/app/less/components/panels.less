@@ -3,6 +3,10 @@
 // --------------------------------------------------
 
 .panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
   border: 1px solid @panel-default-border;
   .box-shadow(0px 1px 1px darken(@body-bg, 2%));
   //background-clip: padding-box;
@@ -18,7 +22,6 @@
   .panel-title {
     padding: ((33 - @font-size-base) / 2) 0;
     display: table-cell;
-    width: 1%;
     vertical-align: middle;
     //font-size: inherit;
     font-weight: 600;
@@ -30,6 +33,11 @@
     width: 1%;
     vertical-align: middle;
   }
+}
+
+// Panel body
+.panel-body {
+  flex-grow: 1;
 }
 
 // Panel group

@@ -164,8 +164,8 @@ trait FieldsTypeTrait
                             ButtonGroupType::class,
                             [
                                 'choices' => [
-                                    '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>'  => 0,
-                                    '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>' => 1,
+                                    '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>'    => 0,
+                                    '<btn class="btn-nospin ri-arrow-right-circle-line"></btn>' => 1,
                                 ],
                                 'label'             => false,
                                 'data'              => $data,

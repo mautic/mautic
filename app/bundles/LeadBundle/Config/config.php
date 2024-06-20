@@ -312,6 +312,7 @@ return [
                     'iconClass' => 'ri-input-field',
                     'route'     => 'mautic_contactfield_index',
                     'access'    => 'lead:fields:full',
+                    'priority'  => 19,
                 ],
             ],
         ],
@@ -969,5 +970,6 @@ return [
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
         'contact_allow_multiple_companies'                                                      => true,
+        'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
     ],
 ];
