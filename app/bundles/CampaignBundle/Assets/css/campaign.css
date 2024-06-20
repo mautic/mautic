@@ -270,8 +270,8 @@
 .list-campaign-action .campaign-event-icon { 
     background-color: var(--background);
     color: var(--icon-interactive); 
-    width: 54px;
-    height: 54px;
+    aspect-ratio: 1/1;
+    height: 60px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -281,7 +281,7 @@
 .list-campaign-decision .campaign-event-icon {
     background-color: var(--background);
     min-height: 36px;
-    min-width: 36px;
+    aspect-ratio: 1/1;
     display: inline-flex;
     align-items: center;
     justify-content: center;

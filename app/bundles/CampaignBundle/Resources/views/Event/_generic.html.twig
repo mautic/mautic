@@ -27,10 +27,10 @@
         
         <div class="campaign-event-content d-flex fw-nowrap ai-center gap-sm">
             <div class="campaign-event-icon pa-sm mr-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
-            <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-            <span class="campaign-event-name label label-primary ellipsis">
-            {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
-            </span>
+            <div class="d-flex fd-column ai-start">
+                <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
+                <span class="campaign-event-name label label-primary ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span>
+            </div>
             <i class="ri-thumb-up-fill ml-md"></i>
         </div>
 
