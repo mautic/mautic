@@ -1008,7 +1008,7 @@ class PageModel extends FormModel
         $q->select('t.url_title, t.url, COUNT(CASE WHEN t.page_id IS NULL AND t.email_id IS NULL AND t.redirect_id IS NULL AND t.code = 200 THEN 1 ELSE NULL END) AS hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 't')
             ->orderBy('hits', 'DESC')
-            ->groupBy('t.url_title')
+            ->groupBy('t.url_title, t.url')
             ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
