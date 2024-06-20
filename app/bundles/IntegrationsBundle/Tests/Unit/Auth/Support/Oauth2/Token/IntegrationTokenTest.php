@@ -28,6 +28,13 @@ class IntegrationTokenTest extends TestCase
         $this->assertTrue($token->isExpired());
     }
 
+    public function testIsExpiredIfAccessTokenIsMissing(): void
+    {
+        $token = new IntegrationToken('', 'refreshToken');
+
+        $this->assertTrue($token->isExpired());
+    }
+
     public function testIsNotExpired(): void
     {
         $token = new IntegrationToken('accessToken', 'refreshToken', time() + 100);

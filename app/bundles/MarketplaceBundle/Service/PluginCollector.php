@@ -11,9 +11,6 @@ use Mautic\MarketplaceBundle\DTO\AllowlistEntry;
 
 class PluginCollector
 {
-    private Connection $connection;
-    private Allowlist $allowlist;
-
     /**
      * @var AllowlistEntry[]
      */
@@ -21,10 +18,10 @@ class PluginCollector
 
     private int $total = 0;
 
-    public function __construct(Connection $connection, Allowlist $allowlist)
-    {
-        $this->connection = $connection;
-        $this->allowlist  = $allowlist;
+    public function __construct(
+        private Connection $connection,
+        private Allowlist $allowlist
+    ) {
     }
 
     public function collectPackages(int $page, int $limit, string $query = ''): PackageCollection
@@ -57,17 +54,17 @@ class PluginCollector
     {
         $mauticVersion = ThisRelease::getMetadata()->getVersion();
 
-        return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion) {
+        return array_filter($entries, function (AllowlistEntry $entry) use ($mauticVersion): bool {
             if (
-                !empty($entry->minimumMauticVersion) &&
-                !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
+                !empty($entry->minimumMauticVersion)
+                && !version_compare($mauticVersion, $entry->minimumMauticVersion, '>=')
             ) {
                 return false;
             }
 
             if (
-                !empty($entry->maximumMauticVersion) &&
-                !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
+                !empty($entry->maximumMauticVersion)
+                && !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
             ) {
                 return false;
             }
@@ -95,7 +92,7 @@ class PluginCollector
             ];
         }
 
-        /** @var array<int,AllowlistEntry[]> */
+        /** @var array<int, AllowlistEntry[]> $chunks */
         $chunks = array_chunk($this->allowlistedPackages, $limit);
         // Array keys start at 0 but page numbers start at 1
         $pageChunk = $page - 1;

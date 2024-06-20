@@ -35,67 +35,64 @@ class SyncProcessTest extends TestCase
     /**
      * @var MockObject|MappingManualDAO
      */
-    private $mappingManualDAO;
+    private MockObject $mappingManualDAO;
 
     /**
      * @var MockObject|MauticSyncDataExchange
      */
-    private $internalSyncDataExchange;
+    private MockObject $internalSyncDataExchange;
 
     /**
      * @var MockObject|SyncDataExchangeInterface
      */
-    private $integrationSyncDataExchange;
+    private MockObject $integrationSyncDataExchange;
 
     /**
      * @var MockObject|SyncDateHelper
      */
-    private $syncDateHelper;
+    private MockObject $syncDateHelper;
 
     /**
      * @var MockObject|MappingHelper
      */
-    private $mappingHelper;
+    private MockObject $mappingHelper;
 
     /**
      * @var MockObject|RelationsHelper
      */
-    private $relationsHelper;
+    private MockObject $relationsHelper;
 
     /**
      * @var MockObject|IntegrationSyncProcess
      */
-    private $integrationSyncProcess;
+    private MockObject $integrationSyncProcess;
 
     /**
      * @var MockObject|MauticSyncProcess
      */
-    private $mauticSyncProcess;
+    private MockObject $mauticSyncProcess;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private MockObject $eventDispatcher;
 
     /**
      * @var MockObject|Notifier
      */
-    private $notifier;
+    private MockObject $notifier;
 
     /**
      * @var MockObject|InputOptionsDAO
      */
-    private $inputOptionsDAO;
+    private MockObject $inputOptionsDAO;
 
     /**
      * @var MockObject|SyncServiceInterface
      */
-    private $syncService;
+    private MockObject $syncService;
 
-    /**
-     * @var SyncProcess
-     */
-    private $syncProcess;
+    private SyncProcess $syncProcess;
 
     protected function setUp(): void
     {
@@ -137,6 +134,9 @@ class SyncProcessTest extends TestCase
         $this->inputOptionsDAO->expects($this->once())
             ->method('pushIsEnabled')
             ->willReturn(true);
+
+        $this->syncDateHelper->expects($this->once())
+            ->method('setInternalSyncStartDateTime');
 
         // Integration to Mautic
 

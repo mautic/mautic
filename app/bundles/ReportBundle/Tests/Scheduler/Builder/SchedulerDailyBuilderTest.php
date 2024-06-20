@@ -11,7 +11,7 @@ use Recurr\Rule;
 
 class SchedulerDailyBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBuilEvent()
+    public function testBuilEvent(): void
     {
         $schedulerDailyBuilder = new SchedulerDailyBuilder();
 
@@ -27,7 +27,7 @@ class SchedulerDailyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Rule::$freqs['DAILY'], $rule->getFreq());
     }
 
-    public function testBuilEventFails()
+    public function testBuilEventFails(): void
     {
         $schedulerDailyBuilder = new SchedulerDailyBuilder();
 

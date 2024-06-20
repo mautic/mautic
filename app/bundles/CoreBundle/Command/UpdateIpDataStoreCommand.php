@@ -14,16 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UpdateIpDataStoreCommand extends Command
 {
-    private TranslatorInterface $translator;
-    private AbstractLookup $ipService;
-
     public function __construct(
-        TranslatorInterface $translator,
-        AbstractLookup $ipService
+        private TranslatorInterface $translator,
+        private AbstractLookup $ipService
     ) {
-        $this->translator = $translator;
-        $this->ipService  = $ipService;
-
         parent::__construct();
     }
 
@@ -64,7 +58,8 @@ EOT
             }
         }
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Fetch remote datastores for IP lookup services that leverage local lookups';
 }

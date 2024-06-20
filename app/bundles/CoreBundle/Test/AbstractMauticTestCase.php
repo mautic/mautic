@@ -9,17 +9,14 @@ use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -27,13 +24,18 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 abstract class AbstractMauticTestCase extends WebTestCase
 {
     protected EntityManager $em;
+
     protected Connection $connection;
+
     protected KernelBrowser $client;
+
     protected Router $router;
+
     protected array $clientOptions = [];
+
     protected array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
-        'PHP_AUTH_PW'   => 'mautic',
+        'PHP_AUTH_PW'   => 'Maut1cR0cks!',
     ];
 
     protected array $configParams = [
@@ -84,7 +86,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
-        $this->databaseTool = $this->getContainer()->get(DatabaseToolCollection::class)->get();
+        $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
     }
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
@@ -97,22 +99,14 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->em         = self::$container->get('doctrine')->getManager();
+        $this->em         = static::getContainer()->get('doctrine')->getManager();
         $this->connection = $this->em->getConnection();
 
-        $this->router = self::$container->get('router');
+        $this->router = static::getContainer()->get('router');
         $scheme       = $this->router->getContext()->getScheme();
         $secure       = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', (string) $secure);
-    }
-
-    /**
-     * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
-     */
-    protected static function getContainer(): ContainerInterface
-    {
-        return self::$container;
     }
 
     /**
@@ -136,7 +130,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application(self::$container->get('kernel'));
+        $application = new Application(static::getContainer()->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -170,36 +164,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         ];
     }
 
-    /**
-     * @return string Command's output
-     *
-     * @throws \Exception
-     *
-     * @deprecated use testSymfonyCommand() instead
-     */
-    protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0, bool $catchExceptions = false): string
-    {
-        $params      = array_merge(['command' => $name], $params);
-        $kernel      = self::$container->get('kernel');
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-        $application->setCatchExceptions($catchExceptions);
-
-        if ($command) {
-            // Register the command
-            $application->add($command);
-        }
-
-        $input      = new ArrayInput($params);
-        $output     = new BufferedOutput();
-        $statusCode = $application->run($input, $output);
-        $message    = $output->fetch();
-
-        Assert::assertSame($expectedStatusCode, $statusCode, $message);
-
-        return $message;
-    }
-
     protected function loginUser(string $username): User
     {
         /** @var User|null $user */
@@ -211,7 +175,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         }
 
         $firewall = 'mautic';
-        $session  = self::$container->get('session');
+        $session  = static::getContainer()->get('session');
         $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
         $session->set('_security_'.$firewall, serialize($token));
         $session->save();
@@ -226,7 +190,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function testSymfonyCommand(string $name, array $params = [], Command $command = null): CommandTester
     {
-        $kernel      = self::$container->get('kernel');
+        $kernel      = static::getContainer()->get('kernel');
         $application = new Application($kernel);
 
         if ($command) {

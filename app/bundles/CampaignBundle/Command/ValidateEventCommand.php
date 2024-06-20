@@ -15,33 +15,14 @@ class ValidateEventCommand extends Command
 {
     use WriteCountTrait;
 
-    /**
-     * @var InactiveExecutioner
-     */
-    private $inactiveExecution;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
-    public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
-    {
+    public function __construct(
+        private InactiveExecutioner $inactiveExecution,
+        private TranslatorInterface $translator,
+        private FormatterHelper $formatterHelper
+    ) {
         parent::__construct();
-
-        $this->inactiveExecution = $inactiveExecutioner;
-        $this->translator        = $translator;
-        $this->formatterHelper   = $formatterHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -86,7 +67,7 @@ class ValidateEventCommand extends Command
                 .'</comment>'
             );
 
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $limiter = new ContactLimiter(null, $contactId, null, null, $contactIds);
@@ -94,7 +75,8 @@ class ValidateEventCommand extends Command
 
         $this->writeCounts($output, $this->translator, $counter);
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
+
     protected static $defaultDescription = 'Validate if a contact has been inactive for a decision and execute events if so.';
 }

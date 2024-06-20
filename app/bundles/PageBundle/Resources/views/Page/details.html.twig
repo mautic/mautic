@@ -63,8 +63,8 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 bg-white height-auto">
-          <div class="bg-auto">
+      <div class="col-md-9 height-auto">
+          <div>
               <!-- page detail header -->
               <div class="pr-md pl-md pt-lg pb-lg">
                   <div class="box-layout">
@@ -98,7 +98,7 @@
               <div class="collapse" id="page-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-bordered table-striped mb-0">
+                          <table class="table table-hover mb-0">
                               <tbody>
                                 {{ include('@MauticCore/Helper/details.html.twig', {'entity': activePage}, with_context=false) }}
                               </tbody>
@@ -109,7 +109,7 @@
               <!--/ page detail collapseable -->
           </div>
 
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- page detail collapseable toggler -->
               <div class="hr-expand nm">
                   <span data-toggle="tooltip" title="Detail">
@@ -145,7 +145,7 @@
               </div>
               <!--/ stats -->
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+              {{ customContent('details.stats.graph.below', _context) }}
 
               <!-- tabs controls -->
               <ul class="nav nav-tabs pr-md pl-md">
@@ -201,7 +201,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bg-white bdr-l height-auto">
+      <div class="col-md-3 bdr-l height-auto">
           <!-- preview URL -->
           {% if not activePage.isPreferenceCenter %}
           <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
@@ -215,7 +215,7 @@
                              value="{{ pageUrl|e }}"/>
                       <span class="input-group-btn">
                           <button class="btn btn-default btn-nospin" onclick="window.open('{{ pageUrl }}', '_blank');">
-                              <i class="fa fa-external-link"></i>
+                              <i class="ri-external-link-line"></i>
                           </button>
                       </span>
                   </div>
@@ -227,16 +227,51 @@
                   <div class="panel-title">{{ 'mautic.page.preview.url'|trans }}</div>
               </div>
               <div class="panel-body pt-xs">
-                  <div class="input-group">
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                             readonly
-                             value="{{ previewUrl|e }}"/>
-                      <span class="input-group-btn">
-                      <button class="btn btn-default btn-nospin"
-                              onclick="window.open('{{ previewUrl }}', '_blank');">
-                          <i class="fa fa-external-link"></i>
-                      </button>
-                  </span>
+                  {% if previewSettingsForm.translation is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.translation) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  {% if previewSettingsForm.variant is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.variant) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  {% if previewSettingsForm.contact is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.contact) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="input-group">
+                              <input id="content_preview_url"
+                                     data-route="page/preview"
+                                     onclick="this.setSelectionRange(0, this.value.length);"
+                                     type="text"
+                                     class="form-control"
+                                     readonly
+                                     value="{{ previewUrl|e }}"/>
+                              <span class="input-group-btn">
+                                  <button id="content_preview_url_button"
+                                          class="btn btn-default btn-nospin"
+                                          onclick="window.open('{{ previewUrl }}', '_blank');">
+                                      <i class="ri-external-link-line"></i>
+                                  </button>
+                              </span>
+                              <input type="hidden" id="content_preview_settings_object_id" value="{{ activePage.id }}">
+                              <input type="hidden" id="content_preview_settings_contact_id" value="">
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>

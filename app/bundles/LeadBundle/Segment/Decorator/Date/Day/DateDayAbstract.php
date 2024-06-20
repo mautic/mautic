@@ -16,17 +16,11 @@ abstract class DateDayAbstract extends DateOptionAbstract
         return '+1 day';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
         return $dateTimeHelper->toLocalString('Y-m-d%');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
         return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';

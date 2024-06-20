@@ -30,7 +30,7 @@
         <div class="row mt-lg pa-md">
             {% if isInline %}
                 <div class="mautibot-content col-xs-12">
-                    <h1><i class="fa fa-warning fa-fw text-danger"></i>{{ message|trans({'%code%': status_code}) }}</h1>
+                    <h1><i class="ri-alert-line fa-fw text-danger"></i>{{ message|trans({'%code%': status_code}) }}</h1>
                     <h4 class="mt-5"><strong>{{ status_code }}</strong> {{ status_text }}</h4>
                 </div>
             {% else %}

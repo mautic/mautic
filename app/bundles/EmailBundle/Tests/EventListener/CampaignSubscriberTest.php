@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -33,27 +34,24 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $emailModel;
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
 
     /**
      * @var RealTimeExecutioner|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $realTimeExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
 
     /**
      * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $sendEmailToUser;
+    private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
 
     /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private CampaignSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -63,16 +61,18 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
         $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
+        $leadModel                 = $this->createMock(LeadModel::class);
 
         $this->subscriber = new CampaignSubscriber(
             $this->emailModel,
             $this->realTimeExecutioner,
             $this->sendEmailToUser,
-            $this->translator
+            $this->translator,
+            $leadModel
         );
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
+    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = new Event();
@@ -97,7 +97,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
+    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
@@ -124,7 +124,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithError()
+    public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
@@ -164,5 +164,32 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $failedLead = $failure->getLead();
 
         $this->assertSame('tester@mautic.org', $failedLead->getEmail());
+    }
+
+    /**
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testOnCampaignTriggerActionSendEmailToContactWithWrongEventType(): void
+    {
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $event         = new Event();
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
+
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(6);
+
+        $logs = new ArrayCollection([$leadEventLog]);
+
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToContact($pendingEvent);
+
+        $this->assertCount(0, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
     }
 }

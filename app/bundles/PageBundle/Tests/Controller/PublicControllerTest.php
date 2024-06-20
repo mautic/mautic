@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -38,52 +37,71 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class PublicControllerTest extends MauticMysqlTestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Container
+     * @var MockObject|Container
      */
-    private $internalContainer;
+    private MockObject $internalContainer;
 
-    /** @var \Psr\Log\LoggerInterface */
-    private $logger;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private MockObject $logger;
 
-    /** @var ModelFactory<object>&MockObject */
-    private $modelFactory;
+    /**
+     * @var ModelFactory<object>&MockObject
+     */
+    private MockObject $modelFactory;
 
-    /** @var RedirectModel */
-    private $redirectModel;
+    /**
+     * @var RedirectModel
+     */
+    private MockObject $redirectModel;
 
-    /** @var Redirect */
-    private $redirect;
+    /**
+     * @var Redirect
+     */
+    private MockObject $redirect;
 
-    /** @var Request */
-    private $request;
+    private Request $request;
 
-    /** @var IpLookupHelper */
-    private $ipLookupHelper;
+    /**
+     * @var IpLookupHelper
+     */
+    private MockObject $ipLookupHelper;
 
-    /** @var IpAddress */
-    private $ipAddress;
+    /**
+     * @var IpAddress
+     */
+    private MockObject $ipAddress;
 
-    /** @var LeadModel */
-    private $leadModel;
+    /**
+     * @var LeadModel
+     */
+    private MockObject $leadModel;
 
-    /** @var PageModel */
-    private $pageModel;
+    /**
+     * @var PageModel
+     */
+    private MockObject $pageModel;
 
-    /** @var PrimaryCompanyHelper */
-    private $primaryCompanyHelper;
+    /**
+     * @var PrimaryCompanyHelper
+     */
+    private MockObject $primaryCompanyHelper;
 
-    /** @var ContactRequestHelper&MockObject */
-    private $contactRequestHelper;
+    /**
+     * @var ContactRequestHelper&MockObject
+     */
+    private MockObject $contactRequestHelper;
 
     protected function setUp(): void
     {
@@ -250,18 +268,10 @@ class PublicControllerTest extends MauticMysqlTestCase
         $container = $this->createMock(Container::class);
         $container->method('has')
             ->will($this->returnValue(true));
-        $container->expects(self::once())
-            ->method('get')
-            ->willReturnMap(
-                [
-                    ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $router],
-                ]
-            );
 
         $this->request->attributes->set('ignore_mismatch', true);
 
-        $formFactory          = $this->createMock(FormFactoryInterface::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $router               = $this->createMock(RouterInterface::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
@@ -271,8 +281,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $requestStack         = new RequestStack();
 
         $controller = new PublicController(
-            $formFactory,
-            $fieldHelper,
             $doctrine,
             $factory,
             $modelFactory,
@@ -293,6 +301,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $analyticsHelper,
             $assetHelper,
             $this->createMock(Tracking404Model::class),
+            $router,
             '/page/a',
         );
 
@@ -358,8 +367,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->request->query->set('ct', $clickTrough);
 
-        $formFactory          = $this->createMock(FormFactoryInterface::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
@@ -371,8 +378,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $mauticSecurity       = $this->createMock(CorePermissions::class);
 
         $controller = new PublicController(
-            $formFactory,
-            $fieldHelper,
             $doctrine,
             $factory,
             $this->modelFactory,
@@ -461,8 +466,6 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->request->query->set('ct', $clickThrough);
 
-        $formFactory          = $this->createMock(FormFactoryInterface::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
@@ -474,8 +477,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $mauticSecurity       = $this->createMock(CorePermissions::class);
 
         $controller = new PublicController(
-            $formFactory,
-            $fieldHelper,
             $doctrine,
             $factory,
             $this->modelFactory,
@@ -509,7 +510,7 @@ class PublicControllerTest extends MauticMysqlTestCase
      *
      * @throws \Exception
      */
-    public function testMtcTrackingEvent()
+    public function testMtcTrackingEvent(): void
     {
         $request = new Request(
             [
@@ -556,15 +557,13 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $trackingHelper = $this->createMock(TrackingHelper::class);
         $trackingHelper->expects($this->once())
-            ->method('getSession')
+            ->method('getCacheItem')
             ->willReturn($mtcSessionEventArray);
 
         $contactTracker = $this->createMock(ContactTracker::class);
         $contactTracker->method('getContact')
             ->willReturn($contact);
 
-        $formFactory          = $this->createMock(FormFactoryInterface::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
@@ -574,8 +573,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $requestStack         = new RequestStack();
 
         $publicController = new PublicController(
-            $formFactory,
-            $fieldHelper,
             $doctrine,
             $factory,
             $modelFactory,
@@ -607,13 +604,13 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testTrackingActionWithInvalidCt()
+    public function testTrackingActionWithInvalidCt(): void
     {
         $request = new Request();
 
         $pageModel    = $this->createMock(PageModel::class);
         $pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
-            function () {
+            function (): void {
                 throw new InvalidDecodedStringException();
             }
         );
@@ -629,8 +626,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->method('isAnonymous')
             ->willReturn(true);
 
-        $formFactory          = $this->createMock(FormFactoryInterface::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $factory              = $this->createMock(MauticFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
@@ -641,8 +636,6 @@ class PublicControllerTest extends MauticMysqlTestCase
         $requestStack         = new RequestStack();
 
         $publicController = new PublicController(
-            $formFactory,
-            $fieldHelper,
             $doctrine,
             $factory,
             $modelFactory,
@@ -667,7 +660,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testTrackingImageAction()
+    public function testTrackingImageAction(): void
     {
         $this->client->request('GET', '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
 
