@@ -25,10 +25,10 @@
 {% if update is not defined or update is empty %}
     <div class="campaign-event-buttons hide">
         <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-primary btn-xs btn-edit">
-            <i class="fa fa-pencil"></i>
+            <i class="ri-edit-line"></i>
         </a>
         <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}"  class="btn btn-delete btn-danger btn-xs">
-            <i class="fa fa-times"></i>
+            <i class="ri-close-line"></i>
         </a>
     </div>
 </div>

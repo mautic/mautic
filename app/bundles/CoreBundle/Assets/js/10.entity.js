@@ -184,10 +184,10 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     if (mQuery(btn).length) {
                         if (action == 'clear') {
                             mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('fa-eraser').addClass('fa-search');
+                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
                         } else {
                             mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('fa-search').addClass('fa-eraser');
+                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
                         }
                     }
 
@@ -206,10 +206,10 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     if (mQuery(btn).length) {
                         if (action == 'clear') {
                             mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('fa-eraser').addClass('fa-search');
+                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
                         } else {
                             mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('fa-search').addClass('fa-eraser');
+                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
                         }
                     }
                 },
