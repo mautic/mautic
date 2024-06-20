@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
@@ -400,5 +402,59 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 'Email' => 'con\\tact\'email@email.com',
             ],
         ]);
+    }
+
+    public function testHandleDeletesGracefully(): void
+    {
+        /**
+         * @phpstan-ignore-next-line
+         */
+        $cache = $this->createMock(CacheStorageHelper::class);
+
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl', 'getCache', 'getTranslator', 'upsertUnreadAdminsNotification'])
+            ->getMock();
+
+        $cache
+            ->method('get')
+            ->withAnyParameters()
+            ->willReturn('2019-05-22 19:36:30');
+
+        $integration->expects($this->atLeastOnce())->method('getCache')->willReturn($cache);
+
+        $integration->method('getFieldsForQuery')
+            ->willReturn(['firstname', 'lastname']);
+
+        $params['start']    = '2019-05-22 19:36:30';
+        $params['end']      = '2030-05-22 19:36:30';
+
+        $api = new SalesforceApi($integration);
+
+        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
+
+        $translator = $this->createMock(TranslatorInterface::class);
+
+        $integration->method('getTranslator')->willReturn($translator);
+
+        $translator->expects($this->exactly(2))->method('trans')
+            ->withConsecutive(['mautic.salesforce.error.opt-out_permission.header'], ['mautic.salesforce.error.opt-out_permission.message'])
+            ->willReturn('Incorrect Salesforce permissions.', 'Incorrect Salesforce permissions.');
+
+        $integration->expects($this->once())->method('upsertUnreadAdminsNotification');
+
+        $this->expectException(ApiErrorException::class);
+        $integration->expects($this->atLeastOnce())
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'errorCode' => 'FATAL_ERROR',
+                        'message'   => "ERROR at Row1\nNo such column 'HasOptedOutOfEmail' on entity 'Lead'",
+                    ],
+                ]
+            );
+
+        $api->getLeads($params, 'Lead');
     }
 }
