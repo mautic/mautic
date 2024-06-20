@@ -310,8 +310,8 @@ return [
                     'request_stack',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.core_parameters',
-                    'mautic.ip_lookup',
                     'mautic.lead.factory.device_detector_factory',
+                    'mautic.ip_lookup',
                 ],
             ],
             'mautic.helper.user' => [
