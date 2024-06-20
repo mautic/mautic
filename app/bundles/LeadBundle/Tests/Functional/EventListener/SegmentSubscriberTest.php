@@ -81,7 +81,6 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
      */
     private function saveSegment(string $name, string $alias, array $filters): LeadList
     {
-        // Add 1 segment
         $segmentRepo = $this->em->getRepository(LeadList::class);
         \assert($segmentRepo instanceof LeadListRepository);
         $segment     = new LeadList();
