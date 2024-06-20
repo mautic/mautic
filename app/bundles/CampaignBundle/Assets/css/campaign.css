@@ -145,7 +145,7 @@
 }
 .list-campaign-event {
     background: var(--background);
-    border-radius: clamp(4px, var(--border-radius-md), 8px);
+    color: var(--text-primary);
     box-shadow: hsl(0deg 100% 15% / 10%) 0px 0px 10px 0px;
 }
 
@@ -202,7 +202,6 @@
 }
 
 .campaign-event-icon {
-    border-radius: 100px;
     color: var(--icon-inverse);
     font-size: 20px;
     text-align: center;
@@ -235,29 +234,40 @@
     white-space: nowrap;
 }
 
+.list-campaign-event .label {
+    color: var(--text-inverse);
+}
+
 .list-campaign-decision {
-    background-color: var(--support-success);
-    border: solid 3px var(--support-success);
+    background-color: var(--background);
+    border-style: solid;
+    border-width: 0 0 0 6px;
+    border-color: var(--support-info);
 }
 
 .list-campaign-decision .label {
-    background-color: var(--support-success-inverse);
+    background-color: var(--support-info);
 }
 
-.list-campaign-decision, .list-campaign-condition {
-    border-radius: 100px;
-    padding: 0 var(--spacing-05) 0 0;
+.list-campaign-decision, 
+.list-campaign-condition {
+    padding: var(--spacing-05);
     line-height: 1em;
 }
 
 .list-campaign-condition {
-    background-color: var(--support-error);
-    border: 3px solid var(--support-error);
+    background-color: var(--background);
+    border-style: solid;
+    border-width: 0 0 0 6px;
+    border-color: var(--support-warning);
 }
 
 .list-campaign-condition .label {
-    background-color: var(--support-error-inverse);
+    background-color: var(--support-warning);
+    color: #161616;
 }
+
+.list-campaign-action { border-radius: clamp(4px, var(--border-radius-md), 8px); }
 
 .list-campaign-action .campaign-event-content {
     background-color: var(--interactive);
@@ -275,27 +285,25 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: clamp(0px, var(--border-radius-sm), 6px);
+    border-radius: clamp(0px, var(--border-radius-md), 6px);
 }
 .list-campaign-condition .campaign-event-icon,
 .list-campaign-decision .campaign-event-icon {
-    background-color: var(--background);
-    min-height: 36px;
+    color: var(--text-inverse);
     aspect-ratio: 1/1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 .list-campaign-condition .campaign-event-icon { 
-    color: var(--support-error);
+    color: var(--support-warning);
 }
 .list-campaign-decision .campaign-event-icon { 
-    color: var(--support-success);
+    color: var(--support-info);
 }
 
 .list-campaign-action .campaign-event-type { color: var(--text-inverse); }
-.list-campaign-condition .campaign-event-type, 
-.list-campaign-decision .campaign-event-type { color: var(--text-inverse); }
+
 
 #CampaignEventSelector_chosen .list-campaign-action,
 #CampaignEventSelector_chosen .list-campaign-condition,
@@ -347,7 +355,7 @@
     background-repeat: repeat;
     background-size: 130px;
     content: "";
-    background-color: #9a4f1d0a;
+    background-color: #9a4f1d14;
     height: 100%;
     width: 100%;
     display: block;
