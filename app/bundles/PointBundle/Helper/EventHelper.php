@@ -21,7 +21,8 @@ class EventHelper
         // only initiate once per lead per type
         if (empty($initiated[$lead->getId()][$action['type']])) {
             if (!empty($action['points'])) {
-                $pointsChange = $action['points'];
+                $pointsChange                               = $action['points'];
+                $initiated[$lead->getId()][$action['type']] = true;
             }
         }
 
