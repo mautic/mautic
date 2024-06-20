@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class EventHelperTest extends TestCase
 {
-    public function testEngagePointAction()
+    public function testEngagePointAction(): void
     {
         $lead = new Lead();
 
