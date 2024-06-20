@@ -195,6 +195,7 @@ return [
                 'class'     => Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [
@@ -676,6 +677,7 @@ return [
                     'monolog.logger.mautic',
                     'mautic.http.client',
                     '%kernel.cache_dir%',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.ip_lookup' => [

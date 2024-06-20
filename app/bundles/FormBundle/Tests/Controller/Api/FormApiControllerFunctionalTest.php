@@ -156,7 +156,10 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $formId         = $response['form']['id'];
+
+        Assert::assertTrue(isset($response['form']['id']), $clientResponse->getContent());
+
+        $formId = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertGreaterThan(0, $formId);
