@@ -394,7 +394,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param string $valueColumn
      */
-    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id'): array
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', ?int $limit = 100, array $include = [])
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -413,7 +413,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             if ($reflection->hasMethod('getTitle')) {
                 $labelColumn = 'title';
             } else {
-                $labelColumn = 'name';
+                $labelColumn = 'companyname';
             }
         }
 
@@ -430,10 +430,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         if (null !== $expr && $expr->count()) {
             $q->where($expr);
+            if (!empty($parameters)) {
+                $q->setParameters($parameters);
+            }
         }
 
-        if (!empty($parameters)) {
-            $q->setParameters($parameters);
+        if (!empty($include)) {
+            $q->andWhere($q->expr()->in('comp.id', $include));
         }
 
         // Published only
@@ -442,6 +445,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
                 ->setParameter('true', true, 'boolean');
+        }
+
+        if ($limit) {
+            $q->setMaxResults($limit);
         }
 
         return $q->executeQuery()->fetchAllAssociative();
