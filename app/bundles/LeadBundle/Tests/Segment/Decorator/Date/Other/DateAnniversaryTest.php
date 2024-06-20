@@ -42,7 +42,7 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
          *
          * @var string
          */
-        $expectedResult = '%'.(new \DateTime('now', new \DateTimeZone('UTC')))->format('-m-d');
+        $expectedResult = '%'.(new \DateTime('now', new \DateTimeZone('UTC')))->format('-m-d').'%';
 
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
@@ -94,6 +94,6 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 
         $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('%-03-04', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals('%-03-04%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }
