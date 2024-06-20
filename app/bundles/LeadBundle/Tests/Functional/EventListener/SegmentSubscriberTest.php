@@ -27,9 +27,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
 
-        $expectedTranslationString = implode(' ', array_map(function ($trans) use ($translator) {
-            return $translator->trans($trans);
-        }, $expectedTranslations));
+        $expectedTranslationString = implode(' ', array_map(fn ($trans) => $translator->trans($trans), $expectedTranslations));
 
         $crawlerText = $crawler->filter('#leadlist_filters_0_properties')->filter('.alert')->text();
         $this->assertStringContainsString($expectedTranslationString, $crawlerText);
@@ -84,8 +82,8 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     private function saveSegment(string $name, string $alias, array $filters): LeadList
     {
         // Add 1 segment
-        /** @var LeadListRepository $segmentRepo */
         $segmentRepo = $this->em->getRepository(LeadList::class);
+        \assert($segmentRepo instanceof LeadListRepository);
         $segment     = new LeadList();
         $segment->setName($name)
             ->setPublicName($name)
