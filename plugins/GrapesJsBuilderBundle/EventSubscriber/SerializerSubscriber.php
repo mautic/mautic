@@ -9,6 +9,7 @@ use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\InstallBundle\Install\InstallService;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 
 class SerializerSubscriber implements EventSubscriberInterface
@@ -16,6 +17,7 @@ class SerializerSubscriber implements EventSubscriberInterface
     public function __construct(
         private GrapesJsBuilderModel $grapesJsBuilderModel,
         private InstallService $installer,
+        private Config $config,
     ) {
     }
 
@@ -38,23 +40,25 @@ class SerializerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $object = $event->getObject();
+        if ($this->config->isPublished()) {
+            $object = $event->getObject();
 
-        if (!$object instanceof Email) {
-            return;
-        }
+            if (!$object instanceof Email) {
+                return;
+            }
 
-        // Get the grapesJsBuilder data.
-        $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object]);
+            // Get the grapesJsBuilder data.
+            $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object]);
 
-        // Add it to the serialized data.
-        $visitor = $event->getContext()->getVisitor();
-        if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
-            $visitor->visitProperty(
-                new StaticPropertyMetadata(
-                    '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
-                ), ['customMjml' => $grapesJsBuilder->getCustomMjml()]
-            );
+            // Add it to the serialized data.
+            $visitor = $event->getContext()->getVisitor();
+            if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
+                $visitor->visitProperty(
+                    new StaticPropertyMetadata(
+                        '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+                    ), ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+                );
+            }
         }
     }
 }
