@@ -42,8 +42,8 @@ class IpLookupHelper
         protected RequestStack $requestStack,
         protected EntityManager $em,
         CoreParametersHelper $coreParametersHelper,
-        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
         protected ?AbstractLookup $ipLookup = null,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
     ) {
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
         $this->doNotTrackBots        = $coreParametersHelper->get('do_not_track_bots');
