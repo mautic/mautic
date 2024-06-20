@@ -34,6 +34,10 @@ return [
                 'path'       => '/themes/{objectAction}/{objectId}',
                 'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
             ],
+            'mautic_core_keep_alive' => [
+                'path'       => '/keep-alive',
+                'controller' => 'Mautic\CoreBundle\Controller\KeepAliveController::keepAliveAction',
+            ],
         ],
         'public' => [
             'mautic_js' => [
@@ -191,6 +195,7 @@ return [
                 'class'     => Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [
@@ -672,6 +677,7 @@ return [
                     'monolog.logger.mautic',
                     'mautic.http.client',
                     '%kernel.cache_dir%',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.ip_lookup' => [
@@ -1434,5 +1440,6 @@ return [
         'load_froala_assets'                                      => false, // As we cannot remove the legacy builder in M5 we require users to enable Froala assets and agree with its security vulnerabilities.
         'redis_primary_only'                                      => false,
         Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE  => null,
+        'gdpr_user_purge_threshold'                               => 1095, // Minimum no. of days a user has to be inactive to get picked up by `mautic:maintenance:cleanup --gdpr`
     ],
 ];
