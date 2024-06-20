@@ -40,25 +40,27 @@ class SerializerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->config->isPublished()) {
-            $object = $event->getObject();
+        if (!$this->config->isPublished()) {
+            return;
+        }
 
-            if (!$object instanceof Email) {
-                return;
-            }
+        $object = $event->getObject();
 
-            // Get the grapesJsBuilder data.
-            $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object]);
+        if (!$object instanceof Email) {
+            return;
+        }
 
-            // Add it to the serialized data.
-            $visitor = $event->getContext()->getVisitor();
-            if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
-                $visitor->visitProperty(
-                    new StaticPropertyMetadata(
-                        '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
-                    ), ['customMjml' => $grapesJsBuilder->getCustomMjml()]
-                );
-            }
+        // Get the grapesJsBuilder data.
+        $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object]);
+
+        // Add it to the serialized data.
+        $visitor = $event->getContext()->getVisitor();
+        if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
+            $visitor->visitProperty(
+                new StaticPropertyMetadata(
+                    '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+                ), ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+            );
         }
     }
 }
