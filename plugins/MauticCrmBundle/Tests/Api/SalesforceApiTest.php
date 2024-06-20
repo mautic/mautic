@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
@@ -404,40 +406,48 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testHandleDeletesGracefully(): void
+    public function testHandleDeletesGracefullyWithHasOptedOutOfEmailAsMissingField(): void
     {
         /**
          * @phpstan-ignore-next-line
          */
         $cache = $this->createMock(CacheStorageHelper::class);
 
-        $integration = $this->getMockBuilder(SalesforceIntegration::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['mergeConfigToFeatureSettings', 'makeRequest', 'getQueryUrl', 'getIntegrationSettings', 'getFieldsForQuery', 'getApiUrl', 'getCache', 'getTranslator', 'upsertUnreadAdminsNotification'])
-            ->getMock();
-
         $cache
             ->method('get')
             ->withAnyParameters()
             ->willReturn('2019-05-22 19:36:30');
 
-        $integration->expects($this->atLeastOnce())->method('getCache')->willReturn($cache);
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'mergeConfigToFeatureSettings',
+                'makeRequest',
+                'getQueryUrl',
+                'getIntegrationSettings',
+                'getFieldsForQuery',
+                'getApiUrl',
+                'getCache',
+                'getTranslator',
+                'upsertUnreadAdminsNotification',
+            ])
+            ->getMock();
+
+        $integration
+            ->expects($this->atLeastOnce())
+            ->method('getCache')
+            ->willReturn($cache);
 
         $integration->method('getFieldsForQuery')
-            ->willReturn(['firstname', 'lastname']);
-
-        $params['start']    = '2019-05-22 19:36:30';
-        $params['end']      = '2030-05-22 19:36:30';
-
-        $api = new SalesforceApi($integration);
-
-        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
+            ->with('Lead')
+            ->willReturn(['firstname', 'lastname', 'HasOptedOutOfEmail']);
 
         $translator = $this->createMock(TranslatorInterface::class);
 
         $integration->method('getTranslator')->willReturn($translator);
 
-        $translator->expects($this->exactly(2))->method('trans')
+        $translator->expects($this->exactly(2))
+            ->method('trans')
             ->withConsecutive(['mautic.salesforce.error.opt-out_permission.header'], ['mautic.salesforce.error.opt-out_permission.message'])
             ->willReturn('Incorrect Salesforce permissions.', 'Incorrect Salesforce permissions.');
 
@@ -454,6 +464,91 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                     ],
                 ]
             );
+
+        $params['start']    = '2019-05-22 19:36:30';
+        $params['end']      = '2030-05-22 19:36:30';
+
+        $api = new SalesforceApi($integration);
+
+        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
+
+        $api->getLeads($params, 'Lead');
+    }
+
+    public function testHandleDeletesGracefully(): void
+    {
+        /**
+         * @phpstan-ignore-next-line
+         */
+        $cache = $this->createMock(CacheStorageHelper::class);
+
+        $cache
+            ->method('get')
+            ->withAnyParameters()
+            ->willReturn('2019-05-22 19:36:30');
+
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'mergeConfigToFeatureSettings',
+                'makeRequest',
+                'getQueryUrl',
+                'getIntegrationSettings',
+                'getFieldsForQuery',
+                'getApiUrl',
+                'getCache',
+                'getTranslator',
+                'upsertUnreadAdminsNotification',
+                'getEntityManager',
+            ])
+            ->getMock();
+
+        $integration
+            ->expects($this->atLeastOnce())
+            ->method('getCache')
+            ->willReturn($cache);
+
+        $integration->method('getFieldsForQuery')
+            ->with('Lead')
+            ->willReturn(['firstname', 'lastname', 'extraField']);
+
+        $integration->expects($this->never())->method('upsertUnreadAdminsNotification');
+
+        $entityManager = $this
+            ->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entity = $this
+            ->getMockBuilder(Integration::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getFeatureSettings', 'setFeatureSettings'])
+            ->getMock();
+
+        $integration->method('getEntityManager')->willReturn($entityManager);
+        $integration->method('getIntegrationSettings')->willReturn($entity);
+        $entity->method('getFeatureSettings')->willReturn(['leadFields' => ['extraField__Lead' => '']]);
+
+        $entity->expects($this->once())->method('setFeatureSettings')->with(['leadFields' => []]);
+
+        $this->expectException(ApiErrorException::class);
+        $integration->expects($this->atLeastOnce())
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'errorCode' => 'FATAL_ERROR',
+                        'message'   => "ERROR at Row1\nNo such column 'extraField' on entity 'Lead'",
+                    ],
+                ]
+            );
+
+        $params['start']    = '2019-05-22 19:36:30';
+        $params['end']      = '2030-05-22 19:36:30';
+
+        $api = new SalesforceApi($integration);
+
+        self::assertEquals('2019-05-22 19:36:30', $api->getOrganizationCreatedDate());
 
         $api->getLeads($params, 'Lead');
     }
