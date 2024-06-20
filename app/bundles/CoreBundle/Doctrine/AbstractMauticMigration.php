@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Doctrine;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -35,6 +36,10 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      * @var string
      */
     protected $platform;
+
+    protected EntityManagerInterface $entityManager;
+
+    protected static string $tableName;
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -184,5 +189,18 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected function suppressNoSQLStatementError()
     {
         $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
+    }
+
+    /**
+     * This method will remove the burden of getting prefixed table name in individual migration file.
+     * Individual migration files just need to keep a protected member static protected variable '$tableName'.
+     */
+    protected function getPrefixedTableName(string $tableName = null): string
+    {
+        if (is_null($tableName)) {
+            $tableName = static::$tableName;
+        }
+
+        return $this->prefix.$tableName;
     }
 }

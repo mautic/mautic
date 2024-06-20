@@ -54,9 +54,4 @@ final class Version20231110103625 extends AbstractMauticMigration
 
         $this->write(sprintf('<comment>%s record(s) have been updated successfully.</comment>', $updatedRecords));
     }
-
-    private function getPrefixedTableName(): string
-    {
-        return $this->prefix.self::$tableName;
-    }
 }

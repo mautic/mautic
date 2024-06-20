@@ -43,9 +43,4 @@ final class Version20230606111852 extends PreUpAssertionMigration
         }
         $this->write(sprintf('<comment>%s record(s) have been updated successfully.</comment>', $updatedRecords));
     }
-
-    private function getPrefixedTableName(): string
-    {
-        return $this->prefix.self::$tableName;
-    }
 }

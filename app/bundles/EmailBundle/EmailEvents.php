@@ -280,4 +280,12 @@ final class EmailEvents
      * Mautic\EmailBundle\Event\EmailStatEvent
      */
     public const ON_EMAIL_STAT_POST_SAVE = 'mautic.email.on_email_stat_post_save';
+
+    /**
+     * The mautic.email.on_edit_submit event is fired after an email edit is successfully submitted.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailEditSubmitEvent
+     */
+    public const ON_EMAIL_EDIT_SUBMIT = 'mautic.email.on_edit_submit';
 }
