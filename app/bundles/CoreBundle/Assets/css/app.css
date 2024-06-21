@@ -1376,6 +1376,9 @@ blockquote > p:after {
   padding-right: 40px;
   border-width: 0px;
 }
+.help-block {
+  font-size: 12px;
+}
 .touchevents .scroll-content {
   height: 100%;
   overflow-y: auto;
