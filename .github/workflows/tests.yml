@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read # to fetch code (actions/checkout)
+  issues: write # to apply labels
 
 jobs:
   phpunit:
@@ -261,3 +262,30 @@ jobs:
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
+
+
+  label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Labeler
+        uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+
+      - name: Label PR if title contains 'bug' or 'fix'
+        if: contains(github.event.pull_request.title, 'bug') || contains(github.event.pull_request.title, 'fix')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "bug"
+      
+      - name: Apply 'needs triage' label for new PRs
+        if: github.event.action == 'opened'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "needs-triage"
