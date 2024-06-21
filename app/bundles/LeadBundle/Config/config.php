@@ -403,6 +403,11 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
             ],
+            'mautic.lead.constraint.dbregex' => [
+                'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\DbRegexValidator::class,
+                'arguments' => ['doctrine.dbal.default_connection'],
+                'tag'       => 'validator.constraint_validator',
+            ],
             'mautic.lead.validator.custom_field' => [
                 'class'     => Mautic\LeadBundle\Validator\CustomFieldValidator::class,
                 'arguments' => ['mautic.lead.model.field', 'translator'],
