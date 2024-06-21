@@ -441,23 +441,24 @@
 // Accessibility features
 
 /// No animations
-@media (prefers-reduced-motion: reduce) {
-:root {
+:root[reduce-motion="true"] {
 --duration-productive: 0;
 --duration-expressive: 0;
-    }
 }
 
 /// High contrast
-:root[high-contrast="enabled"] {
+:root[contrast-borders="true"] {
     outline-style: dotted;
 --border-no-color: var(--border-strong);
 --border-bottom: 1px solid var(--border-strong);
 }
 
 /// No transparency and blur
-@media (prefers-reduced-transparency: reduce) {
-:root {
+:root[reduce-transparency="true"] {
     --layer-translucent: var(--layer);
-    }
+}
+
+/// Underlines
+:root[enable-underlines="true"] {
+    a { text-decoration: underline; }
 }

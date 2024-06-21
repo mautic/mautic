@@ -91,3 +91,40 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
         mQuery('.' + bundle + '_granted').html(granted);
     }
 };
+
+Mautic.userOnLoad = function (container) {
+    const settings = [
+        'reduce-motion',
+        'dark-mode',
+        'enable-underlines',
+        'contrast-borders',
+        'reduce-transparency'
+    ];
+
+    // Aplicar configurações salvas ao carregar a página
+    settings.forEach(setting => {
+        let value = localStorage.getItem(setting);
+        if (value) {
+            document.documentElement.setAttribute(setting, value);
+        } else {
+            // Definir valor padrão como 'false' se não estiver no localStorage
+            document.documentElement.setAttribute(setting, 'false');
+        }
+    });
+
+    // Alternar configurações ao clicar nos botões correspondentes
+    settings.forEach(setting => {
+        mQuery(`#${setting}`).on('click', function() {
+            let currentValue = document.documentElement.getAttribute(setting);
+            let newValue = currentValue === 'true' ? 'false' : 'true';
+            document.documentElement.setAttribute(setting, newValue);
+            localStorage.setItem(setting, newValue);
+        });
+    });
+};
+
+
+
+
+
+

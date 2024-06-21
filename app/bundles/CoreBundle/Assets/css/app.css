@@ -6225,19 +6225,18 @@ ul.media-list.media-list-feed div.media-object {
   --border-radius-md: clamp(0px, calc(1.8 * 0px), 14px);
   --border-radius-lg: clamp(0px, calc(2.6 * 0px), 21px);
 }
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --duration-productive: 0;
-    --duration-expressive: 0;
-  }
+:root[reduce-motion="true"] {
+  --duration-productive: 0;
+  --duration-expressive: 0;
 }
-:root[high-contrast="enabled"] {
+:root[contrast-borders="true"] {
   outline-style: dotted;
   --border-no-color: var(--border-strong);
   --border-bottom: 1px solid var(--border-strong);
 }
-@media (prefers-reduced-transparency: reduce) {
-  :root {
-    --layer-translucent: var(--layer);
-  }
+:root[reduce-transparency="true"] {
+  --layer-translucent: var(--layer);
+}
+:root[enable-underlines="true"] a {
+  text-decoration: underline;
 }

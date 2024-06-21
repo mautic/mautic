@@ -37,6 +37,10 @@
                     </a>
                 </li>
                 {% endif %}
+
+                <li class="list-group-item">
+                    <a href="#accessibility" class="steps" data-toggle="tab">{% trans %}mautic.user.account.accessibility{% endtrans %}</a>
+                </li>
             </ul>
         </div>
     </div>
@@ -86,6 +90,45 @@
                     </div>
                 </div>
             {% endif %}
+
+            <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="accessibility">
+                <div class="pa-md bg-light-xs bdr-b">
+                    <h4 class="fw-sb">Accessibility</h4>
+                </div>
+                <div class="pa-md">
+                    <div class="col-md-7">
+                        <div class="row">
+                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.accessibility.appearance'|trans }}</h3>
+                            <h4>{{ 'mautic.user.account.accessibility.smooth_color_transitions'|trans }}</h4>
+                            <div class="help-block">{{ 'mautic.user.account.accessibility.smooth_color_transitions_help'|trans }}</div>
+                            <div class="btn-group">
+                                <button id="reduce-motion" class="btn btn-tertiary mt-sm">{{ 'mautic.user.account.accessibility.toggle_motion'|trans }}</button>
+                            </div>
+                            <hr>
+                            <h4>{{ 'mautic.user.account.accessibility.borders_outline_style'|trans }}</h4>
+                            <div class="help-block">{{ 'mautic.user.account.accessibility.borders_outline_style_help'|trans }}</div>
+                            <div class="btn-group">
+                                <button id="contrast-borders" class="btn btn-tertiary mt-sm">{{ 'mautic.user.account.accessibility.toggle_borders'|trans }}</button>
+                            </div>
+                            <hr>
+                            <h4>{{ 'mautic.user.account.accessibility.reduce_transparency_blur'|trans }}</h4>
+                            <div class="help-block">{{ 'mautic.user.account.accessibility.reduce_transparency_blur_help'|trans }}</div>
+                            <div class="btn-group">
+                                <button id="reduce-transparency" class="btn">{{ 'mautic.user.account.accessibility.toggle_transparency_blur'|trans }}</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <h3 class="pt-20 mb-md">{{ 'mautic.user.account.accessibility.content'|trans }}</h3>
+                            <h4>{{ 'mautic.user.account.accessibility.link_underlines'|trans }}</h4>
+                            <div class="help-block">{{ 'mautic.user.account.accessibility.link_underlines_help'|trans }}</div>
+                            <div class="btn-group">
+                                <button id="enable-underlines" class="btn btn-tertiary mt-sm">{{ 'mautic.user.account.accessibility.toggle_underlines'|trans }}</button>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
         </div>
     </div>
     <!--/ end: container -->
