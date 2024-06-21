@@ -48,10 +48,10 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
         $contactId = (int) $contact->getId();
 
         return match ($operator) {
-            OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId),
-            OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId),
-            OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds),
-            OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds),
+            OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
             default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }
