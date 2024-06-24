@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use JMS\Serializer\EventDispatcher\Events;
@@ -36,10 +38,6 @@ class SerializerSubscriber implements EventSubscriberInterface
 
     public function addCustomMJML(ObjectEvent $event): void
     {
-        if (!$this->installer->checkIfInstalled()) {
-            return;
-        }
-
         if (!$this->config->isPublished()) {
             return;
         }
