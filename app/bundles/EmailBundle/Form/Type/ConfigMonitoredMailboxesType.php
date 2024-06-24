@@ -133,7 +133,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'attr'       => [
                     'class'        => 'form-control',
                     'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
+                    'preaddon'     => 'ri-lock-fill',
                     'tooltip'      => 'mautic.email.config.monitored_email_password.tooltip',
                     'autocomplete' => 'off',
                     'data-show-on' => $monitoredShowOn,

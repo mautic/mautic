@@ -54,7 +54,7 @@ class SubmitActionRepostType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.action.repost.authorization_header.tooltip',
-                    'preaddon' => 'fa fa-lock',
+                    'preaddon' => 'ri-lock-fill',
                 ],
                 'required' => false,
             ]
