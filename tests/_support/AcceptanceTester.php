@@ -33,7 +33,7 @@ class AcceptanceTester extends Codeception\Actor
         $I->fillField('#password', $password);
         $I->click('button[type=submit]');
         $I->waitForElement('h1.page-header-title', 30);
-         // saving snapshot
+        // saving snapshot
         $I->saveSessionSnapshot('login');
     }
 }
