@@ -20,7 +20,20 @@ class AcceptanceTester extends Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
 
-    /**
-     * Define custom actions here.
-     */
+    public function login($name, $password)
+    {
+        $I = $this;
+        // if snapshot exists - skipping login
+        if ($I->loadSessionSnapshot('login')) {
+            return;
+        }
+        // logging in
+        $I->amOnPage('/s/login');
+        $I->fillField('#username', $name);
+        $I->fillField('#password', $password);
+        $I->click('button[type=submit]');
+        $I->waitForElement('h1.page-header-title', 30);
+         // saving snapshot
+        $I->saveSessionSnapshot('login');
+    }
 }
