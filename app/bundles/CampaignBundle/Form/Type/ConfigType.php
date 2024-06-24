@@ -20,6 +20,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.campaignconfig.campaign_time_wait_on_event_false',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.campaignconfig.campaign_time_wait_on_event_false_help',
                 'data'       => $options['data']['campaign_time_wait_on_event_false'],
                 'choices'    => [
                     'mautic.core.never' => 'null',

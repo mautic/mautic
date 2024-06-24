@@ -68,6 +68,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.webroot',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.core.config.form.webroot.help',
                 'attr'       => [
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.core.config.form.webroot.tooltip',
@@ -85,6 +86,7 @@ class ConfigType extends AbstractType
             [
                 'label'         => 'mautic.core.config.form.404_page',
                 'label_attr'    => ['class' => 'control-label'],
+                'help'          => 'mautic.core.config.form.404_page.help',
                 'attr'          => [
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
@@ -434,6 +436,7 @@ class ConfigType extends AbstractType
                 'label_attr'        => [
                     'class' => 'control-label',
                 ],
+                'help'              => 'mautic.core.config.form.ip.lookup.service.help',
                 'required'          => false,
                 'attr'              => [
                     'class'    => 'form-control',
@@ -574,6 +577,7 @@ class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.link.max_entity_lock_time',
                 'label_attr' => ['class' => 'control-label'],
+                'help'       => 'mautic.core.config.form.link.max_entity_lock_time.help',
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.link.max_entity_lock_time.tooltip',
@@ -613,6 +617,7 @@ class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.config.cors.restrict.domains',
+                'help'  => 'mautic.core.config.cors.restrict.domains.help',
                 'data'  => (array_key_exists('cors_restrict_domains', $options['data']) && !empty($options['data']['cors_restrict_domains'])),
                 'attr'  => [
                     'class'   => 'form-control',
