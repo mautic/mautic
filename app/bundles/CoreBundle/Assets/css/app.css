@@ -3441,6 +3441,9 @@ ul.line-legend li {
   vertical-align: middle;
   border-bottom: 1px solid #ebedf0;
 }
+table i:not(.fa-lg) {
+  font-size: 14px;
+}
 .table-responsive-force {
   width: 100%;
   margin-bottom: 13.5px;
@@ -5884,6 +5887,7 @@ ul.media-list.media-list-feed div.media-object {
 }
 .flip-vertically {
   transform: scaleY(-1);
+  display: inline-flex;
 }
 .disabled-row {
   opacity: 0.6;

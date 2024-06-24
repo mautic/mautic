@@ -93,7 +93,7 @@ class EventType extends AbstractType
                     'label'  => false,
                     'attr'   => [
                         'class'       => 'form-control',
-                        'preaddon'    => 'fa fa-calendar',
+                        'preaddon'    => 'ri-calendar-line',
                         'data-toggle' => 'datetime',
                     ],
                     'widget' => 'single_text',
