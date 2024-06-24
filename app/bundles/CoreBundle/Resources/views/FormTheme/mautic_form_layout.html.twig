@@ -115,6 +115,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
             {% else %}
             {{ form_widget(form) }}
             {% endif %}
+            {{ form_help(form) }}
             {{ form_errors(form) }}
         </div>
     </div>
