@@ -16,6 +16,21 @@
 {% endblock %}
 
 {% block content %}
+<div class="col-xs-12">
+    <div class="row-no-gutters fw-nowrap-lg gap-md mb-xl mt-xl">
+        <a class="tile tile-clickable" href="{{ path('mautic_email_action', {'objectAction': 'new', 'emailType': 'template'}) }}">
+            <h3>{{ 'mautic.campaign.list.new.email'|trans }}<i class="ri-mail-add-fill tile-icon"></i></h3>
+        </a> 
+        <a class="tile tile-clickable" href="{{ path('mautic_form_action', {'objectAction': 'new', 'formType': 'campaign'}) }}">
+            <h3>{{ 'mautic.campaign.list.new.form'|trans }}<i class="ri-survey-fill tile-icon"></i></h3>
+        </a>
+        <a class="tile tile-clickable" href="{{ path('mautic_page_action', {'objectAction': 'new'}) }}">
+            <h3>{{ 'mautic.campaign.list.new.page'|trans }}<i class="ri-pages-fill tile-icon"></i></h3>
+        </a>
+    </div>
+</div>
+
+
   {% if isIndex %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
