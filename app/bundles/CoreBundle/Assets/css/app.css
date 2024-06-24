@@ -5887,6 +5887,7 @@ ul.media-list.media-list-feed div.media-object {
 }
 .flip-vertically {
   transform: scaleY(-1);
+  display: inline-flex;
 }
 .disabled-row {
   opacity: 0.6;
