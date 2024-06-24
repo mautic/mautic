@@ -1,7 +1,7 @@
 {% set inline = menuRender('profile') %}
 <li class="dropdown">
     <a class="dropdown-toggle user" data-toggle="dropdown" href="#">
-        <span class="img-wrapper"><img src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
+        <span class="img-wrapper"><img onerror="this.classList.add('hide')" src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
         <span class="flex-column-inline info">
             <span class="text fw-sb ml-xs hidden-xs">{{ app.getUser().getName() }}</span>
             <span class="text ml-xs small hidden-xs position">{{ app.getUser().getPosition() }}</span>
