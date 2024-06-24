@@ -4,19 +4,19 @@
     - lead
     - permissions
 #}
-{% set icon = 'fa-file-text' %}
+{% set icon = 'ri-file-text-line' %}
 {% if 'email' == note.type %}
-    {% set icon = 'fa-send' %}
+    {% set icon = 'ri-send-plane-line' %}
 {% elseif 'call' == note.type %}
-    {% set icon = 'fa-phone' %}
+    {% set icon = 'ri-phone-line' %}
 {% elseif 'meeting' == note.type %}
-    {% set icon = 'fa-group' %}
+    {% set icon = 'ri-team-line' %}
 {% endif %}
 <li id="LeadNote{{ note.id }}">
     <div class="panel ">
         <div class="panel-body np box-layout">
             <div class="height-auto icon bdr-r col-xs-1 text-center">
-                <h3><i class="fa fa-lg fa-fw {{ icon }}"></i></h3>
+                <h3><i class="fa ri-lg fa-fw {{ icon }}"></i></h3>
             </div>
             <div class="media-body col-xs-11 pa-10">
                 <div class="pull-right btn-group">
