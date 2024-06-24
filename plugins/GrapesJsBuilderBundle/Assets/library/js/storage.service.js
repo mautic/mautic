@@ -27,7 +27,7 @@ export default class StorageService {
         buttonContainer.className = 'alert-growl-buttons';
 
         const restoreButton = document.createElement('button');
-        restoreButton.innerHTML = '<i class="fa fa-undo"></i> ' + Mautic.translate('mautic.core.builder.storage.restore.button')
+        restoreButton.innerHTML = '<i class="ri-arrow-go-back-line"></i> ' + Mautic.translate('mautic.core.builder.storage.restore.button')
         restoreButton.className = 'btn btn-primary';
 
         const dismissButton = document.createElement('button');

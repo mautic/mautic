@@ -545,3 +545,13 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         </p>
     {%- endif -%}
 {%- endblock form_help %}
+
+{% block alert_widget %}
+    <div class="row">
+        <div {% with { attr: {class: 'col-sm-12'}|merge(attr) } %} {{ block('attributes') }}{% endwith %}>
+            <div class="alert alert-{{ messageType }}">
+                {{ message }}
+            </div>
+        </div>
+    </div>
+{%- endblock alert_widget %}
