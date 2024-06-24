@@ -3,6 +3,12 @@ Mautic.emailOnLoad = function (container, response) {
     Mautic.internalDynamicContentItemCreateListeners = [];
     Mautic.internalDynamicContentFilterCreateListeners = [];
 
+    var urlParams = new URLSearchParams(window.location.search);
+    var emailType = urlParams.get('emailType');
+    if (emailType && typeof Mautic.selectEmailType === 'function') {
+        Mautic.selectEmailType(emailType);
+    }
+
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
         var plaintext = mQuery('#emailform_plainText');

@@ -8,6 +8,12 @@ Mautic.formOnLoad = function (container) {
     Mautic.formBuilderNewComponentInit();
     Mautic.iniNewConditionalField();
 
+    var urlParams = new URLSearchParams(window.location.search);
+    var formType = urlParams.get('formType');
+    if (formType && typeof Mautic.selectFormType === 'function') {
+        Mautic.selectFormType(formType);
+    }
+
     var bodyOverflow = {};
 
     if (mQuery('#mauticforms_fields')) {
