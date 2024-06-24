@@ -6364,6 +6364,7 @@ a.inline-token .text-muted {
   --layout-density-padding-inline-local: 16px;
   position: relative;
   display: flex;
+  flex-grow: 1;
   padding: var(--layout-density-padding-inline-local);
   background-color: var(--layer);
   min-block-size: 4rem;
@@ -6387,7 +6388,8 @@ a.inline-token .text-muted {
   letter-spacing: var(--body-compact-01-letter-spacing, 0.16px);
   padding: var(--layout-density-padding-inline-local);
   cursor: pointer;
-  transition: 150ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: var(--transition-all-productive);
+  outline-color: transparent;
 }
 .tile.tile-clickable:hover,
 .tile.tile-selectable:hover {
@@ -6395,7 +6397,7 @@ a.inline-token .text-muted {
 }
 .tile.tile-clickable:focus,
 .tile.tile-selectable:focus {
-  outline: 2px solid var(--focus, #0f62fe);
+  outline-color: var(--focus, #0f62fe);
   outline-offset: -2px;
   text-decoration: none;
 }
@@ -6403,14 +6405,14 @@ a.inline-token .text-muted {
   color: var(--text-primary, #161616);
   text-decoration: none;
 }
-.tile.tile-icon {
+.tile .tile-icon {
   position: absolute;
   inset-block-end: var(--layout-density-padding-inline-local);
   inset-inline-end: var(--layout-density-padding-inline-local);
   fill: var(--icon-interactive, #0f62fe);
 }
-.tile.tile-icon.tile-disabled,
-.tile.tile-icon:disabled {
+.tile .tile-icon.tile-disabled,
+.tile .tile-icon:disabled {
   fill: var(--icon-disabled, rgba(22, 22, 22, 0.25));
 }
 .tile * {
