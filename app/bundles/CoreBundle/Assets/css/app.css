@@ -1284,11 +1284,11 @@ a.text-danger:focus {
   color: #f6421e;
 }
 .text-info {
-  color: #35B4B9;
+  color: #0043ce;
 }
 a.text-info:hover,
 a.text-info:focus {
-  color: #2a8d91;
+  color: #00329b;
 }
 .text-twitter {
   color: #55acee;
@@ -1415,7 +1415,7 @@ blockquote > p:after {
   color: #F86B4F;
 }
 .btn.btn-outline.btn-info {
-  color: #35B4B9;
+  color: #0043ce;
 }
 .btn-link {
   font-weight: 600;
@@ -2824,7 +2824,7 @@ ul.dropdown-menu-form {
   background-color: #00B49C;
 }
 .bullet.bullet-info {
-  background-color: #35B4B9;
+  background-color: #0043ce;
 }
 .bullet.bullet-warning {
   background-color: #FDB933;
@@ -3197,13 +3197,13 @@ label {
 .radio.custom-info label input + span:after,
 .checkbox-inline.custom-info label input + span:after,
 .radio-inline.custom-info label input + span:after {
-  background-color: #35B4B9;
+  background-color: #0043ce;
 }
 .checkbox.custom-info label input:checked + span,
 .radio.custom-info label input:checked + span,
 .checkbox-inline.custom-info label input:checked + span,
 .radio-inline.custom-info label input:checked + span {
-  border: 1px solid #35B4B9;
+  border: 1px solid #0043ce;
 }
 .checkbox.custom-info label:hover input + span,
 .radio.custom-info label:hover input + span,
@@ -3215,7 +3215,7 @@ label {
 .radio.custom-info label:hover input:checked + span,
 .checkbox-inline.custom-info label:hover input:checked + span,
 .radio-inline.custom-info label:hover input:checked + span {
-  border: 1px solid #35B4B9;
+  border: 1px solid #0043ce;
 }
 .checkbox.custom-success label input + span:after,
 .radio.custom-success label input + span:after,
@@ -3495,7 +3495,7 @@ table i:not(.fa-lg) {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
 .progress-bar-info {
-  background-color: #35B4B9;
+  background-color: #0043ce;
 }
 .progress-striped .progress-bar-info {
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
@@ -3746,11 +3746,11 @@ table i:not(.fa-lg) {
   border-color: #4E5D9D;
 }
 .switch.switch-info input:checked + .switch {
-  border-color: #35B4B9;
-  box-shadow: inset 0 0 0 0.6em #35B4B9;
+  border-color: #0043ce;
+  box-shadow: inset 0 0 0 0.6em #0043ce;
 }
 .switch.switch-info input:checked + .switch:after {
-  border-color: #35B4B9;
+  border-color: #0043ce;
 }
 .switch.switch-success input:checked + .switch {
   border-color: #00B49C;
@@ -4138,49 +4138,49 @@ table i:not(.fa-lg) {
   border-color: #007767 !important;
 }
 .bg-info {
-  background-color: #35B4B9 !important;
-  border-color: #32a8ad !important;
+  background-color: #0043ce !important;
+  border-color: #003ebf !important;
   color: #fff !important;
 }
 .bg-info.bg-light-xs,
 .bg-info .bg-light-xs {
-  background-color: #36b8bd !important;
-  border-color: #32a8ad !important;
+  background-color: #0045d3 !important;
+  border-color: #003ebf !important;
 }
 .bg-info.bg-light-sm,
 .bg-info .bg-light-sm {
-  background-color: #38c0c5 !important;
-  border-color: #32a8ad !important;
+  background-color: #0048dd !important;
+  border-color: #003ebf !important;
 }
 .bg-info.bg-light-md,
 .bg-info .bg-light-md {
-  background-color: #3fc3c8 !important;
-  border-color: #32a8ad !important;
+  background-color: #004be8 !important;
+  border-color: #003ebf !important;
 }
 .bg-info.bg-light-lg,
 .bg-info .bg-light-lg {
-  background-color: #47c5ca !important;
-  border-color: #32a8ad !important;
+  background-color: #004ff2 !important;
+  border-color: #003ebf !important;
 }
 .bg-info.bg-dark-xs,
 .bg-info .bg-dark-xs {
-  background-color: #34b0b5 !important;
-  border-color: #32a8ad !important;
+  background-color: #0041c9 !important;
+  border-color: #003ebf !important;
 }
 .bg-info.bg-dark-sm,
 .bg-info .bg-dark-sm {
-  background-color: #32a8ad !important;
-  border-color: #2e9da1 !important;
+  background-color: #003ebf !important;
+  border-color: #0039af !important;
 }
 .bg-info.bg-dark-md,
 .bg-info .bg-dark-md {
-  background-color: #2fa1a5 !important;
-  border-color: #2b9195 !important;
+  background-color: #003bb5 !important;
+  border-color: #0034a0 !important;
 }
 .bg-info.bg-dark-lg,
 .bg-info .bg-dark-lg {
-  background-color: #2d999d !important;
-  border-color: #278689 !important;
+  background-color: #0037aa !important;
+  border-color: #002f91 !important;
 }
 .bg-warning {
   background-color: #FDB933 !important;
