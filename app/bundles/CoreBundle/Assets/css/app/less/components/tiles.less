@@ -2,6 +2,7 @@
     --layout-density-padding-inline-local: 16px;
     position: relative;
     display: flex;
+    flex-grow: 1;
     padding: var(--layout-density-padding-inline-local);
     background-color: var(--layer);
     min-block-size: 4rem;
@@ -25,14 +26,15 @@
         letter-spacing: var(--body-compact-01-letter-spacing, 0.16px);
         padding: var(--layout-density-padding-inline-local);
         cursor: pointer;
-        transition: 150ms cubic-bezier(.2,0,.38,.9);
+        transition: var(--transition-all-productive);
+        outline-color: transparent;
 
         &:hover {
             background: var(--layer-hover);
         }
 
         &:focus {
-            outline: 2px solid var(--focus, #0f62fe);
+            outline-color: var(--focus, #0f62fe);
             outline-offset: -2px;
             text-decoration: none;
         }
@@ -43,7 +45,7 @@
         text-decoration: none;
     }
 
-    &.tile-icon {
+    .tile-icon {
         position: absolute;
         inset-block-end: var(--layout-density-padding-inline-local);
         inset-inline-end: var(--layout-density-padding-inline-local);
