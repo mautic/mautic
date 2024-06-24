@@ -55,9 +55,6 @@ plugin:
 points-scoring:
   - "app/bundles/PointBundle/**"
   
-queue:
-  - "app/bundles/QueueBundle/**"
-  
 reports:
   - "app/bundles/ReportBundle/**"
   
