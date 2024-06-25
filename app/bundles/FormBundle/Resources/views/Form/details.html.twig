@@ -37,7 +37,7 @@
                         'target': '_blank',
                         'href': path('mautic_form_action', {'objectAction': 'preview', 'objectId': activeForm.id}),
                     },
-                    'iconClass': 'fa fa-camera',
+                    'iconClass': 'ri-camera-3-line',
                     'btnText': 'mautic.form.form.preview',
                     'btnClass': 'btn btn-default btn-nospin',
                 },
@@ -46,7 +46,7 @@
                         'data-toggle': 'ajax',
                         'href': path('mautic_form_action', {'objectAction': 'results', 'objectId': activeForm.id}),
                     },
-                    'iconClass': 'fa fa-database',
+                    'iconClass': 'ri-database-line',
                     'btnText': 'mautic.form.form.results',
                 },
             ],
@@ -165,7 +165,7 @@
                                         {% if 'lead' == group %}
                                           {% set icon = 'ri-user-6-fill' %}
                                         {% elseif 'asset' == group %}
-                                          {% set icon = 'fa-cloud-download' %}
+                                          {% set icon = 'ri-download-cloud-2-line' %}
                                         {% endif %}
                                         {% if icon is not empty %}
                                             <div class="col-md-1 va-m">
