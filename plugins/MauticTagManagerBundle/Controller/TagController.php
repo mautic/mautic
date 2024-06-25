@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
+use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -431,7 +432,7 @@ class TagController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, TagDependencies $tagDependencies, $objectId)
     {
         /** @var TagModel $model */
         $model    = $this->getModel('lead.tag');
@@ -468,8 +469,9 @@ class TagController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
-                'tag'      => $tag,
-                'security' => $security,
+                'tag'        => $tag,
+                'security'   => $security,
+                'usageStats' => $tagDependencies->getChannelsIds($tag->getTag()),
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
             'passthroughVars' => [
