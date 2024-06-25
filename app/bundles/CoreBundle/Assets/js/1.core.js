@@ -60,6 +60,30 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
+
+    const prefix = 'm-toggle-setting-';
+
+    Object.keys(localStorage)
+        .filter(key => key.startsWith(prefix))
+        .forEach(setting => {
+            const attributeName = setting.replace(prefix, '');
+            const value = localStorage.getItem(setting);
+    
+            if (value) {
+                document.documentElement.setAttribute(attributeName, value);
+            }
+        });
+    
+    document.querySelectorAll('[data-attribute-toggle]').forEach(element => {
+        const attributeName = element.dataset.attributeToggle;
+        element.addEventListener('click', function() {
+            const currentValue = document.documentElement.getAttribute(attributeName);
+            const newValue = currentValue !== 'true';
+            document.documentElement.setAttribute(attributeName, newValue);
+            localStorage.setItem(`${prefix}${attributeName}`, newValue);
+        });
+    });
+    
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
