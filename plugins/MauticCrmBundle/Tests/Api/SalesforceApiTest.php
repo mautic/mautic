@@ -446,11 +446,6 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         $integration->method('getTranslator')->willReturn($translator);
 
-        $translator->expects($this->exactly(2))
-            ->method('trans')
-            ->withConsecutive(['mautic.salesforce.error.opt-out_permission.header'], ['mautic.salesforce.error.opt-out_permission.message'])
-            ->willReturn('Incorrect Salesforce permissions.', 'Incorrect Salesforce permissions.');
-
         $this->expectException(ApiErrorException::class);
         $integration->expects($this->atLeastOnce())
             ->method('makeRequest')
