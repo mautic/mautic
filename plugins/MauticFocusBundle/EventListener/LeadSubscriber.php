@@ -48,7 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($leadId, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
-            $icon     = 'fa-search';
+            $icon     = 'ri-search-line';
 
             // Add the view to the event array
             foreach (array_merge($statsViewsByLead['results'] ?? [], $statsClickByLead['results'] ?? []) as $statsView) {

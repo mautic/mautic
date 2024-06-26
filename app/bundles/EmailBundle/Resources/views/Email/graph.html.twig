@@ -17,8 +17,7 @@
     }
 }) %}
 
-<div class="pa-md">
-    <div class="row">
+<div class="row">
         <div class="col-sm-12">
             {% if isVariant %}
             <div class="text-right small" id="variant-chart-switcher">
@@ -35,20 +34,13 @@
                 </span>
             </div>
             {% endif %}
-            <div class="panel">
+
                 <div class="panel-body box-layout">
-                    <div class="col-xs-4 va-m">
+                    <div class="col-xs-12 va-m">
                         <h5 class="text-white dark-md fw-sb mb-xs">
-                            <span class="fa fa-envelope"></span>
+                            <span class="ri-mail-line"></span>
                             {{ label|trans }}
                         </h5>
-                    </div>
-                    <div class="col-xs-8 va-m">
-                        {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
-                            'dateRangeForm' : dateRangeForm,
-                            'class'         : 'pull-right'
-                        })
-                        -}}
                     </div>
                 </div>
                 <div class="row">
@@ -69,8 +61,8 @@
                         -}}
                     </div>
                 </div>
-            </div>
+
         </div>
     </div>
-</div>
+
 <!--/ some stats -->
