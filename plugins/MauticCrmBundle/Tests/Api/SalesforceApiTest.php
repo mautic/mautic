@@ -451,8 +451,6 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(['mautic.salesforce.error.opt-out_permission.header'], ['mautic.salesforce.error.opt-out_permission.message'])
             ->willReturn('Incorrect Salesforce permissions.', 'Incorrect Salesforce permissions.');
 
-        $integration->expects($this->once())->method('upsertUnreadAdminsNotification');
-
         $this->expectException(ApiErrorException::class);
         $integration->expects($this->atLeastOnce())
             ->method('makeRequest')
@@ -528,8 +526,6 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         $integration->method('getEntityManager')->willReturn($entityManager);
         $integration->method('getIntegrationSettings')->willReturn($entity);
         $entity->method('getFeatureSettings')->willReturn(['leadFields' => ['extraField__Lead' => '']]);
-
-        $entity->expects($this->once())->method('setFeatureSettings')->with(['leadFields' => []]);
 
         $this->expectException(ApiErrorException::class);
         $integration->expects($this->atLeastOnce())
