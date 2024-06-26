@@ -131,21 +131,21 @@ Mautic.leadOnLoad = function (container, response) {
 
     var leadMap = [];
 
-    mQuery(document).on('shown.bs.tab', 'a#load-lead-map', function (e) {
-        leadMap = Mautic.renderMap(mQuery('#place-container .vector-map'));
+    mQuery(document).on('shown.bs.tab', 'a#load-lead-map',  () => {
+        leadMap = Mautic.initMap('#place-container', 'markers');
     });
 
     mQuery('a[data-toggle="tab"]').not('a#load-lead-map').on('shown.bs.tab', function (e) {
         if (leadMap.length) {
-            Mautic.destroyMap(leadMap);
-            leadMap = [];
+            leadMap.destroyMap();
+            leadMap = undefined;
         }
     });
 
     Mautic.initUniqueIdentifierFields();
 
     if (mQuery(container + ' .panel-companies').length) {
-        mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
+        mQuery(container + ' .panel-companies .ri-check-line').tooltip({html: true});
     }
 
     // Adding behavior to be able to create new tags by pressing the `Escape` key
@@ -174,7 +174,7 @@ Mautic.leadOnLoad = function (container, response) {
 
 Mautic.leadTimelineOnLoad = function (container, response) {
     mQuery("#contact-timeline a[data-activate-details='all']").on('click', function() {
-        if (mQuery(this).find('span').first().hasClass('fa-level-down')) {
+        if (mQuery(this).find('span').first().hasClass('ri-corner-right-down-line')) {
             mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
                 if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
@@ -182,7 +182,7 @@ Mautic.leadTimelineOnLoad = function (container, response) {
                     mQuery(this).addClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('fa-level-down').addClass('fa-level-up');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('ri-corner-right-up-line');
         } else {
             mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
@@ -191,7 +191,7 @@ Mautic.leadTimelineOnLoad = function (container, response) {
                     mQuery(this).removeClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('fa-level-up').addClass('fa-level-down');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-up-line').addClass('ri-corner-right-down-line');
         }
     });
     mQuery("#contact-timeline a[data-activate-details!='all']").on('click', function() {
@@ -216,7 +216,7 @@ Mautic.leadTimelineOnLoad = function (container, response) {
 
 Mautic.leadAuditlogOnLoad = function (container, response) {
     mQuery("#contact-auditlog a[data-activate-details='all']").on('click', function() {
-        if (mQuery(this).find('span').first().hasClass('fa-level-down')) {
+        if (mQuery(this).find('span').first().hasClass('ri-corner-right-down-line')) {
             mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
                 if (detailsId && mQuery('#auditlog-details-'+detailsId).length) {
@@ -224,7 +224,7 @@ Mautic.leadAuditlogOnLoad = function (container, response) {
                     mQuery(this).addClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('fa-level-down').addClass('fa-level-up');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('ri-corner-right-up-line');
         } else {
             mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
@@ -233,7 +233,7 @@ Mautic.leadAuditlogOnLoad = function (container, response) {
                     mQuery(this).removeClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('fa-level-up').addClass('fa-level-down');
+            mQuery(this).find('span').first().removeClass('ri-corner-right-up-line').addClass('ri-corner-right-down-line');
         }
     });
     mQuery("#contact-auditlog a[data-activate-details!='all']").on('click', function() {
@@ -653,9 +653,9 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     }
 
     if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('fa-user').addClass('fa-building');
+        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
     } else {
-        prototype.find(".object-icon").removeClass('fa-building').addClass('fa-user');
+        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
     }
     prototype.find(".inline-spacer").append(fieldObject);
 
@@ -960,7 +960,7 @@ Mautic.refreshSegmentContacts = function(form) {
 };
 
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
-    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
 
     Mautic.toggleLeadSwitch(toggleId, query, action);
@@ -1002,21 +1002,21 @@ Mautic.setPreferredChannel = function(channel) {
 };
 
 Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
-    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
 Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
-    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query  = "action=lead:toggleLeadCampaign&leadId=" + leadId + "&campaignId=" + campaignId + "&campaignAction=" + action;
 
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
 Mautic.toggleLeadSwitch = function(toggleId, query, action) {
-    var toggleOn  = 'fa-toggle-on text-success';
-    var toggleOff = 'fa-toggle-off text-danger';
+    var toggleOn  = 'ri-toggle-fill text-success';
+    var toggleOff = 'ri-toggle-line text-danger';
     var spinClass = 'fa-spin fa-spinner ';
 
     if (action == 'remove') {
@@ -1141,7 +1141,7 @@ Mautic.reloadLeadImportProgress = function() {
 };
 
 Mautic.removeBounceStatus = function (el, dncId, channel) {
-    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+    mQuery(el).removeClass('ri-close-line').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
@@ -1150,7 +1150,7 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
 };
 
 Mautic.removeTagFromLead = function (el, leadId, tagId) {
-    mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
+    mQuery(el).removeClass('ri-close-line').addClass('fa-spinner fa-spin');
 
     Mautic.ajaxActionRequest('lead:removeTagFromLead', {'leadId': leadId, 'tagId': tagId}, function() {
         mQuery('#tagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });
@@ -1352,8 +1352,7 @@ Mautic.createLeadUtmTag = function (el) {
 
 Mautic.leadBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {
-
-        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length || mQuery('#contact_channels_ids').length) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length || mQuery('#contact_channels_ids').length || mQuery('#batch_tag_tags_add_tags').val() || mQuery('#batch_tag_tags_remove_tags').val()) {
             var ids = Mautic.getCheckedListIds(false, true);
 
             if (mQuery('#lead_batch_ids').length) {
@@ -1366,6 +1365,8 @@ Mautic.leadBatchSubmit = function() {
                 mQuery('#lead_batch_owner_ids').val(ids);
             } else if (mQuery('#contact_channels_ids').length) {
                 mQuery('#contact_channels_ids').val(ids);
+            } else if (mQuery('#batch_tag_ids').length) {
+                mQuery('#batch_tag_ids').val(ids);
             }
 
             return true;

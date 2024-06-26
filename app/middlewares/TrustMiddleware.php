@@ -27,7 +27,7 @@ class TrustMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInter
         return self::PRIORITY;
     }
 
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): Response
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {
         $config = $this->getConfig();
 

@@ -37,7 +37,7 @@ class CompanyMergeType extends AbstractType
             [
                 'apply_text' => false,
                 'save_text'  => 'mautic.lead.merge',
-                'save_icon'  => 'fa fa-building',
+                'save_icon'  => 'ri-building-2-line',
             ]
         );
 

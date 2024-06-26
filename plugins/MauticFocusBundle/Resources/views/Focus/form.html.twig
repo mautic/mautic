@@ -18,7 +18,7 @@
     <!-- start: box layout -->
     <div class="box-layout">
         <!-- container -->
-        <div class="col-md-9 bg-auto height-auto bdr-r pa-md">
+        <div class="col-md-9 height-auto bdr-r pa-md">
             <div class="row">
                 <div class="col-md-6">{{ form_row(form.name) }}</div>
                 <div class="col-md-6">{{ form_row(form.website) }}</div>
@@ -27,7 +27,7 @@
                 <div class="col-md-12">{{ form_row(form.description) }}</div>
             </div>
         </div>
-        <div class="col-md-3 bg-white height-auto">
+        <div class="col-md-3 height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
                 {{ form_row(form.category) }}
                 {{ form_row(form.isPublished) }}
@@ -54,8 +54,8 @@
                             <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}"/>
                         </div>
                         <div class="col-xs-9">
-                            <h4><i class="fa fa-quote-left"></i> {{ 'mautic.core.noresults.tip'|trans }}
-                                <i class="fa fa-quote-right"></i></h4>
+                            <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.core.noresults.tip'|trans }}
+                                <i class="ri-double-quotes-r"></i></h4>
                             <p class="mt-md">
                                 {{ 'mautic.focus.website_placeholder'|trans }}
                             </p>
@@ -73,7 +73,7 @@
                 <!-- Viewport switcher -->
                 <div class="viewport-switcher text-center bdr-t-sm bdr-b-sm bdr-r-sm">
                     <div class="btn btn-sm btn-success btn-nospin btn-viewport" data-viewport="desktop">
-                        <i class="fa fa-mobile-phone fa-3x"></i>
+                        <i class="fa fa-mobile-phone ri-3x"></i>
                     </div>
                 </div>
 
@@ -102,7 +102,7 @@
                     <div class="panel-heading">
                         <h4 class="focus-type-header panel-title">
                             <a role="button" data-toggle="collapse" href="#focusTypePanel" aria-expanded="true" aria-controls="focusTypePanel">
-                                <i class="fa fa-bullseye"></i> {{ 'mautic.focus.form.type'|trans }}
+                                <i class="ri-focus-2-line"></i> {{ 'mautic.focus.form.type'|trans }}
                             </a>
                         </h4>
                     </div>
@@ -112,7 +112,7 @@
                             <li data-focus-type="form" class="focus-type list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="fa fa-2x fa-pencil-square-o text-primary"></i>
+                                        <i class="fa ri-2x fa-pencil-square-o text-primary"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.form.type.form'|trans }}</h4>
@@ -126,7 +126,7 @@
                             <li data-focus-type="notice" class="focus-type list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="fa fa-2x fa-bullhorn text-warning"></i>
+                                        <i class="fa ri-2x fa-bullhorn text-warning"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.form.type.notice'|trans }}</h4>
@@ -140,7 +140,7 @@
                             <li data-focus-type="link" class="focus-type list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="fa fa-2x fa-hand-o-right text-info"></i>
+                                        <i class="fa ri-2x fa-hand-o-right text-info"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.form.type.link'|trans }}</h4>
@@ -172,7 +172,7 @@
                     <div class="panel-heading">
                         <h4 class="panel-title focus-style-header">
                             <a role="button" data-toggle="collapse" href="#focusStylePanel" aria-expanded="true" aria-controls="focusStylePanel">
-                                <i class="fa fa-desktop"></i> {{ 'mautic.focus.form.style'|trans }}
+                                <i class="ri-mac-line"></i> {{ 'mautic.focus.form.style'|trans }}
                             </a>
                         </h4>
                     </div>
@@ -181,7 +181,7 @@
                             <li data-focus-style="bar" class="focus-style visible-focus-style-bar list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="pl-2 fa fa-2x fa-minus text-primary"></i>
+                                        <i class="pl-2 fa ri-2x fa-minus text-primary"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.bar'|trans }}</h4>
@@ -194,7 +194,7 @@
                             <li data-focus-style="modal" class="focus-style visible-focus-style-modal list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="fa fa-2x fa-list-alt text-warning"></i>
+                                        <i class="fa ri-2x fa-list-alt text-warning"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.modal'|trans }}</h4>
@@ -207,7 +207,7 @@
                             <li data-focus-style="notification" class="focus-style visible-focus-style-notification list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="pl-2 fa fa-2x fa-info-circle text-info"></i>
+                                        <i class="pl-2 fa fa-2x ri-information-2-line text-info"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.notification'|trans }}</h4>
@@ -220,7 +220,7 @@
                             <li data-focus-style="page" class="focus-style visible-focus-style-page list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="pl-2 fa fa-2x fa-square text-danger"></i>
+                                        <i class="pl-2 fa ri-2x fa-square text-danger"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.page'|trans }}</h4>
@@ -263,7 +263,7 @@
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a role="button" data-toggle="collapse" href="#focusColorsPanel" aria-expanded="true" aria-controls="focusColorsPanel">
-                                <i class="fa fa-paint-brush"></i> {{ 'mautic.focus.tab.focus_colors'|trans }}
+                                <i class="ri-paint-brush-line"></i> {{ 'mautic.focus.tab.focus_colors'|trans }}
                             </a>
                         </h4>
                     </div>
@@ -275,7 +275,7 @@
                                     <div class="input-group">
                                         {{ form_widget(form.properties.colors.primary) }}
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="primary_site_colors"></div>
@@ -289,7 +289,7 @@
                                     <div class="input-group">
                                         {{ form_widget(form.properties.colors.text) }}
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="text_site_colors"></div>
@@ -305,7 +305,7 @@
                                         <div class="input-group">
                                             {{ form_widget(form.properties.colors.button) }}
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_site_colors"></div>
@@ -319,7 +319,7 @@
                                         <div class="input-group">
                                             {{ form_widget(form.properties.colors.button_text) }}
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_text_site_colors"></div>
@@ -337,7 +337,7 @@
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a role="button" data-toggle="collapse" href="#focusContentPanel" aria-expanded="true" aria-controls="focusContentPanel">
-                                <i class="fa fa-newspaper-o"></i> {{ 'mautic.focus.tab.focus_content'|trans }}
+                                <i class="ri-newspaper-line"></i> {{ 'mautic.focus.tab.focus_content'|trans }}
                             </a>
                         </h4>
                     </div>

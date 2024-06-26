@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-136-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-139-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -241,6 +241,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/magician7"><img src="https://avatars.githubusercontent.com/u/2359284?v=4?s=100" width="100px;" alt="Damian"/><br /><sub><b>Damian</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Amagician7" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/mautic/mautic/issues?q=author%3Amagician7" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/markusVJH"><img src="https://avatars.githubusercontent.com/u/121946942?v=4?s=100" width="100px;" alt="Markus Heinilä"/><br /><sub><b>Markus Heinilä</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3AmarkusVJH" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/juangadiel"><img src="https://avatars.githubusercontent.com/u/706997?v=4?s=100" width="100px;" alt="Juan Gadiel Rosado Colon"/><br /><sub><b>Juan Gadiel Rosado Colon</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Ajuangadiel" title="Bug reports">🐛</a> <a href="#userTesting-juangadiel" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://abhisek.xyz/"><img src="https://avatars.githubusercontent.com/u/12195330?v=4?s=100" width="100px;" alt="Abhisek Mazumdar"/><br /><sub><b>Abhisek Mazumdar</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=abhisekmazumdar" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/luk4s"><img src="https://avatars.githubusercontent.com/u/635997?v=4?s=100" width="100px;" alt="Lukas Pokorny"/><br /><sub><b>Lukas Pokorny</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=luk4s" title="Documentation">📖</a> <a href="https://github.com/mautic/mautic/commits?author=luk4s" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Oluwatos94"><img src="https://avatars.githubusercontent.com/u/111003311?v=4?s=100" width="100px;" alt="Tosin Akinbowa"/><br /><sub><b>Tosin Akinbowa</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Oluwatos94" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

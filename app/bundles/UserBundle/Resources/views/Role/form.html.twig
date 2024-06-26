@@ -15,9 +15,9 @@
 {% block content %}
     {{ form_start(form) }}
     <div class="box-layout">
-	<div class="col-xs-12 bg-white height-auto">
+	<div class="col-xs-12 height-auto">
 		<!-- tabs controls -->
-		<ul class="bg-auto nav nav-tabs pr-md pl-md">
+		<ul class="nav nav-tabs pr-md pl-md">
 			<li class="active"><a href="#details-container" role="tab" data-toggle="tab">{% trans %}mautic.core.details{% endtrans %}</a></li>
 			<li class=""><a href="#permissions-container" role="tab" data-toggle="tab">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
 		</ul>
@@ -50,7 +50,7 @@
 					<!-- start: box layout -->
 					<div class="box-layout">
 						<!-- step container -->
-						<div class="col-md-5 bg-white height-auto">
+						<div class="col-md-5 height-auto">
 							<div class="pr-lg pl-lg pt-md pb-md">
 
 								<!-- Nav tabs -->
@@ -68,7 +68,7 @@
 						</div>
 
 						<!-- container -->
-						<div class="col-md-7 bg-auto height-auto bdr-l">
+						<div class="col-md-7 height-auto bdr-l">
 							<div class="tab-content">
 								{% set permissions = form.permissions.children %}
 								{% for child in permissions %}
