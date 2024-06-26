@@ -991,14 +991,12 @@ hr.hr-w-3,
   position: relative;
   top: -1px;
   z-index: 1;
-  background-color: #fff;
+  background-color: var(--layer);
   padding: 0 15px;
   margin: 0 15px;
-  border: 1px solid #ebedf0;
   border-top-width: 0;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   font-size: 9px;
   line-height: 22px;
   text-transform: uppercase;
@@ -2678,7 +2676,8 @@ ul.dropdown-menu-form {
 .stats-menu__content.tab-content > .tab-pane {
   width: 100%;
 }
-.nav-tabs + .tab-content {
+.nav-tabs + .tab-content,
+.nav-tabs + form > .tab-content {
   background-color: var(--layer);
 }
 .nav-pills > li + li {
