@@ -81,7 +81,7 @@
                             {% if 'template' == type %}
                                 {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'notification'}) }}
                             {% else %}
-                                <i class="fa fa-fw fa-lg ri-toggle-fill text-muted disabled"></i>
+                                <i class="mr-xs ri-xl ri-toggle-fill text-muted disabled"></i>
                             {% endif %}
                             <a href="{{ path('mautic_mobile_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}">
                                 {{ item.name }}

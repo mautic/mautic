@@ -3408,7 +3408,7 @@ ul.line-legend li {
   vertical-align: middle;
   border-bottom: 1px solid #ebedf0;
 }
-table i:not(.fa-lg) {
+table i:not([class^="ri-toggle"], [class*=" ri-toggle"]) {
   font-size: 14px;
 }
 .table-responsive-force {
