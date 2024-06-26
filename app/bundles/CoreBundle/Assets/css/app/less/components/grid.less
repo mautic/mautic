@@ -39,8 +39,14 @@
 .row {
   display: flex;
   flex-wrap: wrap;
-  
   .make-row();
+}
+
+.row > * {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .row-no-gutters {

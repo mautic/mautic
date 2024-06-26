@@ -9,6 +9,7 @@ use DeviceDetector\Parser\OperatingSystem;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Form\Type\AlertType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
@@ -30,6 +31,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
+
+    private const EMAIL_ALIAS = 'email';
 
     private TranslatorInterface $translator;
 
@@ -138,7 +141,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ],
             ]
         );
-
         $event->stopPropagation();
     }
 
@@ -203,7 +205,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ],
             ]
         );
-
         $event->stopPropagation();
     }
 
@@ -270,7 +271,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                     'constraints'               => $event->filterShouldBeDisabled() ? [] : [new NotBlank(['message' => 'mautic.core.value.required'])],
                 ]
             );
-
             $event->stopPropagation();
         }
     }
@@ -289,8 +289,37 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 'data'     => $form->getData()['filter'] ?? '',
             ]
         );
-
+        $this->showOperatorsBasedAlertMessages($event);
         $event->stopPropagation();
+    }
+
+    private function showOperatorsBasedAlertMessages(FormAdjustmentEvent $event): void
+    {
+        switch ($event->getOperator()) {
+            case OperatorOptions::REGEXP:
+                $alertText = $this->translator->trans('mautic.lead_list.filter.alert.regexp');
+                break;
+            case OperatorOptions::ENDS_WITH:
+                $alertText = $this->translator->trans('mautic.lead_list.filter.alert.endwith');
+                break;
+            case OperatorOptions::CONTAINS:
+                $alertText = $this->translator->trans('mautic.lead_list.filter.alert.contain');
+                break;
+            case OperatorOptions::LIKE:
+                $alertText = $this->translator->trans('mautic.lead_list.filter.alert.like');
+                break;
+            default:
+                return;
+        }
+
+        if (self::EMAIL_ALIAS === $event->getFieldAlias()) {
+            $alertText .= ' '.$this->translator->trans('mautic.lead_list.filter.alert.email');
+        }
+
+        $event->getForm()->add('alert', AlertType::class, [
+            'message'      => $alertText,
+            'message_type' => 'warning',
+        ]);
     }
 
     /**

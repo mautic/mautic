@@ -35,8 +35,8 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto">
+    <div class="col-md-9 height-auto">
+        <div>
             <!-- campaign detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
@@ -51,7 +51,7 @@
             <div class="collapse" id="campaign-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': campaign}) }}
                             {% for sourceType, typeNames in sources %}
@@ -74,7 +74,7 @@
             <!--/ campaign detail collapseable -->
         </div>
 
-        <div class="bg-auto bg-dark-xs">
+        <div>
             <!-- campaign detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
@@ -215,7 +215,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bg-white bdr-l height-auto">
+    <div class="col-md-3 bdr-l height-auto">
         {{ customContent('right.section.top', _context) }}
 
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
