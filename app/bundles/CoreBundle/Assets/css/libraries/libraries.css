@@ -1601,11 +1601,11 @@ th {
   padding: 8px 15px;
   line-height: 1.3856;
   vertical-align: top;
-  border-top: 1px solid #ebedf0;
+  border-top: 1px solid var(--border-subtle);
 }
 .table > thead > tr > th {
   vertical-align: bottom;
-  border-bottom: 2px solid #ebedf0;
+  border-bottom: 2px solid var(--border-subtle);
 }
 .table > caption + thead > tr:first-child > th,
 .table > colgroup + thead > tr:first-child > th,
@@ -1616,7 +1616,7 @@ th {
   border-top: 0;
 }
 .table > tbody + tbody {
-  border-top: 2px solid #ebedf0;
+  border-top: 2px solid var(--border-subtle);
 }
 .table .table {
   background-color: #fff;
@@ -1630,7 +1630,7 @@ th {
   padding: 5px 15px;
 }
 .table-bordered {
-  border: 1px solid #ebedf0;
+  border: 1px solid var(--border-subtle);
 }
 .table-bordered > thead > tr > th,
 .table-bordered > tbody > tr > th,
@@ -1638,7 +1638,7 @@ th {
 .table-bordered > thead > tr > td,
 .table-bordered > tbody > tr > td,
 .table-bordered > tfoot > tr > td {
-  border: 1px solid #ebedf0;
+  border: 1px solid var(--border-subtle);
 }
 .table-bordered > thead > tr > th,
 .table-bordered > thead > tr > td {
@@ -1765,7 +1765,7 @@ th {
     margin-bottom: 13.5px;
     overflow-y: hidden;
     -ms-overflow-style: -ms-autohiding-scrollbar;
-    border: 1px solid #ebedf0;
+    border: 1px solid var(--border-subtle);
   }
   .table-responsive > .table {
     margin-bottom: 0;
@@ -4878,7 +4878,7 @@ button.list-group-item-danger.active:focus {
 .panel > .panel-body + .table-responsive,
 .panel > .table + .panel-body,
 .panel > .table-responsive + .panel-body {
-  border-top: 1px solid #ebedf0;
+  border-top: 1px solid var(--border-subtle);
 }
 .panel > .table > tbody:first-child > tr:first-child th,
 .panel > .table > tbody:first-child > tr:first-child td {

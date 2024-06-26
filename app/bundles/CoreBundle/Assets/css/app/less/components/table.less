@@ -22,7 +22,20 @@
     border-bottom: 1px solid @table-border-color;
   }
 }
-table i:not(.fa-lg) {
+
+.table > thead > tr,
+  .table > tbody > tr,
+  .table > tfoot > tr {
+    > td.active,
+    > th.active,
+    &.active > td,
+    &.active > th {
+      background-color: var(--layer-selected);
+      transition: var(--transition-all-productive);
+    }
+  }
+
+table i:not(.fa-lg,.ri-more-2-line) {
   font-size: 14px;
 }
 
@@ -90,7 +103,14 @@ table i:not(.fa-lg) {
   }
 
   .table-hover {
-    > tbody > tr:hover {
-      transition: var(--all-productive);
+    > tbody > tr {
+      &:hover {
+      background-color: var(--layer);
+      transition: var(--transition-all-productive);
+    }
+
+    &:active {
+      background-color: var(--layer-selected);
+    }
     }
   }

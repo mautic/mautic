@@ -3406,9 +3406,24 @@ ul.line-legend li {
 }
 .table > thead > tr > th {
   vertical-align: middle;
-  border-bottom: 1px solid #ebedf0;
+  border-bottom: 1px solid var(--border-subtle);
 }
-table i:not(.fa-lg) {
+.table > thead > tr > td.active,
+.table > tbody > tr > td.active,
+.table > tfoot > tr > td.active,
+.table > thead > tr > th.active,
+.table > tbody > tr > th.active,
+.table > tfoot > tr > th.active,
+.table > thead > tr.active > td,
+.table > tbody > tr.active > td,
+.table > tfoot > tr.active > td,
+.table > thead > tr.active > th,
+.table > tbody > tr.active > th,
+.table > tfoot > tr.active > th {
+  background-color: var(--layer-selected);
+  transition: var(--transition-all-productive);
+}
+table i:not(.fa-lg,.ri-more-2-line) {
   font-size: 14px;
 }
 .table-responsive-force {
@@ -3417,7 +3432,7 @@ table i:not(.fa-lg) {
   overflow-y: hidden;
   overflow-x: auto;
   -ms-overflow-style: -ms-autohiding-scrollbar;
-  border: 1px solid #ebedf0;
+  border: 1px solid var(--border-subtle);
   -webkit-overflow-scrolling: touch;
 }
 .table-responsive-force > .table {
@@ -3457,7 +3472,11 @@ table i:not(.fa-lg) {
   border-bottom: 0;
 }
 .table-hover > tbody > tr:hover {
-  transition: var(--all-productive);
+  background-color: var(--layer);
+  transition: var(--transition-all-productive);
+}
+.table-hover > tbody > tr:active {
+  background-color: var(--layer-selected);
 }
 .progress {
   background-color: #ebedf0;
@@ -5723,6 +5742,8 @@ body.noscroll {
   padding: 0;
 }
 .table .input-group-sm .dropdown-toggle {
+  font-weight: bold;
+  font-size: 12px;
   border: 0;
   background-color: transparent;
   padding: 5px 8px;
