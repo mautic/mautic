@@ -6306,9 +6306,6 @@ ul.media-list.media-list-feed div.media-object {
   --support-warning-inverse: var(--text-secondary);
   --support-info-inverse: var(--text-secondary);
 }
-:root[high-contrast="enabled"] a:not(.btn) {
-  text-decoration: underline;
-}
 @media (prefers-reduced-transparency: reduce) {
   :root {
     --layer-translucent: var(--layer);
