@@ -4532,16 +4532,16 @@ a.thumbnail.active {
   padding: 10px 15px;
   margin-bottom: -1px;
   background-color: transparent;
-  border: 1px solid #ebedf0;
+  border: 1px solid transparent;
 }
 .list-group-item:first-child {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
 }
 .list-group-item:last-child {
   margin-bottom: 0;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
 }
 .list-group-item.disabled,
 .list-group-item.disabled:hover,
@@ -4564,8 +4564,8 @@ a.thumbnail.active {
 .list-group-item.active:hover,
 .list-group-item.active:focus {
   z-index: 2;
-  color: #3c4650;
-  background-color: #fcfcfc;
+  color: var(--text-inverse);
+  background-color: var(--layer-selected-inverse);
   border-color: #ebedf0;
 }
 .list-group-item.active .list-group-item-heading,
@@ -4582,11 +4582,11 @@ a.thumbnail.active {
 .list-group-item.active .list-group-item-text,
 .list-group-item.active:hover .list-group-item-text,
 .list-group-item.active:focus .list-group-item-text {
-  color: #ffffff;
+  color: var(--text-inverse);
 }
 a.list-group-item,
 button.list-group-item {
-  color: #555;
+  color: var(--text-secondary);
 }
 a.list-group-item .list-group-item-heading,
 button.list-group-item .list-group-item-heading {
@@ -4596,9 +4596,9 @@ a.list-group-item:hover,
 button.list-group-item:hover,
 a.list-group-item:focus,
 button.list-group-item:focus {
-  color: #555;
+  color: var(--text-primary);
   text-decoration: none;
-  background-color: #fcfcfc;
+  background-color: var(--layer-hover);
 }
 button.list-group-item {
   width: 100%;
