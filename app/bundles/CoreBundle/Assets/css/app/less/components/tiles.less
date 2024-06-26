@@ -20,10 +20,9 @@
         font-family: inherit;
         font-size: 100%;
         vertical-align: baseline;
-        font-size: var(--body-compact-01-font-size, 0.875rem);
-        font-weight: var(--body-compact-01-font-weight, 400);
-        line-height: var(--body-compact-01-line-height, 1.28572);
-        letter-spacing: var(--body-compact-01-letter-spacing, 0.16px);
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.28572;
         padding: var(--layout-density-padding-inline-local);
         cursor: pointer;
         transition: var(--transition-all-productive);
@@ -34,7 +33,7 @@
         }
 
         &:focus {
-            outline-color: var(--focus, #0f62fe);
+            outline-color: var(--focus, #4e5e9e);
             outline-offset: -2px;
             text-decoration: none;
         }
@@ -49,7 +48,7 @@
         position: absolute;
         inset-block-end: var(--layout-density-padding-inline-local);
         inset-inline-end: var(--layout-density-padding-inline-local);
-        fill: var(--icon-interactive, #0f62fe);
+        fill: var(--icon-interactive, #4e5e9e);
 
         &.tile-disabled,
         &:disabled {
@@ -57,7 +56,5 @@
         }
     }
 
-    * {
-        box-sizing: inherit;
-    }
+    * { box-sizing: inherit; }
 }
