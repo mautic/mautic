@@ -145,7 +145,7 @@ Mautic.leadOnLoad = function (container, response) {
     Mautic.initUniqueIdentifierFields();
 
     if (mQuery(container + ' .panel-companies').length) {
-        mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
+        mQuery(container + ' .panel-companies .ri-check-line').tooltip({html: true});
     }
 
     // Adding behavior to be able to create new tags by pressing the `Escape` key
@@ -960,7 +960,7 @@ Mautic.refreshSegmentContacts = function(form) {
 };
 
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
-    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
 
     Mautic.toggleLeadSwitch(toggleId, query, action);
@@ -1002,21 +1002,21 @@ Mautic.setPreferredChannel = function(channel) {
 };
 
 Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
-    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
 Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
-    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query  = "action=lead:toggleLeadCampaign&leadId=" + leadId + "&campaignId=" + campaignId + "&campaignAction=" + action;
 
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
 Mautic.toggleLeadSwitch = function(toggleId, query, action) {
-    var toggleOn  = 'fa-toggle-on text-success';
-    var toggleOff = 'fa-toggle-off text-danger';
+    var toggleOn  = 'ri-toggle-fill text-success';
+    var toggleOff = 'ri-toggle-line text-danger';
     var spinClass = 'fa-spin fa-spinner ';
 
     if (action == 'remove') {
