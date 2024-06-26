@@ -22,7 +22,7 @@ class CompanyListType extends AbstractType
                 'modal_header'        => 'mautic.company.new.company',
                 'model'               => 'lead.company',
                 'ajax_lookup_action'  => 'lead:getLookupChoiceList',
-                'model_lookup_method' => fn (Options $options): string => $options['model_lookup_method'] ?? 'getLookupResults',
+                'model_lookup_method' => 'getLookupResults',
                 'lookup_arguments'    => fn (Options $options): array => [
                     'type'      => 'lead.company',
                 ] + ((isset($options['model_lookup_method']) && ('getSimpleLookupResults' === $options['model_lookup_method'])) ? ['exclude' => $options['main_entity']] : []),
