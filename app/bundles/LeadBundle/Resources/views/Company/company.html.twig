@@ -70,7 +70,7 @@
 
             <!-- lead detail collapseable -->
             <div class="collapse" id="lead-details">
-                <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
+                <ul class="pt-md nav nav-tabs" role="tablist">
                     {% for g in fields|keys %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
