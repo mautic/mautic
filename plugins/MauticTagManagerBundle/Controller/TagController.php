@@ -471,7 +471,7 @@ class TagController extends FormController
             'viewParameters' => [
                 'tag'        => $tag,
                 'security'   => $security,
-                'usageStats' => $tagDependencies->getChannelsIds($tag->getTag()),
+                'usageStats' => $tagDependencies->getChannelsIds($tag),
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
             'passthroughVars' => [

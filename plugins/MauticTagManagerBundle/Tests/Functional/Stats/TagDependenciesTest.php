@@ -9,11 +9,12 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
 
 final class TagDependenciesTest extends MauticMysqlTestCase
 {
-    public function testEmailUsageInCampaigns(): void
+    public function testTagUsageInCampaigns(): void
     {
         $tag = $this->createTag('TagA');
 
@@ -25,6 +26,34 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $content        = $clientResponse->getContent();
         $searchIds      = join(',', [$campaign->getId(), $campaign2->getId()]);
         $this->assertStringContainsString("href=\"/s/campaigns?search=ids:{$searchIds}\"", $content);
+    }
+
+    public function testTagUsageInSegments(): void
+    {
+        $tag = $this->createTag('TagA');
+
+        $segmentWithTag = $this->createSegment('tags', [
+            [
+                'glue'       => 'and',
+                'field'      => 'tags',
+                'object'     => 'lead',
+                'type'       => 'tags',
+                'operator'   => 'in',
+                'properties' => [
+                    'filter' => [
+                        $tag->getId(),
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->createSegment('other');
+
+        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $content        = $clientResponse->getContent();
+        $searchIds      = join(',', [$segmentWithTag->getId()]);
+        $this->assertStringContainsString("href=\"/s/segments?search=ids:{$searchIds}\"", $content);
     }
 
     private function createTag(string $tagName): Tag
@@ -229,5 +258,21 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $campaign;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     */
+    private function createSegment(string $alias, array $filters = []): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($alias);
+        $segment->setPublicName($alias);
+        $segment->setAlias($alias);
+        $segment->setFilters($filters);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
     }
 }
