@@ -143,7 +143,7 @@
 
             <!-- lead detail collapseable -->
             <div class="collapse" id="lead-details">
-                <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
+                <ul class="pt-md nav nav-tabs" role="tablist">
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
@@ -253,64 +253,65 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- tabs controls -->
-            <ul class="nav nav-tabs pr-md pl-md mt-10">
-                <li class="active">
-                    <a href="#timeline-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="TimelineCount">
-                            {{ events.total }}
-                        </span>
-                        {{ 'mautic.lead.lead.tab.history'|trans }}
-                    </a>
-                </li>
-                <li class="">
-                    <a href="#notes-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="NoteCount">
-                            {{ noteCount }}
-                        </span>
-                        {{ 'mautic.lead.lead.tab.notes'|trans }}
-                    </a>
-                </li>
-                {% if not isAnonymous and socialProfiles is not empty %}
-                    <li class="">
-                        <a href="#social-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="SocialCount">
-                            {{ socialProfiles|length }}
-                        </span>
-                            {{ 'mautic.lead.lead.tab.social'|trans }}
-                        </a>
-                    </li>
-                {% endif %}
-                <li class="">
-                    <a href="#integration-container" role="tab" data-toggle="tab">
-                    <span class="label label-primary mr-sm" id="IntegrationCount">
-                        {{ integrations|length }}
-                    </span>
-                        {{ 'mautic.lead.lead.tab.integration'|trans }}
-                    </a>
-                </li>
-                <li class="">
-                    <a href="#auditlog-container" role="tab" data-toggle="tab">
-                    <span class="label label-primary mr-sm" id="AuditLogCount">
-                        {{ auditlog.total }}
-                    </span>
-                        {{ 'mautic.lead.lead.tab.auditlog'|trans }}
-                    </a>
-                </li>
-                {% if places %}
-                    <li class="">
-                        <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
-                        <span class="label label-primary mr-sm" id="PlaceCount">
-                            {{ places|length }}
-                        </span>
-                            {{ 'mautic.lead.lead.tab.places'|trans }}
-                        </a>
-                    </li>
-                {% endif %}
-                {{ customContent('tabs', _context) }}
-            </ul>
-            <!--/ tabs controls -->
+            
         </div>
+        <!-- tabs controls -->
+        <ul class="nav nav-tabs mt-10">
+            <li class="active">
+                <a href="#timeline-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="TimelineCount">
+                        {{ events.total }}
+                    </span>
+                    {{ 'mautic.lead.lead.tab.history'|trans }}
+                </a>
+            </li>
+            <li class="">
+                <a href="#notes-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="NoteCount">
+                        {{ noteCount }}
+                    </span>
+                    {{ 'mautic.lead.lead.tab.notes'|trans }}
+                </a>
+            </li>
+            {% if not isAnonymous and socialProfiles is not empty %}
+                <li class="">
+                    <a href="#social-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="SocialCount">
+                        {{ socialProfiles|length }}
+                    </span>
+                        {{ 'mautic.lead.lead.tab.social'|trans }}
+                    </a>
+                </li>
+            {% endif %}
+            <li class="">
+                <a href="#integration-container" role="tab" data-toggle="tab">
+                <span class="label label-primary mr-sm" id="IntegrationCount">
+                    {{ integrations|length }}
+                </span>
+                    {{ 'mautic.lead.lead.tab.integration'|trans }}
+                </a>
+            </li>
+            <li class="">
+                <a href="#auditlog-container" role="tab" data-toggle="tab">
+                <span class="label label-primary mr-sm" id="AuditLogCount">
+                    {{ auditlog.total }}
+                </span>
+                    {{ 'mautic.lead.lead.tab.auditlog'|trans }}
+                </a>
+            </li>
+            {% if places %}
+                <li class="">
+                    <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
+                    <span class="label label-primary mr-sm" id="PlaceCount">
+                        {{ places|length }}
+                    </span>
+                        {{ 'mautic.lead.lead.tab.places'|trans }}
+                    </a>
+                </li>
+            {% endif %}
+            {{ customContent('tabs', _context) }}
+        </ul>
+        <!--/ tabs controls -->
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
