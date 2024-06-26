@@ -17323,7 +17323,7 @@ a > .fa {
   list-style: none;
   margin: 0;
   padding: 5px var(--spacing-05);
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
 }
 .chosen-container .chosen-results li em {
   background: #feffde;
@@ -17464,7 +17464,7 @@ a > .fa {
   height: var(--spacing-07);
   width: 100%;
   max-width: 100%;
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
 }
 .chosen-container-single .chosen-search input[type="text"]:focus {
   outline: 2px solid var(--focus);
@@ -17502,7 +17502,7 @@ a > .fa {
   margin: 0;
   overflow: hidden;
   position: relative;
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
   outline: 2px solid transparent;
   outline-offset: -2px;
 }
@@ -17793,7 +17793,7 @@ a > .fa {
 .ms-container .ms-selection li.ms-elem-selection {
   padding: var(--spacing-03) var(--spacing-04);
   color: var(--text-secondary);
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
   line-height: 1em;
 }
 .ms-container .ms-selectable li.ms-hover,
