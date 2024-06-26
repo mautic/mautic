@@ -18,7 +18,7 @@ class SalesforceApi extends CrmApi
      *
      * @var string
      */
-    public const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+\nNo\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
+    public const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+No\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
 
     protected $object          = 'Lead';
 
@@ -569,6 +569,10 @@ class SalesforceApi extends CrmApi
         if (is_array($response)) {
             if (!empty($response['errors'])) {
                 throw new ApiErrorException(implode(', ', $response['errors']));
+            }
+
+            if (isset($response['error']['message'])) {
+                throw new ApiErrorException($response['error']['message']);
             }
 
             foreach ($response as $lineItem) {
