@@ -2817,7 +2817,7 @@ tbody.collapse.in {
   font-size: 13px;
   text-align: left;
   list-style: none;
-  background-color: #fff;
+  background-color: var(--layer);
   background-clip: padding-box;
   border: 1px solid #eee;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -2833,7 +2833,7 @@ tbody.collapse.in {
   height: 1px;
   margin: 8px 0;
   overflow: hidden;
-  background-color: #eaeaea;
+  background-color: var(--border-no-color);
 }
 .dropdown-menu > li > a {
   display: block;
@@ -2841,14 +2841,14 @@ tbody.collapse.in {
   clear: both;
   font-weight: 400;
   line-height: 1.3856;
-  color: #3c4650;
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
-  color: #313942;
+  color: var(--text-primary);
   text-decoration: none;
-  background-color: #f5f5f5;
+  background-color: var(--layer-hover);
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
@@ -22305,7 +22305,7 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   margin: 2px 0 0;
   list-style: none;
   font-size: 13px;
-  background-color: #fff;
+  background-color: var(--layer);
   border: 1px solid #eee;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 3px;
@@ -22321,17 +22321,17 @@ fieldset[disabled] .twitter-typeahead .tt-input {
   clear: both;
   font-weight: normal;
   line-height: 1.3856;
-  color: #3c4650;
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 .tt-menu .tt-suggestion.tt-cursor {
   text-decoration: none;
   outline: 0;
-  background-color: #f5f5f5;
-  color: #313942;
+  background-color: var(--layer-hover);
+  color: var(--text-primary);
 }
 .tt-menu .tt-suggestion.tt-cursor a {
-  color: #313942;
+  color: var(--text-primary);
 }
 .tt-menu .tt-suggestion p {
   margin: 0;
