@@ -971,6 +971,9 @@ body > #app-wrapper {
     margin-left: 60px !important;
   }
 }
+body {
+  color: var(--text-primary);
+}
 hr,
 .hr-expand {
   margin-top: 15px;
@@ -1019,9 +1022,11 @@ hr.hr-w-3,
   top: -3px;
 }
 a {
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
+  color: var(--link-primary);
 }
 a:hover {
+  color: var(--link-primary-hover);
   cursor: pointer;
 }
 a:hover,
