@@ -2831,17 +2831,233 @@ ul.dropdown-menu-form {
   background-color: #F86B4F;
 }
 .label {
-  display: inline-block;
+  display: inline-flex;
+  font-size: 75%;
+  font-weight: 700;
+  gap: 6px;
+  white-space: nowrap;
   line-height: 1.5;
-  padding: 0.25em 0.6em 0.15em 0.6em;
-  border-radius: 2px;
-  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.1);
+  padding: 0.25em 0.8em 0.15em 0.8em;
+  border-radius: 100px;
+  min-width: 30px;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition-all-productive);
 }
-.label i {
-  padding: 2px;
-  line-height: 12px;
-  top: 1px;
+.label.pa-10 {
+  min-width: auto;
+}
+a.label:hover,
+a.label:focus {
+  text-decoration: none;
+  cursor: pointer;
+}
+.label:empty {
+  display: none;
+}
+.btn .label {
   position: relative;
+  top: -1px;
+}
+.label.label-gray {
+  background-color: var(--label-background-gray);
+  color: var(--label-color-gray);
+}
+.label.label-gray > a {
+  color: var(--label-color-gray);
+}
+.label.label-gray:hover {
+  background-color: var(--label-background-hover-gray);
+}
+.label.label-cool-gray {
+  background-color: var(--label-background-cool-gray);
+  color: var(--label-color-cool-gray);
+}
+.label.label-cool-gray > a {
+  color: var(--label-color-cool-gray);
+}
+.label.label-cool-gray:hover {
+  background-color: var(--label-background-hover-cool-gray);
+}
+.label.label-warm-gray {
+  background-color: var(--label-background-warm-gray);
+  color: var(--label-color-warm-gray);
+}
+.label.label-warm-gray > a {
+  color: var(--label-color-warm-gray);
+}
+.label.label-warm-gray:hover {
+  background-color: var(--label-background-hover-warm-gray);
+}
+.label.label-red {
+  background-color: var(--label-background-red);
+  color: var(--label-color-red);
+}
+.label.label-red > a {
+  color: var(--label-color-red);
+}
+.label.label-red:hover {
+  background-color: var(--label-background-hover-red);
+}
+.label.label-magenta {
+  background-color: var(--label-background-magenta);
+  color: var(--label-color-magenta);
+}
+.label.label-magenta > a {
+  color: var(--label-color-magenta);
+}
+.label.label-magenta:hover {
+  background-color: var(--label-background-hover-magenta);
+}
+.label.label-purple {
+  background-color: var(--label-background-purple);
+  color: var(--label-color-purple);
+}
+.label.label-purple > a {
+  color: var(--label-color-purple);
+}
+.label.label-purple:hover {
+  background-color: var(--label-background-hover-purple);
+}
+.label.label-blue {
+  background-color: var(--label-background-blue);
+  color: var(--label-color-blue);
+}
+.label.label-blue > a {
+  color: var(--label-color-blue);
+}
+.label.label-blue:hover {
+  background-color: var(--label-background-hover-blue);
+}
+.label.label-cyan {
+  background-color: var(--label-background-cyan);
+  color: var(--label-color-cyan);
+}
+.label.label-cyan > a {
+  color: var(--label-color-cyan);
+}
+.label.label-cyan:hover {
+  background-color: var(--label-background-hover-cyan);
+}
+.label.label-teal {
+  background-color: var(--label-background-teal);
+  color: var(--label-color-teal);
+}
+.label.label-teal > a {
+  color: var(--label-color-teal);
+}
+.label.label-teal:hover {
+  background-color: var(--label-background-hover-teal);
+}
+.label.label-green {
+  background-color: var(--label-background-green);
+  color: var(--label-color-green);
+}
+.label.label-green > a {
+  color: var(--label-color-green);
+}
+.label.label-green:hover {
+  background-color: var(--label-background-hover-green);
+}
+.label.label-primary {
+  background-color: var(--label-background-brand-primary);
+  color: var(--label-color-brand-primary);
+}
+.label.label-primary > a {
+  color: var(--label-color-brand-primary);
+}
+.label.label-primary:hover {
+  background-color: var(--label-background-hover-brand-primary);
+}
+.label.label-secondary {
+  background-color: var(--label-background-brand-secondary);
+  color: var(--label-color-brand-secondary);
+}
+.label.label-secondary > a {
+  color: var(--label-color-brand-secondary);
+}
+.label.label-secondary:hover {
+  background-color: var(--label-background-hover-brand-secondary);
+}
+.label.has-click-event {
+  border: 1px solid #00000017;
+}
+.label.has-click-event.label-gray {
+  border: 1px solid var(--label-border-gray);
+}
+.label.has-click-event.label-cool-gray {
+  border: 1px solid var(--label-border-cool-gray);
+}
+.label.has-click-event.label-warm-gray {
+  border: 1px solid var(--label-border-warm-gray);
+}
+.label.has-click-event.label-red {
+  border: 1px solid var(--label-border-red);
+}
+.label.has-click-event.label-magenta {
+  border: 1px solid var(--label-border-magenta);
+}
+.label.has-click-event.label-purple {
+  border: 1px solid var(--label-border-purple);
+}
+.label.has-click-event.label-blue {
+  border: 1px solid var(--label-border-blue);
+}
+.label.has-click-event.label-cyan {
+  border: 1px solid var(--label-border-cyan);
+}
+.label.has-click-event.label-teal {
+  border: 1px solid var(--label-border-teal);
+}
+.label.has-click-event.label-green {
+  border: 1px solid var(--label-border-green);
+}
+.label.has-click-event.label-primary {
+  border: 1px solid var(--label-border-brand-primary);
+}
+.label.has-click-event.label-secondary {
+  border: 1px solid var(--label-border-brand-secondary);
+}
+.label-default {
+  background-color: #a0acb8;
+}
+.label-default[href]:hover,
+.label-default[href]:focus {
+  background-color: #8392a2;
+}
+.label-success {
+  background-color: #00B49C;
+}
+.label-success[href]:hover,
+.label-success[href]:focus {
+  background-color: #008170;
+}
+.label-info {
+  background-color: #35B4B9;
+}
+.label-info[href]:hover,
+.label-info[href]:focus {
+  background-color: #2a8d91;
+}
+.label-warning {
+  background-color: #FDB933;
+}
+.label-warning[href]:hover,
+.label-warning[href]:focus {
+  background-color: #fba702;
+}
+.label-danger {
+  background-color: #F86B4F;
+}
+.label-danger[href]:hover,
+.label-danger[href]:focus {
+  background-color: #f6421e;
+}
+.label-success,
+.label-info,
+.label-warning,
+.label-danger {
+  color: var(--text-on-color);
 }
 .badge {
   padding-top: 0px;
