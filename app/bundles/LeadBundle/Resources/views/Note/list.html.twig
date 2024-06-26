@@ -9,7 +9,7 @@
             {{ include('@MauticLead/Note/_list_filter_form.html.twig') }}
         </div>
         <div class="col-xs-12 col-md-3 col-lg-2 va-t">
-            <a class="btn btn-primary btn-leadnote-add pull-right" href="{{ path('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'new'}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.new'|trans }}"><i class="fa fa-plus fa-lg"></i> {{ 'mautic.lead.add.note'|trans }}</a>
+            <a class="btn btn-primary btn-leadnote-add pull-right" href="{{ path('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'new'}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.new'|trans }}"><i class="ri-add-line fa-lg"></i> {{ 'mautic.lead.add.note'|trans }}</a>
         </div>
     </div>
     <div id="NoteList">

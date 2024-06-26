@@ -144,7 +144,7 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Download full installation package from previous step
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: ${{ needs.release.outputs.mautic-version }}.zip
 
@@ -211,7 +211,7 @@ jobs:
         php bin/console mautic:install --force http://localhost
     
     - name: "Download update package artifact ${{ needs.release.outputs.mautic-version }}-update.zip"
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: ${{ needs.release.outputs.mautic-version }}-update.zip
         path: ./mautic-testing
@@ -252,7 +252,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Download full installation package from previous step
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: ${{ needs.release.outputs.mautic-version }}.zip
 
