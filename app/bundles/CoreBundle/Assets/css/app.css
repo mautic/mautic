@@ -2596,7 +2596,7 @@ label.list-group-item:focus {
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
-  color: #596776;
+  color: var(--text-primary);
   background-color: #f7f7f7;
 }
 .scrollable-menu {
@@ -2677,6 +2677,9 @@ ul.dropdown-menu-form {
 }
 .stats-menu__content.tab-content > .tab-pane {
   width: 100%;
+}
+.nav-tabs + .tab-content {
+  background-color: var(--layer);
 }
 .nav-pills > li + li {
   margin-left: 5px;
