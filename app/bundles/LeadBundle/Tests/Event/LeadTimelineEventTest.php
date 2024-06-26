@@ -24,7 +24,7 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
                 'extra'      => [
                     'something' => 'something',
                 ],
-                'icon'      => 'fa-tachometer',
+                'icon'      => 'ri-speed-up-line',
                 'contactId' => 1,
             ],
             [
@@ -35,7 +35,7 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
                 'extra'      => [
                     'something' => 'something else',
                 ],
-                'icon'      => 'fa-tachometer',
+                'icon'      => 'ri-speed-up-line',
                 'contactId' => 2,
             ],
             [
@@ -47,7 +47,7 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
                 'extra'      => [
                     'something' => 'something else',
                 ],
-                'icon'      => 'fa-tachometer',
+                'icon'      => 'ri-speed-up-line',
                 'contactId' => 2,
             ],
         ];

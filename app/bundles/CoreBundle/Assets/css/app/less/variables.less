@@ -1,110 +1,8 @@
-//
-// Variables
-// --------------------------------------------------
-
-//== General
-//
-
-:root {
-    // Animations
-    --timing:                                    .3s ease;
-    --all:                                       all var(--timing);
-
-    // Tags
-    --label-background-gray: #e0e0e0;
-    --label-color-gray: #161616;
-    --label-hover-gray: #d1d1d1;
-    --label-border-gray: #a8a8a8;
-    --label-background-cool-gray: #dde1e6;
-    --label-color-cool-gray: #121619;
-    --label-hover-cool-gray: #cdd3da;
-    --label-border-cool-gray: #a2a9b0;
-    --label-background-warm-gray: #e5e0df;
-    --label-color-warm-gray: #171414;
-    --label-hover-warm-gray: #d8d0cf;
-    --label-border-warm-gray: #ada8a8;
-    --label-background-red: #ffd7d9;
-    --label-color-red: #a2191f;
-    --label-hover-red: #ffc2c5;
-    --label-border-red: #ff8389;
-    --label-background-magenta: #ffd6e8;
-    --label-color-magenta: #9f1853;
-    --label-hover-magenta: #ffbdda;
-    --label-border-magenta: #ff7eb6;
-    --label-background-purple: #e8daff;
-    --label-color-purple: #6929c4;
-    --label-hover-purple: #dcc7ff;
-    --label-border-purple: #be95ff;
-    --label-background-blue: #d0e2ff;
-    --label-color-blue: #0043ce;
-    --label-hover-blue: #b8d3ff;
-    --label-border-blue: #78a9ff;
-    --label-background-cyan: #bae6ff;
-    --label-color-cyan: #00539a;
-    --label-hover-cyan: #99daff;
-    --label-border-cyan: #33b1ff;
-    --label-background-teal: #9EF0E5;
-    --label-color-teal: #005C59;
-    --label-hover-teal: #57E6D3;
-    --label-border-teal: #08BDA5;
-    --label-background-green: #a7f0ba;
-    --label-color-green: #0e6027;
-    --label-hover-green: #74e792;
-    --label-border-green: #42be65;
-    --label-background-mautic-blue: #d0d3f8;
-    --label-color-mautic-blue: #495895;
-    --label-hover-mautic-blue: #C1C4F7;
-    --label-border-mautic-blue: #7a7dcf;
-    --label-background-gold: #ffebcc;
-    --label-color-gold: #cc7a00;
-    --label-hover-gold: #FFDBA6;
-    --label-border-gold: #FABE64;
-
-    // Text
-    --text-on-color: white;
-
-    //== Border
-    --border-interactive: #4e5e9e;
-    --border-subtle: #e0e0e0;
-    --border-subtle-alt: #c6c6c6;
-    --border-subtle-selected: #c6c6c6;
-    --border-strong: #8d8d8d;
-    --border-tile: #c6c6c6;
-    --border-tile-alt: #a8a8a8;
-    --border-inverse: #161616;
-    --border-disabled: #c6c6c6;
-
-    //== Layer
-    --layer: #f4f4f4;
-    --layer-alt: #ffffff;
-    --layer-hover: #e8e8e8;
-    --layer-active: #c6c6c6;
-    --layer-selected: #e0e0e0;
-    --layer-selected-hover: #cacaca;
-    --layer-selected-inverse: #161616;
-    --layer-selected-disabled: #8d8d8d;
-
-    //== Icons
-    --icon-primary: #161616;
-    --icon-secondary: #525252;
-    --icon-on-color: #ffffff;
-    --icon-on-color-disabled: #8d8d8d;
-    --icon-interactive: #4e5e9e;
-    --icon-inverse: #ffffff;
-    --icon-disabled: rgba(22, 22, 22, 0.25);
-
-}
-
-@media (prefers-reduced-motion: reduce) {
-    :root {
-        --timing:                                0;
-    }
-}
-
+/////////////////////////////////////////////////////////////////////////
 //== Bootstrap variable
 //
 //## import bootstrap variable.
-@import "../../../../../../../node_modules/bootstrap/less/variables.less";
+@import "../../libraries/bootstrap/bootstrap-mautic-custom-variables";
 
 //== Logo
 //
@@ -120,6 +18,10 @@
 @mautic-secondary:							#fdb933;
 @mautic-tertiary:							#35b5b9;
 
+@alert-mautic-bg:             @brand-primary;
+@alert-mautic-text:           #fff;
+@alert-mautic-border:         rgba(0,0,0,0.03);
+
 //== Header layout
 //
 //## common main header variable.
@@ -134,7 +36,7 @@
 @sidebar-zindex:                           (@header-zindex - 20 + 5);  // 990
 //** left sidebar option
 @sidebar-left-bg:                           darken(#27303a, 5%);
-@sidebar-left-header-bg:                    @brand-primary;
+@sidebar-left-header-bg:                    @mautic-primary;
 @sidebar-left-width:                        230px;
 @sidebar-left-collapse-width:               60px;
 @sidebar-left-dark:							darken(@sidebar-left-bg, 8%);
@@ -157,7 +59,10 @@
 //
 //## common footer variable.
 @footer-height:                             46px;
-@footer-bg:                                 lighten(@body-bg, 1%);
+@footer-bg:                                 transparent;
 @footer-zindex:                             @content-zindex;  // 1000
 
-@border-radius-infinite:                    200px;
+
+@brand-facebook:        #3b5998;
+@brand-twitter:         #55acee;
+@brand-google:          #dd4b39;
