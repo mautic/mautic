@@ -43,6 +43,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'     => 'return',
+            'formAttributes' => 'class="foobar"',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -84,6 +86,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
         $this->assertSame(1, $formCrawler->count());
+        $this->assertStringContainsString(' class="foobar"', $crawler->html());
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[country]' => 'Australia',
@@ -146,6 +149,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -240,6 +244,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction' => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -343,6 +348,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'                => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -378,6 +384,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -390,7 +397,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $campaignSources = ['forms' => [$formId => $formId]];
 
         /** @var CampaignModel $campaignModel */
-        $campaignModel = $this->getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
 
         $publishedCampaign = new Campaign();
         $publishedCampaign->setName('Published');
@@ -422,7 +429,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
-        $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
+        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
         if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
@@ -449,6 +456,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
@@ -519,7 +527,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordEncoderInterface $encoder */
-        $encoder = self::$container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = static::getContainer()->get('security.encoder_factory')->getEncoder($user);
         $user->setPassword($encoder->encodePassword($this->getUserPlainPassword(), $user->getSalt()));
 
         /** @var UserRepository $userRepo */
@@ -549,6 +557,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                     'type'  => 'button',
                 ],
             ],
+            'postAction'  => 'return',
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);

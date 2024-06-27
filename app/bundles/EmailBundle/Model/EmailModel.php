@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
@@ -31,6 +30,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -52,6 +52,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
@@ -105,17 +107,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         private DNC $doNotContact,
         private StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $security,
-        Connection $connection,
         EntityManagerInterface $em,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        private EmailStatModel $emailStatModel
     ) {
-        $this->connection               = $connection;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -124,15 +124,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
+        return $this->em->getRepository(Email::class);
     }
 
-    /**
-     * @return \Mautic\EmailBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+        return $this->emailStatModel->getRepository();
     }
 
     /**
@@ -148,7 +145,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatDeviceRepository()
     {
-        return $this->em->getRepository(\Mautic\EmailBundle\Entity\StatDevice::class);
+        return $this->em->getRepository(StatDevice::class);
     }
 
     public function getPermissionBase(): string
@@ -170,8 +167,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
-            /** @var Email $translationParent */
             if ($translationParent = $entity->getTranslationParent()) {
+                \assert($translationParent instanceof Email);
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }
@@ -326,7 +323,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
@@ -439,7 +436,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_OPEN);
         }
 
-        $this->em->persist($stat);
+        $this->emailStatModel->saveEntity($stat);
 
         // Only up counts if associated with both an email and lead
         if ($firstTime && $email && $lead) {
@@ -488,6 +485,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
+    }
+
+    public function saveEmailStat(Stat $stat): void
+    {
+        $this->emailStatModel->saveEntity($stat);
     }
 
     /**
@@ -621,6 +623,26 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @return array<string, array<int, array<string, int|string>>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getCountryStats(Email $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo, bool $includeVariants = false): array
+    {
+        $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
+
+        $emailStats            = $this->getStatRepository()->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds);
+        $results['read_count'] = $results['clicked_through_count'] = [];
+
+        foreach ($emailStats as $e) {
+            $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
+            $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+        }
+
+        return $results;
+    }
+
+    /**
      * Get a stats for email by list.
      *
      * @param bool $includeVariants
@@ -646,14 +668,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+        $statRepo = $this->getStatRepository();
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
+        $dncRepo = $this->em->getRepository(DoNotContact::class);
 
-        /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
-        $trackableRepo = $this->em->getRepository(\Mautic\PageBundle\Entity\Trackable::class);
+        /** @var TrackableRepository $trackableRepo */
+        $trackableRepo = $this->em->getRepository(Trackable::class);
         $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $key           = ($listCount > 1) ? 1 : 0;
 
@@ -1262,12 +1283,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * Send an email to lead(s).
      *
      * @param $options = array()
-     *                  array source array('model', 'id')
-     *                  array emailSettings
-     *                  int   listId
-     *                  bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                  bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                  array assetAttachments Array of optional Asset IDs to attach
+     *                 array source array('model', 'id')
+     *                 array emailSettings
+     *                 int   listId
+     *                 bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *                 bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                 array assetAttachments Array of optional Asset IDs to attach
      *
      * @return string[]|bool|string|null
      */
@@ -1619,7 +1640,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if (isset($saveEntities)) {
-            $this->getStatRepository()->saveEntities($saveEntities);
+            $this->emailStatModel->saveEntities($saveEntities);
         }
 
         // save some memory
@@ -1685,6 +1706,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return false;
     }
 
+    public function setDoNotContactLead(Lead $lead, string $comments, int $reason = DoNotContact::BOUNCED, bool $flush = true): false|DoNotContact
+    {
+        return $this->doNotContact->addDncForContact($lead->getId(), 'email', $reason, $comments, $flush);
+    }
+
     /**
      * Remove a Lead's EMAIL DNC entry.
      *
@@ -1693,7 +1719,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function removeDoNotContact($email): void
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
-        $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
+        $leadRepo = $this->em->getRepository(Lead::class);
         $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
 
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
@@ -1716,7 +1742,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
-        $leadRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class);
+        $leadRepo = $this->em->getRepository(Lead::class);
 
         if (null === $leadId) {
             $leadId = (array) $leadRepo->getLeadByEmail($email, true);
@@ -1727,7 +1753,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $dnc = [];
         foreach ($leadId as $lead) {
             $dnc[] = $this->doNotContact->addDncForContact(
-                $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $lead),
+                $this->em->getReference(Lead::class, $lead),
                 'email',
                 $reason,
                 $comments,
@@ -2205,7 +2231,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if (isset($saveEntities)) {
-            $this->getStatRepository()->saveEntities($saveEntities);
+            $this->emailStatModel->saveEntities($saveEntities);
         }
 
         // save some memory

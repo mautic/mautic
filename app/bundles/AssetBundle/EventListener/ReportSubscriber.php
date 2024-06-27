@@ -233,7 +233,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-download';
+                    $graphData['iconClass'] = 'ri-download-line';
                     $graphData['link']      = 'mautic_asset_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -244,7 +244,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-download';
+                    $graphData['iconClass'] = 'ri-download-line';
                     $graphData['link']      = 'mautic_asset_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -253,7 +253,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-globe';
+                    $graphData['iconClass'] = 'ri-earth-line';
                     $event->setGraph($g, $graphData);
                     break;
             }

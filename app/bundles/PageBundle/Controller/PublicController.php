@@ -2,17 +2,20 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
@@ -28,8 +31,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-class PublicController extends CommonFormController
+class PublicController extends AbstractFormController
 {
     /**
      * @return Response
@@ -44,9 +48,10 @@ class PublicController extends CommonFormController
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         Tracking404Model $tracking404Model,
+        RouterInterface $router,
         $slug)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model    = $this->getModel('page');
         $security = $this->security;
         /** @var Page|bool $entity */
@@ -272,8 +277,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $assetsHelper->addScript(
-                $this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $assetsHelper->addScript($router->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
                 'mautic_js'
@@ -301,26 +305,58 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction($id)
+    public function previewAction(Request $request, CorePermissions $security, int $id)
     {
-        $model  = $this->getModel('page');
-        $entity = $model->getEntity($id);
+        $contactId = (int) $request->query->get('contactId');
 
-        if (null === $entity) {
+        if ($contactId) {
+            /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead.lead');
+            /** @var Lead $contact */
+            $contact = $leadModel->getEntity($contactId);
+        }
+
+        /** @var PageModel $model */
+        $model = $this->getModel('page');
+        /** @var Page $page */
+        $page = $model->getEntity($id);
+
+        if (!$page->getId()) {
             return $this->notFound();
         }
 
         $analytics = $this->factory->getHelper('twig.analytics')->getCode();
 
-        $BCcontent = $entity->getContent();
-        $content   = $entity->getCustomHtml();
+        $BCcontent = $page->getContent();
+        $content   = $page->getCustomHtml();
+
+        if (!$security->isAdmin()
+            && (
+                (!$page->isPublished())
+                || (!$security->hasEntityAccess(
+                    'email:emails:viewown',
+                    'email:emails:viewother',
+                    $page->getCreatedBy()
+                )))
+        ) {
+            return $this->accessDenied();
+        }
+
+        if ($contactId && (
+            !$security->isAdmin()
+            || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
         if (empty($content) && !empty($BCcontent)) {
-            $template = $entity->getTemplate();
+            $template = $page->getTemplate();
             // all the checks pass so display the content
             $slots   = $this->factory->getTheme($template)->getSlots('page');
-            $content = $entity->getContent();
+            $content = $page->getContent();
 
-            $this->processSlots($slots, $entity);
+            $this->processSlots($slots, $page);
 
             // Add the GA code to the template assets
             if (!empty($analytics)) {
@@ -334,7 +370,7 @@ class PublicController extends CommonFormController
                 [
                     'slots'    => $slots,
                     'content'  => $content,
-                    'page'     => $entity,
+                    'page'     => $page,
                     'template' => $template,
                     'public'   => true, // @deprecated Remove in 2.0
                 ]
@@ -346,7 +382,10 @@ class PublicController extends CommonFormController
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-            $event = new PageDisplayEvent($content, $entity);
+            $event = new PageDisplayEvent($content, $page, $this->getPreferenceCenterConfig());
+            if (isset($contact) && $contact instanceof Lead) {
+                $event->setLead($contact);
+            }
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
         }
@@ -361,7 +400,7 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction(Request $request)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page');
         $model->hitPage(null, $request);
 
@@ -388,7 +427,7 @@ class PublicController extends CommonFormController
             return $notSuccessResponse;
         }
 
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page');
 
         try {
@@ -402,7 +441,7 @@ class PublicController extends CommonFormController
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
-        $sessionValue   = $trackingHelper->getSession(true);
+        $sessionValue   = $trackingHelper->getCacheItem(true);
 
         $event = new TrackingEvent($lead, $request, $sessionValue);
         $this->dispatcher->dispatch($event, PageEvents::ON_CONTACT_TRACKED);
@@ -517,7 +556,7 @@ class PublicController extends CommonFormController
      */
     private function processSlots($slots, $entity): void
     {
-        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
+        /** @var AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
@@ -627,5 +666,19 @@ class PublicController extends CommonFormController
         }
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * @return array<string,bool>
+     */
+    private function getPreferenceCenterConfig(): array
+    {
+        return [
+            'showContactFrequency'         => $this->coreParametersHelper->get('show_contact_frequency'),
+            'showContactPauseDates'        => $this->coreParametersHelper->get('show_contact_pause_dates'),
+            'showContactPreferredChannels' => $this->coreParametersHelper->get('show_contact_preferred_channels'),
+            'showContactCategories'        => $this->coreParametersHelper->get('show_contact_categories'),
+            'showContactSegments'          => $this->coreParametersHelper->get('show_contact_segments'),
+        ];
     }
 }

@@ -1,6 +1,6 @@
 {% set channelNumber = 0 %}
 {% if form is defined %}
-<table class="table table-striped">
+<table class="table table-hover">
     {% for key, channel in form.lead_channels.subscribed_channels.vars.choices %}
         {%- set contactMe = leadChannels[channel.value] is defined %}
         {%- set checked = contactMe ? 'checked' : '' %}
@@ -33,7 +33,7 @@
                               and not form.lead_channels['frequency_number_' ~ channel.value].isRendered
                               and not form.lead_channels['frequency_time_' ~ channel.value].isRendered
                         %}
-                            <div class="col-md-6">
+                            <div class="col-md-6" data-contact-frequency="1">
                                 <label class="text-muted label1">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
                                 {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value]) }}
                                 {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
@@ -54,7 +54,7 @@
                               and not form.lead_channels['contact_pause_start_date_' ~ channel.value].isRendered
                               and not form.lead_channels['contact_pause_end_date_' ~ channel.value].isRendered
                         %}
-                            <div class="col-md-6">
+                            <div class="col-md-6" data-contact-pause-dates="1">
                                 <label class="text-muted label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                                 {{ form_widget(form.lead_channels['contact_pause_start_date_' ~ channel.value]) }}
                                 {{ form_label(form.lead_channels['contact_pause_end_date_' ~ channel.value]) }}
@@ -72,7 +72,7 @@
     {% endfor %}
 </table>
 {% else %}
-<table class="table table-striped">
+<table class="table table-hover">
     <tbody>
     <tr>
         <td>

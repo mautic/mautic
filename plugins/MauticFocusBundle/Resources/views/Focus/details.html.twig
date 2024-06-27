@@ -42,7 +42,7 @@
               <div class="collapse" id="focus-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-bordered table-striped mb-0">
+                          <table class="table table-hover mb-0">
                               <tbody>
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
                               <tr>
@@ -88,7 +88,7 @@
                               <div class="panel-body box-layout">
                                   <div class="col-xs-4 va-m">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
-                                          <span class="fa fa-line-chart"></span>
+                                          <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.focus.graph.stats'|trans }}
                                       </h5>
                                   </div>
@@ -105,7 +105,7 @@
               </div>
               <!--/ stats -->
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+              {{ customContent('details.stats.graph.below', _context) }}
 
               {% if trackables is defined and trackables is not empty %}
                   <!-- tabs controls -->

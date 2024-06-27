@@ -17,6 +17,6 @@ trait ContextTrait
 
         $type = ($this->event instanceof Event) ? $this->event->getType() : $this->event['type'];
 
-        return strtolower($eventType) === strtolower($type);
+        return strtolower((string) $eventType) === strtolower((string) $type);
     }
 }

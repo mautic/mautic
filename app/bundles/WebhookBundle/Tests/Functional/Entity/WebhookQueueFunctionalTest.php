@@ -84,7 +84,7 @@ class WebhookQueueFunctionalTest extends MauticMysqlTestCase
      */
     private function fetchPayloadDbValues(WebhookQueue $webhookQueue): array
     {
-        $prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
         $query  = sprintf('SELECT payload, payload_compressed FROM %swebhook_queue WHERE id = ?', $prefix);
 
         return $this->connection->executeQuery($query, [$webhookQueue->getId()])

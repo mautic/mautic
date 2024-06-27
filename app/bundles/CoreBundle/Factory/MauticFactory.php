@@ -15,6 +15,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -54,7 +55,7 @@ class MauticFactory
     /**
      * Retrieves Mautic's security object.
      *
-     * @return \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     * @return CorePermissions
      */
     public function getSecurity()
     {
@@ -84,7 +85,7 @@ class MauticFactory
     /**
      * Retrieves Doctrine EntityManager.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return EntityManager
      */
     public function getEntityManager()
     {
@@ -107,7 +108,7 @@ class MauticFactory
     /**
      * Retrieves Translator.
      *
-     * @return \Mautic\CoreBundle\Translation\Translator
+     * @return Translator
      */
     public function getTranslator()
     {
@@ -137,7 +138,7 @@ class MauticFactory
     /**
      * Retrieves event dispatcher.
      *
-     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @return EventDispatcherInterface
      */
     public function getDispatcher()
     {
@@ -147,7 +148,7 @@ class MauticFactory
     /**
      * Retrieves request.
      *
-     * @return \Symfony\Component\HttpFoundation\Request|null
+     * @return Request|null
      */
     public function getRequest()
     {
@@ -407,7 +408,9 @@ class MauticFactory
     }
 
     /**
-     * @return bool
+     * @param string $service
+     *
+     * @return object|bool
      */
     public function get($service)
     {

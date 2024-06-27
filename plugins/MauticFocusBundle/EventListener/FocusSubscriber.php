@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -43,6 +45,7 @@ class FocusSubscriber implements EventSubscriberInterface
             FocusEvents::POST_SAVE         => ['onFocusPostSave', 0],
             FocusEvents::POST_DELETE       => ['onFocusDelete', 0],
             FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            ReportEvents::REPORT_ON_BUILD  => ['onReportBuild', -10],
         ];
     }
 
@@ -104,6 +107,19 @@ class FocusSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    public function onReportBuild(ReportBuilderEvent $event): void
+    {
+        $tables = $event->getTables();
+
+        if (!isset($tables['audit.log']['columns']['al.bundle']['list'])) {
+            return;
+        }
+
+        $tables['audit.log']['columns']['al.object']['list']['focus'] = 'focus';
+
+        $event->addTable('audit.log', $tables['audit.log']);
     }
 
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void

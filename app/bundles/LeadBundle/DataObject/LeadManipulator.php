@@ -70,4 +70,29 @@ class LeadManipulator
     {
         $this->logged = true;
     }
+
+    public function getManipulatedBy(): string
+    {
+        if ($this->objectDescription) {
+            return (string) $this->objectDescription;
+        }
+
+        return $this->getManipulatorKey();
+    }
+
+    public function getManipulatorKey(): string
+    {
+        $objectParts = [];
+        if ($this->bundleName) {
+            $objectParts[] = $this->bundleName;
+        }
+        if ($this->objectName) {
+            $objectParts[] = $this->objectName;
+        }
+        if ($this->objectId) {
+            $objectParts[] = $this->objectId;
+        }
+
+        return implode(':', $objectParts);
+    }
 }

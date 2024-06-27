@@ -71,7 +71,7 @@ class ReloadHelper
                 $plugin       = $this->mapConfigToPluginEntity($plugin, $pluginConfig);
 
                 // compare versions to see if an update is necessary
-                if (!empty($oldVersion) && -1 == version_compare($oldVersion, $plugin->getVersion())) {
+                if ((empty($oldVersion) && !empty($plugin->getVersion())) || (!empty($oldVersion) && -1 == version_compare($oldVersion, $plugin->getVersion()))) {
                     // call the update callback
                     $callback        = $pluginConfig['bundleClass'];
                     $metadata        = $pluginMetadata[$pluginConfig['namespace']] ?? null;

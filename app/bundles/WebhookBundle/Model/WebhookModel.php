@@ -233,7 +233,7 @@ class WebhookModel extends FormModel
             return;
         }
 
-        /** @var \Mautic\WebhookBundle\Entity\Event $event */
+        /** @var Event $event */
         foreach ($webhookEvents as $event) {
             $webhook = $event->getWebhook();
             $queue   = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
@@ -324,7 +324,7 @@ class WebhookModel extends FormModel
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
-                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode);
+                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode.' with payload: '.json_encode($payload));
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();
@@ -472,7 +472,7 @@ class WebhookModel extends FormModel
 
         /* @var WebhookQueue $queueItem */
         foreach ($queuesArray as $queueItem) {
-            /** @var \Mautic\WebhookBundle\Entity\Event $event */
+            /** @var Event $event */
             $event = $queueItem->getEvent();
             $type  = $event->getEventType();
 
@@ -564,7 +564,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, SymfonyEvent $event = null): ?SymfonyEvent
     {
@@ -631,6 +631,11 @@ class WebhookModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'webhook:webhooks';
+    }
+
+    public function getWebhookLimit(): int
+    {
+        return $this->webhookLimit;
     }
 
     public function setMinQueueId(int $minQueueId): self

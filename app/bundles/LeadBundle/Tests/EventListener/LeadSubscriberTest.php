@@ -6,9 +6,12 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -26,52 +29,64 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriberTest extends CommonMocks
 {
     /**
-     * @var IpLookupHelper|MockObject
+     * @var IpLookupHelper&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
-     * @var AuditLogModel|MockObject
+     * @var AuditLogModel&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+    private MockObject $auditLogModel;
 
     /**
-     * @var LeadChangeEventDispatcher|MockObject
+     * @var LeadChangeEventDispatcher&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEventDispatcher;
+    private MockObject $leadEventDispatcher;
 
-    private \Mautic\LeadBundle\Twig\Helper\DncReasonHelper $dncReasonHelper;
-
-    /**
-     * @var EntityManager|MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private DncReasonHelper $dncReasonHelper;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var EntityManager&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $entityManager;
 
     /**
-     * @var RouterInterface|MockObject
+     * @var TranslatorInterface&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
+    private MockObject $translator;
+
+    /**
+     * @var RouterInterface&MockObject
+     */
+    private MockObject $router;
 
     /**
      * @var ModelFactory<object>&MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $modelFacotry;
+    private MockObject $modelFacotry;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var CompanyLeadRepository
+     */
+    private $companyLeadRepository;
 
     protected function setUp(): void
     {
-        $this->ipLookupHelper      = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel       = $this->createMock(AuditLogModel::class);
-        $this->leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper     = new DncReasonHelper($this->createMock(TranslatorInterface::class));
-        $this->entityManager       = $this->createMock(EntityManager::class);
-        $this->translator          = $this->createMock(TranslatorInterface::class);
-        $this->router              = $this->createMock(RouterInterface::class);
-        $this->modelFacotry        = $this->createMock(ModelFactory::class);
+        $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
+        $this->auditLogModel         = $this->createMock(AuditLogModel::class);
+        $this->leadEventDispatcher   = $this->createMock(LeadChangeEventDispatcher::class);
+        $this->dncReasonHelper       = new DncReasonHelper($this->createMock(TranslatorInterface::class));
+        $this->entityManager         = $this->createMock(EntityManager::class);
+        $this->translator            = $this->createMock(TranslatorInterface::class);
+        $this->router                = $this->createMock(RouterInterface::class);
+        $this->modelFacotry          = $this->createMock(ModelFactory::class);
+        $this->coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
+        $this->companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice(): void
@@ -81,29 +96,29 @@ class LeadSubscriberTest extends CommonMocks
         $lead->setId(54);
 
         $changes = [
-            'title' => [
+            'title'          => [
                 '0' => 'sdf',
                 '1' => 'Mr.',
             ],
-            'fields' => [
+            'fields'         => [
                 'firstname' => [
                     '0' => 'Test',
                     '1' => 'John',
                 ],
-                'lastname' => [
+                'lastname'  => [
                     '0' => 'test',
                     '1' => 'Doe',
                 ],
-                'email' => [
+                'email'     => [
                     '0' => 'zrosa91@gmail.com',
                     '1' => 'john@gmail.com',
                 ],
-                'mobile' => [
+                'mobile'    => [
                     '0' => '345345',
                     '1' => '555555555',
                 ],
             ],
-            'dateModified' => [
+            'dateModified'   => [
                 '0' => '2017-08-21T15:50:57+00:00',
                 '1' => '2017-08-22T08:04:31+00:00',
             ],
@@ -126,7 +141,9 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
-            $this->modelFacotry
+            $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository
         );
 
         $leadEvent = $this->createMock(LeadEvent::class);
@@ -184,7 +201,7 @@ class LeadSubscriberTest extends CommonMocks
             'eventType'  => $eventTypeName,
             'eventLabel' => $eventTypeName,
             'timestamp'  => $leadEventLog['date_added'],
-            'icon'       => 'fa-cogs',
+            'icon'       => 'ri-list-settings-line',
             'extra'      => $leadEventLog,
             'contactId'  => $leadEventLog['lead_id'],
         ];
@@ -213,6 +230,8 @@ class LeadSubscriberTest extends CommonMocks
             $this->translator,
             $this->router,
             $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository,
             true
         );
 
@@ -222,5 +241,196 @@ class LeadSubscriberTest extends CommonMocks
         $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
+    }
+
+    public function testOnLeadPostSaveWillNotProcessTheSameContactMultipleTimesBetweenContacts(): void
+    {
+        $lead = new Lead();
+        $lead->setId(54);
+        $lead->addUpdatedField('title', 'Mr');
+        $lead->addUpdatedField('firstname', 'John');
+        $lead->addUpdatedField('lastname', 'Doe');
+
+        $lead2 = new Lead();
+        $lead2->setId(58);
+        $lead2->addUpdatedField('title', 'Mrs');
+        $lead2->addUpdatedField('firstname', 'Jane');
+        $lead2->addUpdatedField('lastname', 'Doe');
+
+        // Imitate a changed $lead2 but can't clone because it resets stuff in the __clone magic method
+        // namely just need same ID
+        $lead3 = new Lead();
+        $lead3->setId(58);
+        $lead3->addUpdatedField('lastname', 'Somebody');
+
+        // This method will be called exactly once per set of changes
+        $this->auditLogModel->expects($this->exactly(3))
+            ->method('writeToLog')
+            ->withConsecutive(
+                [
+                    [
+                        'bundle'    => 'lead',
+                        'object'    => 'lead',
+                        'objectId'  => $lead->getId(),
+                        'action'    => 'update',
+                        'details'   => [
+                            'title'     => [null, 'Mr'],
+                            'fields'    => [
+                                'title'     => [null, 'Mr'],
+                                'firstname' => [null, 'John'],
+                                'lastname'  => [null, 'Doe'],
+                            ],
+                            'firstname' => [null, 'John'],
+                            'lastname'  => [null, 'Doe'],
+                        ],
+                        'ipAddress' => null,
+                    ],
+                ],
+                [
+                    [
+                        'bundle'    => 'lead',
+                        'object'    => 'lead',
+                        'objectId'  => $lead2->getId(),
+                        'action'    => 'update',
+                        'details'   => [
+                            'title'     => [null, 'Mrs'],
+                            'fields'    => [
+                                'title'     => [null, 'Mrs'],
+                                'firstname' => [null, 'Jane'],
+                                'lastname'  => [null, 'Doe'],
+                            ],
+                            'firstname' => [null, 'Jane'],
+                            'lastname'  => [null, 'Doe'],
+                        ],
+                        'ipAddress' => null,
+                    ],
+                ],
+                [
+                    [
+                        'bundle'    => 'lead',
+                        'object'    => 'lead',
+                        'objectId'  => $lead3->getId(),
+                        'action'    => 'update',
+                        'details'   => [
+                            'fields'   => [
+                                'lastname' => [null, 'Somebody'],
+                            ],
+                            'lastname' => [null, 'Somebody'],
+                        ],
+                        'ipAddress' => null,
+                    ],
+                ]
+            );
+
+        $subscriber = new LeadSubscriber(
+            $this->ipLookupHelper,
+            $this->auditLogModel,
+            $this->leadEventDispatcher,
+            $this->dncReasonHelper,
+            $this->entityManager,
+            $this->translator,
+            $this->router,
+            $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository,
+            true
+        );
+
+        $leadEvent = $this->createMock(LeadEvent::class);
+
+        $leadEvent->expects($this->exactly(6))
+            ->method('getLead')
+            ->willReturnOnConsecutiveCalls(
+                $lead,
+                $lead,
+                $lead2,
+                $lead2,
+                $lead3,
+                $lead3
+            );
+
+        $leadEvent->expects($this->exactly(6))
+            ->method('getChanges')
+            ->willReturnOnConsecutiveCalls(
+                $lead->getChanges(),
+                $lead->getChanges(),
+                $lead2->getChanges(),
+                $lead2->getChanges(),
+                $lead3->getChanges(),
+                $lead3->getChanges()
+            );
+
+        $subscriber->onLeadPostSave($leadEvent);
+        $subscriber->onLeadPostSave($leadEvent);
+        $subscriber->onLeadPostSave($leadEvent);
+        $subscriber->onLeadPostSave($leadEvent);
+        $subscriber->onLeadPostSave($leadEvent);
+        $subscriber->onLeadPostSave($leadEvent);
+    }
+
+    public function testManipulatorLogged(): void
+    {
+        $lead = new Lead();
+        $lead->setId(54);
+
+        $lead->setManipulator(
+            new LeadManipulator('campaign', 'trigger-action', 1, 'Event Name (Campaign Name)')
+        );
+
+        $lead->addUpdatedField('title', 'Mr');
+        $lead->addUpdatedField('firstname', 'John');
+        $lead->addUpdatedField('lastname', 'Test');
+
+        // This method will be called exactly once
+        // even though the onLeadPostSave was called twice for the same lead
+        $this->auditLogModel->expects($this->once())
+            ->method('writeToLog')
+            ->with(
+                [
+                    'bundle'    => 'lead',
+                    'object'    => 'lead',
+                    'objectId'  => $lead->getId(),
+                    'action'    => 'update',
+                    'details'   => [
+                        'title'           => [null, 'Mr'],
+                        'fields'          => [
+                            'title'     => [null, 'Mr'],
+                            'firstname' => [null, 'John'],
+                            'lastname'  => [null, 'Test'],
+                        ],
+                        'firstname'       => [null, 'John'],
+                        'lastname'        => [null, 'Test'],
+                        'manipulated_by'  => 'Event Name (Campaign Name)',
+                        'manipulator_key' => 'campaign:trigger-action:1',
+                    ],
+                    'ipAddress' => null,
+                ]
+            );
+
+        $subscriber = new LeadSubscriber(
+            $this->ipLookupHelper,
+            $this->auditLogModel,
+            $this->leadEventDispatcher,
+            $this->dncReasonHelper,
+            $this->entityManager,
+            $this->translator,
+            $this->router,
+            $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository,
+            true
+        );
+
+        $leadEvent = $this->createMock(LeadEvent::class);
+
+        $leadEvent->expects($this->once())
+            ->method('getLead')
+            ->will($this->returnValue($lead));
+
+        $leadEvent->expects($this->once())
+            ->method('getChanges')
+            ->will($this->returnValue($lead->getChanges()));
+
+        $subscriber->onLeadPostSave($leadEvent);
     }
 }

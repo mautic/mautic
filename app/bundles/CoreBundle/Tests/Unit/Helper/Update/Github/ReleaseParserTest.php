@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class ReleaseParserTest extends TestCase
 {
-    private \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser $releaseParser;
+    private ReleaseParser $releaseParser;
 
     protected function setUp(): void
     {

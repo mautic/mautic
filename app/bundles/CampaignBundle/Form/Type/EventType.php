@@ -93,7 +93,7 @@ class EventType extends AbstractType
                     'label'  => false,
                     'attr'   => [
                         'class'       => 'form-control',
-                        'preaddon'    => 'fa fa-calendar',
+                        'preaddon'    => 'ri-calendar-line',
                         'data-toggle' => 'datetime',
                     ],
                     'widget' => 'single_text',
@@ -242,10 +242,10 @@ class EventType extends AbstractType
         $update = !empty($options['data']['properties']);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
-            $btnIcon  = 'fa fa-pencil';
+            $btnIcon  = 'ri-edit-line';
         } else {
             $btnValue = 'mautic.core.form.add';
-            $btnIcon  = 'fa fa-plus';
+            $btnIcon  = 'ri-add-line';
         }
 
         $builder->add(

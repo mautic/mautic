@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
@@ -19,32 +20,32 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\LeadBundle\Field\BackgroundService $backgroundService;
+    private BackgroundService $backgroundService;
 
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
+    private MockObject $fieldModel;
 
     /**
      * @var MockObject|CustomFieldColumn
      */
-    private \PHPUnit\Framework\MockObject\MockObject $customFieldColumn;
+    private MockObject $customFieldColumn;
 
     /**
      * @var MockObject|LeadFieldSaver
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldSaver;
+    private MockObject $leadFieldSaver;
 
     /**
      * @var MockObject|FieldColumnBackgroundJobDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldColumnBackgroundJobDispatcher;
+    private MockObject $fieldColumnBackgroundJobDispatcher;
 
     /**
      * @var MockObject|CustomFieldNotification
      */
-    private \PHPUnit\Framework\MockObject\MockObject $customFieldNotification;
+    private MockObject $customFieldNotification;
 
     public function setUp(): void
     {
@@ -117,6 +118,27 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->addColumn(1, $userId);
     }
 
+    public function testAbortColumnUpdate(): void
+    {
+        $leadField = new LeadField();
+
+        $this->fieldModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($leadField);
+
+        $userId = 3;
+
+        $this->fieldColumnBackgroundJobDispatcher->expects($this->once())
+            ->method('dispatchPreUpdateColumnEvent')
+            ->with($leadField)
+            ->willThrowException(new AbortColumnUpdateException('Message'));
+
+        $this->expectException(AbortColumnUpdateException::class);
+        $this->expectExceptionMessage('Message');
+
+        $this->backgroundService->updateColumn(1, $userId);
+    }
+
     public function testCustomFieldLimit(): void
     {
         $leadField = new LeadField();
@@ -175,5 +197,29 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->addColumn(1, $userId);
 
         $this->assertFalse($leadField->getColumnIsNotCreated());
+    }
+
+    public function testUpdateColumnWithNoError(): void
+    {
+        $leadField = new LeadField();
+
+        $this->fieldModel->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($leadField);
+
+        $this->fieldColumnBackgroundJobDispatcher->expects($this->once())
+            ->method('dispatchPreUpdateColumnEvent')
+            ->with($leadField);
+
+        $this->customFieldColumn->expects($this->once())
+            ->method('processUpdateLeadColumn')
+            ->with($leadField);
+
+        $userId = 3;
+        $this->customFieldNotification->expects($this->once())
+            ->method('customFieldWasUpdated')
+            ->with($leadField, $userId);
+
+        $this->backgroundService->updateColumn(1, $userId);
     }
 }

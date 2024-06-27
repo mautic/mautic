@@ -198,7 +198,7 @@ class FocusType extends AbstractType
                 'label' => 'mautic.core.builder',
                 'attr'  => [
                     'class'   => 'btn btn-default btn-dnd btn-nospin',
-                    'icon'    => 'fa fa-cube',
+                    'icon'    => 'ri-layout-line',
                     'onclick' => 'Mautic.launchFocusBuilder();',
                 ],
             ],

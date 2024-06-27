@@ -16,7 +16,7 @@
 
 {% block actions %}
   {{ include('@MauticCore/Helper/page_actions.html.twig', {
-        'templateButtons': {'new': true},
+        'templateButtons': {'new': permissions[constant('Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions::LISTS_CREATE')]},
         'routeBase': 'segment',
         'langVar': 'lead.list',
         'tooltip': 'mautic.lead.lead.segment.add.help',

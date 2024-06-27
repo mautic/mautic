@@ -7,6 +7,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -17,7 +18,8 @@ class TokenSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private PrimaryCompanyHelper $primaryCompanyHelper
+        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private LeadListRepository $segmentRepository
     ) {
     }
 
@@ -39,11 +41,11 @@ class TokenSubscriber implements EventSubscriberInterface
 
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();
-        $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content, -1, $count);
+        $content = $this->urlDecodeTokens($content);
         $event->setContent($content);
 
         if ($plainText = $event->getPlainText()) {
-            $plainText = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $plainText);
+            $plainText = $this->urlDecodeTokens($plainText);
             $event->setPlainText($plainText);
         }
 
@@ -116,5 +118,10 @@ class TokenSubscriber implements EventSubscriberInterface
 
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
+    }
+
+    private function urlDecodeTokens(string $content): string
+    {
+        return preg_replace('/(%7B)(.*?)(%3D|=)(.*?)(%7D)/i', '{$2=$4}', $content);
     }
 }

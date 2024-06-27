@@ -45,7 +45,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
         $request = new Request([], [], [], [], [], $server);
 
         // google.com should not be returned as the URL
-        $this->assertEquals('https://test.com//google.com', $this->getHelper()->getSafeRedirectUrl($request));
+        $this->assertEquals('https://test.com/google.com', $this->getHelper()->getSafeRedirectUrl($request));
     }
 
     public function testMauticUrlWithTrailingSlashIsGeneratedCorrectly(): void

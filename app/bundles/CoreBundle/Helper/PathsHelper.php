@@ -32,6 +32,8 @@ class PathsHelper
 
     private ?\Mautic\UserBundle\Entity\User $user;
 
+    private string $importLeadsDir;
+
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
@@ -40,6 +42,7 @@ class PathsHelper
         $this->theme                  = $coreParametersHelper->get('theme');
         $this->imagePath              = $this->removeTrailingSlash((string) $coreParametersHelper->get('image_path'));
         $this->dashboardImportDir     = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_dir'));
+        $this->importLeadsDir         = $this->removeTrailingSlash((string) $coreParametersHelper->get('import_leads_dir'));
         $this->temporaryDir           = $this->removeTrailingSlash((string) $coreParametersHelper->get('tmp_path'));
         $this->dashboardUserImportDir = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
@@ -112,6 +115,11 @@ class PathsHelper
         return $this->getSystemPath('plugins', true);
     }
 
+    public function getImportLeadsPath(): string
+    {
+        return $this->getSystemPath('import.leads.dir', true);
+    }
+
     /**
      * Returns absolute path to the root directory where the "vendor" directory is located.
      */
@@ -147,7 +155,7 @@ class PathsHelper
                 return $this->kernelLogsDir;
             case 'temporary':
             case 'tmp':
-                if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
+                if (!file_exists($this->temporaryDir)) {
                     mkdir($this->temporaryDir, 0777, true);
                 }
 
@@ -171,11 +179,14 @@ class PathsHelper
 
                 $userPath .= '/'.$this->user->getId();
 
-                if (!is_dir($userPath) && !file_exists($userPath) && is_writable($userPath)) {
-                    mkdir($userPath);
+                if (!file_exists($userPath)) {
+                    mkdir($userPath, 0777, true);
                 }
 
                 return $userPath;
+
+            case 'import.leads.dir':
+                return $this->importLeadsDir;
 
             default:
                 if (isset($this->paths[$name])) {

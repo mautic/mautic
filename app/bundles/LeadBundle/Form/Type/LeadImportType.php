@@ -61,7 +61,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.delimiter',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.delimiter.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -75,7 +76,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.enclosure',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.enclosure.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -89,7 +91,8 @@ class LeadImportType extends AbstractType
             [
                 'label' => 'mautic.lead.import.escape',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.escape.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -117,7 +120,7 @@ class LeadImportType extends AbstractType
             [
                 'attr' => [
                     'class'   => 'btn btn-primary',
-                    'icon'    => 'fa fa-upload',
+                    'icon'    => 'ri-import-line',
                     'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'lead_import\']').submit();",
                 ],
                 'label' => 'mautic.lead.import.upload',

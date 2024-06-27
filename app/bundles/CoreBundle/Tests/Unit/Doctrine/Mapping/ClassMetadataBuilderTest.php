@@ -12,9 +12,9 @@ class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|ClassMetadataInfo
      */
-    private \PHPUnit\Framework\MockObject\MockObject $classMetadataInfo;
+    private MockObject $classMetadataInfo;
 
-    private \Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder $classMetadataBuilder;
+    private ClassMetadataBuilder $classMetadataBuilder;
 
     protected function setUp(): void
     {
