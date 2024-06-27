@@ -9,8 +9,12 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Entity\TriggerEvent;
 
 final class TagDependenciesTest extends MauticMysqlTestCase
 {
@@ -54,6 +58,33 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $content        = $clientResponse->getContent();
         $searchIds      = join(',', [$segmentWithTag->getId()]);
         $this->assertStringContainsString("href=\"/s/segments?search=ids:{$searchIds}\"", $content);
+    }
+
+    public function testTagUsageInForms(): void
+    {
+        $tag = $this->createTag('TagA');
+
+        $form = $this->createForm('form-with-tag-action');
+        $this->createFormActionChangeTags($form, $tag->getTag());
+
+        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $content        = $clientResponse->getContent();
+        $searchIds      = join(',', [$form->getId()]);
+        $this->assertStringContainsString("href=\"/s/forms?search=ids:{$searchIds}\"", $content);
+    }
+
+    public function testTagUsageInPointTriggers(): void
+    {
+        $tag = $this->createTag('TagA');
+
+        $pointActionIsSent = $this->createPointTriggerWithChangeTagsEvent($tag);
+
+        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $content        = $clientResponse->getContent();
+        $searchIds      = join(',', [$pointActionIsSent->getId()]);
+        $this->assertStringContainsString("href=\"/s/points/triggers?search=ids:{$searchIds}\"", $content);
     }
 
     private function createTag(string $tagName): Tag
@@ -274,5 +305,55 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $segment;
+    }
+
+    private function createForm(string $alias): Form
+    {
+        $form = new Form();
+        $form->setName($alias);
+        $form->setAlias($alias);
+        $this->em->persist($form);
+        $this->em->flush();
+
+        return $form;
+    }
+
+    private function createFormActionChangeTags(Form $form, string $tagName): Action
+    {
+        $action = new Action();
+        $action->setName('change tags');
+        $action->setForm($form);
+        $action->setType('lead.changetags');
+        $action->setProperties([
+            'add_tags'    => [$tagName],
+            'remove_tags' => [],
+        ]);
+        $this->em->persist($action);
+        $this->em->flush();
+
+        return $action;
+    }
+
+    private function createPointTriggerWithChangeTagsEvent(Tag $tag): Trigger
+    {
+        $pointTrigger = new Trigger();
+        $pointTrigger->setName('trigger');
+        $this->em->persist($pointTrigger);
+        $this->em->flush();
+
+        $triggerEvent = new TriggerEvent();
+        $triggerEvent->setTrigger($pointTrigger);
+        $triggerEvent->setName('event');
+        $triggerEvent->setType('lead.changetags');
+        $triggerEvent->setProperties(
+            [
+                'add_tags'    => [$tag->getTag()],
+                'remove_tags' => [],
+            ]
+        );
+        $this->em->persist($triggerEvent);
+        $this->em->flush();
+
+        return $pointTrigger;
     }
 }

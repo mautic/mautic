@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Stats;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\FormBundle\Model\ActionModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\PointBundle\Model\TriggerEventModel;
 
 class TagDependencies
 {
     public function __construct(
         private CampaignModel $campaignModel,
         private ListModel $listModel,
+        private ActionModel $actionModel,
+        private TriggerEventModel $triggerEventModel,
     ) {
     }
 
@@ -31,6 +35,16 @@ class TagDependencies
                 'label' => 'mautic.lead.lead.lists',
                 'route' => 'mautic_segment_index',
                 'ids'   => $this->listModel->getSegmentIdsWithDependenciesOnTag($tag->getId()),
+            ],
+            [
+                'label' => 'mautic.form.forms',
+                'route' => 'mautic_form_index',
+                'ids'   => $this->actionModel->getFormsIdsWithDependenciesOnTag($tag->getTag()),
+            ],
+            [
+                'label' => 'mautic.point.trigger.header.index',
+                'route' => 'mautic_pointtrigger_index',
+                'ids'   => $this->triggerEventModel->getPointTriggerIdsWithDependenciesOnTag($tag->getTag()),
             ],
         ];
     }
