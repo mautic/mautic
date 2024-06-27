@@ -250,6 +250,11 @@ export default class BuilderService {
         // disable all except link components
         disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
       },
+      parser: {
+        optionsHtml: {
+          allowScripts: true,
+        }
+      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', grapesjscustomcode, ...BuilderService.getPluginNames('email-mjml')],
@@ -271,7 +276,7 @@ export default class BuilderService {
             components: '<span>Initial content</span>',
             attributes: {
               'data-gjs-type': 'custom-code', // make sure our block remains editable after saving & reopening
-              'style': 'font-size: initial;' // make sure the content doesn't inherrit size 0 from the column
+              'style': 'font-size: initial; min-height: 20px' // make sure the content doesn't inherrit size 0 from the column
             }
           }
         },
