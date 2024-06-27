@@ -991,14 +991,12 @@ hr.hr-w-3,
   position: relative;
   top: -1px;
   z-index: 1;
-  background-color: #fff;
+  background-color: var(--layer);
   padding: 0 15px;
   margin: 0 15px;
-  border: 1px solid #ebedf0;
   border-top-width: 0;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   font-size: 9px;
   line-height: 22px;
   text-transform: uppercase;
@@ -1019,7 +1017,7 @@ hr.hr-w-3,
   top: -3px;
 }
 a {
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
 }
 a:hover {
   cursor: pointer;
@@ -1361,7 +1359,7 @@ blockquote > p:after {
   right: 3px !important;
 }
 .btn {
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
 }
 .btn,
 .btn:active {
@@ -2596,7 +2594,7 @@ label.list-group-item:focus {
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
-  color: #596776;
+  color: var(--text-primary);
   background-color: #f7f7f7;
 }
 .scrollable-menu {
@@ -2633,14 +2631,17 @@ ul.dropdown-menu-form {
   color: #a0acb8;
 }
 .nav-tabs {
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
+  border-top-right-radius: var(--border-radius-sm);
+  border-top-left-radius: var(--border-radius-sm);
   display: flex;
   flex-wrap: wrap;
   text-wrap: nowrap;
 }
 .nav-tabs > li > a {
   line-height: 20px;
+  background-color: var(--layer-accent);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-secondary);
 }
 .nav-tabs > li.active > a {
   overflow: hidden;
@@ -2653,7 +2654,7 @@ ul.dropdown-menu-form {
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #4E5D9D;
+  background-color: var(--border-interactive);
 }
 @media (min-width: 1200px) {
   .nav-tabs {
@@ -2677,6 +2678,10 @@ ul.dropdown-menu-form {
 }
 .stats-menu__content.tab-content > .tab-pane {
   width: 100%;
+}
+.nav-tabs + .tab-content,
+.nav-tabs + form > .tab-content {
+  background-color: var(--layer);
 }
 .nav-pills > li + li {
   margin-left: 5px;
@@ -3457,7 +3462,7 @@ table i:not(.fa-lg) {
   border-bottom: 0;
 }
 .table-hover > tbody > tr:hover {
-  transition: var(--all-productive);
+  transition: var(--transition-all-productive);
 }
 .progress {
   background-color: #ebedf0;
