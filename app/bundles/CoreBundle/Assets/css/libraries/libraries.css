@@ -3302,7 +3302,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   max-width: none;
 }
 .nav-tabs {
-  border-bottom: 1px solid #ebedf0;
+  border-bottom: 1px solid var(--border-no-color);
 }
 .nav-tabs > li {
   float: left;
@@ -3315,15 +3315,15 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   border-radius: 3px 3px 0 0;
 }
 .nav-tabs > li > a:hover {
-  border-color: #f5f5f5 #f5f5f5 #ebedf0;
+  border-color: var(--border-no-color) var(--border-no-color) var(--border-no-color);
 }
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  color: #596776;
+  color: var(--text-primary);
   cursor: default;
-  background-color: #fff;
-  border: 1px solid #ebedf0;
+  background-color: var(--layer);
+  border: 1px solid var(--border-no-color);
   border-bottom-color: transparent;
 }
 .nav-tabs.nav-justified {
@@ -3357,24 +3357,24 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav-tabs.nav-justified > .active > a,
 .nav-tabs.nav-justified > .active > a:hover,
 .nav-tabs.nav-justified > .active > a:focus {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-no-color);
 }
 @media (min-width: 768px) {
   .nav-tabs.nav-justified > li > a {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-no-color);
     border-radius: 3px 3px 0 0;
   }
   .nav-tabs.nav-justified > .active > a,
   .nav-tabs.nav-justified > .active > a:hover,
   .nav-tabs.nav-justified > .active > a:focus {
-    border-bottom-color: #fff;
+    border-bottom-color: var(--border-no-color);
   }
 }
 .nav-pills > li {
   float: left;
 }
 .nav-pills > li > a {
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
 }
 .nav-pills > li + li {
   margin-left: 2px;
@@ -3383,7 +3383,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
   color: #fff;
-  background-color: #4E5D9D;
+  background-color: var(--border-interactive);
 }
 .nav-stacked > li {
   float: none;
@@ -3425,17 +3425,17 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav-tabs-justified > .active > a,
 .nav-tabs-justified > .active > a:hover,
 .nav-tabs-justified > .active > a:focus {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-no-color);
 }
 @media (min-width: 768px) {
   .nav-tabs-justified > li > a {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-no-color);
     border-radius: 3px 3px 0 0;
   }
   .nav-tabs-justified > .active > a,
   .nav-tabs-justified > .active > a:hover,
   .nav-tabs-justified > .active > a:focus {
-    border-bottom-color: #fff;
+    border-bottom-color: var(--border-no-color);
   }
 }
 .tab-content > .tab-pane {
