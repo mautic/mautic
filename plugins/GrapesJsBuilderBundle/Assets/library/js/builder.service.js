@@ -1,11 +1,11 @@
 import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
+import grapesjscustomcode from 'grapesjs-custom-code';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjsblocksbasic from 'grapesjs-blocks-basic';
 import grapesjscomponentcountdown from 'grapesjs-component-countdown';
 import grapesjsnavbar from 'grapesjs-navbar';
-import grapesjscustomcode from 'grapesjs-custom-code';
 import grapesjstouch from 'grapesjs-touch';
 import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
@@ -204,7 +204,6 @@ export default class BuilderService {
         grapesjsblocksbasic,
         grapesjscomponentcountdown,
         grapesjsnavbar,
-        grapesjscustomcode,
         grapesjstouch,
         grapesjspostcss,
         grapesjstuiimageeditor,
@@ -251,9 +250,14 @@ export default class BuilderService {
         // disable all except link components
         disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
       },
+      parser: {
+        optionsHtml: {
+          allowScripts: true,
+        }
+      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', ...BuilderService.getPluginNames('email-mjml')],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', grapesjscustomcode, ...BuilderService.getPluginNames('email-mjml')],
       pluginsOpts: {
         [grapesjsmjml]: {
           hideSelector: false,
@@ -262,6 +266,21 @@ export default class BuilderService {
         },
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
+        [grapesjscustomcode]: {
+          blockCustomCode: {
+            label: 'Custom Code',
+            category: 'Blocks' // move to existing category
+          },
+          propsCustomCode: {
+            name: 'Custom Code',
+            components: '<span>Initial content</span>',
+            attributes: {
+              'class': 'grapes-custom-code',
+              'data-gjs-type': 'custom-code', // make sure our block remains editable after saving & reopening
+              'style': 'font-size: initial; min-height: 20px' // make sure the content doesn't inherrit size 0 from the column
+            }
+          }
+        },
         ...BuilderService.getPluginOptions('email-mjml'),
       },
     });
