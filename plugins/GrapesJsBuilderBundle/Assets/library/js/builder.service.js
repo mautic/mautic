@@ -204,7 +204,6 @@ export default class BuilderService {
         grapesjsblocksbasic,
         grapesjscomponentcountdown,
         grapesjsnavbar,
-        grapesjscustomcode,
         grapesjstouch,
         grapesjspostcss,
         grapesjstuiimageeditor,
@@ -253,7 +252,7 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', ...BuilderService.getPluginNames('email-mjml')],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', grapesjscustomcode, ...BuilderService.getPluginNames('email-mjml')],
       pluginsOpts: {
         [grapesjsmjml]: {
           hideSelector: false,
@@ -262,6 +261,20 @@ export default class BuilderService {
         },
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
+        [grapesjscustomcode]: {
+          blockCustomCode: {
+            label: 'Custom Code',
+            category: 'Blocks' // move to existing category
+          },
+          propsCustomCode: {
+            name: 'Custom Code',
+            components: '<span>Initial content</span>',
+            attributes: {
+              'data-gjs-type': 'custom-code', // make sure our block remains editable after saving & reopening
+              'style': 'font-size: initial;' // make sure the content doesn't inherrit size 0 from the column
+            }
+          }
+        },
         ...BuilderService.getPluginOptions('email-mjml'),
       },
     });
