@@ -275,6 +275,7 @@ export default class BuilderService {
             name: 'Custom Code',
             components: '<span>Initial content</span>',
             attributes: {
+              'class': 'grapes-custom-code',
               'data-gjs-type': 'custom-code', // make sure our block remains editable after saving & reopening
               'style': 'font-size: initial; min-height: 20px' // make sure the content doesn't inherrit size 0 from the column
             }
