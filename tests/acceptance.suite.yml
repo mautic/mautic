@@ -8,7 +8,7 @@ actor: AcceptanceTester
 modules:
   enabled:
     - WebDriver:
-        url: https://mautic.ddev.site
+        url: "https://web:443"
         host: selenium-chrome
         browser: chrome
         capabilities:
