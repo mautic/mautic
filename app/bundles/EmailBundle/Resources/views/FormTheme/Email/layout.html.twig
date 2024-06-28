@@ -131,7 +131,7 @@
 {% block dynamic_content_filter_widget %}
     <div class="tab-pane dynamic-content bdr-w-0 {{ '0' == form.vars.name ? 'active' : 'fade' }}" id="{{ form.vars.id }}">
         <div class="panel">
-            <ul class="nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_{{ form.vars.name }}">
+            <ul class="nav nav-tabs" id="dynamicContentFilterTabs_{{ form.vars.name }}">
               <li>
                 <a role="tab" class="addNewDynamicContentFilter" data-index="{{ form.vars.name }}"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
               </li>
