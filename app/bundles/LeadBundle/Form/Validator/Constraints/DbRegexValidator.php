@@ -33,6 +33,6 @@ final class DbRegexValidator extends ConstraintValidator
 
     private function stripUglyPartOfTheErrorMessage(string $message): string
     {
-        return preg_replace('/^SQLSTATE\[HY000\]: General error: \d+ /', '', $message);
+        return preg_replace('/SQLSTATE\[\d+\]: [\w ]+: \d+ /', '', $message);
     }
 }

@@ -42,14 +42,14 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'regexp',
             '^{Test|Test string)', // invalid regex: the first parantheses should not be curly
             Response::HTTP_BAD_REQUEST,
-            'filter: Incorrect description of a {min,max} interval.',
+            'filter: Got error \'unmatched parentheses at offset 18\' from regexp',
         ];
 
         yield [
             '!regexp',
             '^(Test|Test string))', // invalid regex: 2 ending parantheses
             Response::HTTP_BAD_REQUEST,
-            'filter: Mismatched parenthesis in regular expression.',
+            'filter: Got error \'unmatched parentheses at offset 19\' from regexp',
         ];
 
         yield [
