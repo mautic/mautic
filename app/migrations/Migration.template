@@ -45,6 +45,6 @@ final class <className> extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        // Undo what was done in the up() method here.
+        // If it makes sense for your migration, undo what was done in the up() method here.
     }
 }
