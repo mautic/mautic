@@ -7,11 +7,19 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 
 class AssertCustomMjmlTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->createIntegration();
+    }
+
     /**
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\Exception\ORMException
@@ -85,7 +93,7 @@ class AssertCustomMjmlTest extends MauticMysqlTestCase
         return $translator;
     }
 
-    private function addToGrapesJsBuilder($email): void
+    private function addToGrapesJsBuilder(Email $email): void
     {
         $grapesJsBuilder = new GrapesJsBuilder();
         $grapesJsBuilder->setEmail($email);
@@ -107,5 +115,24 @@ class AssertCustomMjmlTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(201);
 
         return json_decode($this->client->getResponse()->getContent(), true);
+    }
+
+    /**
+     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function createIntegration(): void
+    {
+        $plugin = new Plugin();
+        $plugin->setName('GrapesJS Builder');
+        $plugin->setBundle('GrapesJsBuilderBundle');
+        $this->em->persist($plugin);
+
+        $integration = new Integration();
+        $integration->setPlugin($plugin);
+        $integration->setIsPublished(true);
+        $integration->setName('grapesjsbuilder');
+        $this->em->persist($integration);
+        $this->em->flush();
     }
 }
