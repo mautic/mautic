@@ -174,79 +174,87 @@ Mautic.leadOnLoad = function (container, response) {
 
 Mautic.leadTimelineOnLoad = function (container, response) {
     mQuery("#contact-timeline a[data-activate-details='all']").on('click', function() {
-        if (mQuery(this).find('span').first().hasClass('ri-corner-right-down-line')) {
+        var $icon = mQuery(this).find('span').first();
+        if ($icon.hasClass('ri-arrow-down-s-line')) {
             mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
-                if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+                if (detailsId && mQuery('#timeline-details-' + detailsId).length) {
                     mQuery('#timeline-details-' + detailsId).removeClass('hide');
                     mQuery(this).addClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('ri-corner-right-up-line');
+            $icon.removeClass('ri-arrow-down-s-line').addClass('ri-arrow-up-s-line');
         } else {
             mQuery("#contact-timeline a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
-                if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+                if (detailsId && mQuery('#timeline-details-' + detailsId).length) {
                     mQuery('#timeline-details-' + detailsId).addClass('hide');
                     mQuery(this).removeClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('ri-corner-right-up-line').addClass('ri-corner-right-down-line');
+            $icon.removeClass('ri-arrow-up-s-line').addClass('ri-arrow-down-s-line');
         }
     });
+
     mQuery("#contact-timeline a[data-activate-details!='all']").on('click', function() {
         var detailsId = mQuery(this).data('activate-details');
-        if (detailsId && mQuery('#timeline-details-'+detailsId).length) {
+        var $icon = mQuery(this).find('span').first();
+        if (detailsId && mQuery('#timeline-details-' + detailsId).length) {
             var activateDetailsState = mQuery(this).hasClass('active');
-
             if (activateDetailsState) {
-                mQuery('#timeline-details-'+detailsId).addClass('hide');
+                mQuery('#timeline-details-' + detailsId).addClass('hide');
                 mQuery(this).removeClass('active');
+                $icon.removeClass('ri-arrow-up-s-line').addClass('ri-arrow-down-s-line');
             } else {
-                mQuery('#timeline-details-'+detailsId).removeClass('hide');
+                mQuery('#timeline-details-' + detailsId).removeClass('hide');
                 mQuery(this).addClass('active');
+                $icon.removeClass('ri-arrow-down-s-line').addClass('ri-arrow-up-s-line');
             }
         }
     });
 
-    if (response && typeof response.timelineCount != 'undefined') {
+    if (response && typeof response.timelineCount !== 'undefined') {
         mQuery('#TimelineCount').html(response.timelineCount);
     }
 };
 
 Mautic.leadAuditlogOnLoad = function (container, response) {
     mQuery("#contact-auditlog a[data-activate-details='all']").on('click', function() {
-        if (mQuery(this).find('span').first().hasClass('ri-corner-right-down-line')) {
+        var $icon = mQuery(this).find('span').first();
+        if ($icon.hasClass('ri-arrow-down-s-line')) {
             mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
-                if (detailsId && mQuery('#auditlog-details-'+detailsId).length) {
+                if (detailsId && mQuery('#auditlog-details-' + detailsId).length) {
                     mQuery('#auditlog-details-' + detailsId).removeClass('hide');
                     mQuery(this).addClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('ri-corner-right-down-line').addClass('ri-corner-right-up-line');
+            $icon.removeClass('ri-arrow-down-s-line').addClass('ri-arrow-up-s-line');
         } else {
             mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
                 var detailsId = mQuery(this).data('activate-details');
-                if (detailsId && mQuery('#auditlog-details-'+detailsId).length) {
+                if (detailsId && mQuery('#auditlog-details-' + detailsId).length) {
                     mQuery('#auditlog-details-' + detailsId).addClass('hide');
                     mQuery(this).removeClass('active');
                 }
             });
-            mQuery(this).find('span').first().removeClass('ri-corner-right-up-line').addClass('ri-corner-right-down-line');
+            $icon.removeClass('ri-arrow-up-s-line').addClass('ri-arrow-down-s-line');
         }
     });
+
     mQuery("#contact-auditlog a[data-activate-details!='all']").on('click', function() {
         var detailsId = mQuery(this).data('activate-details');
-        if (detailsId && mQuery('#auditlog-details-'+detailsId).length) {
+        var $icon = mQuery(this).find('span').first();
+        if (detailsId && mQuery('#auditlog-details-' + detailsId).length) {
             var activateDetailsState = mQuery(this).hasClass('active');
-
             if (activateDetailsState) {
-                mQuery('#auditlog-details-'+detailsId).addClass('hide');
+                mQuery('#auditlog-details-' + detailsId).addClass('hide');
                 mQuery(this).removeClass('active');
+                $icon.removeClass('ri-arrow-up-s-line').addClass('ri-arrow-down-s-line');
             } else {
-                mQuery('#auditlog-details-'+detailsId).removeClass('hide');
+                mQuery('#auditlog-details-' + detailsId).removeClass('hide');
                 mQuery(this).addClass('active');
+                $icon.removeClass('ri-arrow-down-s-line').addClass('ri-arrow-up-s-line');
             }
         }
     });
