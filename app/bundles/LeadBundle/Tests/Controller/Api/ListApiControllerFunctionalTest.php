@@ -66,7 +66,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testRegexOperatorValidation(string $operator, string $regex, int $expectedResponseCode, ?string $expectedErrorMessage): void
     {
         $version = $this->connection->executeQuery('SELECT VERSION()')->fetchOne();
-        var_dump($version);
+        version_compare($version, '8.0.0', '<') ? $this->markTestSkipped('MySQL 5.7.0 does not throw error for invalid REGEXP') : null;
 
         $this->client->request(
             Request::METHOD_POST,
