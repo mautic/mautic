@@ -26,10 +26,12 @@ class AssertCustomMjmlTest extends MauticMysqlTestCase
      */
     public function testAssertCustomMjml(): void
     {
+        // Create email & add GrapesJs to it.
         $email = $this->createEmail();
         $this->addToGrapesJsBuilder($email);
         $emailId = $email->getId();
 
+        // Get the Email via API and assert customMjml.
         $this->client->request('GET', '/api/emails/'.$emailId);
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($this->client->getResponse()->getContent(), true);
@@ -41,11 +43,13 @@ class AssertCustomMjmlTest extends MauticMysqlTestCase
      */
     public function testAssertCustomHtmlAndCustomMjml(): void
     {
+        // Create email using an API call and add GrapesJS into it.
         $responseData = $this->createEmailViaApi();
         $emailId      = $responseData['email']['id'];
         $email        = $this->em->getRepository(Email::class)->find($emailId);
         $this->addToGrapesJsBuilder($email);
 
+        // Get email & check for both customHtml & customMjml in the response.
         $this->client->request('GET', '/api/emails/'.$emailId);
         $this->assertResponseStatusCodeSame(200);
         $content = json_decode($this->client->getResponse()->getContent(), true);
