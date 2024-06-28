@@ -1341,6 +1341,9 @@ blockquote > p:after {
   padding-right: 40px;
   border-width: 0px;
 }
+code {
+  padding: var(--spacing-01) var(--spacing-03);
+}
 .touchevents .scroll-content {
   height: 100%;
   overflow-y: auto;
