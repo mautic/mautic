@@ -11,11 +11,15 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageBuilderEvent;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\PageSubscriber;
+use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
 class PageSubscriberTest extends TestCase
@@ -28,6 +32,44 @@ class PageSubscriberTest extends TestCase
         $tokens = $pageBuilderEvent->getTokens();
         $this->assertArrayHasKey('{token_test}', $tokens);
         $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
+    }
+
+    public function testOnPageDisplayBodyTagRegex(): void
+    {
+        $dummyPageContent = <<<EOF
+<html>
+    <head>
+    </head>
+    <body class="mt-6 md:max-w-2xl p-[5px]"  onclick="myFunction()" data-help-text="téxt with nön äscii charactêrs">
+    </body>
+</html>
+EOF;
+        $event = new PageDisplayEvent(
+            $dummyPageContent,
+            $this->createMock(Page::class)
+        );
+        $dispatcher = new EventDispatcher();
+        $subscriber = $this->getPageSubscriber();
+
+        $dispatcher->addSubscriber($subscriber);
+
+        $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+
+        $this->assertEquals(
+            $event->getContent(),
+            <<<EOF
+<html>
+    <head>
+    </head>
+    <body class="mt-6 md:max-w-2xl p-[5px]"  onclick="myFunction()" data-help-text="téxt with nön äscii charactêrs">
+<script data-source="mautic">
+const foo='bar';
+</script>
+
+    </body>
+</html>
+EOF
+        );
     }
 
     /**
@@ -48,6 +90,8 @@ class PageSubscriberTest extends TestCase
         $contactRepository  = $this->createMock(LeadRepository::class);
         $hitMock            = $this->createMock(Hit::class);
         $leadMock           = $this->createMock(Lead::class);
+
+        $assetsHelperMock->addScriptDeclaration("const foo='bar';", 'onPageDisplay_bodyOpen');
 
         $hitRepository->expects($this->any())
             ->method('find')

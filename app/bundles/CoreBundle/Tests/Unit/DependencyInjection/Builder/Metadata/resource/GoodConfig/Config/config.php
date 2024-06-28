@@ -13,7 +13,7 @@ return [
         'main' => [
             'mautic.core.components' => [
                 'id'        => 'mautic_components_root',
-                'iconClass' => 'fa-puzzle-piece',
+                'iconClass' => 'ri-puzzle-2-line',
                 'priority'  => 60,
             ],
         ],
@@ -21,7 +21,7 @@ return [
     'services' => [
         'helpers'  => [
             'mautic.helper.bundle' => [
-                'class'     => \Mautic\CoreBundle\Helper\BundleHelper::class,
+                'class'     => Mautic\CoreBundle\Helper\BundleHelper::class,
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
@@ -44,7 +44,7 @@ return [
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => \Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
+            'class'        => Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
         ],
     ],
 

@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -116,10 +117,11 @@ CONTENT
         $primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
         $primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
             ->willReturn(['email' => 'hello@someone.com']);
+        $segmentRepository    = $this->createMock(LeadListRepository::class);
 
         /** @var TokenSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(TokenSubscriber::class)
-            ->setConstructorArgs([$dispatcher, $primaryCompanyHelper])
+            ->setConstructorArgs([$dispatcher, $primaryCompanyHelper, $segmentRepository])
             ->onlyMethods([])
             ->getMock();
 

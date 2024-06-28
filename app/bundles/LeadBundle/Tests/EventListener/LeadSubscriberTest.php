@@ -43,7 +43,7 @@ class LeadSubscriberTest extends CommonMocks
      */
     private MockObject $leadEventDispatcher;
 
-    private \Mautic\LeadBundle\Twig\Helper\DncReasonHelper $dncReasonHelper;
+    private DncReasonHelper $dncReasonHelper;
 
     /**
      * @var EntityManager&MockObject
@@ -201,7 +201,7 @@ class LeadSubscriberTest extends CommonMocks
             'eventType'  => $eventTypeName,
             'eventLabel' => $eventTypeName,
             'timestamp'  => $leadEventLog['date_added'],
-            'icon'       => 'fa-cogs',
+            'icon'       => 'ri-list-settings-line',
             'extra'      => $leadEventLog,
             'contactId'  => $leadEventLog['lead_id'],
         ];

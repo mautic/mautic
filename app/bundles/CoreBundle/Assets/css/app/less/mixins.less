@@ -4,6 +4,12 @@
 
 // Background color
 // ------------------------
+
+.background-blur() {
+  backdrop-filter: var(--blur);
+  background-color: var(--layer-translucent);
+}
+
 .bg-color(@bg-color; @color) {
   background-color: @bg-color !important;
   border-color: darken(@bg-color, 3%) !important;

@@ -137,7 +137,7 @@ class ImportModel extends FormModel
                     'info',
                     false,
                     $this->translator->trans('mautic.lead.import.failed'),
-                    'fa-download',
+                    'ri-download-line',
                     null,
                     $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
                 );
@@ -234,7 +234,7 @@ class ImportModel extends FormModel
                 'info',
                 false,
                 $this->translator->trans('mautic.lead.import.completed'),
-                'fa-download',
+                'ri-download-line',
                 null,
                 $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
             );
@@ -542,7 +542,7 @@ class ImportModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Import::class);
+        return $this->em->getRepository(Import::class);
     }
 
     /**
@@ -550,7 +550,7 @@ class ImportModel extends FormModel
      */
     public function getEventLogRepository()
     {
-        return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadEventLog::class);
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     public function getPermissionBase(): string
@@ -571,9 +571,7 @@ class ImportModel extends FormModel
      */
     public function getImportDir(): string
     {
-        $tmpDir = $this->pathsHelper->getSystemPath('tmp', true);
-
-        return $tmpDir.'/imports';
+        return $this->pathsHelper->getImportLeadsPath();
     }
 
     /**
@@ -589,7 +587,7 @@ class ImportModel extends FormModel
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

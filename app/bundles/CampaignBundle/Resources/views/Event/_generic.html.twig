@@ -21,13 +21,13 @@
 {% if update is not defined %}
     <div class="campaign-event-buttons hide">
         <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'clone', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-primary btn-clone btn-xs" title="{{ 'mautic.campaign.event.clone.btn.tooltip'|trans }}">
-            <i class="fa fa-copy"></i>
+            <i class="ri-file-copy-line"></i>
         </a>
         <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="{{ path(route, {'objectAction': 'edit', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-primary btn-xs btn-edit" title="{{ 'mautic.campaign.event.edit.btn.tooltip'|trans }}">
-            <i class="fa fa-pencil"></i>
+            <i class="ri-edit-line"></i>
         </a>
         <a data-toggle="ajax" data-target="CampaignEvent_{{ event['id'] }}" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'delete', 'objectId': event['id'], 'campaignId': campaignId}) }}" class="btn btn-delete btn-danger btn-xs" title="{{ 'mautic.campaign.event.remove.btn.tooltip'|trans }}">
-            <i class="fa fa-times"></i>
+            <i class="ri-close-line"></i>
         </a>
     </div>
 </div>

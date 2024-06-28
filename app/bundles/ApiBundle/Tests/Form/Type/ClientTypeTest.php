@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientTypeTest extends TestCase
 {
-    private \Mautic\ApiBundle\Form\Type\ClientType $clientType;
+    private ClientType $clientType;
 
     /**
      * @var RequestStack

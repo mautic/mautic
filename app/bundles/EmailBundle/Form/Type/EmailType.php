@@ -8,7 +8,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
+use Mautic\CoreBundle\Form\Type\DynamicContentFilterType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -41,8 +42,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailType extends AbstractType
 {
-    use DynamicContentTrait;
-
     public function __construct(
         private TranslatorInterface $translator,
         private EntityManagerInterface $em,
@@ -88,7 +87,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-user',
+                    'preaddon' => 'ri-user-6-fill',
                     'tooltip'  => 'mautic.email.from_name.tooltip',
                 ],
                 'required' => false,
@@ -103,7 +102,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                     'tooltip'  => 'mautic.email.from_email.tooltip',
                 ],
                 'required' => false,
@@ -118,7 +117,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
                 ],
                 'required' => false,
@@ -133,7 +132,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                     'tooltip'  => 'mautic.email.bcc.tooltip',
                 ],
                 'required' => false,
@@ -206,7 +205,9 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
@@ -287,7 +288,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\EmailBundle\Entity\Email::class);
+        $transformer = new IdToEntityModelTransformer($this->em, Email::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -486,7 +487,7 @@ class EmailType extends AbstractType
                         'label' => 'mautic.core.builder',
                         'attr'  => [
                             'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                            'icon'    => 'fa fa-cube',
+                            'icon'    => 'ri-layout-line',
                             'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
                         ],
                     ],
@@ -556,5 +557,44 @@ class EmailType extends AbstractType
     private function getGlobalMailerIsOwner(): bool
     {
         return (bool) $this->coreParametersHelper->get('mailer_is_owner');
+    }
+
+    private function addDynamicContentField(FormBuilderInterface $builder): void
+    {
+        $builder->add(
+            'dynamicContent',
+            CollectionType::class,
+            [
+                'entry_type'         => DynamicContentFilterType::class,
+                'allow_add'          => true,
+                'allow_delete'       => true,
+                'label'              => false,
+                'entry_options'      => [
+                    'label' => false,
+                ],
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event): void {
+                $data = $event->getData();
+                /** @var Email $entity */
+                $entity = $event->getForm()->getData();
+
+                if (empty($data['dynamicContent'])) {
+                    $data['dynamicContent'] = $entity->getDefaultDynamicContent();
+                    unset($data['dynamicContent'][0]['filters']['filter']);
+                }
+
+                foreach ($data['dynamicContent'] as $key => $dc) {
+                    if (empty($dc['filters'])) {
+                        $data['dynamicContent'][$key]['filters'] = $entity->getDefaultDynamicContent()[0]['filters'];
+                    }
+                }
+
+                $event->setData($data);
+            }
+        );
     }
 }
