@@ -1,0 +1,39 @@
+<div class="hr-expand">
+  <a
+    href="javascript:void(0)"
+    class="pa-lg quick-help collapsed"
+    data-toggle="collapse"
+    data-target="#quickHelpModal"
+  >
+    <i class="ri-question-mark ri-xl"></i>
+  </a>
+</div>
+
+<div
+  class="collapse"
+  id="quickHelpModal"
+  tabindex="-1"
+  aria-labelledby="quickHelpModalLabel"
+  aria-hidden="true"
+>
+  <div class="panel-header">
+    <h4 class="mt-lg fw-sb text-left" id="quickHelpModalLabel">
+      {{ "mautic.core.quick_help" | trans }}
+    </h4>
+  </div>
+  <div class="panel-body mt-lg">
+    <div class="col-md-12">
+      <a
+        class="tile tile-clickable fs-18 mb-sm"
+        data-toggle="modal"
+        data-target="#keyboardShortcutsModal"
+      >
+        <i class="ri-keyboard-box-line"></i> Keyboard shortcuts
+      </a>
+      <a class="tile tile-clickable fs-18 mb-sm">
+        <i class="ri-menu-search-line"></i> Search commands
+      </a>
+    </div>
+  </div>
+  <div class="panel-footer">hey</div>
+</div>
