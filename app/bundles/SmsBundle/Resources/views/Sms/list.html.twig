@@ -104,7 +104,7 @@
                                     'href'        : path('mautic_sms_action', { 'objectId' : item.getId(), 'objectAction' : 'preview' }),
                                 },
                                 'btnText'   : 'mautic.sms.preview'|trans,
-                                'iconClass' : 'fa fa-share',
+                                'iconClass' : 'ri-share-forward-box-fill',
                             }
                         ] %}
                         {{- include(
@@ -137,7 +137,7 @@
                                 {{ item.getName() }}
                                 {% if 'list' == type %}
                                     <span data-toggle="tooltip" title="{{ 'mautic.sms.icon_tooltip.list_sms'|trans }}">
-                                        <i class="fa fa-fw fa-pie-chart"></i>
+                                        <i class="ri-pie-chart-line"></i>
                                     </span>
                                 {% endif %}
                             </a>

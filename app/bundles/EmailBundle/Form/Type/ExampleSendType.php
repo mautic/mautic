@@ -32,7 +32,7 @@ class ExampleSendType extends AbstractType
             [
                 'apply_text' => false,
                 'save_text'  => 'mautic.email.send',
-                'save_icon'  => 'fa fa-send',
+                'save_icon'  => 'ri-send-plane-line',
             ]
         );
     }

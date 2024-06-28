@@ -108,7 +108,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'type' => $state,
                         ],
                         'contentTemplate' => '@MauticEmail/SubscribedEvents/Timeline/index.html.twig',
-                        'icon'            => ('read' == $state) ? 'fa-envelope-o' : 'fa-envelope',
+                        'icon'            => ('read' == $state) ? 'ri-mail-open-line' : 'ri-mail-unread-line',
                         'contactId'       => $contactId,
                     ]
                 );
@@ -149,7 +149,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventLabel' => $label,
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $reply['date_replied'],
-                        'icon'       => 'fa-envelope',
+                        'icon'       => 'ri-mail-unread-line',
                         'contactId'  => $contactId,
                     ]
                 );
