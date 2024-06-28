@@ -250,11 +250,6 @@ export default class BuilderService {
         // disable all except link components
         disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
       },
-      parser: {
-        optionsHtml: {
-          allowScripts: true,
-        }
-      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor5', grapesjscustomcode, ...BuilderService.getPluginNames('email-mjml')],
@@ -268,11 +263,12 @@ export default class BuilderService {
         'gjs-plugin-ckeditor5': BuilderService.getCkeConf('email:getBuilderTokens'),
         [grapesjscustomcode]: {
           blockCustomCode: {
-            label: 'Custom Code',
-            category: 'Blocks' // move to existing category
+            label: Mautic.translate('grapesjsbuilder.customCodeBlockLabel'), // 'Custom Code',
+            category: Mautic.translate('grapesjsbuilder.categoryBlockLabel'), // move to existing category
+            content: `<mj-section><mj-column><mj-text data-gjs-type="custom-code" style="font-size: initial; min-height: 20px;"><span>Initial content</span></mj-text></mj-column></mj-section>`,
           },
           propsCustomCode: {
-            name: 'Custom Code',
+            name: Mautic.translate('grapesjsbuilder.customCodeBlockLabel'),
             components: '<span>Initial content</span>',
             attributes: {
               'class': 'grapes-custom-code',
