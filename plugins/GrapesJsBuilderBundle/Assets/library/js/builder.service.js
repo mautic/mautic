@@ -265,7 +265,6 @@ export default class BuilderService {
           blockCustomCode: {
             label: Mautic.translate('grapesjsbuilder.customCodeBlockLabel'), // 'Custom Code',
             category: Mautic.translate('grapesjsbuilder.categoryBlockLabel'), // move to existing category
-            content: `<mj-section><mj-column><mj-text data-gjs-type="custom-code" style="font-size: initial; min-height: 20px;"><span>Initial content</span></mj-text></mj-column></mj-section>`,
           },
           propsCustomCode: {
             name: Mautic.translate('grapesjsbuilder.customCodeBlockLabel'),
