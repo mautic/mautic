@@ -131,6 +131,7 @@ return [
                     'translator',
                     'monolog.logger.mautic',
                     'mautic.lead.model.dnc',
+                    'mautic.email.repository.email',
                 ],
             ],
             'mautic.validator.email' => [
@@ -308,6 +309,7 @@ return [
         'show_contact_categories'                                           => false,
         'show_contact_segments'                                             => false,
         'disable_trackable_urls'                                            => false,
+        'segment_email_once_to_email_address'                               => false,
         'theme_email_default'                                               => 'blank',
         'mailer_memory_msg_limit'                                           => 100,
         Mautic\EmailBundle\Form\Type\ConfigType::MINIFY_EMAIL_HTML          => false,
