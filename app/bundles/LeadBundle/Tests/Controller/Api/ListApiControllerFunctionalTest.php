@@ -65,6 +65,9 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testRegexOperatorValidation(string $operator, string $regex, int $expectedResponseCode, ?string $expectedErrorMessage): void
     {
+        $version = $this->connection->executeQuery('SELECT VERSION()')->fetchOne();
+        var_dump($version);
+
         $this->client->request(
             Request::METHOD_POST,
             '/api/segments/new',
