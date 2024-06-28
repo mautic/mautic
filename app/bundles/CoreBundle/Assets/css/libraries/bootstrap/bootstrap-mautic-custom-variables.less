@@ -235,21 +235,21 @@
 //## Dropdown menu container and contents.
 
 //** Background for the dropdown menu.
-@dropdown-bg:                    #fff;
+@dropdown-bg:                    var(--layer);
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,0.06);
 
 //** Dropdown menu `border-color` **for IE8**.
 @dropdown-fallback-border:       #eee;
 //** Divider color for between dropdown items.
-@dropdown-divider-bg:            #eaeaea;
+@dropdown-divider-bg:            var(--border-no-color);
 
 //** Dropdown link text color.
-@dropdown-link-color:            @text-color;
+@dropdown-link-color:            var(--text-secondary);
 //** Hover color for dropdown links.
-@dropdown-link-hover-color:      darken(@dropdown-link-color, 5%);
+@dropdown-link-hover-color:      var(--text-primary);
 //** Hover background for dropdown links.
-@dropdown-link-hover-bg:         #f5f5f5;
+@dropdown-link-hover-bg:         var(--layer-hover);
 
 //** Active dropdown menu item text color.
 @dropdown-link-active-color:     @component-active-color;
