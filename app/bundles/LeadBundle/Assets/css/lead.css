@@ -163,9 +163,10 @@ ul.tag-cloud li {
     min-height: 95px;
 }
 
-.timeline-icon {
-    width: 50px;
+.timeline-icon, .table-expand {
+    width: 30px;
     text-align: center;
+    aspect-ratio: 1/1;
 }
 
 .timeline-featured td, .timeline-featured th {
@@ -181,6 +182,7 @@ ul.tag-cloud li {
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     hyphens: auto;
+    height: 42px;
 }
 
 #contact-timeline .dl-horizontal dt {
