@@ -27,9 +27,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
-    $services->get(Mautic\EmailBundle\Entity\EmailRepository::class)
-        ->call('setSegmentEmailOnceToEmailAddress', ['%mautic.segment_email_once_to_email_address%']);
-
     $services->alias(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
     $services->set(Mautic\EmailBundle\Mailer\Transport\TransportFactory::class)
         ->decorate('mailer.transport_factory');
