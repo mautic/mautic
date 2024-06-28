@@ -1,4 +1,4 @@
-@import "../../../../../../../node_modules/bootstrap/less/variables";
+@import "../../libraries/bootstrap/bootstrap-mautic-custom-variables";
 
 @media (min-width: @screen-md-min) {
   .modal-xl { width: 1140px; }
@@ -11,10 +11,6 @@
 .media-list {
   .media-body {
     width: auto;
-  }
-  .media-object{
-    padding-right: 0;
-    margin-right: 10px;
   }
 }
 
@@ -314,11 +310,6 @@ ul.media-list.media-list-feed div.media-body
   width:auto;
 }
 
-ul.media-list.media-list-feed div.media-object
-{
-  padding: 0px;
-  margin: 10px;
-}
 .ico-email:before {
   font-family: "FontAwesome";
   content: "\f1fa";
@@ -363,6 +354,7 @@ ul.media-list.media-list-feed div.media-object
 
 .flip-vertically {
   transform: scaleY(-1);
+  display: inline-flex;
 }
 
 .disabled-row {
