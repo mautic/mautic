@@ -17,8 +17,9 @@
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
         
-        {{ include('@MauticCore/Menu/profile.html.twig') }}
         {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
+        {{ include('@MauticCore/Menu/quick_help.html.twig') }}
+        {{ include('@MauticCore/Menu/profile.html.twig') }}
         <li>
             <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
                 <i class="ri-settings-5-line ri-xl"></i>
