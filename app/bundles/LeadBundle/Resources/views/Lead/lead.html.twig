@@ -71,6 +71,17 @@
 
     {% endif %}
 
+    {% set google_search_url = "https://www.google.com/search?q=" ~ leadName|url_encode %}
+    {% set buttons = buttons|merge([{
+        'attr': {
+            'href': google_search_url,
+            'target': '_blank',
+            'data-toggle': '',
+        },
+        'btnText': 'mautic.lead.contact.google'|trans,
+        'iconClass': 'ri-google-line',
+    }]) %}
+
     {# View Campaigns List button #}
     {% if securityIsGranted('campaign:campaigns:edit') %}
       {% set buttons = buttons|merge([{
