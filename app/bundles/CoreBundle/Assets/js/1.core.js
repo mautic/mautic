@@ -136,6 +136,10 @@ var Mautic = {
             mQuery('#mautic_contact_index').click();
         });
 
+        Mautic.addKeyboardShortcut('g+e', 'Load Emails', function (e) {
+            mQuery('#mautic_email_index').click();
+        });
+
         Mautic.addKeyboardShortcut('[', 'Toggle Sidebar', function (e) {
             mQuery(".navbar-right a[data-toggle='sidebar']").click();
         });
