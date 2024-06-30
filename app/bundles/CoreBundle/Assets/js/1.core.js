@@ -164,6 +164,10 @@ var Mautic = {
             mQuery('#edit').click();
         });
 
+        Mautic.addKeyboardShortcut('s', 'General send example button', function(e) {
+            mQuery('#sendEmailButton').click();
+        });
+
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
