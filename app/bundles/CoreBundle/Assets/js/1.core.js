@@ -128,23 +128,23 @@ var Mautic = {
      * Binds global keyboard shortcuts
      */
     bindGlobalKeyboardShortcuts: function () {
-        Mautic.addKeyboardShortcut('shift+d', 'Load the Dashboard', function (e) {
+        Mautic.addKeyboardShortcut('g+d', 'Load the Dashboard', function (e) {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+c', 'Load Contacts', function (e) {
+        Mautic.addKeyboardShortcut('g+c', 'Load Contacts', function (e) {
             mQuery('#mautic_contact_index').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+right', 'Activate Right Menu', function (e) {
+        Mautic.addKeyboardShortcut('[', 'Toggle Sidebar', function (e) {
             mQuery(".navbar-right a[data-toggle='sidebar']").click();
         });
 
-        Mautic.addKeyboardShortcut('shift+n', 'Show Notifications', function (e) {
+        Mautic.addKeyboardShortcut('g+n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
+        Mautic.addKeyboardShortcut('g+s', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
         });
 
