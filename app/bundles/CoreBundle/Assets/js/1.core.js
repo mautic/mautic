@@ -148,6 +148,12 @@ var Mautic = {
             mQuery('#globalSearchContainer .search-button').click();
         });
 
+        Mautic.addKeyboardShortcut('/', 'Search current list', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            mQuery('#list-search').focus();
+        });
+
         Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
             if (mQuery('.btn-undo').length) {
                 mQuery('.btn-undo').click();
