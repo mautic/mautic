@@ -178,6 +178,11 @@ var Mautic = {
             mQuery('[id*="buttons_save"]').click();
         });
         
+        Mautic.addKeyboardShortcut('esc', 'Close/Cancel without saving', function(e) {
+            mQuery('[id*="buttons_cancel"]').click();
+            mQuery('#close').click();
+        });
+
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
