@@ -23,14 +23,19 @@
       </div>
       <div class="modal-body row">
         <div class="col-md-12">
-          {% set shortcuts = { 'navigation': { '⇧+d':
-          'mautic.core.keyboard.load_dashboard', '⇧+c':
-          'mautic.core.keyboard.load_contacts', '⇧+right':
-          'mautic.core.keyboard.activate_right_menu', '⇧+n':
-          'mautic.core.keyboard.show_notifications', '⇧+s':
-          'mautic.core.keyboard.global_search' }, 'actions': { 'mod+z':
-          'mautic.core.keyboard.undo_change', 'mod+⇧+z':
-          'mautic.core.keyboard.redo_change' } } %}
+          {% set shortcuts = { 
+            'navigation': { 
+              '⇧+d': 'mautic.core.keyboard.load_dashboard', 
+              '⇧+c': 'mautic.core.keyboard.load_contacts', 
+              '⇧+right': 'mautic.core.keyboard.activate_right_menu', 
+              '⇧+n': 'mautic.core.keyboard.show_notifications', 
+              '⇧+s': 'mautic.core.keyboard.global_search' 
+            }, 
+          'actions': { 
+            'mod+z': 'mautic.core.keyboard.undo_change', 
+            'mod+⇧+z': 'mautic.core.keyboard.redo_change',
+            'e' : 'mautic.core.keyboard.edit'
+          } } %}
           <h4 class="fw-sb mb-md">
             {{ "mautic.core.keyboard.section.global" | trans }}
           </h4>

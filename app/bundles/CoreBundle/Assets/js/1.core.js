@@ -160,6 +160,10 @@ var Mautic = {
             }
         });
 
+        Mautic.addKeyboardShortcut('e', 'Edit current resource', function(e) {
+            mQuery('#edit').click();
+        });
+
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
