@@ -38,7 +38,7 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
     public function testGetParameterValue(): void
     {
         /**
-         * Today in '%-m-d' format.
+         * Today in '%-m-d%' format. This matches date and datetime fields.
          *
          * @var string
          */
