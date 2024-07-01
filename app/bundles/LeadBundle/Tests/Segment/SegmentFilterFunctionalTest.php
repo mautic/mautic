@@ -6,7 +6,9 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 
 class SegmentFilterFunctionalTest extends MauticMysqlTestCase
@@ -16,6 +18,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
      */
     private $leads = [];
 
+    protected $useCleanupRollback = false;
+
     /**
      * Test creates: contacts, segment
      * Test rebuilds segment
@@ -23,6 +27,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
      */
     public function testSegments(): void
     {
+        $this->createCustomMultiselectField();
+
         foreach ($this->getSegmentsProvider() as $scenario) {
             $this->runTestSegments($scenario['contacts'], $scenario['segment']);
         }
@@ -171,5 +177,27 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
                 ['field' => 'points', 'operator' => 'gte', 'value' => 20, 'glue' => 'and', 'type' => 'text'],
             ],
         ];
+
+        yield [
+            'contacts' => [
+                ['email' => 'lukas@mautic.com',  'in_segment' => true],
+            ],
+            'segment' => [
+                ['field' => 'multiselect', 'object' => 'lead',  'operator' => '!in', 'value' => ['s'], 'glue' => 'and', 'type' => 'multiselect'],
+            ],
+        ];
+    }
+
+    protected function createCustomMultiselectField(): void
+    {
+        $field = new LeadField();
+        $field->setType('multiselect');
+        $field->setObject('lead');
+        $field->setAlias('multiselect');
+        $field->setName('Multiselect');
+        $properties = unserialize('a:1:{s:4:"list";a:3:{i:0;a:2:{s:5:"label";s:1:"f";s:5:"value";s:1:"f";}i:1;a:2:{s:5:"label";s:1:"s";s:5:"value";s:1:"s";}i:2;a:2:{s:5:"label";s:1:"t";s:5:"value";s:1:"t";}}}');
+        $field->setProperties($properties);
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel->saveEntity($field);
     }
 }
