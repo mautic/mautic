@@ -182,6 +182,14 @@ var Mautic = {
             mQuery('#new').click();
         });
 
+        Mautic.addKeyboardShortcut('del', 'Delete  current resource', function(e) {
+            mQuery('#delete').click();
+        });
+
+        Mautic.addKeyboardShortcut('enter', 'Modal confirm action', function(e) {
+            mQuery('#confirm').click();
+        });
+
         Mautic.addKeyboardShortcut('s', 'General send example button', function(e) {
             mQuery('#sendEmailButton').click();
         });
