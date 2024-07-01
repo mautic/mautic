@@ -9,6 +9,7 @@ use Mautic\FormBundle\Model\ActionModel;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PointBundle\Model\TriggerEventModel;
+use Mautic\ReportBundle\Model\ReportModel;
 
 class TagDependencies
 {
@@ -17,6 +18,7 @@ class TagDependencies
         private ListModel $listModel,
         private ActionModel $actionModel,
         private TriggerEventModel $triggerEventModel,
+        private ReportModel $reportModel
     ) {
     }
 
@@ -45,6 +47,11 @@ class TagDependencies
                 'label' => 'mautic.point.trigger.header.index',
                 'route' => 'mautic_pointtrigger_index',
                 'ids'   => $this->triggerEventModel->getPointTriggerIdsWithDependenciesOnTag($tag->getTag()),
+            ],
+            [
+                'label' => 'mautic.report.reports',
+                'route' => 'mautic_report_index',
+                'ids'   => $this->reportModel->getReportsIdsWithDependenciesOnTag($tag->getId()),
             ],
         ];
     }

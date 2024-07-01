@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\ReportBundle\Entity\Report;
 
 final class TagDependenciesTest extends MauticMysqlTestCase
 {
@@ -87,6 +88,17 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->assertStringContainsString("href=\"/s/points/triggers?search=ids:{$searchIds}\"", $content);
     }
 
+    public function testTagUsageInReports(): void
+    {
+        $tag         = $this->createTag('TagA');
+        $report      = $this->createReportWithTag($tag->getId());
+        $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $content        = $clientResponse->getContent();
+        $searchIds      = join(',', [$report->getId()]);
+        $this->assertStringContainsString("href=\"/s/reports?search=ids:{$searchIds}\"", $content);
+    }
+
     private function createTag(string $tagName): Tag
     {
         $tag = new Tag();
@@ -98,7 +110,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
     }
 
     /**
-     * Creates campaign with email sent action.
+     * Creates campaign with change tag action.
      *
      * Campaign diagram:
      * -------------------
@@ -196,7 +208,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
     }
 
     /**
-     * Creates campaign with email sent action.
+     * Creates campaign with has tag condition.
      *
      * Campaign diagram:
      * -------------------
@@ -355,5 +367,28 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $pointTrigger;
+    }
+
+    private function createReportWithTag(int $tagId): Report
+    {
+        $report = new Report();
+        $report->setName('Contact report');
+        $report->setSource('leads');
+        $report->setColumns([
+            'l.id',
+        ]);
+        $report->setFilters([
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'dynamic'   => null,
+                'condition' => 'in',
+                'value'     => [$tagId],
+            ],
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        return $report;
     }
 }
