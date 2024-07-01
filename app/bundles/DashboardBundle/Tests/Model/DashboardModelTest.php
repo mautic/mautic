@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -73,7 +74,8 @@ final class DashboardModelTest extends TestCase
             $this->createMock(UrlGeneratorInterface::class),
             $this->createMock(Translator::class),
             $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CacheProviderInterface::class),
         );
     }
 
