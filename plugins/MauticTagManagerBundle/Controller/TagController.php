@@ -146,7 +146,7 @@ class TagController extends FormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, TagDependencies $tagDependencies)
     {
         if (!$this->security->isGranted('tagManager:tagManager:create')) {
             return $this->accessDenied();
@@ -211,7 +211,7 @@ class TagController extends FormController
                     ],
                 ]);
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($request, $tag->getId(), true);
+                return $this->editAction($request, $tagDependencies, $tag->getId(), true);
             }
         }
 
@@ -237,7 +237,7 @@ class TagController extends FormController
      *
      * @return Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, TagDependencies $tagDependencies, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('tagManager:tagManager:edit')) {
             return $this->accessDenied();
@@ -251,6 +251,7 @@ class TagController extends FormController
             return $this->createTagModifyResponse(
                 $request,
                 $tag,
+                $tagDependencies,
                 $postActionVars,
                 $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
@@ -280,7 +281,7 @@ class TagController extends FormController
      *
      * @return Response
      */
-    private function createTagModifyResponse(Request $request, Tag $tag, array $postActionVars, $action, $ignorePost)
+    private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, $action, $ignorePost)
     {
         /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
@@ -348,7 +349,7 @@ class TagController extends FormController
 
                         return $this->postActionRedirect($postActionVars);
                     } else {
-                        return $this->viewAction($request, $tag->getId());
+                        return $this->viewAction($request, $tagDependencies, $tag->getId());
                     }
                 }
             }
