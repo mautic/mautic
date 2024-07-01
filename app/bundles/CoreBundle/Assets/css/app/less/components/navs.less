@@ -53,6 +53,9 @@
   > li {
     > a {
       line-height: 20px;
+      background-color: var(--layer-accent);
+      border-radius: var(--border-radius-sm);
+      color: var(--text-secondary);
     }
 
     // Active state
@@ -100,6 +103,11 @@
 .stats-menu__content.tab-content > .tab-pane {
   width: 100%;
 }
+
+.nav-tabs + .tab-content, .nav-tabs + form > .tab-content {
+  background-color: var(--layer);
+}
+//
 // Pills
 // -------------------------
 .nav-pills {
