@@ -53,10 +53,10 @@
           </h5>
           {% for key, description in shortcut_list %}
           <div class="row mb-xs">
-            <div class="col-md-8">
+            <div class="col-md-7">
               {{ description | trans }}
             </div>
-            <div class="col-md-4 text-right">
+            <div class="col-md-5 text-right">
               <div>
                 {% set keys = key|split('+') %} {% for k in keys %}
                 <kbd>{{ k }}</kbd>
