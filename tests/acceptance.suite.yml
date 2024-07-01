@@ -16,3 +16,10 @@ modules:
             args:
               - "--ignore-certificate-errors"
               - "--disable-dev-shm-usage"
+    - Db:
+        dsn: "mysql:host=db;dbname=db"
+        user: "db"
+        password: "db"
+        dump: "tests/_data/dump.sql"
+        populate: true
+        cleanup: true
