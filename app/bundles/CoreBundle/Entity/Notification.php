@@ -217,6 +217,11 @@ class Notification
         $this->header = $header;
     }
 
+    public function getDeduplicate()
+    {
+        return $this->deduplicate;
+    }
+
     public function setDeduplicate(?string $deduplicate): void
     {
         $this->deduplicate = $deduplicate;
