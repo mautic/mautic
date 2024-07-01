@@ -128,19 +128,19 @@ var Mautic = {
      * Binds global keyboard shortcuts
      */
     bindGlobalKeyboardShortcuts: function () {
-        Mautic.addKeyboardShortcut('g+d', 'Load the Dashboard', function (e) {
+        Mautic.addKeyboardShortcut('g d', 'Load the Dashboard', function (e) {
             mQuery('#mautic_dashboard_index').click();
         });
 
-        Mautic.addKeyboardShortcut('g+c', 'Load Contacts', function (e) {
+        Mautic.addKeyboardShortcut('g c', 'Load Contacts', function (e) {
             mQuery('#mautic_contact_index').click();
         });
 
-        Mautic.addKeyboardShortcut('g+e', 'Load Emails', function (e) {
+        Mautic.addKeyboardShortcut('g e', 'Load Emails', function (e) {
             mQuery('#mautic_email_index').click();
         });
 
-        Mautic.addKeyboardShortcut('g+f', 'Load Forms', function (e) {
+        Mautic.addKeyboardShortcut('g f', 'Load Forms', function (e) {
             mQuery('#mautic_form_index').click();
         });
 
@@ -148,11 +148,11 @@ var Mautic = {
             mQuery(".navbar-right a[data-toggle='sidebar']").click();
         });
 
-        Mautic.addKeyboardShortcut('g+n', 'Show Notifications', function (e) {
+        Mautic.addKeyboardShortcut('g n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mautic.addKeyboardShortcut('g+s', 'Global Search', function (e) {
+        Mautic.addKeyboardShortcut('g s', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
         });
 
@@ -176,6 +176,10 @@ var Mautic = {
 
         Mautic.addKeyboardShortcut('e', 'Edit current resource', function(e) {
             mQuery('#edit').click();
+        });
+
+        Mautic.addKeyboardShortcut('c', 'Create current resource', function(e) {
+            mQuery('#new').click();
         });
 
         Mautic.addKeyboardShortcut('s', 'General send example button', function(e) {
