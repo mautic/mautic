@@ -24,8 +24,6 @@ Mautic.leadOnLoad = function (container, response) {
         }
     }, 'contact pages');
     
-    
-
     //Prevent single combo keys from initiating within lead note
     Mousetrap.stopCallback = function(e, element, combo) {
         if (element.id == 'leadnote_text' && combo != 'mod+enter') {
