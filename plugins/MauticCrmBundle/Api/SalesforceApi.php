@@ -373,9 +373,7 @@ class SalesforceApi extends CrmApi
         $baseQuery = 'SELECT %s from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end'].' and isDeleted = false'
             .$ignoreConvertedLeads;
 
-        $response = $this->handleQueryAll($baseQuery, $fields, $queryUrl);
-
-        return $response;
+        return $this->handleQueryAll($baseQuery, $fields, $queryUrl);
     }
 
     /**
