@@ -1768,7 +1768,7 @@ a.media {
   display: flex;
   flex-wrap: wrap;
 }
-.row-no-gutters [class*="col-"] {
+.row-no-gutters > [class*="col-"] {
   padding-right: 0;
   padding-left: 0;
 }
