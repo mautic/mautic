@@ -48,7 +48,7 @@ class SerializerSubscriber implements EventSubscriberInterface
         if ($grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object])) {
             // Add it to the serialized data.
             $visitor = $event->getContext()->getVisitor();
-            if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
+            if ($visitor instanceof JsonSerializationVisitor && $grapesJsBuilder && !empty($grapesJsBuilder->getCustomMjml())) {
                 $visitor->visitProperty(
                     new StaticPropertyMetadata(
                         '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
