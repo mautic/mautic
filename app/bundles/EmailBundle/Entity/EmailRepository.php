@@ -14,8 +14,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
  */
 class EmailRepository extends CommonRepository
 {
-    private bool $segmentEmailOnceToEmailAddress = false;
-
     /**
      * Get an array of do not email.
      *
@@ -187,6 +185,8 @@ class EmailRepository extends CommonRepository
         $statQb->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
 
+        $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
+
         if ($variantIds) {
             if (!in_array($emailId, $variantIds)) {
                 $variantIds[] = (string) $emailId;
@@ -197,17 +197,6 @@ class EmailRepository extends CommonRepository
             $statQb->andWhere($statQb->expr()->eq('stat.email_id', (int) $emailId));
             $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
         }
-
-        if (true === $this->segmentEmailOnceToEmailAddress) {
-            $statQb2 = clone $statQb;
-            $statQb2->innerJoin('stat', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = stat.lead_id');
-            $statQb2->andWhere(
-                $statQb->expr()->eq('ld.email', 'l.email')
-            );
-        }
-        $statQb->andWhere(
-            $statQb->expr()->eq('stat.lead_id', 'l.id')
-        );
 
         // Only include those who belong to the associated lead lists
         if (is_null($listIds)) {
@@ -248,20 +237,12 @@ class EmailRepository extends CommonRepository
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
-            if (true === $this->segmentEmailOnceToEmailAddress) {
-                $q->select('count(DISTINCT l.email) as count');
-            } else {
-                $q->select('count(*) as count');
-            }
-
+            $q->select('count(*) as count');
             if ($countWithMaxMin) {
                 $q->addSelect('MIN(l.id) as min_id, MAX(l.id) as max_id');
             }
         } else {
             $q->select('l.*');
-            if (true === $this->segmentEmailOnceToEmailAddress) {
-                $q->addGroupBy('l.email');
-            }
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
@@ -270,10 +251,6 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
-
-        if (true === $this->segmentEmailOnceToEmailAddress) {
-            $q->andWhere(sprintf('NOT EXISTS (%s)', $statQb2->getSQL()));
-        }
 
         $excludedListQb = $this->getExcludedListQuery((int) $emailId);
 
@@ -752,11 +729,6 @@ class EmailRepository extends CommonRepository
             ->getOneOrNullResult();
 
         return (bool) $result;
-    }
-
-    public function setSegmentEmailOnceToEmailAddress(bool $segmentEmailOnceToEmailAddress): void
-    {
-        $this->segmentEmailOnceToEmailAddress = $segmentEmailOnceToEmailAddress;
     }
 
     private function getCategoryUnsubscribedLeadsQuery(int $emailId): QueryBuilder
