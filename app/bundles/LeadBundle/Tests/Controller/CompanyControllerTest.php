@@ -146,7 +146,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertEquals(true, $this->client->getResponse()->isRedirect('/s/companies'));
     }
 
-    public function testCompanyMergeButtonVisible (): void
+    public function testNewCompanyMergeButtonVisible(): void
     {
         $this->client->request('GET', '/s/companies/new/');
         $clientResponse         = $this->client->getResponse();
@@ -157,10 +157,10 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $crawler = new \Symfony\Component\DomCrawler\Crawler($clientResponseContent);
 
         // Check for specific buttons by their IDs
-        $applyButton = $crawler->filter('#company_buttons_apply_toolbar');
-        $saveButton = $crawler->filter('#company_buttons_save_toolbar');
-        $cancelButton = $crawler->filter('#company_buttons_cancel_toolbar');
-        $mergeButton = $crawler->filter('#company_buttons_merge_toolbar');
+        $applyButton  = $crawler->filter('#company_buttons_apply');
+        $saveButton   = $crawler->filter('#company_buttons_save');
+        $cancelButton = $crawler->filter('#company_buttons_cancel');
+        $mergeButton  = $crawler->filter('#company_buttons_merge');
 
         $this->assertCount(1, $applyButton, 'Apply button not found');
         $this->assertCount(1, $saveButton, 'Save button not found');
