@@ -2,6 +2,7 @@
 
 namespace Step\Acceptance;
 
+use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\ContactPage;
 
 class Contact extends \AcceptanceTester
@@ -22,7 +23,7 @@ class Contact extends \AcceptanceTester
         $I->fillField(ContactPage::$lastNameField, $lastName);
         $I->fillField(ContactPage::$emailField, $email);
         $I->fillField(ContactPage::$tagField, $tag);
-        $I->pressKey(ContactPage::$tagField, \Facebook\WebDriver\WebDriverKeys::ENTER);
+        $I->pressKey(ContactPage::$tagField, WebDriverKeys::ENTER);
     }
 
     public function selectContactFromList()
