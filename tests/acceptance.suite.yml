@@ -21,5 +21,6 @@ modules:
         user: "db"
         password: "db"
         dump: "tests/_data/dump.sql"
-        populate: true
-        cleanup: true
+        populate: true # load dump before all tests
+        #cleanup: true # reload dump between tests
+        populator: 'mysql -u $user -h $host $dbname < $dump'
