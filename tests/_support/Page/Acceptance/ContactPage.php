@@ -30,6 +30,9 @@ class ContactPage
     // Contact Details Page
     public static $editButton = '#toolbar > div.std-toolbar.btn-group > a:nth-child(1)';
 
+    // Delete Contact alert
+    public static $ConfirmDelete = 'button.btn.btn-danger';
+
     /**
      * Basic route example for your current URL
      * You can append any additional parameter to URL

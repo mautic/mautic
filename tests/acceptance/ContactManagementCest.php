@@ -122,27 +122,24 @@ class ContactManagementCest
         $I->see('Edited-First-Name Edited-Last-Name has been updated!');
     }
 
-    public function deleteContactFromList(AcceptanceTester $I)
-    {
-        // Navigate to the contacts page
-        $I->amOnPage('/s/contacts');
+    public function deleteContactFromList(
+        AcceptanceTester $I,
+        Contact $contact
+    ) {
+        $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $I->grabTextFrom('#leadTable tbody tr:first-child td:nth-child(2) a div');
-
-        // Check we can see the first contact name
-        $I->see($contactName);
+        $contactName = $contact->selectContactFromList(1);
 
         // Click on the dropdown caret on the first contact
-        $I->click('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > button');
+        $contact->dropDownMenu(1);
 
         // Wait for the dropdown menu to show and click the delete menu option
-        $I->waitForElementVisible('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(4) > a', 5);
-        $I->click('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(4) > a');
+        $contact->selectOptionFromDropDown(1, 4);
 
         // Wait for the modal to show and confirm deletion
-        $I->waitForElementVisible('button.btn.btn-danger', 5);
-        $I->click('button.btn.btn-danger');
+        $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
+        $I->click(ContactPage::$ConfirmDelete);
 
         // Wait for the delete confirmation message
         $I->waitForText("$contactName has been deleted!", 30);
