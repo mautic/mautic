@@ -138,7 +138,7 @@ CREATE TABLE `audit_log` (
   KEY `object_search` (`object`,`object_id`),
   KEY `timeline_search` (`bundle`,`object`,`action`,`object_id`),
   KEY `date_added_index` (`date_added`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,7 +147,7 @@ CREATE TABLE `audit_log` (
 
 LOCK TABLES `audit_log` WRITE;
 /*!40000 ALTER TABLE `audit_log` DISABLE KEYS */;
-INSERT INTO `audit_log` VALUES (1,1,'Admin Mautic','user','security',1,'login','a:1:{s:8:\"username\";s:5:\"admin\";}','2024-07-01 15:59:30','127.0.0.1');
+INSERT INTO `audit_log` VALUES (1,1,'Admin Mautic','user','security',1,'login','a:1:{s:8:\"username\";s:5:\"admin\";}','2024-07-01 15:59:30','127.0.0.1'),(2,1,'Admin Mautic','user','security',1,'login','a:1:{s:8:\"username\";s:5:\"admin\";}','2024-07-03 14:24:56','127.0.0.1'),(3,1,'Admin Mautic','lead','lead',1,'update','a:10:{s:4:\"tags\";a:1:{s:5:\"added\";a:1:{i:0;s:7:\"TestTag\";}}s:5:\"owner\";a:2:{i:0;N;i:1;i:1;}s:9:\"firstname\";a:2:{i:0;N;i:1;s:4:\"Jane\";}s:6:\"fields\";a:4:{s:9:\"firstname\";a:2:{i:0;N;i:1;s:4:\"Jane\";}s:8:\"lastname\";a:2:{i:0;N;i:1;s:3:\"Doe\";}s:5:\"email\";a:2:{i:0;N;i:1;s:16:\"jane@example.com\";}s:6:\"points\";a:2:{i:0;i:0;i:1;N;}}s:8:\"lastname\";a:2:{i:0;N;i:1;s:3:\"Doe\";}s:5:\"email\";a:2:{i:0;N;i:1;s:16:\"jane@example.com\";}s:6:\"points\";a:2:{i:0;i:0;i:1;N;}s:14:\"dateIdentified\";a:2:{i:0;s:0:\"\";i:1;O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2024-07-03 14:25:09.331855\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:3:\"UTC\";}}s:14:\"manipulated_by\";s:12:\"Admin Mautic\";s:15:\"manipulator_key\";s:9:\"lead:lead\";}','2024-07-03 14:25:09','127.0.0.1'),(4,1,'Admin Mautic','lead','lead',1,'identified','a:0:{}','2024-07-03 14:25:09','127.0.0.1'),(5,1,'Admin Mautic','lead','lead',2,'update','a:10:{s:4:\"tags\";a:1:{s:5:\"added\";a:1:{i:0;s:7:\"TestTag\";}}s:5:\"owner\";a:2:{i:0;N;i:1;i:1;}s:9:\"firstname\";a:2:{i:0;N;i:1;s:4:\"John\";}s:6:\"fields\";a:4:{s:9:\"firstname\";a:2:{i:0;N;i:1;s:4:\"John\";}s:8:\"lastname\";a:2:{i:0;N;i:1;s:3:\"Doe\";}s:5:\"email\";a:2:{i:0;N;i:1;s:14:\"john@email.com\";}s:6:\"points\";a:2:{i:0;i:0;i:1;N;}}s:8:\"lastname\";a:2:{i:0;N;i:1;s:3:\"Doe\";}s:5:\"email\";a:2:{i:0;N;i:1;s:14:\"john@email.com\";}s:6:\"points\";a:2:{i:0;i:0;i:1;N;}s:14:\"dateIdentified\";a:2:{i:0;s:0:\"\";i:1;O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2024-07-03 14:26:06.133523\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:3:\"UTC\";}}s:14:\"manipulated_by\";s:12:\"Admin Mautic\";s:15:\"manipulator_key\";s:9:\"lead:lead\";}','2024-07-03 14:26:06','127.0.0.1'),(6,1,'Admin Mautic','lead','lead',2,'identified','a:0:{}','2024-07-03 14:26:06','127.0.0.1');
 /*!40000 ALTER TABLE `audit_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1979,7 +1979,7 @@ CREATE TABLE `lead_tags` (
   `description` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `lead_tag_search` (`tag`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1988,6 +1988,7 @@ CREATE TABLE `lead_tags` (
 
 LOCK TABLES `lead_tags` WRITE;
 /*!40000 ALTER TABLE `lead_tags` DISABLE KEYS */;
+INSERT INTO `lead_tags` VALUES (1,'TestTag',NULL);
 /*!40000 ALTER TABLE `lead_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2014,6 +2015,7 @@ CREATE TABLE `lead_tags_xref` (
 
 LOCK TABLES `lead_tags_xref` WRITE;
 /*!40000 ALTER TABLE `lead_tags_xref` DISABLE KEYS */;
+INSERT INTO `lead_tags_xref` VALUES (1,1),(2,1);
 /*!40000 ALTER TABLE `lead_tags_xref` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2128,7 +2130,7 @@ CREATE TABLE `leads` (
   KEY `generated_email_domain` (`generated_email_domain`),
   CONSTRAINT `FK_179045522298D193` FOREIGN KEY (`stage_id`) REFERENCES `stages` (`id`) ON DELETE SET NULL,
   CONSTRAINT `FK_179045527E3C61F9` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2137,6 +2139,7 @@ CREATE TABLE `leads` (
 
 LOCK TABLES `leads` WRITE;
 /*!40000 ALTER TABLE `leads` DISABLE KEYS */;
+INSERT INTO `leads` VALUES (1,1,NULL,1,'2024-07-03 14:25:09',NULL,NULL,'2024-07-03 14:25:09',1,'Admin Mautic',NULL,NULL,NULL,0,NULL,'a:0:{}','a:0:{}','2024-07-03 14:25:09',NULL,NULL,'Jane','Doe',NULL,NULL,'jane@example.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'example.com'),(2,1,NULL,1,'2024-07-03 14:26:06',NULL,NULL,'2024-07-03 14:26:06',1,'Admin Mautic',NULL,NULL,NULL,0,NULL,'a:0:{}','a:0:{}','2024-07-03 14:26:06',NULL,NULL,'John','Doe',NULL,NULL,'john@email.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'email.com');
 /*!40000 ALTER TABLE `leads` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3762,7 +3765,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,1,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'admin','$2y$13$MG.VqXSME1mBIpgMsPPI6.hvNcgKMPFLpQFuswMGNWDbtNYdIONKa','Admin','Mautic','mautic@ddev.local',NULL,'','','2024-07-01 15:59:30','2024-07-01 15:59:30','a:0:{}',NULL);
+INSERT INTO `users` VALUES (1,1,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'admin','$2y$13$MG.VqXSME1mBIpgMsPPI6.hvNcgKMPFLpQFuswMGNWDbtNYdIONKa','Admin','Mautic','mautic@ddev.local',NULL,'','','2024-07-03 14:24:56','2024-07-03 14:24:56','a:0:{}',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3993,4 +3996,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-07-01 19:30:35
+-- Dump completed on 2024-07-03 14:26:35
