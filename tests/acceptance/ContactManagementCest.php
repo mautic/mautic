@@ -40,7 +40,7 @@ class ContactManagementCest
         AcceptanceTester $I,
         Contact $contact
     ) {
-        $I->amOnPage('/s/contacts');
+        $I->amOnPage(ContactPage::$URL);
 
         // Click on "+New" button
         $I->waitForElementClickable(ContactPage::$newContactButton, 30);
@@ -56,33 +56,34 @@ class ContactManagementCest
         $I->waitForElementClickable(ContactPage::$saveAndCloseButton, 30);
         $I->click(ContactPage::$saveAndCloseButton);
 
+        $I->waitForElementVisible('.page-header-title .span-block', 30);
+        $I->see('FirstName LastName', '.page-header-title .span-block');
+
+        // Check the database for the created contact
         $I->seeInDatabase('leads', ['firstname' => 'FirstName', 'email' => 'email@example.com']);
     }
 
-    public function acessEditContactFormFromList(AcceptanceTester $I)
-    {
-        // Navigate to the contacts page
-        $I->amOnPage('/s/contacts');
+    public function acessEditContactFormFromList(
+        AcceptanceTester $I,
+        Contact $contact
+    ) {
+        $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $I->grabTextFrom('#leadTable tbody tr:first-child td:nth-child(2) a div');
-
-        // Check we can see the first contact name
-        $I->see($contactName);
+        $contactName = $contact->selectContactFromList(1);
 
         // Click on the dropdown caret on the first contact
-        $I->click('#leadTable tbody tr:first-child td:first-child div div button');
+        $contact->dropDownMenu(1);
 
         // Wait for the dropdown menu to show and click the delete menu option
-        $I->waitForElementClickable('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(1) > a', 30);
-        $I->click('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(1) > a');
+        $contact->selectOptionFromDropDown(1, 1);
 
         // Wait for the edit form to be visible
-        $I->waitForElementVisible('#core > div.pa-md.bg-light-xs.bdr-b > h4', 30);
+        $I->waitForElementVisible(ContactPage::$editForm, 30);
         $I->see("Edit $contactName");
 
         // Close the edit form (No changes are made)
-        $I->click('#lead_buttons_cancel_toolbar');
+        $I->click(ContactPage::$cancelButton);
     }
 
     public function editContactFromProfile(AcceptanceTester $I)

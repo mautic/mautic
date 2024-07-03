@@ -6,21 +6,24 @@ class ContactPage
 {
     public static $URL = '/s/contacts';
 
+    // Quick Add Form
     public static $quickAddButton     = '#toolbar .quickadd';
     public static $quickAddModal      = '#MauticSharedModal-label';
+    public static $saveButton         = '.btn-save.btn-copy';
+
+    // +New Contact Form
+    public static $newContactButton   = '#toolbar a:nth-child(2)';
+    public static $saveAndCloseButton = '#lead_buttons_save_toolbar';
+
+    // Form fields
     public static $firstNameField     = '#lead_firstname';
     public static $lastNameField      = '#lead_lastname';
     public static $emailField         = '#lead_email';
     public static $tagField           = '#lead_tags_chosen input';
-    public static $saveButton         = '.btn-save.btn-copy';
-    public static $listSearch         = '#list-search';
-    public static $listTable          = '#leadTable';
-    public static $clearSearch        = '#btn-filter > i';
-    public static $newContactButton   = '#toolbar a:nth-child(2)';
-    public static $saveAndCloseButton = '#lead_buttons_save_toolbar';
-    public static $contactDetailsPage = '#app-content > div > div.page-header';
-    public static $closeButton        = '#toolbar > div.std-toolbar.btn-group > a:nth-child(3)';
-    public static $editButton         = '#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(1) > a';
+
+    // Edit Contact Form
+    public static $editForm     = '#core > div.pa-md.bg-light-xs.bdr-b > h4';
+    public static $cancelButton = '#lead_buttons_cancel_toolbar';
 
     /**
      * Basic route example for your current URL

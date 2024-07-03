@@ -26,13 +26,27 @@ class Contact extends \AcceptanceTester
         $I->pressKey(ContactPage::$tagField, WebDriverKeys::ENTER);
     }
 
-    public function selectContactFromList()
+    public function selectContactFromList($place)
     {
         $I           = $this;
-        $contactName = $I->grabTextFrom('#leadTable tbody tr:first-child td:nth-child(2) a div');
-        $I->see($contactName);
-        $I->click(['link' => $contactName]);
-        $I->waitForText($contactName, 30);
-        $I->see($contactName);
+        $xpath       = "//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]";
+        $contactName = $I->grabTextFrom($xpath);
+        $I->see($contactName, $xpath);
+
+        return $contactName;
+    }
+
+    public function dropDownMenu($place)
+    {
+        $I = $this;
+        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/button");
+    }
+
+    public function selectOptionFromDropDown($place, $option)
+    {
+        // 1-> Edit, 2-> Details, 3-> Send Email, 4-> Delete
+        $I = $this;
+        $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a", 30);
+        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a");
     }
 }
