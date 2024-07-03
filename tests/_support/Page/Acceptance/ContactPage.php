@@ -29,6 +29,8 @@ class ContactPage
 
     // Contact Details Page
     public static $editButton = '#toolbar > div.std-toolbar.btn-group > a:nth-child(1)';
+    public static $dropDown   = '#toolbar .std-toolbar.btn-group > button';
+    public static $delete     = '#toolbar > div.std-toolbar.btn-group.open > ul > li:nth-child(5) > a';
 
     // Delete Contact alert
     public static $ConfirmDelete = 'button.btn.btn-danger';

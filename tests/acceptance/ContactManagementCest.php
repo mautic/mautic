@@ -146,13 +146,14 @@ class ContactManagementCest
         $I->see("$contactName has been deleted!");
     }
 
-    public function deleteContactFromProfile(AcceptanceTester $I)
-    {
-        // Navigate to the contacts page
-        $I->amOnPage('/s/contacts');
+    public function deleteContactFromProfile(
+        AcceptanceTester $I,
+        Contact $contact
+    ) {
+        $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $I->grabTextFrom('#leadTable tbody tr:first-child td:nth-child(2) a div');
+        $contactName = $contact->selectContactFromList(1);
 
         // Click on the contact name to view the contact details
         $I->click(['link' => $contactName]);
@@ -162,15 +163,14 @@ class ContactManagementCest
         $I->see($contactName);
 
         // Click the dropdown caret to show the delete option
-        $I->click('#toolbar .std-toolbar.btn-group > button > i');
+        $I->click(ContactPage::$dropDown);
 
-        // Wait for the dropdown to be displayed and click on the delete option
-        $I->waitForElementVisible('#toolbar .std-toolbar.btn-group.open > ul', 30);
-        $I->click('#toolbar .std-toolbar.btn-group.open > ul > li:nth-child(5) > a');
+        // click on the delete option
+        $I->click(ContactPage::$delete);
 
         // Wait for the modal to become visible and click on the button to confirm delete
-        $I->waitForElementVisible('button.btn.btn-danger', 30);
-        $I->click('button.btn.btn-danger');
+        $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
+        $I->click(ContactPage::$ConfirmDelete);
 
         // Wait for the delete to be completed and confirm the contact is deleted
         $I->waitForText("$contactName has been deleted!", 30);
