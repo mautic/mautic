@@ -28,11 +28,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class ListType extends AbstractType
 {
     public function __construct(
-        private readonly FieldFilterTransformer,
+        private readonly FieldFilterTransformer $fieldFilterTransformer,
         private readonly ListModel $listModel,
         private readonly RelativeDate $relativeDate,
         TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
+        $this->fieldFilterTransformer->setContext('segment');
         $typeOperatorProvider->setContext('segment');
     }
 

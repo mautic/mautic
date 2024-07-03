@@ -42,10 +42,17 @@ class FieldFilterTransformer implements DataTransformerInterface, ServiceSubscri
         }
     }
 
-    /**
-     * From DB format to form format.
-     */
-    public function transform(mixed $rawFilters): mixed
+    public function setContext(string $context): void
+    {
+        $this->context = $context;
+    }
+
+    public function getContext(): string
+    {
+        return $this->context;
+    }
+
+    public static function getSubscribedServices(): array
     {
         return [
             'date'     => FieldFilter\FieldFilterDateTransformer::class,
@@ -88,6 +95,10 @@ class FieldFilterTransformer implements DataTransformerInterface, ServiceSubscri
             if ($this->serviceLocator->has($type)) {
                 $transformer = $this->serviceLocator->get($type);
                 \assert($transformer instanceof DataTransformerInterface);
+
+                if (method_exists($transformer, 'setContext')) {
+                    $transformer->setContext($this->context);
+                }
 
                 $value[$key] = $transform($transformer, $filter);
             }

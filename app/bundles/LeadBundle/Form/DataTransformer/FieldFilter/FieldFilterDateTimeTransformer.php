@@ -71,10 +71,14 @@ class FieldFilterDateTimeTransformer implements DataTransformerInterface
 
         $dt = new DateTimeHelper($filterVal, 'Y-m-d H:i', 'local');
 
-        if (is_string($value['properties']['filter'])) {
-            $value['properties']['filter'] = ['absoluteDate' => $dt->toUtcString()];
+        if ($this->isAbsoluteRelativeDateFilterAllowed($value)) {
+            if (isset($value['properties']) && is_string($value['properties']['filter'])) {
+                $value['properties']['filter'] = ['absoluteDate' => $dt->toUtcString()];
+            } else {
+                $value['properties']['filter']['absoluteDate'] = $dt->toUtcString();
+            }
         } else {
-            $value['properties']['filter']['absoluteDate'] = $dt->toUtcString();
+            $value['properties']['filter'] = $dt->toUtcString();
         }
 
         return $value;

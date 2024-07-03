@@ -30,6 +30,7 @@ final class FieldFilterTransformerTest extends TestCase
             'datetime' => fn () => new FieldFilter\FieldFilterDateTimeTransformer($this->createMock(TranslatorInterface::class)),
         ]);
         $this->transformer = new FieldFilterTransformer($serviceLocator);
+        $this->transformer->setContext('segment');
         $translator         = $this->createMock(TranslatorInterface::class);
         $this->relativeDate = $this->createMock(RelativeDate::class);
         $translator
