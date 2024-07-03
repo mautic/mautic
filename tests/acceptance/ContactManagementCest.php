@@ -86,13 +86,14 @@ class ContactManagementCest
         $I->click(ContactPage::$cancelButton);
     }
 
-    public function editContactFromProfile(AcceptanceTester $I)
-    {
-        // Navigate to the contacts page
-        $I->amOnPage('/s/contacts');
+    public function editContactFromProfile(
+        AcceptanceTester $I,
+        Contact $contact
+    ) {
+        $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $I->grabTextFrom('#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div');
+        $contactName = $contact->selectContactFromList(1);
 
         // Click on the contact name to view the contact details
         $I->click(['link' => $contactName]);
@@ -102,19 +103,19 @@ class ContactManagementCest
         $I->see($contactName);
 
         // Click on the edit button
-        $I->click('#toolbar > div.std-toolbar.btn-group > a:nth-child(1)');
+        $I->click(ContactPage::$editButton);
 
         // Wait for the edit form to be visible
-        $I->waitForElementVisible('#core > div.pa-md.bg-light-xs.bdr-b > h4', 30);
+        $I->waitForElementVisible(ContactPage::$editForm, 30);
         $I->see("Edit $contactName");
 
         // Edit the first and last names
-        $I->fillField('#lead_firstname', 'Edited-First-Name');
-        $I->fillField('#lead_lastname', 'Edited-Last-Name');
+        $I->fillField(ContactPage::$firstNameField, 'Edited-First-Name');
+        $I->fillField(ContactPage::$lastNameField, 'Edited-Last-Name');
 
         // Save and close the form
-        $I->waitForElementClickable('#lead_buttons_save_toolbar', 30);
-        $I->click('#lead_buttons_save_toolbar');
+        $I->waitForElementClickable(ContactPage::$saveAndCloseButton, 30);
+        $I->click(ContactPage::$saveAndCloseButton);
 
         // Verify the update message
         $I->waitForText('Edited-First-Name Edited-Last-Name has been updated!', 30);
