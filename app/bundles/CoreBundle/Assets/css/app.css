@@ -1466,6 +1466,10 @@ code {
   line-height: 0.5em;
   top: 0.15em;
 }
+.nav-tabs-contained + .tab-content .alert,
+.nav-tabs-contained + * > .tab-content .alert {
+  background-color: var(--layer-alternate);
+}
 .alert-success {
   border-color: var(--support-success);
 }
