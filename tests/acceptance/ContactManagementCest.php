@@ -63,7 +63,7 @@ class ContactManagementCest
         $I->seeInDatabase('leads', ['firstname' => 'FirstName', 'email' => 'email@example.com']);
     }
 
-    public function acessEditContactFormFromList(
+    public function accessEditContactFormFromList(
         AcceptanceTester $I,
         Contact $contact
     ) {
