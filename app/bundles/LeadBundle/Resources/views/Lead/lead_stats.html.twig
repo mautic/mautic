@@ -18,4 +18,11 @@
         <span class="lead-stats-val">{{ emailStats['click_through_open_rate'] * 100 }}%</span>
     </div>
 </div>
+{% if emailStats['sent_count'] == 0 and
+    emailStats['open_rate'] == 0 and
+    emailStats['click_through_rate'] == 0 and
+    emailStats['click_through_open_rate'] == 0
+%}
+    {{ include('@MauticCore/Helper/noinformation.html.twig', {'tip': 'mautic.contact.noinformation.statistics'|trans}) }}
+{% endif %}
 {% endif %}
