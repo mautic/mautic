@@ -45,16 +45,19 @@ class SerializerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object])) {
-            // Add it to the serialized data.
-            $visitor = $event->getContext()->getVisitor();
-            if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
-                $visitor->visitProperty(
-                    new StaticPropertyMetadata(
-                        '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
-                    ), ['customMjml' => $grapesJsBuilder->getCustomMjml()]
-                );
-            }
+        $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $object]);
+        if (is_null($grapesJsBuilder)) {
+            return;
+        }
+
+        // Add it to the serialized data.
+        $visitor = $event->getContext()->getVisitor();
+        if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
+            $visitor->visitProperty(
+                new StaticPropertyMetadata(
+                    '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+                ), ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+            );
         }
     }
 }
