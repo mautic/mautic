@@ -33,6 +33,7 @@ class ContactManagementCest
 
         $I->reloadPage(); // Ensure the latest data is loaded
 
+        // Confirm the contact is in the database
         $I->seeInDatabase('leads', ['firstname' => 'QuickAddFirstName', 'email' => 'quickadd@example.com']);
     }
 
@@ -56,6 +57,7 @@ class ContactManagementCest
         $I->waitForElementClickable(ContactPage::$saveAndCloseButton, 30);
         $I->click(ContactPage::$saveAndCloseButton);
 
+        // Confirm the contact is created
         $I->waitForElementVisible('.page-header-title .span-block', 30);
         $I->see('FirstName LastName', '.page-header-title .span-block');
 
@@ -75,7 +77,7 @@ class ContactManagementCest
         // Click on the dropdown caret on the first contact
         $contact->dropDownMenu(1);
 
-        // Wait for the dropdown menu to show and click the delete menu option
+        // Click the edit menu option
         $contact->selectOptionFromDropDown(1, 1);
 
         // Wait for the edit form to be visible
@@ -134,7 +136,7 @@ class ContactManagementCest
         // Click on the dropdown caret on the first contact
         $contact->dropDownMenu(1);
 
-        // Wait for the dropdown menu to show and click the delete menu option
+        // Click the delete menu option
         $contact->selectOptionFromDropDown(1, 4);
 
         // Wait for the modal to show and confirm deletion
@@ -168,11 +170,11 @@ class ContactManagementCest
         // click on the delete option
         $I->click(ContactPage::$delete);
 
-        // Wait for the modal to become visible and click on the button to confirm delete
+        // Wait for the modal to show and confirm deletion
         $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
         $I->click(ContactPage::$ConfirmDelete);
 
-        // Wait for the delete to be completed and confirm the contact is deleted
+        // Wait for the delete confirmation message
         $I->waitForText("$contactName has been deleted!", 30);
         $I->see("$contactName has been deleted!");
     }
@@ -183,12 +185,15 @@ class ContactManagementCest
     ) {
         $I->amOnPage(ContactPage::$URL);
 
+        // Grab the names of the first two contacts in the list
         $contactName1 = $contact->grabContactNameFromList(1);
         $contactName2 = $contact->grabContactNameFromList(2);
 
+        // Select the contacts from the list
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
+        // Select delete option from dropdown for multiple selections
         $contact->selectOptionFromDropDownForMultipleSelections(11);
 
         // Wait for the modal to become visible and click on the button to confirm delete
@@ -197,6 +202,7 @@ class ContactManagementCest
 
         $I->reloadPage(); // Wait for delete to be completed
 
+        // Confirm the contacts are no longer visible
         $I->dontSee($contactName1);
         $I->dontSee($contactName2);
     }
