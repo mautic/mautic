@@ -49,6 +49,7 @@ return [
                 'class'     => Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [

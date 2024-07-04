@@ -86,7 +86,7 @@ class EmailSendType extends AbstractType
                         'onclick' => 'Mautic.loadNewWindow({
                             "windowUrl": "'.$windowUrl.'"
                         })',
-                        'icon' => 'fa fa-plus',
+                        'icon' => 'ri-add-line',
                     ],
                     'label' => 'mautic.email.send.new.email',
                 ]
@@ -111,7 +111,7 @@ class EmailSendType extends AbstractType
                         'class'    => 'btn btn-default btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
-                        'icon'     => 'fa fa-edit',
+                        'icon'     => 'ri-edit-line',
                     ],
                     'label' => 'mautic.email.send.edit.email',
                 ]
@@ -128,7 +128,7 @@ class EmailSendType extends AbstractType
                         'class'    => 'btn btn-default btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']) && !isset($options['attr']['email']),
-                        'icon'     => 'fa fa-external-link',
+                        'icon'     => 'ri-external-link-line',
                     ],
                     'label' => 'mautic.email.send.preview.email',
                 ]

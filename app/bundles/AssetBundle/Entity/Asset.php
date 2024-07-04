@@ -150,7 +150,7 @@ class Asset extends FormEntity
     /**
      * @var bool|null
      */
-    private $disallow = false;
+    private $disallow = true;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -953,7 +953,7 @@ class Asset extends FormEntity
 
         // return missing file icon if file type is empty
         if (!$fileType) {
-            return 'fa fa-ban';
+            return 'ri-prohibited-line';
         }
 
         $fileTypes = $this->getFileExtensions();
@@ -966,7 +966,7 @@ class Asset extends FormEntity
         }
 
         // File extension is unknown, display general file icon.
-        return 'fa fa-file-o';
+        return 'ri-file-line';
     }
 
     /**
