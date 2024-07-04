@@ -72,10 +72,25 @@
                       {% set groupFields = fields[group] %}
                       {% if groupFields is not empty %}
                           <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">
-                              <div class="pa-md bg-light-xs bdr-b">
-                                  <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
+                              <div class="col-lg-8 pa-md bg-light-xs bdr-b">
+                                {% if not lead.id %}
+                                <div class="alert alert-info col-lg-12 jc-space-between">
+                                    <div class="d-flex ai-center fw-wrap">
+                                        <div class="col-md-7 col-xs-12 ai-center ai-start-md">
+                                            <strong>{{ 'mautic.contact.import.tip.title'|trans }}</strong> 
+                                            {{ 'mautic.contact.import.tip.description'|trans }}
+                                        </div>
+                                        <div class="col-md-5 col-xs-12 ai-end-md jc-center mt-md mb-md">
+                                            <a class="btn btn-default" href="{{ path('mautic_import_action', {'object': 'contacts', 'objectAction': 'new'}) }}">
+                                                {{ 'mautic.contact.import.tip.button'|trans }}
+                                            </a>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                                {% endif %}
+                                  <h4 class="fw-sb mt-md">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
                               </div>
-                              <div class="pa-md">
+                              <div class="col-lg-12 pa-md">
                                   {% if 'core' == group %}
                                       {% if form.title is defined or form.firstname is defined or form.lastname is defined %}
                                           <div class="form-group mb-0">
