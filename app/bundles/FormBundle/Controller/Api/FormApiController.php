@@ -197,6 +197,7 @@ class FormApiController extends CommonApiController
 
                     $fieldEntityArray           = $fieldEntity->convertToArray();
                     $fieldEntityArray['formId'] = $formId;
+                    $fieldEntityArray['mappedObject'] = $fieldParams['mappedObject'] ?? null;
 
                     if (!empty($fieldParams['alias'])) {
                         $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], 'f_', 25);
