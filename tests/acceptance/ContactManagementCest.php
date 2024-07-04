@@ -13,7 +13,7 @@ class ContactManagementCest
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
         Contact $contact
-    ) {
+    ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Click on "Quick Add" button
@@ -40,7 +40,7 @@ class ContactManagementCest
     public function createContactFromForm(
         AcceptanceTester $I,
         Contact $contact
-    ) {
+    ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Click on "+New" button
@@ -68,7 +68,7 @@ class ContactManagementCest
     public function accessEditContactFormFromList(
         AcceptanceTester $I,
         Contact $contact
-    ) {
+    ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
@@ -91,7 +91,7 @@ class ContactManagementCest
     public function editContactFromProfile(
         AcceptanceTester $I,
         Contact $contact
-    ) {
+    ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
@@ -127,7 +127,7 @@ class ContactManagementCest
     public function deleteContactFromList(
         AcceptanceTester $I,
         Contact $contact
-    ) {
+    ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
@@ -151,7 +151,7 @@ class ContactManagementCest
     public function deleteContactFromProfile(
         AcceptanceTester $I,
         Contact $contact
-    ) {
+    ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
@@ -182,7 +182,7 @@ class ContactManagementCest
     public function batchDeleteContacts(
         AcceptanceTester $I,
         Contact $contact
-    ) {
+    ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the names of the first two contacts in the list
