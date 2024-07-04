@@ -566,8 +566,12 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     private function getBehaviorOperators(string $fieldType): array
     {
         if ('segment' === $this->typeOperatorProvider->getContext()) {
+            $this->behaviorOperators['datetime'][] = OperatorOptions::BETWEEN;
+            $this->behaviorOperators['datetime'][] = OperatorOptions::NOT_BETWEEN;
             $this->behaviorOperators['datetime'][] = OperatorOptions::IN_LAST;
             $this->behaviorOperators['datetime'][] = OperatorOptions::IN_NEXT;
+            $this->behaviorOperators['number'][]   = OperatorOptions::BETWEEN;
+            $this->behaviorOperators['number'][]   = OperatorOptions::NOT_BETWEEN;
         }
 
         return $this->typeOperatorProvider->getOperatorsIncluding($this->behaviorOperators[$fieldType]);

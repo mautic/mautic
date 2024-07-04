@@ -73,17 +73,26 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $event->setOperatorsForFieldType($typeName, $operatorOptions);
         }
 
-        $dateOperators = $this->typeOperators['date'];
+        $dateOperators    = $this->typeOperators['date'];
+        $numbereOperators = $this->typeOperators['number'];
 
         if ('segment' === $event->getContext()) {
             $dateOperators['include'][] = OperatorOptions::IN_LAST;
             $dateOperators['include'][] = OperatorOptions::IN_NEXT;
+            $dateOperators['include'][] = OperatorOptions::BETWEEN;
+            $dateOperators['include'][] = OperatorOptions::NOT_BETWEEN;
+
+            $numbereOperators['include'][] = OperatorOptions::BETWEEN;
+            $numbereOperators['include'][] = OperatorOptions::NOT_BETWEEN;
         }
 
         // Subscribe aliases
         $event->setOperatorsForFieldType('boolean', $this->typeOperators['bool']);
         $event->setOperatorsForFieldType('datetime', $dateOperators);
         $event->setOperatorsForFieldType('date', $dateOperators);
+        $event->setOperatorsForFieldType('int', $numbereOperators);
+        $event->setOperatorsForFieldType('integer', $numbereOperators);
+        $event->setOperatorsForFieldType('number', $numbereOperators);
 
         foreach (['country', 'timezone', 'region', 'locale'] as $selectAlias) {
             $event->setOperatorsForFieldType($selectAlias, $this->typeOperators['select']);
