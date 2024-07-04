@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -96,9 +97,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $clickthrough = $event->getClickthrough();
 
         if ($lead instanceof Lead && $content) {
-            $leadArray              = $this->dynamicContentHelper->convertLeadToArray($lead);
-            $leadArray['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($leadArray['id']);
-
+            $leadArray = $lead->getProfileFields();
+            try {
+                $primaryCompany         = $this->companyModel->getCompanyLeadRepository()->getPrimaryCompanyByLeadId($lead->getId());
+                $leadArray['companies'] = [$primaryCompany];
+            } catch (PrimaryCompanyNotFoundException) {
+            }
             $tokens = array_merge(
                 TokenHelper::findLeadTokens($content, $leadArray),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
@@ -136,7 +140,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function decodeTokens(PageDisplayEvent $event): void
     {
-        $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        if (!$lead = $event->getLead()) {
+            $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        }
+
         if (!$lead) {
             return;
         }
@@ -147,8 +154,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-        $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        $result    = [];
+        $leadArray = [];
+        if ($lead instanceof Lead) {
+            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
+        }
+
+        $result = [];
         foreach ($tokens as $token => $dwc) {
             $result[$token] = '';
             if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
@@ -159,12 +170,13 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         // replace slots
         $dom = new \DOMDocument('1.0', 'utf-8');
-        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
         $xpath = new \DOMXPath($dom);
 
-        $divContent = $xpath->query('//*[@data-slot="dwc"]');
-        for ($i = 0; $i < $divContent->length; ++$i) {
-            $slot = $divContent->item($i);
+        $contentSlots = $xpath->query('//*[@data-slot="dwc"]');
+
+        for ($i = 0; $i < $contentSlots->length; ++$i) {
+            $slot = $contentSlots->item($i);
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
                 continue;
             }
@@ -174,7 +186,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
+            $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 

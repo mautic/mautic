@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -24,6 +23,7 @@ use Mautic\MessengerBundle\Message\EmailHitNotification;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
@@ -42,7 +42,7 @@ class PublicController extends CommonFormController
      */
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
@@ -60,10 +60,6 @@ class PublicController extends CommonFormController
             if ($copy = $stat->getStoredCopy()) {
                 $subject = $copy->getSubject();
                 $content = $copy->getBody();
-
-                // Convert emoji
-                $content = EmojiHelper::toEmoji($content, 'short');
-                $subject = EmojiHelper::toEmoji($subject, 'short');
 
                 // Replace tokens
                 $content = str_ireplace(array_keys($tokens), $tokens, $content);
@@ -115,7 +111,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, $idHash, string $urlEmail = null, string $secretHash = null)
     {
         $stat                  = $model->getEmailStatus($idHash);
         $message               = '';
@@ -247,23 +243,23 @@ class PublicController extends CommonFormController
                     if (str_contains($html, 'data-slot="saveprefsbutton"') || str_contains($html, BuilderSubscriber::saveprefsRegex)) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
-                        $params     = array_merge(
+                        $showParameters  = $this->buildSlotShowParametersBasedOnContent($html, $viewParameters);
+                        $eventParameters = array_merge(
                             $viewParameters,
+                            $showParameters,
                             [
-                                'form'                         => $formView,
-                                'startform'                    => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
-                                'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
-                                'showContactFrequency'         => str_contains($html, 'data-slot="channelfrequency"') || str_contains($html, BuilderSubscriber::channelfrequency),
-                                'showContactSegments'          => str_contains($html, 'data-slot="segmentlist"') || str_contains($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'        => str_contains($html, 'data-slot="categorylist"') || str_contains($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels' => str_contains($html, 'data-slot="preferredchannel"') || str_contains($html, BuilderSubscriber::preferredchannel),
+                                'form'       => $formView,
+                                'startform'  => $this->renderView('@MauticCore/Default/form.html.twig', ['form' => $formView]),
+                                'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
                             ]
                         );
-                        // Replace tokens in preference center page
-                        $event = new PageDisplayEvent($html, $prefCenter, $params);
-                        $this->dispatcher
-                            ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+
+                        $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
+
+                        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
+
                         $html = $event->getContent();
+
                         if (!$session->has($successSessionName)) {
                             $successMessageDataSlots       = [
                                 'data-slot="successmessage"',
@@ -286,6 +282,7 @@ class PublicController extends CommonFormController
                             $lead->getPrimaryIdentifier(),
                             $html
                         );
+                        $pageModel->hitPage($prefCenter, $request, 200, $lead);
                     } else {
                         unset($html);
                     }
@@ -442,11 +439,12 @@ class PublicController extends CommonFormController
     /**
      * Preview email.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, $objectId)
+    public function previewAction(AnalyticsHelper $analyticsHelper, Request $request, string $objectId, string $objectType = null)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $contactId = (int) $request->query->get('contactId');
+        /** @var EmailModel $model */
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
@@ -464,6 +462,16 @@ class PublicController extends CommonFormController
                 ))
         ) {
             return $this->accessDenied();
+        }
+
+        // bogus ID
+        if ($contactId && (
+            !$this->security->isAdmin()
+            || !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+        )
+        ) {
+            // disallow displaying contact information
+            $contactId = null;
         }
 
         // bogus ID
@@ -499,23 +507,32 @@ class PublicController extends CommonFormController
             $content = $response->getContent();
         }
 
-        // Convert emojis
-        $content = EmojiHelper::toEmoji($content, 'short');
-
         // Override tracking_pixel
         $tokens = ['{tracking_pixel}' => ''];
 
-        // Prepare a fake lead
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $fields     = $fieldModel->getFieldList(false, false);
-        array_walk(
-            $fields,
-            function (&$field): void {
-                $field = "[$field]";
-            }
-        );
-        $fields['id'] = 0;
+        // Prepare contact
+        if ($contactId) {
+            // We have one from request parameter
+            /** @var LeadModel $leadModel */
+            $leadModel = $this->getModel('lead.lead');
+            /** @var Lead $contact */
+            $contact = $leadModel->getEntity($contactId);
+            $contact = $contact->convertToArray();
+        } else {
+            // Generate faked one
+            /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+            $fieldModel = $this->getModel('lead.field');
+            $contact    = $fieldModel->getFieldList(false, false);
+
+            array_walk(
+                $contact,
+                function (&$field): void {
+                    $field = "[$field]";
+                }
+            );
+
+            $contact['id'] = 0;
+        }
 
         // Generate and replace tokens
         $event = new EmailSendEvent(
@@ -526,7 +543,7 @@ class PublicController extends CommonFormController
                 'idHash'       => $idHash,
                 'tokens'       => $tokens,
                 'internalSend' => true,
-                'lead'         => $fields,
+                'lead'         => $contact,
             ]
         );
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
@@ -630,7 +647,7 @@ class PublicController extends CommonFormController
             $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
         }
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
 
         // email is a semicolon delimited list of emails
@@ -758,5 +775,39 @@ class PublicController extends CommonFormController
             ],
             $message
         );
+    }
+
+    /**
+     * The $viewParameters here have already been used to build the $form.
+     * Fields that are set to show based on the app configuration are part
+     * of the form. If the field is not configured to show, but a slot exists
+     * for that field in the content, then we need to keep the configuration
+     * value instead of letting the content determine if it should show. This
+     * is because of what was stated above - fields that are not configured to
+     * to show are not part of the form. Attempting to render them will result
+     * in an error.
+     *
+     * @param mixed[] $viewParameters
+     *
+     * @return mixed[]
+     */
+    private function buildSlotShowParametersBasedOnContent(string $content, array $viewParameters): array
+    {
+        /*
+         * Since we're going to be merging this with the $viewParameters, filter out `true` values. We do not
+         * want to change a configured value from `false` to `true` because a value of `false` in the $viewParameters
+         * means that the field is not configured to show and therefore is not part of the form. Attempting to
+         * render that field just because a slot for it exists will result in an error.
+         */
+        $showParamsBasedOnContent = array_filter([
+            'showContactFrequency'         => str_contains($content, 'data-slot="channelfrequency"') || str_contains($content, BuilderSubscriber::channelfrequency),
+            'showContactSegments'          => str_contains($content, 'data-slot="segmentlist"') || str_contains($content, BuilderSubscriber::segmentListRegex),
+            'showContactCategories'        => str_contains($content, 'data-slot="categorylist"') || str_contains($content, BuilderSubscriber::categoryListRegex),
+            'showContactPreferredChannels' => str_contains($content, 'data-slot="preferredchannel"') || str_contains($content, BuilderSubscriber::preferredchannel),
+        ], fn (bool $value) =>!$value);
+
+        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
+
+        return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }
 }

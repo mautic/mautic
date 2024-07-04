@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\RouterInterface;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,6 +39,9 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var MockObject&LoggerInterface $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
+        /** @var MockObject&RouterInterface $router */
+        $router = $this->createMock(RouterInterface::class);
+
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
         $coreParametersHelper->method('get')
@@ -50,7 +54,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $tokens = ['{test}' => 'value'];
 
-        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper);
+        $mailHelper = new MailHelper($mockFactory, new Mailer(new SmtpTransport()), $fromEmailHelper, $coreParametersHelper, $mailbox, $logger, $mailHashHelper, $router);
         $mailHelper->setTokens($tokens);
 
         $email = new Email();

@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -84,10 +85,17 @@ class AssetType extends AbstractType
             'remotePath',
             TextType::class,
             [
-                'label'      => 'mautic.asset.asset.form.remotePath',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'       => 'mautic.asset.asset.form.remotePath',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'constraints' => [
+                    new Url(
+                        [
+                            'message' => 'mautic.asset.validation.error.url',
+                        ]
+                    ),
+                ],
             ]
         );
 
@@ -151,7 +159,9 @@ class AssetType extends AbstractType
             ],
         ]);
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 

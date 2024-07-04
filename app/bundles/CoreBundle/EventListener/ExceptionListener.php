@@ -35,8 +35,10 @@ class ExceptionListener extends ErrorListener
         $exception = $event->getThrowable();
 
         if ($exception instanceof LightSamlException) {
+            // Convert the LightSamlException to a AuthenticationException so it can be passed in the session.
+            $exception = new AuthenticationException($exception->getMessage());
             // Redirect to login page with message
-            $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception->getMessage());
+            $event->getRequest()->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
             $event->setResponse(new RedirectResponse($this->router->generate('login')));
 
             return;

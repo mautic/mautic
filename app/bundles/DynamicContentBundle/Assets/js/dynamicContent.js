@@ -172,9 +172,9 @@ Mautic.addDwcFilter = function (elId, elObj) {
     }
 
     if (fieldObject == 'company') {
-        prototype.find(".object-icon").removeClass('fa-user').addClass('fa-building');
+        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
     } else {
-        prototype.find(".object-icon").removeClass('fa-building').addClass('fa-user');
+        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
     }
     prototype.find(".inline-spacer").append(fieldObject);
 
@@ -201,13 +201,13 @@ Mautic.addDwcFilter = function (elId, elObj) {
 
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean') {
+        if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean' || fieldType == 'leadlist') {
             // Generate the options
             var fieldOptions = filterOption.data("field-list");
-            mQuery.each(fieldOptions, function(index, val) {
-                if (mQuery.isPlainObject(val)) {
+            mQuery.each(fieldOptions, function(val, index) {
+                if (mQuery.isPlainObject(index)) {
                     var optGroup = index;
-                    mQuery.each(val, function(index, value) {
+                    mQuery.each(optGroup, function(value, index) {
                         mQuery('<option class="' + optGroup + '">').val(index).text(value).appendTo(filterEl);
                     });
                     mQuery('.' + index).wrapAll("<optgroup label='"+index+"' />");

@@ -36,7 +36,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testViewEmail(): void
     {
-        $email = $this->createEmail('ABC', 'template');
+        $email = $this->createEmail('ABC', 'template', 'list', 'blank', 'Test html');
         $email->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
         $email->setDateModified(new \DateTime('2020-03-21 20:29:02'));
         $email->setCreatedByUser('Test User');
@@ -81,12 +81,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testProfileEmailDetailPageForUnsentEmail(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
         $this->client->enableProfiler();
@@ -115,9 +111,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testProfileEmailDetailPageForSentEmail(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
+
         $contact = new Lead();
         $contact->setEmail('john@doe.email');
         $emailStat = new Stat();
@@ -125,8 +121,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $emailStat->setLead($contact);
         $emailStat->setEmailAddress($contact->getEmail());
         $emailStat->setDateSent(new \DateTime());
-        $this->em->persist($segment);
-        $this->em->persist($email);
         $this->em->persist($contact);
         $this->em->persist($emailStat);
         $this->em->flush();
@@ -151,11 +145,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailDetailPageForDisabledSendButton(): void
     {
-        $segment = $this->createSegment();
-        $this->em->persist($segment);
-        $email   = $this->createEmail();
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'test html', $segment);
         $email->setPublishUp(new \DateTime('now -1 hour'));
-        $email->addList($segment);
         $this->em->persist($email);
         $this->em->flush();
 
@@ -194,12 +186,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     public function testSegmentEmailTranslationLookUp(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
@@ -209,11 +197,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentEmailSend(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
-        $email->setSubject('Subject A');
-        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
 
         foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
             $contact = new Lead();
@@ -227,9 +212,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             $this->em->persist($member);
             $this->em->persist($contact);
         }
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
         $this->em->flush();
 
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
@@ -262,11 +244,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentEmailSendWithAdvancedOptions(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
-        $email->setSubject('Subject A');
-        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $email->setPlainText('Dear {contactfield=email}');
         $email->setFromAddress('custom@from.address');
         $email->setFromName('Custom From Name');
@@ -329,11 +308,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentEmailSendWithTokenInFromAddress(): void
     {
-        $segment = $this->createSegment();
-        $email   = $this->createEmail();
-        $email->addList($segment);
-        $email->setSubject('Subject A');
-        $email->setCustomHtml('Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>');
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $email->setPlainText('Dear {contactfield=email}');
         $email->setFromAddress('{contactfield=address2}');
         $email->setFromName('{contactfield=address1}');
@@ -401,22 +377,105 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('value123', $messageTwo->getHeaders()->get('x-global-custom-header')->getBody());
     }
 
-    private function createSegment(string $suffix = 'A'): LeadList
+    public function testCloneAction(): void
+    {
+        $segment = $this->createSegment('Segment B', 'segment-B');
+        $email   = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment);
+        $this->em->flush();
+
+        // request for email clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[emailType]']->setValue('list');
+        $form['emailform[subject]']->setValue('Email B Subject clone');
+        $form['emailform[name]']->setValue('Email B clone');
+        $form['emailform[isPublished]']->setValue('1');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $emails);
+
+        $firstEmail  = $emails[0];
+        $secondEmail = $emails[1];
+
+        Assert::assertSame($email->getId(), $firstEmail->getId());
+        Assert::assertNotSame($email->getId(), $secondEmail->getId());
+        Assert::assertEquals('list', $secondEmail->getEmailType());
+        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
+        Assert::assertEquals('Email B', $firstEmail->getName());
+        Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
+        Assert::assertEquals('Email B clone', $secondEmail->getName());
+        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
+    }
+
+    public function testAbTestAction(): void
+    {
+        $segment        = $this->createSegment('Segment B', 'segment-B');
+        $varientSetting = ['totalWeight' => 100, 'winnerCriteria' => 'email.openrate'];
+        $email          = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment, $varientSetting);
+        $this->em->flush();
+
+        // request for email clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/abtest/{$email->getId()}");
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[subject]']->setValue('Email B Subject var 2');
+        $form['emailform[name]']->setValue('Email B var 2');
+        $form['emailform[variantSettings][weight]']->setValue((string) $varientSetting['totalWeight']);
+        $form['emailform[variantSettings][winnerCriteria]']->setValue($varientSetting['winnerCriteria']);
+        $form['emailform[isPublished]']->setValue('1');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $emails);
+
+        $firstEmail  = $emails[0];
+        $secondEmail = $emails[1];
+
+        Assert::assertSame($email->getId(), $firstEmail->getId());
+        Assert::assertNotSame($email->getId(), $secondEmail->getId());
+        Assert::assertEquals('list', $secondEmail->getEmailType());
+        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
+        Assert::assertEquals('Email B', $firstEmail->getName());
+        Assert::assertEquals('Email B Subject var 2', $secondEmail->getSubject());
+        Assert::assertEquals('Email B var 2', $secondEmail->getName());
+        Assert::assertEquals('blank', $secondEmail->getTemplate());
+        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
+        Assert::assertEquals($firstEmail->getId(), $secondEmail->getVariantParent()->getId());
+    }
+
+    private function createSegment(string $name, string $alias): LeadList
     {
         $segment = new LeadList();
-        $segment->setName("Segment $suffix");
-        $segment->setPublicName("Segment $suffix");
-        $segment->setAlias("segment-$suffix");
+        $segment->setName($name);
+        $segment->setAlias($alias);
+        $segment->setPublicName($name);
+        $this->em->persist($segment);
 
         return $segment;
     }
 
-    private function createEmail(string $suffix = 'A', string $emailType = 'list')
+    /**
+     * @param mixed[]|null $varientSetting
+     */
+    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, LeadList $segment = null, ?array $varientSetting = []): Email
     {
         $email = new Email();
-        $email->setName("Email $suffix");
-        $email->setSubject("Email $suffix Subject");
+        $email->setName($name);
+        $email->setSubject($subject);
         $email->setEmailType($emailType);
+        $email->setTemplate($template);
+        $email->setCustomHtml($customHtml);
+        $email->setVariantSettings($varientSetting);
+        if (!empty($segment)) {
+            $email->addList($segment);
+        }
+        $this->em->persist($email);
 
         return $email;
     }
@@ -434,6 +493,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setName('Test Email C');
         $email->setSubject('Test Email C Subject');
         $email->setEmailType('list');
+        $email->setCustomHtml('This is Email C custom HTML.');
         $email->addList($segment);
 
         $this->em->persist($segment);

@@ -16,9 +16,9 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class EventLogger
 {
-    private \Doctrine\Common\Collections\ArrayCollection $persistQueue;
+    private ArrayCollection $persistQueue;
 
-    private \Doctrine\Common\Collections\ArrayCollection $logs;
+    private ArrayCollection $logs;
 
     private array $contactRotations = [];
 
@@ -80,11 +80,12 @@ class EventLogger
         $log->setSystemTriggered(defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'));
 
         if (isset($this->contactRotations[$contact->getId()]) && ($this->lastUsedCampaignIdToFetchRotation === $event->getCampaign()->getId())) {
-            $log->setRotation($this->contactRotations[$contact->getId()]);
+            $log->setRotation($this->contactRotations[$contact->getId()]['rotation']);
         } else {
             // Likely a single contact handle such as decision processing
-            $rotations = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
-            $log->setRotation($rotations[$contact->getId()]);
+            $rotations   = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
+            $rotationVal = isset($rotations[$contact->getId()]) ? $rotations[$contact->getId()]['rotation'] : 1;
+            $log->setRotation($rotationVal);
         }
 
         return $log;
@@ -160,6 +161,9 @@ class EventLogger
 
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
+            if (isset($this->contactRotations[$contact->getId()]) && $this->contactRotations[$contact->getId()]['manually_removed']) {
+                continue;
+            }
             $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());

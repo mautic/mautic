@@ -20,11 +20,13 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
+class OwnerSubscriberTest extends TestCase
 {
     protected $contacts = [
         [
@@ -308,9 +310,12 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var LoggerInterface|MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
+        /** @var MockObject&RouterInterface $router */
+        $router = $this->createMock(RouterInterface::class);
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper);
+        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router);
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;
@@ -347,10 +352,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $event->getContent());
     }
 
-    /**
-     * @return User
-     */
-    protected function getUser()
+    protected function getUser(): User
     {
         $user = new class() extends User {
             public function setId(int $id): void

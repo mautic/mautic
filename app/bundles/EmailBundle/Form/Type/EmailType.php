@@ -2,13 +2,13 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
+use Mautic\CoreBundle\Form\Type\DynamicContentFilterType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -41,11 +42,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailType extends AbstractType
 {
-    use DynamicContentTrait;
-
     public function __construct(
         private TranslatorInterface $translator,
-        private EntityManager $em,
+        private EntityManagerInterface $em,
         private StageModel $stageModel,
         private CoreParametersHelper $coreParametersHelper,
         private ThemeHelperInterface $themeHelper
@@ -68,18 +67,16 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'subject',
-                TextType::class,
-                [
-                    'label'      => 'mautic.email.subject',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'   => 'form-control',
-                        'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
-                    ],
-                ]
-            )
+            'subject',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.subject',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'onBlur'  => 'Mautic.copySubjectToName(mQuery(this))',
+                ],
+            ]
         );
 
         $builder->add(
@@ -90,7 +87,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-user',
+                    'preaddon' => 'ri-user-6-fill',
                     'tooltip'  => 'mautic.email.from_name.tooltip',
                 ],
                 'required' => false,
@@ -148,12 +145,17 @@ class EmailType extends AbstractType
             [
                 'label'      => 'mautic.email.use.owner.as.mailer',
                 'label_attr' => ['class' => 'control-label'],
+                'data'       => $this->getUseOwnerAsMailerOrDefaultValue($options['data']),
+                'required'   => false,
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.email.use.owner.as.mailer.tooltip',
+                    'data-global-mailer-is-onwer' => (string) $this->getGlobalMailerIsOwner(),
+                    'class'                       => 'form-control mailer-is-owner-local',
+                    'tooltip'                     => 'mautic.email.use.owner.as.mailer.tooltip',
+                    'data-warning'                => $this->translator->trans(
+                        'mautic.email.config.mailer.is.owner.local.warning',
+                        ['%value%' => $this->translator->trans($this->getGlobalMailerIsOwner() ? 'mautic.core.yes' : 'mautic.core.no')]
+                    ),
                 ],
-                'data'     => (bool) (is_null($options['data']->getUseOwnerAsMailer()) ? $this->coreParametersHelper->get('mailer_is_owner') : $options['data']->getUseOwnerAsMailer()),
-                'required' => false,
             ]
         );
 
@@ -203,7 +205,9 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
@@ -226,22 +230,20 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'customHtml',
-                TextareaType::class,
-                [
-                    'label'      => 'mautic.email.form.body',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => false,
-                    'attr'       => [
-                        'tooltip'              => 'mautic.email.form.body.help',
-                        'class'                => 'form-control editor-builder-tokens builder-html editor-email',
-                        'data-token-callback'  => 'email:getBuilderTokens',
-                        'data-token-activator' => '{',
-                        'rows'                 => '15',
-                    ],
-                ]
-            )
+            'customHtml',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.email.form.body',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'tooltip'              => 'mautic.email.form.body.help',
+                    'class'                => 'form-control editor-builder-tokens builder-html editor-email',
+                    'data-token-callback'  => 'email:getBuilderTokens',
+                    'data-token-activator' => '{',
+                    'rows'                 => '15',
+                ],
+            ]
         );
 
         $transformer = new IdToEntityModelTransformer($this->em, \Mautic\FormBundle\Entity\Form::class, 'id');
@@ -286,7 +288,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\EmailBundle\Entity\Email::class);
+        $transformer = new IdToEntityModelTransformer($this->em, Email::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -419,6 +421,23 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
+            $builder->create(
+                'excludedLists',
+                LeadListType::class,
+                [
+                    'label'      => 'mautic.email.form.excluded_list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'multiple'   => true,
+                    'expanded'   => false,
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+
+        $builder->add(
             'language',
             LocaleType::class,
             [
@@ -468,7 +487,7 @@ class EmailType extends AbstractType
                         'label' => 'mautic.core.builder',
                         'attr'  => [
                             'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                            'icon'    => 'fa fa-cube',
+                            'icon'    => 'ri-layout-line',
                             'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
                         ],
                     ],
@@ -524,5 +543,58 @@ class EmailType extends AbstractType
     public function getBlockPrefix()
     {
         return 'emailform';
+    }
+
+    /**
+     * The owner as mailer value will be taken from the email entity unless the email is new.
+     * If so, it will choose the value from the global configuration as default.
+     */
+    private function getUseOwnerAsMailerOrDefaultValue(Email $email): bool
+    {
+        return $email->getId() ? ((bool) $email->getUseOwnerAsMailer()) : $this->getGlobalMailerIsOwner();
+    }
+
+    private function getGlobalMailerIsOwner(): bool
+    {
+        return (bool) $this->coreParametersHelper->get('mailer_is_owner');
+    }
+
+    private function addDynamicContentField(FormBuilderInterface $builder): void
+    {
+        $builder->add(
+            'dynamicContent',
+            CollectionType::class,
+            [
+                'entry_type'         => DynamicContentFilterType::class,
+                'allow_add'          => true,
+                'allow_delete'       => true,
+                'label'              => false,
+                'entry_options'      => [
+                    'label' => false,
+                ],
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event): void {
+                $data = $event->getData();
+                /** @var Email $entity */
+                $entity = $event->getForm()->getData();
+
+                if (empty($data['dynamicContent'])) {
+                    $data['dynamicContent'] = $entity->getDefaultDynamicContent();
+                    unset($data['dynamicContent'][0]['filters']['filter']);
+                }
+
+                foreach ($data['dynamicContent'] as $key => $dc) {
+                    if (empty($dc['filters'])) {
+                        $data['dynamicContent'][$key]['filters'] = $entity->getDefaultDynamicContent()[0]['filters'];
+                    }
+                }
+
+                $event->setData($data);
+            }
+        );
     }
 }

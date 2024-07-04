@@ -18,14 +18,14 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|FilterOperatorProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $filterOperatorPovider;
+    private MockObject $filterOperatorPovider;
 
-    private \Mautic\LeadBundle\Provider\TypeOperatorProvider $provider;
+    private TypeOperatorProvider $provider;
 
     protected function setUp(): void
     {

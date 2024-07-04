@@ -20,7 +20,9 @@ class ExceptionController extends CommonController
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();
 
-        if (0 === $code) {
+        // All valid status codes are within the range of 100 to 599, inclusive
+        // @see https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes
+        if ($code < 100 || $code > 599) {
             // thrown exception that didn't set a code
             $code = 500;
         }
@@ -32,10 +34,10 @@ class ExceptionController extends CommonController
             || (!defined('MAUTIC_AJAX_VIEW') && str_contains($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
         ) {
             $allowRealMessage =
-                'dev' === MAUTIC_ENV ||
-                str_contains($class, 'UnexpectedValueException') ||
-                str_contains($class, 'NotFoundHttpException') ||
-                str_contains($class, 'AccessDeniedHttpException');
+                'dev' === MAUTIC_ENV
+                || str_contains($class, 'UnexpectedValueException')
+                || str_contains($class, 'NotFoundHttpException')
+                || str_contains($class, 'AccessDeniedHttpException');
 
             $message   = $allowRealMessage
                 ? $exception->getMessage()

@@ -238,7 +238,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $query = $this->createQueryMock();
         $this->entityManager->expects($this->once())
             ->method('createQuery')
-            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer FROM  f INDEX BY f.alias WHERE f.object = :object')
+            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit FROM  f INDEX BY f.alias WHERE f.object = :object')
             ->willReturn($query);
 
         $result = [];
@@ -249,7 +249,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
     public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing(): void
     {
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
+        $queryBuilder = $this->createMock(OrmQueryBuilder::class);
 
         $this->entityManager->method('createQueryBuilder')
             ->willReturn($queryBuilder);

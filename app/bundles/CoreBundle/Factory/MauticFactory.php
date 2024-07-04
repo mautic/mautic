@@ -55,7 +55,7 @@ class MauticFactory
     /**
      * Retrieves Mautic's security object.
      *
-     * @return \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     * @return CorePermissions
      */
     public function getSecurity()
     {
@@ -85,7 +85,7 @@ class MauticFactory
     /**
      * Retrieves Doctrine EntityManager.
      *
-     * @return \Doctrine\ORM\EntityManager
+     * @return EntityManager
      */
     public function getEntityManager()
     {
@@ -108,7 +108,7 @@ class MauticFactory
     /**
      * Retrieves Translator.
      *
-     * @return \Mautic\CoreBundle\Translation\Translator
+     * @return Translator
      */
     public function getTranslator()
     {
@@ -148,7 +148,7 @@ class MauticFactory
     /**
      * Retrieves request.
      *
-     * @return \Symfony\Component\HttpFoundation\Request|null
+     * @return Request|null
      */
     public function getRequest()
     {

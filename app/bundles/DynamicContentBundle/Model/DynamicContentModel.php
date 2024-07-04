@@ -45,7 +45,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     public function getRepository()
     {
         /** @var DynamicContentRepository $repo */
-        $repo = $this->em->getRepository(\Mautic\DynamicContentBundle\Entity\DynamicContent::class);
+        $repo = $this->em->getRepository(DynamicContent::class);
 
         $repo->setTranslator($this->translator);
 
@@ -57,7 +57,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository(\Mautic\DynamicContentBundle\Entity\Stat::class);
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
@@ -147,23 +147,25 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param Lead|array $lead
      * @param string     $source
+     *
+     * @return Stat|null
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): void
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
         if (empty($lead)) {
-            return;
+            return null;
         }
 
         if ($lead instanceof Lead && !$lead->getId()) {
-            return;
+            return null;
         }
 
         if (is_array($lead)) {
             if (empty($lead['id'])) {
-                return;
+                return null;
             }
 
-            $lead = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $lead['id']);
+            $lead = $this->em->getReference(Lead::class, $lead['id']);
         }
 
         $stat = new Stat();
@@ -173,10 +175,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $stat->setSource($source);
 
         $this->getStatRepository()->saveEntity($stat);
+
+        return $stat;
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {

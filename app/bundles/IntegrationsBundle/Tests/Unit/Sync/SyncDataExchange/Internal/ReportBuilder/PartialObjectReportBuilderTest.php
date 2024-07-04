@@ -13,6 +13,8 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company as InternalCompany;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
@@ -33,29 +35,29 @@ class PartialObjectReportBuilderTest extends TestCase
     /**
      * @var FieldChangeRepository|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
+    private MockObject $fieldChangeRepository;
 
     /**
      * @var FieldHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    private MockObject $fieldHelper;
 
     /**
      * @var EventDispatcherInterface|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var FieldBuilder|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
+    private MockObject $fieldBuilder;
 
     /**
      * @var ObjectProvider|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $objectProvider;
 
-    private \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder $reportBuilder;
+    private PartialObjectReportBuilder $reportBuilder;
 
     protected function setUp(): void
     {
@@ -88,7 +90,7 @@ class PartialObjectReportBuilderTest extends TestCase
 
         $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
-            ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
+            ->with('email', $this->anything(), $requestObject, self::INTEGRATION_NAME)
             ->willReturn(
                 new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
             );
@@ -179,7 +181,7 @@ class PartialObjectReportBuilderTest extends TestCase
 
         $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
-            ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
+            ->with('email', $this->anything(), $requestObject, self::INTEGRATION_NAME)
             ->willReturn(
                 new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
             );
@@ -256,5 +258,143 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->assertTrue(isset($objects[1]));
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
         $this->assertEquals('Bob and Cat', $objects[1]->getField('companyname')->getValue()->getNormalizedValue());
+    }
+
+    public function testTrackedContactChangesThrowsObjectNotFoundException(): void
+    {
+        $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
+        $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
+        $toDateTime    = new \DateTimeImmutable('2018-10-08 00:01:00');
+        $requestObject = new ObjectDAO(Contact::NAME, $fromDateTime, $toDateTime);
+        $requestObject->addField('email');
+        $requestObject->addField('firstname');
+        $requestDAO->addObject($requestObject);
+
+        $fieldChange = [
+            'object_type'  => Lead::class,
+            'object_id'    => 1,
+            'modified_at'  => '2018-10-08 00:30:00',
+            'column_name'  => 'firstname',
+            'column_type'  => EncodedValueDAO::STRING_TYPE,
+            'column_value' => 'Bob',
+        ];
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFieldObjectName')
+            ->with(Contact::NAME)
+            ->willReturn(Lead::class);
+
+        // Find and return tracked changes
+        $this->fieldChangeRepository->expects($this->once())
+            ->method('findChangesBefore')
+            ->with(
+                'Test',
+                Lead::class,
+                $toDateTime,
+                0
+            )
+            ->willReturn([$fieldChange]);
+
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByEntityName')
+            ->with(Lead::class)
+            ->willThrowException(new ObjectNotFoundException(Contact::NAME));
+
+        $report  = $this->reportBuilder->buildReport($requestDAO);
+        $objects = $report->getObjects(Contact::NAME);
+
+        $this->assertEmpty($objects);
+    }
+
+    public function testTrackedContactChangesFieldNotFoundException(): void
+    {
+        $exception = new FieldNotFoundException('email', 'company');
+        $this->expectExceptionObject($exception);
+
+        $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
+        $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
+        $toDateTime    = new \DateTimeImmutable('2018-10-08 00:01:00');
+        $requestObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_COMPANY, $fromDateTime, $toDateTime);
+        $requestObject->addField('email');
+        $requestObject->addField('companyname');
+        $requestDAO->addObject($requestObject);
+
+        $this->fieldBuilder->expects($this->once())
+            ->method('buildObjectField')
+            ->with('email', $this->anything(), $requestObject, self::INTEGRATION_NAME)
+            ->willThrowException(new FieldNotFoundException('email', $requestObject->getObject()));
+
+        $fieldChange = [
+            'object_type'  => Company::class,
+            'object_id'    => 1,
+            'modified_at'  => '2018-10-08 00:30:00',
+            'column_name'  => 'firstname',
+            'column_type'  => EncodedValueDAO::STRING_TYPE,
+            'column_value' => 'Bob',
+        ];
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFieldChangeObject')
+            ->with($fieldChange)
+            ->willReturn(
+                new FieldDAO('companyname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob and Cat'))
+            );
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFieldObjectName')
+            ->with(InternalCompany::NAME)
+            ->willReturn(Company::class);
+
+        // Find and return tracked changes
+        $this->fieldChangeRepository->expects($this->once())
+            ->method('findChangesBefore')
+            ->with(
+                'Test',
+                Company::class,
+                $toDateTime,
+                0
+            )
+            ->willReturn([$fieldChange]);
+
+        $internalObject = new InternalCompany();
+
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByEntityName')
+            ->with(Company::class)
+            ->willReturn($internalObject);
+
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with(InternalCompany::NAME)
+            ->willReturn($internalObject);
+
+        // Find the complete object
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
+                    $this->assertSame([1], $event->getIds());
+                    $this->assertSame($internalObject, $event->getObject());
+
+                    // Mock a subscriber:
+                    $event->setFoundObjects([
+                        [
+                            'id'          => 1,
+                            'email'       => 'test@test.com',
+                            'companyname' => 'Bob and Cat',
+                        ],
+                    ]);
+
+                    return true;
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
+            );
+
+        $report  = $this->reportBuilder->buildReport($requestDAO);
+        $objects = $report->getObjects(InternalCompany::NAME);
+
+        $this->assertTrue(isset($objects[1]));
+        // trying to access non-existent object
+        $objects[1]->getField('email');
     }
 }

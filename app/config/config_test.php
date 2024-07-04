@@ -5,7 +5,7 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/** @var Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
 $root          = $container->getParameter('mautic.application_dir').'/app';
@@ -65,7 +65,7 @@ $connectionSettings = [
     'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
     'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
     'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
-    'options'  => [\PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+    'options'  => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
@@ -131,20 +131,25 @@ $container->setParameter('mautic.rss_notification_url', null);
 $container->setParameter('mautic.batch_sleep_time', 0);
 
 // Turn off creating of indexes in lead field fixtures
-$container->register('mautic.install.fixture.lead_field', \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class)
+$container->register('mautic.install.fixture.lead_field', Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class)
     ->addArgument(new Reference('translator'))
     ->addTag(FixturesCompilerPass::FIXTURE_TAG)
     ->setPublic(true);
 
 // Use static namespace for token manager
-$container->register('security.csrf.token_manager', \Symfony\Component\Security\Csrf\CsrfTokenManager::class)
+$container->register('security.csrf.token_manager', Symfony\Component\Security\Csrf\CsrfTokenManager::class)
     ->addArgument(new Reference('security.csrf.token_generator'))
     ->addArgument(new Reference('security.csrf.token_storage'))
     ->addArgument('test')
     ->setPublic(true);
 
 // HTTP client mock handler providing response queue
-$container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
+$container->register(GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
 
-$container->register('http_client', \Symfony\Component\HttpClient\MockHttpClient::class)
+$container->register('http_client', Symfony\Component\HttpClient\MockHttpClient::class)
+    ->setPublic(true);
+
+$container->register('test.service_container', Mautic\CoreBundle\Test\Container\TestContainer::class)
+    ->setArgument('$kernel', new Reference('kernel'))
+    ->setArgument('$privateServicesLocatorId', 'test.private_services_locator')
     ->setPublic(true);

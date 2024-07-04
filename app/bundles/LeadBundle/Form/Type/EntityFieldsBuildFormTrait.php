@@ -81,6 +81,10 @@ trait EntityFieldsBuildFormTrait
                 $field['isRequired'] = false;
             }
 
+            if ($field['charLengthLimit'] > 0) {
+                $constraints[] = new Length(['max' => $field['charLengthLimit']]);
+            }
+
             switch ($type) {
                 case NumberType::class:
                     if (empty($properties['scale'])) {
@@ -270,6 +274,9 @@ trait EntityFieldsBuildFormTrait
                             if (!empty($properties['allowHtml'])) {
                                 $cleaningRules[$field['alias']] = 'html';
                             }
+                            break;
+                        case HtmlType::class:
+                            $cleaningRules[$field['alias']] = 'html';
                             break;
                     }
 

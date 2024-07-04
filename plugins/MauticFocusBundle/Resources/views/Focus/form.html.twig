@@ -18,7 +18,7 @@
     <!-- start: box layout -->
     <div class="box-layout">
         <!-- container -->
-        <div class="col-md-9 bg-auto height-auto bdr-r pa-md">
+        <div class="col-md-9 height-auto bdr-r pa-md">
             <div class="row">
                 <div class="col-md-6">{{ form_row(form.name) }}</div>
                 <div class="col-md-6">{{ form_row(form.website) }}</div>
@@ -27,7 +27,7 @@
                 <div class="col-md-12">{{ form_row(form.description) }}</div>
             </div>
         </div>
-        <div class="col-md-3 bg-white height-auto">
+        <div class="col-md-3 height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
                 {{ form_row(form.category) }}
                 {{ form_row(form.isPublished) }}
@@ -48,7 +48,7 @@
             <div class="website-preview">
 
                 <!-- Form to get preview URL -->
-                <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3 mt-lg">
+                <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3">
                     <div class="row">
                         <div class="mautibot-image col-xs-3 text-center">
                             <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}"/>
@@ -207,7 +207,7 @@
                             <li data-focus-style="notification" class="focus-style visible-focus-style-notification list-group-item pl-sm pr-sm">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="pl-2 fa fa-2x fa-info-circle text-info"></i>
+                                        <i class="pl-2 fa fa-2x ri-information-2-line text-info"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.notification'|trans }}</h4>
@@ -275,7 +275,7 @@
                                     <div class="input-group">
                                         {{ form_widget(form.properties.colors.primary) }}
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_primary" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="primary_site_colors"></div>
@@ -289,7 +289,7 @@
                                     <div class="input-group">
                                         {{ form_widget(form.properties.colors.text) }}
                                         <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                     </div>
                                     <div class="mt-xs site-color-list hide" id="text_site_colors"></div>
@@ -305,7 +305,7 @@
                                         <div class="input-group">
                                             {{ form_widget(form.properties.colors.button) }}
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_site_colors"></div>
@@ -319,7 +319,7 @@
                                         <div class="input-group">
                                             {{ form_widget(form.properties.colors.button_text) }}
                                             <span class="input-group-btn">
-                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="fa fa-eyedropper"></i></button>
+                                        <button data-dropper="focus_properties_colors_button_text" class="btn btn-default btn-nospin btn-dropper" type="button"><i class="ri-eye-linedropper"></i></button>
                                     </span>
                                         </div>
                                         <div class="mt-xs site-color-list hide" id="button_text_site_colors"></div>

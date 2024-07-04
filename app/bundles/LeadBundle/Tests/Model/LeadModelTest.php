@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -48,106 +49,106 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|RequestStack
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
+    private MockObject $requestStackMock;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelperMock;
+    private MockObject $ipLookupHelperMock;
 
     /**
      * @var MockObject|PathsHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
+    private MockObject $pathsHelperMock;
 
     /**
      * @var MockObject|IntegrationHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $integrationHelperkMock;
+    private MockObject $integrationHelperkMock;
 
     /**
      * @var MockObject|FieldModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModelMock;
+    private MockObject $fieldModelMock;
 
     /**
      * @var MockObject|ListModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $listModelMock;
+    private MockObject $listModelMock;
 
     /**
      * @var MockObject|FormFactory
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formFactoryMock;
+    private MockObject $formFactoryMock;
 
     /**
      * @var MockObject|CompanyModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyModelMock;
+    private MockObject $companyModelMock;
 
     /**
      * @var MockObject|CategoryModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $categoryModelMock;
+    private MockObject $categoryModelMock;
 
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
+    private ChannelListHelper $channelListHelperMock;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+    private MockObject $coreParametersHelperMock;
 
     /**
      * @var MockObject|EmailValidator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $emailValidatorMock;
+    private MockObject $emailValidatorMock;
 
     /**
      * @var MockObject|UserProvider
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userProviderMock;
+    private MockObject $userProviderMock;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTrackerMock;
+    private MockObject $contactTrackerMock;
 
     /**
      * @var MockObject|DeviceTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackerMock;
+    private MockObject $deviceTrackerMock;
 
     /**
      * @var MockObject|IpAddressModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipAddressModelMock;
+    private MockObject $ipAddressModelMock;
 
     /**
      * @var MockObject|LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepositoryMock;
+    private MockObject $leadRepositoryMock;
 
     /**
      * @var MockObject|CompanyLeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyLeadRepositoryMock;
+    private MockObject $companyLeadRepositoryMock;
 
     /**
      * @var MockObject|UserHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userHelperMock;
+    private MockObject $userHelperMock;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcherMock;
+    private MockObject $dispatcherMock;
 
     /**
      * @var MockObject|EntityManager
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
+    private MockObject $entityManagerMock;
 
-    private \Mautic\LeadBundle\Model\LeadModel $leadModel;
+    private LeadModel $leadModel;
 
     /**
      * @var MockObject&Translator
@@ -310,10 +311,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldModelMock->expects($this->once())
             ->method('getEntities')
-            ->willReturn([
-                4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
-                5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
-            ]);
+            ->willReturn($this->getFieldPaginatorFake());
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
@@ -353,10 +351,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->fieldModelMock->expects($this->once())
             ->method('getEntities')
-            ->willReturn([
-                4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
-                5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
-            ]);
+            ->willReturn($this->getFieldPaginatorFake());
 
         /** @var LeadModel&MockObject $mockLeadModel */
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
@@ -739,6 +734,29 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             public function getId(): int
             {
                 return $this->id;
+            }
+        };
+    }
+
+    /**
+     * @return Paginator<mixed[]>
+     */
+    private function getFieldPaginatorFake(): Paginator
+    {
+        return new class() extends Paginator {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @return \ArrayIterator<int,array{label: string, alias: string, isPublished: bool, id: int, object: string, group: string, type: string}>
+             */
+            public function getIterator()
+            {
+                return new \ArrayIterator([
+                    4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
+                    5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
+                ]);
             }
         };
     }

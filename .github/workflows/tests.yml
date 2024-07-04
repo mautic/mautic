@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0', '8.1']
+        php-versions: ['8.0', '8.1', '8.2']
         db-types: ['mysql', 'mariadb']
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -81,7 +81,7 @@ jobs:
 
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v2"
+      uses: "ramsey/composer-install@v3"
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
@@ -89,18 +89,19 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.1" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          php -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          composer test
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Save test results for future steps
       if: ${{ matrix.php-versions == '8.1' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
@@ -184,7 +185,7 @@ jobs:
 
     - name: Install dependencies
       # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v2"
+      uses: "ramsey/composer-install@v3"
       env:
         NPM_CONFIG_CACHE: ./var/cache/js/npm
 

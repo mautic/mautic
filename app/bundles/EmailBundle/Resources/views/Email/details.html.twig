@@ -57,7 +57,7 @@
             'href'        : path('mautic_email_action', {'objectAction' : 'sendExample', 'objectId' : email.getId()}),
             'data-header' : 'mautic.email.send.example'|trans,
         },
-        'iconClass' : 'fa fa-send',
+        'iconClass' : 'ri-mail-send-line',
         'btnText'   : 'mautic.email.send.example',
         'primary'   : true,
     } %}
@@ -71,7 +71,7 @@
             'href'        : '#',
             'data-header' : 'mautic.email.heatmap.click_heatmap'|trans,
         },
-        'iconClass' : 'fa fa-fire',
+        'iconClass' : 'ri-fire-line',
         'btnText'   : 'mautic.email.heatmap.click_heatmap'
     } %}
     {% set customButtons = customButtons|merge([heatmapButton]) %}
@@ -121,13 +121,14 @@
   <!-- start: box layout -->
   <div class="box-layout">
       <!-- left section -->
-      <div class="col-md-9 bg-white height-auto">
-          <div class="bg-auto">
+      <div class="col-md-9 height-auto">
+          <div>
               <!-- email detail header -->
               <div class="pr-md pl-md pt-lg pb-lg">
                   <div class="box-layout">
                       <div class="col-xs-10">
-                          <div>{{ emoji_to_html(email.subject, 'short') }}</div>
+                          <div>{{ email.subject }}</div>
+                          <div class="text-muted">{{ emailPreview }}</div>
                           {% if email.isVariant(true) %}
                             <div class="small">
                               <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}) }}" data-toggle="ajax">
@@ -151,7 +152,7 @@
               <div class="collapse" id="email-details">
                   <div class="pr-md pl-md pb-md">
                       <div class="panel shd-none mb-0">
-                          <table class="table table-bordered table-striped mb-0">
+                          <table class="table table-hover mb-0">
                               <tbody>
                               {{- include('@MauticCore/Helper/details.html.twig', {'entity': email}) -}}
                               <tr>
@@ -226,7 +227,7 @@
               <!--/ email detail collapseable -->
           </div>
 
-          <div class="bg-auto bg-dark-xs">
+          <div>
               <!-- email detail collapseable toggler -->
               <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
@@ -241,14 +242,50 @@
               {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
               {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
-              <div id="emailGraphStats"
-                   data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                  <div class="spinner">
-                      <i class="fa fa-spin fa-spinner"></i>
+              <div class="stats-menu pl-md mt-lg">
+                  <!-- tabs controls -->
+                  <ul class="nav nav-tabs">
+                      <li class="active">
+                          <a href="#stats-container" role="tab" data-toggle="tab">
+                              {{ 'mautic.email.thead.stats'|trans }}
+                          </a>
+                      </li>
+                      <li>
+                          <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
+                              {{ 'mautic.email.thead.maps'|trans }}
+                          </a>
+                      </li>
+                  </ul>
+                  <!--/ tabs controls -->
+
+                  <div class="date-range">
+                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                          'dateRangeForm': dateRangeForm,
+                      }) }}
                   </div>
               </div>
 
-              {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ?: []) }}
+              <div class="stats-menu__content tab-content bg-white pa-md mb-lg shd-sm">
+                  <div class="tab-pane active bdr-w-0" id="stats-container">
+                      <div id="emailGraphStats"
+                           data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
+                      >
+                          <div class="spinner">
+                              <i class="fa fa-spin fa-spinner"></i>
+                          </div>
+                      </div>
+
+                  </div>
+                  <div class="tab-pane bdr-w-0" id="reads-map-container"
+                       data-map-url="{{ path('mautic_email_map_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
+                  >
+                      <div class="spinner">
+                          <i class="fa fa-spin fa-spinner"></i>
+                      </div>
+                  </div>
+              </div>
+
+              {{ customContent('details.stats.graph.below', _context) }}
 
               <!-- tabs controls -->
               <ul class="nav nav-tabs pr-md pl-md">
@@ -314,27 +351,57 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bg-white bdr-l height-auto">
+      <div class="col-md-3 bdr-l height-auto">
           <!-- preview URL -->
           <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
               </div>
               <div class="panel-body pt-xs">
-                  <div class="input-group">
-                      <div class="input-group-addon">
-                          {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
-                              'item'  : email,
-                              'model' : 'email',
-                              'query' : 'customToggle=publicPreview'
-                          }) -}}
+                  {% if previewSettingsForm.translation is defined %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="control-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
+                          {{ form_widget(previewSettingsForm.translation) }}
                       </div>
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
-                      <span class="input-group-btn">
-                      <button class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
-                          <i class="fa fa-external-link"></i>
-                      </button>
-                  </span>
+                  </div>
+                  {% endif %}
+                  {% if previewSettingsForm.variant is defined %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="control-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
+                          {{ form_widget(previewSettingsForm.variant) }}
+                      </div>
+                  </div>
+                  {% endif %}
+                  {% if previewSettingsForm.contact is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.contact) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  <div class="row">
+                      <div class="form-group col-xs-12 ">
+                          <div class="input-group">
+                              <div class="input-group-addon">
+                                  {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                      'item'  : email,
+                                      'model' : 'email',
+                                      'query' : 'customToggle=publicPreview'
+                                  }) -}}
+                              </div>
+                              <input id="content_preview_url" data-route="email/preview" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
+                              <span class="input-group-btn">
+                              <button id="content_preview_url_button" class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
+                                  <i class="ri-external-link-line"></i>
+                              </button>
+                          </span>
+                              <input type="hidden" id="content_preview_settings_object_id" value="{{ email.id }}">
+                              <input type="hidden" id="content_preview_settings_contact_id" value="">
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>

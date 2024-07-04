@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
+namespace MauticPlugin\MauticFocusBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -27,32 +27,32 @@ class FocusModelTest extends TestCase
     /**
      * @var ContactTracker|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var FormModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formModel;
+    private MockObject $formModel;
 
     /**
      * @var FieldModel|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
+    private MockObject $leadFieldModel;
 
     /**
      * @var Environment|mixed|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $twig;
+    private MockObject $twig;
 
     /**
      * @var TrackableModel|mixed|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $trackableModel;
+    private MockObject $trackableModel;
 
     protected function setUp(): void
     {
@@ -97,7 +97,7 @@ class FocusModelTest extends TestCase
         $focusModel->getContent($focus);
     }
 
-    public function focusTypeProvider(): iterable
+    public function focusTypeProvider(): \Generator
     {
         yield ['form', self::once()];
         yield ['notice', self::never()];

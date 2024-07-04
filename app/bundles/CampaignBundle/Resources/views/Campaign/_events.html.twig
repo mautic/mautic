@@ -9,7 +9,7 @@
         {% set typeClass    = ('action' == event.eventType and 'no' == event.decisionPath) ? 'danger' : 'success' %}
         {% set percentLabel = ('danger' == typeClass) ? 'mautic.report.campaign.no.percent' : 'mautic.report.campaign.yes.percent' %}
         {% set percentProp  = ('danger' == typeClass) ? 'noPercent' : 'yesPercent' %}
-        <li class="list-group-item bg-auto bg-light-xs">
+        <li class="list-group-item bg-light-xs">
             <div class="progress-bar progress-bar-{{ typeClass }}" style="width:{{ event.yesPercent }}%; left: 0;"></div>
             <div class="progress-bar progress-bar-danger" style="width:{{ event['noPercent'] }}%; left: {{ event['yesPercent'] }}%"></div>
             <div class="box-layout">

@@ -14,7 +14,7 @@ class PublishUpDateType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['label' => 'mautic.core.form.publishup']);
+        $resolver->setDefaults(['label' => 'mautic.core.form.activate_at']);
     }
 
     public function getParent(): string

@@ -94,6 +94,8 @@ Mautic.emailOnLoad = function (container, response) {
            Mautic.loadEmailUsages(mQuery(el));
         });
     }
+
+    Mautic.initMailerIsOwnerGlobalCheck();
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -518,6 +520,30 @@ Mautic.updateDynamicContentDropdown = function () {
     mQuery('button[data-cmd="dynamicContent"]').next().find('ul').html(options.join(''));
 };
 
+Mautic.initMailerIsOwnerGlobalCheck = function() {
+    let radioSelector = '.mailer-is-owner-local';
+    Mautic.toggleMailerIsOwnerWarningMessage(radioSelector);
+    mQuery(radioSelector).on('change', function() {
+        Mautic.toggleMailerIsOwnerWarningMessage(radioSelector);
+    });
+}
+
+Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
+    let checkedRadio = mQuery(radioSelector+':checked');
+    let globalMailerIsOwnerValue = checkedRadio.attr('data-global-mailer-is-onwer') ? '1' : '0';
+    let warningMessageId = 'mailer-is-owner-waring';
+    
+    mQuery('#'+warningMessageId).remove();
+
+    if (checkedRadio.val() !== globalMailerIsOwnerValue) {
+        let warning = mQuery('<div/>');
+        warning.attr('id', warningMessageId);
+        warning.html(checkedRadio.attr('data-warning'));
+        warning.addClass('alert alert-warning mt-md');
+        checkedRadio.closest('.form-group').append(warning);
+    }
+}
+
 Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
@@ -594,9 +620,9 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     prototype = mQuery(prototype);
 
     if (fieldObject == 'company') {
-        prototype.find('.object-icon').removeClass('fa-user').addClass('fa-building');
+        prototype.find('.object-icon').removeClass('ri-user-6-fill').addClass('ri-building-2-line');
     } else {
-        prototype.find('.object-icon').removeClass('fa-building').addClass('fa-user');
+        prototype.find('.object-icon').removeClass('ri-building-2-line').addClass('ri-user-6-fill');
     }
 
     var filterBase  = "emailform[dynamicContent][" + dynamicContentIndex + "][filters][" + dynamicContentFilterIndex + "][filters][" + filterNum + "]";

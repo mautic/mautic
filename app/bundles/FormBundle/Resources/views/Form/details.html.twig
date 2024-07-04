@@ -78,7 +78,7 @@
             <div class="collapse" id="form-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
-                        <table class="table table-bordered table-striped mb-0">
+                        <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeForm}) }}
                             <tr>
@@ -116,7 +116,7 @@
                             <div class="panel-body box-layout">
                                 <div class="col-xs-6 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-download"></span>
+                                        <span class="ri-download-line"></span>
                                         {{ 'mautic.form.graph.line.submissions'|trans }}
                                     </h5>
                                 </div>
@@ -133,7 +133,7 @@
             </div>
             <!--/ stats -->
 
-            {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
+            {{ customContent('details.stats.graph.below', _context) }}
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
@@ -163,7 +163,7 @@
                                     <div class="box-layout">
                                         {% set icon = null %}
                                         {% if 'lead' == group %}
-                                          {% set icon = 'fa-user' %}
+                                          {% set icon = 'ri-user-6-fill' %}
                                         {% elseif 'asset' == group %}
                                           {% set icon = 'fa-cloud-download' %}
                                         {% endif %}
@@ -224,8 +224,8 @@
                 <div class="panel-body">
                     <h5 class="fw-sb mb-sm">{{ 'mautic.form.form.header.copy'|trans }}</h5>
                     <p class="mb-sm">{{ 'mautic.form.form.help.landingpages'|trans }}</p>
-                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-automatic-copy">{{ 'mautic.form.form.header.automaticcopy'|trans }}</a>
-                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-manual-copy">{{ 'mautic.form.form.header.manualcopy'|trans }}</a>
+                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-automatic-copy">{{ 'mautic.form.form.header.embedded'|trans }}</a>
+                    <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-manual-copy">{{ 'mautic.form.form.header.selfhosted'|trans }}</a>
                 </div>
             </div>
         </div>
@@ -246,7 +246,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.automaticcopy'|trans }}</h5>
+                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.embedded'|trans }}</h5>
                 </div>
                 <div class="modal-body">
                     <p>{{ 'mautic.form.form.help.automaticcopy'|trans }}</p>
@@ -269,16 +269,16 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.manualcopy'|trans }}</h5>
+                    <h5 class="modal-title fw-sb">{{ 'mautic.form.form.header.selfhosted'|trans }}</h5>
                 </div>
                 <div class="panel-body">
-                    <p>{{ 'mautic.form.form.help.manualcopy'|trans }}</p>
+                    <p>{{ 'mautic.form.form.help.selfhosted'|trans }}</p>
 
-                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.manualcopy.script'|trans }}</h4>
+                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.script'|trans }}</h4>
                     <textarea class="form-html form-control" readonly
                               onclick="this.setSelectionRange(0, this.value.length);">{{ formScript|purify }}</textarea>
 
-                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.manualcopy.body'|trans }}</h4>
+                    <h4 class="mt-sm mb-sm">{{ 'mautic.form.form.help.selfhosted.body'|trans }}</h4>
                     <textarea class="form-html form-control" readonly
                               onclick="this.setSelectionRange(0, this.value.length);">{{ formContent|raw }}</textarea>
                 </div>

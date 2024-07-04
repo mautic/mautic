@@ -15,15 +15,18 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    public function testNewFieldVarcharFieldWith191Length(): void
+    /**
+     * @dataProvider provideFieldLength
+     */
+    public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
-        $field      = $this->createField('a');
+        $field      = $this->createField('a', 'text', [], $inputLength);
         $fieldModel->saveEntity($field);
 
         $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
-        $this->assertEquals(ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH, $columns[$field->getAlias()]->getLength());
+        $this->assertEquals($expectedLength, $columns[$field->getAlias()]->getLength());
     }
 
     public function testNewMultiSelectField(): void
@@ -95,7 +98,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed> $parameters
      */
-    private function createField(string $suffix, string $type = 'text', array $parameters = []): LeadField
+    private function createField(string $suffix, string $type = 'text', array $parameters = [], ?int $charLength = null): LeadField
     {
         $field = new LeadField();
         $field->setName("Field $suffix");
@@ -104,9 +107,21 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $field->setDateAdded(new \DateTime());
         $field->setDateModified(new \DateTime());
         $field->setType($type);
+        if (!empty($charLength)) {
+            $field->setCharLengthLimit($charLength);
+        }
         $field->setObject('lead');
         isset($parameters['properties']) && $field->setProperties($parameters['properties']);
 
         return $field;
+    }
+
+    /**
+     * @return iterable<array<mixed>>
+     */
+    public function provideFieldLength(): iterable
+    {
+        yield [ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH];
+        yield [64, null];
     }
 }

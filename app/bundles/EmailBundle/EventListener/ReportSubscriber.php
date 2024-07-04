@@ -600,7 +600,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -610,6 +610,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select(
                         'e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
                     )
+                        ->andWhere('es.is_failed = 1')
                         ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
                         ->groupBy('e.id, e.subject')
                         ->orderBy('failed', 'DESC');
@@ -680,7 +681,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-tachometer';
+                    $graphData['iconClass'] = 'ri-speed-up-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;

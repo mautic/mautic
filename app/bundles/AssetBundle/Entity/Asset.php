@@ -150,14 +150,14 @@ class Asset extends FormEntity
     /**
      * @var bool|null
      */
-    private $disallow = false;
+    private $disallow = true;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('assets')
-            ->setCustomRepositoryClass(\Mautic\AssetBundle\Entity\AssetRepository::class)
+            ->setCustomRepositoryClass(AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
@@ -1073,7 +1073,7 @@ class Asset extends FormEntity
     /**
      * Load the file object from it's path.
      *
-     * @return \Symfony\Component\HttpFoundation\File\File|null
+     * @return File|null
      */
     public function loadFile($temp = false)
     {
