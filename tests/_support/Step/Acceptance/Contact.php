@@ -26,7 +26,7 @@ class Contact extends \AcceptanceTester
         $I->pressKey(ContactPage::$tagField, WebDriverKeys::ENTER);
     }
 
-    public function selectContactFromList($place)
+    public function grabContactNameFromList($place)
     {
         $I           = $this;
         $xpath       = "//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]";
@@ -48,5 +48,18 @@ class Contact extends \AcceptanceTester
         $I = $this;
         $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a", 30);
         $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a");
+    }
+
+    public function selectContactFromList($place)
+    {
+        $I = $this;
+        $I->checkOption("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/span/input");
+    }
+
+    public function selectOptionFromDropDownForMultipleSelections($option)
+    {
+        $I = $this;
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button/i');
+        $I->click("//*[@id='leadTable']/thead/tr/th[1]/div/div/ul/li[$option]/a/span/span");
     }
 }

@@ -70,7 +70,7 @@ class ContactManagementCest
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $contact->selectContactFromList(1);
+        $contactName = $contact->grabContactNameFromList(1);
 
         // Click on the dropdown caret on the first contact
         $contact->dropDownMenu(1);
@@ -93,7 +93,7 @@ class ContactManagementCest
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $contact->selectContactFromList(1);
+        $contactName = $contact->grabContactNameFromList(1);
 
         // Click on the contact name to view the contact details
         $I->click(['link' => $contactName]);
@@ -129,7 +129,7 @@ class ContactManagementCest
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $contact->selectContactFromList(1);
+        $contactName = $contact->grabContactNameFromList(1);
 
         // Click on the dropdown caret on the first contact
         $contact->dropDownMenu(1);
@@ -153,7 +153,7 @@ class ContactManagementCest
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
-        $contactName = $contact->selectContactFromList(1);
+        $contactName = $contact->grabContactNameFromList(1);
 
         // Click on the contact name to view the contact details
         $I->click(['link' => $contactName]);
@@ -175,5 +175,29 @@ class ContactManagementCest
         // Wait for the delete to be completed and confirm the contact is deleted
         $I->waitForText("$contactName has been deleted!", 30);
         $I->see("$contactName has been deleted!");
+    }
+
+    public function batchDeleteContacts(
+        AcceptanceTester $I,
+        Contact $contact
+    ) {
+        $I->amOnPage(ContactPage::$URL);
+
+        $contactName1 = $contact->grabContactNameFromList(1);
+        $contactName2 = $contact->grabContactNameFromList(2);
+
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
+
+        $contact->selectOptionFromDropDownForMultipleSelections(11);
+
+        // Wait for the modal to become visible and click on the button to confirm delete
+        $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
+        $I->click(ContactPage::$ConfirmDelete);
+
+        $I->reloadPage(); // Wait for delete to be completed
+
+        $I->dontSee($contactName1);
+        $I->dontSee($contactName2);
     }
 }

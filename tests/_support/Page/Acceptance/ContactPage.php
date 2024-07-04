@@ -17,23 +17,23 @@ class ContactPage
     public static $saveAndCloseButton = '#lead_buttons_save_toolbar';
 
     // Quick Add Form
-    public static $quickAddButton     = '#toolbar .quickadd';
     public static $quickAddModal      = '#MauticSharedModal-label';
     public static $saveButton         = '.btn-save.btn-copy';
 
-    // +New Contact Form
-    public static $newContactButton   = '#toolbar a:nth-child(2)';
-
     // Edit Contact Form
     public static $editForm     = '#core > div.pa-md.bg-light-xs.bdr-b > h4';
+
+    // Delete Contact alert
+    public static $ConfirmDelete = 'button.btn.btn-danger';
 
     // Contact Details Page
     public static $editButton = '#toolbar > div.std-toolbar.btn-group > a:nth-child(1)';
     public static $dropDown   = '#toolbar .std-toolbar.btn-group > button';
     public static $delete     = '#toolbar > div.std-toolbar.btn-group.open > ul > li:nth-child(5) > a';
 
-    // Delete Contact alert
-    public static $ConfirmDelete = 'button.btn.btn-danger';
+    // Contact Page
+    public static $quickAddButton     = '#toolbar .quickadd';
+    public static $newContactButton   = '#toolbar a:nth-child(2)';
 
     /**
      * Basic route example for your current URL
