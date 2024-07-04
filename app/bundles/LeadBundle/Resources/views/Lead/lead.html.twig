@@ -301,7 +301,6 @@
                         {{ 'mautic.lead.lead.tab.auditlog'|trans }}
                     </a>
                 </li>
-                {% if places %}
                     <li class="">
                         <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
                         <span class="label label-primary mr-sm" id="PlaceCount">
@@ -310,7 +309,6 @@
                             {{ 'mautic.lead.lead.tab.places'|trans }}
                         </a>
                     </li>
-                {% endif %}
                 {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
@@ -364,11 +362,14 @@
                 <!-- end: custom content -->
 
                 <!-- #place-container -->
-                {% if places %}
                     <div class="tab-pane fade bdr-w-0" id="place-container">
+                        {% if not places %}
+                        {{ include('@MauticCore/Helper/noinformation.html.twig', {
+                            'tip': 'mautic.contact.noinformation.places'
+                        }) }}
+                        {% endif %}
                         {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
                     </div>
-                {% endif %}
                 <!--/ #place-container -->
             </div>
             <!--/ end: tab-content -->
