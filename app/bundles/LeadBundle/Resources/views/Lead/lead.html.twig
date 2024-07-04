@@ -143,7 +143,7 @@
 
             <!-- lead detail collapseable -->
             <div class="collapse pr-md pl-md" id="lead-details">
-                <ul class="pt-md nav nav-tabs" role="tablist">
+                <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
@@ -258,7 +258,7 @@
 
         <div class="pa-md">
             <!-- tabs controls -->
-            <ul class="nav nav-tabs mt-10">
+            <ul class="nav nav-tabs nav-tabs-contained mt-10">
                 <li class="active">
                     <a href="#timeline-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="TimelineCount">
