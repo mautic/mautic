@@ -221,6 +221,18 @@ class UserController extends FormController
         $model = $this->getModel('user.user');
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
+        if (null === $user) {
+            return $this->postActionRedirect([
+                'returnUrl'       => $this->generateUrl('mautic_user_index'),
+                'flashes'         => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.user.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        }
         $oldEmail = $user->getEmail();
 
         /** @var AuditLogModel $auditLogModel */

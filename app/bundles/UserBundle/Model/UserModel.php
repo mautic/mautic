@@ -314,7 +314,7 @@ class UserModel extends FormModel
     public function sendChangeEmailInfo(string $oldEmail, User $user): void
     {
         $mailer = $this->mailHelper->getMailer();
-        $text = $this->translator->trans(
+        $text   = $this->translator->trans(
             'mautic.user.user.emailchange.email.body',
             ['%name%' => $user->getFirstName()]
         );
