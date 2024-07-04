@@ -4944,6 +4944,21 @@ lesshat-selector { -lh-property: 0 ;
 .csr-move {
   cursor: move !important;
 }
+.ma-a {
+  margin: auto !important;
+}
+.mr-a {
+  margin-right: auto !important;
+}
+.mt-a {
+  margin-top: auto !important;
+}
+.mb-a {
+  margin-bottom: auto !important;
+}
+.ml-a {
+  margin-left: auto !important;
+}
 .ma-0 {
   margin: 0px !important;
 }
