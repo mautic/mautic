@@ -211,7 +211,7 @@
                             {% if devices %}
                                 {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
                             {% else %}
-                                {{ include('@MauticCore/Helper/noinformation.html.twig', {'tip': 'mautic.contact.noinformation.devices'|trans}) }}
+                                {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.devices'|trans}) }}
                             {% endif %}
                         </div>
                     <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
@@ -364,7 +364,7 @@
                 <!-- #place-container -->
                     <div class="tab-pane fade bdr-w-0" id="place-container">
                         {% if not places %}
-                        {{ include('@MauticCore/Helper/noinformation.html.twig', {
+                        {{ include('@MauticCore/Helper/no_information.html.twig', {
                             'tip': 'mautic.contact.noinformation.places'
                         }) }}
                         {% endif %}
