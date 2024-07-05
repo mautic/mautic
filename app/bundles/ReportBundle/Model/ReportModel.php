@@ -813,6 +813,35 @@ class ReportModel extends FormModel
     }
 
     /**
+     * @return array<int, int>
+     */
+    public function getReportsIdsWithDependenciesOnTag(int $tagId): array
+    {
+        $search = 'tag';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+
+        $dependents = [];
+        foreach ($entities as $entity) {
+            foreach ($entity->getFilters() as $entityFilter) {
+                if ($entityFilter['column'] == $search && in_array($tagId, $entityFilter['value'])) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return array_unique($dependents);
+    }
+
+    /**
      * @return \Doctrine\DBAL\Connection
      */
     private function getConnection()

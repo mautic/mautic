@@ -25,6 +25,8 @@
                 let fileUrl = file.url;
                 if (file.baseUrl == '' && typeof window.opener.mauticImagesPath !== 'undefined') {
                     fileUrl = window.opener.mauticImagesPath+'/'+file.name;
+                } else if (file.baseUrl != '') {
+                    fileUrl = file.baseUrl + '' + (file.path).replace('//', '');
                 }
 
                 const editorParam = new RegExp('(?:[\?&]|&amp;)editor=([^&]+)', 'i');
