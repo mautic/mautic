@@ -12,13 +12,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
-    public function testEditGetPage()
+    public function testEditGetPage(): void
     {
         $this->client->request('GET', '/s/users/edit/1');
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
-    public function testRedirectNonExistingUser()
+    public function testRedirectNonExistingUser(): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/00000');
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -26,7 +26,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('User not found with', $crawler->filter('#flashes')->text());
     }
 
-    public function testEditActionFormSubmissionValid()
+    public function testEditActionFormSubmissionValid(): void
     {
         $crawler                = $this->client->request('GET', '/s/users/edit/1');
         $buttonCrawlerNode      = $crawler->selectButton('Save & Close');
@@ -39,7 +39,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('has been updated!', $response->getContent());
     }
 
-    public function testEditActionFormSubmissionInvalid()
+    public function testEditActionFormSubmissionInvalid(): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
 
@@ -59,9 +59,15 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<mixed> $details
      */
-    public function auditLogSetter(int $userId, string $userName, string $bundle,
-        string $object, int $objectId, string $action, array $details): AuditLog
-    {
+    public function auditLogSetter(
+        int $userId,
+        string $userName,
+        string $bundle,
+        string $object,
+        int $objectId,
+        string $action,
+        array $details
+    ): AuditLog {
         $auditLog = new AuditLog();
         $auditLog->setUserId($userId);
         $auditLog->setUserName($userName);

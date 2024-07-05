@@ -262,19 +262,7 @@ class UserController extends FormController
             ],
         ];
 
-        if (null === $user) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => [
-                        [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.user.user.error.notfound',
-                            'msgVars' => ['%id%' => $objectId],
-                        ],
-                    ],
-                ])
-            );
-        } elseif ($model->isLocked($user)) {
+        if ($model->isLocked($user)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $user, 'user.user');
         }
