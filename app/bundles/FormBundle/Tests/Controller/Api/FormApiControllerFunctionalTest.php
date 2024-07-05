@@ -223,15 +223,15 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                             'mappedObject' => 'contact',
                         ],
                         [
-                            'label'        => 'Company Address',
+                            'label'        => 'Company Email',
                             'type'         => 'text',
-                            'alias'        => 'companyaddress1',
+                            'alias'        => 'companyemail1',
                             'mappedField'  => 'companyemail',
                             'mappedObject' => 'company',
                             'leadField'    => 'companyemail',
                         ],
                         [
-                            'label'        => 'Company Phone',
+                            'label'        => 'Phone',
                             'type'         => 'tel',
                             'alias'        => 'phone',
                             'leadField'    => 'position',
