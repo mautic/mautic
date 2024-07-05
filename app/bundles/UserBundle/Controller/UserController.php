@@ -279,7 +279,7 @@ class UserController extends FormController
                 $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $hasher, $submittedPassword);
-                $newEmail          = $formUser['email'];
+                $newEmail          = $formUser['email'] ?? null;
 
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
