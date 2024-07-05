@@ -71,7 +71,7 @@
                                             'href': path('mautic_notification_action', {'objectId': item.id, 'objectAction': 'preview'}),
                                         },
                                         'btnText': 'mautic.notification.preview'|trans,
-                                        'iconClass': 'fa fa-share',
+                                        'iconClass': 'ri-share-forward-box-fill',
                                     },
                                 ],
                         }) }}
@@ -81,12 +81,12 @@
                             {% if 'template' == type %}
                                 {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'notification'}) }}
                             {% else %}
-                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
+                                <i class="fa fa-fw fa-lg ri-toggle-fill text-muted disabled"></i>
                             {% endif %}
                             <a href="{{ path('mautic_notification_action', {'objectAction': 'view', 'objectId': item.id}) }}">
                                 {{ item.name }}
                                 {% if 'list' == type %}
-                                    <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="fa fa-fw fa-list"></i></span>
+                                    <span data-toggle="tooltip" title="{{ 'mautic.notification.icon_tooltip.list_notification'|trans }}"><i class="fa fa-fw ri-list-check"></i></span>
                                 {% endif %}
                             </a>
                         </div>

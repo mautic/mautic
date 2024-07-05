@@ -32,7 +32,7 @@ trait ControllerTrait
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-desc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'ri-sort-desc')]"
             )->count(),
             'The order must be desc'
         );
@@ -44,7 +44,7 @@ trait ControllerTrait
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'fa-sort-amount-asc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column."')]//i[contains(@class, 'ri-sort-asc')]"
             )->count(),
             'The order must be asc'
         );
@@ -56,7 +56,7 @@ trait ControllerTrait
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-asc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'ri-sort-asc')]"
             )->count(),
             'The order must be asc'
         );
@@ -68,7 +68,7 @@ trait ControllerTrait
         PageControllerTest::assertEquals(
             1,
             $crawler->filterXPath(
-                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'fa-sort-amount-desc')]"
+                "//th[contains(@class,'col-".$routeAlias.'-'.$column2."')]//i[contains(@class, 'ri-sort-desc')]"
             )->count(),
             'The order must be desc'
         );

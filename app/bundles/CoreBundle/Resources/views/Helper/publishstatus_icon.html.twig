@@ -10,7 +10,7 @@
 #}
 {# set defaults #}
 {%- set query = query|default('') %}
-{%- set size = size|default('fa-lg') %}
+{%- set size = size|default('ri-lg') %}
 {%- set onclick = onclick|default('') %}
 {%- set attributes = attributes|default({}) %}
 {%- set transKeys = transKeys|default({}) %}
@@ -28,10 +28,10 @@
 
 
 {%- if status is same as 'published' %}
-  {%- set icon = 'fa-toggle-on text-success' %}
+  {%- set icon = 'ri-toggle-fill text-success' %}
   {%- set text = 'mautic.core.form.active'|trans %}
 {%- elseif status is same as 'unpublished' %}
-  {%- set icon = 'fa-toggle-off text-danger' %}
+  {%- set icon = 'ri-toggle-line text-danger' %}
   {%- set text = 'mautic.core.form.inactive'|trans %}
 {%- elseif status is same as 'expired' %}
   {%- set icon = 'ri-time-line text-danger' %}
@@ -42,10 +42,10 @@
 {%- endif %}
 
 {%- if true is same as status %}
-  {%- set icon = 'fa-toggle-on text-success' %}
+  {%- set icon = 'ri-toggle-fill text-success' %}
   {%- set text = 'mautic.core.form.public'|trans %}
 {%- elseif false is same as status %}
-  {%- set icon = 'fa-toggle-off text-danger' %}
+  {%- set icon = 'ri-toggle-line text-danger' %}
   {%- set text = 'mautic.core.form.not.public'|trans %}
 {%- endif %}
 
