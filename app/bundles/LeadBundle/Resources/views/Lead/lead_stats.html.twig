@@ -16,4 +16,11 @@
     </div>
     {% endfor %}
 </div>
+{% if emailStats['sent_count'] == 0 and
+    emailStats['open_rate'] == 0 and
+    emailStats['click_through_rate'] == 0 and
+    emailStats['click_through_open_rate'] == 0
+%}
+    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.statistics'|trans}) }}
+{% endif %}
 {% endif %}

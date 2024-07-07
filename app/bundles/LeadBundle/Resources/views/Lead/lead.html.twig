@@ -309,13 +309,16 @@ lead.permissionUser
                     <!-- Upcoming events -->
                     <div class="col-sm-3 tile">
                         <div class="">
-                            {% if upcomingEvents %}
+                            
                             <hr class="hr-w-2" style="width:50%">
 
                             <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
                                 <div class="panel-heading">
                                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                                 </div>
+                                {% if not upcomingEvents %}
+                                    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.upcoming'|trans}) }}
+                                {% endif %}
                                 <div class="panel-body pt-sm">
                                     <ul class="media-list media-list-feed">
                                         {% for event in upcomingEvents %}
@@ -351,9 +354,6 @@ lead.permissionUser
                                     </ul>
                                 </div>
                             </div>
-                            {% else %}
-                            <div>Nothing here</div>
-                            {% endif %}
                         </div>
 
                     </div>
@@ -515,7 +515,6 @@ lead.permissionUser
                     {% endfor %}
                 </ul>
 
-
             </div>
             <!--/ lead detail collapseable -->
         </div>
@@ -569,14 +568,14 @@ lead.permissionUser
 
 
                 <!-- #social-container -->
-                {% if not isAnonymous and socialProfiles is not empty %}
-                <div class="tab-pane fade bdr-w-0" id="social-container">
-                    {{ include('@MauticLead/Social/index.html.twig', {
-                    'lead': lead,
-                    'socialProfiles': socialProfiles,
-                    'socialProfileUrls': socialProfileUrls,
-                    }) }}
-                </div>
+                {% if not isAnonymous %}
+                    <div class="tab-pane fade bdr-w-0" id="social-container">
+                        {{ include('@MauticLead/Social/index.html.twig', {
+                            'lead': lead,
+                            'socialProfiles': socialProfiles,
+                            'socialProfileUrls': socialProfileUrls,
+                        }) }}
+                    </div>
                 {% endif %}
                 <!--/ #social-container -->
 
@@ -594,21 +593,20 @@ lead.permissionUser
                 <!-- end: custom content -->
 
                 <!-- #place-container -->
-                {% if places %}
-                <div class="tab-pane fade bdr-w-0" id="place-container">
-                    {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
-                </div>
-                {% endif %}
+                    <div class="tab-pane fade bdr-w-0" id="place-container">
+                        {% if not places %}
+                        {{ include('@MauticCore/Helper/no_information.html.twig', {
+                            'tip': 'mautic.contact.noinformation.places'
+                        }) }}
+                        {% endif %}
+                        {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
+                    </div>
                 <!--/ #place-container -->
             </div>
             <!--/ end: tab-content -->
         </div>
-
-
     </div>
     <!--/ left section -->
-
-
 </div>
 <!--/ end: box layout -->
 {% endblock %}
