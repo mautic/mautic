@@ -11,7 +11,7 @@ Variables
 {% set leadName = lead.isAnonymous ? lead.primaryIdentifier|trans : lead.primaryIdentifier %}
 {% set avatar %}
 {% if not isAnonymous %}
-<span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="{{ leadGetAvatar(lead) }}"
+<span class="pull-left img-wrapper"><img src="{{ leadGetAvatar(lead) }}"
         alt="{{ leadName|e }}" /></span>
 {% endif %}
 {% endset %}
@@ -174,63 +174,140 @@ lead.permissionUser
         <div class="tab-content">
             <!-- #overview-tab-content -->
             <div class="tab-pane fade in active bdr-w-0 gap-sm" id="overview-tab-content">
+                <!-- Start first row -->
                 <div class="row-no-gutters gap-sm fw-nowrap-lg mb-sm">
+                    <div class="col-lg-6 gap-sm pa-0">
+                        <div class="d-flex fg-1 gap-sm">
+                            <div class="col-lg-3 gap-sm pa-0">
+                                <!-- Avatar -->
+                                <div class="ar-1-1">{{ avatar }}</div>
 
-                    <!-- Contact info -->
-                    <div class="col-sm-3 tile">
-                        {{ avatar }}
-                        {% if lead.owner %}
-                        <h6 class="fw-sb">{{ 'mautic.lead.lead.field.owner'|trans }}</h6>
-                        <p class="text-muted">{{ lead.owner.name|purify }}</p>
-                        {% endif %}
-
-                        <h6 class="fw-sb">
-                            {{ 'mautic.lead.field.address'|trans }}
-                        </h6>
-                        <address class="text-muted">
-                            {% if fields.core.address1 is defined %}{{ fields.core.address1.value|purify }}<br>{%
-                            endif %}
-                            {% if fields.core.address2 is defined %}{{ fields.core.address2.value|purify }}<br>{%
-                            endif %}
-                            {{ lead.location|purify }}
-                            {% if fields.core.zipcode is defined %}{{ fields.core.zipcode.value|purify }}{% endif %}
-                            <br>
-                        </address>
-
-                        <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
-                        <p class="text-muted">{{ fields.core.email.value|purify }}</p>
-
-                        {% if fields.core.phone is defined %}
-                        <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.home'|trans }}</h6>
-                        <p class="text-muted">{{ fields.core.phone.value|purify }}</p>
-                        {% endif %}
-
-                        {% if fields.core.mobile is defined %}
-                        <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.mobile'|trans }}</h6>
-                        <p class="text-muted mb-0">{{ fields.core.mobile.value|purify }}</p>
-                        {% endif %}
-
-                        <div class="pa-sm">
-                            {% for tag in lead.tags %}
-                            <div id="tagLabel{{ tag.id }}">
-                                <h5 class="pull-left mt-xs mr-xs">
-                                    <span class="label label-success label-tag">
-                                        <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}"
-                                            data-toggle="ajax" style="color: white;">
-                                            {{ tag.tag|purify }}
-                                        </a>
-                                        <i class="ri-close-line has-click-event"
-                                            onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
-                                    </span>
-                                </h5>
+                                <!-- Points panel -->
+                                <div class="tile ai-center jc-center ar-1-1">
+                                    <div class="mt-sm points-panel text-center">
+                                        <div class="fs-36"
+                                            style="{% if lead.color is not empty %}font-color:{{ lead.color }} !important;{% endif %}">
+                                            {{ 'mautic.lead.points.count'|trans({'%count%': lead.points}) }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            {% endfor %}
-                            <div class="clearfix"></div>
+
+                            <div class="col-lg-9 pa-0">
+                                <div class="tile">
+                                    <!-- Basic info -->
+                                    {% if lead.owner %}
+                                    <h6 class="fw-sb">{{ 'mautic.lead.lead.field.owner'|trans }}</h6>
+                                    <p class="text-muted">{{ lead.owner.name|purify }}</p>
+                                    {% endif %}
+
+                                    <h6 class="fw-sb">
+                                        {{ 'mautic.lead.field.address'|trans }}
+                                    </h6>
+                                    <address class="text-muted">
+                                        {% if fields.core.address1 is defined %}{{ fields.core.address1.value|purify
+                                        }}<br>{%
+                                        endif %}
+                                        {% if fields.core.address2 is defined %}{{ fields.core.address2.value|purify
+                                        }}<br>{%
+                                        endif %}
+                                        {{ lead.location|purify }}
+                                        {% if fields.core.zipcode is defined %}{{ fields.core.zipcode.value|purify }}{%
+                                        endif %}
+                                        <br>
+                                    </address>
+
+                                    <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
+                                    <p class="text-muted">{{ fields.core.email.value|purify }}</p>
+
+                                    {% if fields.core.phone is defined %}
+                                    <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.home'|trans }}</h6>
+                                    <p class="text-muted">{{ fields.core.phone.value|purify }}</p>
+                                    {% endif %}
+
+                                    {% if fields.core.mobile is defined %}
+                                    <h6 class="fw-sb">{{ 'mautic.lead.field.type.tel.mobile'|trans }}</h6>
+                                    <p class="text-muted mb-0">{{ fields.core.mobile.value|purify }}</p>
+                                    {% endif %}
+
+                                    <!-- Tags -->
+                                    <div class="pa-sm">
+                                        {% for tag in lead.tags %}
+                                        <div id="tagLabel{{ tag.id }}">
+                                            <h5 class="pull-left mt-xs mr-xs">
+                                                <span class="label label-success label-tag">
+                                                    <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}"
+                                                        data-toggle="ajax" style="color: white;">
+                                                        {{ tag.tag|purify }}
+                                                    </a>
+                                                    <i class="ri-close-line has-click-event"
+                                                        onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
+                                                </span>
+                                            </h5>
+                                        </div>
+                                        {% endfor %}
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                    <!-- Group scores -->
+                                    {% if lead.groupScores is not empty %}
+                                    <div class="panel-heading">
+                                        <div class="panel-title">
+                                            {{ 'mautic.lead.groups.panel.title'|trans }}
+                                        </div>
+                                    </div>
+
+                                    <div class="panel-body pt-sm group-points-panel">
+                                        {% for groupScore in lead.groupScores %}
+                                        <div class="row">
+                                            <h6 class="fw-sb col-md-6">
+                                                {{ groupScore.group.name }}
+                                            </h6>
+                                            <p class="text-muted col-md-6">
+                                                {{ 'mautic.lead.points.count'|trans({'%count%': groupScore.score}) }}
+                                            </p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Do Not Contact -->
+                                    {% if doNotContact %}
+                                    {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContact})
+                                    }}
+                                    {% endif %}
+                                    {% if doNotContactSms %}
+                                    {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact':
+                                    doNotContactSms})
+                                    }}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                        <div class="pa-sm panel-companies">
-                            <div class="panel-title">
-                                {{ 'mautic.lead.lead.companies'|trans }}
-                            </div>
+                    </div>
+
+
+                    <!-- Segments -->
+                    <div class="col-lg-3 tile">
+                        <div class="fw-b mb-sm">{{ 'mautic.lead.lead.lists'|trans }}</div>
+                        {% if lists[lead.id] is defined %}
+                        {% for key, list in lists[lead.id] %}
+                        <h5 class="pull-left mt-xs mr-xs">
+                            <span class="label label-success">
+                                <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}"
+                                    data-toggle="ajax" style="color: white;">
+                                    {{ list.name|purify }}
+                                </a>
+                            </span>
+                        </h5>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="col-lg-3 gap-sm">
+                        <!-- Companies -->
+                        <div class="pa-sm panel-companies tile">
+                            <div class="fw-b mb-sm">{{ 'mautic.lead.lead.companies'|trans }}</div>
                             {% for key, company in companies %}
                             <h5 class="pull-left mt-xs mr-xs">
                                 <span class="label label-success">
@@ -247,119 +324,32 @@ lead.permissionUser
                             {% endfor %}
                             <div class="clearfix"></div>
                         </div>
-                        {% if lists[lead.id] is defined %}
-                        <div class="pa-sm panel-segments">
-                            <div class="panel-title">
-                                {{ 'mautic.lead.lead.lists'|trans }}
-                            </div>
-                            {% for key, list in lists[lead.id] %}
-                            <h5 class="pull-left mt-xs mr-xs">
-                                <span class="label label-success">
-                                    <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}"
-                                        data-toggle="ajax" style="color: white;">
-                                        {{ list.name|purify }}
-                                    </a>
-                                </span>
-                            </h5>
-                            {% endfor %}
-                            {% endif %}
-                            <div class="mt-sm points-panel text-center">
-                                <h1
-                                    style="{% if lead.color is not empty %}font-color:{{ lead.color }} !important;{% endif %}">
-                                    {{ 'mautic.lead.points.count'|trans({'%count%': lead.points}) }}
-                                </h1>
-                                <hr />
-                                {% if lead.stage %}
-                                {{ lead.stage.name|purify }}
-                                <hr>
-                                {% endif %}
-                            </div>
 
-                            {% if lead.groupScores is not empty %}
-                            <div class="panel-heading">
-                                <div class="panel-title">
-                                    {{ 'mautic.lead.groups.panel.title'|trans }}
-                                </div>
-                            </div>
-
-                            <div class="panel-body pt-sm group-points-panel">
-                                {% for groupScore in lead.groupScores %}
-                                <div class="row">
-                                    <h6 class="fw-sb col-md-6">
-                                        {{ groupScore.group.name }}
-                                    </h6>
-                                    <p class="text-muted col-md-6">
-                                        {{ 'mautic.lead.points.count'|trans({'%count%': groupScore.score}) }}
-                                    </p>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-
-                            {% if doNotContact %}
-                            {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContact}) }}
-                            {% endif %}
-                            {% if doNotContactSms %}
-                            {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContactSms})
-                            }}
+                        <!-- Stages -->
+                        <div class="tile">
+                            <div class="fw-b mb-sm">{{'mautic.stages.menu.index'|trans}}</div>
+                            {% if lead.stage %}
+                            {{ lead.stage.name|purify }}
                             {% endif %}
                         </div>
                     </div>
+                </div>
+                <!--/ End first row -->
 
-                    <!-- Upcoming events -->
-                    <div class="col-sm-3 tile">
-                        <div class="">
-                            
-                            <hr class="hr-w-2" style="width:50%">
-
-                            <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
-                                <div class="panel-heading">
-                                    <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
-                                </div>
-                                {% if not upcomingEvents %}
-                                    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.upcoming'|trans}) }}
-                                {% endif %}
-                                <div class="panel-body pt-sm">
-                                    <ul class="media-list media-list-feed">
-                                        {% for event in upcomingEvents %}
-                                        {% set metadata = serializerDecode(event.metadata) %}
-                                        {% set errors = false %}
-                                        {% if metadata.errors is defined and metadata.errors is not empty %}
-                                        {% set errors = metadata.errors is iterable ? metadata.errors|join('<br />')
-                                        :
-                                        metadata.errors %}
-                                        {% endif %}
-                                        <li class="media">
-                                            <div class="media-object pull-left mt-xs">
-                                                <span class="figure"></span>
-                                            </div>
-                                            <div class="media-body">
-                                                {{ 'mautic.lead.lead.upcoming.event.triggered.at'|trans({
-                                                '%event%': event.event_name,
-                                                '%link%': '<a
-                                                    href="'~path('mautic_campaign_action', {'objectAction': 'view', 'objectId': event.campaign_id})~'"
-                                                    data-toggle="ajax">'~event.campaign_name~'</a>',
-                                                })|purify }}
-                                                {% if errors is not empty %}
-                                                <i class="ri-alert-line text-danger" data-toggle="tooltip"
-                                                    title="{{ errors|purify }}"></i>
-                                                {% endif %}
-                                                <p
-                                                    class="fs-12 dark-sm timeline-campaign-event-date-{{ event.event_id }}">
-                                                    {{ dateToFull(event.trigger_date, 'utc') }}
-                                                </p>
-                                            </div>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
+                <!-- Start second row -->
+                <!-- Channel statistics -->
+                <div class="row-no-gutters mb-sm">
+                    <div class="col-lg-12" id="lead-stats"
+                        data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
+                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                     </div>
+                </div>
+                <!--/ End second row -->
 
+                <!-- Start third row -->
+                <div class="row-no-gutters gap-sm fw-nowrap-lg mb-sm">
                     <!-- Engagement chart -->
-                    <div class="col-sm-6 tile">
+                    <div class="col-lg-8 tile">
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
@@ -375,13 +365,52 @@ lead.permissionUser
                         </div>
                     </div>
 
-                </div>
-                <div class="row-no-gutters">
-                    <div class="col-lg-12 tile" id="lead-stats"
-                        data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
-                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                    <!-- Upcoming events -->
+                    <div class="col-lg-4 tile">
+                        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
+                            <div class="fw-b mb-lg">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
+                            {% if not upcomingEvents %}
+                            {{ include('@MauticCore/Helper/no_information.html.twig', {'tip':
+                            'mautic.contact.noinformation.upcoming'|trans}) }}
+                            {% endif %}
+                            <div class="panel-body pt-sm">
+                                <ul class="media-list media-list-feed">
+                                    {% for event in upcomingEvents %}
+                                    {% set metadata = serializerDecode(event.metadata) %}
+                                    {% set errors = false %}
+                                    {% if metadata.errors is defined and metadata.errors is not empty %}
+                                    {% set errors = metadata.errors is iterable ? metadata.errors|join('<br />')
+                                    :
+                                    metadata.errors %}
+                                    {% endif %}
+                                    <li class="media">
+                                        <div class="media-object pull-left mt-xs">
+                                            <span class="figure"></span>
+                                        </div>
+                                        <div class="media-body">
+                                            {{ 'mautic.lead.lead.upcoming.event.triggered.at'|trans({
+                                            '%event%': event.event_name,
+                                            '%link%': '<a
+                                                href="'~path('mautic_campaign_action', {'objectAction': 'view', 'objectId': event.campaign_id})~'"
+                                                data-toggle="ajax">'~event.campaign_name~'</a>',
+                                            })|purify }}
+                                            {% if errors is not empty %}
+                                            <i class="ri-alert-line text-danger" data-toggle="tooltip"
+                                                title="{{ errors|purify }}"></i>
+                                            {% endif %}
+                                            <p class="fs-12 dark-sm timeline-campaign-event-date-{{ event.event_id }}">
+                                                {{ dateToFull(event.trigger_date, 'utc') }}
+                                            </p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
+                    <!-- End upcoming events -->
                 </div>
+                <!--/ End third row -->
             </div>
             <!--/ #overview-tab-content -->
 
@@ -462,7 +491,7 @@ lead.permissionUser
                 </div>
                 {% endfor %}
 
-                {% if devices %}
+                {% if not devices %}
                 <div class="col-lg-9 tile bdr-w-0" id="devices">
                     {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
                 </div>
@@ -543,7 +572,7 @@ lead.permissionUser
                     </a>
                 </li>
 
-                {% if places %}
+
                 <li class="">
                     <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
                         <span class="label label-primary mr-sm" id="PlaceCount">
@@ -552,7 +581,7 @@ lead.permissionUser
                         {{ 'mautic.lead.lead.tab.places'|trans }}
                     </a>
                 </li>
-                {% endif %}
+
                 {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
@@ -569,13 +598,13 @@ lead.permissionUser
 
                 <!-- #social-container -->
                 {% if not isAnonymous %}
-                    <div class="tab-pane fade bdr-w-0" id="social-container">
-                        {{ include('@MauticLead/Social/index.html.twig', {
-                            'lead': lead,
-                            'socialProfiles': socialProfiles,
-                            'socialProfileUrls': socialProfileUrls,
-                        }) }}
-                    </div>
+                <div class="tab-pane fade bdr-w-0" id="social-container">
+                    {{ include('@MauticLead/Social/index.html.twig', {
+                    'lead': lead,
+                    'socialProfiles': socialProfiles,
+                    'socialProfileUrls': socialProfileUrls,
+                    }) }}
+                </div>
                 {% endif %}
                 <!--/ #social-container -->
 
@@ -593,14 +622,14 @@ lead.permissionUser
                 <!-- end: custom content -->
 
                 <!-- #place-container -->
-                    <div class="tab-pane fade bdr-w-0" id="place-container">
-                        {% if not places %}
-                        {{ include('@MauticCore/Helper/no_information.html.twig', {
-                            'tip': 'mautic.contact.noinformation.places'
-                        }) }}
-                        {% endif %}
-                        {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
-                    </div>
+                <div class="tab-pane fade bdr-w-0" id="place-container">
+                    {% if not places %}
+                    {{ include('@MauticCore/Helper/no_information.html.twig', {
+                    'tip': 'mautic.contact.noinformation.places'
+                    }) }}
+                    {% endif %}
+                    {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
+                </div>
                 <!--/ #place-container -->
             </div>
             <!--/ end: tab-content -->
