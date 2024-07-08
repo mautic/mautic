@@ -10,6 +10,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface
 {
+    protected const TABLE_NAME = null;
+
     /**
      * @var ContainerInterface
      */
@@ -39,6 +41,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * @throws \Doctrine\DBAL\Exception
      * @throws AbortMigration
+     *
+     * @todo remove this method to make it absctract for Mautic 6
      */
     public function up(Schema $schema): void
     {
@@ -56,6 +60,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
     /**
      * @throws AbortMigration
+     *
+     * @todo remove this method to make it absctract for Mautic 6
      */
     public function down(Schema $schema): void
     {
@@ -184,5 +190,18 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected function suppressNoSQLStatementError()
     {
         $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
+    }
+
+    /**
+     * This method will remove the burden of getting prefixed table name in individual migration file.
+     * Individual migration files just need to keep a protected constant TABLE_NAME.
+     */
+    protected function getPrefixedTableName(string $tableName = null): string
+    {
+        if (null === $tableName) {
+            $tableName = static::TABLE_NAME;
+        }
+
+        return $this->prefix.$tableName;
     }
 }
