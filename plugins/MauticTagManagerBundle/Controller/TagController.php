@@ -7,7 +7,9 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
+use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -144,7 +146,7 @@ class TagController extends FormController
      *
      * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, TagDependencies $tagDependencies)
     {
         if (!$this->security->isGranted('tagManager:tagManager:create')) {
             return $this->accessDenied();
@@ -195,7 +197,10 @@ class TagController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            /** @var SubmitButton $saveSubmitButton */
+            $saveSubmitButton = $form->get('buttons')->get('save');
+
+            if ($cancelled || ($valid && $saveSubmitButton->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
@@ -206,7 +211,7 @@ class TagController extends FormController
                     ],
                 ]);
             } elseif ($valid && !$cancelled) {
-                return $this->editAction($request, $tag->getId(), true);
+                return $this->editAction($request, $tagDependencies, $tag->getId(), true);
             }
         }
 
@@ -232,8 +237,12 @@ class TagController extends FormController
      *
      * @return Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, TagDependencies $tagDependencies, $objectId, $ignorePost = false)
     {
+        if (!$this->security->isGranted('tagManager:tagManager:edit')) {
+            return $this->accessDenied();
+        }
+
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         try {
@@ -242,13 +251,14 @@ class TagController extends FormController
             return $this->createTagModifyResponse(
                 $request,
                 $tag,
+                $tagDependencies,
                 $postActionVars,
                 $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException $exception) {
+        } catch (AccessDeniedException) {
             return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
+        } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -271,12 +281,12 @@ class TagController extends FormController
      *
      * @return Response
      */
-    private function createTagModifyResponse(Request $request, Tag $tag, array $postActionVars, $action, $ignorePost)
+    private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, $action, $ignorePost)
     {
         /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
 
-        /** @var FormInterface<FormInterface> $form */
+        /** @var FormInterface<FormInterface<Tag>> $form */
         $form = $tagModel->createForm($tag, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
@@ -339,7 +349,7 @@ class TagController extends FormController
 
                         return $this->postActionRedirect($postActionVars);
                     } else {
-                        return $this->viewAction($request, $tag->getId());
+                        return $this->viewAction($request, $tagDependencies, $tag->getId());
                     }
                 }
             }
@@ -391,10 +401,8 @@ class TagController extends FormController
      * Get variables for POST action.
      *
      * @param int|null $objectId
-     *
-     * @return array
      */
-    private function getPostActionVars(Request $request, $objectId = null)
+    private function getPostActionVars(Request $request, $objectId = null): array
     {
         // set the return URL
         if ($objectId) {
@@ -423,11 +431,11 @@ class TagController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, TagDependencies $tagDependencies, $objectId)
     {
-        /** @var \Mautic\LeadBundle\Model\TagModel $model */
+        /** @var TagModel $model */
         $model    = $this->getModel('lead.tag');
         $security = $this->security;
 
@@ -462,8 +470,9 @@ class TagController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
-                'tag'      => $tag,
-                'security' => $security,
+                'tag'        => $tag,
+                'security'   => $security,
+                'usageStats' => $tagDependencies->getChannelsIds($tag),
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
             'passthroughVars' => [
@@ -593,7 +602,7 @@ class TagController extends FormController
             if (!empty($deleteIds)) {
                 try {
                     $entities = $model->deleteEntities($deleteIds);
-                } catch (ForeignKeyConstraintViolationException $exception) {
+                } catch (ForeignKeyConstraintViolationException) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',

@@ -46,7 +46,7 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
      *
      * {@inheritdoc}
      */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true)
     {
         if (in_array($request->getClientIp(), $this->allowedIps) || false !== getenv('DDEV_TLD')) {
             return $this->app->handle($request, $type, $catch);
@@ -55,9 +55,6 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         return new Response('You are not allowed to access this file.', 403);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority()
     {
         return self::PRIORITY;

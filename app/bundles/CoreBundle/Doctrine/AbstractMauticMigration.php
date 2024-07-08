@@ -10,6 +10,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface
 {
+    protected const TABLE_NAME = null;
+
     /**
      * @var ContainerInterface
      */
@@ -39,10 +41,12 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * @throws \Doctrine\DBAL\Exception
      * @throws AbortMigration
+     *
+     * @todo remove this method to make it absctract for Mautic 6
      */
     public function up(Schema $schema): void
     {
-        $platform = $this->connection->getDatabasePlatform()->getName();
+        $platform = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
 
         // Abort the migration if the platform is unsupported
         $this->abortIf(!in_array($platform, $this->supported), 'The database platform is unsupported for migrations');
@@ -56,6 +60,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
     /**
      * @throws AbortMigration
+     *
+     * @todo remove this method to make it absctract for Mautic 6
      */
     public function down(Schema $schema): void
     {
@@ -63,15 +69,13 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container     = $container;
         $this->prefix        = $container->getParameter('mautic.db_table_prefix');
-        $this->platform      = $this->connection->getDatabasePlatform()->getName();
+        $this->platform      = DatabasePlatform::getDatabasePlatform($this->connection->getDatabasePlatform());
     }
 
     /**
@@ -85,7 +89,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         static $tables = [];
 
         if (empty($schemaManager)) {
-            $schemaManager = $this->connection->getSchemaManager();
+            $schemaManager = $this->connection->createSchemaManager();
         }
 
         // Prepend prefix
@@ -157,9 +161,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $hash        = implode(
             '',
             array_map(
-                function ($column) {
-                    return dechex(crc32($column));
-                },
+                fn ($column): string => dechex(crc32($column)),
                 $columnNames
             )
         );
@@ -188,5 +190,18 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected function suppressNoSQLStatementError()
     {
         $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
+    }
+
+    /**
+     * This method will remove the burden of getting prefixed table name in individual migration file.
+     * Individual migration files just need to keep a protected constant TABLE_NAME.
+     */
+    protected function getPrefixedTableName(string $tableName = null): string
+    {
+        if (null === $tableName) {
+            $tableName = static::TABLE_NAME;
+        }
+
+        return $this->prefix.$tableName;
     }
 }

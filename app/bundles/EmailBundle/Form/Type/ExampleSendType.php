@@ -8,9 +8,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ExampleSendType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'emails',
@@ -29,7 +32,7 @@ class ExampleSendType extends AbstractType
             [
                 'apply_text' => false,
                 'save_text'  => 'mautic.email.send',
-                'save_icon'  => 'fa fa-send',
+                'save_icon'  => 'ri-send-plane-line',
             ]
         );
     }

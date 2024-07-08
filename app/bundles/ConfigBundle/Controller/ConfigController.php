@@ -25,7 +25,7 @@ class ConfigController extends FormController
     /**
      * Controller action for editing the application configuration.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
     {
@@ -67,6 +67,8 @@ class ConfigController extends FormController
                 if ($isWritable && $isValid = $this->isFormValid($form)) {
                     // Bind request to the form
                     $post     = $request->request;
+
+                    /** @var mixed[] $formData */
                     $formData = $form->getData();
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
@@ -182,7 +184,7 @@ class ConfigController extends FormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function downloadAction(Request $request, BundleHelper $bundleHelper, $objectId)
     {
@@ -221,7 +223,7 @@ class ConfigController extends FormController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function removeAction(BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, $objectId)
     {
@@ -245,7 +247,7 @@ class ConfigController extends FormController
 
                 $cacheHelper->refreshConfig();
                 $success = 1;
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
         }
 
@@ -263,9 +265,9 @@ class ConfigController extends FormController
         // Import the current local configuration, $parameters is defined in this file
 
         $parameters = [];
-        /** @var array $parameters */
         include $localConfigFile;
 
+        /** @var mixed[] $parameters */
         $localParams = $parameters;
 
         foreach ($forms as &$form) {

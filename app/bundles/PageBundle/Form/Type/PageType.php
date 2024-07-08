@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -30,51 +29,30 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Page>
+ */
 class PageType extends AbstractType
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
-
-    /**
-     * @var \Mautic\PageBundle\Model\PageModel
-     */
-    private $model;
-
-    /**
-     * @var User
-     */
-    private $user;
+    private ?\Mautic\UserBundle\Entity\User $user;
 
     /**
      * @var bool
      */
     private $canViewOther = false;
 
-    /**
-     * @var ThemeHelperInterface
-     */
-    private $themeHelper;
-
     public function __construct(
-        EntityManager $entityManager,
-        PageModel $pageModel,
+        private EntityManager $em,
+        private PageModel $model,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
-        ThemeHelperInterface $themeHelper
+        private ThemeHelperInterface $themeHelper
     ) {
-        $this->em           = $entityManager;
-        $this->model        = $pageModel;
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
-        $this->themeHelper  = $themeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url', 'headScript' => 'html', 'footerScript' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
@@ -123,14 +101,16 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
 
         $builder->add(
             'isPreferenceCenter',
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.form.preference_center',
-                'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
+                'data'  => $options['data']->isPreferenceCenter() ?: false,
                 'attr'  => [
                     'tooltip' => 'mautic.page.form.preference_center.tooltip',
                 ],
@@ -142,7 +122,7 @@ class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.no_index',
-                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+                'data'  => $options['data']->getNoIndex() ?: false,
             ]
         );
 
@@ -159,7 +139,7 @@ class PageType extends AbstractType
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class);
+        $transformer = new IdToEntityModelTransformer($this->em, Page::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -187,7 +167,7 @@ class PageType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $formModifier = function (FormInterface $form, $isVariant) {
+        $formModifier = function (FormInterface $form, $isVariant): void {
             if ($isVariant) {
                 $form->add(
                     'variantSettings',
@@ -202,7 +182,7 @@ class PageType extends AbstractType
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier(
                     $event->getForm(),
                     $event->getData()->getVariantParent()
@@ -213,7 +193,7 @@ class PageType extends AbstractType
         // After submit
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $data = $event->getData();
                 if (isset($data['variantParent'])) {
                     $formModifier(
@@ -242,8 +222,9 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.headscript',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => '8',
+                    'class'   => 'form-control',
+                    'rows'    => '8',
+                    'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
             ]
@@ -256,8 +237,9 @@ class PageType extends AbstractType
                 'label'      => 'mautic.page.form.footerscript',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => '8',
+                    'class'   => 'form-control',
+                    'rows'    => '8',
+                    'tooltip' => 'mautic.page.form.script.help',
                 ],
                 'required'   => false,
             ]
@@ -341,7 +323,7 @@ class PageType extends AbstractType
                     'label' => 'mautic.core.builder',
                     'attr'  => [
                         'class'   => 'btn btn-default btn-dnd btn-nospin btn-builder text-primary',
-                        'icon'    => 'fa fa-cube',
+                        'icon'    => 'ri-layout-line',
                         'onclick' => "Mautic.launchBuilder('page');",
                     ],
                 ],
@@ -353,10 +335,7 @@ class PageType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Page::class,

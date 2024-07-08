@@ -9,6 +9,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * This form is filled with the LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD subscribers.
+ *
+ * @extends AbstractType<mixed>
  */
 class FilterPropertiesType extends AbstractType
 {

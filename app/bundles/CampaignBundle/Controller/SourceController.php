@@ -11,7 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SourceController extends CommonFormController
 {
-    private $supportedSourceTypes = ['lists', 'forms'];
+    /**
+     * @var string[]
+     */
+    private array $supportedSourceTypes = ['lists', 'forms'];
 
     /**
      * @param int $objectId
@@ -229,7 +232,7 @@ class SourceController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, $objectId)
     {

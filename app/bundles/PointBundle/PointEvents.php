@@ -3,9 +3,7 @@
 namespace Mautic\PointBundle;
 
 /**
- * Class PointEvents.
- *
- * Events available for PointBundle
+ * Events available for PointBundle.
  */
 final class PointEvents
 {
@@ -116,4 +114,13 @@ final class PointEvents
      * @var string
      */
     public const TRIGGER_ON_EVENT_EXECUTE = 'mautic.trigger_on_event_execute';
+
+    /**
+     * The mautic.trigger_on_lead_segments_change event is thrown to change lead's segments.
+     *
+     * The event listener receives a Mautic\PointBundle\Event\TriggerExecutedEvent instance.
+     *
+     * @var string
+     */
+    public const TRIGGER_ON_LEAD_SEGMENTS_CHANGE = 'mautic.trigger_on_lead_segments_change';
 }

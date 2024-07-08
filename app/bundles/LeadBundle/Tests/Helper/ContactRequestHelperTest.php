@@ -26,47 +26,47 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|LeadModel
      */
-    private $leadModel;
+    private MockObject $leadModel;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|CoreParametersHelper
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|IpLookupHelper
      */
-    private $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
      * @var MockObject|EventDispatcher
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|RequestStack
      */
-    private $requestStack;
+    private MockObject $requestStack;
 
     /**
      * @var MockObject|Logger
      */
-    private $logger;
+    private MockObject $logger;
 
     /**
      * @var MockObject|Lead
      */
-    private $trackedContact;
+    private MockObject $trackedContact;
 
     /**
      * @var MockObject|ContactMerger
      */
-    private $contactMerger;
+    private MockObject $contactMerger;
 
     protected function setUp(): void
     {

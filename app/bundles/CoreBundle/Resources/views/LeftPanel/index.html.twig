@@ -43,7 +43,7 @@
     {% if extraMenu is not empty %}
         <div class="dropdown extra-menu">
             <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                <i class="fa fa-chevron-down fa-lg"></i>
+                <i class="ri-arrow-down-s-line ri-lg"></i>
             </a>
             {{ extraMenu }}
         </div>
@@ -58,13 +58,13 @@
     <div class="scroll-content slimscroll">
         <!-- start: navigation -->
         <nav class="nav-sidebar">
-            {{ customContent('menu.above', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+            {{ customContent('menu.above', _context) }}
             {{ menuRender('main') }}
 
             <!-- start: left nav -->
             <ul class="nav sidebar-left-dark">
                 <li class="hidden-xs">
-                    <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="direction icon pull-left fa"></span><span class="nav-item-name pull-left text">{% trans %}mautic.core.menu.left.collapse{% endtrans %}</span></a>
+                    <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer" aria-label="{% trans %}mautic.core.menu.left.collapse{% endtrans %}"><span class="direction icon pull-left fa"></span><span class="nav-item-name pull-left text">{% trans %}mautic.core.menu.left.collapse{% endtrans %}</span></a>
                 </li>
             </ul>
             <!--/ end: left nav -->

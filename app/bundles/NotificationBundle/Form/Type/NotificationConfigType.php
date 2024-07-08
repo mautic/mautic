@@ -13,15 +13,16 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class NotificationConfigType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<int,FormBuilderInterface> $builder
      * @param array<string,mixed>                            $options
-     *
-     * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'campaign_send_notification_to_author',
@@ -86,13 +87,10 @@ class NotificationConfigType extends AbstractType
         );
     }
 
-    /**
-     * @return void
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'validation_groups' => function (FormInterface $form) {
+            'validation_groups' => function (FormInterface $form): array {
                 $data   = $form->getData();
                 $groups = ['Default'];
                 if (!$data['webhook_send_notification_to_author']) {
