@@ -18,12 +18,15 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var ArrayCollection
+     * @var Collection
      *
      * @Groups({"page:read", "download:read", "email:read"})
      **/
     private $translationChildren;
 
+    /**
+     * @var TranslationEntityInterface
+     */
     private $translationParent;
 
     /**
@@ -34,8 +37,7 @@ trait TranslationEntityTrait
     private $language = 'en';
 
     /**
-     * @param ClassMetadata $builder
-     * @param string        $languageColumnName
+     * @param string $languageColumnName
      */
     protected static function addTranslationMetadata(ClassMetadataBuilder $builder, $entityClass, $languageColumnName = 'lang')
     {
