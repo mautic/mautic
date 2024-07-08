@@ -51,7 +51,7 @@
             },
         } %}
         {% if formContainsErrors(form.channels[channel]) %}
-            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'fa-warning'}) %}
+            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'ri-alert-fill'}) %}
         {% elseif form.channels[channel].isEnabled.vars.data %}
             {% set tab = tab|merge({'published': true}) %}
         {% endif %}
