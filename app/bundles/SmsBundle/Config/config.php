@@ -187,10 +187,7 @@ return [
         ],
     ],
     'categories' => [
-        'sms' => [
-            'class' => 'Mautic\SmsBundle\Entity\Sms',
-            'label' => 'mautic.sms.sms',
-        ],
+        'sms' => null,
     ],
     'parameters' => [
         'sms_enabled'                                                      => false,
