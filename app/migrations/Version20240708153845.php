@@ -9,27 +9,19 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20240708153845 extends AbstractMauticMigration
 {
-    protected const TABLE_NAME = 'emails';
     private string $emailStatsTableName;
+
+    protected string $emailsTableName;
 
     public function preUp(Schema $schema): void
     {
-        $this->initTableNames();
-    }
-
-    private function initTableNames(): void
-    {
-        $this->emailStatsTableName = $this->generateTableName('email_stats');
-    }
-
-    private function generateTableName(string $tableName): string
-    {
-        return "{$this->prefix}$tableName";
+        $this->emailStatsTableName = $this->prefix.'email_stats';
+        $this->emailsTableName     = $this->prefix.'emails';
     }
 
     public function up(Schema $schema): void
     {
-        $sql          = sprintf('SELECT id, read_count FROM %s', $this->getPrefixedTableName());
+        $sql          = sprintf('SELECT id, read_count FROM %s', $this->emailsTableName);
         $emailsResult = $this->connection->executeQuery($sql)->fetchAllAssociative();
 
         foreach ($emailsResult as $email) {
@@ -47,7 +39,7 @@ final class Version20240708153845 extends AbstractMauticMigration
             if ((int) $email['read_count'] < $totalReadCount) {
                 $this
                   ->addSql(
-                      "UPDATE {$this->getPrefixedTableName()} 
+                      "UPDATE {$this->emailsTableName} 
                             SET read_count = '{$totalReadCount}' 
                             WHERE id = '{$email['id']}'"
                   );
