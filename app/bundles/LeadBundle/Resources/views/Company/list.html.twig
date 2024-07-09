@@ -149,7 +149,7 @@
                           <span class="label label-gray">{{ item.score }}</span>
                       </td>
                       <td class="visible-md visible-lg">
-                          <a class="label label-primary has-click-event"
+                          <a class="label label-primary"
                              href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans~':'~item.id}) }}"
                              data-toggle="ajax"
                              {% if 0 == leadCounts[item.id] %}disabled="disabled"{% endif %}>

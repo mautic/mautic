@@ -141,7 +141,7 @@
                     </td>
                     <td class="visible-md visible-lg">{{ item.createdByUser }}</td>
                     <td class="visible-md visible-lg">
-                        <a href="{{ path('mautic_page_results', {'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" class="label label-primary has-click-event" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
+                        <a href="{{ path('mautic_page_results', {'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" class="label label-primary" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
                             {{- 'mautic.form.form.viewresults'|trans({'%count%': i.submission_count}) -}}
                         </a>
                     </td>
