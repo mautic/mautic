@@ -22,7 +22,7 @@
     <!-- start: box layout -->
     <div class="box-layout">
         <!-- left section -->
-        <div class="col-md-12 height-auto">
+        <div class="col-md-9 height-auto">
             <div>
                 <!-- page detail header -->
                 <!-- sms detail collapseable toggler -->
@@ -64,7 +64,16 @@
             </div>
         </div>
 
+        <!-- right section -->
+        <div class="col-md-3 bdr-l height-auto">
+            {{ include('@MauticCore/Helper/usage.html.twig', {
+                'title': 'mautic.tagmanager.tag.usages'|trans,
+                'stats': usageStats,
+                'noUsages': 'mautic.tagmanager.tag.no_usages'|trans,
+            }) }}
+        </div>
         <!--/ right section -->
+
         <input name="entityId" id="entityId" type="hidden" value="{{ tag.getId()|escape }}" />
     </div>
     <!--/ end: box layout -->
