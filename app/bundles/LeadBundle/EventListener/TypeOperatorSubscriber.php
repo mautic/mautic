@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -277,16 +278,22 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
     {
-        $form = $event->getForm();
+        $form        = $event->getForm();
+        $constraints = [];
+
+        if (in_array($event->getOperator(), [OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP], true)) {
+            $constraints[] = new DbRegex();
+        }
 
         $form->add(
             'filter',
             TextType::class,
             [
-                'label'    => false,
-                'attr'     => ['class' => 'form-control'],
-                'disabled' => $event->filterShouldBeDisabled(),
-                'data'     => $form->getData()['filter'] ?? '',
+                'label'       => false,
+                'attr'        => ['class' => 'form-control'],
+                'disabled'    => $event->filterShouldBeDisabled(),
+                'data'        => $form->getData()['filter'] ?? '',
+                'constraints' => $constraints,
             ]
         );
         $this->showOperatorsBasedAlertMessages($event);
@@ -297,6 +304,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         switch ($event->getOperator()) {
             case OperatorOptions::REGEXP:
+            case OperatorOptions::NOT_REGEXP:
                 $alertText = $this->translator->trans('mautic.lead_list.filter.alert.regexp');
                 break;
             case OperatorOptions::ENDS_WITH:
@@ -306,6 +314,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 $alertText = $this->translator->trans('mautic.lead_list.filter.alert.contain');
                 break;
             case OperatorOptions::LIKE:
+            case OperatorOptions::NOT_LIKE:
                 $alertText = $this->translator->trans('mautic.lead_list.filter.alert.like');
                 break;
             default:
