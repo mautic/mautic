@@ -545,7 +545,7 @@
                 <div class="panel-title">
                     {{ 'mautic.lead.lead.lists'|trans }}
                 </div>
-                {% set classes = ['label-gray', 'label-cool-gray', 'label-warm-gray', 'label-red', 'label-magenta', 'label-purple', 'label-blue', 'label-cyan', 'label-teal', 'label-green'] %}
+                {% set classes = ['label-gray', 'label-red', 'label-magenta', 'label-purple', 'label-blue', 'label-cyan', 'label-teal', 'label-green'] %}
                 {% for key, list in lists[lead.id] %}
                     <h5 class="pull-left mt-xs mr-xs">
                         <span class="label {{ cycle(classes, key) }} has-click-event">
