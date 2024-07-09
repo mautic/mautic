@@ -18,14 +18,14 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var Collection
+     * @var Collection&iterable<mixed>&null
      *
      * @Groups({"page:read", "download:read", "email:read"})
      **/
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface
+     * @var mixed|null
      */
     private $translationParent;
 
