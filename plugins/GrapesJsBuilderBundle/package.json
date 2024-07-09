@@ -44,7 +44,7 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "grapesjs": "^0.21.10",
+    "grapesjs": "^0.21.12",
     "grapesjs-blocks-basic": "^1.0.2",
     "grapesjs-component-countdown": "^1.0.2",
     "grapesjs-custom-code": "^1.0.2",
