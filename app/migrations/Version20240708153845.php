@@ -25,22 +25,20 @@ final class Version20240708153845 extends AbstractMauticMigration
         $emailsResult = $this->connection->executeQuery($sql)->fetchAllAssociative();
 
         foreach ($emailsResult as $email) {
-            $statsResult = $this->connection
+            $totalCountResult = $this->connection
               ->executeQuery(
-                  "SELECT email_id, is_read 
+                  "SELECT email_id, SUM(is_read) as total_read_count 
                         FROM {$this->emailStatsTableName} 
-                        WHERE email_id = {$email['id']}"
+                        WHERE email_id = :email_id 
+                        GROUP BY email_id",
+                  ['email_id' => $email['id']]
               )
-              ->fetchAllAssociative();
-            $totalReadCount = 0;
-            foreach ($statsResult as $stats) {
-                $totalReadCount += (int) $stats['is_read'];
-            }
-            if ((int) $email['read_count'] < $totalReadCount) {
+              ->fetchAssociative();
+            if ($email['id'] === $totalCountResult['email_id'] && (int) $email['read_count'] < $totalCountResult['total_read_count']) {
                 $this
                   ->addSql(
                       "UPDATE {$this->emailsTableName} 
-                            SET read_count = '{$totalReadCount}' 
+                            SET read_count = '{$totalCountResult['total_read_count']}' 
                             WHERE id = '{$email['id']}'"
                   );
             }
