@@ -4,17 +4,18 @@
 
 .label {
   display: inline-flex;
-  font-size: 75%;
-  font-weight: 700;
+  font-size: 80%;
+  font-weight: 600;
   gap: 6px;
-  white-space: nowrap;
-  line-height: 1.5;
-  padding: 0.25em 0.8em 0.15em 0.8em;
+  line-height: 1;
+  height: 24px;
+  padding: 0 var(--spacing-03);
   border-radius: 100px;
   min-width: 30px;
   justify-content: center;
   align-items: center;
   transition: var(--transition-all-productive);
+  .text-overflow();
 
   // Exception for category color labels
   &.pa-10 {
@@ -40,6 +41,11 @@
     position: relative;
     top: -1px;
   }
+
+  // Sizes
+  &[size="sm"] { height: 18px; padding: 0 var(--spacing-03); }
+  &[size="md"] { height: 24px; padding: 0 var(--spacing-03); }
+  &[size="lg"] { height: 32px; padding: 0 var(--spacing-04); }
 }
 
 // Colors
@@ -130,9 +136,9 @@
 }
 
 
-// Operational state
+// Interactive
 
-.has-click-event, a.label, .label:has(> a) {
+a.label, .label:has(> a) {
   border: 1px solid #00000017;
   &.label-gray { border: 1px solid var(--label-border-gray); }
   &.label-cool-gray { border: 1px solid var(--label-border-cool-gray); }
