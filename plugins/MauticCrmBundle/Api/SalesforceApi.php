@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
@@ -13,6 +15,13 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
  */
 class SalesforceApi extends CrmApi
 {
+    /**
+     * This regular expression parses missing field's name from the error message.
+     *
+     * @var string
+     */
+    public const REGEXP_MISSING_FIELD = "/ERROR\sat\sRow.+No\ssuch\scolumn\s'([^']+)'\son\sentity\s'([^']+)'/m";
+
     protected $object          = 'Lead';
 
     protected $requestSettings = [
@@ -24,6 +33,8 @@ class SalesforceApi extends CrmApi
     protected $requestCounter      = 1;
 
     protected $maxLockRetries      = 3;
+
+    private bool $optOutFieldAccessible = true;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -101,6 +112,7 @@ class SalesforceApi extends CrmApi
         // try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
             $fields      = $this->integration->getFieldsForQuery('Contact');
+            unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
             $fields[]    = 'Id';
             $fields      = implode(', ', array_unique($fields));
             $findContact = 'select '.$fields.' from Contact where email = \''.$this->escapeQueryValue($data['Contact']['Email']).'\'';
@@ -113,6 +125,7 @@ class SalesforceApi extends CrmApi
 
         if (!empty($data['Lead']['Email'])) {
             $fields   = $this->integration->getFieldsForQuery('Lead');
+            unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
             $findLead = 'select '.$fields.' from Lead where email = \''.$this->escapeQueryValue($data['Lead']['Email']).'\' and ConvertedContactId = NULL';
@@ -229,11 +242,11 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      *
      * @throws ApiErrorException
      */
-    public function createLeadActivity(array $activity, $object)
+    public function createLeadActivity(array $activity, $object): array
     {
         $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
@@ -283,9 +296,9 @@ class SalesforceApi extends CrmApi
 
                 return $results;
             }
-
-            return [];
         }
+
+        return [];
     }
 
     /**
@@ -323,25 +336,44 @@ class SalesforceApi extends CrmApi
             }
 
             $fields[] = 'Id';
-            $fields   = implode(', ', array_unique($fields));
 
-            $config = $this->integration->mergeConfigToFeatureSettings([]);
-            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
-                $fields = 'Owner.Name, Owner.Email, '.$fields;
-            }
-
-            $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
-
-            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
-                .$ignoreConvertedLeads;
-
-            return $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
+            return $this->requestQueryAllAndHandle($queryUrl, $fields, $object, $query);
         }
 
         return [
             'totalSize' => 0,
             'records'   => [],
         ];
+    }
+
+    /**
+     * Perform queryAll request and retry if HasOptedOutOfEmail is not accessible.
+     *
+     * @param array<mixed> $fields
+     * @param array<mixed> $query
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    private function requestQueryAllAndHandle(string $queryUrl, array $fields, string $object, array $query)
+    {
+        $config = $this->integration->mergeConfigToFeatureSettings([]);
+        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
+            $fields[] = 'Owner.Name';
+            $fields[] = 'Owner.Email';
+        }
+        $fields = array_unique($fields);
+
+        $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
+        if (!$this->isOptOutFieldAccessible()) { // If not opt-out is supported; unset it
+            unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
+        }
+
+        $baseQuery = 'SELECT %s from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end'].' and isDeleted = false'
+            .$ignoreConvertedLeads;
+
+        return $this->handleQueryAll($baseQuery, $fields, $queryUrl);
     }
 
     /**
@@ -494,6 +526,10 @@ class SalesforceApi extends CrmApi
                 throw new ApiErrorException(implode(', ', $response['errors']));
             }
 
+            if (isset($response['error']['message'])) {
+                throw new ApiErrorException($response['error']['message']);
+            }
+
             foreach ($response as $lineItem) {
                 if (!is_array($lineItem)) {
                     continue;
@@ -574,6 +610,17 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @return array<mixed>
+     */
+    private function parseMissingField(string $errorMessage)
+    {
+        $matches = [];
+        preg_match(self::REGEXP_MISSING_FIELD, $errorMessage, $matches);
+
+        return isset($matches[1]) ? [$matches[1], $matches[2]] : [null, null];
+    }
+
+    /**
      * @return bool|float|mixed|string
      */
     private function escapeQueryValue($value)
@@ -589,5 +636,82 @@ class SalesforceApi extends CrmApi
         $value = str_replace("'", "\'", $value);
 
         return $value;
+    }
+
+    public function isOptOutFieldAccessible(): bool
+    {
+        return $this->optOutFieldAccessible;
+    }
+
+    public function setOptOutFieldAccessible(bool $optOutFieldAccessible): SalesforceApi
+    {
+        $this->optOutFieldAccessible = $optOutFieldAccessible;
+
+        return $this;
+    }
+
+    /**
+     * @param array<string> $fields
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function handleQueryAll(string $baseQuery, array $fields, string $queryUrl, int $tries = 0, bool $isRetry = false): mixed
+    {
+        if (10 === $tries) {
+            $this->integration->logIntegrationError(new \Exception(
+                sprintf('Maximum tries exceeded for handling missing field scenarios')
+            ));
+        }
+        try {
+            $leadsQuery = sprintf($baseQuery, join(', ', $fields));
+            $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', $isRetry, null, $queryUrl);
+        } catch (ApiErrorException $e) {
+            list($missingField, $entityType) = $this->parseMissingField($e->getMessage());
+            if (!$missingField) {
+                throw $e;
+            }
+            if ('HasOptedOutOfEmail' == $missingField) {
+                // Unset field as it is not accessible
+                unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
+
+                // Disable the use of the HasOptedOutOfEmail field for future requests
+                $this->setOptOutFieldAccessible(false);
+
+                // Notify all admins of this error
+                $this->integration->upsertUnreadAdminsNotification(
+                    $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.header'),
+                    $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.message')
+                );
+            } else {
+                $entityManager   = $this->integration->getEntityManager();
+                $entity          = $this->integration->getIntegrationSettings();
+                $featureSettings = $entity->getFeatureSettings();
+
+                $field = $missingField.'__'.$entityType;
+
+                if (isset($featureSettings['leadFields'][$field])) {
+                    unset($featureSettings['leadFields'][$field]);
+
+                    // Remove the missing field from mapping
+                    $entity->setFeatureSettings($featureSettings);
+                    $entityManager->persist($entity);
+                    $entityManager->flush();
+
+                    // Remove the missing field from the request
+                    $missingFieldIndex = array_search($missingField, $fields);
+                    if (false !== $missingFieldIndex) {
+                        unset($fields[$missingFieldIndex]);
+                    }
+                }
+            }
+
+            $response = $this->handleQueryAll($baseQuery, $fields, $queryUrl, ++$tries, true);
+        }
+
+        return $response;
     }
 }

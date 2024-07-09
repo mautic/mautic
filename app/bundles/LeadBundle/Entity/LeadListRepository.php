@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
@@ -13,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class LeadListRepository extends CommonRepository
 {
     use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
+
     use ExpressionHelperTrait;
     use RegexTrait;
 
@@ -205,7 +207,7 @@ class LeadListRepository extends CommonRepository
                 )
             )
             ->setParameter('leadId', $lead->getId())
-            ->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return (bool) $qb->executeQuery()->fetchOne();
     }
@@ -364,7 +366,7 @@ class LeadListRepository extends CommonRepository
             if (is_array($value)) {
                 $subFunc                        = 'in';
                 $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
-                $parameters[$subFilterParamter] = ['value' => $value, 'type' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY];
+                $parameters[$subFilterParamter] = ['value' => $value, 'type' => ArrayParameterType::STRING];
             } else {
                 $parameters[$subFilterParamter] = $value;
             }
@@ -382,7 +384,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -397,7 +399,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -507,5 +509,118 @@ class LeadListRepository extends CommonRepository
             ->fetchOne();
 
         return 1 === $result;
+    }
+
+    /**
+     * Returns array of campaigns related to this segment.
+     *
+     * @return array<int, string>
+     */
+    public function getSegmentCampaigns(int $segmentId): array
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('clx.campaign_id, c.name')
+            ->distinct()
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx')
+            ->join('clx', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = clx.campaign_id');
+        $q->where(
+            $q->expr()->eq('clx.leadlist_id', $segmentId)
+        );
+
+        $lists   = [];
+        $results = $q->executeQuery()->fetchAllAssociative();
+
+        foreach ($results as $row) {
+            $lists[$row['campaign_id']] = $row['name'];
+        }
+
+        return $lists;
+    }
+
+    public function isContactInAnySegment(int $contactId): bool
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+
+        $sql = <<<SQL
+            SELECT leadlist_id 
+            FROM $tableName
+            WHERE lead_id = ?
+                AND manually_removed = 0
+            LIMIT 1
+SQL;
+
+        $segmentIds = $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                $sql,
+                [$contactId],
+                [\PDO::PARAM_INT]
+            )
+            ->fetchFirstColumn();
+
+        return !empty($segmentIds);
+    }
+
+    public function isNotContactInAnySegment(int $contactId): bool
+    {
+        return !$this->isContactInAnySegment($contactId);
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     */
+    public function isContactInSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        return !empty($segmentIds);
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     */
+    public function isNotContactInSegments(int $contactId, array $expectedSegmentIds): bool
+    {
+        $segmentIds = $this->fetchContactToSegmentIdsRelationships($contactId, $expectedSegmentIds);
+
+        if (empty($segmentIds)) {
+            return true; // Contact is not associated wit any segment
+        }
+
+        foreach ($expectedSegmentIds as $expectedSegmentId) {
+            if (in_array($expectedSegmentId, $segmentIds)) { // No exact type comparison used!
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param int[] $expectedSegmentIds
+     *
+     * @return int[]
+     */
+    private function fetchContactToSegmentIdsRelationships(int $contactId, array $expectedSegmentIds): array
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+
+        $sql = <<<SQL
+            SELECT leadlist_id 
+            FROM $tableName
+            WHERE lead_id = ?
+                AND leadlist_id IN (?)
+                AND manually_removed = 0
+SQL;
+
+        return $this->getEntityManager()->getConnection()
+            ->executeQuery(
+                $sql,
+                [$contactId, $expectedSegmentIds],
+                [
+                    \PDO::PARAM_INT,
+                    ArrayParameterType::INTEGER,
+                ]
+            )
+            ->fetchFirstColumn();
     }
 }

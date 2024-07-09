@@ -51,8 +51,8 @@ class DateOptionFactory
             case 'birthday':
             case 'anniversary':
             case $timeframe && (
-                str_contains($timeframe, 'anniversary') ||
-                str_contains($timeframe, 'birthday')
+                str_contains($timeframe, 'anniversary')
+                || str_contains($timeframe, 'birthday')
             ):
                 return new DateAnniversary($this->dateDecorator, $dateOptionParameters);
             case 'today':
@@ -80,13 +80,30 @@ class DateOptionFactory
             case 'year_this':
                 return new DateYearThis($this->dateDecorator, $dateOptionParameters);
             case $timeframe && (
-                str_contains($timeframe[0], '-') || // -5 days
-                str_contains($timeframe[0], '+') || // +5 days
-                str_contains($timeframe, ' ago')    // 5 days ago
+                str_contains($timeframe[0], '-') // -5 days
+                || str_contains($timeframe[0], '+') // +5 days
+                || false !== $this->isRelativeFormatsPresent($timeframe)
             ):
                 return new DateRelativeInterval($this->dateDecorator, $originalValue, $dateOptionParameters);
             default:
                 return new DateDefault($this->dateDecorator, $originalValue);
         }
+    }
+
+    protected function isRelativeFormatsPresent(string $timeframe): bool
+    {
+        $notations = [
+            'first day of ', // first day of January 2021
+            'last day of ', // last day of January 2021
+            ' ago', // 5 days ago
+        ];
+
+        foreach ($notations as $notation) {
+            if (str_contains($timeframe, $notation)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

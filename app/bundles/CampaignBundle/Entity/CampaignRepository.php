@@ -19,10 +19,9 @@ class CampaignRepository extends CommonRepository
 
     public function getEntities(array $args = [])
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($this->getTableAlias().', cat')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+        $q = $this->getEntityManager()->createQueryBuilder();
+        $q->select($this->getTableAlias().', cat')
+            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
@@ -32,40 +31,32 @@ class CampaignRepository extends CommonRepository
         if (!empty($args['joinForms'])) {
             $q->leftJoin($this->getTableAlias().'.forms', 'f');
         }
-
+        $q->where($q->expr()->isNull($this->getTableAlias().'.deleted'));
         $args['qb'] = $q;
 
         return parent::getEntities($args);
     }
 
-    /**
-     * @param object $entity
-     * @param bool   $flush
-     */
-    public function deleteEntity($entity, $flush = true): void
+    public function setCampaignAsDeleted(int $campaignId): void
     {
-        // Null parents of associated events first
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
-            ->set('parent_id', ':null')
-            ->setParameter('null', null)
-            ->where('campaign_id = '.$entity->getId())
-            ->executeStatement();
+        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
 
-        // Delete events
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->delete(MAUTIC_TABLE_PREFIX.'campaign_events')
-            ->where('campaign_id = '.$entity->getId())
-            ->executeStatement();
+        $this->getEntityManager()->getConnection()->update(
+            MAUTIC_TABLE_PREFIX.Event::TABLE_NAME,
+            ['deleted'     => $dateTime],
+            ['campaign_id' => $campaignId]
+        );
 
-        parent::deleteEntity($entity, $flush);
+        $this->getEntityManager()->getConnection()->update(
+            MAUTIC_TABLE_PREFIX.Campaign::TABLE_NAME,
+            ['deleted'   => $dateTime, 'is_published' => 0],
+            ['id'        => $campaignId]
+        );
     }
 
     /**
      * Returns a list of all published (and active) campaigns (optionally for a specific lead).
      *
-
-
      * @param bool $forList   If true, returns ID and name only
      * @param bool $viewOther If true, returns all the campaigns
      *
@@ -74,7 +65,7 @@ class CampaignRepository extends CommonRepository
     public function getPublishedCampaigns($specificId = null, ?int $leadId = null, $forList = false, $viewOther = false)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::class, 'c', 'c.id');
+            ->from(Campaign::class, 'c', 'c.id');
 
         if ($forList && $leadId) {
             $q->select('partial c.{id, name}, partial l.{campaign, lead, dateAdded, manuallyAdded, manuallyRemoved}, partial ll.{id}');
@@ -566,7 +557,7 @@ class CampaignRepository extends CommonRepository
         $emails = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e.channelId')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin(
                 $this->getTableAlias().'.events',
                 'e',

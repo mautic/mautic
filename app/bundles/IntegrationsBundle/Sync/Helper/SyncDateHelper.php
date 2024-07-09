@@ -20,6 +20,8 @@ class SyncDateHelper
      */
     private array $lastObjectSyncDates = [];
 
+    private ?\DateTimeInterface $internalSyncStartDateTime = null;
+
     public function __construct(
         private Connection $connection
     ) {
@@ -59,7 +61,7 @@ class SyncDateHelper
         return $this->lastObjectSyncDates[$key];
     }
 
-    public function getSyncToDateTime(): \DateTimeInterface
+    public function getSyncToDateTime(): ?\DateTimeInterface
     {
         if ($this->syncToDateTime) {
             return $this->syncToDateTime;
@@ -109,5 +111,40 @@ class SyncDateHelper
         }
 
         return $lastSync;
+    }
+
+    public function getInternalSyncStartDateTime(): ?\DateTimeInterface
+    {
+        return $this->internalSyncStartDateTime;
+    }
+
+    public function setInternalSyncStartDateTime(): void
+    {
+        if ($this->internalSyncStartDateTime) {
+            return;
+        }
+
+        $this->internalSyncStartDateTime = $this->calculateInternalSyncStartDateTime();
+    }
+
+    private function calculateInternalSyncStartDateTime(): \DateTimeInterface
+    {
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        // If there is no syncToDateTime value use "now"
+        if (!$this->getSyncToDateTime()) {
+            return $now;
+        }
+
+        // Clone it so that we don't modify the initial object
+        $syncToDateTime = clone $this->getSyncToDateTime();
+
+        // We should compare in UTC timezone
+        if (method_exists($syncToDateTime, 'setTimezone')) {
+            $syncToDateTime->setTimezone(new \DateTimeZone('UTC'));
+        }
+
+        // If syncToDate is less than now then use syncToDate, because otherwise we may delete
+        // changes that aren't supposed to be deleted from the sync_object_field_change_report table
+        return min($now, $syncToDateTime);
     }
 }

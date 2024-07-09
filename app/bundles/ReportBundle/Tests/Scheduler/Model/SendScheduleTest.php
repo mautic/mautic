@@ -10,29 +10,32 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\ReportBundle\Entity\Report $report;
+    private Report $report;
 
-    private \Mautic\ReportBundle\Entity\Scheduler $scheduler;
+    private Scheduler $scheduler;
 
-    private \Mautic\ReportBundle\Scheduler\Model\SendSchedule $sendSchedule;
+    private SendSchedule $sendSchedule;
 
     /**
      * @var MockObject|MailHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mailHelperMock;
+    private MockObject $mailHelperMock;
 
     /**
      * @var MockObject|MessageSchedule
      */
-    private \PHPUnit\Framework\MockObject\MockObject $messageSchedule;
+    private MockObject $messageSchedule;
 
     /**
      * @var MockObject|FileHandler
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fileHandler;
+    private MockObject $fileHandler;
+
+    private \PHPUnit\Framework\MockObject\MockObject|EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -43,6 +46,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock  = $this->createMock(MailHelper::class);
         $this->messageSchedule = $this->createMock(MessageSchedule::class);
         $this->fileHandler     = $this->createMock(FileHandler::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
 
         $this->mailHelperMock->expects($this->once())
             ->method('getMailer')
@@ -51,7 +55,8 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->sendSchedule = new SendSchedule(
             $this->mailHelperMock,
             $this->messageSchedule,
-            $this->fileHandler
+            $this->fileHandler,
+            $this->eventDispatcher
         );
     }
 

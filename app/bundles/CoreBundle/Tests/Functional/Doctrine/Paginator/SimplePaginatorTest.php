@@ -24,7 +24,7 @@ class SimplePaginatorTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $debugDataHolder = self::$container->get('doctrine.debug_data_holder');
+        $debugDataHolder = static::getContainer()->get('doctrine.debug_data_holder');
         \assert($debugDataHolder instanceof DebugDataHolder);
         $debugDataHolder->reset();
 
@@ -59,7 +59,7 @@ class SimplePaginatorTest extends MauticMysqlTestCase
             $ipAddress3->getId() => $ipAddress3,
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
-        $prefix  = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix  = static::getContainer()->getParameter('mautic.db_table_prefix');
         $queries = $this->debugDataHolder->getData()['default'];
 
         $this->assertCount(5, $queries, 'There should be exactly 5 queries executed.');

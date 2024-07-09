@@ -14,8 +14,8 @@ class DsnParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that a BouncedEmail is returned from a dsn report
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse
      */
     public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
@@ -40,8 +40,8 @@ DSN;
     /**
      * @testdox Test a Postfix BouncedEmail is returned from a dsn report
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::parse
      */
     public function testPostfixBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
@@ -69,7 +69,7 @@ DSN;
     /**
      * @testdox Test that an exception is thrown if a bounce cannot be found in a dsn report
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser::getBounce
      */
     public function testBounceNotFoundFromBadDsnReport(): void
     {

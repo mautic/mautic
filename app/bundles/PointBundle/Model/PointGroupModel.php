@@ -124,6 +124,7 @@ class PointGroupModel extends CommonFormModel
             Lead::POINTS_SUBTRACT => $newScore -= $points,
             Lead::POINTS_MULTIPLY => $newScore *= $points,
             Lead::POINTS_DIVIDE   => $newScore /= $points,
+            Lead::POINTS_SET      => $newScore = $points,
             default               => throw new \UnexpectedValueException('Invalid operator'),
         };
         $contactScore->setScore($newScore);
@@ -134,5 +135,10 @@ class PointGroupModel extends CommonFormModel
         $this->dispatcher->dispatch($scoreChangeEvent, PointGroupEvents::SCORE_CHANGE);
 
         return $contact;
+    }
+
+    public static function isAllowedPointOperation(string $operator): bool
+    {
+        return in_array($operator, [Lead::POINTS_ADD, Lead::POINTS_SUBTRACT, Lead::POINTS_MULTIPLY, Lead::POINTS_DIVIDE, Lead::POINTS_SET]);
     }
 }

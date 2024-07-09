@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 
 class InactiveHelper
 {
-    private \DateTimeInterface|null $earliestInactiveDate = null;
+    private ?\DateTimeInterface $earliestInactiveDate = null;
 
     public function __construct(
         private EventScheduler $scheduler,
@@ -111,8 +111,9 @@ class InactiveHelper
     {
         $collection = new ArrayCollection();
 
-        /** @var Event $decision */
-        if ($decision = $this->eventRepository->find($decisionId)) {
+        /** @var Event|null $decision */
+        $decision = $this->eventRepository->find($decisionId);
+        if ($decision && !$decision->isDeleted()) {
             $collection->set($decision->getId(), $decision);
         }
 

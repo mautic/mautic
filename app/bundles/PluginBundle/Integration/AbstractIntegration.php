@@ -96,7 +96,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $persistIntegrationEntities = [];
 
-    protected array  $commandParameters         = [];
+    protected array $commandParameters         = [];
 
     public function __construct(
         protected EventDispatcherInterface $dispatcher,
@@ -840,7 +840,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ->setInternalEntityId($internalEntityId);
 
         if ($persist) {
-            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntity($entity);
+            $this->em->getRepository(IntegrationEntity::class)->saveEntity($entity);
         }
 
         return $entity;
@@ -851,7 +851,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        return $this->em->getRepository(IntegrationEntity::class);
     }
 
     /**
@@ -1690,7 +1690,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        /** @var LeadModel $leadModel */
         $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
@@ -1706,7 +1706,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)
+            $existingLeads = $this->em->getRepository(Lead::class)
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
@@ -1910,7 +1910,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Mautic\CoreBundle\Model\NotificationModel
+     * @return NotificationModel
      */
     public function getNotificationModel()
     {
@@ -1977,7 +1977,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         $this->getName(),
                         false,
                         $errorHeader,
-                        'text-danger fa-exclamation-circle',
+                        'text-danger ri-error-warning-line-circle',
                         null,
                         $user
                     );

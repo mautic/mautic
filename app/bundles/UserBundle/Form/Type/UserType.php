@@ -49,7 +49,7 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'preaddon'     => 'fa fa-user',
+                    'preaddon'     => 'ri-user-6-fill',
                     'autocomplete' => 'off',
                 ],
             ]
@@ -98,7 +98,7 @@ class UserType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                 ],
             ]
         );
@@ -119,7 +119,7 @@ class UserType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => $required,
@@ -133,7 +133,7 @@ class UserType extends AbstractType
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
-                        'preaddon'     => 'fa fa-lock',
+                        'preaddon'     => 'ri-lock-fill',
                         'autocomplete' => 'off',
                     ],
                     'required'       => $required,
@@ -193,6 +193,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'data' => $defaultSignature,
+                'help' => 'mautic.user.config.signature.helper',
             ]
         );
 

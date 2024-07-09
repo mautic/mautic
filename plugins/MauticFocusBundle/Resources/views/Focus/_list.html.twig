@@ -3,7 +3,7 @@
 {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
 {% if items|length > 0 %}
     <div class="table-responsive page-list">
-        <table class="table table-hover table-striped table-bordered focus-list" id="focusTable">
+        <table class="table table-hover focus-list" id="focusTable">
             <thead>
             <tr>
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {

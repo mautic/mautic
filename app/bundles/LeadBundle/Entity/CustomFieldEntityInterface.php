@@ -2,28 +2,23 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-/**
- * Interface CustomFieldEntityInterface.
- */
 interface CustomFieldEntityInterface
 {
     /**
-     * Set fields.
+     * @param mixed[] $fields
      *
      * @return mixed
      */
     public function setFields($fields);
 
     /**
-     * Get fields.
-     *
      * @return mixed
      */
-    public function getFields($fields);
+    public function getFields();
 
     /**
-     * Update field value.
-     *
+     * @param string $alias
+     * @param mixed  $value
      * @param string $oldValue
      *
      * @return mixed
@@ -31,14 +26,15 @@ interface CustomFieldEntityInterface
     public function addUpdatedField($alias, $value, $oldValue = '');
 
     /**
-     * Get updated fields.
-     *
      * @return mixed
      */
     public function getUpdatedFields();
 
     /**
      * Get a field value (should include those in updated fields).
+     *
+     * @param string      $field alias
+     * @param string|null $group
      *
      * @return mixed
      */

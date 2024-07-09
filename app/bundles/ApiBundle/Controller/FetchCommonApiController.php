@@ -8,6 +8,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiSerializationContextEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
@@ -222,6 +224,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         if ($order = $this->getOrderFromRequest($request)) {
             $args['filter']['order'] = $order;
+        }
+
+        if ($totalCountTtl = $this->getTotalCountTtl()) {
+            $args['totalCountTtl'] = $totalCountTtl;
         }
 
         $results = $this->model->getEntities($args);
@@ -675,6 +681,13 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     protected function setSerializationContext(View $view): void
     {
         $context = $view->getContext();
+
+        if ($this->dispatcher->hasListeners(ApiEvents::API_PRE_SERIALIZATION_CONTEXT)) {
+            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->getCurrentRequest());
+            $this->dispatcher->dispatch($apiSerializationContextEvent, ApiEvents::API_PRE_SERIALIZATION_CONTEXT);
+            $context = $apiSerializationContextEvent->getContext();
+        }
+
         if (!empty($this->serializerGroups)) {
             $context->setGroups($this->serializerGroups);
         }
@@ -701,6 +714,12 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $context->setSerializeNull(true);
         }
 
+        if ($this->dispatcher->hasListeners(ApiEvents::API_POST_SERIALIZATION_CONTEXT)) {
+            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->getCurrentRequest());
+            $this->dispatcher->dispatch($apiSerializationContextEvent, ApiEvents::API_POST_SERIALIZATION_CONTEXT);
+            $context = $apiSerializationContextEvent->getContext();
+        }
+
         $view->setContext($context);
     }
 
@@ -711,7 +730,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function validateBatchPayload(array $parameters)
     {
-        $batchLimit = (int) $this->coreParametersHelper->getParameter('api_batch_max_limit', 200);
+        $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {
             return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
         }
@@ -733,5 +752,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $headers['Mautic-Version'] = $this->appVersion->getVersion();
 
         return parent::view($data, $statusCode, $headers);
+    }
+
+    protected function getTotalCountTtl(): ?int
+    {
+        return null;
     }
 }

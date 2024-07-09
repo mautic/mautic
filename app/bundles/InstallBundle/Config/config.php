@@ -32,29 +32,28 @@ return [
     'services' => [
         'fixtures' => [
             'mautic.install.fixture.lead_field' => [
-                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['translator'],
             ],
             'mautic.install.fixture.role' => [
-                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['translator'],
             ],
             'mautic.install.fixture.report_data' => [
-                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
             'mautic.install.fixture.grape_js' => [
-                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
+                'class'     => Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
         ],
         'other' => [
             'mautic.install.configurator.step.check' => [
-                'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
+                'class'     => Mautic\InstallBundle\Configurator\Step\CheckStep::class,
                 'arguments' => [
                     'mautic.configurator',
                     '%kernel.project_dir%',
@@ -67,7 +66,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.doctrine' => [
-                'class'     => \Mautic\InstallBundle\Configurator\Step\DoctrineStep::class,
+                'class'     => Mautic\InstallBundle\Configurator\Step\DoctrineStep::class,
                 'arguments' => [
                     'mautic.configurator',
                 ],
@@ -77,14 +76,14 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.user' => [
-                'class'        => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
+                'class'        => Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
                     'priority' => 2,
                 ],
             ],
             'mautic.install.service' => [
-                'class'     => \Mautic\InstallBundle\Install\InstallService::class,
+                'class'     => Mautic\InstallBundle\Install\InstallService::class,
                 'arguments' => [
                     'mautic.configurator',
                     'mautic.helper.cache',
@@ -98,7 +97,7 @@ return [
                 ],
             ],
             'mautic.install.leadcolumns' => [
-                'class'     => \Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
+                'class'     => Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
                 'tag'       => 'doctrine.event_subscriber',
                 'arguments' => [],
             ],

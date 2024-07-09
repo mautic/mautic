@@ -21,7 +21,7 @@ class LeadRepository extends CommonRepository
     public function getLeadDetails($campaignId, $leads = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
+            ->from(Lead::class, 'lc')
             ->select('lc')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
@@ -53,7 +53,7 @@ class LeadRepository extends CommonRepository
     public function getLeads($campaignId, $eventId = null)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
+            ->from(Lead::class, 'lc')
             ->select('lc, l')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
@@ -69,7 +69,7 @@ class LeadRepository extends CommonRepository
         if (null != $eventId) {
             $dq = $this->getEntityManager()->createQueryBuilder();
             $dq->select('el.id')
-                ->from(\Mautic\CampaignBundle\Entity\LeadEventLog::class, 'ell')
+                ->from(LeadEventLog::class, 'ell')
                 ->leftJoin('ell.lead', 'el')
                 ->leftJoin('ell.event', 'ev')
                 ->where(
@@ -322,7 +322,7 @@ class LeadRepository extends CommonRepository
     public function getContactRotations(array $contactIds, $campaignId): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->select('cl.lead_id, cl.rotation')
+        $qb->select('cl.lead_id, cl.rotation, cl.manually_removed')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $qb->expr()->and(
@@ -337,7 +337,7 @@ class LeadRepository extends CommonRepository
 
         $contactRotations = [];
         foreach ($results as $result) {
-            $contactRotations[$result['lead_id']] = $result['rotation'];
+            $contactRotations[$result['lead_id']] = ['rotation' => $result['rotation'], 'manually_removed' => $result['manually_removed']];
         }
 
         return $contactRotations;
@@ -594,5 +594,39 @@ class LeadRepository extends CommonRepository
         $qb->andWhere(
             sprintf('NOT EXISTS (%s)', $subq->getSQL())
         );
+    }
+
+    /**
+     * @return array{}|array<int, array<string, string|null>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
+    {
+        $queryBuilder      = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $leadCampaignAlias = 'lc';
+        $leadAlias         = 'l';
+
+        $queryBuilder->select(
+            "$leadAlias.country",
+            'count(id) AS contacts'
+        )
+        ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', $leadCampaignAlias)
+        ->leftJoin(
+            $leadCampaignAlias,
+            MAUTIC_TABLE_PREFIX.'leads',
+            $leadAlias,
+            "$leadAlias.id = $leadCampaignAlias.lead_id"
+        )
+        ->andWhere("$leadCampaignAlias.campaign_id = :campaign")
+        ->andWhere("$leadCampaignAlias.manually_removed = :false")
+        ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
+        ->groupBy("$leadAlias.country")
+        ->setParameter('campaign', $campaign->getId())
+        ->setParameter('false', false)
+        ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))
+        ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
+
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
     }
 }

@@ -69,4 +69,12 @@ class ObjectIdsDAO
 
         return $this->objects[$objectType];
     }
+
+    /**
+     * @return string[]
+     */
+    public function getObjectTypes(): array
+    {
+        return array_keys($this->objects);
+    }
 }

@@ -18,6 +18,16 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
+    /**
+     * @const DYNAMIC_CONTENT_REGEX
+     */
+    public const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
+
+    /**
+     * @const DYNAMIC_WEB_CONTENT_REGEX
+     */
+    public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
+
     public function __construct(
         protected DynamicContentModel $dynamicContentModel,
         protected RealTimeExecutioner $realTimeExecutioner,
@@ -156,15 +166,16 @@ class DynamicContentHelper
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */
-        [$ignore, $translation] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+        list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
         if ($translation !== $dwc) {
             // Use translated version of content
             $dwc     = $translation;
             $content = $dwc->getContent();
         }
-        $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+        $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+        $tokenEvent->setStat($stat);
         $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();

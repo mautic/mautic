@@ -19,7 +19,7 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     /**
      * @var ArrayCollection|Lead[]
      */
-    private \Doctrine\Common\Collections\ArrayCollection $contacts;
+    private ArrayCollection $contacts;
 
     private array $logContactXref = [];
 

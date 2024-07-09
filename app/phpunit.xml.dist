@@ -50,7 +50,7 @@
   <php>
     <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
     <env name="MAXMIND_LICENSE_KEY" value=""/>
-    <env name="KERNEL_CLASS" value="AppKernel" />
+    <env name="KERNEL_CLASS" value="AppTestKernel" />
     <const name="IS_PHPUNIT" value="true"/>
     <const name="MAUTIC_ENV" value="test"/>
     <server name="KERNEL_DIR" value="app"/>
@@ -62,6 +62,7 @@
   <listeners>
     <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
     <listener class="\Mautic\CoreBundle\Test\Listeners\SeparateProcessListener" />
+    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
   </listeners>
   <extensions>
     <extension class="\Mautic\CoreBundle\Test\Hooks\MauticExtension" />

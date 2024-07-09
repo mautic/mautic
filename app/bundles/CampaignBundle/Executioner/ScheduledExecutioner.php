@@ -23,17 +23,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 {
-    private ?\Mautic\CampaignBundle\Entity\Campaign $campaign = null;
+    private ?Campaign $campaign = null;
 
-    private ?\Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter $limiter = null;
+    private ?ContactLimiter $limiter = null;
 
-    private ?\Symfony\Component\Console\Output\OutputInterface $output = null;
+    private ?OutputInterface $output = null;
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     private ?array $scheduledEvents = null;
 
-    private ?\Mautic\CampaignBundle\Executioner\Result\Counter $counter = null;
+    private ?Counter $counter = null;
 
     protected ?\DateTime $now = null;
 
@@ -88,8 +88,9 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function executeByIds(array $logIds, OutputInterface $output = null)
+    public function executeByIds(array $logIds, OutputInterface $output = null, ?\DateTime $now = null)
     {
+        $now           = $now ?? $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
@@ -124,7 +125,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
-        $now       = $this->now ?? new \DateTime();
         foreach ($organized as $organizedLogs) {
             /** @var Event $event */
             $event = $organizedLogs->first()->getEvent();

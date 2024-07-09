@@ -83,7 +83,7 @@ trait VariantModelTrait
         if (!$isVariant && $entity instanceof TranslationEntityInterface) {
             // Translations could be assigned to a variant and thus applicable to be reset
             if ($translationParent = $entity->getTranslationParent()) {
-                $isVariant = $translationParent->isVariant();
+                $isVariant = $translationParent->isVariant(); /** @phpstan-ignore-line @todo for M6, extend the TranslationEntityInterface from The VariantEntityInterface */
             }
         }
 

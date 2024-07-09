@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -29,39 +30,39 @@ class LeadSubscriberTest extends TestCase
     /**
      * @var MockObject|FieldChangeRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldChangeRepository;
+    private MockObject $fieldChangeRepository;
 
     /**
      * @var MockObject|ObjectMappingRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectMappingRepository;
+    private MockObject $objectMappingRepository;
 
     /**
      * @var MockObject|VariableExpresserHelperInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $variableExpresserHelper;
+    private MockObject $variableExpresserHelper;
 
     /**
      * @var MockObject|SyncIntegrationsHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncIntegrationsHelper;
+    private MockObject $syncIntegrationsHelper;
 
     /**
      * @var MockObject|LeadEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEvent;
+    private MockObject $leadEvent;
 
     /**
      * @var MockObject|CompanyEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyEvent;
+    private MockObject $companyEvent;
 
-    private \Mautic\IntegrationsBundle\EventListener\LeadSubscriber $subscriber;
+    private LeadSubscriber $subscriber;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcherInterfaceMock;
+    private MockObject $eventDispatcherInterfaceMock;
 
     public function setUp(): void
     {
@@ -85,7 +86,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        Assert::assertEquals(
             [
                 LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],

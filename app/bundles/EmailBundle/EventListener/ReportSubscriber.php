@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -428,7 +429,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     if ($event->hasFilter('e.id')) {
                         $filterParam = $event->createParameterName();
                         $qbcut->andWhere($qb->expr()->in('cut2.channel_id', ":{$filterParam}"));
-                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), Connection::PARAM_INT_ARRAY);
+                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), ArrayParameterType::INTEGER);
                     }
 
                     $qb->leftJoin(
@@ -530,7 +531,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-flag-checkered',
+                            'iconClass' => 'ri-flag-fill',
                         ]
                     );
                     break;
@@ -567,7 +568,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-flag-checkered',
+                            'iconClass' => 'ri-flag-fill',
                         ]
                     );
                     break;
@@ -583,7 +584,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-paper-plane-o';
+                    $graphData['iconClass'] = 'ri-send-plane-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -599,7 +600,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -609,6 +610,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select(
                         'e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
                     )
+                        ->andWhere('es.is_failed = 1')
                         ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
                         ->groupBy('e.id, e.subject')
                         ->orderBy('failed', 'DESC');
@@ -618,7 +620,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-exclamation-triangle';
+                    $graphData['iconClass'] = 'ri-alert-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -641,7 +643,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-exclamation-triangle';
+                    $graphData['iconClass'] = 'ri-alert-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -663,7 +665,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-exclamation-triangle';
+                    $graphData['iconClass'] = 'ri-alert-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -679,7 +681,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-tachometer';
+                    $graphData['iconClass'] = 'ri-speed-up-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;

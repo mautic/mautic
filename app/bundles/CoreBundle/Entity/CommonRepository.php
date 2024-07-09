@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
@@ -339,7 +338,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param array<string,mixed> $args
      *
-     * @return object[]|array<int,mixed>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
+     * @return object[]|array<int,mixed>|iterable<object>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
      */
     public function getEntities(array $args = [])
     {
@@ -376,8 +375,15 @@ class CommonRepository extends ServiceEntityRepository
             $hydrationMode = Query::HYDRATE_OBJECT;
         }
 
-        if (!empty($args['iterator_mode'])) {
+        if (array_key_exists('iterable_mode', $args) && true === $args['iterable_mode']) {
             // Hydrate one by one
+            return $query->toIterable([], $hydrationMode);
+        }
+
+        if (!empty($args['iterator_mode'])) {
+            // When you remove the following, please search for the "iterator_mode" in the project.
+            @\trigger_error('Using "iterator_mode" is deprecated. Use "iterable_mode" instead. Usage of "iterator_mode" will be removed in 6.0.', \E_USER_DEPRECATED);
+
             return $query->iterate(null, $hydrationMode);
         } elseif (empty($args['ignore_paginator'])) {
             if (!empty($args['use_simple_paginator'])) {
@@ -958,6 +964,12 @@ class CommonRepository extends ServiceEntityRepository
         return $clause;
     }
 
+    /**
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     * @param \StdClass|mixed[]             $filters
+     *
+     * @return mixed[]
+     */
     protected function addAdvancedSearchWhereClause($qb, $filters): array
     {
         $parseFilters = [];
@@ -988,7 +1000,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     * @param \StdClass                     $filter
      */
     protected function addCatchAllWhereClause($qb, $filter): array
     {
@@ -1042,7 +1055,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param \StdClass                     $filter
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -1063,8 +1077,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param object                     $filter
+     * @param QueryBuilder $q
+     * @param object       $filter
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns): array
     {
@@ -1112,7 +1126,7 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param DbalQueryBuilder|QueryBuilder $q
-     * @param object                        $filter
+     * @param \StdClass                     $filter
      */
     protected function addStandardSearchCommandWhereClause(&$q, $filter): array
     {
@@ -1214,7 +1228,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder $q
      */
     protected function buildClauses($q, array $args): bool
     {
@@ -1343,7 +1357,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
     protected function buildSelectClause($q, array $args)
     {
@@ -1443,7 +1457,7 @@ class CommonRepository extends ServiceEntityRepository
                 $queryExpression->add(
                     $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
                 );
-                $q->setParameter($param, $ids, Connection::PARAM_INT_ARRAY);
+                $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
             }
         } elseif (!empty($args['ownedBy'])) {
             $queryExpression->add(
@@ -1527,8 +1541,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $query
-     * @param array                                          $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
+     * @param QueryBuilder|DbalQueryBuilder $query
+     * @param array                         $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
     protected function buildWhereClauseFromArray($query, array $clauses, $expr = null)
     {
@@ -1599,7 +1613,7 @@ class CommonRepository extends ServiceEntityRepository
 
                             if (is_array($arg)) {
                                 $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                $query->setParameter($param, $arg, Connection::PARAM_STR_ARRAY);
+                                $query->setParameter($param, $arg, ArrayParameterType::STRING);
                             } else {
                                 $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
                                 $whereClause = $query->expr()->{$expression}($column, ':'.$param);
@@ -1698,9 +1712,13 @@ class CommonRepository extends ServiceEntityRepository
         return false;
     }
 
+    /**
+     * @param \StdClass                     $parseFilters
+     * @param QueryBuilder|DbalQueryBuilder $qb
+     */
     protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
-        foreach ($parseFilters as $f) {
+        foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             if (isset($f->children)) {
                 [$expr, $params] = $this->addAdvancedSearchWhereClause($qb, $f);
             } else {
@@ -1754,5 +1772,18 @@ class CommonRepository extends ServiceEntityRepository
 
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
         }
+    }
+
+    /**
+     * Checks if table contains any rows.
+     */
+    protected function tableHasRows(string $table): bool
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('null')
+            ->from($table)
+            ->setMaxResults(1);
+
+        return (bool) count($query->executeQuery()->fetchAllAssociative());
     }
 }

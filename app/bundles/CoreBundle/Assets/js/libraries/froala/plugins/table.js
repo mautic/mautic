@@ -427,7 +427,7 @@
         }
 
         else {
-          colors_html += '<span class="fr-command" data-cmd="tableCellBackgroundColor" tabIndex="-1" role="button" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '"><i class="fa fa-eraser"></i><span class="fr-sr-only">' + editor.language.translate('Clear Formatting') + '</span></span>';
+          colors_html += '<span class="fr-command" data-cmd="tableCellBackgroundColor" tabIndex="-1" role="button" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '"><i class="ri-eraser-line"></i><span class="fr-sr-only">' + editor.language.translate('Clear Formatting') + '</span></span>';
         }
       }
 
