@@ -1707,27 +1707,6 @@ Mautic.initSlotListeners = function() {
         Mautic.builderSlots.push({slot: slot, type: type});
     });
 
-    Mautic.getPredefinedLinks = function(callback) {
-        var linkList = [];
-        Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(tokens) {
-            if (tokens.length) {
-                mQuery.each(tokens, function(token, label) {
-                    if (token.startsWith('{pagelink=') ||
-                        token.startsWith('{assetlink=') ||
-                        token.startsWith('{webview_url') ||
-                        token.startsWith('{unsubscribe_url')) {
-
-                        linkList.push({
-                            text: label,
-                            href: token
-                        });
-                    }
-                });
-            }
-            return callback(linkList);
-        });
-    };
-
     Mautic.builderContents.on('slot:change', function(event, params) {
         // Change some slot styles when the values are changed in the slot edit form
         var fieldParam = params.field.attr('data-slot-param');
@@ -2196,7 +2175,8 @@ Mautic.getPredefinedLinks = function(callback) {
                 if (token.startsWith('{pagelink=') ||
                     token.startsWith('{assetlink=') ||
                     token.startsWith('{webview_url') ||
-                    token.startsWith('{unsubscribe_url')) {
+                    token.startsWith('{unsubscribe_url') ||
+                    token.startsWith('{resubscribe_url')) {
 
                     linkList.push({
                         text: label,
