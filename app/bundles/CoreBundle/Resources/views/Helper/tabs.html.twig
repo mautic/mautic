@@ -24,7 +24,7 @@
     {% endif %}
     <ul{{ (deletable is defined and deletable is string) ? ' data-delete-action="' ~ deletable ~ '" ' : '' }}
         {{ (sortable is defined and sortable is string) ? ' data-sort-action="' ~ sortable ~ '" ' : '' }}
-            class="{{ (deletable is defined and deletable is not empty) ? 'nav-deletable ' : '' }}nav nav-tabs {{ (vertical is not empty) ? 'tabs-' ~ vertical ~ ' pt-0 bdr-b-wdh-0  bdr-r-wdh-0' : 'tabs-horizontal' }}{{ sortable is defined and sortable is not empty ? ' sortable' : '' }}">
+            class="{{ (deletable is defined and deletable is not empty) ? 'nav-deletable ' : '' }}nav nav-tabs nav-tabs-contained {{ (vertical is not empty) ? 'tabs-' ~ vertical ~ ' pt-0 bdr-b-wdh-0  bdr-r-wdh-0' : 'tabs-horizontal' }}{{ sortable is defined and sortable is not empty ? ' sortable' : '' }}">
         {% for tabKey, tab in tabs %}
             {% set class = (tab.class is defined and tab.class is not empty) ? ' ' ~ tab.class : '' %}
             {% if tab.attr is defined and tab.attr is iterable %}
