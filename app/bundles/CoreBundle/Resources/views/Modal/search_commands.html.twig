@@ -1,0 +1,417 @@
+<!-- Search commands modal -->
+<div class="modal fade" id="searchCommandsModal" tabindex="-1" role="dialog" aria-labelledby="searchCommandsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <p class="modal-title" id="searchCommandsModalLabel">
+          {{ "mautic.core.help.searchcommands.title" | trans }}
+        </p>
+      </div>
+      <div class="modal-body">
+        <h4 class="fw-sb mb-sm mt-md ml-md mr-md">{{ 'mautic.core.searchcommands.heading.operators'|trans }}</h4>
+        <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+          <!-- General operators -->
+          <li class="panel">
+            <a role="button" id="headingSearchOperators" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseSearchOperators" aria-expanded="false"
+              aria-controls="collapseSearchOperators">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.searchcommands.operators'|trans }}</span>
+            </a>
+
+            <div id="collapseSearchOperators" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingSearchOperators">
+              <div class="accordion-content">
+                <p><code>+term</code>: {{ 'mautic.core.searchcommands.operators.exact_term'|trans|raw }}</p>
+                <p><code>!term</code>: {{ 'mautic.core.searchcommands.operators.exclude_terms'|trans|raw }}</p>
+                <p><code>"phrase"</code>: {{ 'mautic.core.searchcommands.operators.exact_phrase'|trans|raw }}</p>
+                <p><code>(term1 OR term2)</code>: {{ 'mautic.core.searchcommands.operators.grouping'|trans|raw }}</p>
+                <p><code>term1 OR term2</code>: {{ 'mautic.core.searchcommands.operators.multiple_terms'|trans|raw }}
+                </p>
+                <p><code>%term%</code>: {{ 'mautic.core.searchcommands.operators.wildcard'|trans|raw }}</p>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <h4 class="fw-sb mb-sm mt-32 ml-md mr-md">{{ 'mautic.core.searchcommands.heading.commands'|trans }}</h4>
+        <!-- Accordion -->
+        <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+          <!-- API -->
+          <li class="panel">
+            <a role="button" id="headingAPI" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseAPI" aria-expanded="false" aria-controls="collapseAPI">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.api'|trans}}</span>
+            </a>
+
+            <div id="collapseAPI" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="headingAPI">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.api.section.identification_naming'|trans}}</p>
+                <p><code>name:*</code>: {{'mautic.core.searchcommands.api.name'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.api.ids'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">
+                  {{'mautic.core.searchcommands.api.section.authentication_authorization'|trans}}</p>
+                <p><code>callback:*</code>: (OAuth 1.0a) {{'mautic.core.searchcommands.api.oauth10a'|trans}}</p>
+                <p><code>redirecturi:*</code>: (OAuth 2) {{'mautic.core.searchcommands.api.oauth20'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Assets -->
+          <li class="panel">
+            <a role="button" id="headingAssets" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseAssets" aria-expanded="false" aria-controls="collapseAssets">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.assets'|trans}}</span>
+            </a>
+
+            <div id="collapseAssets" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="headingAssets">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.assets.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.assets.ids'|trans}}</p>
+                <p><code>name:*</code>: {{'mautic.core.searchcommands.assets.name'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.assets.section.filters'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.assets.mine'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.assets.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.assets.unpublished'|trans}}</p>
+                <p><code>is:uncategorized</code>: {{'mautic.core.searchcommands.assets.uncategorized'|trans}}</p>
+                <p><code>category:{category alias}</code>: {{'mautic.core.searchcommands.assets.category'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Categories -->
+          <li class="panel">
+            <a role="button" id="headingCategories" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseCategories" aria-expanded="false"
+              aria-controls="collapseCategories">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.categories'|trans}}</span>
+            </a>
+
+            <div id="collapseCategories" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingCategories">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.categories.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.categories.ids'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.categories.section.filters'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.categories.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.categories.unpublished'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Dynamic Content -->
+          <li class="panel">
+            <a role="button" id="headingDynamicContent" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseDynamicContent" aria-expanded="false"
+              aria-controls="collapseDynamicContent">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.dynamiccontent'|trans}}</span>
+            </a>
+
+            <div id="collapseDynamicContent" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingDynamicContent">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.dynamiccontent.section.identification'|trans}}
+                </p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.dynamiccontent.ids'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.dynamiccontent.section.filters'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.dynamiccontent.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.dynamiccontent.unpublished'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.dynamiccontent.mine'|trans}}</p>
+                <p><code>is:uncategorized</code>: {{'mautic.core.searchcommands.dynamiccontent.uncategorized'|trans}}
+                </p>
+                <p><code>category:{category alias}</code>:
+                  {{'mautic.core.searchcommands.dynamiccontent.category'|trans}}</p>
+                <p><code>lang:{lang code}</code>: {{'mautic.core.searchcommands.dynamiccontent.lang'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Emails -->
+          <li class="panel">
+            <a role="button" id="headingEmails" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseEmails" aria-expanded="false" aria-controls="collapseEmails">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.emails'|trans}}</span>
+            </a>
+
+            <div id="collapseEmails" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="headingEmails">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.emails.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.emails.ids'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.emails.section.filters'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.emails.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.emails.unpublished'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.emails.mine'|trans}}</p>
+                <p><code>is:uncategorized</code>: {{'mautic.core.searchcommands.emails.uncategorized'|trans}}</p>
+                <p><code>category:{category alias}</code>: {{'mautic.core.searchcommands.emails.category'|trans}}</p>
+                <p><code>lang:{lang code}</code>: {{'mautic.core.searchcommands.emails.lang'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Forms -->
+          <li class="panel">
+            <a role="button" id="headingForms" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseForms" aria-expanded="false" aria-controls="collapseForms">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.forms'|trans}}</span>
+            </a>
+
+            <div id="collapseForms" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="headingForms">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.forms.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.forms.ids'|trans}}</p>
+                <p><code>name:*</code>: {{'mautic.core.searchcommands.forms.name'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.forms.section.filters'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.forms.mine'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.forms.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.forms.unpublished'|trans}}</p>
+                <p><code>has:results</code>: {{'mautic.core.searchcommands.forms.results'|trans}}</p>
+                <p><code>is:uncategorized</code>: {{'mautic.core.searchcommands.forms.uncategorized'|trans}}</p>
+                <p><code>category:{category alias}</code>: {{'mautic.core.searchcommands.forms.category'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Lead Fields -->
+          <li class="panel">
+            <a role="button" id="headingLeadFields" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseLeadFields" aria-expanded="false"
+              aria-controls="collapseLeadFields">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.leadfields'|trans}}</span>
+            </a>
+            <div id="collapseLeadFields" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingLeadFields">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.leadfields.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.leadfields.ids'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.leadfields.section.filters'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.leadfields.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.leadfields.unpublished'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.leadfields.mine'|trans}}</p>
+                <p><code>is:indexed</code>: {{'mautic.core.searchcommands.leadfields.indexed'|trans}}</p>
+                <p><code>is:unique</code>: {{'mautic.core.searchcommands.leadfields.unique'|trans}}</p>
+                <p><code>type:{type name}</code>: {{'mautic.core.searchcommands.leadfields.type'|trans}}</p>
+                <p><code>group:{group name}</code>: {{'mautic.core.searchcommands.leadfields.group'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Contacts -->
+          <li class="panel">
+            <a role="button" id="headingContacts" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseContacts" aria-expanded="false" aria-controls="collapseContacts">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.contacts'|trans}}</span>
+            </a>
+
+            <div id="collapseContacts" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingContacts">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.contacts.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.contacts.ids'|trans}}</p>
+                <p><code>name:*</code>: {{'mautic.core.searchcommands.contacts.name'|trans}}</p>
+                <p><code>email:*</code>: {{'mautic.core.searchcommands.contacts.email'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.contacts.section.filters'|trans}}</p>
+                <p><code>is:anonymous</code>: {{'mautic.core.searchcommands.contacts.anonymous'|trans}}</p>
+                <p><code>is:unowned</code>: {{'mautic.core.searchcommands.contacts.unowned'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.contacts.mine'|trans}}</p>
+                <p><code>segment:{segment_alias}</code>: {{'mautic.core.searchcommands.contacts.segment'|trans}}</p>
+                <p><code>company:*</code>: {{'mautic.core.searchcommands.contacts.company'|trans}}</p>
+                <p><code>company_id:*</code>: {{'mautic.core.searchcommands.contacts.companyid'|trans}}</p>
+                <p><code>owner:*</code>: {{'mautic.core.searchcommands.contacts.owner'|trans}}</p>
+                <p><code>ip:*</code>: {{'mautic.core.searchcommands.contacts.ip'|trans}}</p>
+                <p><code>common:{segment_alias} + {segment_alias} + ...</code>:
+                  {{'mautic.core.searchcommands.contacts.common'|trans}}</p>
+                <p><code>tag:*</code>: {{'mautic.core.searchcommands.contacts.tag'|trans}}</p>
+                <p><code>stage:*</code>: {{'mautic.core.searchcommands.contacts.stage'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.contacts.section.email_interactions'|trans}}
+                </p>
+                <p><code>email_sent:EMAIL_ID</code>: {{'mautic.core.searchcommands.contacts.emailsent'|trans}}</p>
+                <p><code>email_read:EMAIL_ID</code>: {{'mautic.core.searchcommands.contacts.emailread'|trans}}</p>
+                <p><code>email_queued:EMAIL_ID</code>: {{'mautic.core.searchcommands.contacts.emailqueued'|trans}}</p>
+                <p><code>email_pending:EMAIL_ID</code>: {{'mautic.core.searchcommands.contacts.emailpending'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Segments -->
+          <li class="panel">
+            <a role="button" id="headingSegments" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseSegments" aria-expanded="false" aria-controls="collapseSegments">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.segments'|trans}}</span>
+            </a>
+
+            <div id="collapseSegments" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingSegments">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.segments.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.segments.ids'|trans}}</p>
+                <p><code>name:*</code>: {{'mautic.core.searchcommands.segments.name'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.segments.section.filters'|trans}}</p>
+                <p><code>is:global</code>: {{'mautic.core.searchcommands.segments.global'|trans}}</p>
+                <p><code>category:category-alias</code>: {{'mautic.core.searchcommands.segments.category'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Notifications -->
+          <li class="panel">
+            <a role="button" id="headingNotifications" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseNotifications" aria-expanded="false"
+              aria-controls="collapseNotifications">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.notifications'|trans}}</span>
+            </a>
+
+            <div id="collapseNotifications" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingNotifications">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.notifications.section.identification'|trans}}
+                </p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.notifications.ids'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Pages -->
+          <li class="panel">
+            <a role="button" id="headingPages" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.pages'|trans}}</span>
+            </a>
+
+            <div id="collapsePages" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="headingPages">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.pages.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.pages.ids'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.pages.section.filters'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.pages.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.pages.unpublished'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.pages.mine'|trans}}</p>
+                <p><code>is:uncategorized</code>: {{'mautic.core.searchcommands.pages.uncategorized'|trans}}</p>
+                <p><code>is:prefcenter</code>: {{'mautic.core.searchcommands.pages.prefcenter'|trans}}</p>
+                <p><code>category:{category alias}</code>: {{'mautic.core.searchcommands.pages.category'|trans}}</p>
+                <p><code>lang:{lang code}</code>: {{'mautic.core.searchcommands.pages.lang'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Plugins -->
+          <li class="panel">
+            <a role="button" id="headingPlugins" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapsePlugins" aria-expanded="false" aria-controls="collapsePlugins">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.plugins'|trans}}</span>
+            </a>
+
+            <div id="collapsePlugins" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingPlugins">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.plugins.section.filters'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.plugins.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.plugins.unpublished'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Reports -->
+          <li class="panel">
+            <a role="button" id="headingReports" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseReports" aria-expanded="false" aria-controls="collapseReports">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.reports'|trans}}</span>
+            </a>
+
+            <div id="collapseReports" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingReports">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.reports.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.reports.ids'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.reports.section.filters'|trans}}</p>
+                <p><code>is:published</code>: {{'mautic.core.searchcommands.reports.published'|trans}}</p>
+                <p><code>is:unpublished</code>: {{'mautic.core.searchcommands.reports.unpublished'|trans}}</p>
+                <p><code>is:mine</code>: {{'mautic.core.searchcommands.reports.mine'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- SMS -->
+          <li class="panel">
+            <a role="button" id="headingSMS" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseSMS" aria-expanded="false" aria-controls="collapseSMS">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.sms'|trans}}</span>
+            </a>
+
+            <div id="collapseSMS" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="headingSMS">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.sms.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.sms.ids'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- User Roles -->
+          <li class="panel">
+            <a role="button" id="headingUserRoles" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseUserRoles" aria-expanded="false"
+              aria-controls="collapseUserRoles">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.userroles'|trans}}</span>
+            </a>
+
+            <div id="collapseUserRoles" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingUserRoles">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.userroles.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.userroles.ids'|trans}}</p>
+                <p><code>name:*</code>: {{'mautic.core.searchcommands.userroles.name'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.userroles.section.filters'|trans}}</p>
+                <p><code>is:admin</code>: {{'mautic.core.searchcommands.userroles.admin'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Users -->
+          <li class="panel">
+            <a role="button" id="headingUsers" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{'mautic.core.searchcommands.users'|trans}}</span>
+            </a>
+
+            <div id="collapseUsers" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="headingUsers">
+              <div class="accordion-content">
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.users.section.identification'|trans}}</p>
+                <p><code>ids:ID1,ID2</code>: {{'mautic.core.searchcommands.users.ids'|trans}}</p>
+                <p><code>email:*</code>: {{'mautic.core.searchcommands.users.email'|trans}}</p>
+                <p><code>name:*</code>: {{'mautic.core.searchcommands.users.name'|trans}}</p>
+                <p><code>username:*</code>: {{'mautic.core.searchcommands.users.username'|trans}}</p>
+                <p class="fw-b mb-sm mt-md">{{'mautic.core.searchcommands.users.section.filters'|trans}}</p>
+                <p><code>is:admin</code>: {{'mautic.core.searchcommands.users.admin'|trans}}</p>
+                <p><code>is:active</code>: {{'mautic.core.searchcommands.users.active'|trans}}</p>
+                <p><code>is:inactive</code>: {{'mautic.core.searchcommands.users.inactive'|trans}}</p>
+                <p><code>position:*</code>: {{'mautic.core.searchcommands.users.position'|trans}}</p>
+                <p><code>role:*</code>: {{'mautic.core.searchcommands.users.role'|trans}}</p>
+              </div>
+            </div>
+          </li>
+
+          <!-- Accordion end -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
