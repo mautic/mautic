@@ -1,0 +1,611 @@
+<!-- Token placeholders modal -->
+<div class="modal fade" id="tokenPlaceholdersModal" tabindex="-1" role="dialog" aria-labelledby="tokenPlaceholdersLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <p class="modal-title" id="tokenPlaceholdersLabel">
+          {{ "mautic.core.tokens.placeholder_tokens" | trans }}
+        </p>
+      </div>
+      <div class="modal-body">
+        <div class="pa-md">
+          <h3 class="fw-sb mb-sm">{{ 'mautic.core.tokens.introducing_tokens.title'|trans }}</h3>
+          <p>{{ 'mautic.core.tokens.introducing_tokens.description'|trans }}</p>
+        </div>
+
+        <div class="alert alert-info">
+          {{ 'mautic.core.searchcommands.fallback_text_info'|trans|raw }}
+        </div>
+
+        <ul id="accordion" class="accordion">
+          <!-- Contact fields -->
+          <li class="panel">
+            <a role="button" id="headingContactFields" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseContactFields" aria-expanded="false"
+              aria-controls="collapseContactFields">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.contact_fields'|trans }}</span>
+            </a>
+            <div id="collapseContactFields" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingContactFields">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.attribution'|trans }}</td>
+                    <td><code>{contactfield=attribution}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.attribution_date'|trans }}</td>
+                    <td><code>{contactfield=attribution_date}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.address1'|trans }}</td>
+                    <td><code>{contactfield=address1}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.address2'|trans }}</td>
+                    <td><code>{contactfield=address2}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.country'|trans }}</td>
+                    <td><code>{contactfield=country}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.city'|trans }}</td>
+                    <td><code>{contactfield=city}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.company'|trans }}</td>
+                    <td><code>{contactfield=company}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.id'|trans }}</td>
+                    <td><code>{contactfield=id}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.email'|trans }}</td>
+                    <td><code>{contactfield=email}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.facebook'|trans }}</td>
+                    <td><code>{contactfield=facebook}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.fax'|trans }}</td>
+                    <td><code>{contactfield=fax}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.firstname'|trans }}</td>
+                    <td><code>{contactfield=firstname}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.foursquare'|trans }}</td>
+                    <td><code>{contactfield=foursquare}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.googleplus'|trans }}</td>
+                    <td><code>{contactfield=googleplus}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.instagram'|trans }}</td>
+                    <td><code>{contactfield=instagram}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.ipaddress'|trans }}</td>
+                    <td><code>{contactfield=ipAddress}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.lastname'|trans }}</td>
+                    <td><code>{contactfield=lastname}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.linkedin'|trans }}</td>
+                    <td><code>{contactfield=linkedin}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.mobile'|trans }}</td>
+                    <td><code>{contactfield=mobile}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.phone'|trans }}</td>
+                    <td><code>{contactfield=phone}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.position'|trans }}</td>
+                    <td><code>{contactfield=position}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.skype'|trans }}</td>
+                    <td><code>{contactfield=skype}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.state'|trans }}</td>
+                    <td><code>{contactfield=state}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.twitter'|trans }}</td>
+                    <td><code>{contactfield=twitter}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.title'|trans }}</td>
+                    <td><code>{contactfield=title}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.website'|trans }}</td>
+                    <td><code>{contactfield=website}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.contact.zipcode'|trans }}</td>
+                    <td><code>{contactfield=zipcode}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Contact Owner fields -->
+          <li class="panel">
+            <a role="button" id="headingOwnerFields" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseOwnerFields" aria-expanded="false"
+              aria-controls="collapseOwnerFields">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.contact_owner_fields'|trans }}</span>
+            </a>
+            <div id="collapseOwnerFields" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingOwnerFields">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.owner.firstname'|trans }}</td>
+                    <td><code>{ownerfield=firstname}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.owner.lastname'|trans }}</td>
+                    <td><code>{ownerfield=lastname}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.owner.email'|trans }}</td>
+                    <td><code>{ownerfield=email}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.owner.position'|trans }}</td>
+                    <td><code>{ownerfield=position}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.owner.signature'|trans }}</td>
+                    <td><code>{ownerfield=signature}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Company Contact fields -->
+          <li class="panel">
+            <a role="button" id="headingCompanyFields" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseCompanyFields" aria-expanded="false"
+              aria-controls="collapseCompanyFields">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.company_contact_fields'|trans }}</span>
+            </a>
+            <div id="collapseCompanyFields" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingCompanyFields">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.address1'|trans }}</td>
+                    <td><code>{contactfield=companyaddress1}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.address2'|trans }}</td>
+                    <td><code>{contactfield=companyaddress2}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.annual_revenue'|trans }}</td>
+                    <td><code>{contactfield=companyannual_revenue}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.city'|trans }}</td>
+                    <td><code>{contactfield=companycity}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.country'|trans }}</td>
+                    <td><code>{contactfield=companycountry}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.description'|trans }}</td>
+                    <td><code>{contactfield=companydescription}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.email'|trans }}</td>
+                    <td><code>{contactfield=companyemail}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.fax'|trans }}</td>
+                    <td><code>{contactfield=companyfax}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.industry'|trans }}</td>
+                    <td><code>{contactfield=companyindustry}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.name'|trans }}</td>
+                    <td><code>{contactfield=companyname}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.number_of_employees'|trans }}</td>
+                    <td><code>{contactfield=companynumber_of_employees}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.phone'|trans }}</td>
+                    <td><code>{contactfield=companyphone}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.state'|trans }}</td>
+                    <td><code>{contactfield=companystate}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.website'|trans }}</td>
+                    <td><code>{contactfield=companywebsite}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.company.zipcode'|trans }}</td>
+                    <td><code>{contactfield=companyzipcode}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Mautic Component tokens -->
+          <li class="panel">
+            <a role="button" id="headingComponentTokens" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseComponentTokens" aria-expanded="false"
+              aria-controls="collapseComponentTokens">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.component_tokens'|trans }}</span>
+            </a>
+            <div id="collapseComponentTokens" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingComponentTokens">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.component.asset_link'|trans }}</td>
+                    <td><code>{assetlink=25}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.component.focus_item'|trans }}</td>
+                    <td><code>{focus=4}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.component.form'|trans }}</td>
+                    <td><code>{form=83}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.component.landing_page_link'|trans }}</td>
+                    <td><code>{pagelink=17}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Email specific tokens -->
+          <li class="panel">
+            <a role="button" id="headingEmailTokens" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseEmailTokens" aria-expanded="false"
+              aria-controls="collapseEmailTokens">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.email_tokens'|trans }}</span>
+            </a>
+            <div id="collapseEmailTokens" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingEmailTokens">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.email.signature'|trans }}</td>
+                    <td><code>{signature}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.email.subject'|trans }}</td>
+                    <td><code>{subject}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.email.tracking_pixel'|trans }}</td>
+                    <td><code>{tracking_pixel}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.email.unsubscribe_text'|trans }}</td>
+                    <td><code>{unsubscribe_text}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.email.webview_text'|trans }}</td>
+                    <td><code>{webview_text}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.email.webview_url'|trans }}</td>
+                    <td><code>{webview_url}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Landing Page tokens -->
+          <li class="panel">
+            <a role="button" id="headingLandingPageTokens" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseLandingPageTokens" aria-expanded="false"
+              aria-controls="collapseLandingPageTokens">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.landing_page_tokens'|trans }}</span>
+            </a>
+            <div id="collapseLandingPageTokens" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingLandingPageTokens">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.landing_page.meta_description'|trans }}</td>
+                    <td><code>{pagemetadescription}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.landing_page.title'|trans }}</td>
+                    <td><code>{pagetitle}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.landing_page.language_bar'|trans }}</td>
+                    <td><code>{langbar}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.landing_page.share_buttons'|trans }}</td>
+                    <td><code>{sharebuttons}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.landing_page.success_message'|trans }}</td>
+                    <td><code>{successmessage}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Preference Center Landing Page tokens -->
+          <li class="panel">
+            <a role="button" id="headingPreferenceCenterTokens" class="accordion-heading collapsed"
+              data-toggle="collapse" data-parent="#accordion" href="#collapsePreferenceCenterTokens"
+              aria-expanded="false" aria-controls="collapsePreferenceCenterTokens">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.preference_center_tokens'|trans }}</span>
+            </a>
+            <div id="collapsePreferenceCenterTokens" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingPreferenceCenterTokens">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.preference_center.lead_identifier'|trans }}</td>
+                    <td><code>{leadidentifier}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.preference_center.category_list'|trans }}</td>
+                    <td><code>{categorylist}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.preference_center.segment_list'|trans }}</td>
+                    <td><code>{segmentlist}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.preference_center.preferred_channel'|trans }}</td>
+                    <td><code>{preferredchannel}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.preference_center.channel_frequency'|trans }}</td>
+                    <td><code>{channelfrequency}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.preference_center.save_preferences'|trans }}</td>
+                    <td><code>{saveprefsbutton}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Dynamic Web Content tokens -->
+          <li class="panel">
+            <a role="button" id="headingDynamicContentTokens" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseDynamicContentTokens" aria-expanded="false"
+              aria-controls="collapseDynamicContentTokens">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.dynamic_content_tokens'|trans }}</span>
+            </a>
+            <div id="collapseDynamicContentTokens" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingDynamicContentTokens">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.dynamic_content.example'|trans }}</td>
+                    <td><code>{dynamiccontent="Dynamic Content 1"}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+
+          <!-- Contact Monitoring -->
+          <li class="panel">
+            <a role="button" id="headingContactMonitoring" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseContactMonitoring" aria-expanded="false"
+              aria-controls="collapseContactMonitoring">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.contact_monitoring'|trans }}</span>
+            </a>
+            <div id="collapseContactMonitoring" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingContactMonitoring">
+
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.language'|trans }}</td>
+                    <td><code>{language}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.title'|trans }}</td>
+                    <td><code>{title}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.landing_page_title'|trans }}</td>
+                    <td><code>{page_title}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.url'|trans }}</td>
+                    <td><code>{url}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.landing_page_url'|trans }}</td>
+                    <td><code>{page_url}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.referrer'|trans }}</td>
+                    <td><code>{referrer}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.tracking_pixel'|trans }}</td>
+                    <td><code>{tracking_pixel}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.utm_campaign'|trans }}</td>
+                    <td><code>{utm_campaign}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.utm_content'|trans }}</td>
+                    <td><code>{utm_content}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.utm_medium'|trans }}</td>
+                    <td><code>{utm_medium}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.utm_source'|trans }}</td>
+                    <td><code>{utm_source}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.monitoring.utm_term'|trans }}</td>
+                    <td><code>{utm_term}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+          <li class="panel">
+            <a role="button" id="headingCustomFields" class="accordion-heading collapsed" data-toggle="collapse"
+              data-parent="#accordion" href="#collapseCustomFields" aria-expanded="false"
+              aria-controls="collapseCustomFields">
+              <i class="ri-arrow-down-s-line accordion-arrow"></i>
+              <span class="accordion-title">{{ 'mautic.core.tokens.custom_fields'|trans }}</span>
+            </a>
+
+            <div id="collapseCustomFields" class="collapse accordion-wrapper" role="tabpanel"
+              aria-labelledby="headingCustomFields">
+              <div class="accordion-content">
+                <h4 class="mb-xs fw-sb">{{ 'mautic.core.tokens.custom_fields.date_and_time'|trans }}</h4>
+                <p>{{ 'mautic.core.tokens.custom_fields.date_and_time.description'|trans }}</p>
+              </div>
+              <table class="table table-hover accordion-content">
+                <thead>
+                  <tr>
+                    <th>{{ 'mautic.core.tokens.variable_name'|trans }}</th>
+                    <th>{{ 'mautic.core.tokens.variable_syntax'|trans }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.custom_fields.datetime'|trans }}</td>
+                    <td><code>{contactfield=aliasofyourcustomdatefield|datetime}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.custom_fields.date'|trans }}</td>
+                    <td><code>{contactfield=aliasofyourcustomdatefield|date}</code></td>
+                  </tr>
+                  <tr>
+                    <td>{{ 'mautic.core.tokens.custom_fields.time'|trans }}</td>
+                    <td><code>{contactfield=aliasofyourcustomdatefield|time}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="accordion-content">
+                <div class="alert alert-info">
+                  {{ 'mautic.core.tokens.custom_fields.note'|trans }}
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
