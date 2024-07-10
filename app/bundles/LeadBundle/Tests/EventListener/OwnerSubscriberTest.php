@@ -2,29 +2,38 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Entity\User;
-use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class OwnerSubscriberTest extends TestCase
 {
@@ -79,7 +88,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailBuild(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
+        $leadModel = $this->getMockLeadModel();
         if (!$leadModel instanceof LeadModel) {
             self::fail('The mock does not contain LeadModel.');
         }
@@ -95,7 +104,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerate(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
+        $leadModel = $this->getMockLeadModel();
         if (!$leadModel instanceof LeadModel) {
             self::fail('The mock does not contain LeadModel.');
         }
@@ -117,7 +126,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerateWithFakeOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
+        $leadModel = $this->getMockLeadModel();
         if (!$leadModel instanceof LeadModel) {
             self::fail('The mock does not contain LeadModel.');
         }
@@ -135,7 +144,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailGenerateWithNoOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
+        $leadModel = $this->getMockLeadModel();
         if (!$leadModel instanceof LeadModel) {
             self::fail('The mock does not contain LeadModel.');
         }
@@ -157,7 +166,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplay(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
+        $leadModel = $this->getMockLeadModel();
         if (!$leadModel instanceof LeadModel) {
             self::fail('The mock does not contain LeadModel.');
         }
@@ -175,7 +184,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplayWithFakeOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
+        $leadModel = $this->getMockLeadModel();
         if (!$leadModel instanceof LeadModel) {
             self::fail('The mock does not contain LeadModel.');
         }
@@ -193,7 +202,7 @@ class OwnerSubscriberTest extends TestCase
 
     public function testOnEmailDisplayWithNoOwner(): void
     {
-        $leadModel = $this->getMockFactory()->getModel('lead');
+        $leadModel = $this->getMockLeadModel();
         if (!$leadModel instanceof LeadModel) {
             self::fail('The mock does not contain LeadModel.');
         }
@@ -214,13 +223,12 @@ class OwnerSubscriberTest extends TestCase
     }
 
     /**
-     * @param mixed[] $parameterMap
+     * @return MockObject&LeadModel
      */
-    protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory|MockObject
+    protected function getMockLeadModel(): MockObject
     {
-        $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockLeadRepository = $this->createMock(LeadRepository::class);
+        $mockLeadModel      = $this->createMock(LeadModel::class);
 
         $mockLeadRepository->method('getLeadOwner')
             ->will(
@@ -233,71 +241,14 @@ class OwnerSubscriberTest extends TestCase
                 )
             );
 
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        $mockLeadModel->method('getRepository')
-            ->willReturn($mockLeadRepository);
+        $mockLeadModel->method('getRepository')->willReturn($mockLeadRepository);
 
-        /** @var MauticFactory|MockObject $mockFactory */
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $parameterMap = array_merge(
-            [
-                ['mailer_return_path', false, null],
-                ['mailer_is_owner', false, $mailIsOwner],
-            ],
-            $parameterMap
-        );
-
-        $mockFactory->method('getParameter')
-            ->will(
-                $this->returnValueMap($parameterMap)
-            );
-        $mockFactory->method('getModel')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['lead', $mockLeadModel],
-                    ]
-                )
-            );
-
-        $mockLogger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockFactory->method('getLogger')
-            ->willReturn($mockLogger);
-
-        $mockMailboxHelper = $this->getMockBuilder(Mailbox::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockMailboxHelper->method('isConfigured')
-            ->willReturn(false);
-
-        $mockFactory->method('getHelper')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['mailbox', $mockMailboxHelper],
-                    ]
-                )
-            );
-
-        return $mockFactory;
+        return $mockLeadModel;
     }
 
     protected function getMockMailer(array $lead): MailHelper
     {
-        $parameterMap = [
-            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
-        ];
-        /** @var MauticFactory|MockObject $mockFactory */
-        $mockFactory = $this->getMockFactory(true, $parameterMap);
-
         /** @var FromEmailHelper|MockObject $fromEmaiHelper */
         $fromEmaiHelper = $this->createMock(FromEmailHelper::class);
 
@@ -313,9 +264,46 @@ class OwnerSubscriberTest extends TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+        /** @var MockObject&EventDispatcherInterface $dispatcher */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        /** @var MockObject&PathsHelper $pathsHelper */
+        $pathsHelper = $this->createMock(PathsHelper::class);
+
+        /** @var MockObject&Environment $environment */
+        $environment = $this->createMock(Environment::class);
+
+        /** @var MockObject&AssetModel $assetModel */
+        $assetModel = $this->createMock(AssetModel::class);
+
+        /** @var MockObject&ThemeHelper $themeHelper */
+        $themeHelper = $this->createMock(ThemeHelper::class);
+
+        /** @var MockObject&TrackableModel $trackableModel */
+        $trackableModel = $this->createMock(TrackableModel::class);
+
+        /** @var MockObject&RedirectModel $redirectModel */
+        $redirectModel = $this->createMock(RedirectModel::class);
+
+        /** @var MockObject&EntityManagerInterface $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        /** @var MockObject&RequestStack $requestStack */
+        $requestStack = $this->createMock(RequestStack::class);
+
+        /** @var MockObject&EmailStatModel $emailStatModel */
+        $emailStatModel = $this->createMock(EmailStatModel::class);
+
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+                ]
+            );
+
         $transport    = new SmtpTransport();
         $mailer       = new Mailer($transport);
-        $mailerHelper = new MailHelper($mockFactory, $mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router);
+        $mailerHelper = new MailHelper($mailer, $fromEmaiHelper, $coreParametersHelper, $mailbox, $logger, $this->mailHashHelper, $router, $dispatcher, $pathsHelper, $environment, $assetModel, $themeHelper, $trackableModel, $redirectModel, $entityManager, $requestStack, $emailStatModel, new SlotsHelper());
         $mailerHelper->setLead($lead);
 
         return $mailerHelper;
