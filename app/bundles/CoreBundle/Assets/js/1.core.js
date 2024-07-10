@@ -57,6 +57,7 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
+    initializeCodeBlocks();
 });
 
 mQuery(document).ready(function() {
@@ -83,32 +84,31 @@ mQuery(document).ready(function() {
         }
     }, mauticSessionLifetime * 1000 / 2);
 
-    mQuery('code').each(function() {
-        var $codeBlock = mQuery(this);
-        $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
-    });
-
-    // Handle click event on the code block
+    // Copy code block on click
     mQuery(document).on('click', 'code', function() {
         var $codeBlock = mQuery(this);
         var $icon = $codeBlock.find('.copy-icon');
-
-        // Create a temporary textarea to copy the code content
         var $temp = mQuery('<textarea>');
         mQuery('body').append($temp);
         $temp.val($codeBlock.text()).select();
         document.execCommand('copy');
         $temp.remove();
-
-        // Change the icon to check icon
         $icon.removeClass('ri-clipboard-fill').addClass('ri-check-line');
-
-        // Revert the icon back to clipboard after a delay
         setTimeout(function() {
             $icon.removeClass('ri-check-line').addClass('ri-clipboard-fill');
-        }, 2000); // Change back after 2 seconds
+        }, 2000);
     });
+    initializeCodeBlocks();
 });
+
+function initializeCodeBlocks() {
+    mQuery('code').each(function() {
+        var $codeBlock = mQuery(this);
+        if (!$codeBlock.find('.copy-icon').length) {
+            $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
+        }
+    });
+}
 
 if (typeof history != 'undefined') {
     //back/forward button pressed
