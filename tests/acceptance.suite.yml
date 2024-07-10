@@ -11,6 +11,8 @@ modules:
         url: "https://web:443"
         host: selenium-chrome
         browser: chrome
+        port: 4444
+        window_size: maximize
         capabilities:
           chromeOptions:
             args:
