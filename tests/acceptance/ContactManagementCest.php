@@ -31,8 +31,6 @@ class ContactManagementCest
         $I->click(ContactPage::$saveButton);
         $I->waitForElementNotVisible(ContactPage::$quickAddModal, 30);
 
-        $I->reloadPage(); // Ensure the latest data is loaded
-
         // Confirm the contact is in the database
         $I->seeInDatabase('leads', ['firstname' => 'QuickAddFirstName', 'email' => 'quickadd@example.com']);
     }
@@ -199,7 +197,6 @@ class ContactManagementCest
         // Wait for the modal to become visible and click on the button to confirm delete
         $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
         $I->click(ContactPage::$ConfirmDelete);
-
         $I->reloadPage(); // Wait for delete to be completed
 
         // Confirm the contacts are no longer visible
