@@ -3061,6 +3061,15 @@ a.label:focus {
 .label-secondary:hover {
   background-color: var(--label-background-hover-brand-secondary);
 }
+.label-outline {
+  background-color: transparent;
+  color: var(--text-primary);
+  outline: 1px solid var(--background-inverse);
+}
+.label-high-contrast {
+  background-color: var(--background-inverse);
+  color: var(--text-inverse);
+}
 a.label,
 .label:has(> a) {
   border: 1px solid #00000017;
