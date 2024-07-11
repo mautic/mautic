@@ -122,7 +122,7 @@
               <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index) }} {% if event.feature is defined %}timeline-featured{% endif %}">
                   <td class="timeline-icon">
                       <a data-activate-details="{{ loop.index }}" class="btn btn-sm btn-nospin btn-default {% if details is empty %}disabled{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}" data-target="timeline-details-{{ loop.index }}">
-                          <span class="fa fa-fw {{ icon }}"></span>
+                          <span class="fa ri-fw {{ icon }}"></span>
                       </a>
                   </td>
                   <td class="timeline-name">{{ eventLabel }}</td>
