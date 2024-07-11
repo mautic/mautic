@@ -835,7 +835,8 @@ class MailHelper
         $this->message->html($content);
     }
 
-    private function resolveMimeType(string $data): ?string {
+    private function resolveMimeType(string $data): ?string
+    {
         $mimeType = null;
         if (extension_loaded('fileinfo')) {
             if (($info = finfo_open(\FILEINFO_MIME)) !== false) {
