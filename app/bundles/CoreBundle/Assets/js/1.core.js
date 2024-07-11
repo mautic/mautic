@@ -407,7 +407,7 @@ var Mautic = {
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['fa-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'fa-li', 'text-white', 'text-muted'];
+                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'fa-li', 'text-white', 'text-muted'];
                 var appendClasses = "";
 
                 //check for special classes to add to spinner

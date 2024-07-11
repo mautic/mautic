@@ -16,7 +16,7 @@
     <div class="panel ">
         <div class="panel-body np box-layout">
             <div class="height-auto icon bdr-r col-xs-1 text-center">
-                <h3><i class="fa ri-lg fa-fw {{ icon }}"></i></h3>
+                <h3><i class="fa ri-lg ri-fw {{ icon }}"></i></h3>
             </div>
             <div class="media-body col-xs-11 pa-10">
                 <div class="pull-right btn-group">
@@ -36,8 +36,8 @@
                 </div>
                 {{ note.text|purify }}
                 <div class="mt-15 text-muted">
-                  <i class="ri-time-line fa-fw"></i> <span class="small">{{ dateToFullConcat(note.dateTime) }}</span>
-                  <i class="ri-user-6-line fa-fw"></i> <span class="small">{{ note.createdByUser }}</span>
+                  <i class="ri-time-line ri-fw"></i> <span class="small">{{ dateToFullConcat(note.dateTime) }}</span>
+                  <i class="ri-user-6-line ri-fw"></i> <span class="small">{{ note.createdByUser }}</span>
                 </div>
             </div>
         </div>
