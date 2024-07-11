@@ -2941,6 +2941,9 @@ a.label:focus {
   height: 32px;
   padding: 0 var(--spacing-04);
 }
+.label i {
+  font-size: calc(1em + 2px);
+}
 .label-gray {
   background-color: var(--label-background-gray);
   color: var(--label-color-gray);

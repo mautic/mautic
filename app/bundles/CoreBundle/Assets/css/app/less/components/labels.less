@@ -18,9 +18,7 @@
   .text-overflow();
 
   // Exception for category color labels
-  &.pa-10 {
-    min-width: auto;
-  }
+  &.pa-10 { min-width: auto; }
 
   // Add hover effects, but only for links
   a& {
@@ -32,9 +30,7 @@
   }
 
   // Empty labels collapse automatically (not available in IE8)
-  &:empty {
-    display: none;
-  }
+  &:empty { display: none; }
 
   // Quick fix for labels in buttons
   .btn & {
@@ -46,6 +42,9 @@
   &[size="sm"] { height: 18px; padding: 0 var(--spacing-03); }
   &[size="md"] { height: 24px; padding: 0 var(--spacing-03); }
   &[size="lg"] { height: 32px; padding: 0 var(--spacing-04); }
+
+  // Icons
+  i { font-size: calc(1em + 2px); }
 }
 
 // Colors
