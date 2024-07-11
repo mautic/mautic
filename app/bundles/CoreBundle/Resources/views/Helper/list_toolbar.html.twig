@@ -23,6 +23,10 @@
                 overlayDisabled: overlayDisabled is defined ? overlayDisabled : null
             }) -}}
             {% endif %}
+            <a id="lastSearch" class="label label-gray mr-sm hide" size="md" data-toggle="tooltip" data-original-title="{{ 'mautic.core.search.again'|trans }}">
+                <span id="lastSearchText"></span>
+                <i class="ri-arrow-go-back-line"></i>
+            </a>            
 
             {% if filters is defined and filters is not empty %}
             {{- include('@MauticCore/Helper/list_filters.html.twig', {

@@ -47,6 +47,7 @@ mQuery.ajaxSetup({
 
 mQuery( document ).ajaxComplete(function(event, xhr, settings) {
     Mautic.stopPageLoadingBar();
+    setupLastSearch();
     if (xhr.responseJSON && xhr.responseJSON.flashes) {
         Mautic.setFlashes(xhr.responseJSON.flashes);
     }
@@ -82,7 +83,69 @@ mQuery( document ).ready(function() {
                 });
         }
     }, mauticSessionLifetime * 1000 / 2);
+
+    setupLastSearch();
 });
+
+function setupLastSearch() {
+    var $searchInput = mQuery('#list-search');
+    var $lastSearch = mQuery('#lastSearch');
+    var $lastSearchText = mQuery('#lastSearchText');
+    var $searchButton = mQuery('#btn-filter');
+
+    if ($searchInput.length === 0 || $lastSearch.length === 0 || $searchButton.length === 0) return;
+
+    var dataAction = $searchInput.attr('data-action');
+    if (!dataAction) return;
+
+    var storageKey = 'lastSearch_' + dataAction;
+
+    // Remove existing event listeners
+    $searchInput.off('keyup.lastSearch');
+    $searchButton.off('click.lastSearch');
+    $lastSearch.off('click.lastSearch');
+
+    // Add event listeners
+    $searchInput.on('keyup.lastSearch', function(event) {
+        if (event.key === 'Enter') {
+            saveAndUpdateLastSearch();
+        }
+    });
+
+    $searchButton.on('click.lastSearch', function() {
+        saveAndUpdateLastSearch();
+    });
+
+    $lastSearch.on('click.lastSearch', function(e) {
+        e.preventDefault();
+        var lastSearchTerm = localStorage.getItem(storageKey);
+        if (lastSearchTerm) {
+            $searchInput.val(lastSearchTerm);
+            $searchButton.click();
+        }
+    });
+
+    function saveAndUpdateLastSearch() {
+        var searchTerm = $searchInput.val().trim();
+        if (searchTerm) {
+            localStorage.setItem(storageKey, searchTerm);
+            updateLastSearchElement(searchTerm);
+        }
+    }
+
+    function updateLastSearchElement(searchTerm) {
+        $lastSearchText.text(searchTerm);
+        $lastSearch.removeClass('hide');
+    }
+
+    // Check localStorage on load
+    var savedSearch = localStorage.getItem(storageKey);
+    if (savedSearch) {
+        updateLastSearchElement(savedSearch);
+    } else {
+        $lastSearch.addClass('hide');
+    }
+}
 
 if (typeof history != 'undefined') {
     //back/forward button pressed
