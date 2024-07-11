@@ -257,7 +257,7 @@ var Mautic = {
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
         if (!button.find('.fa-spinner.fa-spin').length) {
-            button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+            button.append(mQuery('<i class="fa ri-fw fa-spinner fa-spin"></i>'));
         }
     },
 
@@ -278,7 +278,7 @@ var Mautic = {
      */
     activateLabelLoadingIndicator: function (el) {
         var labelSpinner = mQuery("label[for='" + el + "']");
-        Mautic.labelSpinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+        Mautic.labelSpinner = mQuery('<i class="fa ri-fw fa-spinner fa-spin"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
