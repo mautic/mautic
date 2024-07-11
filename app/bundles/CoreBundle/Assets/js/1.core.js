@@ -867,3 +867,9 @@ var Mautic = {
         }
     }
 };
+
+function listQuickFilter(element) {
+    const filterValue = element.dataset.filter;
+    document.getElementById('list-search').value = filterValue;
+    document.getElementById('btn-filter').click();
+}
