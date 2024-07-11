@@ -2995,7 +2995,7 @@ a.label:focus {
 .label-outline {
   background-color: transparent;
   color: var(--text-primary);
-  outline: 1px solid var(--background-inverse);
+  border: 1px solid var(--background-inverse);
 }
 .label-high-contrast {
   background-color: var(--background-inverse);
@@ -3112,6 +3112,10 @@ a.label.label-secondary,
 a.label.label-secondary:hover,
 .label:has(> a).label-secondary:hover {
   background-color: var(--label-background-hover-brand-secondary);
+}
+a.label.label-outline,
+.label:has(> a).label-outline {
+  border: 1px solid var(--background-inverse);
 }
 .label-default {
   background-color: #a0acb8;

@@ -113,7 +113,7 @@
 .label-outline {
   background-color: transparent;
   color: var(--text-primary);
-  outline: 1px solid var(--background-inverse);
+  border: 1px solid var(--background-inverse);
 }
 
 .label-high-contrast {
@@ -185,6 +185,9 @@ a.label, .label:has(> a) {
     border: 1px solid var(--label-border-brand-secondary);
     color: var(--label-color-brand-secondary);
     &:hover { background-color: var(--label-background-hover-brand-secondary); }
+  }
+  &.label-outline {
+    border: 1px solid var(--background-inverse);
   }
 }
 
