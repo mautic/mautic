@@ -27,14 +27,14 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
         return;
     }
 
-    mQuery('#' + mailbox + 'TestButtonContainer .ri-loader-line').removeClass('hide');
+    mQuery('#' + mailbox + 'TestButtonContainer .ri-loader-3-line').removeClass('hide');
 
     Mautic.ajaxActionRequest('email:testMonitoredEmailServerConnection', data, function(response) {
         var theClass = (response.success) ? 'has-success' : 'has-error';
         var theMessage = response.message;
         mQuery('#' + mailbox + 'TestButtonContainer').removeClass('has-success has-error').addClass(theClass);
         mQuery('#' + mailbox + 'TestButtonContainer .help-block').html(theMessage);
-        mQuery('#' + mailbox + 'TestButtonContainer .ri-loader-line').addClass('hide');
+        mQuery('#' + mailbox + 'TestButtonContainer .ri-loader-3-line').addClass('hide');
 
         if (response.folders) {
             if (mailbox == 'general') {

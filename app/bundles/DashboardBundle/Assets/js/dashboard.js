@@ -71,8 +71,8 @@ Mautic.dashboardFilterPreventSubmit = function() {
     let button = form.find('button:first');
     Mautic.dashboardSubmitButton = button.clone();
     button.width(button.width()+'px'); // Keep button width
-    button.html('<i class="ri-loader-line ri-spin"></i>');
-    jQuery('.widget').find('.card-body').html('<div class="spinner"><i class="ri-loader-line ri-spin"></i></div>');
+    button.html('<i class="ri-loader-3-line ri-spin"></i>');
+    jQuery('.widget').find('.card-body').html('<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>');
     form
         .unbind('submit')
         .on('submit', function(e){

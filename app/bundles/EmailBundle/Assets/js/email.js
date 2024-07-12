@@ -365,7 +365,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
         });
     }
 
-    tabHolder.find('i').first().removeClass('ri-loader-line ri-spin').addClass('fa-plus text-success');
+    tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('fa-plus text-success');
     newTab.find('a').tab('show');
 
     firstInput.focus();

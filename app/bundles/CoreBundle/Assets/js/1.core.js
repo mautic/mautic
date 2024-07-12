@@ -256,8 +256,8 @@ var Mautic = {
      */
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
-        if (!button.find('.ri-loader-line.ri-spin').length) {
-            button.append(mQuery('<i class="ri-loader-line ri-spin"></i>'));
+        if (!button.find('.ri-loader-3-line.ri-spin').length) {
+            button.append(mQuery('<i class="ri-loader-3-line ri-spin"></i>'));
         }
     },
 
@@ -268,7 +268,7 @@ var Mautic = {
      */
     removeButtonLoadingIndicator: function (button) {
         button.prop('disabled', false);
-        button.find('.ri-loader-line').remove();
+        button.find('.ri-loader-3-line').remove();
     },
 
     /**
@@ -278,7 +278,7 @@ var Mautic = {
      */
     activateLabelLoadingIndicator: function (el) {
         var labelSpinner = mQuery("label[for='" + el + "']");
-        Mautic.labelSpinner = mQuery('<i class="ri-loader-line ri-spin"></i>');
+        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
@@ -420,7 +420,7 @@ var Mautic = {
                     }
                 }
                 mQuery(el).removeClass();
-                mQuery(el).addClass('ri-loader-line ri-spin ' + identifierClass + appendClasses);
+                mQuery(el).addClass('ri-loader-3-line ri-spin ' + identifierClass + appendClasses);
             }
         }
     },
@@ -430,11 +430,11 @@ var Mautic = {
      */
     stopIconSpinPostEvent: function (specificId) {
         if (typeof specificId != 'undefined' && specificId in MauticVars.iconClasses) {
-            mQuery('.' + specificId).removeClass('ri-loader-line ri-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
+            mQuery('.' + specificId).removeClass('ri-loader-3-line ri-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
             delete MauticVars.iconClasses[specificId];
         } else {
             mQuery.each(MauticVars.iconClasses, function (index, value) {
-                mQuery('.' + index).removeClass('ri-loader-line ri-spin ' + index).addClass(value);
+                mQuery('.' + index).removeClass('ri-loader-3-line ri-spin ' + index).addClass(value);
                 delete MauticVars.iconClasses[index];
             });
         }
