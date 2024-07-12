@@ -180,42 +180,6 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a .sli {
   top: 1px;
 }
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a > img,
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .img-wrapper {
-  --width: 28px;
-  border-radius: 100%;
-  width: var(--width);
-  height: var(--width);
-  display: inline-block;
-  margin-top: -8px;
-  margin-bottom: -8px;
-}
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user .info {
-  transform: translateY(-6%);
-  position: relative;
-  transition: transform 0.3s ease;
-}
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user .info > .position {
-  opacity: 0;
-}
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user:hover .info {
-  transform: translateY(-20%);
-}
-@keyframes slideDown {
-  from {
-    transform: translateY(-10px);
-  }
-  to {
-    transform: translateY(-5px);
-  }
-}
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user:hover .info > .position {
-  display: flex;
-  animation: fadeIn 0.5s ease-in-out forwards, slideDown 0.5s ease-in-out forwards;
-}
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.user > .text {
-  line-height: 14px;
-}
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .badge,
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .label {
   position: absolute;
@@ -258,6 +222,16 @@ body > #app-wrapper {
   color: rgba(0, 0, 0, 0.7);
   background-color: #f5f5f5;
   outline: 0;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav img,
+#app-header.navbar .navbar-nocollapse .navbar-nav .img-wrapper {
+  border-radius: 100%;
+  width: 28px;
+  min-width: 28px;
+  aspect-ratio: 1/1;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav .dropdown-menu-user .text {
+  line-height: 14px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .dropdown-custom {
   position: static;
@@ -3467,8 +3441,6 @@ ul.line-legend li {
   left: 0;
   right: 0;
   border-radius: inherit;
-  -webkit-box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.3);
 }
 .img-wrapper img {
   border-radius: inherit;
@@ -6752,10 +6724,6 @@ ul.media-list.media-list-feed div.media-body {
 }
 .ui-sortable-handle:active {
   cursor: grabbing;
-}
-.flex-column-inline {
-  display: inline-flex;
-  flex-direction: column;
 }
 .notification {
   width: inherit !important;
