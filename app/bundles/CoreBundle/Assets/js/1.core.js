@@ -390,36 +390,40 @@ var Mautic = {
             MauticVars.ignoreIconSpin = false;
             return;
         }
-    
+
         if (typeof target == 'object' && typeof(target.target) !== 'undefined') {
             target = target.target;
         }
-    
+
         if (mQuery(target).length) {
             var hasBtn = mQuery(target).hasClass('btn');
             var hasIcon = mQuery(target).attr('class') && mQuery(target).attr('class').startsWith('ri-');
             var dontspin = mQuery(target).hasClass('btn-nospin');
-    
-            var i = (hasBtn && mQuery(target).find('i[class^="ri-"]').length) ? mQuery(target).find('i[class^="ri-"]') : target;
-    
+
+            var icon = (hasBtn && mQuery(target).find('i[class^="ri-"]').length) ? mQuery(target).find('i[class^="ri-"]') : target;
+
             if (!dontspin && ((hasBtn && mQuery(target).find('i[class^="ri-"]').length) || hasIcon)) {
                 var el = (hasIcon) ? target : mQuery(target).find('i[class^="ri-"]').first();
                 var identifierClass = (new Date).getTime();
+
+                if (typeof MauticVars.iconClasses === 'undefined') {
+                    MauticVars.iconClasses = {};
+                }
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
-    
+
                 var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-muted'];
                 var appendClasses = "";
-    
-                for (var i = 0; i < specialClasses.length; i++) {
-                    if (mQuery(el).hasClass(specialClasses[i])) {
-                        appendClasses += " " + specialClasses[i];
+
+                for (var j = 0; j < specialClasses.length; j++) {
+                    if (mQuery(el).hasClass(specialClasses[j])) {
+                        appendClasses += " " + specialClasses[j];
                     }
                 }
                 mQuery(el).removeClass();
                 mQuery(el).addClass('ri-loader-line ri-spin ' + identifierClass + appendClasses);
-                mQuery(el).removeClass();
-                mQuery(el).addClass('ri-loader-line ri-spin ' + identifierClass + appendClasses);
             }
+        }
+    },
 
     /**
      * Stops the icon spinning after an event is complete
@@ -427,12 +431,11 @@ var Mautic = {
     stopIconSpinPostEvent: function (specificId) {
         if (typeof specificId != 'undefined' && specificId in MauticVars.iconClasses) {
             mQuery('.' + specificId).removeClass('ri-loader-line ri-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
-        if (typeof specificId != 'undefined' && specificId in MauticVars.iconClasses) {
-            mQuery('.' + specificId).removeClass('ri-loader-line ri-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
             delete MauticVars.iconClasses[specificId];
-                mQuery('.' + index).removeClass('ri-loader-line ri-spin ' + index).addClass(value);
+        } else {
             mQuery.each(MauticVars.iconClasses, function (index, value) {
                 mQuery('.' + index).removeClass('ri-loader-line ri-spin ' + index).addClass(value);
+                delete MauticVars.iconClasses[index];
             });
         }
     },
