@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
@@ -51,7 +52,7 @@ class PointActionHelper
             return false;
         }
 
-        $hitRepository = $factory->getEntityManager()->getRepository(\Mautic\PageBundle\Entity\Hit::class);
+        $hitRepository = $factory->getEntityManager()->getRepository(Hit::class);
         $lead          = $eventDetails->getLead();
         $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 
@@ -64,7 +65,13 @@ class PointActionHelper
             }
         }
         $now       = new \DateTime();
-        $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+
+        if ($action['properties']['returns_within'] || $action['properties']['returns_after']) {
+            // get the latest hit only when it's needed
+            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+        } else {
+            $latestHit = null;
+        }
 
         if ($action['properties']['accumulative_time']) {
             if (!isset($hitStats)) {
@@ -92,14 +99,14 @@ class PointActionHelper
             }
         }
         if ($action['properties']['returns_within']) {
-            if ($now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
+            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
                 $changePoints['returns_within'] = true;
             } else {
                 $changePoints['returns_within'] = false;
             }
         }
         if ($action['properties']['returns_after']) {
-            if ($now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
+            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
                 $changePoints['returns_after'] = true;
             } else {
                 $changePoints['returns_after'] = false;

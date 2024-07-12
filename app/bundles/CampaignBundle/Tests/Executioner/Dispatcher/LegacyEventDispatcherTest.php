@@ -16,7 +16,6 @@ use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
-use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,37 +30,32 @@ class LegacyEventDispatcherTest extends TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|EventScheduler
      */
-    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
-
-    /**
-     * @var MockObject|NotificationHelper
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $notificationHelper;
+    private MockObject $scheduler;
 
     /**
      * @var MockObject|MauticFactory
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mauticFactory;
+    private MockObject $mauticFactory;
 
     /**
      * @var MockObject|ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject|AbstractEventAccessor
      */
-    private \PHPUnit\Framework\MockObject\MockObject $config;
+    private MockObject $config;
 
     /**
      * @var MockObject|PendingEvent
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pendingEvent;
+    private MockObject $pendingEvent;
 
     protected function setUp(): void
     {
@@ -69,7 +63,6 @@ class LegacyEventDispatcherTest extends TestCase
 
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->scheduler          = $this->createMock(EventScheduler::class);
-        $this->notificationHelper = $this->createMock(NotificationHelper::class);
         $this->mauticFactory      = $this->createMock(MauticFactory::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
         $this->config             = $this->createMock(AbstractEventAccessor::class);
@@ -255,10 +248,6 @@ class LegacyEventDispatcherTest extends TestCase
         $this->scheduler->expects($this->once())
             ->method('rescheduleFailures');
 
-        $this->notificationHelper->expects($this->once())
-            ->method('notifyOfFailure')
-            ->with($lead, $event);
-
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
@@ -437,7 +426,6 @@ class LegacyEventDispatcherTest extends TestCase
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
-            $this->notificationHelper,
             $this->mauticFactory,
             $this->contactTracker
         );

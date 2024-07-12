@@ -96,10 +96,6 @@
                     document.dispatchEvent(new CustomEvent("focus_{{ focus.id }}_close"));
                 });
 
-                document.addEventListener('click', function (event) {
-                    document.dispatchEvent(new CustomEvent("focus_{{ focus.id }}_close"));
-                });
-
                 document.addEventListener("focus_{{ focus.id }}_close", function (event) {
                     // Prevent multiple engagements for link clicks on exit intent
                     Focus.modalsDismissed["{{ focus.id }}"] = true;
@@ -192,6 +188,12 @@
 
             // Register scroll events, etc
             registerFocusEvent: function () {
+
+                window.addEventListener('resize', function () {
+                    Focus.disableIFrameResizer();
+                    Focus.enableIframeResizer();
+                });
+
                 if (Focus.debug)
                     console.log('registerFocusEvent()');
 
@@ -453,6 +455,7 @@
 
                 // Set body margin to 0
                 Focus.iframeDoc.getElementsByTagName('body')[0].style.margin = 0;
+                Focus.iframeDoc.getElementsByTagName('body')[0].style.overflowX = 'hidden';
 
                 // Find elements that should be moved to parent
                 var move = Focus.iframeDoc.getElementsByClassName('mf-move-to-parent');
@@ -597,7 +600,7 @@
                 Focus.iframe.style.width = "100%";
                 Focus.iframe.style.height = "100%";
                 Focus.iframe.src = "about:blank";
-                Focus.iframe.scrolling = "no";
+                Focus.iframe.scrolling = "auto";
                 Focus.iframe.className = "{{ iframeClass|raw }}";
 
                 var bodyFirstChild = document.body.firstChild;

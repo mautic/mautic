@@ -9,14 +9,14 @@ class InputHelper
     /**
      * String filter.
      */
-    private static ?\Joomla\Filter\InputFilter $stringFilter = null;
+    private static ?InputFilter $stringFilter = null;
 
     /**
      * HTML filter.
      */
-    private static ?\Joomla\Filter\InputFilter $htmlFilter = null;
+    private static ?InputFilter $htmlFilter = null;
 
-    private static ?\Joomla\Filter\InputFilter $strictHtmlFilter = null;
+    private static ?InputFilter $strictHtmlFilter = null;
 
     /**
      * Adjust the boolean values from text to boolean.
@@ -402,13 +402,13 @@ class InputHelper
                 $value = str_replace($from, $to, $value);
             }
 
-            // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
+            // Special handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
             $value = preg_replace_callback(
                 "/<\/*[o|w|v]:[^>]*>/is",
                 fn ($matches): string => '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>',
                 $value, -1, $needsDecoding);
 
-            // Slecial handling for script tags
+            // Special handling for script tags
             $value = preg_replace_callback(
                 "/<script>(.*?)<\/script>/is",
                 fn ($matches): string => '<mscript>'.base64_encode($matches[0]).'</mscript>',
@@ -417,8 +417,11 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
-            // detect if there is any unicode character in the passed string
-            $hasUnicode = strlen($value) != strlen(utf8_decode($value));
+            try {
+                $hasUnicode = strlen($value) != strlen(iconv('UTF-8', 'Windows-1252', $value));
+            } catch (\ErrorException) {
+                $hasUnicode = 'UTF-8"' === mb_detect_encoding($value);
+            }
 
             $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 

@@ -9,7 +9,7 @@ class AddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Test that an email header with email addresses are parsed into array
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList
      */
     public function testArrayOfAddressesAreReturnedFromEmailHeader(): void
     {
@@ -27,7 +27,7 @@ class AddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Obtain hash ID from a special formatted email address
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Address::parseList
      */
     public function testStatHashIsParsedFromEmail(): void
     {

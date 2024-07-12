@@ -12,12 +12,12 @@ class ConfigMetadataTest extends TestCase
     /**
      * @var BundleMetadata|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $metadata;
+    private MockObject $metadata;
 
     protected function setUp(): void
     {
         $this->metadata = $this->getMockBuilder(BundleMetadata::class)
-            ->setMethodsExcept(['setConfig', 'toArray'])
+            ->onlyMethods(['getDirectory'])
             ->disableOriginalConstructor()
             ->getMock();
     }

@@ -11,9 +11,9 @@ class ParameterLoader
 {
     private string $configBaseDir;
 
-    private \Symfony\Component\HttpFoundation\ParameterBag $parameterBag;
+    private ParameterBag $parameterBag;
 
-    private \Symfony\Component\HttpFoundation\ParameterBag $localParameterBag;
+    private ParameterBag $localParameterBag;
 
     /**
      * @var array<string, mixed>
@@ -177,6 +177,10 @@ class ParameterLoader
         if ($envParameters) {
             $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
         }
+
+        // Hardcode the db_driver to pdo_mysql, as it is currently the only supported driver.
+        // We set in here, to ensure it is always set to this value.
+        $compiledParameters['db_driver'] = 'pdo_mysql';
 
         $this->localParameters = $compiledParameters;
     }

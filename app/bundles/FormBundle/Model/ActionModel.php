@@ -17,7 +17,7 @@ class ActionModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository(\Mautic\FormBundle\Entity\Action::class);
+        return $this->em->getRepository(Action::class);
     }
 
     public function getPermissionBase(): string
@@ -112,5 +112,34 @@ class ActionModel extends CommonFormModel
         }
 
         return array_unique($formIds);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getFormsIdsWithDependenciesOnTag(string $tagName): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'EQ', 'value' => 'lead.changetags'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            foreach ($properties as $property) {
+                if (in_array($tagName, $property)) {
+                    $dependents[] = $entity->getForm()->getId();
+                }
+            }
+        }
+
+        return $dependents;
     }
 }

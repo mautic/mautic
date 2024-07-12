@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Helper\DateTime;
+namespace Mautic\CoreBundle\Tests\Unit\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeLocalization;
@@ -62,51 +62,51 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
         $now      = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $contents =  [
             [
-            '<html lang="en"><head><title></title></head><body>{today}</body></html>',
-            [
-                '{today}' => $now->format(self::DATE_TIME_FORMAT),
+                '<html lang="en"><head><title></title></head><body>{today}</body></html>',
+                [
+                    '{today}' => $now->format(self::DATE_TIME_FORMAT),
                 ],
-        ], [
+            ], [
                 '<html lang="en"><head><title></title></head><body>{today|datetime}</body></html>',
                 [
                     '{today|datetime}' => $now->format(self::DATE_TIME_FORMAT),
                 ],
             ],
             [
-            '<html lang="en"><head><title></title></head><body>{today|date}</body></html>',
-            [
-                '{today|date}' => $now->format(self::DATE_FORMAT),
+                '<html lang="en"><head><title></title></head><body>{today|date}</body></html>',
+                [
+                    '{today|date}' => $now->format(self::DATE_FORMAT),
+                ],
+            ], [
+                '<html lang="en"><head><title></title></head><body>{today|time}</body></html>',
+                [
+                    '{today|time}' => $now->format(self::TIME_FORMAT),
+                ],
+            ], [
+                '<html lang="en"><head><title></title></head><body>{today|date} {today|time}</body></html>',
+                [
+                    '{today|date}' => $now->format(self::DATE_FORMAT),
+                    '{today|time}' => $now->format(self::TIME_FORMAT),
+                ],
+            ], [
+                '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_TIME_FORMAT.'}</body></html>',
+                [
+                    '{today|'.self::DATE_TIME_FORMAT.'}' => $now->format(self::DATE_TIME_FORMAT),
+                ],
+            ], [
+                '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_TIME_FORMAT.'|+ 1 month}</body></html>',
+                [
+                    '{today|'.self::DATE_TIME_FORMAT.'|+ 1 month}' => (clone $now)->modify('+1 month')->format(self::DATE_TIME_FORMAT),
+                ],
+            ], [
+                '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_FORMAT.'|+1 day}</body></html>',
+                [
+                    '{today|'.self::DATE_FORMAT.'|+1 day}' => (clone $now)->modify('+1 day')->format(self::DATE_FORMAT),
+                ],
+            ], [
+                '<html lang="en"><head><title></title></head><body></body></html>',
+                [],
             ],
-        ], [
-            '<html lang="en"><head><title></title></head><body>{today|time}</body></html>',
-            [
-                '{today|time}' => $now->format(self::TIME_FORMAT),
-            ],
-        ], [
-            '<html lang="en"><head><title></title></head><body>{today|date} {today|time}</body></html>',
-            [
-                '{today|date}' => $now->format(self::DATE_FORMAT),
-                '{today|time}' => $now->format(self::TIME_FORMAT),
-            ],
-        ], [
-            '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_TIME_FORMAT.'}</body></html>',
-            [
-                '{today|'.self::DATE_TIME_FORMAT.'}' => $now->format(self::DATE_TIME_FORMAT),
-            ],
-        ], [
-            '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_TIME_FORMAT.'|+ 1 month}</body></html>',
-            [
-                '{today|'.self::DATE_TIME_FORMAT.'|+ 1 month}' => (clone $now)->modify('+1 month')->format(self::DATE_TIME_FORMAT),
-            ],
-        ], [
-            '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_FORMAT.'|+1 day}</body></html>',
-            [
-                '{today|'.self::DATE_FORMAT.'|+1 day}' => (clone $now)->modify('+1 day')->format(self::DATE_FORMAT),
-            ],
-        ], [
-            '<html lang="en"><head><title></title></head><body></body></html>',
-            [],
-        ],
         ];
 
         $now        = (clone $now)->setTimezone(new \DateTimeZone(self::TIMEZONE_CUSTOM));

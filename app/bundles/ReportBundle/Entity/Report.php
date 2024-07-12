@@ -101,6 +101,7 @@ class Report extends FormEntity implements SchedulerInterface
      * @var string|null
      */
     private $scheduleMonthFrequency;
+    private bool $hasScheduleChanged = false;
 
     public function __clone()
     {
@@ -603,8 +604,8 @@ class Report extends FormEntity implements SchedulerInterface
     public function ensureIsMonthlyScheduled(): void
     {
         if (
-            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
-            !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
+            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect())
+            || !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
         ) {
             throw new ScheduleNotValidException();
         }
@@ -648,5 +649,28 @@ class Report extends FormEntity implements SchedulerInterface
     public function isScheduledWeekDays(): bool
     {
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
+    }
+
+    public function getHasScheduleChanged(): bool
+    {
+        return $this->hasScheduleChanged;
+    }
+
+    public function setHasScheduleChanged(bool $hasScheduleChanged): void
+    {
+        $this->hasScheduleChanged = $hasScheduleChanged;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getSchedule(): array
+    {
+        $schedule                             = [];
+        $schedule['schedule_unit']            = $this->getScheduleUnit();
+        $schedule['schedule_day']             = $this->getScheduleDay();
+        $schedule['schedule_month_frequency'] = $this->getScheduleMonthFrequency();
+
+        return $schedule;
     }
 }

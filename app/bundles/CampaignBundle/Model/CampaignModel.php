@@ -2,12 +2,14 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -21,6 +23,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -61,7 +65,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository(\Mautic\CampaignBundle\Entity\Campaign::class);
+        $repo = $this->em->getRepository(Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -72,7 +76,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Event::class);
+        return $this->em->getRepository(Event::class);
     }
 
     /**
@@ -80,11 +84,11 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignLeadRepository()
     {
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class);
+        return $this->em->getRepository(CampaignLead::class);
     }
 
     /**
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     * @return LeadEventLogRepository
      */
     public function getCampaignLeadEventLogRepository()
     {
@@ -129,22 +133,49 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param object $entity
+     * Delete an array of campaigns.
+     *
+     * @param int[] $campaignIds
+     *
+     * @return array<int,Campaign>
      */
+    public function deleteEntities($campaignIds): array
+    {
+        $entities = [];
+        foreach ($campaignIds as $campaignId) {
+            $campaign = $this->getEntity($campaignId);
+            if ($campaign) {
+                $entities[$campaignId] = $campaign;
+                $this->deleteEntity($campaign);
+            }
+        }
+
+        return $entities;
+    }
+
     public function deleteEntity($entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
+        $this->dispatchEvent('pre_delete', $entity);
+        $this->getRepository()->setCampaignAsDeleted($entity->getId());
 
-        parent::deleteEntity($entity);
+        $this->dispatcher->dispatch(new Events\DeleteCampaign($entity), CampaignEvents::ON_CAMPAIGN_DELETE);
+    }
+
+    public function deleteCampaign(Campaign $campaign): void
+    {
+        $campaign->deletedId = $campaign->getId();
+        $this->getRepository()->deleteEntity($campaign);
+        $this->dispatchEvent('post_delete', $campaign);
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, \Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
-        if ($entity instanceof \Mautic\CampaignBundle\Entity\Lead) {
+        if ($entity instanceof CampaignLead) {
             return null;
         }
 
@@ -418,7 +449,7 @@ class CampaignModel extends CommonFormModel
                         $entity->addList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->addForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
+                        $entity->addForm($this->em->getReference(Form::class, $id));
                         break;
                     default:
                         break;
@@ -433,7 +464,7 @@ class CampaignModel extends CommonFormModel
                         $entity->removeList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $id));
                         break;
                     case 'forms':
-                        $entity->removeForm($this->em->getReference(\Mautic\FormBundle\Entity\Form::class, $id));
+                        $entity->removeForm($this->em->getReference(Form::class, $id));
                         break;
                     default:
                         break;
@@ -579,7 +610,7 @@ class CampaignModel extends CommonFormModel
             $leads = array_keys($leads->toArray());
         }
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeadDetails($campaignId, $leads);
+        return $this->em->getRepository(CampaignLead::class)->getLeadDetails($campaignId, $leads);
     }
 
     /**
@@ -595,7 +626,7 @@ class CampaignModel extends CommonFormModel
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
 
-        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
+        return $this->em->getRepository(CampaignLead::class)->getLeads($campaignId, $eventId);
     }
 
     public function getCampaignListIds($id): array
@@ -759,5 +790,85 @@ class CampaignModel extends CommonFormModel
     public function getCampaignIdsWithDependenciesOnEmail(int $emailId): array
     {
         return $this->getRepository()->getCampaignIdsWithDependenciesOnEmail($emailId);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getCampaignIdsWithDependenciesOnTagName(string $tagName): array
+    {
+        $entities = $this->getEventRepository()->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        [
+                            'column' => 'e.type',
+                            'expr'   => 'IN',
+                            'value'  => ['lead.changetags', 'lead.tags'],
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $dependents = [];
+        /** @var Event $entity */
+        foreach ($entities as $entity) {
+            $type       = $entity->getType();
+            $properties = $entity->getProperties();
+            if ('lead.changetags' === $type) {
+                $eventTags = array_merge([], $properties['add_tags'], $properties['remove_tags']);
+            }
+            if ('lead.tags' === $type) {
+                $eventTags = $properties['tags'];
+            }
+            if (in_array($tagName, $eventTags)) {
+                $dependents[] = $entity->getCampaign()->getId();
+            }
+        }
+
+        return array_unique($dependents);
+    }
+
+    /**
+     * @return array<string, array<int, array<string, int|string>>>
+     *
+     * @throws Exception
+     */
+    public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo): array
+    {
+        /** @var StatRepository $statRepo */
+        $statRepo            = $this->em->getRepository(Stat::class);
+        $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
+
+        if ($entity->isEmailCampaign()) {
+            $eventsEmailsSend     = $entity->getEmailSendEvents();
+            $eventsIds            = $eventsEmailsSend->getKeys();
+            $emailIds             = [];
+
+            foreach ($eventsEmailsSend as $event) {
+                $emailIds[] = $event->getChannelId();
+            }
+
+            $emailStats            = $statRepo->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds, 'campaign', $eventsIds);
+            $results['read_count'] = $results['clicked_through_count'] = [];
+
+            foreach ($emailStats as $e) {
+                $results['read_count'][]            = array_intersect_key($e, array_flip(['country', 'read_count']));
+                $results['clicked_through_count'][] = array_intersect_key($e, array_flip(['country', 'clicked_through_count']));
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get leads in a campaign grouped by country.
+     *
+     * @return array{}|array<int, array<string, string|null>>
+     */
+    public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
+    {
+        return $this->em->getRepository(CampaignLead::class)->getCampaignMembersGroupByCountry($campaign, $dateFromObject, $dateToObject);
     }
 }

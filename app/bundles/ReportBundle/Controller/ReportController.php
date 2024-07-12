@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\EventListener\ReportSubscriber;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -24,7 +25,7 @@ class ReportController extends FormController
     /**
      * @param int $page
      *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
+     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
@@ -63,6 +64,10 @@ class ReportController extends FormController
 
         if (!$permissions['report:reports:viewother']) {
             $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+        }
+
+        if (!$this->security->isAdmin()) {
+            $filter['force'][] = ['column' => 'r.source', 'expr' => 'neq', 'value' => ReportSubscriber::CONTEXT_AUDIT_LOG];
         }
 
         $orderBy    = $request->getSession()->get('mautic.report.orderby', 'r.dateModified');
@@ -169,7 +174,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('report');
             \assert($model instanceof ReportModel);
             $entity = $model->getEntity($objectId);
@@ -212,7 +217,7 @@ class ReportController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return HttpFoundation\Response
+     * @return Response
      */
     public function batchDeleteAction(Request $request)
     {
@@ -230,7 +235,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('report');
             \assert($model instanceof ReportModel);
             $ids       = json_decode($request->query->get('ids', '{}'));
@@ -290,7 +295,7 @@ class ReportController extends FormController
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
      *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
+     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
@@ -337,6 +342,15 @@ class ReportController extends FormController
                 // Columns have to be reset in order for Symfony to honor the new submitted order
                 $oldColumns = $entity->getColumns();
                 $entity->setColumns([]);
+                $oldSchedule = $entity->isScheduled() ? $entity->getSchedule() : null;
+
+                $newSchedule['schedule_unit']            = $request->request->all()['report']['scheduleUnit'];
+                $newSchedule['schedule_day']             = $request->request->all()['report']['scheduleDay'];
+                $newSchedule['schedule_month_frequency'] = $request->request->all()['report']['scheduleMonthFrequency'];
+
+                if ($oldSchedule != $newSchedule) {
+                    $entity->setHasScheduleChanged(true);
+                }
 
                 $oldGraphs = $entity->getGraphs();
                 $entity->setGraphs([]);
@@ -444,7 +458,7 @@ class ReportController extends FormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (HttpFoundation\Request::METHOD_POST === $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -523,7 +537,7 @@ class ReportController extends FormController
      * @param int $objectId   Report ID
      * @param int $reportPage
      *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\Response
+     * @return HttpFoundation\JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId, $reportPage = 1)
     {
@@ -665,8 +679,9 @@ class ReportController extends FormController
                         ],
                         'RETURN_ARRAY'
                     ),
-                    'dateRangeForm'     => $dateRangeForm->createView(),
-                    'dynamicFilterForm' => $dynamicFilterForm->createView(),
+                    'dateRangeForm'          => $dateRangeForm->createView(),
+                    'dynamicFilterForm'      => $dynamicFilterForm->createView(),
+                    'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => $reportData['contentTemplate'],
                 'passthroughVars' => [
@@ -723,13 +738,13 @@ class ReportController extends FormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return HttpFoundation\Response
+     * @return Response
      *
      * @throws \Exception
      */
     public function exportAction(Request $request, $objectId, $format = 'csv')
     {
-        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var ReportModel $model */
         $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->security;
@@ -756,6 +771,8 @@ class ReportController extends FormController
                 ]
             );
         } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+            return $this->accessDenied();
+        } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
 
@@ -834,10 +851,10 @@ class ReportController extends FormController
             throw new \Exception($this->translator->trans('mautic.format.invalid', ['%format%' => $format, '%validFormats%' => 'csv']));
         }
 
-        /** @var \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var ReportModel $model */
         $model = $this->getModel('report');
 
-        /** @var \Mautic\ReportBundle\Entity\Report $report */
+        /** @var Report $report */
         $report = $model->getEntity($reportId);
 
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */

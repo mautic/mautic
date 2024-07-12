@@ -6,6 +6,7 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
@@ -37,7 +38,7 @@ class GroupContactScore extends CommonEntity
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(GroupContactScoreRepository::class);
 
-        $builder->addContact(false, 'CASCADE', true, 'group_score');
+        $builder->addContact(false, 'CASCADE', true, 'groupScores');
 
         $builder->createManyToOne('group', Group::class)
             ->isPrimaryKey()
@@ -45,6 +46,24 @@ class GroupContactScore extends CommonEntity
             ->build();
 
         $builder->createField('score', Types::INTEGER)
+            ->build();
+    }
+
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
+    {
+        $metadata->setGroupPrefix('groupContactScore')
+            ->addListProperties(
+                [
+                    'score',
+                    'group',
+                ]
+            )
+            ->addProperties(
+                [
+                    'score',
+                    'group',
+                ]
+            )
             ->build();
     }
 

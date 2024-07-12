@@ -3,8 +3,10 @@
 namespace Mautic\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -15,11 +17,11 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -33,6 +35,7 @@ class DashboardModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         private PathsHelper $pathsHelper,
+        private WidgetDetailEventFactory $widgetEventFactory,
         private Filesystem $filesystem,
         private RequestStack $requestStack,
         EntityManagerInterface $em,
@@ -41,7 +44,8 @@ class DashboardModel extends FormModel
         UrlGeneratorInterface $router,
         Translator $translator,
         UserHelper $userHelper,
-        LoggerInterface $mauticLogger
+        LoggerInterface $mauticLogger,
+        private CacheProviderInterface $cacheProvider,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -140,6 +144,20 @@ class DashboardModel extends FormModel
     }
 
     /**
+     * Fill widgets with their empty content.
+     *
+     * @param array<mixed> $widgets
+     */
+    public function populateWidgetPreviews(&$widgets): void
+    {
+        if (count($widgets)) {
+            foreach ($widgets as &$widget) {
+                $this->populateWidgetPreview($widget);
+            }
+        }
+    }
+
+    /**
      * Fill widgets with their content.
      *
      * @param array $widgets
@@ -176,14 +194,22 @@ class DashboardModel extends FormModel
     }
 
     /**
+     * Populate widget preview.
+     */
+    public function populateWidgetPreview(Widget $widget): void
+    {
+        $event = $this->widgetEventFactory->create($widget);
+
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD);
+    }
+
+    /**
      * Load widget content from the onWidgetDetailGenerate event.
      *
      * @param array $filter
      */
     public function populateWidgetContent(Widget $widget, $filter = []): void
     {
-        $cacheDir = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-
         if (null === $widget->getCacheTimeout() || -1 === $widget->getCacheTimeout()) {
             $widget->setCacheTimeout($this->coreParametersHelper->get('cached_data_timeout'));
         }
@@ -206,11 +232,10 @@ class DashboardModel extends FormModel
 
         $widget->setParams($resultParams);
 
-        $event = new WidgetDetailEvent($this->translator);
-        $event->setWidget($widget);
-        $event->setCacheDir($cacheDir, $this->userHelper->getUser()->getId());
-        $event->setSecurity($this->security);
-        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE);
+        $this->dispatcher->dispatch(
+            $this->widgetEventFactory->create($widget),
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
+        );
     }
 
     /**
@@ -222,6 +247,8 @@ class DashboardModel extends FormModel
         $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
 
         $cacheStorage->clear();
+
+        $this->cacheProvider->invalidateTags([WidgetDetailEvent::DASHBOARD_CACHE_TAG]);
     }
 
     /**
@@ -231,7 +258,7 @@ class DashboardModel extends FormModel
      *
      * @return \Symfony\Component\Form\FormInterface<mixed>
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
@@ -251,6 +278,8 @@ class DashboardModel extends FormModel
      *
      * @param object $entity
      * @param bool   $unlock
+     *
+     * @throws \Exception
      */
     public function saveEntity($entity, $unlock = true): void
     {

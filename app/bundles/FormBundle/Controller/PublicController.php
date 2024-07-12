@@ -19,7 +19,7 @@ class PublicController extends CommonFormController
     private array $tokens = [];
 
     /**
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function submitAction(Request $request, DateHelper $dateTemplateHelper)
     {
@@ -295,7 +295,8 @@ class PublicController extends CommonFormController
                 $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
             }
 
-            $template = $form->getTemplate();
+            // Use form specific template or system-wide default theme
+            $template = $form->getTemplate() ?? $this->coreParametersHelper->get('theme');
             if (!empty($template)) {
                 $theme = $this->factory->getTheme($template);
                 if ($theme->getTheme() != $template) {

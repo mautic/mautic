@@ -18,14 +18,14 @@
   <div class="campaign-event-buttons hide">
     <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal"
        href="{{ path('mautic_campaignsource_action', {'objectAction': 'edit', 'objectId': campaignId, 'sourceType': sourceType}) }}"
-       class="btn btn-primary btn-xs btn-edit"><i class="fa fa-pencil"></i></a>
+       class="btn btn-primary btn-xs btn-edit"><i class="ri-edit-line"></i></a>
     <a data-toggle="ajax"
        data-target="CampaignEvent_{{ sourceType }}"
        data-ignore-formexit="true"
        data-method="POST"
        data-hide-loadingbar="true"
        href="{{ path('mautic_campaignsource_action', {'objectAction': 'delete', 'objectId': campaignId, 'sourceType': sourceType}) }}"
-       class="btn btn-delete btn-danger btn-xs"><i class="fa fa-times"></i></a>
+       class="btn btn-delete btn-danger btn-xs"><i class="ri-close-line"></i></a>
   </div>
 </div>
 {% endif %}
