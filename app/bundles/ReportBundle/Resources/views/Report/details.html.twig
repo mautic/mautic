@@ -30,7 +30,7 @@
                   'href': path('mautic_report_export', {'objectId': report.id, 'format': 'csv'}),
               },
               'btnText': 'mautic.form.result.export.csv'|trans,
-              'iconClass': 'fa fa-file-text-o',
+              'iconClass': 'ri-file-text-line',
           }]) -%}
 
           {% if '\\PhpOffice\\PhpSpreadsheet\\Spreadsheet' is class %}
@@ -41,7 +41,7 @@
                       'href': path('mautic_report_export', {'objectId': report.id, 'format': 'xlsx'}),
                   },
                   'btnText': 'mautic.form.result.export.xlsx'|trans,
-                  'iconClass': 'fa fa-file-excel-o',
+                  'iconClass': 'ri-file-excel-2-fill',
               }]) -%}
           {% endif %}
       {% endif %}

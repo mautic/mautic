@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
+use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
+
 abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 {
     /**
@@ -85,5 +87,22 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                 $this->logger->warning('IP LOOKUP: '.$data->error);
             }
         }
+    }
+
+    protected function shouldPerformLookup(): bool
+    {
+        if (!isset($this->ip)) {
+            return false;
+        }
+
+        $doNotSellList = new MaxMindDoNotSellList($this->coreParametersHelper);
+
+        $ip = $this->ip;
+        $doNotSellList->loadList();
+        $ipMatch = array_filter($doNotSellList->getList(), function ($item) use ($ip, $doNotSellList): bool {
+            return $doNotSellList->stripCIDR($item['value']) == $ip;
+        });
+
+        return !boolval(count($ipMatch));
     }
 }

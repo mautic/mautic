@@ -228,6 +228,11 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
             ['message' => 'mautic.lead.field.label.notblank']
         ));
 
+        $metadata->addPropertyConstraint('label', new Assert\Length([
+            'max'        => 191,
+            'maxMessage' => 'mautic.lead.field.label.maxlength',
+        ]));
+
         $metadata->addConstraint(new UniqueEntity([
             'fields'  => ['alias'],
             'message' => 'mautic.lead.field.alias.unique',

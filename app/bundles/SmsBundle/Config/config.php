@@ -186,6 +186,9 @@ return [
             ],
         ],
     ],
+    'categories' => [
+        'sms' => null,
+    ],
     'parameters' => [
         'sms_enabled'                                                      => false,
         'sms_username'                                                     => null,
