@@ -11,7 +11,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
 
-final class Version20230809094201 extends AbstractMauticMigration
+final class Version20240712094201 extends AbstractMauticMigration
 {
     private EntityManagerInterface $entityManager;
 
@@ -45,12 +45,12 @@ final class Version20230809094201 extends AbstractMauticMigration
                 continue;
             }
 
-            $leadExports = $rawPermissions['lead:exports'];
+            $leadExports = $rawPermissions['lead:export'] ?? null;
             if (!empty($leadExports)) {
                 continue;
             }
 
-            $this->setBitwise($role, 1024, $rawPermissions);
+            $this->setBitwise($role, 2, $rawPermissions);
         }
     }
 
@@ -64,7 +64,7 @@ final class Version20230809094201 extends AbstractMauticMigration
     {
         $permission = new Permission();
         $permission->setBundle('lead');
-        $permission->setName('exports');
+        $permission->setName('export');
         $permission->setBitwise($bit);
         $this->entityManager->persist($permission);
 

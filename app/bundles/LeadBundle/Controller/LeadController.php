@@ -1981,10 +1981,11 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
-                'lead:exports:notAnonymize',
+                'lead:export:notAnonymize',
             ],
             'RETURN_ARRAY'
         );
+
 
         if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
             return $this->accessDenied();
@@ -1992,7 +1993,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $notAnonymize = $permissions['lead:exports:notAnonymize'];
+        $notAnonymize = $permissions['lead:export:notAnonymize'];
 
         $fileType = $request->get('filetype', 'csv');
 
@@ -2081,7 +2082,6 @@ class LeadController extends FormController
         if (empty($lead)) {
             return $this->notFound();
         }
-
         $contactFields = $notAnonymize ? $lead->getProfileFields() : $lead->getAnonymizationProfileFields();
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
