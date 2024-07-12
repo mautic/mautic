@@ -16,14 +16,9 @@
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
-        
         {{ include('@MauticCore/Menu/profile.html.twig') }}
         {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
-        <li>
-            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
-                <i class="ri-settings-5-line ri-xl"></i>
-            </a>
-        </li>
+        {{ menuRender('admin') }}
     </ul>
     <div class="navbar-toolbar pull-right mt-15 mr-10">
     {{ buttonReset(constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}
