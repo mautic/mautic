@@ -27,10 +27,6 @@ class LeadPermissions extends AbstractPermissions
                 'full' => 1024,
                 'view' => 1,
             ],
-//            'exports' => [
-//                'full'         => 1024,
-//                'notAnonymize' => 2,
-//            ],
         ];
 
         $this->addExtendedPermissions('leads', false);
