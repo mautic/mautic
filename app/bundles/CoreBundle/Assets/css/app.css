@@ -6530,6 +6530,7 @@ a.inline-token .text-muted {
   border-radius: var(--border-radius-md);
   outline: 2px solid transparent;
   outline-offset: -2px;
+  flex-direction: column;
 }
 .tile.tile-clickable,
 .tile.tile-selectable {
