@@ -216,7 +216,7 @@ class PublicController extends FormController
                                 $ex->getMessage()
                             ),
                             'FullContact Plugin',
-                            'fa-exclamation',
+                            'ri-error-warning-line',
                             $user
                         );
                     }
@@ -373,7 +373,7 @@ class PublicController extends FormController
                                 $ex->getMessage()
                             ),
                             'FullContact Plugin',
-                            'fa-exclamation',
+                            'ri-error-warning-line',
                             $user
                         );
                     }
