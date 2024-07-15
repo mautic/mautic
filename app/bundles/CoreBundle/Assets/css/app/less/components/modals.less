@@ -3,18 +3,9 @@
     box-shadow: none;
 
     // Fields
-    .form-control {
-      background-color: var(--field-alt);
-
-      &:hover { background-color: var(--field-hover-alt); }
-    }
-
-    // Tab
-    .tab-content { 
-      background-color: var(--layer-alt);
-
-      .form-control,
-      .form-control:hover { background-color: initial; }
+    .form-control, .chosen-container-single .chosen-single, .form-control.search.tt-input {
+      background-color: var(--field-alternate) !important;
+      &:hover { background-color: var(--field-hover-alternate) !important; }
     }
 } 
 

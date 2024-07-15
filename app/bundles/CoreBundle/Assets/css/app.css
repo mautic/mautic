@@ -6621,18 +6621,15 @@ a.inline-token .text-muted {
   border-radius: var(--border-radius-lg);
   box-shadow: none;
 }
-.modal-content .form-control {
-  background-color: var(--field-alt);
+.modal-content .form-control,
+.modal-content .chosen-container-single .chosen-single,
+.modal-content .form-control.search.tt-input {
+  background-color: var(--field-alternate) !important;
 }
-.modal-content .form-control:hover {
-  background-color: var(--field-hover-alt);
-}
-.modal-content .tab-content {
-  background-color: var(--layer-alt);
-}
-.modal-content .tab-content .form-control,
-.modal-content .tab-content .form-control:hover {
-  background-color: initial;
+.modal-content .form-control:hover,
+.modal-content .chosen-container-single .chosen-single:hover,
+.modal-content .form-control.search.tt-input:hover {
+  background-color: var(--field-hover-alternate) !important;
 }
 .form-type-modal-backdrop {
   background-color: var(--background) !important;
