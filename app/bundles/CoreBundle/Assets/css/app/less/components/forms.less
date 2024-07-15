@@ -7,7 +7,8 @@
 // Restyle and baseline non-control form elements.
 
 label {
-  font-weight: 600;
+  font-weight: normal;
+  font-size: var(--utility-01);
 }
 
 .label-tag {
@@ -25,13 +26,83 @@ label {
 
 // form control
 // -------------------------
-.form-control {
+.form-control, .chosen-container-single .chosen-single, .form-control.search.tt-input {
+  background-color: var(--field) !important;
+  border-width: var(--border-bottom);
+  border-color: var(--border-strong);
+  transition: var(--transition-all-productive);
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  border-radius: var(--border-radius-md);
+
   .box-shadow(none);
-  .transition(~"border-color ease-in-out .15s");
   // Rounded
   // -------------------------
   &.form-control-rounded {
     border-radius: @input-height-base;
+  }
+
+  &:hover {
+    background-color: var(--field-hover) !important;
+  }
+
+  &:focus {
+    outline: 2px solid var(--focus);
+    box-shadow: none;
+  }
+}
+
+.form-control {
+  padding: var(--spacing-04) var(--spacing-05);
+  color: var(--text-primary);
+
+  +.help-text,
+  +p {
+    margin-top: 5px;
+    font-size: var(--utility-01);
+  }
+
+  &.not-chosen { padding: var(--spacing-01) var(--spacing-04); }
+}
+
+//Search
+.search-container {
+  position: relative;
+  line-height: 60px;
+  .transition(all 0.3s ease);
+
+  .search {
+    border: 1px solid #fff;
+    background-color: transparent;
+    position: absolute;
+    left: 0px;
+    width: 24px;
+    height: 34px;
+    padding: 0 0 0 32px;
+    margin: 12px 0 0 5px;
+    z-index: 1;
+    .transition(all 0.5s ease);
+  }
+  a.search-button {
+    color: var(--icon-secondary);
+    position: absolute;
+    left: 12px;
+    z-index: 5;
+    transition: var(--transition-all-productive);
+
+    &:hover {
+      color: var(--icon-primary);
+    }
+  }
+
+  &.active {
+    .search {
+      width: 225px;
+      border: 1px solid @input-border;
+    }
+    i {
+      color: var(--icon-interactive);
+    }
   }
 }
 
@@ -161,6 +232,10 @@ label {
   }
 }
 
+input[type=file].form-control {
+  padding: 6px;
+}
+
 // Custom file input
 // -------------------------
 .btn-file {
@@ -280,6 +355,13 @@ label {
   }
 }
 
+input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  margin-right: 4px;
+}
+
 // radio radius reset
 .radio-inline,
 .radio {
@@ -305,6 +387,13 @@ label {
       padding-left: 4px;
     }
   }
+}
+
+input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  vertical-align: -3px;
+  accent-color: var(--text-primary);
 }
 
 // time input (3 select boxes hh:mm:ss)
