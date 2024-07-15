@@ -21,6 +21,16 @@
                 <i class="ri-user-smile-line ri-lg"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
             </a>
         </li>
+
+        {% if securityIsGranted('user:users:create') %}
+        <li>
+            <a href="{{ path('mautic_user_action', {objectAction: 'new'}) }}">
+                <i class="ri-team-line"></i>
+                <span>{{ 'mautic.user.profile.invite'|trans }}</span>
+            </a>
+        </li>
+        {% endif %}
+
         <li>
             <a href="{{ path('mautic_user_logout') }}">
                 <i class="ri-logout-circle-r-line ri-lg"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
