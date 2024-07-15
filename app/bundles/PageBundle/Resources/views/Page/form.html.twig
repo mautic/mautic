@@ -111,8 +111,8 @@
                   {{ form_row(form.isPreferenceCenter) }}
               {% endif %}
 
-              {{ form_row(form.publishUp) }}
-              {{ form_row(form.publishDown) }}
+              {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+    	      {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
 
               {% if not isVariant %}
                   {{ form_row(form.redirectType) }}
