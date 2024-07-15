@@ -2750,28 +2750,16 @@ ul.dropdown-menu-form {
 }
 .notes {
   overflow: hidden;
-  height: auto;
-  position: relative;
   padding: 0px;
   list-style-type: none;
 }
-.notes > .note-single [class*=" icon"],
-.notes > .note-single [class^="icon"] {
-  position: static;
-  padding: 0;
-}
-.notes > .note-single [class*=" icon"] .icon-wrapper,
-.notes > .note-single [class^="icon"] .icon-wrapper {
-  width: 40px;
-  border-radius: 100px;
+.notes > .note-single .icon-wrapper {
+  width: 50px;
   aspect-ratio: 1 / 1;
   background-color: var(--layer-alternate);
 }
 .notes > .note-single .tile {
   background-color: var(--layer-alternate);
-}
-.notes > .note-single .col-xs-1 {
-  vertical-align: middle;
 }
 .bullet {
   display: inline-block;
