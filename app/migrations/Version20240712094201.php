@@ -55,10 +55,7 @@ final class Version20240712094201 extends AbstractMauticMigration
     }
 
     /**
-     * @param Role $role
-     * @param int $bit
-     * @param array<string> $rawPermissions
-     * @return void
+     * @param array<string, array<int, string>> $rawPermissions
      */
     private function setBitwise(Role $role, int $bit, array $rawPermissions): void
     {

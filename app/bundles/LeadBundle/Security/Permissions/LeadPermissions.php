@@ -67,8 +67,8 @@ class LeadPermissions extends AbstractPermissions
             $builder,
             'mautic.core.permissions.export',
             [
-                'mautic.core.permissions.enable' => 'enable',
-                'mautic.core.permissions.notAnonymize' => 'notAnonymize'
+                'mautic.core.permissions.enable'       => 'enable',
+                'mautic.core.permissions.notAnonymize' => 'notAnonymize',
             ],
             $data
         );
