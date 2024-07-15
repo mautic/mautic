@@ -110,7 +110,7 @@ body > #app-wrapper {
   background-color: #ffffff;
   float: left;
   z-index: 1005;
-  min-height: 60px;
+  min-height: 48px;
   border-width: 0;
   border-radius: 0;
   margin-bottom: 0;
@@ -125,7 +125,7 @@ body > #app-wrapper {
   box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.03);
 }
 .header-fixed #app-header.navbar ~ #app-content > .content-body {
-  padding-top: 60px;
+  padding-top: 48px;
 }
 #app-header.navbar .navbar-nocollapse:before,
 #app-header.navbar .navbar-nocollapse:after {
@@ -136,14 +136,14 @@ body > #app-wrapper {
   clear: both;
 }
 #app-header.navbar .navbar-nocollapse .navbar-header {
-  height: 60px;
+  height: 48px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-header .navbar-toggle {
   display: inline-block;
   float: left;
   margin: 0;
   border-width: 0;
-  padding: 24px 15px;
+  padding: 18px 15px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-header .navbar-toggle .icon-bar {
   margin-left: auto;
@@ -165,7 +165,7 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a {
   color: rgba(0, 0, 0, 0.6);
-  line-height: 60px;
+  line-height: 48px;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -184,7 +184,7 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .label {
   position: absolute;
   z-index: 1;
-  top: 12px;
+  top: 6px;
   right: 8px;
   font-size: 10px;
   padding: 0 4px;
@@ -203,7 +203,7 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a > .bullet {
   position: absolute;
   z-index: 1;
-  top: 18px;
+  top: 12px;
   right: 15px;
   -webkit-box-shadow: 0 0 0 2px #ffffff;
   box-shadow: 0 0 0 2px #ffffff;
@@ -299,8 +299,8 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-form .form-group,
 #app-header.navbar .navbar-nocollapse .navbar-form .input-group {
-  margin-top: 14px;
-  margin-bottom: 14px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 #app-header.navbar .navbar-nocollapse .navbar-form .form-group .fa,
 #app-header.navbar .navbar-nocollapse .navbar-form .input-group .fa {
@@ -370,7 +370,7 @@ body > #app-wrapper {
 }
 @media (min-width: 768px) {
   .header-fixed #app-header.navbar ~ .app-sidebar {
-    padding-top: 60px;
+    padding-top: 48px;
   }
   .sidebar-minimized #app-header.navbar {
     left: 60px !important;
@@ -428,6 +428,7 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left .sidebar-header > .mautic-brand > .mautic-logo-text {
   opacity: 1;
   margin-left: 3px;
+  position: absolute;
   -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
   -o-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
   transition: opacity .3s ease .1s, margin-left 0s ease .2s;
@@ -517,7 +518,7 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-right .sidebar-content {
   padding-left: 1px;
-  top: 60px;
+  top: 48px;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.nav-group:after {
   content: '';
@@ -573,7 +574,7 @@ body > #app-wrapper {
 }
 .app-sidebar .sidebar-header {
   z-index: 100;
-  height: 60px;
+  height: 48px;
   padding-left: 15px;
   padding-right: 15px;
 }
@@ -583,7 +584,7 @@ body > #app-wrapper {
   box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.06);
 }
 .app-sidebar .sidebar-header ~ .sidebar-content {
-  top: 60px;
+  top: 48px;
 }
 .app-sidebar .sidebar-footer {
   position: absolute;
@@ -1114,7 +1115,7 @@ h6,
 }
 .page-header {
   padding: 15px;
-  margin: 0;
+  margin: 16px 0 0 0;
   border-bottom: 0;
 }
 .page-header .breadcrumb {
@@ -2983,7 +2984,7 @@ ul.dropdown-menu-form {
 }
 .mautic-brand {
   display: block;
-  height: 60px;
+  height: 48px;
   padding-left: 35px;
   padding-right: 32px;
   width: 100%;
@@ -2997,7 +2998,7 @@ ul.dropdown-menu-form {
 }
 .mautic-brand > svg.mautic-logo-figure {
   width: 32px;
-  height: 60px;
+  height: 48px;
 }
 .mautic-brand > svg.mautic-logo-figure .circle {
   fill: #ffffff;
@@ -3007,7 +3008,7 @@ ul.dropdown-menu-form {
   fill: #FDB933;
 }
 .mautic-brand > svg.mautic-logo-text {
-  height: 60px;
+  height: 48px;
   width: 98px;
 }
 .mautic-brand > svg.mautic-logo-text .m,
@@ -6355,7 +6356,7 @@ lesshat-selector { -lh-property: 0 ;
   width: 100%;
 }
 .builder-active {
-  background-color: #fff;
+  background-color: var(--background);
   position: absolute;
   top: 0;
   bottom: 0;
