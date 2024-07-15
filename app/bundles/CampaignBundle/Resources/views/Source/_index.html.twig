@@ -9,9 +9,9 @@
 {% if update is not defined or update is empty %}
   <div id="CampaignEvent_{{ sourceType }}" data-type="source" class="draggable list-campaign-source list-campaign-leadsource">
 {% endif %}
-
+<div class="h5 fw-b mb-5 campaign-source-title">{{'mautic.campaign.form.lead_source'|trans}}</div>
 <div class="campaign-event-content">
-    <div><span class="campaign-event-name ellipsis"><i class="mr-sm fa fa-{% if 'lists' == sourceType %}list{% else %}pencil-square-o{% endif %}"></i>{{ names|default(null) }}</span></div>
+    <div><span class="campaign-event-name ellipsis"><i class="mr-xs campaign-event-icon ri-{% if 'lists' == sourceType %}pie-chart-line{% else %}survey-line{% endif %}"></i>{{ names|default(null) }}</span></div>
 </div>
 
 {% if update is not defined or update is empty %}
