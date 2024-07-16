@@ -86,7 +86,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'href'        => $exportRoute.'?filetype=xlsx',
                     'data-toggle' => null,
                 ],
-                'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
+                'btnText'   => $this->translator->trans('mautic.core.export.xlsx.all'),
                 'iconClass' => 'ri-file-excel-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
@@ -98,7 +98,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                     'href'        => $exportRoute.'?filetype=csv',
                     'data-toggle' => null,
                 ],
-                'btnText'   => $this->translator->trans('mautic.core.export.csv'),
+                'btnText'   => $this->translator->trans('mautic.core.export.csv.all'),
                 'iconClass' => 'ri-file-text-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
