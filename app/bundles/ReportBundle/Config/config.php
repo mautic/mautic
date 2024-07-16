@@ -64,7 +64,7 @@ return [
         'main' => [
             'mautic.report.reports' => [
                 'route'     => 'mautic_report_index',
-                'iconClass' => 'ri-file-chart-fill',
+                'iconClass' => 'ri-file-chart-2-fill',
                 'access'    => [
                     'report:reports:viewown',
                     'report:reports:viewother',

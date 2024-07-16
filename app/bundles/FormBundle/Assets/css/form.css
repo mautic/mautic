@@ -11,9 +11,6 @@
 .panel2 label {
     font-size: 1em;
 }
-.panel:hover, .panel2:hover {
-    border-color: #ccc;
-}
 
 /* Form Submit Action Group Header */
 .form-submitaction-group-header {
@@ -57,9 +54,6 @@
 #mauticforms_fields input[type="datetime-local"],
 #mauticforms_fields input[type="month"] {
     line-height: inherit;
-}
-#mauticforms_fields input.mauticform-radiogrp-radio {
-    width: auto;
 }
 
 /* Textarea Form HTML */
