@@ -450,52 +450,69 @@ lead.permissionUser
 
             <!-- #details-tab-content -->
             <div class="tab-pane fade bdr-w-0" id="details-tab-content">
+                <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
                 {% for group in groups %}
-                <div class="row-no-gutters" id="{{ group }}">
-                    <div class="col-lg-9">
-
-                            <table class="table table-hover mb-0">
-                                <tbody>
-                                    {% if 'core' == group %}
-                                    {{ include('@MauticCore/Helper/details.html.twig', {'entity': lead}) }}
-                                    {% endif %}
-                                    {% for field in fields[group] %}
-                                    {% if field.value is not empty %}
-                                    <tr>
-                                        <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span>
-                                        </td>
-                                        <td>
-                                            {% if 'core' == group and 'country' == field.alias and flag is not empty
-                                            %}
-                                            <img class="mr-sm" src="{{ flag }}" alt="" style="max-height: 24px;" />
-                                            <span class="mt-1">{{ field.value|purify }}</span>
-                                            {% else %}
-                                            {% if 'multiselect' == field.type %}
-                                            {% if field.value is iterable %}
-                                            {{ field.value|join(', ') }}
-                                            {% else %}
-                                            {{ field.normalizedValue|purify|replace({'|': ', '}) }}
+                <!-- {{ group }} -->
+                <li class="panel">
+                    <a role="button" id="heading{{ group }}" class="accordion-heading collapsed" data-toggle="collapse"
+                      data-parent="#accordion" href="#collapse{{ group }}" aria-expanded="false" aria-controls="collapse{{ group }}">
+                      <i class="ri-arrow-down-s-line accordion-arrow"></i>
+                      <span class="accordion-title">{{'mautic.core.searchcommands.api'|trans}}</span>
+                    </a>
+        
+                    <div id="collapse{{ group }}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{ group }}">
+                      <div class="accordion-content">
+                        <div class="row-no-gutters" id="{{ group }}">
+                            <div class="col-lg-9">
+        
+                                    <table class="table table-hover mb-0">
+                                        <tbody>
+                                            {% if 'core' == group %}
+                                            {{ include('@MauticCore/Helper/details.html.twig', {'entity': lead}) }}
                                             {% endif %}
-                                            {% elseif 'url' == field.type %}
-                                            <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
-                                            {% elseif 'html' == field.type %}
-                                            <div style="resize: vertical; overflow: auto">{{ field.value|e }}</div>
-                                            {% elseif 'datetime' == field.type %}
-                                            {{ dateToFullConcat(field.value, 'UTC') }}
-                                            {% else %}
-                                            {{ field.normalizedValue|purify }}
+                                            {% for field in fields[group] %}
+                                            {% if field.value is not empty %}
+                                            <tr>
+                                                <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span>
+                                                </td>
+                                                <td>
+                                                    {% if 'core' == group and 'country' == field.alias and flag is not empty
+                                                    %}
+                                                    <img class="mr-sm" src="{{ flag }}" alt="" style="max-height: 24px;" />
+                                                    <span class="mt-1">{{ field.value|purify }}</span>
+                                                    {% else %}
+                                                    {% if 'multiselect' == field.type %}
+                                                    {% if field.value is iterable %}
+                                                    {{ field.value|join(', ') }}
+                                                    {% else %}
+                                                    {{ field.normalizedValue|purify|replace({'|': ', '}) }}
+                                                    {% endif %}
+                                                    {% elseif 'url' == field.type %}
+                                                    <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
+                                                    {% elseif 'html' == field.type %}
+                                                    <div style="resize: vertical; overflow: auto">{{ field.value|e }}</div>
+                                                    {% elseif 'datetime' == field.type %}
+                                                    {{ dateToFullConcat(field.value, 'UTC') }}
+                                                    {% else %}
+                                                    {{ field.normalizedValue|purify }}
+                                                    {% endif %}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
                                             {% endif %}
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                
+                            </div>
+                        </div>
+                        {% endfor %}
+                      </div>
                     </div>
-                </div>
-                {% endfor %}
+                  </li>
+
+                
+            </ul>
 
                 {% if not devices %}
                 <div class="col-lg-9 tile bdr-w-0" id="devices">
