@@ -11,8 +11,7 @@ Variables
 {% set leadName = lead.isAnonymous ? lead.primaryIdentifier|trans : lead.primaryIdentifier %}
 {% set avatar %}
 {% if not isAnonymous %}
-<span class="pull-left img-wrapper"><img src="{{ leadGetAvatar(lead) }}"
-        alt="{{ leadName|e }}" /></span>
+<span class="pull-left img-wrapper"><img src="{{ leadGetAvatar(lead) }}" alt="{{ leadName|e }}" /></span>
 {% endif %}
 {% endset %}
 
@@ -148,27 +147,27 @@ lead.permissionUser
         <ul class="nav nav-tabs nav-tabs-line mt-10 mb-lg">
             <li class="active">
                 <a href="#overview-tab-content" role="tab" data-toggle="tab">
-                    {{ 'Overview'|trans }}
+                    {{ 'mautic.lead.lead.tab.overview'|trans }}
                 </a>
             </li>
             <li class="">
                 <a href="#history-tab-content" role="tab" data-toggle="tab">
-                    {{ 'History'|trans }}
+                    {{ 'mautic.lead.lead.tab.history'|trans }}
                 </a>
             </li>
             <li class="">
-                <a href="#details-tab-content" role="tab" data-toggle="tab">
-                    {{ 'Details'|trans }}
+                <a href="#details-tab-content" id="load-lead-map" role="tab" data-toggle="tab">
+                    {{ 'mautic.lead.lead.tab.details'|trans }}
                 </a>
             </li>
             <li class="">
                 <a href="#notes-tab-content" role="tab" data-toggle="tab">
-                    {{ 'Notes'|trans }}
+                    {{ 'mautic.lead.lead.tab.notes'|trans }}
                 </a>
             </li>
+            {{ customContent('tabs', _context) }}
         </ul>
         <!--/ tabs controls -->
-
 
         <!-- start: tab-content -->
         <div class="tab-content">
@@ -286,25 +285,23 @@ lead.permissionUser
                         </div>
                     </div>
 
-
                     <!-- Segments -->
                     <div class="col-lg-3">
                         <div class="tile">
                             <div class="fw-b mb-sm">{{ 'mautic.lead.lead.lists'|trans }}</div>
-                        {% if lists[lead.id] is defined %}
-                        {% for key, list in lists[lead.id] %}
-                        <h5 class="pull-left mt-xs mr-xs">
-                            <span class="label label-success">
-                                <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}"
-                                    data-toggle="ajax" style="color: white;">
-                                    {{ list.name|purify }}
-                                </a>
-                            </span>
-                        </h5>
-                        {% endfor %}
-                        {% endif %}
+                            {% if lists[lead.id] is defined %}
+                            {% for key, list in lists[lead.id] %}
+                            <h5 class="pull-left mt-xs mr-xs">
+                                <span class="label label-success">
+                                    <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}"
+                                        data-toggle="ajax" style="color: white;">
+                                        {{ list.name|purify }}
+                                    </a>
+                                </span>
+                            </h5>
+                            {% endfor %}
+                            {% endif %}
                         </div>
-                        
                     </div>
 
                     <div class="col-lg-3 gap-sm">
@@ -424,8 +421,8 @@ lead.permissionUser
                     <div class="col-lg-12 ">
                         <div class="tile">
                             <div class="row-no-gutters fw-nowrap ai-center mb-lg">
-                            <span class="label label-primary mr-sm" id="TimelineCount">{{ events.total }}</span>
-                            <div class="fw-b">{{ 'mautic.lead.lead.tab.history'|trans }}</div>
+                                <span class="label label-primary mr-sm" id="TimelineCount">{{ events.total }}</span>
+                                <div class="fw-b">{{ 'mautic.lead.lead.tab.history'|trans }}</div>
                             </div>
                             {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
                         </div>
@@ -450,35 +447,49 @@ lead.permissionUser
 
             <!-- #details-tab-content -->
             <div class="tab-pane fade bdr-w-0" id="details-tab-content">
-                <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
-                {% for group in groups %}
-                <!-- {{ group }} -->
-                <li class="panel">
-                    <a role="button" id="heading{{ group }}" class="accordion-heading collapsed" data-toggle="collapse"
-                      data-parent="#accordion" href="#collapse{{ group }}" aria-expanded="false" aria-controls="collapse{{ group }}">
-                      <i class="ri-arrow-down-s-line accordion-arrow"></i>
-                      <span class="accordion-title">{{'mautic.core.searchcommands.api'|trans}}</span>
-                    </a>
-        
-                    <div id="collapse{{ group }}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{ group }}">
-                      <div class="accordion-content">
-                        <div class="row-no-gutters" id="{{ group }}">
-                            <div class="col-lg-9">
-        
+                <ul class="accordion mb-lg" id="accordion" role="tablist" aria-multiselectable="true">
+                    <!-- Field groups -->
+                    {% for group in groups %}
+                    <!-- {{ group }} -->
+                    {% if fields[group] is not empty %}
+                    <li class="panel">
+                        <a role="button" id="heading{{ group }}"
+                            class="accordion-heading {% if not loop.first %}collapsed{% endif %}" data-toggle="collapse"
+                            data-parent="#accordion" href="#collapse{{ group }}"
+                            aria-expanded="{% if loop.first %}true{% else %}false{% endif %}"
+                            aria-controls="collapse{{ group }}">
+                            <i class="ri-arrow-down-s-line accordion-arrow"></i>
+                            <span class="accordion-title">
+                                {{ ('mautic.lead.field.group.'~group)|trans }}
+                                {% if 'social' == group %}
+                                <span class="label label-primary ml-xs" id="SocialCount">{{ socialProfiles|length
+                                    }}</span>
+                                {% endif %}
+                            </span>
+                        </a>
+                        {% endif %}
+
+                        <div id="collapse{{ group }}"
+                            class="accordion-wrapper collapse {% if loop.first %}in{% endif %}" role="tabpanel"
+                            aria-labelledby="heading{{ group }}">
+                            <div class="accordion-content">
+                                <div class="row" id="{{ group }}">
                                     <table class="table table-hover mb-0">
                                         <tbody>
                                             {% if 'core' == group %}
                                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': lead}) }}
                                             {% endif %}
                                             {% for field in fields[group] %}
-                                            {% if field.value is not empty %}
                                             <tr>
-                                                <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span>
+                                                <td width="20%"><span class="fw-b textTitle">{{ field.label|purify
+                                                        }}</span>
                                                 </td>
                                                 <td>
-                                                    {% if 'core' == group and 'country' == field.alias and flag is not empty
+                                                    {% if 'core' == group and 'country' == field.alias and flag is not
+                                                    empty
                                                     %}
-                                                    <img class="mr-sm" src="{{ flag }}" alt="" style="max-height: 24px;" />
+                                                    <img class="mr-sm" src="{{ flag }}" alt=""
+                                                        style="max-height: 24px;" />
                                                     <span class="mt-1">{{ field.value|purify }}</span>
                                                     {% else %}
                                                     {% if 'multiselect' == field.type %}
@@ -488,9 +499,11 @@ lead.permissionUser
                                                     {{ field.normalizedValue|purify|replace({'|': ', '}) }}
                                                     {% endif %}
                                                     {% elseif 'url' == field.type %}
-                                                    <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
+                                                    <a href="{{ field.value|purify }}" target="_blank">{{ field.value
+                                                        }}</a>
                                                     {% elseif 'html' == field.type %}
-                                                    <div style="resize: vertical; overflow: auto">{{ field.value|e }}</div>
+                                                    <div style="resize: vertical; overflow: auto">{{ field.value|e }}
+                                                    </div>
                                                     {% elseif 'datetime' == field.type %}
                                                     {{ dateToFullConcat(field.value, 'UTC') }}
                                                     {% else %}
@@ -499,26 +512,85 @@ lead.permissionUser
                                                     {% endif %}
                                                 </td>
                                             </tr>
-                                            {% endif %}
                                             {% endfor %}
                                         </tbody>
                                     </table>
-                                
+                                </div>
+
+                                {% if 'social' == group %}
+                                <!-- #social-container -->
+                                {% if not isAnonymous and socialProfiles is not empty %}
+                                <div class="tile" id="social-container">
+                                    {{ include('@MauticLead/Social/index.html.twig', {
+                                    'lead': lead,
+                                    'socialProfiles': socialProfiles,
+                                    'socialProfileUrls': socialProfileUrls,
+                                    }) }}
+                                </div>
+                                {% endif %}
+                                <!--/ #social-container -->
+                                {% endif %}
+
+                                {% endfor %}
                             </div>
                         </div>
-                        {% endfor %}
-                      </div>
-                    </div>
-                  </li>
+                    </li>
 
-                
-            </ul>
+                    <!-- Devices -->
+                    <li class="panel">
+                        <a role="button" id="headingdevices" class="accordion-heading collapsed" data-toggle="collapse"
+                            data-parent="#accordion" href="#collapsedevices" aria-expanded="false"
+                            aria-controls="collapsedevices">
+                            <i class="ri-arrow-down-s-line accordion-arrow"></i>
+                            <span class="accordion-title">{{'mautic.lead.devices'|trans}}</span>
+                        </a>
 
-                {% if not devices %}
-                <div class="col-lg-9 tile bdr-w-0" id="devices">
-                    {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
+                        <div id="collapsedevices" class="collapse accordion-wrapper" role="tabpanel"
+                            aria-labelledby="headingdevices">
+                            <div class="accordion-content">
+                                {{ include('@MauticLead/Lead/_devices.html.twig', {'devices': devices}) }}
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- Integrations -->
+                    <li class="panel">
+                        <a role="button" id="headingintegrations" class="accordion-heading collapsed"
+                            data-toggle="collapse" data-parent="#accordion" href="#collapseintegrations"
+                            aria-expanded="false" aria-controls="collapseintegrations">
+                            <i class="ri-arrow-down-s-line accordion-arrow"></i>
+                            <span class="accordion-title">
+                                {{'mautic.lead.lead.tab.integration'|trans}}
+                                <span class="label label-primary ml-xs" id="IntegrationCount">{{ integrations|length
+                                    }}</span>
+                            </span>
+                        </a>
+
+                        <div id="collapseintegrations" class="collapse accordion-wrapper" role="tabpanel"
+                            aria-labelledby="headingintegrations">
+                            <div class="accordion-content">
+                                {{ include('@MauticLead/Integration/index.html.twig', { 'lead': lead, 'integrations':
+                                integrations, }) }}
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- Places -->
+                <div class="tile" id="place-container">
+                    {% if not places %}
+                    {{ include('@MauticCore/Helper/no_information.html.twig', {
+                    'tip': 'mautic.contact.noinformation.places'
+                    }) }}
+                    {% endif %}
+                    {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
                 </div>
-                {% endif %}
+
+                <!-- Custom content -->
+                <div class="tile">
+                    {{ customContent('tabs.content', _context) }}
+                </div>
+                <!-- end: custom content -->
 
             </div>
             <!--/ #details-tab-content -->
@@ -529,134 +601,8 @@ lead.permissionUser
                 lead.id, 'ignoreAjax': 1})) }}
             </div>
             <!--/ #notes-tab-content -->
-
-
-
-
         </div>
         <!--/ end: tab-content -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <div>
-            <!--/ lead detail header -->
-
-            <!-- lead detail collapseable -->
-            <div class="collapse pr-md pl-md" id="lead-details">
-                <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
-                    {% for g in groups %}
-                    {% if fields[g] is not empty %}
-                    <li class="{% if loop.first %}active{% endif %}">
-                        <a href="#{{ g }}" class="group" data-toggle="tab">
-                            {{ ('mautic.lead.field.group.'~g)|trans }}
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                </ul>
-
-            </div>
-            <!--/ lead detail collapseable -->
-        </div>
-
-
-
-        <div class="pa-md">
-            <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained mt-10">
-                {% if not isAnonymous and socialProfiles is not empty %}
-                <li class="">
-                    <a href="#social-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="SocialCount">
-                            {{ socialProfiles|length }}
-                        </span>
-                        {{ 'mautic.lead.lead.tab.social'|trans }}
-                    </a>
-                </li>
-                {% endif %}
-                <li class="">
-                    <a href="#integration-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="IntegrationCount">
-                            {{ integrations|length }}
-                        </span>
-                        {{ 'mautic.lead.lead.tab.integration'|trans }}
-                    </a>
-                </li>
-
-
-                <li class="">
-                    <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
-                        <span class="label label-primary mr-sm" id="PlaceCount">
-                            {{ places|length }}
-                        </span>
-                        {{ 'mautic.lead.lead.tab.places'|trans }}
-                    </a>
-                </li>
-
-                {{ customContent('tabs', _context) }}
-            </ul>
-            <!--/ tabs controls -->
-
-            <!-- start: tab-content -->
-            <div class="tab-content pa-md">
-                <!-- #history-container -->
-                <div class="tab-pane fade in active bdr-w-0" id="timeline-container">
-
-                </div>
-                <!--/ #history-container -->
-
-
-
-                <!-- #social-container -->
-                {% if not isAnonymous %}
-                <div class="tab-pane fade bdr-w-0" id="social-container">
-                    {{ include('@MauticLead/Social/index.html.twig', {
-                    'lead': lead,
-                    'socialProfiles': socialProfiles,
-                    'socialProfileUrls': socialProfileUrls,
-                    }) }}
-                </div>
-                {% endif %}
-                <!--/ #social-container -->
-
-                <!-- #integration-container -->
-                <div class="tab-pane fade bdr-w-0" id="integration-container">
-                    {{ include('@MauticLead/Integration/index.html.twig', {
-                    'lead': lead,
-                    'integrations': integrations,
-                    }) }}
-                </div>
-                <!--/ #integration-container -->
-
-                <!-- custom content -->
-                {{ customContent('tabs.content', _context) }}
-                <!-- end: custom content -->
-
-                <!-- #place-container -->
-                <div class="tab-pane fade bdr-w-0" id="place-container">
-                    {% if not places %}
-                    {{ include('@MauticCore/Helper/no_information.html.twig', {
-                    'tip': 'mautic.contact.noinformation.places'
-                    }) }}
-                    {% endif %}
-                    {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
-                </div>
-                <!--/ #place-container -->
-            </div>
-            <!--/ end: tab-content -->
-        </div>
     </div>
     <!--/ left section -->
 </div>

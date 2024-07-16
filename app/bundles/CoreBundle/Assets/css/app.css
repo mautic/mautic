@@ -6696,6 +6696,7 @@ a.inline-token .text-muted {
   -webkit-border-before: 1px solid var(--border-subtle);
   border-block-start: 1px solid var(--border-subtle);
   transition: border-color cubic-bezier(0.2, 0, 0.38, 0.9) 110ms;
+  list-style-type: none;
 }
 .panel:last-child {
   -webkit-border-after: 1px solid var(--border-subtle);
