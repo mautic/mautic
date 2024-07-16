@@ -9,10 +9,12 @@
     ] %}
     
     {% for stat in stats %}
-    <div class="lead-stats-el tile h-144 jc-space-between col-lg-3 col-xs-12">
-        <i class="tile-icon {{ stat.icon }}"></i>
-        <span class="lead-stats-name fw-b ellipsis">{{ stat.name|trans }}</span>
-        <span class="lead-stats-val lh-1 fs-40">{{ stat.value }}{{ stat.suffix|default('') }}</span>
+    <div class="lead-stats-el h-144 col-lg-3 col-xs-12">
+        <div class="tile jc-space-between">
+            <i class="tile-icon {{ stat.icon }}"></i>
+            <span class="lead-stats-name fw-b ellipsis">{{ stat.name|trans }}</span>
+            <span class="lead-stats-val lh-1 fs-40">{{ stat.value }}{{ stat.suffix|default('') }}</span>
+        </div>
     </div>
     {% endfor %}
 </div>

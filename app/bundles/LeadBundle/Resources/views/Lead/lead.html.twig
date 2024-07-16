@@ -288,8 +288,9 @@ lead.permissionUser
 
 
                     <!-- Segments -->
-                    <div class="col-lg-3 tile">
-                        <div class="fw-b mb-sm">{{ 'mautic.lead.lead.lists'|trans }}</div>
+                    <div class="col-lg-3">
+                        <div class="tile">
+                            <div class="fw-b mb-sm">{{ 'mautic.lead.lead.lists'|trans }}</div>
                         {% if lists[lead.id] is defined %}
                         {% for key, list in lists[lead.id] %}
                         <h5 class="pull-left mt-xs mr-xs">
@@ -302,11 +303,13 @@ lead.permissionUser
                         </h5>
                         {% endfor %}
                         {% endif %}
+                        </div>
+                        
                     </div>
 
                     <div class="col-lg-3 gap-sm">
                         <!-- Companies -->
-                        <div class="pa-sm panel-companies tile">
+                        <div class="panel-companies tile">
                             <div class="fw-b mb-sm">{{ 'mautic.lead.lead.companies'|trans }}</div>
                             {% for key, company in companies %}
                             <h5 class="pull-left mt-xs mr-xs">
@@ -349,8 +352,8 @@ lead.permissionUser
                 <!-- Start third row -->
                 <div class="row-no-gutters gap-sm fw-nowrap-lg mb-sm">
                     <!-- Engagement chart -->
-                    <div class="col-lg-8 tile">
-                        <div class="panel">
+                    <div class="col-lg-8">
+                        <div class="tile">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">{{
@@ -366,8 +369,8 @@ lead.permissionUser
                     </div>
 
                     <!-- Upcoming events -->
-                    <div class="col-lg-4 tile">
-                        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0">
+                    <div class="col-lg-4">
+                        <div class="tile">
                             <div class="fw-b mb-lg">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                             {% if not upcomingEvents %}
                             {{ include('@MauticCore/Helper/no_information.html.twig', {'tip':
@@ -416,29 +419,32 @@ lead.permissionUser
 
             <!-- #history-tab-content -->
             <div class="tab-pane fade bdr-w-0" id="history-tab-content">
+                <!-- #history-container -->
                 <div class="row-no-gutters mb-sm">
-                    <!-- #history-container -->
-                    <div class="col-lg-9 tile">
-                        <div class="row-no-gutters fw-nowrap ai-center mb-lg">
+                    <div class="col-lg-12 ">
+                        <div class="tile">
+                            <div class="row-no-gutters fw-nowrap ai-center mb-lg">
                             <span class="label label-primary mr-sm" id="TimelineCount">{{ events.total }}</span>
                             <div class="fw-b">{{ 'mautic.lead.lead.tab.history'|trans }}</div>
+                            </div>
+                            {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
                         </div>
-                        {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
                     </div>
-                    <!--/ #history-container -->
                 </div>
+                <!--/ #history-container -->
+                <!-- #auditlog-container -->
                 <div class="row-no-gutters">
-                    <!-- #auditlog-container -->
-                    <div class="col-lg-6 tile">
-                        <div class="row-no-gutters fw-nowrap ai-center mb-lg">
-                            <span class="label label-primary mr-sm" id="TimelineCount">{{ auditlog.total }}</span>
-                            <div class="fw-b">{{ 'mautic.lead.lead.tab.auditlog'|trans }}</div>
+                    <div class="col-lg-12">
+                        <div class="tile">
+                            <div class="row-no-gutters fw-nowrap ai-center mb-lg">
+                                <span class="label label-primary mr-sm" id="TimelineCount">{{ auditlog.total }}</span>
+                                <div class="fw-b">{{ 'mautic.lead.lead.tab.auditlog'|trans }}</div>
+                            </div>
+                            {{ include('@MauticLead/Auditlog/_list.html.twig', { 'lead': lead, 'events': auditlog, }) }}
                         </div>
-                        {{ include('@MauticLead/Auditlog/_list.html.twig', { 'lead': lead, 'events': auditlog, }) }}
                     </div>
-                    <!--/ #auditlog-container -->
                 </div>
-
+                <!--/ #auditlog-container -->
             </div>
             <!--/ #history-tab-content -->
 
@@ -447,7 +453,7 @@ lead.permissionUser
                 {% for group in groups %}
                 <div class="row-no-gutters" id="{{ group }}">
                     <div class="col-lg-9">
-                        <div class="tile">
+
                             <table class="table table-hover mb-0">
                                 <tbody>
                                     {% if 'core' == group %}
@@ -486,7 +492,7 @@ lead.permissionUser
                                     {% endfor %}
                                 </tbody>
                             </table>
-                        </div>
+                        
                     </div>
                 </div>
                 {% endfor %}
