@@ -13,14 +13,8 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailSendFunctionalTest extends MauticMysqlTestCase
+final class EmailSendFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        $this->configParams['mailer_spool_type'] = 'file';
-        parent::setUp();
-    }
-
     public function testSendEmailWithContact(): void
     {
         $segment = $this->createSegment('Segment A', 'seg-a');
@@ -50,12 +44,19 @@ class EmailSendFunctionalTest extends MauticMysqlTestCase
             $response->getContent()
         );
 
-        $messages = $this->messageLogger->getMessages();
+        $messages = [
+            $this->getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
+            $this->getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
+        ];
+
         foreach ($messages as $message) {
-            preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $message->getBody(), $match);
+            $body = quoted_printable_decode($message->getBody()->bodyToString());
+            preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
+            Assert::assertArrayHasKey(1, $match, $body);
             parse_str(parse_url($match[1], PHP_URL_QUERY), $queryParams);
             $clickThrough = unserialize(base64_decode($queryParams['ct']));
-            Assert::assertSame($leads[array_key_first($message->getTo())]->getId(), $clickThrough['lead']);
+            Assert::assertArrayHasKey($message->getTo()[0]->toString(), $leads);
+            Assert::assertSame($leads[$message->getTo()[0]->toString()]->getId(), (int) $clickThrough['lead']);
         }
     }
 
@@ -100,6 +101,7 @@ class EmailSendFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName($name);
+        $segment->setPublicName($name);
         $segment->setAlias($alias);
         $this->em->persist($segment);
 
