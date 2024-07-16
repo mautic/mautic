@@ -313,6 +313,8 @@ class ResultController extends CommonFormController
             return $this->accessDenied();
         }
 
+        $notAnonymize = (bool) $this->security->isGranted('form:export:notAnonymize', 'MATCH_ONE');
+
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
@@ -328,7 +330,7 @@ class ResultController extends CommonFormController
         /** @var SubmissionModel $model */
         $model = $this->getModel('form.submission');
 
-        return $model->exportResults($format, $form, $args);
+        return $model->exportResults($format, $form, $args, $notAnonymize);
     }
 
     /**
