@@ -346,10 +346,6 @@ return [
                     'mautic.email.repository.email',
                 ],
             ],
-            'mautic.form.list.validator.infiniteloop' => [
-                'class' => Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator::class,
-                'tag'   => 'validator.constraint_validator',
-            ],
         ],
         'fixtures' => [
             'mautic.campaign.fixture.campaign' => [
