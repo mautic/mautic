@@ -189,8 +189,8 @@
           <div class="pr-lg pl-lg pt-md pb-md">
               {{ form_row(form.category) }}
               {{ form_row(form.isPublished) }}
-              {{ form_row(form.publishUp) }}
-              {{ form_row(form.publishDown) }}
+              {{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
+              {{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
               {{ form_row(form.noIndex) }}
               {{ form_row(form.inKioskMode) }}
               {{ form_row(form.renderStyle) }}
