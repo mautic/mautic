@@ -145,7 +145,7 @@
   },
   "config": {
     "platform": {
-      "php": "8.0.2"
+      "php": "8.1.0"
     },
     "bin-dir": "bin",
     "component-dir": "media/assets",
