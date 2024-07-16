@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -66,7 +65,7 @@ class EmailSendFunctionalTest extends MauticMysqlTestCase
     private function createEmail(string $subject, array $segments, string $emailContent): Email
     {
         $email = new Email();
-        $email->setDateAdded(new DateTime());
+        $email->setDateAdded(new \DateTime());
         $email->setName('Email name');
         $email->setSubject($subject);
         $email->setEmailType('list');
