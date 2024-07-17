@@ -163,7 +163,7 @@ class ButtonExtension extends AbstractExtension
             if ($path) {
                 $mergeAttr = (!in_array($action, ['edit', 'new'])) ? [] : $editAttr;
                 $btnClass = in_array($action, ['new', 'edit']) ? 'btn btn-primary' : 'btn btn-tertiary';
-        
+
                 $this->buttonHelper->addButton(
                     [
                         'attr' => array_merge(
