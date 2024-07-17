@@ -27,7 +27,7 @@ class EmailValidator
     public function validate($address, $doDnsCheck = false): void
     {
         if (!$this->isValidFormat($address)) {
-            throw new InvalidEmailException($address, $this->translator->trans('mautic.email.address.invalid_format', ['%email%' => $address ?: '?']));
+            throw new InvalidEmailException($address ?: '?', $this->translator->trans('mautic.email.address.invalid_format', ['%email%' => $address ?: '?']));
         }
 
         if ($this->hasValidCharacters($address)) {
