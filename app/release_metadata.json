@@ -1,6 +1,7 @@
 {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "version": "5.1.0",
 =======
   "version": "5.0.3",
@@ -8,6 +9,9 @@
 =======
   "version": "5.0.4",
 >>>>>>> 4676457f5a (Bump to 5.0.4 (#13634))
+=======
+  "version": "5.0.4",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
   "stability": "stable",
   "minimum_php_version": "8.0.2",
   "maximum_php_version": "8.2.99",
@@ -17,6 +21,7 @@
   "minimum_mautic_version": "4.4.10",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "announcement_url": "https://github.com/mautic/mautic/releases/tag/5.1.0"
 =======
   "announcement_url": "https://github.com/mautic/mautic/releases/tag/5.0.3"
@@ -24,4 +29,7 @@
 =======
   "announcement_url": "https://github.com/mautic/mautic/releases/tag/5.0.4"
 >>>>>>> 4676457f5a (Bump to 5.0.4 (#13634))
+=======
+  "announcement_url": "https://github.com/mautic/mautic/releases/tag/5.0.4"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
 }

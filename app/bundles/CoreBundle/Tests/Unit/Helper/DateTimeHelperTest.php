@@ -128,6 +128,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     public function testAddMethodModifiesOriginalDateTime(): void
 =======
@@ -138,6 +139,10 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 =======
     public function testAddMethodModifiesOriginalDateTime(): void
 >>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
+=======
+
+    public function testAddMethodModifiesOriginalDateTime(): void
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         $originalDate   = '2023-01-01 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -157,6 +162,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testAddMethodReturnsClonedDateTime(): void
 =======
     public function testAddMethodReturnsClonedDateTime()
@@ -164,6 +170,9 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 =======
     public function testAddMethodReturnsClonedDateTime(): void
 >>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
+=======
+    public function testAddMethodReturnsClonedDateTime(): void
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         $originalDate   = '2023-01-01 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -186,6 +195,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testSubMethodModifiesOriginalDateTime(): void
 =======
     public function testSubMethodModifiesOriginalDateTime()
@@ -193,6 +203,9 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 =======
     public function testSubMethodModifiesOriginalDateTime(): void
 >>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
+=======
+    public function testSubMethodModifiesOriginalDateTime(): void
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         $originalDate   = '2023-01-02 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -212,6 +225,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testSubMethodReturnsClonedDateTime(): void
 =======
     public function testSubMethodReturnsClonedDateTime()
@@ -219,6 +233,9 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 =======
     public function testSubMethodReturnsClonedDateTime(): void
 >>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
+=======
+    public function testSubMethodReturnsClonedDateTime(): void
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         $originalDate   = '2023-01-02 12:00:00';
         $intervalString = 'P1D'; // Interval of 1 day
@@ -241,6 +258,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testModifyMethodModifiesOriginalDateTime(): void
 =======
     public function testModifyMethodModifiesOriginalDateTime()
@@ -248,6 +266,9 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 =======
     public function testModifyMethodModifiesOriginalDateTime(): void
 >>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
+=======
+    public function testModifyMethodModifiesOriginalDateTime(): void
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         $originalDate       = '2023-01-02 12:00:00';
         $modificationString = '+1 day';
@@ -267,6 +288,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     public function testModifyMethodReturnsClonedDateTime(): void
 =======
     public function testModifyMethodReturnsClonedDateTime()
@@ -274,6 +296,9 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 =======
     public function testModifyMethodReturnsClonedDateTime(): void
 >>>>>>> 3674e8c477 (fix: [DPMMA-2401] DateTimeHelperTest Phpstan)
+=======
+    public function testModifyMethodReturnsClonedDateTime(): void
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         $originalDate       = '2023-01-02 12:00:00';
         $modificationString = '+1 day';
@@ -294,8 +319,11 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> beca7e681d (fix: [DPMMA-2401] Use object's timezone when comparing with 'now' in DateTimeHelper)
 =======
 >>>>>>> e5987884d0 (fix: [DPMMA-2401] DateTimeHelper unit tests)
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
 }

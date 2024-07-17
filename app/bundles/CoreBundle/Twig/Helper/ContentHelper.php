@@ -27,6 +27,9 @@ final class ContentHelper
     {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         if (null === $viewName && isset($vars['mauticTemplate'])) {
             $viewName = $vars['mauticTemplate'];
 =======

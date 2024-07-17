@@ -260,8 +260,11 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         /** @var LeadModel $model */
 =======
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
 >>>>>>> 2cc4af975f (Merge pull request from GHSA-qjx3-2g35-6hv8)
         $model = $this->getModel('lead.lead');

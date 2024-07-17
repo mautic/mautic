@@ -352,6 +352,7 @@ class FormApiController extends CommonApiController
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     /**
      * @param CommonEntity $entity
      * @param array<mixed> $parameters
@@ -377,6 +378,10 @@ class FormApiController extends CommonApiController
 >>>>>>> b3715407e9 (Add new entity action to check for existing post action.)
 =======
 >>>>>>> 17580b59f9 (Remove unrelated comment)
+=======
+    public function newEntityAction(Request $request): Response
+    {
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         $parameters = $request->request->all();
 
         if (!isset($parameters['postAction'])) {

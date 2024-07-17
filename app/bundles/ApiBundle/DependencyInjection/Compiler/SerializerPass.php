@@ -20,10 +20,13 @@ class SerializerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         if ($container->hasDefinition('jms_serializer.metadata.doctrine_type_driver')) {
             $definition = $container->getDefinition('jms_serializer.metadata.doctrine_type_driver');
             $definition->replaceArgument(0, new Reference(ApiMetadataDriver::class));
 =======
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         if ($container->hasDefinition('jms_serializer.metadata.annotation_or_attribute_driver')) {
             $definition = $container->getDefinition('jms_serializer.metadata.annotation_or_attribute_driver');
             $definition->setClass(\Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver::class);

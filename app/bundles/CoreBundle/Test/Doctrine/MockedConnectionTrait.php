@@ -15,6 +15,7 @@ trait MockedConnectionTrait
         $platform = $this->createMock(AbstractPlatform::class);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         // Following line is needed once we update to doctrine/dbal >= 3.8.0.
         // This allows easy mocking of the createSelectSQLBuilder method without needing to mock the whole chain.
         // $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
@@ -26,6 +27,11 @@ trait MockedConnectionTrait
         // This allows easy mocking of the createSelectSQLBuilder method without needing to mock the whole chain.
         // $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
 >>>>>>> 19815833a6 (temp restrict doctrine/dbal version to prevent large deprecation refactor)
+=======
+        // Following line is needed once we update to doctrine/dbal >= 3.8.0.
+        // This allows easy mocking of the createSelectSQLBuilder method without needing to mock the whole chain.
+        // $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
 
         $connection = $this->createMock(Connection::class);
         $connection->method('getDatabasePlatform')
@@ -36,6 +42,7 @@ trait MockedConnectionTrait
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     private function passThrough(MockObject $object, string $class, string $method, ?InvocationOrder $invocationRule = null): void
 =======
     private function passThrough(MockObject $object, string $class, string $method, InvocationOrder $invocationRule = null): void
@@ -43,6 +50,9 @@ trait MockedConnectionTrait
 =======
     private function passThrough(MockObject $object, string $class, string $method, ?InvocationOrder $invocationRule = null): void
 >>>>>>> de384098e2 (phpcs fixes needed due to update)
+=======
+    private function passThrough(MockObject $object, string $class, string $method, ?InvocationOrder $invocationRule = null): void
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         if (!$invocationRule) {
             $invocationRule = new AnyInvokedCount();

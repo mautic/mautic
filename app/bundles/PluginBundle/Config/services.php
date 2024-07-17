@@ -32,7 +32,10 @@ return function (ContainerConfigurator $configurator): void {
 =======
     $services->alias('mautic.plugin.model.plugin', \Mautic\PluginBundle\Model\PluginModel::class);
     $services->alias('mautic.plugin.model.integration_entity', \Mautic\PluginBundle\Model\IntegrationEntityModel::class);
+<<<<<<< HEAD
 >>>>>>> f529872d14 (fix: [DPMMA-2462] integration helper dependency (#13470))
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
 
     $services->set(FormSubscriber::class)
         ->call('setIntegrationHelper', [service('mautic.helper.integration')]);

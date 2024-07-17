@@ -468,6 +468,7 @@
         {
             "name": "composer/ca-bundle",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "1.5.0",
             "source": {
                 "type": "git",
@@ -490,6 +491,18 @@
                 "url": "https://api.github.com/repos/composer/ca-bundle/zipball/b66d11b7479109ab547f9405b97205640b17d385",
                 "reference": "b66d11b7479109ab547f9405b97205640b17d385",
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "version": "1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/ca-bundle.git",
+                "reference": "b66d11b7479109ab547f9405b97205640b17d385"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/b66d11b7479109ab547f9405b97205640b17d385",
+                "reference": "b66d11b7479109ab547f9405b97205640b17d385",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -502,10 +515,14 @@
                 "psr/log": "^1.0",
                 "symfony/phpunit-bridge": "^4.2 || ^5",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "symfony/process": "^4.0 || ^5.0 || ^6.0 || ^7.0"
 =======
                 "symfony/process": "^2.5 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+                "symfony/process": "^2.5 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "type": "library",
             "extra": {
@@ -541,10 +558,14 @@
                 "irc": "irc://irc.freenode.org/composer",
                 "issues": "https://github.com/composer/ca-bundle/issues",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/composer/ca-bundle/tree/1.5.0"
 =======
                 "source": "https://github.com/composer/ca-bundle/tree/1.4.0"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+                "source": "https://github.com/composer/ca-bundle/tree/1.4.0"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -561,10 +582,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-03-15T14:00:32+00:00"
 =======
             "time": "2023-12-18T12:05:55+00:00"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "time": "2023-12-18T12:05:55+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "composer/class-map-generator",
@@ -642,6 +667,7 @@
         {
             "name": "composer/composer",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "2.7.7",
             "source": {
                 "type": "git",
@@ -664,6 +690,18 @@
                 "url": "https://api.github.com/repos/composer/composer/zipball/683557bd2466072777309d039534bb1332d0dda5",
                 "reference": "683557bd2466072777309d039534bb1332d0dda5",
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "version": "2.6.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/composer.git",
+                "reference": "683557bd2466072777309d039534bb1332d0dda5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/composer/zipball/683557bd2466072777309d039534bb1332d0dda5",
+                "reference": "683557bd2466072777309d039534bb1332d0dda5",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -749,10 +787,14 @@
                 "issues": "https://github.com/composer/composer/issues",
                 "security": "https://github.com/composer/composer/security/policy",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/composer/composer/tree/2.7.7"
 =======
                 "source": "https://github.com/composer/composer/tree/2.6.6"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+                "source": "https://github.com/composer/composer/tree/2.6.6"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -769,10 +811,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-06-10T20:11:12+00:00"
 =======
             "time": "2023-12-08T17:32:26+00:00"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "time": "2023-12-08T17:32:26+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "composer/installers",
@@ -1070,6 +1116,7 @@
         {
             "name": "composer/pcre",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "3.1.4",
             "source": {
                 "type": "git",
@@ -1092,6 +1139,18 @@
                 "url": "https://api.github.com/repos/composer/pcre/zipball/00104306927c7a0919b4ced2aaa6782c1e61a3c9",
                 "reference": "00104306927c7a0919b4ced2aaa6782c1e61a3c9",
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "version": "3.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/pcre.git",
+                "reference": "00104306927c7a0919b4ced2aaa6782c1e61a3c9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/pcre/zipball/00104306927c7a0919b4ced2aaa6782c1e61a3c9",
+                "reference": "00104306927c7a0919b4ced2aaa6782c1e61a3c9",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -1134,10 +1193,14 @@
             "support": {
                 "issues": "https://github.com/composer/pcre/issues",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/composer/pcre/tree/3.1.4"
 =======
                 "source": "https://github.com/composer/pcre/tree/3.1.1"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+                "source": "https://github.com/composer/pcre/tree/3.1.1"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -1154,10 +1217,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-05-27T13:40:54+00:00"
 =======
             "time": "2023-10-11T07:11:09+00:00"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "time": "2023-10-11T07:11:09+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "composer/semver",
@@ -1804,6 +1871,9 @@
             "name": "doctrine/dbal",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             "version": "3.7.2",
             "source": {
                 "type": "git",
@@ -1814,6 +1884,7 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/doctrine/dbal/zipball/0ac3c270590e54910715e9a1a044cc368df282b2",
                 "reference": "0ac3c270590e54910715e9a1a044cc368df282b2",
+<<<<<<< HEAD
 =======
             "version": "3.8.1",
 =======
@@ -1834,6 +1905,8 @@
                 "url": "https://api.github.com/repos/doctrine/dbal/zipball/0ac3c270590e54910715e9a1a044cc368df282b2",
                 "reference": "0ac3c270590e54910715e9a1a044cc368df282b2",
 >>>>>>> 19815833a6 (temp restrict doctrine/dbal version to prevent large deprecation refactor)
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -1851,6 +1924,9 @@
                 "jetbrains/phpstorm-stubs": "2023.1",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "phpstan/phpstan": "1.10.42",
                 "phpstan/phpstan-strict-rules": "^1.5",
                 "phpunit/phpunit": "9.6.13",
@@ -1940,6 +2016,7 @@
                 "issues": "https://github.com/doctrine/dbal/issues",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/doctrine/dbal/tree/3.7.2"
 =======
                 "source": "https://github.com/doctrine/dbal/tree/3.8.1"
@@ -1947,6 +2024,9 @@
 =======
                 "source": "https://github.com/doctrine/dbal/tree/3.7.2"
 >>>>>>> 19815833a6 (temp restrict doctrine/dbal version to prevent large deprecation refactor)
+=======
+                "source": "https://github.com/doctrine/dbal/tree/3.7.2"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -1964,6 +2044,7 @@
             ],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2023-11-19T08:06:58+00:00"
 =======
             "time": "2024-02-03T17:33:49+00:00"
@@ -1971,6 +2052,9 @@
 =======
             "time": "2023-11-19T08:06:58+00:00"
 >>>>>>> 19815833a6 (temp restrict doctrine/dbal version to prevent large deprecation refactor)
+=======
+            "time": "2023-11-19T08:06:58+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "doctrine/deprecations",
@@ -5523,10 +5607,14 @@
                 "type": "git",
                 "url": "https://github.com/mautic/SpBundle.git",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "reference": "083bf6d62cb03443372068e0ea1b1c3183eed05a"
 =======
                 "reference": "91f36a54b223d5405e6e41ea612d640360d35554"
 >>>>>>> 28a5bbbad2 (fix incorrect version of the SpBundle)
+=======
+                "reference": "91f36a54b223d5405e6e41ea612d640360d35554"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "require": {
                 "lightsaml/symfony-bridge": "dev-symfony5",
@@ -5561,10 +5649,14 @@
             "description": "Light SAML2 SP Symfony Bundle",
             "homepage": "http://www.lightsaml.com/SP-Bundle/",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-05-31T13:23:54+00:00"
 =======
             "time": "2023-11-24T16:00:46+00:00"
 >>>>>>> 28a5bbbad2 (fix incorrect version of the SpBundle)
+=======
+            "time": "2023-11-24T16:00:46+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "lightsaml/symfony-bridge",
@@ -6147,6 +6239,7 @@
                 "url": "app",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "reference": "ff04262752d9b0a30c80be568ceeb5a585fc3cda"
 =======
                 "reference": "5d076ac8de44cbac09d23cd025a21257bc2b201e"
@@ -6154,6 +6247,9 @@
 =======
                 "reference": "a2fefb6250e5d342a5148891c216cf3bc9f3521b"
 >>>>>>> c69eb9fd76 (bump and restrict phpoffice/phpspreadsheet to a version compatible with Mautic)
+=======
+                "reference": "a2fefb6250e5d342a5148891c216cf3bc9f3521b"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -6317,10 +6413,14 @@
             "source": {
                 "type": "git",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "url": "https://github.com/maxmind/MaxMind-DB-Reader-php.git",
 =======
                 "url": "git@github.com:maxmind/MaxMind-DB-Reader-php.git",
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+                "url": "git@github.com:maxmind/MaxMind-DB-Reader-php.git",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "reference": "1e66f73ffcf25e17c7a910a1317e9720a95497c7"
             },
             "dist": {
@@ -7533,6 +7633,7 @@
         {
             "name": "phpseclib/phpseclib",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "3.0.37",
             "source": {
                 "type": "git",
@@ -7555,6 +7656,18 @@
                 "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/4b1827beabce71953ca479485c0ae9c51287f2fe",
                 "reference": "4b1827beabce71953ca479485c0ae9c51287f2fe",
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "version": "3.0.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpseclib/phpseclib.git",
+                "reference": "4b1827beabce71953ca479485c0ae9c51287f2fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/4b1827beabce71953ca479485c0ae9c51287f2fe",
+                "reference": "4b1827beabce71953ca479485c0ae9c51287f2fe",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -7636,10 +7749,14 @@
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/phpseclib/phpseclib/tree/3.0.37"
 =======
                 "source": "https://github.com/phpseclib/phpseclib/tree/3.0.35"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.35"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -7656,10 +7773,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-03-03T02:14:58+00:00"
 =======
             "time": "2023-12-29T01:59:53+00:00"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "time": "2023-12-29T01:59:53+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "phpstan/phpdoc-parser",
@@ -8601,6 +8722,7 @@
         {
             "name": "seld/jsonlint",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "1.10.2",
             "source": {
                 "type": "git",
@@ -8623,6 +8745,18 @@
                 "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/76d449a358ece77d6f1d6331c68453e657172202",
                 "reference": "76d449a358ece77d6f1d6331c68453e657172202",
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "version": "1.10.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/jsonlint.git",
+                "reference": "76d449a358ece77d6f1d6331c68453e657172202"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/76d449a358ece77d6f1d6331c68453e657172202",
+                "reference": "76d449a358ece77d6f1d6331c68453e657172202",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -8662,10 +8796,14 @@
             "support": {
                 "issues": "https://github.com/Seldaek/jsonlint/issues",
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/Seldaek/jsonlint/tree/1.10.2"
 =======
                 "source": "https://github.com/Seldaek/jsonlint/tree/1.10.1"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+                "source": "https://github.com/Seldaek/jsonlint/tree/1.10.1"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -8678,10 +8816,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-02-07T12:57:50+00:00"
 =======
             "time": "2023-12-18T13:03:25+00:00"
 >>>>>>> 023c9df1c9 (bump other packages)
+=======
+            "time": "2023-12-18T13:03:25+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "seld/phar-utils",
@@ -9452,6 +9594,7 @@
         {
             "name": "symfony/console",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "v5.4.40",
             "source": {
                 "type": "git",
@@ -9474,6 +9617,18 @@
                 "url": "https://api.github.com/repos/symfony/console/zipball/dbdf6adcb88d5f83790e1efb57ef4074309d3931",
                 "reference": "dbdf6adcb88d5f83790e1efb57ef4074309d3931",
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "version": "v5.4.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/console.git",
+                "reference": "dbdf6adcb88d5f83790e1efb57ef4074309d3931"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/console/zipball/dbdf6adcb88d5f83790e1efb57ef4074309d3931",
+                "reference": "dbdf6adcb88d5f83790e1efb57ef4074309d3931",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -9544,10 +9699,14 @@
             ],
             "support": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/console/tree/v5.4.40"
 =======
                 "source": "https://github.com/symfony/console/tree/v5.4.35"
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+                "source": "https://github.com/symfony/console/tree/v5.4.35"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -9564,10 +9723,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-05-31T14:33:22+00:00"
 =======
             "time": "2024-01-23T14:28:09+00:00"
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "time": "2024-01-23T14:28:09+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "symfony/css-selector",
@@ -10352,6 +10515,7 @@
         {
             "name": "symfony/filesystem",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "v5.4.40",
             "source": {
                 "type": "git",
@@ -10374,6 +10538,18 @@
                 "url": "https://api.github.com/repos/symfony/filesystem/zipball/5a553607d4ffbfa9c0ab62facadea296c9db7086",
                 "reference": "5a553607d4ffbfa9c0ab62facadea296c9db7086",
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "version": "v5.4.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/filesystem.git",
+                "reference": "5a553607d4ffbfa9c0ab62facadea296c9db7086"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/5a553607d4ffbfa9c0ab62facadea296c9db7086",
+                "reference": "5a553607d4ffbfa9c0ab62facadea296c9db7086",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -10412,10 +10588,14 @@
             "homepage": "https://symfony.com",
             "support": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/filesystem/tree/v5.4.40"
 =======
                 "source": "https://github.com/symfony/filesystem/tree/v5.4.35"
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+                "source": "https://github.com/symfony/filesystem/tree/v5.4.35"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -10431,6 +10611,7 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
 <<<<<<< HEAD
             "time": "2024-05-31T14:33:22+00:00"
         },
@@ -10462,6 +10643,22 @@
                 "url": "https://api.github.com/repos/symfony/finder/zipball/abe6d6f77d9465fed3cd2d029b29d03b56b56435",
                 "reference": "abe6d6f77d9465fed3cd2d029b29d03b56b56435",
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "time": "2024-01-23T13:51:25+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "v5.4.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/finder.git",
+                "reference": "abe6d6f77d9465fed3cd2d029b29d03b56b56435"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/abe6d6f77d9465fed3cd2d029b29d03b56b56435",
+                "reference": "abe6d6f77d9465fed3cd2d029b29d03b56b56435",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -10496,10 +10693,14 @@
             "homepage": "https://symfony.com",
             "support": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/finder/tree/v5.4.40"
 =======
                 "source": "https://github.com/symfony/finder/tree/v5.4.35"
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+                "source": "https://github.com/symfony/finder/tree/v5.4.35"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -10516,10 +10717,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-05-31T14:33:22+00:00"
 =======
             "time": "2024-01-23T13:51:25+00:00"
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "time": "2024-01-23T13:51:25+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "symfony/form",
@@ -12643,6 +12848,7 @@
         {
             "name": "symfony/process",
 <<<<<<< HEAD
+<<<<<<< HEAD
             "version": "v5.4.40",
             "source": {
                 "type": "git",
@@ -12665,6 +12871,18 @@
                 "url": "https://api.github.com/repos/symfony/process/zipball/cbc28e34015ad50166fc2f9c8962d28d0fe861eb",
                 "reference": "cbc28e34015ad50166fc2f9c8962d28d0fe861eb",
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "version": "v5.4.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "cbc28e34015ad50166fc2f9c8962d28d0fe861eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/cbc28e34015ad50166fc2f9c8962d28d0fe861eb",
+                "reference": "cbc28e34015ad50166fc2f9c8962d28d0fe861eb",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "shasum": ""
             },
             "require": {
@@ -12698,10 +12916,14 @@
             "homepage": "https://symfony.com",
             "support": {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "source": "https://github.com/symfony/process/tree/v5.4.40"
 =======
                 "source": "https://github.com/symfony/process/tree/v5.4.35"
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+                "source": "https://github.com/symfony/process/tree/v5.4.35"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             },
             "funding": [
                 {
@@ -12718,10 +12940,14 @@
                 }
             ],
 <<<<<<< HEAD
+<<<<<<< HEAD
             "time": "2024-05-31T14:33:22+00:00"
 =======
             "time": "2024-01-23T13:51:25+00:00"
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "time": "2024-01-23T13:51:25+00:00"
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "symfony/property-access",
@@ -15979,6 +16205,7 @@
                 "source": "https://github.com/phpspec/prophecy/tree/v1.18.0"
             },
             "time": "2023-12-07T16:22:33+00:00"
+<<<<<<< HEAD
         },
         {
 =======
@@ -16222,6 +16449,8 @@
                 "source": "https://github.com/phpspec/prophecy/tree/v1.18.0"
             },
             "time": "2023-12-07T16:22:33+00:00"
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "phpstan/extension-installer",
@@ -18259,6 +18488,7 @@
         },
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             "name": "symfony/phpunit-bridge",
             "version": "v5.4.34",
             "source": {
@@ -18362,6 +18592,17 @@
             "dist": {
                 "type": "zip",
 >>>>>>> 854b16710f (bump symfony packages to the latest releases)
+=======
+            "name": "symfony/web-profiler-bundle",
+            "version": "v5.4.35",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/web-profiler-bundle.git",
+                "reference": "d71d64739a77ba23e7797d5ed3226796751df058"
+            },
+            "dist": {
+                "type": "zip",
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
                 "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/d71d64739a77ba23e7797d5ed3226796751df058",
                 "reference": "d71d64739a77ba23e7797d5ed3226796751df058",
                 "shasum": ""
@@ -18541,8 +18782,11 @@
             "time": "2023-11-20T00:12:19+00:00"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> be18187130 (revert bumping dev dependencies as they cause too many side effects)
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         },
         {
             "name": "webmozart/assert",

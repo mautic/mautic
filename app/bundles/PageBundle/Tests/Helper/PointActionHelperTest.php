@@ -12,20 +12,27 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Helper\PointActionHelper;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 use PHPUnit\Framework\MockObject\MockObject;
 =======
 >>>>>>> b69a60365e (fix: [DPMMA-1079] URL hit point action fixed)
 =======
 use PHPUnit\Framework\MockObject\MockObject;
 >>>>>>> c10f05cab7 (fix: [DPMMA-1079] additional tests and refactor)
+=======
+use PHPUnit\Framework\MockObject\MockObject;
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
 use PHPUnit\Framework\TestCase;
 
 class PointActionHelperTest extends TestCase
 {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c10f05cab7 (fix: [DPMMA-1079] additional tests and refactor)
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     /**
      * @var MockObject|MauticFactory
      */
@@ -53,6 +60,9 @@ class PointActionHelperTest extends TestCase
 
     protected function setUp(): void
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     {
         /** @phpstan-ignore-next-line */
         $this->factory       = $this->createMock(MauticFactory::class);
@@ -144,6 +154,7 @@ class PointActionHelperTest extends TestCase
     {
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/test/');
         $this->hitRepository->method('getDwellTimesForUrl')->willReturn([
+<<<<<<< HEAD
 =======
     public function testValidateUrlPageHitsAction(): void
 =======
@@ -181,12 +192,15 @@ class PointActionHelperTest extends TestCase
         $this->eventDetails->method('getUrl')->willReturn('https://example.com/ppk');
         $this->hitRepository->method('getDwellTimesForUrl')->willReturn([
 >>>>>>> c10f05cab7 (fix: [DPMMA-1079] additional tests and refactor)
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             'sum'     => 0,
             'min'     => 0,
             'max'     => 0,
             'average' => 0.0,
             'count'   => 1,
         ]);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -256,11 +270,17 @@ class PointActionHelperTest extends TestCase
 
         // Mock the getLatestHit method to return the current time minus 3 hours
 >>>>>>> b69a60365e (fix: [DPMMA-1079] URL hit point action fixed)
+=======
+
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         $currentTimestamp       = time();
         $threeHoursAgoTimestamp = $currentTimestamp - (3 * 3600);
         $latestHit              = new \DateTime();
         $latestHit->setTimestamp($threeHoursAgoTimestamp);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
         $this->hitRepository->method('getLatestHit')->willReturn($latestHit);
 
         $result = PointActionHelper::validateUrlHit($this->factory, $this->eventDetails, $action);
@@ -313,6 +333,7 @@ class PointActionHelperTest extends TestCase
                 false,
             ],
         ];
+<<<<<<< HEAD
 =======
         $hitRepository->method('getLatestHit')->willReturn($latestHit);
 
@@ -405,5 +426,7 @@ class PointActionHelperTest extends TestCase
             ],
         ];
 >>>>>>> c10f05cab7 (fix: [DPMMA-1079] additional tests and refactor)
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     }
 }

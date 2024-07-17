@@ -22,10 +22,14 @@ import StorageService from "./storage.service";
 
 import CodeModeButton from './codeMode/codeMode.button';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
 =======
 import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
 >>>>>>> 788b1edba3 (DPMMA-2600 Fix for Grapesjs-Mjml self-closing tag issue (#13431))
+=======
+import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
 
 export default class BuilderService {
   editor;
@@ -277,6 +281,7 @@ export default class BuilderService {
     // See: https://github.com/GrapesJS/mjml/issues/149
     const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
     this.editor.setComponents(parsedContent);
+<<<<<<< HEAD
 
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
@@ -286,6 +291,8 @@ export default class BuilderService {
     // See: https://github.com/GrapesJS/mjml/issues/149
     const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
     this.editor.setComponents(parsedContent);
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
 
     this.editor.BlockManager.get('mj-button').set({
       content: '<mj-button href="https://">Button</mj-button>',
@@ -497,6 +504,7 @@ export default class BuilderService {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   /**
    * Move the blocks and categories in the sidebar
    */
@@ -518,6 +526,8 @@ export default class BuilderService {
         });
       }
 =======
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
   unsetComponentVoidTypes(editor) {
     // Support for self-closing components is temporarily disabled due to parsing issues with mjml tags.
     // Browsers only recognize explicit self-closing tags like <img /> and <br />, leading to rendering problems.
@@ -552,7 +562,10 @@ export default class BuilderService {
           },
         }
       });
+<<<<<<< HEAD
 >>>>>>> 788b1edba3 (DPMMA-2600 Fix for Grapesjs-Mjml self-closing tag issue (#13431))
+=======
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
     });
   }
 

@@ -26,6 +26,7 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
         return [
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             'mailer'         => 'string',
 =======
             'mailer' => 'string',
@@ -33,6 +34,9 @@ class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
 =======
             'mailer'         => 'string',
 >>>>>>> 44856d331d (CS and test fixes)
+=======
+            'mailer'         => 'string',
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
             'urlencoded-dsn' => 'string',
         ];
     }

@@ -9,7 +9,11 @@ RUN echo "deb [signed-by=/etc/apt/trusted.gpg.d/ddev.gpg] https://pkg.ddev.com/a
 
 # Update package information and install DDEV
 <<<<<<< HEAD
+<<<<<<< HEAD
 RUN sudo apt update && sudo apt install -y ddev=1.23.3
 =======
 RUN sudo apt update && sudo apt install -y ddev=1.22.7
 >>>>>>> 1507aeb51d (Fixed gitpod installation for Mautic 5.0.)
+=======
+RUN sudo apt update && sudo apt install -y ddev=1.22.7
+>>>>>>> dc6114e482af3f47699520f271d6080d6c0529f4
