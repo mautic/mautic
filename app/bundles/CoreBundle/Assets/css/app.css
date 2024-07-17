@@ -1664,6 +1664,7 @@ code {
   color: var(--link-primary);
   background-color: transparent;
   padding-inline: var(--spacing-05);
+  justify-content: center;
 }
 .btn-ghost i {
   color: var(--link-primary);
