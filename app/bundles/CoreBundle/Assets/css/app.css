@@ -1637,6 +1637,7 @@ code {
 .btn-tertiary {
   padding-left: var(--spacing-05);
   padding-right: var(--spacing-10);
+  gap: var(--spacing-07);
 }
 .btn-primary:has(i),
 .btn-secondary:has(i),
