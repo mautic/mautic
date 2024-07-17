@@ -106,7 +106,7 @@ class CompanyType extends AbstractType
                             'name'  => 'merge',
                             'label' => 'mautic.lead.merge',
                             'attr'  => [
-                                'class'       => 'btn btn-default btn-dnd',
+                                'class'       => 'btn btn-ghost btn-dnd',
                                 'icon'        => 'fa fa-building',
                                 'data-toggle' => 'ajaxmodal',
                                 'data-target' => '#MauticSharedModal',

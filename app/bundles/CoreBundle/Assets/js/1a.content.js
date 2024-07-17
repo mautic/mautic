@@ -475,10 +475,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
     mQuery(container + ' input[class=list-checkbox]').on('change', function () {
         var disabled = Mautic.batchActionPrecheck(container) ? false : true;
-        var color    = (disabled) ? 'btn-default' : 'btn-info';
+        var color    = (disabled) ? 'btn-ghost' : 'btn-info';
         var button   = container + ' th.col-actions .input-group-btn button';
         mQuery(button).prop('disabled', disabled);
-        mQuery(button).removeClass('btn-default btn-info').addClass(color);
+        mQuery(button).removeClass('btn-ghost btn-info').addClass(color);
     });
 
     //Copy form buttons to the toolbar

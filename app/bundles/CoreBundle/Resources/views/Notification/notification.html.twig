@@ -9,7 +9,7 @@
         <i class="fa ri-2x {{ n.iconClass ? n.iconClass : 'fa-star' }}"{{ tooltip }}></i>
         {% endif %}
     </span>
-    <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right do-not-close" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clear{% endtrans %}" onclick="Mautic.clearNotification({{ n.id }});"><i class="ri-close-line do-not-close"></i></a>
+    <a href="javascript:void(0);" class="btn btn-ghost btn-icon btn-xs btn-nospin pull-right do-not-close" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clear{% endtrans %}" onclick="Mautic.clearNotification({{ n.id }});"><i class="ri-close-line do-not-close"></i></a>
     {% if not n.isRead %}
         <span class="pull-right is-unread text-danger"><i class="ri-asterisk"></i></span>
     {% endif %}

@@ -1272,7 +1272,7 @@ Mautic.getSlotDeleteLink = function() {
         Mautic.deleteLink = mQuery('<a><i class="fa fa-lg ri-close-line"></i></a>')
             .attr('data-slot-action', 'delete')
             .attr('alt', 'delete')
-            .addClass('btn btn-delete btn-default');
+            .addClass('btn btn-delete btn-ghost');
     }
 
     return Mautic.deleteLink;

@@ -15,7 +15,7 @@
                         </div>
                         <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                             <i class="hidden-xs ri-shuffle-line fa-lg"></i>
-                            <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-success" data-type="Decision">
+                            <button class="visible-xs pull-right btn btn-sm btn-ghost btn-nospin text-success" data-type="Decision">
                                 {{ 'mautic.core.select'|trans }}
                             </button>
                         </div>
@@ -24,7 +24,7 @@
                         {{ 'mautic.campaign.event.decision.descr'|trans }}
                     </div>
                     <div class="hidden-xs panel-footer text-center">
-                        <button class="btn btn-lg btn-default btn-nospin text-success" data-type="Decision">
+                        <button class="btn btn-lg btn-ghost btn-nospin text-success" data-type="Decision">
                             {{ 'mautic.core.select'|trans }}
                         </button>
                     </div>
@@ -38,7 +38,7 @@
                         </div>
                         <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                             <i class="hidden-xs ri-focus-2-line fa-lg"></i>
-                            <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-primary" data-type="Action">
+                            <button class="visible-xs pull-right btn btn-sm btn-ghost btn-nospin text-primary" data-type="Action">
                                 {{ 'mautic.core.select'|trans }}
                             </button>
                         </div>
@@ -47,7 +47,7 @@
                         {{ 'mautic.campaign.event.action.descr'|trans }}
                     </div>
                     <div class="hidden-xs panel-footer text-center">
-                        <button class="btn btn-lg btn-default btn-nospin text-primary" data-type="Action">
+                        <button class="btn btn-lg btn-ghost btn-nospin text-primary" data-type="Action">
                             {{ 'mautic.core.select'|trans }}
                         </button>
                     </div>
@@ -61,14 +61,14 @@
                         </div>
                         <div class="col-xs-4 col-sm-2 pl-0 pr-0 pt-10 pb-10 text-right">
                             <i class="hidden-xs ri-filter-2-fill fa-lg"></i>
-                            <button class="visible-xs pull-right btn btn-sm btn-default btn-nospin text-danger" data-type="Condition">
+                            <button class="visible-xs pull-right btn btn-sm btn-ghost btn-nospin text-danger" data-type="Condition">
                                 {{ 'mautic.core.select'|trans }}
                             </button>
                         </div>
                     </div>
                     <div class="panel-body">{{ 'mautic.campaign.event.condition.descr'|trans }}</div>
                     <div class="hidden-xs panel-footer text-center">
-                        <button class="btn btn-lg btn-default btn-nospin" data-type="Condition">
+                        <button class="btn btn-lg btn-ghost btn-nospin" data-type="Condition">
                             {{ 'mautic.core.select'|trans }}
                         </button>
                     </div>
@@ -85,7 +85,7 @@
 
                     </div>
                     <div class="panel-footer">
-                        <a id="EventInsertButton" data-toggle="ajax" data-target="CampaignEvent_" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'insert', 'campaignId': campaignId, 'anchor': 'none', 'anchorEventType': 'none'}) }}"  class="btn btn-lg btn-default">
+                        <a id="EventInsertButton" data-toggle="ajax" data-target="CampaignEvent_" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="{{ path(route, {'objectAction': 'insert', 'campaignId': campaignId, 'anchor': 'none', 'anchorEventType': 'none'}) }}"  class="btn btn-lg btn-ghost">
                             {{ 'mautic.campaign.event.clone.insert'|trans }}
                         </a>
                     </div>

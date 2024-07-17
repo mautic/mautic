@@ -51,7 +51,7 @@
     {% endif %}
     {% set sendExampleButton = {
         'attr' : {
-            'class'       : 'btn btn-default btn-nospin',
+            'class'       : 'btn btn-ghost btn-nospin',
             'data-toggle' : 'ajaxmodal',
             'data-target' : '#MauticSharedModal',
             'href'        : path('mautic_email_action', {'objectAction' : 'sendExample', 'objectId' : email.getId()}),
@@ -64,7 +64,7 @@
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
     {% set heatmapButton = {
         'attr' : {
-            'class'       : 'btn btn-default btn-nospin',
+            'class'       : 'btn btn-ghost btn-nospin',
             'data-toggle' : 'email-heatmap',
             'data-email'  : email.getId(),
             'data-target' : '#MauticSharedModal',
@@ -394,7 +394,7 @@
                               </div>
                               <input id="content_preview_url" data-route="email/preview" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
                               <span class="input-group-btn">
-                              <button id="content_preview_url_button" class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
+                              <button id="content_preview_url_button" class="btn btn-ghost btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
                                   <i class="ri-external-link-line"></i>
                               </button>
                           </span>
