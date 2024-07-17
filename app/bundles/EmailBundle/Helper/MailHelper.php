@@ -840,7 +840,7 @@ class MailHelper
         $mimeType = null;
         if (extension_loaded('fileinfo')) {
             if (($info = finfo_open(\FILEINFO_MIME)) !== false) {
-                $mimeType = finfo_buffer($info, $data) ?? null;
+                $mimeType = finfo_buffer($info, $data) ?: null;
                 finfo_close($info);
             }
         }
