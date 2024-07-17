@@ -3489,7 +3489,7 @@ label {
 }
 .search-container .search {
   border: 1px solid #fff;
-  background-color: transparent;
+  background-color: transparent !important;
   position: absolute;
   left: 0px;
   width: 24px;
