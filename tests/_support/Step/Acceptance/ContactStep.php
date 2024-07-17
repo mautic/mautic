@@ -5,7 +5,7 @@ namespace Step\Acceptance;
 use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\ContactPage;
 
-class Contact extends \AcceptanceTester
+class ContactStep extends \AcceptanceTester
 {
     /**
      * Fill out the contact form with the provided details.
@@ -44,17 +44,6 @@ class Contact extends \AcceptanceTester
     }
 
     /**
-     * Click on the dropdown menu for a contact.
-     *
-     * @param int $place the position of the contact in the list (starting from 1)
-     */
-    public function dropDownMenu($place)
-    {
-        $I = $this;
-        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/button");
-    }
-
-    /**
      * Select an option from the dropdown menu for a specific contact.
      *
      * @param int $place  the position of the contact in the list (starting from 1)
@@ -64,6 +53,7 @@ class Contact extends \AcceptanceTester
     {
         // Option: 1-> Edit, 2-> Details, 3-> Send Email, 4-> Delete
         $I = $this;
+        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/button");
         $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a", 30);
         $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a");
     }
@@ -89,5 +79,36 @@ class Contact extends \AcceptanceTester
         $I = $this;
         $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button/i');
         $I->click("//*[@id='leadTable']/thead/tr/th[1]/div/div/ul/li[$option]/a/span/span");
+    }
+
+    public function selectOptionFromDropDownContactsPage($option)
+    {
+        $I = $this;
+        $I->click('#toolbar > div.std-toolbar.btn-group > button');
+        $I->click("//*[@id='toolbar']/div[1]/ul/li[$option]/a/span/span");
+    }
+
+    public function fillImportFormFields()
+    {
+        $I = $this;
+        $I->click(ContactPage::$firstName.'> a > span');
+        $I->fillField(ContactPage::$firstName.' > div > div > input', 'first name');
+        $I->pressKey(ContactPage::$firstName.' > div > div > input', WebDriverKeys::ENTER);
+
+        $I->click(ContactPage::$lastName.'> a > span');
+        $I->fillField(ContactPage::$lastName.' > div > div > input', 'last name');
+        $I->pressKey(ContactPage::$lastName.' > div > div > input', WebDriverKeys::ENTER);
+
+        $I->click(ContactPage::$email.'> a > span');
+        $I->fillField(ContactPage::$email.' > div > div > input', 'email');
+        $I->pressKey(ContactPage::$email.' > div > div > input', WebDriverKeys::ENTER);
+
+        $I->click(ContactPage::$company.'> a > span');
+        $I->fillField(ContactPage::$company.' > div > div > input', 'company name');
+        $I->pressKey(ContactPage::$company.' > div > div > input', WebDriverKeys::ENTER);
+
+        $I->click(ContactPage::$country.'> a > span');
+        $I->fillField(ContactPage::$country.' > div > div > input', 'country');
+        $I->pressKey(ContactPage::$country.' > div > div > input', WebDriverKeys::ENTER);
     }
 }
