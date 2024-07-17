@@ -269,7 +269,7 @@ abstract class AbstractFormFieldHelper
     {
         if ('first_name' === $fieldName || 'last_name' === $fieldName || 'userip' === $fieldName) {
             $results = '*';
-        } elseif ($email && false !== strpos($fieldValue, $email)) {
+        } elseif ($email && str_contains($fieldValue, $email)) {
             $results = str_replace($email, $anonimEmail, $fieldValue);
         } else {
             $results = htmlspecialchars_decode($fieldValue, ENT_QUOTES);

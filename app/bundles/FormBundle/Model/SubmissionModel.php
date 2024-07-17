@@ -427,7 +427,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $form, $viewOnlyFields, $notAnonymize) {
+                    function () use ($results, $form, $viewOnlyFields, $notAnonymize): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
