@@ -1076,7 +1076,7 @@ class MailHelperTest extends TestCase
 
         // We should use a local image to avoid network requests.
         $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.svg';
-        $sampleImage = \file_get_contents($sampleImagePath);
+        $sampleImage     = \file_get_contents($sampleImagePath);
 
         $mailer->setIdHash('IDHASH');
         $email->setSubject('Test');
@@ -1100,8 +1100,11 @@ class MailHelperTest extends TestCase
         $this->assertStringContainsString('<img height="1" width="1" src="http://tracking.url" alt="" />', $body);
 
         $embeddedImages = [];
-        $matchCount = preg_match_all('/"cid:([^"]+?)"/', $body, $embeddedImages);
+        $matchCount     = preg_match_all('/"cid:([^"]+?)"/', $body, $embeddedImages);
         $this->assertSame(2, $matchCount);
+
+        $resolveMimeTypeMethod  = $reflectionMailerObject->getMethod('resolveMimeType');
+        $resolveMimeTypeMethod->setAccessible(true);
 
         foreach ($embeddedImages[1] as $cid) {
             $attachment = null;
@@ -1118,11 +1121,11 @@ class MailHelperTest extends TestCase
                 }
             }
 
-            $this->assertNotNull($attachment, "Cannot find the embedded image in attachments");
+            $this->assertNotNull($attachment, 'Cannot find the embedded image in attachments');
+
             $this->assertEquals(
                 implode('/', [$attachment->getMediaType(), $attachment->getMediaSubtype()]),
-                $reflectionMailerObject->getMethod('resolveMimeType')
-                    ->invoke($mailer, $sampleImage)
+                $resolveMimeTypeMethod->invoke($mailer, $sampleImage)
             );
         }
     }
