@@ -1,7 +1,8 @@
 <?php
 
 use Page\Acceptance\ContactPage;
-use Step\Acceptance\Contact;
+use PHPUnit\Framework\Assert;
+use Step\Acceptance\ContactStep;
 
 class ContactManagementCest
 {
@@ -12,7 +13,7 @@ class ContactManagementCest
 
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
-        Contact $contact
+        ContactStep $contact
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -37,7 +38,7 @@ class ContactManagementCest
 
     public function createContactFromForm(
         AcceptanceTester $I,
-        Contact $contact
+        ContactStep $contact
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -65,7 +66,7 @@ class ContactManagementCest
 
     public function accessEditContactFormFromList(
         AcceptanceTester $I,
-        Contact $contact
+        ContactStep $contact
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -88,7 +89,7 @@ class ContactManagementCest
 
     public function editContactFromProfile(
         AcceptanceTester $I,
-        Contact $contact
+        ContactStep $contact
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -124,15 +125,12 @@ class ContactManagementCest
 
     public function deleteContactFromList(
         AcceptanceTester $I,
-        Contact $contact
+        ContactStep $contact
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the name of the first contact in the list
         $contactName = $contact->grabContactNameFromList(1);
-
-        // Click on the dropdown caret on the first contact
-        $contact->dropDownMenu(1);
 
         // Click the delete menu option
         $contact->selectOptionFromDropDown(1, 4);
@@ -148,7 +146,7 @@ class ContactManagementCest
 
     public function deleteContactFromProfile(
         AcceptanceTester $I,
-        Contact $contact
+        ContactStep $contact
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -179,7 +177,7 @@ class ContactManagementCest
 
     public function batchDeleteContacts(
         AcceptanceTester $I,
-        Contact $contact
+        ContactStep $contact
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
@@ -202,5 +200,50 @@ class ContactManagementCest
         // Confirm the contacts are no longer visible
         $I->dontSee($contactName1);
         $I->dontSee($contactName2);
+    }
+
+    public function importCSV(
+        AcceptanceTester $I,
+        ContactStep $contact
+    ): void {
+        $I->amOnPage(ContactPage::$URL);
+
+        $initialContactCount = $I->grabNumRecords('leads');
+
+        // Click on the import button
+        $contact->selectOptionFromDropDownContactsPage(3);
+
+        // Wait for the import page to load
+        $I->waitForText('Import Contacts', 30, 'h1.page-header-title');
+        $I->seeElement(ContactPage::$importModal);
+
+        // Click 'Choose file' and select a file
+        $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
+
+        // Click the upload button
+        $I->click(ContactPage::$uploadButton);
+
+        // Wait for the new form to open
+        $I->waitForElement(ContactPage::$importForm, 30);
+
+        // Fill in the form
+        $I->seeElement(ContactPage::$importFormFields);
+        $contact->fillImportFormFields();
+
+        // Click 'import in browser'
+        $I->click(ContactPage::$importInBrowser);
+
+        // Wait for import completion message
+        $I->waitForElement(ContactPage::$importProgressComplete, 30);
+        $I->see('Success!', 'h4');
+
+        // Get the count of contacts after import
+        $finalContactCount = $I->grabNumRecords('leads');
+
+        // Verify the number of contacts increased by the expected number of imported contacts
+        $expectedContactsAdded = 10;
+
+        $expectedContactCount = $initialContactCount + $expectedContactsAdded;
+        Assert::assertEquals($expectedContactCount, $finalContactCount);
     }
 }
