@@ -1338,7 +1338,7 @@ code {
 }
 .btn {
   transition: var(--transition-all-productive);
-  border: var(--no-border);
+  border: 1px solid var(--border-no-color);
   border-radius: var(--border-radius-sm);
   display: inline-flex;
   align-items: flex-start;
@@ -1501,6 +1501,13 @@ code {
   color: var(--button-tertiary);
   border-color: var(--button-tertiary);
   margin-left: -1px;
+}
+.btn-tertiary i,
+.btn-tertiary + .dropdown-toggle i,
+.btn-primary + .btn-primary:not(.dropdown-toggle) i,
+.btn-primary + .btn-primary + .btn-primary i,
+.btn-primary + .btn-primary + .btn-secondary i {
+  color: var(--button-tertiary);
 }
 .btn-tertiary:hover,
 .btn-tertiary + .dropdown-toggle:hover,

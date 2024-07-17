@@ -7,7 +7,7 @@
 // ---------------------
 .btn {
   transition: var(--transition-all-productive);
-  border: var(--no-border);
+  border: 1px solid var(--border-no-color);
   border-radius: var(--border-radius-sm);
   display: inline-flex;
   align-items: flex-start;
@@ -149,6 +149,7 @@
 .btn-primary + .btn-primary + .btn-secondary {
   background-color: transparent;
   color: var(--button-tertiary);
+  i {color: var(--button-tertiary);}
   border-color: var(--button-tertiary);
   margin-left: -1px;
   &:hover {
