@@ -768,7 +768,7 @@ section {
 .form .button,
 .form .mauticform-button-wrapper .mauticform-button,
 .form button,
-.form button.btn.btn-ghost {
+.form button.btn.btn-default {
     background: #00bf9a;
     color: #fff;
     border: none;
@@ -789,7 +789,7 @@ section {
 
 .form .button:hover,
 .form .mauticform-button-wrapper .mauticform-button:hover,
-.form button.btn.btn-ghost:hover,
+.form button.btn.btn-default:hover,
 .form button:hover {
     -webkit-transition: all 1s cubic-bezier(.19, 1, .22, 1);
     transition: all 1s cubic-bezier(.19, 1, .22, 1);
@@ -802,7 +802,7 @@ section {
 .form .button#mauticform_input_mauticcomsignupfree_final_page,
 .form .mauticform-button-wrapper .mauticform-button#mauticform_input_mauticcomsignupfree_final_page,
 .form button#mauticform_input_mauticcomsignupfree_final_page,
-.form button.btn.btn-ghost#mauticform_input_mauticcomsignupfree_final_page {
+.form button.btn.btn-default#mauticform_input_mauticcomsignupfree_final_page {
     color: #fff;
     background: #1E2A36
 }
@@ -810,7 +810,7 @@ section {
 .form .button#mauticform_input_mauticcomsignupfree_final_page:hover,
 .form .mauticform-button-wrapper .mauticform-button#mauticform_input_mauticcomsignupfree_final_page:hover,
 .form button#mauticform_input_mauticcomsignupfree_final_page:hover,
-.form button.btn.btn-ghost#mauticform_input_mauticcomsignupfree_final_page:hover {
+.form button.btn.btn-default#mauticform_input_mauticcomsignupfree_final_page:hover {
     background: #11181F
 }
 
