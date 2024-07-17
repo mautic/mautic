@@ -684,7 +684,7 @@ Mautic.campaignBuilderConnectionsMap = {
     }
 };
 
-Mautic.campaignBuilderAnchorDefaultColor = '#d5d4d4';
+Mautic.campaignBuilderAnchorDefaultColor = 'var(--border-subtle)';
 
 Mautic.campaignEndpointDefinitions = {
     'top': {
@@ -697,12 +697,12 @@ Mautic.campaignEndpointDefinitions = {
     },
     'yes': {
         anchors: [0, 1, 0, 1, 30, 0],
-        connectorColor: '#00b49c',
+        connectorColor: 'var(--support-success-inverse)',
         isTarget: false
     },
     'no': {
         anchors: [1, 1, 0, 1, -30, 0],
-        connectorColor: '#f86b4f',
+        connectorColor: 'var(--support-error-inverse)',
         isTarget: false
     },
     'leadSource': {
@@ -1425,10 +1425,10 @@ Mautic.campaignBuilderRegisterEndpoint = function (name, params) {
         },
         connectorStyle: {
             stroke: connectorColor,
-            strokeWidth: 1
+            strokeWidth: 2
         },
         connector: connectorStyle,
-        connectorOverlays: [["Arrow", {width: 8, length: 8, location: 0.5}]],
+        connectorOverlays: [],
         maxConnections: -1,
         isTarget: isTarget,
         isSource: isSource,
@@ -1499,7 +1499,7 @@ Mautic.campaignBuilderRegisterAnchors = function(names, el) {
                 textElement.setAttributeNS(null, 'x', '50%');
                 textElement.setAttributeNS(null, 'y', '50%');
                 textElement.setAttributeNS(null, 'text-anchor', 'middle');
-                textElement.setAttributeNS(null, 'stroke-width', '2px');
+                textElement.setAttributeNS(null, 'stroke-width', '1px');
                 textElement.setAttributeNS(null, 'stroke', '#ffffff');
                 textElement.setAttributeNS(null, 'dy', '.3em');
 
