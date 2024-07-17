@@ -201,6 +201,10 @@ class TimelineController extends CommonController
             return $lead;
         }
 
+        if (!$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
         $this->setListFilters();
 
         $session = $request->getSession();
