@@ -110,11 +110,11 @@ class ButtonExtension extends AbstractExtension
             if (!$enabled) {
                 continue;
             }
-        
+
             $path     = false;
             $primary  = false;
             $priority = 0;
-        
+
             switch ($action) {
                 case 'clone':
                 case 'abtest':
@@ -159,7 +159,7 @@ class ButtonExtension extends AbstractExtension
                     );
                     break;
             }
-        
+
             if ($path) {
                 $mergeAttr = (!in_array($action, ['edit', 'new'])) ? [] : $editAttr;
                 $btnClass = in_array($action, ['new', 'edit']) ? 'btn btn-primary' : 'btn btn-tertiary';
@@ -183,6 +183,6 @@ class ButtonExtension extends AbstractExtension
                     ]
                 );
             }
-        }        
+        }
     }
 }
