@@ -12,6 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDetailEvent extends CommonEvent
 {
+    public const DASHBOARD_CACHE_TAG = 'dashboard_widget';
+
     protected $type;
 
     protected $template;
@@ -220,6 +222,7 @@ class WidgetDetailEvent extends CommonEvent
             $cItem->expiresAfter((int) $this->widget->getCacheTimeout() * 60);  // This is in minutes
         }
         $cItem->set($templateData);
+        $cItem->tag(self::DASHBOARD_CACHE_TAG);
 
         $this->cacheProvider->save($cItem);
     }

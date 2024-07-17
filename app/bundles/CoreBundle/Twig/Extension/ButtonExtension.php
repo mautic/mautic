@@ -171,6 +171,7 @@ class ButtonExtension extends AbstractExtension
                                 'class'       => $btnClass,
                                 'href'        => $path,
                                 'data-toggle' => 'ajax',
+                                'id'          => $action,
                             ],
                             $mergeAttr
                         ),

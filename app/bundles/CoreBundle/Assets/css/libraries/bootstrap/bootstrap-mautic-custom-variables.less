@@ -235,21 +235,21 @@
 //## Dropdown menu container and contents.
 
 //** Background for the dropdown menu.
-@dropdown-bg:                    #fff;
+@dropdown-bg:                    var(--layer);
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,0.06);
 
 //** Dropdown menu `border-color` **for IE8**.
 @dropdown-fallback-border:       #eee;
 //** Divider color for between dropdown items.
-@dropdown-divider-bg:            #eaeaea;
+@dropdown-divider-bg:            var(--border-no-color);
 
 //** Dropdown link text color.
-@dropdown-link-color:            @text-color;
+@dropdown-link-color:            var(--text-secondary);
 //** Hover color for dropdown links.
-@dropdown-link-hover-color:      darken(@dropdown-link-color, 5%);
+@dropdown-link-hover-color:      var(--text-primary);
 //** Hover background for dropdown links.
-@dropdown-link-hover-bg:         #f5f5f5;
+@dropdown-link-hover-bg:         var(--layer-hover);
 
 //** Active dropdown menu item text color.
 @dropdown-link-active-color:     @component-active-color;
@@ -430,20 +430,20 @@
 @nav-disabled-link-hover-color:             @gray-light;
 
 //== Tabs
-@nav-tabs-border-color:                     @hr-border;
+@nav-tabs-border-color:                     var(--border-no-color);
 
-@nav-tabs-link-hover-border-color:          darken(@body-bg, 4%);
+@nav-tabs-link-hover-border-color:          var(--border-no-color);
 
-@nav-tabs-active-link-hover-bg:             @body-bg;
-@nav-tabs-active-link-hover-color:          @gray;
-@nav-tabs-active-link-hover-border-color:   @hr-border;
+@nav-tabs-active-link-hover-bg:             var(--layer);
+@nav-tabs-active-link-hover-color:          var(--text-primary);
+@nav-tabs-active-link-hover-border-color:   var(--border-no-color);
 
-@nav-tabs-justified-link-border-color:            #ddd;
-@nav-tabs-justified-active-link-border-color:     @body-bg;
+@nav-tabs-justified-link-border-color:            var(--border-no-color);
+@nav-tabs-justified-active-link-border-color:     var(--border-no-color);
 
 //== Pills
-@nav-pills-border-radius:                   @border-radius-base;
-@nav-pills-active-link-hover-bg:            @brand-primary;
+@nav-pills-border-radius:                   var(--border-radius-sm);
+@nav-pills-active-link-hover-bg:            var(--border-interactive);
 @nav-pills-active-link-hover-color:         #fff;
 
 
@@ -677,20 +677,20 @@
 
 @list-group-disabled-text-color: @list-group-disabled-color;
 //** `.list-group-item` border color
-@list-group-border:             @hr-border;
+@list-group-border:             transparent;
 //** List group border radius
-@list-group-border-radius:      @border-radius-base;
+@list-group-border-radius:      0px;
 
 //** Background color of single list items on hover
-@list-group-hover-bg:           darken(@body-bg, 1%);
+@list-group-hover-bg:           var(--layer-hover);
 //** Text color of active list items
-@list-group-active-color:       @text-color;
+@list-group-active-color:       var(--text-inverse);
 //** Background color of active list items
-@list-group-active-bg:          @list-group-hover-bg;
+@list-group-active-bg:          var(--layer-selected-inverse);
 //** Border color of active list elements
 @list-group-active-border:      @hr-border;
 //** Text color for content within active list items
-@list-group-active-text-color:  lighten(@list-group-active-bg, 40%);
+@list-group-active-text-color:  var(--text-inverse);
 
 //** Text color of disabled list items
 @list-group-disabled-color:      @gray-light;
@@ -699,8 +699,8 @@
 //** Text color for content within disabled list items
 @list-group-disabled-bg:         @gray-lighter;
 
-@list-group-link-color:         #555;
-@list-group-link-hover-color:   @list-group-link-color;
+@list-group-link-color:         var(--text-secondary);
+@list-group-link-hover-color:   var(--text-primary);
 @list-group-link-heading-color: #333;
 
 
@@ -835,8 +835,8 @@
 //
 //##
 
-@code-color:                  #c7254e;
-@code-bg:                     #f9f2f4;
+@code-color:                  var(--text-primary);
+@code-bg:                     var(--layer);
 
 @kbd-color:                   #fff;
 @kbd-bg:                      #333;
