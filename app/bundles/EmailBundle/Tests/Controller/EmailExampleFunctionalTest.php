@@ -39,7 +39,6 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
-        // Asserting email data
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString(
             'Contact emails is test@domain.tld',
@@ -62,16 +61,10 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
-        // Asserting email data
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString('Contact emails is [Email]', $message->getBody()->toString());
     }
 
-    /**
-     * @throws MappingException
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoContact(): void
     {
         // Create custom field
@@ -132,25 +125,17 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        Assert::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
-        self::assertCount(1, $this->transport->messages);
-        $message = $this->transport->messages[0];
+        
+        $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
-        // Asserting email data
-        self::assertInstanceOf('Swift_Message', $message);
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
-        self::assertStringContainsString('Email subject', $message->getSubject());
-        self::assertStringContainsString('Default Dynamic Content', $message->getBody());
+        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        Assert::assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
     }
 
-    /**
-     * @throws MappingException
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithMatchFilterContact(): void
     {
         // Create custom field
@@ -231,7 +216,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        Assert::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
@@ -239,21 +224,13 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
         ]);
         $this->client->submit($form);
-        self::assertCount(1, $this->transport->messages);
-        $message = $this->transport->messages[0];
 
-        // Asserting email data
-        self::assertInstanceOf('Swift_Message', $message);
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
-        self::assertStringContainsString('Email subject', $message->getSubject());
-        self::assertStringContainsString('Variant 1 Dynamic Content', $message->getBody());
+        $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
+
+        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        Assert::assertStringContainsString('Variant 1 Dynamic Content', $message->getBody()->toString());
     }
 
-    /**
-     * @throws MappingException
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoMatchFilterContact(): void
     {
         // Create custom field
@@ -334,7 +311,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        Assert::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
@@ -342,14 +319,11 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
             'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
         ]);
         $this->client->submit($form);
-        self::assertCount(1, $this->transport->messages);
-        $message = $this->transport->messages[0];
+        
+        $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
-        // Asserting email data
-        self::assertInstanceOf('Swift_Message', $message);
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
-        self::assertStringContainsString('Email subject', $message->getSubject());
-        self::assertStringContainsString('Default Dynamic Content', $message->getBody());
+        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        Assert::assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
     }
 
     private function createEmail(): Email
