@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\CoreBundle\Service\ExportLogger;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
@@ -1968,6 +1969,8 @@ class LeadController extends FormController
 
     /**
      * Bulk export contacts.
+     *
+     * @throws \Exception
      */
     public function batchExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher): Response
     {
@@ -2044,7 +2047,13 @@ class LeadController extends FormController
 
         $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
 
-        return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $response              = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $args['total']         = $iterator->getTotal();
+        $args['dataType']      = $fileType;
+        $logger                = new ExportLogger($this->coreParametersHelper);
+        $logger->loggerInfo($this->getUser(), ExportLogger::LEAD_EXPORT, $args);
+
+        return $response;
     }
 
     /**
@@ -2077,6 +2086,13 @@ class LeadController extends FormController
         }
 
         $contactFields = $lead->getProfileFields();
+        $args[]        = [
+            'lead'          => $contactId,
+            'dataType'      => $dataType,
+        ];
+        $logger = new ExportLogger($this->coreParametersHelper);
+        $logger->loggerInfo($this->getUser(), ExportLogger::LEAD_EXPORT, $args);
+
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
             $export[] = [

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Service\ExportLogger;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
@@ -833,6 +834,13 @@ class ReportController extends FormController
             $reportDataResult = new ReportDataResult($reportData);
             $response         = $model->exportResults($format, $entity, $reportDataResult);
         }
+
+        $args['id']         = $objectId;
+        $args['options']    = $options;
+        $args['dataType']   = $format;
+
+        $logger = new ExportLogger($this->coreParametersHelper);
+        $logger->loggerInfo($this->getUser(), ExportLogger::REPORT_EXPORT, $args);
 
         return $response;
     }

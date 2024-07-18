@@ -122,4 +122,9 @@ class IteratorExportDataModel implements \Iterator
         $this->total += $this->totalResult;
         $this->position = 0;
     }
+
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
 }
