@@ -94,15 +94,15 @@
     flex: 0 0 1rem;
     fill: var(--icon-primary,#161616);
     inline-size: 1rem;
-    -webkit-transform: scaleY(1);
-    transform: scaleY(1);
+    -webkit-transform: scaleY(-1);
+    transform: scaleY(-1);
     transition: all 110ms cubic-bezier(.2,0,.38,.9)
 }
 
 .accordion-heading.collapsed .accordion-arrow {
     fill: var(--icon-primary,#161616);
-    -webkit-transform: scaleY(-1);
-    transform: scaleY(-1);
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
 }
 
 .accordion-title {
