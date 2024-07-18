@@ -9,6 +9,7 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -60,14 +61,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $useOwnerAsMailer;
 
-    /**
-     * @Groups({"email:read", "email:write", "download:read"})
-     */
     private ?string $preheaderText = null;
 
     /**
      * @var string|null
-     * @Groups({"email:read", "email:write", "download:read"})
      */
     private $fromAddress;
 
@@ -147,22 +144,22 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<LeadList>
      */
     private $excludedLists;
 
     /**
-     * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
+     * @var ArrayCollection<Stat>
      */
     private $stats;
 
@@ -187,7 +184,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection<\Mautic\AssetBundle\Entity\Asset>
+     * @var ArrayCollection<Asset>
      */
     private $assetAttachments;
 
@@ -552,7 +549,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return ?Category
      */
     public function getCategory()
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Email;
@@ -12,15 +13,20 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Mautic\EmailBundle\EventListener\EmailSubscriber;
-use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Helper\SMimeHelper;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -257,21 +263,39 @@ CONTENT,
 </body></html>
 CONTENT,
 
-        function (string $content): void {
-            $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
-            $this->assertStringContainsString($preheaderTextHtml, $content);
-            $this->assertStringNotContainsString('Original Preheader here', $content);
-            $this->assertMatchesRegularExpression(EmailSubscriber::PREHEADER_HTML_SEARCH_PATTERN, $content);
-        }
+            function (string $content): void {
+                $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
+                $this->assertStringContainsString($preheaderTextHtml, $content);
+                $this->assertStringNotContainsString('Original Preheader here', $content);
+                $this->assertMatchesRegularExpression(EmailSubscriber::PREHEADER_HTML_SEARCH_PATTERN, $content);
+            }
         );
     }
 
     private function runPreheaderEvent(string $html, callable $assert): void
     {
-        $mockFactory = $this->createMock(MauticFactory::class);
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
-        $smimeHelper = $this->createMock(SMimeHelper::class);
-        $mailHelper  = new MailHelper($mockFactory, $swiftMailer, $smimeHelper);
+        /** @var MockObject&FromEmailHelper $fromEmailHelper */
+        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
+
+        /** @var MockObject&CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var MockObject&Mailbox $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
+        /** @var MockObject&RouterInterface $router */
+        $router = $this->createMock(RouterInterface::class);
+
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_from_name', null, 'No Body'],
+                ]
+            );
+        $mockFactory = $this->createMock(MauticFactory::class); /** @phpstan-ignore-line MauticFactory is deprecated */
+        $mailer      = new Mailer(new BatchTransport());
+        $mailHelper  = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, new NullLogger(), new MailHashHelper($coreParametersHelper), $router);
 
         $email = new Email();
         $email->setCustomHtml($html);

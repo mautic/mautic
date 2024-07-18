@@ -10,14 +10,9 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20210115065034 extends AbstractMauticMigration
 {
-    /**
-     * @throws SkipMigrationException
-     */
     public function preUp(Schema $schema): void
     {
-        $table = $schema->getTable($this->prefix.'emails');
-
-        if ($table->hasColumn('preheader_text')) {
+        if ($schema->getTable($this->prefix.'emails')->hasColumn('preheader_text')) {
             throw new SkipMigration('The emails table already includes the preheader_text column');
         }
     }

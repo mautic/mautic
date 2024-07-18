@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\LeadBundle\Tests\Form\Type;
+namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
@@ -40,7 +40,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
 
         // Send email to contact
@@ -55,7 +55,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $email = $this->messageLogger->getMessages()[0]->toString();
+        $email = $this->getMailerMessagesByToAddress('john@doe.email')[0]->getBody()->toString();
         Assert::assertStringContainsString('Hey John...', $email);
         Assert::assertStringContainsString('Subject: Some interesting subject for John', $email);
         Assert::assertStringContainsString('preheader text', $email);

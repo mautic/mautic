@@ -1437,7 +1437,7 @@ class LeadController extends FormController
 
                         // Set the email entity template so the email configuration like preheader would apply.
                         if ($email['templates']) {
-                            $emailEntity = $this->getDoctrine()->getRepository(Email::class)->find($email['templates']);
+                            $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
                             if ($emailEntity) {
                                 $mailer->setEmail($emailEntity);
                             }

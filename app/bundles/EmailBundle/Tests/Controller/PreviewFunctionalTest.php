@@ -126,10 +126,6 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($urlWithContact, $contentWithContactInfo, self::PREHEADER_TEXT);
     }
 
-    /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
     {
         // Create custom field
