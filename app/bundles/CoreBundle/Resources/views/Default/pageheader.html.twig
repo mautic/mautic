@@ -1,11 +1,12 @@
 <div class="page-header">
 	<div class="box-layout">
 		<div class="col-xs-5 col-sm-6 col-md-5 va-m">
-			<h1 class="pull-left page-header-title">{{ headerTitle|purify }}</h1>
-			<div class="ml-sm pull-left">
-					{{ publishStatus|purify }}
-			</div>
+			<div class="d-flex ai-center">
+				<h1 class="pull-left page-header-title">{{ headerTitle|purify }}</h1>
+			<div class="ml-sm pull-left">{{ publishStatus|purify }}</div>
 			{{ customContent('page.header.left', _context) }}
+			</div>
+			
 		</div>
 		<div class="col-xs-7 col-sm-6 col-md-7 va-m">
 			<div class="toolbar text-right" id="toolbar">
