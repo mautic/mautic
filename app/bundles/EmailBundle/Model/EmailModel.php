@@ -2202,7 +2202,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 'lead'         => $leadFields,
             ]
         );
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
         $mailer = $this->mailHelper->getSampleMailer();
         $mailer->setLead($leadFields, true);

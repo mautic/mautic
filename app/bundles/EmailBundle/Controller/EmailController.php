@@ -15,10 +15,10 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
@@ -1481,11 +1481,8 @@ class EmailController extends FormController
      * Generating the modal box content for
      * the send multiple example email option.
      */
-    public function sendExampleAction(Request $request, $objectId)
+    public function sendExampleAction(Request $request, $objectId, CorePermissions $security, EmailModel $model, LeadModel $leadModel, FieldModel $fieldModel)
     {
-        $model = $this->getModel('email');
-        \assert($model instanceof EmailModel);
-        /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 
         // not found or not allowed
@@ -1515,9 +1512,8 @@ class EmailController extends FormController
         $entity->setSubject($subject);
 
         $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
-        /* @var \Mautic\EmailBundle\Model\EmailModel $model */
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $isCancelled = $this->isFormCancelled($form);
             $isValid     = $this->isFormValid($form);
             if (!$isCancelled && $isValid) {
@@ -1525,12 +1521,10 @@ class EmailController extends FormController
                 // Use this contact data to fill email body content
                 $previewForContactId = (int) $form->getData()['contact_id'];
 
-                /** @var CorePermissions $security */
-                $security = $this->get('mautic.security');
                 if ($previewForContactId && (
-                        !$security->isAdmin()
-                        || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-                    )
+                    !$security->isAdmin()
+                    || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+                )
                 ) {
                     // disallow displaying contact information
                     $previewForContactId = null;
@@ -1538,19 +1532,14 @@ class EmailController extends FormController
 
                 if ($previewForContactId) {
                     // We have one from request parameter
-                    /** @var LeadModel $fieldModel */
-                    $leadModel = $this->getModel('lead.lead');
-                    /** @var Lead $contact */
                     $contact = $leadModel->getEntity($previewForContactId);
                     if ($contact && $contact->getId()) {
-                        $fields  = $contact->convertToArray();
+                        $fields = $contact->convertToArray();
                     }
                 }
 
                 if (!isset($fields)) {
                     // Prepare a fake lead
-                    /** @var FieldModel $fieldModel */
-                    $fieldModel = $this->getModel('lead.field');
                     $fields     = $fieldModel->getFieldList(false, false);
                     array_walk(
                         $fields,
