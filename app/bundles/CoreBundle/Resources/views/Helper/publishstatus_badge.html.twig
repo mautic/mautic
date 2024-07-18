@@ -7,15 +7,6 @@
         warning
     {%- endif -%}
 {% endset %}
-{% set icon %}
-    {%- if entity.getPublishStatus() is same as('published') -%}
-        check
-    {%- elseif entity.getPublishStatus() is same as('unpublished') or entity.getPublishStatus() is same as('expired') -%}
-        close
-    {%- elseif entity.getPublishStatus() is same as('pending') -%}
-        more
-    {%- endif -%}
-{% endset %}
 {% if status is not defined %}
     {% set labelText = ('mautic.core.form.' ~ (entity.getPublishStatus() == 'published' ? 'active' : 'inactive'))|trans %}
 {% else %}
