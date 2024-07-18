@@ -1525,9 +1525,9 @@ class EmailController extends FormController
                     $previewForContactId = (int) $form->getData()['contact_id'];
                 }
 
-                if ($previewForContactId &&
-                    (!$security->isAdmin() ||
-                        !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
+                if ($previewForContactId
+                    && (!$security->isAdmin()
+                        || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
                     )
                 ) {
                     // disallow displaying contact information

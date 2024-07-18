@@ -200,7 +200,7 @@ abstract class AbstractPermissions
             return true;
         }
 
-        //otherwise test for specific level
+        // otherwise test for specific level
         $result = ($this->permissions[$name][$level] & $userPermissions[$name]);
 
         return (bool) $result;

@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\LeadList;
-use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
-use PHPUnit\Framework\Assert;
-use Doctrine\Common\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 

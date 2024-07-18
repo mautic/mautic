@@ -39,8 +39,8 @@ class ContentPreviewSettingsType extends AbstractType
         $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $objectId);
         $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $objectId);
 
-        if ($this->security->isAdmin() ||
-            $this->security->hasEntityAccess(
+        if ($this->security->isAdmin()
+            || $this->security->hasEntityAccess(
                 'lead:leads:viewown',
                 'lead:leads:viewother',
                 $this->userHelper->getUser()->getId()

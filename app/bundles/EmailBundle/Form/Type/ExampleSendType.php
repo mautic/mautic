@@ -35,8 +35,8 @@ class ExampleSendType extends AbstractType
             ]
         );
 
-        if ($this->security->isAdmin() ||
-            $this->security->hasEntityAccess(
+        if ($this->security->isAdmin()
+            || $this->security->hasEntityAccess(
                 'lead:leads:viewown',
                 'lead:leads:viewother',
                 $this->userHelper->getUser()->getId()
