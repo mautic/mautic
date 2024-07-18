@@ -114,7 +114,7 @@ Mautic.activateTabDeleteButtons = function(container) {
  * @param tab
  */
 Mautic.activateTabDeleteButton = function(tab) {
-    var btn = mQuery('<span class="btn btn-danger btn-xs btn-delete pull-right hide"><i class="fa fa-times"></i></span>')
+    var btn = mQuery('<span class="btn btn-danger btn-xs btn-delete pull-right hide"><i class="ri-close-line"></i></span>')
         .on('click',
             function() {
                 return Mautic.deleteTab(btn)

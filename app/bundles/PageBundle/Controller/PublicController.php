@@ -441,7 +441,7 @@ class PublicController extends AbstractFormController
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
-        $sessionValue   = $trackingHelper->getSession(true);
+        $sessionValue   = $trackingHelper->getCacheItem(true);
 
         $event = new TrackingEvent($lead, $request, $sessionValue);
         $this->dispatcher->dispatch($event, PageEvents::ON_CONTACT_TRACKED);

@@ -25,7 +25,7 @@
                 'href': path('mautic_plugin_reload'),
             },
             'btnText': 'mautic.plugin.reload.plugins'|trans,
-            'iconClass': 'fa fa-cubes',
+            'iconClass': 'ri-instance-fills',
             'tooltip': 'mautic.plugin.reload.plugins.tooltip',
         },
     ],
@@ -57,7 +57,7 @@
   {% endif %}
 
   {% if items|length > 0 %}
-      <div class="pa-md bg-auto">
+      <div class="pa-md">
           <div class="row shuffle-integrations native-integrations">
               {% for item in items %}
                   {% if item.plugin in plugins|keys %}
