@@ -12,8 +12,10 @@ class DetailsTest extends MauticMysqlTestCase
 {
     public function testDetailsPageLoadCorrectly(): void
     {
-        $campaign = new Campaign();
+        $description = '<p><b>line1</b></p><p><em>line2</em></p><p><u>line3</u></p>';
+        $campaign    = new Campaign();
         $campaign->setName('Campaign A');
+        $campaign->setDescription($description);
         $campaign->setCanvasSettings([
             'nodes' => [
                 0 => [
@@ -42,11 +44,12 @@ class DetailsTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $this->client->request('GET', sprintf('/s/campaigns/view/%s', $campaign->getId()));
+        $crawler = $this->client->request('GET', sprintf('/s/campaigns/view/%s', $campaign->getId()));
 
         $response = $this->client->getResponse();
         Assert::assertSame(200, $response->getStatusCode());
         Assert::assertStringContainsString($campaign->getName(), $response->getContent());
         Assert::assertStringContainsString(sprintf('data-target-url="/s/campaigns/view/%s/contact/1"', $campaign->getId()), $response->getContent());
+        Assert::assertSame($description, $crawler->filter('#campaign_description')->html());
     }
 }

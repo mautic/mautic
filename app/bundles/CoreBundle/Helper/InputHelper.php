@@ -66,7 +66,7 @@ class InputHelper
                 'lowsrc',
             ];
 
-            // Strict HTML - basic one liner formating really
+            // Strict HTML - basic formating really
             self::$strictHtmlFilter = new InputFilter(
                 [
                     'b',
@@ -76,6 +76,7 @@ class InputHelper
                     'strong',
                     'a',
                     'span',
+                    'p',
                 ], [], 0, 1);
 
             self::$strictHtmlFilter->attrBlacklist = [
