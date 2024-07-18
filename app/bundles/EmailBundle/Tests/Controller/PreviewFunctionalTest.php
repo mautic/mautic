@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -16,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PreviewFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testPreviewPage(): void
     {
         $lead  = $this->createLead();
@@ -122,10 +122,6 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($urlWithContact, $contentWithContactInfo);
     }
 
-    /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
     {
         // Create custom field

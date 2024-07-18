@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
         $this->configParams['mailer_spool_type'] = 'file';
@@ -129,7 +131,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
-        
+
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
@@ -220,7 +222,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
-            'example_send[contact]'         => $contacts['contacts'][0]['firstname'],
+            'example_send[contact]'         => $contacts['contacts'][0]['fields']['core']['firstname']['value'],
             'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
         ]);
         $this->client->submit($form);
@@ -315,11 +317,11 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
-            'example_send[contact]'         => $contacts['contacts'][0]['firstname'],
+            'example_send[contact]'         => $contacts['contacts'][0]['fields']['core']['firstname']['value'],
             'example_send[contact_id]'      => $contacts['contacts'][0]['id'],
         ]);
         $this->client->submit($form);
-        
+
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
