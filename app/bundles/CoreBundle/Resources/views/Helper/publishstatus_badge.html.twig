@@ -16,5 +16,12 @@
         more
     {%- endif -%}
 {% endset %}
-{% set labelText = ('mautic.core.form.' ~ (entity.getPublishStatus() == 'published' ? 'active' : 'inactive'))|trans %}
-<span title="{{ labelText }}" aria-label="{{ labelText }}" class="bg-{{ labelColor }} mt-sm publishstatus_pulse"> </span>
+{% if status is not defined %}
+    {% set labelText = ('mautic.core.form.' ~ (entity.getPublishStatus() == 'published' ? 'active' : 'inactive'))|trans %}
+{% else %}
+    {% set labelText = ('mautic.core.form.' ~ (entity.getPublishStatus() == 'published' ? 'available' : 'unavailable'))|trans %}
+{% endif %}
+<div class="d-flex ai-center gap-xs text-{{ labelColor }} fw-b">
+    <span title="{{ labelText }}" aria-label="{{ labelText }}" class="bg-{{ labelColor }} publishstatus_pulse"> </span>
+{{ labelText }}
+</div>
