@@ -475,7 +475,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordEncoderInterface $encoder */
-        $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($user);
 
         $user->setPassword($encoder->encodePassword('mautic', null));
         $userRepository->saveEntity($user);
