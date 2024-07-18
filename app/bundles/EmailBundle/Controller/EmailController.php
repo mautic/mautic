@@ -1540,10 +1540,10 @@ class EmailController extends FormController
 
                 if (!isset($fields)) {
                     // Prepare a fake lead
-                    $fields     = $fieldModel->getFieldList(false, false);
+                    $fields = $fieldModel->getFieldList(false, false);
                     array_walk(
                         $fields,
-                        function (&$field) {
+                        function (&$field): void {
                             $field = "[$field]";
                         }
                     );
