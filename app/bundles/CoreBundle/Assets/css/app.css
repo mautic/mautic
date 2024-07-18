@@ -6630,12 +6630,7 @@ a.inline-token .text-muted {
   inline-size: 100%;
   list-style: none;
 }
-.accordion *,
-.accordion *::before,
-.accordion *::after {
-  box-sizing: inherit;
-}
-.panel {
+.accordion .panel {
   display: list-item;
   border: none;
   border-radius: 0;
@@ -6645,12 +6640,17 @@ a.inline-token .text-muted {
   border-block-start: 1px solid var(--border-subtle);
   transition: border-color cubic-bezier(0.2, 0, 0.38, 0.9) 110ms;
 }
-.panel:last-child {
+.accordion .panel:last-child {
   -webkit-border-after: 1px solid var(--border-subtle);
   border-block-end: 1px solid var(--border-subtle);
 }
-.panel:not(.panel--active):last-child:hover {
+.accordion .panel:not(.panel--active):last-child:hover {
   border-block-end-color: var(--layer-hover);
+}
+.accordion *,
+.accordion *::before,
+.accordion *::after {
+  box-sizing: inherit;
 }
 .accordion-heading {
   box-sizing: border-box;
