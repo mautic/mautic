@@ -27,7 +27,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        Assert::assertSame(1, $formCrawler->count());
+        Assert::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
