@@ -12,17 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Swift_Transport
-     */
-    private $transport;
-
     protected function setUp(): void
     {
         $this->configParams['mailer_spool_type'] = 'file';
-        parent::setUp();
 
-        $this->container->set('swiftmailer.transport.real', $this->transport = $this->createTransportFake());
+        parent::setUp();
     }
 
     public function testSendExampleEmailWithContact(): void
@@ -61,20 +55,16 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertSame(1, $formCrawler->count());
+        self::assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
 
-        self::assertCount(1, $this->transport->messages);
-
-        $message = $this->transport->messages[0];
+        $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
 
         // Asserting email data
-        self::assertInstanceOf('Swift_Message', $message);
-        self::assertSame('admin@yoursite.com', key($message->getTo()));
-        self::assertContains('Email subject', $message->getSubject());
-        self::assertContains('Contact emails is [Email]', $message->getBody());
+        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        Assert::assertStringContainsString('Contact emails is [Email]', $message->getBody()->toString());
     }
 
     private function createEmail(): Email

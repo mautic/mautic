@@ -19,25 +19,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContentPreviewSettingsTypeTest extends TestCase
 {
-    /**
-     * @var ContentPreviewSettingsType
-     */
-    private $form;
+    private ContentPreviewSettingsType $form;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
-     * @var CorePermissions|MockObject
+     * @var CorePermissions&MockObject
      */
-    private $security;
+    private MockObject $security;
 
     /**
-     * @var UserHelper|MockObject
+     * @var UserHelper&MockObject
      */
-    private $userHelperMock;
+    private MockObject $userHelperMock;
 
     protected function setUp(): void
     {
