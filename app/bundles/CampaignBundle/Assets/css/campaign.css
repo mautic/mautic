@@ -186,9 +186,12 @@
     width: 22px;
     height: 22px;
     padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-weight: normal;
     line-height: 20px;
-    transition: var(--all-productive);
+    transition: var(--transition-all-productive);
 }
 
 .campaign-event-buttons .btn:hover {
