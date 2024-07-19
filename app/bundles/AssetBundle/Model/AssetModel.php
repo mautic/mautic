@@ -124,7 +124,7 @@ class AssetModel extends FormModel
             $request = $this->requestStack->getCurrentRequest();
         }
 
-        if (null == $request) {
+        if ($request !instanceof RequestInterface) {
             // likely this download came via a cron (no request), do not bother logging the download.
             // https://github.com/mautic/mautic/issues/13577
             return;
