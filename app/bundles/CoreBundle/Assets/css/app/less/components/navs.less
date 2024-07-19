@@ -47,8 +47,10 @@
   border-top-left-radius: @nav-pills-border-radius;
   //background-color: @body-bg;
   display: flex;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   text-wrap: nowrap;
+  margin-bottom: -1px;
 
   > li {
     > a {
@@ -125,12 +127,6 @@
         > a { background-color: var(--layer); }
       }
     }
-  }
-}
-
-@media (min-width: @screen-lg-min) {
-  .nav-tabs {
-    flex-wrap: nowrap;
   }
 }
 
