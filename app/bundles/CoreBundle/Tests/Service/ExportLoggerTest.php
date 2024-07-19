@@ -8,9 +8,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\ExportLogger;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class ExportLoggerTest extends TestCase
+class ExportLoggerTest extends KernelTestCase
 {
     private CoreParametersHelper $coreParametersHelper;
     private ExportLogger $exportLogger;
@@ -41,8 +41,10 @@ class ExportLoggerTest extends TestCase
 
     public function testLoggerInfo(): void
     {
-        $logFilePath = '/var/www/html/var/logs/exports/exports_prod-'.(new \DateTime())->format('Y-m-d').'.php';
-
+        self::bootKernel();
+        $container   = static::getContainer();
+        $projectDir  = $container->getParameter('kernel.project_dir');
+        $logFilePath = $projectDir.'/var/logs/exports/exports_prod-'.(new \DateTime())->format('Y-m-d').'.php';
         if (file_exists($logFilePath)) {
             unlink($logFilePath);
         }
