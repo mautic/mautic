@@ -92,7 +92,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
                     // Note as cancelled
                     $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
-                        .'" class="fa fa-calendar-times-o text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
+                        .'" class="ri-calendar-close-fill text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
                 }
 
                 if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed']) || !empty($log['fail_reason'])) {
