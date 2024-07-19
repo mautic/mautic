@@ -2,11 +2,29 @@
 // List groups
 // --------------------------------------------------
 
+.list-group {
+  border: 1px solid var(--border-inverse);
+  border-radius: clamp(4px, var(--border-radius-md), 12px);
+  overflow: hidden;
+}
+
 .list-group-item {
+  transition: var(--transition-all-productive);
+  border: 0;
+
   > a {
     position: relative;
     z-index: 1;
     display: block;
+    color: @list-group-link-color;
+  }
+
+  &:hover {
+    background-color: @list-group-hover-bg;
+
+    > a {
+      color: @list-group-link-hover-color;
+    }
   }
 }
 
@@ -37,4 +55,64 @@ label.list-group-item {
     color: @list-group-link-hover-color;
     background-color: @list-group-hover-bg;
   }
+}
+
+.ds-list-group {
+  counter-reset: item;
+  list-style-type: none;
+  padding-inline-start: 35px;
+
+  > li {
+    @list-padding: 10px;
+    counter-increment: item;
+    position: relative;
+    padding: @list-padding 0px;
+
+    &:not(:first-child) {
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    &:before {
+      @marker-size: 16px;
+      position: absolute;
+      background: var(--layer);
+      border-radius: 50%;
+      left: -35px;
+      width: @marker-size;
+      height: @marker-size;
+      text-align: center;
+      line-height: @marker-size;
+      font-size: calc(@marker-size - 5px);
+      color: var(--icon-secondary);
+      transition: var(--all);
+      top: 11.8px;
+      vertical-align: middle;
+    }
+
+    &:hover:before {
+      transform: scale(1.2);
+    }
+  }
+}
+
+.ds-list-alphabet {
+  > li:before {
+    content: counter(item, upper-alpha);
+  }
+}
+
+.ds-list-check {
+  > li:before {
+    content: "\EB7B";
+    font-family: 'remixicon';
+  }
+}
+
+.ds-list-none {
+  padding-inline-start: 0;
+}
+
+.ds-list-bullet {
+  list-style-type: disc;
+  padding-inline-start: 18px;
 }
