@@ -952,6 +952,7 @@ hr,
   margin-bottom: 15px;
   border: 0;
   border-top: 0;
+  width: auto;
 }
 hr.hr-w-2,
 .hr-expand.hr-w-2 {
@@ -1154,11 +1155,7 @@ h6,
   text-transform: uppercase;
 }
 .text-muted {
-  color: #758697;
-}
-a.text-muted:hover,
-a.text-muted:focus {
-  color: #5d6c7c;
+  color: var(--text-secondary);
 }
 .text-white {
   color: #fff;
@@ -1197,11 +1194,7 @@ a.text-white.dark-lg:hover {
   color: #595959;
 }
 .text-primary {
-  color: #4E5D9D;
-}
-a.text-primary:hover,
-a.text-primary:focus {
-  color: #3d497b;
+  color: var(--interactive);
 }
 .text-success {
   color: #00B49C;
@@ -6623,6 +6616,7 @@ a.inline-token .text-muted {
   position: relative;
   display: flex;
   flex-grow: 1;
+  flex-direction: column;
   padding: var(--layout-density-padding-inline-local);
   background-color: var(--layer);
   min-block-size: 4rem;
@@ -6674,6 +6668,10 @@ a.inline-token .text-muted {
 }
 .tile * {
   box-sizing: inherit;
+}
+.tile hr {
+  margin-inline: calc(-1 * var(--layout-density-padding-inline-local));
+  width: auto;
 }
 @media (min-width: 992px) {
   .modal-xl {

@@ -3,6 +3,7 @@
     position: relative;
     display: flex;
     flex-grow: 1;
+    flex-direction: column;
     padding: var(--layout-density-padding-inline-local);
     background-color: var(--layer);
     min-block-size: 4rem;
@@ -57,4 +58,8 @@
     }
 
     * { box-sizing: inherit; }
+    hr { 
+        margin-inline: calc(-1 * var(--layout-density-padding-inline-local) );
+        width: auto;
+    }
 }
