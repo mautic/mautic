@@ -93,7 +93,7 @@ body:has(.dashboard-widgets) { background-color: var(--layer);}
     color: var(--icon-secondary);
     transition: var(--transition-all-productive);
     width: 30px;
-    margin: -14px;
+    margin: -10px;
     text-align: center;
     line-height: 30px;
 }
