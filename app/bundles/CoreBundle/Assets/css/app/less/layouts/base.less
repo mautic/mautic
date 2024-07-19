@@ -10,6 +10,7 @@ body {
 }
 body {
   overflow-y: scroll;
+  cursor: default;
 
   // Wrapper
   > #app-wrapper {
@@ -20,23 +21,6 @@ body {
     height: auto;
     min-height: 100%;
     width: 100%;
-  }
-
-  * { 
-    user-select: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -o-user-select: none;
-  }
-
-  // select control
-  input, textarea, [contenteditable="true"], td, .user-selectable, .user-selectable * {
-    user-select: text;
-    -webkit-user-select: text;
-    -khtml-user-select: text;
-    -moz-user-select: text;
-    -o-user-select: text;
   }
 }
 
