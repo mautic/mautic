@@ -134,7 +134,9 @@
                       </td>
                       <td>
                           {% if fields.core.companyemail is defined %}
-                            {{ fields.core.companyemail.value|purify }}
+                            <div class="text-muted mt-4">
+                                <small>{{ fields.core.companyemail.value|purify }}</small>
+                            </div>
                           {% endif %}
                       </td>
 
