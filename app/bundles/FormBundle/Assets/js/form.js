@@ -5,6 +5,9 @@ Mautic.formOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
 
+    Mautic.toggleThemeSelectorVisibility();
+    mQuery('#mauticform_renderStyle_0, #mauticform_renderStyle_1').on('change', Mautic.toggleThemeSelectorVisibility);
+
     Mautic.formBuilderNewComponentInit();
     Mautic.iniNewConditionalField();
 
@@ -382,3 +385,14 @@ Mautic.selectFormType = function(formType) {
     mQuery('.form-type-modal').remove();
     mQuery('.form-type-modal-backdrop').remove();
 };
+
+/**
+ * Toggles theme selection field visibility
+ */
+Mautic.toggleThemeSelectorVisibility = function () {
+    if (mQuery('#mauticform_renderStyle_0').prop('checked')) {
+        mQuery('#theme-selector').addClass('hide');
+    } else {
+        mQuery('#theme-selector').removeClass('hide');
+    }
+}; 
