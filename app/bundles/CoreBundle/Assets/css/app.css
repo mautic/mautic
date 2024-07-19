@@ -6875,6 +6875,20 @@ ul.media-list.media-list-feed div.media-body {
     opacity: 0;
   }
 }
+/* Webkit-based browsers custom scroll */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 :root {
   --background: #ffffff;
   --background-hover: #8d8d8d1f;
