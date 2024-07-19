@@ -121,8 +121,10 @@
         &:hover { background-color: var(--layer-accent-hover);}
       }
 
-      &.active {
-        > a { background-color: var(--layer); }
+      &.active { > a { background-color: var(--layer); } }
+      &.disabled { 
+        color: var(--text-disabled);
+        > a { background-color: var(--button-disabled); } 
       }
     }
   }

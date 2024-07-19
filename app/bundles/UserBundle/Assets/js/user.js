@@ -31,10 +31,13 @@ Mautic.togglePermissionVisibility = function () {
         if (mQuery('#role_isAdmin_0').prop('checked')) {
             mQuery('#rolePermissions').removeClass('hide');
             mQuery('#isAdminMessage').addClass('hide');
+            mQuery('#permissions-tab').removeClass('disabled');
         } else {
             mQuery('#rolePermissions').addClass('hide');
             mQuery('#isAdminMessage').removeClass('hide');
+            mQuery('#permissions-tab').addClass('disabled');
         }
+        toggleLinkAttributes();
     }, 10);
 };
 

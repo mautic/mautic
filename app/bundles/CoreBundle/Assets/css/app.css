@@ -2791,6 +2791,12 @@ ul.dropdown-menu-form {
 .nav-tabs.nav-tabs-contained > li.active > a {
   background-color: var(--layer);
 }
+.nav-tabs.nav-tabs-contained > li.disabled {
+  color: var(--text-disabled);
+}
+.nav-tabs.nav-tabs-contained > li.disabled > a {
+  background-color: var(--button-disabled);
+}
 @media (min-width: 1200px) {
   .nav-tabs {
     flex-wrap: nowrap;
