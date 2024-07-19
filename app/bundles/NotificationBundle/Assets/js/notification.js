@@ -76,7 +76,7 @@ Mautic.activatePreviewPanelUpdate = function () {
             }
 
             if (name === 'notification[url]') {
-                notificationPreview.find('span').not('.fa-bell').text($this.val());
+                notificationPreview.find('span').not('.ri-notification-3-fill').text($this.val());
             }
         });
     }
