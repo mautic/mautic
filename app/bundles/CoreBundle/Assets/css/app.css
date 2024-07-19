@@ -1338,6 +1338,7 @@ code {
 }
 .btn {
   transition: var(--transition-all-productive);
+  width: fit-content;
 }
 .btn,
 .btn:active {
