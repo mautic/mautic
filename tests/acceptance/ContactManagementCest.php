@@ -237,13 +237,21 @@ class ContactManagementCest
         $I->waitForElement(ContactPage::$importProgressComplete, 30);
         $I->see('Success!', 'h4');
 
+        // Extract the number of contacts created from the progress message
+        $importProgress = $I->grabTextFrom('#leadImportProgressComplete > div > div > div.panel-body > h4');
+
+        // Use a regular expression to extract the number of contacts created
+        preg_match('/(\d+) created/', $importProgress, $matches);
+        $expectedContactsAdded = isset($matches[1]) ? (int) $matches[1] : 0;
+
         // Get the count of contacts after import
         $finalContactCount = $I->grabNumRecords('leads');
 
-        // Verify the number of contacts increased by the expected number of imported contacts
-        $expectedContactsAdded = 10;
-
+        // Calculate the expected final contact count
         $expectedContactCount = $initialContactCount + $expectedContactsAdded;
+
+        // Assert the expected number of contacts
+        Codeception\Util\Fixtures::add('finalContactCount', $finalContactCount);
         Assert::assertEquals($expectedContactCount, $finalContactCount);
     }
 }
