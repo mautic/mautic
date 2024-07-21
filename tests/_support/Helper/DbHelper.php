@@ -3,14 +3,15 @@
 namespace Helper;
 
 use Codeception\Module;
+use Symfony\Component\Process\Process;
 
 class DbHelper extends Module
 {
+    private bool $databasePrepared = false;
+
     public function _beforeSuite($settings = [])
     {
-        $this->runCommand('bin/console d:f:l --no-interaction', 'Loading Doctrine fixtures');
-        $this->runCommand('bin/console m:s:r', 'Building segments');
-
+        $this->prepareDatabase();
         $this->generateSqlDump();
 
         if (!file_exists('tests/_data/dump.sql')) {
@@ -20,20 +21,60 @@ class DbHelper extends Module
         }
     }
 
-    private function runCommand($command, $description)
+    private function prepareDatabase(): void
     {
-        $output    = [];
-        $returnVar = null;
-        exec($command.' 2>&1', $output, $returnVar);
-        if (0 !== $returnVar) {
-            $this->fail("Command '$command' failed with error: ".implode("\n", $output));
+        if ($this->databasePrepared) {
+            return;
+        }
+
+        $this->createDatabase();
+        $this->applyMigrations();
+        $this->installFixtures();
+        $this->databasePrepared = true;
+    }
+
+    private function createDatabase(): void
+    {
+        $this->runCommand('bin/console doctrine:database:drop --if-exists --force', 'Dropping database');
+        $this->runCommand('bin/console doctrine:database:create', 'Creating database');
+        $this->runCommand('bin/console doctrine:schema:create', 'Creating database schema');
+    }
+
+    private function applyMigrations(): void
+    {
+        $this->runCommand('bin/console doctrine:migrations:migrate --no-interaction', 'Applying migrations');
+    }
+
+    private function installFixtures(): void
+    {
+        $this->runCommand('bin/console doctrine:fixtures:load --no-interaction', 'Loading fixtures');
+    }
+
+    private function generateSqlDump(): void
+    {
+        $dsn      = 'mysql:host=db;dbname=db';
+        $user     = 'db';
+        $password = 'db';
+        $command  = sprintf(
+            'mysqldump --opt -h%s -u%s -p%s %s > tests/_data/dump.sql',
+            parse_url($dsn, PHP_URL_HOST),
+            $user,
+            $password,
+            parse_url($dsn, PHP_URL_PATH)
+        );
+
+        $this->runCommand($command, 'Generating SQL dump');
+    }
+
+    private function runCommand($command, $description): void
+    {
+        $process = Process::fromShellCommandline($command);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            $this->fail("$description failed with error: ".$process->getErrorOutput());
         } else {
             $this->debug("$description completed successfully");
         }
-    }
-
-    private function generateSqlDump()
-    {
-        $this->runCommand('mysqldump -u db -h db db > tests/_data/dump.sql', 'Generating SQL dump');
     }
 }
