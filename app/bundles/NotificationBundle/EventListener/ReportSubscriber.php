@@ -284,7 +284,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-paper-plane-o';
+                    $graphData['iconClass'] = 'ri-send-plane-line';
                     $graphData['link']      = 'mautic_mobile_notification_action';
                     $event->setGraph($g, $graphData);
                     break;
