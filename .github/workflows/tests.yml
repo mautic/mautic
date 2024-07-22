@@ -276,17 +276,3 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
-
-      - name: Label PR if title contains 'bug' or 'fix'
-        if: contains(github.event.pull_request.title, 'bug') || contains(github.event.pull_request.title, 'fix')
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: "bug"
-      
-      - name: Apply 'needs triage' label for new PRs
-        if: github.event.action == 'opened'
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: "needs-triage"
