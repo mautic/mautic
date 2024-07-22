@@ -554,6 +554,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->orderBy('companyname')
             ->setMaxResults(50);
 
-        return $q->execute()->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

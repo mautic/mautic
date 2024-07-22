@@ -116,7 +116,7 @@ return [
             ],
             'mautic_form_company_lookup' => [
                 'path'       => '/form/company-lookup/autocomplete',
-                'controller' => 'MauticFormBundle:Public:lookupCompany',
+                'controller' => 'Mautic\FormBundle\Controller\PublicController::lookupCompanyAction',
                 'method'     => 'POST',
             ],
         ],

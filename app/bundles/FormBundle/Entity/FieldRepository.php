@@ -20,7 +20,7 @@ class FieldRepository extends CommonRepository
             ->andWhere('f.form_id = :formId')
             ->setParameter('type', $type)
             ->setParameter('formId', $formId)
-            ->execute()
-            ->fetchColumn();
+            ->executeQuery()
+            ->fetchOne();
     }
 }

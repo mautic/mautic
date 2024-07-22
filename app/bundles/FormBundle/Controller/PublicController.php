@@ -417,7 +417,7 @@ class PublicController extends CommonFormController
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
     }
 
-    public function lookupCompanyAction(Request $request): JsonResponse
+    public function lookupCompanyAction(Request $request, FieldModel $fieldModel, CompanyModel $companyModel): JsonResponse
     {
         $parameters = json_decode($request->getContent(), true);
         $search     = InputHelper::clean($parameters['search'] ?? '');
@@ -431,15 +431,9 @@ class PublicController extends CommonFormController
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getModel('form.field');
-
         if (!$fieldModel->getRepository()->fieldExistsByFormAndType($formId, 'companyLookup')) {
             return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
         }
-
-        /** @var CompanyModel $companyModel */
-        $companyModel = $this->getModel('lead.company');
 
         return new JsonResponse($companyModel->getRepository()->getCompanyLookupData($search));
     }
