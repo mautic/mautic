@@ -263,7 +263,7 @@ jobs:
         SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
 
 
-  label:
+  labeler:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -272,7 +272,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Labeler
-        uses: actions/labeler@v4
+        uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
