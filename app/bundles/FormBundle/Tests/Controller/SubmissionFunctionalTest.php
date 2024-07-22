@@ -605,12 +605,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->setUpSymfony(
-            [
-                'api_enabled'           => true,
-                'api_enable_basic_auth' => true,
-            ]
-        );
+        $this->setUpSymfony($this->configParams);
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$form->getId()}/delete");
