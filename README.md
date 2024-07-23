@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://codecov.io/gh/mautic/mautic"><img alt="Codecov" src="https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg"></a>
+  <a href="https://codecov.io/gh/mautic/mautic"><img alt="Codecov" src="https://codecov.io/gh/mautic/mautic/branch/5.x/graph/badge.svg"></a>
   <a href="#contributors-#contributors-"><img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-141-orange.svg?style=flat-square"></a>
 </p>
 <br/>
