@@ -441,11 +441,9 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, Request $request, string $objectId, string $objectType = null)
+    public function previewAction(AnalyticsHelper $analyticsHelper, Request $request, string $objectId, string $objectType = null, EmailModel $model)
     {
-        $contactId = (int) $request->query->get('contactId');
-        /** @var EmailModel $model */
-        $model       = $this->getModel('email');
+        $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
 
         if (null === $emailEntity) {
@@ -515,9 +513,7 @@ class PublicController extends CommonFormController
             // We have one from request parameter
             /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead.lead');
-            /** @var Lead $contact */
-            $contact = $leadModel->getEntity($contactId);
-            $contact = $contact->convertToArray();
+            $contact   = $leadModel->getRepository()->getLead($contactId);
         } else {
             // Generate faked one
             /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */

@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-140-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-141-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -245,6 +245,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/luk4s"><img src="https://avatars.githubusercontent.com/u/635997?v=4?s=100" width="100px;" alt="Lukas Pokorny"/><br /><sub><b>Lukas Pokorny</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=luk4s" title="Documentation">📖</a> <a href="https://github.com/mautic/mautic/commits?author=luk4s" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Oluwatos94"><img src="https://avatars.githubusercontent.com/u/111003311?v=4?s=100" width="100px;" alt="Tosin Akinbowa"/><br /><sub><b>Tosin Akinbowa</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Oluwatos94" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nishant-s7"><img src="https://avatars.githubusercontent.com/u/97207366?v=4?s=100" width="100px;" alt="nishant-s7"/><br /><sub><b>nishant-s7</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nishant-s7" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://matbcvo.github.io"><img src="https://avatars.githubusercontent.com/u/1006437?v=4?s=100" width="100px;" alt="Martin Vooremäe"/><br /><sub><b>Martin Vooremäe</b></sub></a><br /><a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Amatbcvo" title="Reviewed Pull Requests">👀</a> <a href="#userTesting-matbcvo" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>
