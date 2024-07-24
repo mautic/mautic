@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class TimelineControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+    private const SALES_USER = 'sales';
 
     public function testIndexActionsIsSuccessful(): void
     {
@@ -46,7 +47,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    public function testBatchExportAction(): void
+    public function testBatchExportActionAsAdmin(): void
     {
         $contact = $this->createLead('TestFirstName');
         $this->em->persist($contact);
@@ -57,5 +58,19 @@ final class TimelineControllerTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testBatchExportActionAsUserNotPermission(): void
+    {
+        $contact = $this->createLead('TestFirstName');
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $this->loginUser(self::SALES_USER);
+        $this->client->setServerParameter('PHP_AUTH_USER', self::SALES_USER);
+        $this->client->request('GET', '/s/contacts/timeline/batchExport/'.$contact->getId());
+
+        $response = $this->client->getResponse();
+        $this->assertEquals(403, $response->getStatusCode());
     }
 }
