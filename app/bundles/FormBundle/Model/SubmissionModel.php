@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
-use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -412,9 +411,11 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * @return StreamedResponse|Response
+     *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs, bool $notAnonymize = true): StreamedResponse|Response
+    public function exportResults($format, $form, $queryArgs)
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -427,7 +428,7 @@ class SubmissionModel extends CommonFormModel
         switch ($format) {
             case 'csv':
                 $response = new StreamedResponse(
-                    function () use ($results, $form, $viewOnlyFields, $notAnonymize): void {
+                    function () use ($results, $form, $viewOnlyFields): void {
                         $handle = fopen('php://output', 'r+');
 
                         // build the header row
@@ -438,7 +439,7 @@ class SubmissionModel extends CommonFormModel
 
                         // build the data rows
                         foreach ($results as $k => $s) {
-                            $row = $this->getExportRow($s, $viewOnlyFields, $notAnonymize);
+                            $row = $this->getExportRow($s, $viewOnlyFields);
                             $this->putCsvExportRow($handle, $row);
 
                             // free memory
@@ -456,21 +457,6 @@ class SubmissionModel extends CommonFormModel
 
                 return $response;
             case 'html':
-                if (!$notAnonymize) {
-                    foreach ($results as $k => $s) {
-                        $anonimEmail = null;
-                        $email       = $s['email'] ?? null;
-                        if ($email) {
-                            $pos         = strpos($email, '@');
-                            $anonimEmail = '*'.substr($email, $pos);
-                        }
-                        $results[$k]['ipAddress'] = '*';
-                        foreach ($s['results'] as $k2 => $r) {
-                            $results[$k]['results'][$k2]['value'] = AbstractFormFieldHelper::anonimizationFields($k2, $r['value'], $email, $anonimEmail);
-                        }
-                    }
-                }
-
                 $content = $this->twig->render(
                     '@MauticForm/Result/export.html.twig',
                     [
@@ -485,7 +471,7 @@ class SubmissionModel extends CommonFormModel
             case 'xlsx':
                 if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
-                        function () use ($results, $form, $name, $viewOnlyFields, $notAnonymize): void {
+                        function () use ($results, $form, $name, $viewOnlyFields): void {
                             $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
@@ -500,7 +486,7 @@ class SubmissionModel extends CommonFormModel
                             // build the data rows
                             $count = 2;
                             foreach ($results as $k => $s) {
-                                $row = $this->getExportRow($s, $viewOnlyFields, $notAnonymize);
+                                $row = $this->getExportRow($s, $viewOnlyFields);
 
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
@@ -682,20 +668,13 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    private function getExportRow(array $values, array $viewOnlyFields = [], bool $notAnonymize = true): array
+    private function getExportRow(array $values, array $viewOnlyFields = []): array
     {
-        $anonimEmail = null;
-        $email       = $values['email'] ?? null;
-        if ($email) {
-            $pos         = strpos($email, '@');
-            $anonimEmail = '*'.substr($email, $pos);
-        }
-
         $row = [
             $values['id'],
             $values['leadId'],
             $this->dateHelper->toFull($values['dateSubmitted'], 'UTC'),
-            !$notAnonymize ? '*' : $values['ipAddress'],
+            $values['ipAddress'],
             $values['referer'],
         ];
 
@@ -704,12 +683,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            if (!$notAnonymize) {
-                $row[] = AbstractFormFieldHelper::anonimizationFields($k2, $r['value'], $email, $anonimEmail);
-            } else {
-                $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
-            }
-
+            $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
             // free memory
             unset($values['results'][$k2]);
         }

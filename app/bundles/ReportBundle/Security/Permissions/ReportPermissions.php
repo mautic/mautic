@@ -11,7 +11,7 @@ class ReportPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->addExtendedPermissions('reports');
-        $this->addCustomPermission('export', ['enable' => 1024, 'notAnonymize' => 2]);
+        $this->addCustomPermission('export', ['enable' => 1024]);
     }
 
     public function getName(): string
@@ -27,10 +27,7 @@ class ReportPermissions extends AbstractPermissions
             'export',
             $builder,
             'mautic.core.permissions.export',
-            [
-                'mautic.core.permissions.enable'       => 'enable',
-                'mautic.core.permissions.notAnonymize' => 'notAnonymize',
-            ],
+            ['mautic.core.permissions.enable' => 'enable'],
             $data
         );
     }

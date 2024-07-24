@@ -11,19 +11,25 @@ trait CustomFieldEntityTrait
 {
     /**
      * Used by Mautic to populate the fields pulled from the DB.
+     *
+     * @var array
      */
-    protected array $fields = [];
+    protected $fields = [];
 
     /**
      * Just a place to store updated field values so we don't have to loop through them again comparing.
+     *
+     * @var array
      */
-    protected array $updatedFields = [];
+    protected $updatedFields = [];
 
     /**
      * A place events can use to pass data around on the object to prevent issues like creating a contact and having it processed to be sent back
      * to the origin of creation in a webhook.
+     *
+     * @var array
      */
-    protected array $eventData = [];
+    protected $eventData = [];
 
     /**
      * @return bool
@@ -235,25 +241,6 @@ trait CustomFieldEntityTrait
         } else {
             // The fields are already flattened
 
-            return $this->fields;
-        }
-    }
-
-    /**
-     * Get anonymization profile values.
-     *
-     * @return array<string,string>
-     */
-    public function getAnonymizationProfileFields(): array
-    {
-        if (isset($this->fields['core'])) {
-            $fieldValues = [
-                'id' => $this->id,
-            ];
-            $fieldValues += CustomFieldValueHelper::anonymizationFields($this->fields);
-
-            return array_merge($fieldValues, $this->updatedFields);
-        } else {
             return $this->fields;
         }
     }

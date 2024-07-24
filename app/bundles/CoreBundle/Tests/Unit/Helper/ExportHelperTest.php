@@ -147,7 +147,7 @@ class ExportHelperTest extends TestCase
         $stage->setName('Stage 3');
         $lead->setStage($stage);
 
-        $result   = $this->exportHelper->parseLeadToExport($lead, true);
+        $result   = $this->exportHelper->parseLeadToExport($lead);
         $expected = $leadFieldsData + ['stage' => 'Stage 3'];
         $this->assertEquals($expected, $result);
     }

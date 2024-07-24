@@ -32,7 +32,7 @@ class LeadPermissions extends AbstractPermissions
         $this->addExtendedPermissions('leads', false);
         $this->addExtendedPermissions('lists', false);
         $this->addStandardPermissions('imports');
-        $this->addCustomPermission('export', ['enable' => 1024, 'notAnonymize' => 2]);
+        $this->addCustomPermission('export', ['enable' => 1024]);
     }
 
     public function getName(): string
@@ -66,10 +66,7 @@ class LeadPermissions extends AbstractPermissions
             'export',
             $builder,
             'mautic.core.permissions.export',
-            [
-                'mautic.core.permissions.enable'       => 'enable',
-                'mautic.core.permissions.notAnonymize' => 'notAnonymize',
-            ],
+            ['mautic.core.permissions.enable' => 'enable'],
             $data
         );
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
