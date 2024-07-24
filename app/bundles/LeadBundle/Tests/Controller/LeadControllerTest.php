@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -949,20 +950,22 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
         Assert::assertStringContainsString('1 contact affected', $clientResponse->getContent());
 
-        /** @var DoNotContactRepository $dncRepository */
         $dncRepository = $this->em->getRepository(DoNotContact::class);
+        \assert($dncRepository instanceof DoNotContactRepository);
 
-        /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
+        \assert($contactRepository instanceof LeadRepository);
 
-        /** @var DoNotContact $dnc */
         $dnc = $dncRepository->findOneBy(['lead' => $contact]);
+        \assert($dnc instanceof DoNotContact);
 
-        /** @var Lead $fetchedContact */
         $fetchedContact = $contactRepository->find($contact->getId());
+        \assert($fetchedContact instanceof Lead);
 
         // Ensure the DNC recored was created.
-        Assert::assertSame('Test Reason', $dnc->getReason());
+        Assert::assertSame(DoNotContact::MANUAL, $dnc->getReason());
+        Assert::assertSame('Test Reason', $dnc->getComments());
+        Assert::assertSame($contact->getId(), $dnc->getLead()->getId());
 
         // Ensure the dateModified is still empty. Meaning the lead record was not updated which is correct.
         Assert::assertNull($fetchedContact->getDateModified());

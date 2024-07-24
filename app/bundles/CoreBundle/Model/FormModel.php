@@ -226,7 +226,7 @@ class FormModel extends AbstractCommonModel
      */
     public function setTimestamps(&$entity, $isNew, $unlock = true): void
     {
-        //unlock the row if applicable
+        // unlock the row if applicable
         if ($unlock && method_exists($entity, 'setCheckedOut')) {
             $entity->setCheckedOut(null);
             $entity->setCheckedOutBy(null);
