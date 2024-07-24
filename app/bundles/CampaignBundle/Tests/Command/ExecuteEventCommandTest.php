@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use DateTime;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
