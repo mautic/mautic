@@ -21,7 +21,8 @@
   &.pa-10 { min-width: auto; }
 
   // Add hover effects, but only for links
-  a& {
+  a&, > a {
+    color: inherit;
   &:hover,
   &:focus {
     text-decoration: none;
@@ -124,7 +125,7 @@
 
 // Interactive
 
-a.label, .label:has(> a) {
+.label[href], .label:has(> a) {
   border: 1px solid #00000017;
   &.label-gray { 
     border: 1px solid var(--label-border-gray);
@@ -194,24 +195,21 @@ a.label, .label:has(> a) {
 }
 
 .label-success {
-  .label-variant(@label-success-bg);
+  background-color: var(--support-success);
+  color: var(--text-inverse);
 }
 
 .label-info {
-  .label-variant(@label-info-bg);
+  background-color: var(--support-info);
+  color: var(--text-inverse);
 }
 
 .label-warning {
-  .label-variant(@label-warning-bg);
+  background-color: var(--support-warning);
+  color: #161616;
 }
 
 .label-danger {
-  .label-variant(@label-danger-bg);
-}
-
-.label-success,
-.label-info,
-.label-warning,
-.label-danger {
-  color: var(--text-on-color);
+  background-color: var(--support-error);
+  color: var(--text-inverse);
 }

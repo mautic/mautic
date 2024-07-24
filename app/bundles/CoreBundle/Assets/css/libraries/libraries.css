@@ -17478,12 +17478,13 @@ a > .fa {
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-  background-color: var(--label-background-warm-gray);
+  background-color: transparent;
+  outline: 1px solid var(--background-inverse);
   border-top-left-radius: 100px;
   border-top-right-radius: 100px;
   border-bottom-right-radius: 100px;
   border-bottom-left-radius: 100px;
-  color: var(--label-color-warm-gray);
+  color: var(--text-primary);
   cursor: default;
   line-height: 16px;
   margin: 6px 0 3px 5px;
@@ -17497,7 +17498,7 @@ a > .fa {
   width: 12px;
   cursor: pointer;
   line-height: 10px;
-  color: var(--label-color-warm-gray);
+  color: var(--text-primary);
 }
 .chosen-container-multi .chosen-choices .search-choice .search-choice-close::before {
   content: "\eb98";
