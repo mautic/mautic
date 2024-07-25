@@ -2880,8 +2880,9 @@ ul.dropdown-menu-form {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.label.pa-10 {
+.label.label-category {
   min-width: auto;
+  aspect-ratio: 1/1;
 }
 a.label,
 .label > a {

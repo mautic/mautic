@@ -151,11 +151,11 @@
                                 {% endfor %}
                                 {% if item['config']['features'] is defined and item['config']['features'] is not empty %}
                                     {% for feature in item['config']['features'] %}
-                                        <span style="white-space: nowrap;">
-                                            <span class="label label-gray pa-10">
+                                        <div class="d-flex ai-center gap-xs">
+                                            <span class="label label-gray label-category">
                                                 {{ ('mautic.core.theme.feature.' ~ feature|e)|trans }}
                                             </span>
-                                        </span>
+                                        </div>
                                     {% endfor %}
                                 {% endif %}
                             </td>
