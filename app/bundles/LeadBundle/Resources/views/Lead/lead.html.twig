@@ -261,7 +261,7 @@
             <ul class="nav nav-tabs nav-tabs-contained mt-10">
                 <li class="active">
                     <a href="#timeline-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="TimelineCount">
+                        <span size="sm" class="label label-primary mr-sm" id="TimelineCount">
                             {{ events.total }}
                         </span>
                         {{ 'mautic.lead.lead.tab.history'|trans }}
@@ -269,7 +269,7 @@
                 </li>
                 <li class="">
                     <a href="#notes-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="NoteCount">
+                        <span size="sm" class="label label-primary mr-sm" id="NoteCount">
                             {{ noteCount }}
                         </span>
                         {{ 'mautic.lead.lead.tab.notes'|trans }}
@@ -278,7 +278,7 @@
                 {% if not isAnonymous and socialProfiles is not empty %}
                     <li class="">
                         <a href="#social-container" role="tab" data-toggle="tab">
-                        <span class="label label-primary mr-sm" id="SocialCount">
+                        <span size="sm" class="label label-primary mr-sm" id="SocialCount">
                             {{ socialProfiles|length }}
                         </span>
                             {{ 'mautic.lead.lead.tab.social'|trans }}
@@ -287,7 +287,7 @@
                 {% endif %}
                 <li class="">
                     <a href="#integration-container" role="tab" data-toggle="tab">
-                    <span class="label label-primary mr-sm" id="IntegrationCount">
+                    <span size="sm" class="label label-primary mr-sm" id="IntegrationCount">
                         {{ integrations|length }}
                     </span>
                         {{ 'mautic.lead.lead.tab.integration'|trans }}
@@ -295,7 +295,7 @@
                 </li>
                 <li class="">
                     <a href="#auditlog-container" role="tab" data-toggle="tab">
-                    <span class="label label-primary mr-sm" id="AuditLogCount">
+                    <span size="sm" class="label label-primary mr-sm" id="AuditLogCount">
                         {{ auditlog.total }}
                     </span>
                         {{ 'mautic.lead.lead.tab.auditlog'|trans }}
@@ -304,7 +304,7 @@
                 {% if places %}
                     <li class="">
                         <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
-                        <span class="label label-primary mr-sm" id="PlaceCount">
+                        <span size="sm" class="label label-primary mr-sm" id="PlaceCount">
                             {{ places|length }}
                         </span>
                             {{ 'mautic.lead.lead.tab.places'|trans }}
@@ -513,11 +513,11 @@
             {% for tag in lead.tags %}
                 <div id="tagLabel{{ tag.id }}">
                     <h5 class="pull-left mt-xs mr-xs">
-                        <span class="label label-success label-tag">
-                            <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax" style="color: white;">
+                        <span class="label label-blue">
+                            <a href="{{ path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}) }}" data-toggle="ajax">
                                 {{ tag.tag|purify }}
                             </a>
-                            <i class="ri-close-line has-click-event" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
+                            <i class="ri-close-line" onclick="Mautic.removeTagFromLead(this, {{ lead.id }}, {{ tag.id }});"></i>
                         </span>
                     </h5>
                 </div>
