@@ -144,20 +144,22 @@
                                 </div>
                             </td>
                             <td class="visible-md visible-lg {{ visibilityCss }}">
+                                <div class="d-flex ai-center gap-xs">
                                     {% for builder in item['config']['builder'] %}
                                     <span style="white-space: nowrap;">
-                                        <span class="label label-primary pa-4">{{ builder }}</span>
+                                        <span class="label label-primary">{{ builder }}</span>
                                     </span>
                                 {% endfor %}
                                 {% if item['config']['features'] is defined and item['config']['features'] is not empty %}
                                     {% for feature in item['config']['features'] %}
-                                        <div class="d-flex ai-center gap-xs">
-                                            <span class="label label-gray label-category">
+                                        
+                                            <span class="label label-gray">
                                                 {{ ('mautic.core.theme.feature.' ~ feature|e)|trans }}
                                             </span>
-                                        </div>
+                                        
                                     {% endfor %}
                                 {% endif %}
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}

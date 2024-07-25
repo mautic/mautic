@@ -114,7 +114,7 @@
                     {{ item.getDescription()|purify }}
                 </td>
                 <td class="visible-md visible-lg">
-                    <a class="label label-primary" href="{{ path('mautic_user_index',
+                    <a size="sm" class="label label-gray" href="{{ path('mautic_user_index',
                         {'search' : ('mautic.user.user.searchcommand.role'|trans) ~ ':&quot;' ~ item.getName() ~ '&quot;'}) }}" data-toggle="ajax"{{ userCounts[item.getId()] == 0 ? 'disabled=disabled' : '' }}>
                         {{ 'mautic.user.role.list.viewusers_count'|trans(
                             {'%count%' : userCounts[item.getId()]}
