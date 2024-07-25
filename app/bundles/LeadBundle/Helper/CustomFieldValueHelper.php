@@ -121,9 +121,15 @@ class CustomFieldValueHelper
      */
     public static function anonymizationFields(array $fields): array
     {
-        $email       = $fields['core']['email']['value'] ?? null;
-        $pos         = strpos($email, '@');
-        $anonimEmail = '*'.substr($email, $pos);
+        $email = $fields['core']['email']['value'] ?? null;
+
+        if ($email) {
+            $pos         = strpos($email, '@');
+            $anonimEmail = '*'.substr($email, $pos);
+        } else {
+            $anonimEmail = null;
+        }
+
         $fieldValues = [];
 
         foreach ($fields as $group => $fields) {

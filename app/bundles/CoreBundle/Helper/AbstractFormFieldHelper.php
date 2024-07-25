@@ -267,14 +267,14 @@ abstract class AbstractFormFieldHelper
 
     public static function anonimizationFields(string $fieldName, ?string $fieldValue, ?string $email, ?string $anonimEmail): ?string
     {
-        if ('first_name' === $fieldName || 'last_name' === $fieldName || 'userip' === $fieldName) {
-            $results = '*';
-        } elseif ($email && str_contains($fieldValue, $email)) {
-            $results = str_replace($email, $anonimEmail, $fieldValue);
-        } else {
-            $results = htmlspecialchars_decode($fieldValue, ENT_QUOTES);
+        if (in_array($fieldName, ['first_name', 'last_name', 'userip'])) {
+            return '*';
         }
 
-        return $results;
+        if ($email && $fieldValue && str_contains($fieldValue, $email)) {
+            return str_replace($email, $anonimEmail, $fieldValue);
+        }
+
+        return htmlspecialchars_decode($fieldValue, ENT_QUOTES);
     }
 }
