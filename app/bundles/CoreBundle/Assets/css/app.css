@@ -2980,6 +2980,7 @@ a.label:focus,
 .label[href].label-gray,
 .label:has(> a).label-gray {
   border: 1px solid var(--label-border-gray);
+  color: var(--label-color-gray);
 }
 .label[href].label-gray:hover,
 .label:has(> a).label-gray:hover {
@@ -2988,6 +2989,7 @@ a.label:focus,
 .label[href].label-cool-gray,
 .label:has(> a).label-cool-gray {
   border: 1px solid var(--label-border-cool-gray);
+  color: var(--label-color-cool-gray);
 }
 .label[href].label-cool-gray:hover,
 .label:has(> a).label-cool-gray:hover {
@@ -2996,6 +2998,7 @@ a.label:focus,
 .label[href].label-warm-gray,
 .label:has(> a).label-warm-gray {
   border: 1px solid var(--label-border-warm-gray);
+  color: var(--label-color-warm-gray);
 }
 .label[href].label-warm-gray:hover,
 .label:has(> a).label-warm-gray:hover {
@@ -3004,6 +3007,7 @@ a.label:focus,
 .label[href].label-red,
 .label:has(> a).label-red {
   border: 1px solid var(--label-border-red);
+  color: var(--label-color-red);
 }
 .label[href].label-red:hover,
 .label:has(> a).label-red:hover {
@@ -3012,6 +3016,7 @@ a.label:focus,
 .label[href].label-magenta,
 .label:has(> a).label-magenta {
   border: 1px solid var(--label-border-magenta);
+  color: var(--label-color-magenta);
 }
 .label[href].label-magenta:hover,
 .label:has(> a).label-magenta:hover {
@@ -3020,6 +3025,7 @@ a.label:focus,
 .label[href].label-purple,
 .label:has(> a).label-purple {
   border: 1px solid var(--label-border-purple);
+  color: var(--label-color-purple);
 }
 .label[href].label-purple:hover,
 .label:has(> a).label-purple:hover {
@@ -3028,6 +3034,7 @@ a.label:focus,
 .label[href].label-blue,
 .label:has(> a).label-blue {
   border: 1px solid var(--label-border-blue);
+  color: var(--label-color-blue);
 }
 .label[href].label-blue:hover,
 .label:has(> a).label-blue:hover {
@@ -3036,6 +3043,7 @@ a.label:focus,
 .label[href].label-cyan,
 .label:has(> a).label-cyan {
   border: 1px solid var(--label-border-cyan);
+  color: var(--label-color-cyan);
 }
 .label[href].label-cyan:hover,
 .label:has(> a).label-cyan:hover {
@@ -3044,6 +3052,7 @@ a.label:focus,
 .label[href].label-teal,
 .label:has(> a).label-teal {
   border: 1px solid var(--label-border-teal);
+  color: var(--label-color-teal);
 }
 .label[href].label-teal:hover,
 .label:has(> a).label-teal:hover {
@@ -3052,6 +3061,7 @@ a.label:focus,
 .label[href].label-green,
 .label:has(> a).label-green {
   border: 1px solid var(--label-border-green);
+  color: var(--label-color-green);
 }
 .label[href].label-green:hover,
 .label:has(> a).label-green:hover {
@@ -3060,6 +3070,7 @@ a.label:focus,
 .label[href].label-primary,
 .label:has(> a).label-primary {
   border: 1px solid var(--label-border-brand-primary);
+  color: var(--label-color-brand-primary);
 }
 .label[href].label-primary:hover,
 .label:has(> a).label-primary:hover {
@@ -3068,6 +3079,7 @@ a.label:focus,
 .label[href].label-secondary,
 .label:has(> a).label-secondary {
   border: 1px solid var(--label-border-brand-secondary);
+  color: var(--label-color-brand-secondary);
 }
 .label[href].label-secondary:hover,
 .label:has(> a).label-secondary:hover {
