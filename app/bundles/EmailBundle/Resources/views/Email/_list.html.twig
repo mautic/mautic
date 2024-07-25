@@ -171,12 +171,11 @@
                             <i class="ri-mail-open-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
                              data-toggle="tooltip"
                              title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.readcount'|trans ({'%count%' : item.getReadCount(true)}) }}</a>
+                             <span id="read-percent-{{ item.getId() }}">
+                                ({{ item.getReadPercentage(true) }}%)
+                            </span>
                         </span>
-                        <span class="mt-xs label label-green" id="read-percent-{{ item.getId() }}">
-                            <i class="ri-eye-line"></i><a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
-                             data-toggle="tooltip"
-                             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.readpercent'|trans ({'%count%' : item.getReadPercentage(true)}) }}</a>
-                        </span>
+                        
                         {{ customContent('email.stats', mauticTemplateVars) }}
                         {{ customContent('email.stats.below', mauticTemplateVars) }}
                     </td>
