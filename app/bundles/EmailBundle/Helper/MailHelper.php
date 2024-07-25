@@ -535,7 +535,7 @@ class MailHelper
                     if (!empty($contact['leadId'])) {
                         $this->queueAssetDownloadEntry($email, $contact);
                     }
-                    $this->message->to(new Address($email, $contact['name'] ?? ''));
+                    $this->message->addTo(new Address($email, $contact['name'] ?? ''));
                 }
 
                 $flushed = $this->send(false, true);
