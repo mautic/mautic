@@ -55,14 +55,14 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $email = $this->getMailerMessagesByToAddress('john@doe.email')[0]->getBody()->toString();
+        $message = $this->getMailerMessagesByToAddress('john@doe.email')[0];
+        $email   = $message->getBody()->toString();
         Assert::assertStringContainsString('Hey John...', $email);
-        Assert::assertStringContainsString('Subject: Some interesting subject for John', $email);
+        Assert::assertStringContainsString('<title>Some interesting subject for John</title>', $email);
+        Assert::assertStringContainsString('Some interesting subject for John', $message->getSubject());
         Assert::assertStringContainsString('preheader text', $email);
-        Assert::assertStringContainsString('From: Admin <admin@test-beta.mautibot.com>', $email);
+        Assert::assertStringContainsString('admin@test-beta.mautibot.com', $message->getFrom()[0]->getAddress());
+        Assert::assertStringContainsString('Admin', $message->getFrom()[0]->getName());
         Assert::assertStringNotContainsString('This should be overwritten by the form content', $email);
-        Assert::assertStringNotContainsString('Subject: Subject to overwrite', $email);
-        Assert::assertStringNotContainsString('overwrite@address.com', $email);
-        Assert::assertStringNotContainsString('Overwrite Name', $email);
     }
 }
