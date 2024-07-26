@@ -1382,6 +1382,7 @@ code {
 .btn:active,
 .btn.active {
   box-shadow: none;
+  outline: 2px solid transparent;
 }
 .btn:focus,
 .btn:active:focus,
@@ -1389,6 +1390,10 @@ code {
 .btn.focus,
 .btn:active.focus,
 .btn.active.focus {
+  outline-width: 2px;
+  outline-style: solid;
+}
+.btn:hover {
   outline: 2px solid transparent;
 }
 .btn span {
@@ -1447,6 +1452,9 @@ code {
 }
 .btn.btn-outline.btn-info {
   color: #35B4B9;
+}
+.open > a {
+  outline: 2px solid transparent;
 }
 .btn-primary,
 .btn-primary + .dropdown-toggle {

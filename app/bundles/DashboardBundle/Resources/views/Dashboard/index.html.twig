@@ -69,16 +69,16 @@
         <div class="d-flex fd-row fw-nowrap gap-sm ai-center jc-space-between">
             {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
             <div class="dropdown">
-                <a href="#" class="dropdown-toggle btn btn-ghost btn-small btn-nospin" data-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="btn btn-ghost btn-small btn-nospin" data-toggle="dropdown" aria-expanded="false">
                     {{ 'mautic.dashboard.quick_filters'|trans }}
                     <i class="ri-arrow-down-s-line"></i>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a onclick="setDateRange('today')">{{ 'mautic.dashboard.date.today'|trans }}</a></li>
-                    <li><a onclick="setDateRange('yesterday')">{{ 'mautic.dashboard.date.yesterday'|trans }}</a></li>
-                    <li><a onclick="setDateRange(7)">{{ 'mautic.dashboard.date.last_7_days'|trans }}</a></li>
-                    <li><a onclick="setDateRange(30)">{{ 'mautic.dashboard.date.last_30_days'|trans }}</a></li>
-                    <li><a onclick="setDateRange(90)">{{ 'mautic.dashboard.date.last_90_days'|trans }}</a></li>
+                    <li><a href="#" onclick="setDateRange('today')">{{ 'mautic.dashboard.date.today'|trans }}</a></li>
+                    <li><a href="#" onclick="setDateRange('yesterday')">{{ 'mautic.dashboard.date.yesterday'|trans }}</a></li>
+                    <li><a href="#" onclick="setDateRange(7)">{{ 'mautic.dashboard.date.last_7_days'|trans }}</a></li>
+                    <li><a href="#" onclick="setDateRange(30)">{{ 'mautic.dashboard.date.last_30_days'|trans }}</a></li>
+                    <li><a href="#" onclick="setDateRange(90)">{{ 'mautic.dashboard.date.last_90_days'|trans }}</a></li>
                 </ul>
             </div>            
         </div>

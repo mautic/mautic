@@ -26,11 +26,14 @@
   &:active,
   &.active {
     box-shadow: none;
+    outline: 2px solid transparent;
     &:focus,
     &.focus {
-      outline: 2px solid transparent;
+      outline-width: 2px;
+      outline-style: solid;
     }
   }
+  &:hover {outline: 2px solid transparent;}
 
   span {
     display: flex;
@@ -90,7 +93,7 @@
     &.btn-info { color: @brand-info; }
   }
 }
-
+.open > a {outline: 2px solid transparent;}
 
 // Hierarchycal buttons
 // ---------------------------------
