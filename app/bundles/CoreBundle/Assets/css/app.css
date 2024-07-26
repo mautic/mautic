@@ -1364,6 +1364,8 @@ code {
 .btn {
   transition: var(--transition-all-productive);
   border: 1px solid var(--border-no-color);
+  outline: 2px solid transparent;
+  outline-offset: -2px;
   border-radius: var(--border-radius-sm);
   display: inline-flex;
   align-items: flex-start;
@@ -1379,8 +1381,15 @@ code {
 .btn,
 .btn:active,
 .btn.active {
-  outline: 0;
   box-shadow: none;
+}
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+  outline: 2px solid transparent;
 }
 .btn span {
   display: flex;
@@ -1458,7 +1467,7 @@ code {
 }
 .btn-primary:focus,
 .btn-primary + .dropdown-toggle:focus {
-  border-color: var(--focus);
+  outline-color: var(--focus);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
 }
 .btn-primary:disabled,
@@ -1485,7 +1494,7 @@ code {
 }
 .btn-primary.btn-danger:focus,
 .btn-primary + .dropdown-toggle.btn-danger:focus {
-  border-color: var(--focus);
+  outline-color: var(--focus);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
 }
 .btn-primary.btn-danger:disabled,
@@ -1511,7 +1520,7 @@ code {
   background-color: var(--button-secondary-active);
 }
 .btn-secondary:focus {
-  border-color: var(--focus);
+  outline-color: var(--focus);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
 }
 .btn-secondary:disabled {
@@ -1571,7 +1580,7 @@ code {
 .btn-primary + .btn-primary + .btn-primary:focus,
 .btn-primary + .btn-primary + .btn-secondary:focus {
   background-color: var(--button-tertiary-hover);
-  border-color: var(--focus);
+  outline-color: var(--focus);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
 }
 .btn-tertiary:focus i,
@@ -1640,7 +1649,7 @@ code {
 .btn-primary + .btn-primary:not(.dropdown-toggle).btn-danger:focus,
 .btn-primary + .btn-primary + .btn-primary.btn-danger:focus,
 .btn-primary + .btn-primary + .btn-secondary.btn-danger:focus {
-  border-color: var(--focus);
+  outline-color: var(--focus);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
 }
 .btn-tertiary.btn-danger:disabled,
@@ -1707,7 +1716,7 @@ code {
   background-color: var(--background-active);
 }
 .btn-ghost:focus {
-  border-color: var(--focus);
+  outline-color: var(--focus);
 }
 .btn-ghost:disabled {
   color: var(--text-disabled);
@@ -1740,7 +1749,7 @@ code {
   color: var(--icon-inverse);
 }
 .btn-ghost.btn-danger:focus {
-  border-color: var(--focus);
+  outline-color: var(--focus);
   box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background, #ffffff);
 }
 .btn-ghost.btn-danger:disabled {
@@ -1764,7 +1773,7 @@ code {
   background-color: var(--background-active);
 }
 .btn-ghost.btn-icon:focus {
-  border-color: var(--focus);
+  outline-color: var(--focus);
 }
 .btn-ghost.btn-icon:selected {
   background-color: var(--background-selected);
