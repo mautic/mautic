@@ -26,6 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\MailboxListHeader;
+use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -1075,6 +1076,7 @@ class MailHelperTest extends TestCase
 
         // We should use a local image to avoid network requests.
         $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.svg';
+        $sampleImage     = \file_get_contents($sampleImagePath);
 
         $mailer->setIdHash('IDHASH');
         $email->setSubject('Test');
@@ -1096,7 +1098,36 @@ class MailHelperTest extends TestCase
         $body = $mauticMessage->getHtmlBody();
 
         $this->assertStringContainsString('<img height="1" width="1" src="http://tracking.url" alt="" />', $body);
-        $this->assertSame(2, substr_count($body, 'cid:'));
+
+        $embeddedImages = [];
+        $matchCount     = preg_match_all('/"cid:([^"]+?)"/', $body, $embeddedImages);
+        $this->assertSame(2, $matchCount);
+
+        $resolveMimeTypeMethod  = $reflectionMailerObject->getMethod('resolveMimeType');
+        $resolveMimeTypeMethod->setAccessible(true);
+
+        foreach ($embeddedImages[1] as $cid) {
+            $attachment = null;
+            foreach ($mauticMessage->getAttachments() as $i) {
+                // Symfony currently replaces our content-ids with its own,
+                // and the original is stored in $name, however, there's no clean way to access it
+                $nameReflection = new \ReflectionProperty(TextPart::class, 'name');
+                $nameReflection->setAccessible(true);
+                $originalCid = $nameReflection->getValue($i);
+
+                if ($originalCid === $cid) {
+                    $attachment = $i;
+                    break;
+                }
+            }
+
+            $this->assertNotNull($attachment, 'Cannot find the embedded image in attachments');
+
+            $this->assertEquals(
+                implode('/', [$attachment->getMediaType(), $attachment->getMediaSubtype()]),
+                $resolveMimeTypeMethod->invoke($mailer, $sampleImage)
+            );
+        }
     }
 
     public function testThatWeDontEmbedAlreadyEmbeddedImages(): void

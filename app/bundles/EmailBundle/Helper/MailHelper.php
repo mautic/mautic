@@ -825,7 +825,7 @@ class MailHelper
                 }
 
                 if ($imageContent = file_get_contents($path)) {
-                    $this->message->embed($imageContent, md5($match));
+                    $this->message->embed($imageContent, md5($match), $this->resolveMimeType($imageContent));
                     $this->embedImagesReplaces[$match] = 'cid:'.md5($match);
                 }
             }
@@ -833,6 +833,19 @@ class MailHelper
         }
 
         $this->message->html($content);
+    }
+
+    private function resolveMimeType(string $data): ?string
+    {
+        $mimeType = null;
+        if (extension_loaded('fileinfo')) {
+            if (($info = finfo_open(\FILEINFO_MIME)) !== false) {
+                $mimeType = finfo_buffer($info, $data) ?: null;
+                finfo_close($info);
+            }
+        }
+
+        return $mimeType;
     }
 
     /**
