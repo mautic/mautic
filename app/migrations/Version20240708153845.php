@@ -34,7 +34,7 @@ final class Version20240708153845 extends AbstractMauticMigration
                   ['email_id' => $email['id']]
               )
               ->fetchAssociative();
-            if ($email['id'] === $totalCountResult['email_id'] && (int) $email['read_count'] < $totalCountResult['total_read_count']) {
+            if (is_array($totalCountResult) && $email['id'] === $totalCountResult['email_id'] && (int) $email['read_count'] < $totalCountResult['total_read_count']) {
                 $this
                   ->addSql(
                       "UPDATE {$this->emailsTableName} 
