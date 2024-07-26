@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -55,7 +56,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
         $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->assetsHelperMock);
-        $this->gravatarHelperMock      = new GravatarHelper();
+        $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $coreParametersHelper, $this->createMock(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
         $this->avatarHelper            = new AvatarHelper($this->assetsHelperMock, $this->pathsHelperMock, $this->gravatarHelperMock, $this->defaultAvatarHelperMock);
     }
@@ -77,7 +78,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $this->leadMock->method('getEmail')
             ->willReturn('mautic@acquia.com');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
-        $this->assertSame('https://www.gravatar.com/avatar/96f1b78c73c1ee806cf6a4168fe9bf77?s=250&d=mp', $avatar, 'Gravatar image should be returned');
+        $this->assertSame('https://www.gravatar.com/avatar/96f1b78c73c1ee806cf6a4168fe9bf77?s=250&d=http%3A%2F%2Flocalhost%2Fimages%2Favatar.svg', $avatar, 'Gravatar image should be returned');
 
         $_SERVER['SERVER_PROTOCOL'] = null;
         $_SERVER['SERVER_PORT']     = null;
