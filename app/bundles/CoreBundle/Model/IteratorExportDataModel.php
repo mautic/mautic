@@ -127,4 +127,12 @@ class IteratorExportDataModel implements \Iterator
     {
         return $this->total;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getArgs(): array
+    {
+        return $this->args;
+    }
 }
