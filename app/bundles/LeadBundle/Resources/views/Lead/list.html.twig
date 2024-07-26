@@ -14,7 +14,7 @@
   {% if permissions['lead:leads:create'] %}
       {% set pageButtons = pageButtons|merge([{
           'attr': {
-              'class': 'btn btn-default btn-nospin quickadd',
+              'class': 'btn btn-ghost btn-nospin quickadd',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'quickAdd'}),
