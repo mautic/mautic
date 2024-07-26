@@ -1,6 +1,6 @@
 {
     "name": "Example - Stats Overview",
-    "description": "Example layout with various statistics.",
+    "description": "Start with a dashboard of 10 widgets that provide statistic about lead generation, engagement, and email interactions.",
     "widgets": [
         {
             "name": "Contacts created",
