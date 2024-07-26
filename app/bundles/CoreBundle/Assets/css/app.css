@@ -1179,11 +1179,7 @@ h6,
   text-transform: uppercase;
 }
 .text-muted {
-  color: #758697;
-}
-a.text-muted:hover,
-a.text-muted:focus {
-  color: #5d6c7c;
+  color: var(--text-secondary);
 }
 .text-white {
   color: #fff;
