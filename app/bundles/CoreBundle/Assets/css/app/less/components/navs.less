@@ -53,20 +53,76 @@
   > li {
     > a {
       line-height: 20px;
+      color: var(--text-secondary);
+
+      &:hover { color: var(--text-primary); }
+
+      &:after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: transparent;
+        }
     }
 
     // Active state
     &.active > a {
       overflow: hidden;
       border-top-color: transparent;
-      &:after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: @nav-pills-active-link-hover-bg;
+      font-weight: 600;
+
+      &:after { background-color: @nav-pills-active-link-hover-bg; }
+    }
+  }
+
+  &.nav-tabs-line {
+    > li {
+      > a {
+        background-color: transparent;
+        padding: 6px 16px;
+        margin-right: -2px;
+
+        &:after {
+          top: unset;
+          bottom: 0;
+          background-color: var(--layer-accent);
+          transition: var(--transition-all-productive);
+        }
+
+        &:hover { 
+          background-color: transparent; 
+          color: var(--text-primary);
+
+          &:after { background-color: var(--layer-accent-hover); }
+        }
+      }
+
+      &.active {
+        > a {
+          background-color: transparent;
+
+          &:after {
+              background-color: var(--border-interactive);
+            }
+        }
+      }
+    }
+  }
+
+  &.nav-tabs-contained {
+    > li {
+      > a {
+        background-color: var(--layer-accent);
+        border-radius: var(--border-radius-sm);
+
+        &:hover { background-color: var(--layer-accent-hover);}
+      }
+
+      &.active {
+        > a { background-color: var(--layer); }
       }
     }
   }
@@ -100,6 +156,12 @@
 .stats-menu__content.tab-content > .tab-pane {
   width: 100%;
 }
+
+.nav-tabs-contained + .tab-content, .nav-tabs-contained + form > .tab-content {
+  background-color: var(--layer);
+}
+
+//
 // Pills
 // -------------------------
 .nav-pills {
@@ -125,5 +187,3 @@
     min-height: 410px;
   }
 }
-
-

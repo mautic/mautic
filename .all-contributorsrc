@@ -1320,6 +1320,25 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "nishant-s7",
+      "name": "nishant-s7",
+      "avatar_url": "https://avatars.githubusercontent.com/u/97207366?v=4",
+      "profile": "https://github.com/nishant-s7",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "matbcvo",
+      "name": "Martin Vooremäe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1006437?v=4",
+      "profile": "https://matbcvo.github.io",
+      "contributions": [
+        "review",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
