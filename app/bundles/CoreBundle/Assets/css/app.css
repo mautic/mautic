@@ -1364,6 +1364,7 @@ code {
 .btn {
   transition: var(--transition-all-productive);
   border: 1px solid var(--border-no-color);
+  outline: 2px solid transparent;
   outline-offset: -2px;
   border-radius: var(--border-radius-sm);
   display: inline-flex;
@@ -1377,6 +1378,11 @@ code {
   justify-content: space-between;
   width: fit-content;
 }
+.btn,
+.btn:active,
+.btn.active {
+  box-shadow: none;
+}
 .btn:focus,
 .btn:active:focus,
 .btn.active:focus,
@@ -1384,7 +1390,6 @@ code {
 .btn:active.focus,
 .btn.active.focus {
   outline: 2px solid transparent;
-  box-shadow: none;
 }
 .btn span {
   display: flex;

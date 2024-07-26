@@ -8,6 +8,7 @@
 .btn {
   transition: var(--transition-all-productive);
   border: 1px solid var(--border-no-color);
+  outline: 2px solid transparent;
   outline-offset: -2px;
   border-radius: var(--border-radius-sm);
   display: inline-flex;
@@ -24,10 +25,10 @@
   &,
   &:active,
   &.active {
+    box-shadow: none;
     &:focus,
     &.focus {
       outline: 2px solid transparent;
-      box-shadow: none;
     }
   }
 
