@@ -2,13 +2,16 @@
 
 namespace Step\Acceptance;
 
+use Page\Acceptance\ContactPage;
+
 class Campaign extends \AcceptanceTester
 {
-    public function selectContactFromContactsTab($place)
+    public function addContactsToCampaign()
     {
         $I = $this;
-        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/button");
-        $I->waitForElementVisible("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[2]/a", 30);
-        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[2]/a");
+        $I->waitForElementVisible(ContactPage::$campaignsModalAddOption, 5); // Wait for the modal to appear
+        $I->click(ContactPage::$campaignsModalAddOption); // Click into "Add to the following" option
+        $I->click(ContactPage::$firstCampaignFromAddList); // Select the first campaign from the list
+        $I->click(ContactPage::$campaignsModalSaveButton); // Click Save
     }
 }

@@ -3,6 +3,7 @@
 use Page\Acceptance\CampaignPage;
 use Page\Acceptance\ContactPage;
 use PHPUnit\Framework\Assert;
+use Step\Acceptance\Campaign;
 use Step\Acceptance\ContactStep;
 
 class ContactManagementCest
@@ -256,9 +257,20 @@ class ContactManagementCest
         Assert::assertEquals($expectedContactCount, $finalContactCount);
     }
 
-    public function batchAddToCampaign(
+    public function exportExcel(
         AcceptanceTester $I,
         ContactStep $contact
+    ): void {
+        $I->amOnPage(ContactPage::$URL);
+
+        // Click on the export button
+        $contact->selectOptionFromDropDownContactsPage(2);
+    }
+
+    public function batchAddToCampaign(
+        AcceptanceTester $I,
+        ContactStep $contact,
+        Campaign $campaign
     ): void {
         // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
@@ -284,13 +296,8 @@ class ContactManagementCest
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
-        // Select the "Change campaigns" option from the dropdown for the selected contacts
         $contact->selectOptionFromDropDownForMultipleSelections(1);
-
-        $I->waitForElementVisible(ContactPage::$campaignsModalAddOption, 5); // Wait for the modal to appear
-        $I->click(ContactPage::$campaignsModalAddOption); // Click into "Add to the following" option
-        $I->click(ContactPage::$firstCampaignFromList); // Select the first campaign from the list
-        $I->click(ContactPage::$campaignsModalSaveButton); // Click Save
+        $campaign->addContactsToCampaign();
 
         // Navigate back to the campaign page and click on the contacts tab
         $I->amOnPage(CampaignPage::$URL);
@@ -300,5 +307,45 @@ class ContactManagementCest
         $I->waitForElementVisible(CampaignPage::$firstContactFromContactsTab);
         $I->see("$contactName1", CampaignPage::$firstContactFromContactsTab);
         $I->see("$contactName2", CampaignPage::$secondContactFromContactsTab);
+    }
+
+    public function batchRemoveFromCampaign(
+        AcceptanceTester $I,
+        ContactStep $contact,
+        Campaign $campaign
+    ): void {
+        // Navigate to the contacts page
+        $I->amOnPage(ContactPage::$URL);
+
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
+
+        $contact->selectOptionFromDropDownForMultipleSelections(1);
+        $campaign->addContactsToCampaign();
+
+        // Navigate to the contacts page
+        $I->amOnPage(ContactPage::$URL);
+
+        // Grab the names of the first and second contacts from the list
+        $contactName1 = $contact->grabContactNameFromList(1);
+        $contactName2 = $contact->grabContactNameFromList(2);
+
+        // Select the first and second contacts from the list
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
+
+        $contact->selectOptionFromDropDownForMultipleSelections(1);
+        $I->waitForElementVisible(ContactPage::$campaignsModalAddOption, 5); // Wait for the modal to appear
+        $I->click(ContactPage::$campaignsModalRemoveOption); // Click into "Add to the following" option
+        $I->click(ContactPage::$firstCampaignFromRemoveList); // Select the first campaign from the list
+        $I->click(ContactPage::$campaignsModalSaveButton); // Click Save
+
+        // Navigate back to the campaign page and click on the contacts tab
+        $I->amOnPage(CampaignPage::$URL);
+        $I->click(CampaignPage::$contactsTab);
+
+        // Confirm the first and second contacts are no longer in the campaign
+        $I->dontSee("$contactName1", CampaignPage::$firstContactFromContactsTab);
+        $I->dontSee("$contactName2", CampaignPage::$secondContactFromContactsTab);
     }
 }
