@@ -282,14 +282,14 @@ class ContactManagementCest
         // Navigate to the campaign page
         $I->amOnPage(CampaignPage::$URL);
 
-        // Click on the contacts tab in the campaign page
+        // Click on the "Contacts" tab in the campaign page
         $I->click(CampaignPage::$contactsTab);
 
-        // Confirm the first and second contacts are not in the campaign
-        $I->dontSee("$contactName1", CampaignPage::$firstContactFromContactsTab);
-        $I->dontSee("$contactName2", CampaignPage::$secondContactFromContactsTab);
+        // Verify that the first and second contacts are not in the campaign yet
+        $I->dontSee($contactName1, CampaignPage::$firstContactFromContactsTab);
+        $I->dontSee($contactName2, CampaignPage::$secondContactFromContactsTab);
 
-        // Navigate back to the contacts page
+        // Return to the contacts page
         $I->amOnPage(ContactPage::$URL);
 
         // Select the first and second contacts from the list
@@ -299,14 +299,14 @@ class ContactManagementCest
         $contact->selectOptionFromDropDownForMultipleSelections(1);
         $campaign->addContactsToCampaign();
 
-        // Navigate back to the campaign page and click on the contacts tab
+        // Navigate back to the campaign page and click on the "Contacts" tab
         $I->amOnPage(CampaignPage::$URL);
         $I->click(CampaignPage::$contactsTab);
 
-        // Confirm the first and second contacts are now in the campaign
+        // Verify that the first and second contacts are now in the campaign
         $I->waitForElementVisible(CampaignPage::$firstContactFromContactsTab);
-        $I->see("$contactName1", CampaignPage::$firstContactFromContactsTab);
-        $I->see("$contactName2", CampaignPage::$secondContactFromContactsTab);
+        $I->see($contactName1, CampaignPage::$firstContactFromContactsTab);
+        $I->see($contactName2, CampaignPage::$secondContactFromContactsTab);
     }
 
     public function batchRemoveFromCampaign(
@@ -317,35 +317,38 @@ class ContactManagementCest
         // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
 
+        // Select the first and second contacts from the list
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
         $contact->selectOptionFromDropDownForMultipleSelections(1);
         $campaign->addContactsToCampaign();
 
-        // Navigate to the contacts page
+        // Return to the contacts page
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the names of the first and second contacts from the list
         $contactName1 = $contact->grabContactNameFromList(1);
         $contactName2 = $contact->grabContactNameFromList(2);
 
-        // Select the first and second contacts from the list
+        // Select the first and second contacts again for removal
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
         $contact->selectOptionFromDropDownForMultipleSelections(1);
-        $I->waitForElementVisible(ContactPage::$campaignsModalAddOption, 5); // Wait for the modal to appear
-        $I->click(ContactPage::$campaignsModalRemoveOption); // Click into "Add to the following" option
-        $I->click(ContactPage::$firstCampaignFromRemoveList); // Select the first campaign from the list
-        $I->click(ContactPage::$campaignsModalSaveButton); // Click Save
 
-        // Navigate back to the campaign page and click on the contacts tab
+        // Wait for the modal to appear and click the "Remove from campaign" option
+        $I->waitForElementVisible(ContactPage::$campaignsModalAddOption, 5);
+        $I->click(ContactPage::$campaignsModalRemoveOption);
+        $I->click(ContactPage::$firstCampaignFromRemoveList);
+        $I->click(ContactPage::$campaignsModalSaveButton);
+
+        // Navigate to the campaign page and click on the "Contacts" tab
         $I->amOnPage(CampaignPage::$URL);
         $I->click(CampaignPage::$contactsTab);
 
-        // Confirm the first and second contacts are no longer in the campaign
-        $I->dontSee("$contactName1", CampaignPage::$firstContactFromContactsTab);
-        $I->dontSee("$contactName2", CampaignPage::$secondContactFromContactsTab);
+        // Verify that the first and second contacts are no longer in the campaign
+        $I->dontSee($contactName1, CampaignPage::$firstContactFromContactsTab);
+        $I->dontSee($contactName2, CampaignPage::$secondContactFromContactsTab);
     }
 }
