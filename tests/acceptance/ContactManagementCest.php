@@ -8,7 +8,7 @@ use Step\Acceptance\ContactStep;
 
 class ContactManagementCest
 {
-    public function _before(AcceptanceTester $I)
+    public function _before(AcceptanceTester $I): void
     {
         $I->login('admin', 'Maut1cR0cks!');
     }
@@ -255,16 +255,6 @@ class ContactManagementCest
         // Assert the expected number of contacts
         Codeception\Util\Fixtures::add('finalContactCount', $finalContactCount);
         Assert::assertEquals($expectedContactCount, $finalContactCount);
-    }
-
-    public function exportExcel(
-        AcceptanceTester $I,
-        ContactStep $contact
-    ): void {
-        $I->amOnPage(ContactPage::$URL);
-
-        // Click on the export button
-        $contact->selectOptionFromDropDownContactsPage(2);
     }
 
     public function batchAddToCampaign(
