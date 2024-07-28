@@ -49,6 +49,11 @@ class ContactPage
     public static $importInBrowser        = '#lead_field_import_buttons_save_toolbar';
     public static $importProgressComplete = '#leadImportProgressComplete > div > div > div.panel-heading';
 
+    // Campaigns
+    public static $campaignsModalAddOption  = '//*[@id="lead_batch_add_chosen"]/ul/li/input';
+    public static $firstCampaignFromList    ='#lead_batch_add_chosen > div > ul > li';
+    public static $campaignsModalSaveButton = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-default.btn-save.btn-copy';
+
     /**
      * Basic route example for your current URL
      * You can append any additional parameter to URL
