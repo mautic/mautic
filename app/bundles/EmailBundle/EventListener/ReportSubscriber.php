@@ -550,8 +550,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
                     $data = $queryBuilder->execute()->fetchAllAssociative();
 
-                    dump($data);
-
                     $names        = array_column($data, 'name');
                     $sentCount    = array_column($data, 'sent_count');
                     $readCount    = array_column($data, 'read_count');
