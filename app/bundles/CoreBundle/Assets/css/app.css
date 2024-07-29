@@ -1026,6 +1026,7 @@ a {
 a:hover {
   color: var(--link-primary-hover);
   cursor: pointer;
+  outline: 2px solid transparent;
 }
 a:hover,
 a:focus {
@@ -1472,6 +1473,28 @@ code {
   margin-right: 10px;
   line-height: 0.5em;
   top: 0.15em;
+}
+.alert.alert-success.notification,
+.alert.alert-info.notification,
+.alert.alert-warning.notification,
+.alert.alert-danger.notification {
+  position: relative;
+}
+.alert.alert-success.notification:before,
+.alert.alert-info.notification:before,
+.alert.alert-warning.notification:before,
+.alert.alert-danger.notification:before {
+  position: absolute;
+  top: 20px;
+  right: 0;
+}
+.alert.alert-success.notification .close,
+.alert.alert-info.notification .close,
+.alert.alert-warning.notification .close,
+.alert.alert-danger.notification .close {
+  position: absolute;
+  top: 10px;
+  right: 30px;
 }
 .alert-success {
   border-color: var(--support-success);

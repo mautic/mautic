@@ -37,10 +37,24 @@
       line-height: .5em;
       top: .15em;
     }
+
+    &.notification {
+      position: relative;
+      &:before {
+        position: absolute;
+        top: 20px;
+        right: 0;
+      }
+      .close {
+        position: absolute;
+        top: 10px;
+        right: 30px;
+      }
+    }
   }
 }
 
-.alert-success { 
+.alert-success {
   border-color: var(--support-success);
 
   &:not([class*="col-"]):before {
