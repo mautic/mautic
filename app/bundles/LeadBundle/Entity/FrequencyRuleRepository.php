@@ -181,7 +181,7 @@ class FrequencyRuleRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch');
 
         if (Stat::TABLE_NAME === $statTable) {
-            $q->join('ch', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ch.email_id = e.id')
+            $query->join('ch', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ch.email_id = e.id')
                 ->andWhere('e.send_to_dnc = 0');
         }
 

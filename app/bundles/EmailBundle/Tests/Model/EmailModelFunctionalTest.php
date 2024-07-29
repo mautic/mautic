@@ -38,7 +38,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->configParams['email_frequency_time']   = 'MONTH';
         parent::setUp();
 
-        $emailModel = self::$container->get('mautic.email.model.email');
+        $emailModel = static::getContainer()->get('mautic.email.model.email');
         \assert($emailModel instanceof EmailModel);
         $this->emailModel = $emailModel;
     }
@@ -55,13 +55,11 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  static::getContainer()->get('mautic.email.model.email');
-        \assert($emailModel instanceof EmailModel);
-        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 7);
-        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
         $this->assertEquals($sentCount, 8);
-        [$sentCount] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
+        [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
         $this->assertEquals($sentCount, 8);
     }
 
@@ -136,22 +134,21 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->addContactsToSegment($contacts, $segment);
         $email = $this->createEmail($segment);
 
-        $emailModel                                             =  static::getContainer()->get('mautic.email.model.email');
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], 4, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 4, 2);
         $this->assertEquals($sentCount, 4);
-        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 3, 2);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 3, 2);
         $this->assertEquals($sentCount, 3);
-        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 2);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 2);
         $this->assertEquals($sentCount, 2);
-        [$sentCount, $failedCount, $failedRecipientsByList] = $emailModel->sendEmailToLists($email, [$segment], 4);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 4);
         $this->assertEquals($sentCount, 1);
 
-        $email                                                  = $this->createEmail($segment);
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment]);
+        $email                                              = $this->createEmail($segment);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment]);
         $this->assertEquals($sentCount, 10);
 
-        $email                                                  = $this->createEmail($segment);
-        [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], null, 2);
+        $email                                              = $this->createEmail($segment);
+        [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], null, 2);
         $this->assertEquals($sentCount, 10);
     }
 
@@ -174,12 +171,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $childrenEmail->setTranslationParent($parentEmail);
         $this->em->persist($parentEmail);
 
-        $this->em->detach($segment);
-        $this->em->detach($parentEmail);
-        $this->em->detach($childrenEmail);
+        $this->em->clear();
 
-        /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
         $parentEmail->setName('Test change');
         $this->emailModel->saveEntity($parentEmail);
 
@@ -248,8 +241,6 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
      */
     public function testGetEmailCountryStatsSingleEmail(): void
     {
-        /** @var EmailModel $emailModel */
-        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
         $dateFrom     = new \DateTimeImmutable('2023-07-21');
         $dateTo       = new \DateTimeImmutable('2023-07-24');
         $leadsPayload = [
@@ -311,7 +302,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             }
         }
         $this->em->flush();
-        $results = $emailModel->getCountryStats($email, $dateFrom, $dateTo);
+        $results = $this->emailModel->getCountryStats($email, $dateFrom, $dateTo);
 
         $this->assertCount(2, $results);
         $this->assertSame([
@@ -352,16 +343,13 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
      */
     public function testGetContextEntity(): void
     {
-        /** @var EmailModel $emailModel */
-        $emailModel   = $this->getContainer()->get('mautic.email.model.email');
-
         $email = new Email();
         $email->setName('Test email');
         $this->em->persist($email);
         $this->em->flush();
 
         $id     = $email->getId();
-        $result = $emailModel->getEntity($id);
+        $result = $this->emailModel->getEntity($id);
 
         $this->assertSame($email, $result);
     }
@@ -381,7 +369,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     public function testFrequencyRulesAreAppliedWhenSendToDncIsNo(): void
     {
         $contact = $this->createContact();
-        $email   = $this->createEmail();
+        $email   = $this->createTemplateEmail();
         $this->createFrequencyRule($contact);
         $this->createEmailStats($email, $contact);
         $this->em->flush();
@@ -396,7 +384,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     public function testFrequencyRulesAreNotAppliedWhenSendToDncIsTrue(): void
     {
         $contact = $this->createContact();
-        $email   = $this->createEmail();
+        $email   = $this->createTemplateEmail();
         $email->setSendToDnc(true);
         $this->em->persist($email);
         $this->createFrequencyRule($contact);
@@ -413,8 +401,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     public function testEmailsWithSendToDncSetToYesAreNotCountedTowardsFrequencyRules(): void
     {
         $contact     = $this->createContact();
-        $emailToSend = $this->createEmail();
-        $emailDncYes = $this->createEmail();
+        $emailToSend = $this->createTemplateEmail();
+        $emailDncYes = $this->createTemplateEmail();
         $emailDncYes->setSendToDnc(true);
         $this->em->persist($emailToSend);
         $this->createFrequencyRule($contact);
@@ -436,7 +424,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         return $contact;
     }
 
-    private function createEmail(): Email
+    private function createTemplateEmail(): Email
     {
         $email = new Email();
         $email->setName('Test');

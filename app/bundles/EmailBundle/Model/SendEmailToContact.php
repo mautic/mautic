@@ -106,8 +106,6 @@ class SendEmailToContact
      * Use an Email entity to populate content, from, etc.
      *
      * @param array $channel ['channelName', 'channelId']
-     *
-     * @return $this
      */
     public function setEmail(
         Email $email,
