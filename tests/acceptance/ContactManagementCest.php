@@ -75,10 +75,7 @@ class ContactManagementCest
         // Grab the name of the first contact in the list
         $contactName = $contact->grabContactNameFromList(1);
 
-        // Click on the dropdown caret on the first contact
-        $contact->dropDownMenu(1);
-
-        // Click the edit menu option
+        // Click on the dropdown caret on the first contact and click on the edit option
         $contact->selectOptionFromDropDown(1, 1);
 
         // Wait for the edit form to be visible
