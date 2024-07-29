@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -476,6 +477,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         if ($event->checkContext(self::CONTEXT_EMAILS)
             && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)
+            && !in_array('mautic.email.graph.bar.read.ingored.unsubscribed.bounced', $graphs)
             && !in_array('mautic.email.table.most.emails.clicks', $graphs)) {
             return;
         }
@@ -537,6 +539,47 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     break;
 
+                case 'mautic.email.graph.bar.read.ingored.unsubscribed.bounced':
+                    $queryBuilder->select('e.id, e.name, e.sent_count, e.read_count,
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                    )
+                    ->groupBy('e.id');
+
+                    $this->addDNCTableForEmails($queryBuilder);
+
+                    $data = $queryBuilder->execute()->fetchAllAssociative();
+
+                    dump($data);
+
+                    $names        = array_column($data, 'name');
+                    $sentCount    = array_column($data, 'sent_count');
+                    $readCount    = array_column($data, 'read_count');
+                    $unsubscribed = array_column($data, 'unsubscribed');
+                    $bounced      = array_column($data, 'bounced');
+
+                    array_push($sentCount, 0);
+                    array_push($readCount, 0);
+                    array_push($unsubscribed, 0);
+                    array_push($bounced, 0);
+
+                    $chart  = new BarChart($names);
+
+                    $chart->setDataset('Sent Count', $sentCount);
+                    $chart->setDataset('Read Count', $readCount);
+                    $chart->setDataset('Unsubscribed Count', $unsubscribed);
+                    $chart->setDataset('Bounced Count', $bounced);
+
+                    $event->setGraph(
+                        $g,
+                        [
+                            'data'      => $chart->render(),
+                            'name'      => $g,
+                            'iconClass' => 'fa-flag-checkered',
+                        ]
+                    );
+
+                    break;
                 case 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced':
                     $queryBuilder->select('SUM(DISTINCT e.sent_count) as sent_count,
                         SUM(DISTINCT e.read_count) as read_count,
