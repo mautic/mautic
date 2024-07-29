@@ -1200,11 +1200,7 @@ h6,
   line-height: 1;
 }
 .text-muted {
-  color: #758697;
-}
-a.text-muted:hover,
-a.text-muted:focus {
-  color: #5d6c7c;
+  color: var(--text-secondary);
 }
 .text-white {
   color: #fff;
