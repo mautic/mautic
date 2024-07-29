@@ -64,6 +64,8 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
                         return $parameters['%count%'].' minute(s) ago';
                     case 'mautic.core.date.just.now':
                         return 'just now';
+                    case 'mautic.core.date.today':
+                        return 'Today';
                     default:
                         return $key;
                 }
@@ -112,6 +114,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
                     if (isset($parameters['%time%'])) {
                         return $parameters['%time%'];
                     }
+                    return $key;
                 }
             );
 
