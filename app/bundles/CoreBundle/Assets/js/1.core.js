@@ -72,6 +72,16 @@ mQuery( document ).ready(function() {
             e.preventDefault();
         }
     });
+
+    // Try to keep alive the session.
+    setInterval(function() {
+        if (window.location.pathname.startsWith('/s/') && window.location.pathname !== '/s/login') {
+            mQuery.get('/s/keep-alive')
+                .fail(function(errorThrown) {
+                    console.error('Error with keep-alive:', errorThrown);
+                });
+        }
+    }, mauticSessionLifetime * 1000 / 2);
 });
 
 if (typeof history != 'undefined') {
@@ -151,30 +161,10 @@ var Mautic = {
         });
 
         Mousetrap.bind('?', function (e) {
-            var modalWindow = mQuery('#MauticSharedModal');
-
-            modalWindow.find('.modal-title').html('Keyboard Shortcuts');
-            modalWindow.find('.modal-body').html(function () {
-                var modalHtml = '';
-                var sections = Object.keys(Mautic.keyboardShortcutHtml);
-                sections.forEach(function (section) {
-                    var sectionTitle = (section + '').replace(/^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, function ($1) {
-                        return $1.toUpperCase();
-                    });
-                    modalHtml += '<h4>' + sectionTitle + '</h4><br />';
-                    modalHtml += '<div class="row">';
-                    var sequences = Object.keys(Mautic.keyboardShortcutHtml[section]);
-                    sequences.forEach(function (sequence) {
-                        modalHtml += Mautic.keyboardShortcutHtml[section][sequence];
-                    });
-                    modalHtml += '</div><hr />';
-                });
-
-                return modalHtml;
-            });
-            modalWindow.find('.modal-footer').html('<p>Press <mark>shift+?</mark> at any time to view this help modal.');
+            var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
         });
+        
     },
 
     /**
@@ -266,8 +256,8 @@ var Mautic = {
      */
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
-        if (!button.find('.fa-spinner.fa-spin').length) {
-            button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+        if (!button.find('.ri-loader-3-line.ri-spin').length) {
+            button.append(mQuery('<i class="ri-loader-3-line ri-spin"></i>'));
         }
     },
 
@@ -278,7 +268,7 @@ var Mautic = {
      */
     removeButtonLoadingIndicator: function (button) {
         button.prop('disabled', false);
-        button.find('.fa-spinner').remove();
+        button.find('.ri-loader-3-line').remove();
     },
 
     /**
@@ -288,7 +278,7 @@ var Mautic = {
      */
     activateLabelLoadingIndicator: function (el) {
         var labelSpinner = mQuery("label[for='" + el + "']");
-        Mautic.labelSpinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
@@ -407,27 +397,30 @@ var Mautic = {
 
         if (mQuery(target).length) {
             var hasBtn = mQuery(target).hasClass('btn');
-            var hasIcon = mQuery(target).hasClass('fa');
+            var hasIcon = mQuery(target).attr('class') && mQuery(target).attr('class').startsWith('ri-');
             var dontspin = mQuery(target).hasClass('btn-nospin');
 
-            var i = (hasBtn && mQuery(target).find('i.fa').length) ? mQuery(target).find('i.fa') : target;
+            var icon = (hasBtn && mQuery(target).find('i[class^="ri-"]').length) ? mQuery(target).find('i[class^="ri-"]') : target;
 
-            if (!dontspin && ((hasBtn && mQuery(target).find('i.fa').length) || hasIcon)) {
-                var el = (hasIcon) ? target : mQuery(target).find('i.fa').first();
+            if (!dontspin && ((hasBtn && mQuery(target).find('i[class^="ri-"]').length) || hasIcon)) {
+                var el = (hasIcon) ? target : mQuery(target).find('i[class^="ri-"]').first();
                 var identifierClass = (new Date).getTime();
+
+                if (typeof MauticVars.iconClasses === 'undefined') {
+                    MauticVars.iconClasses = {};
+                }
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li', 'text-white', 'text-muted'];
+                var specialClasses = ['ri-fw', 'ri-lg', 'ri-2x', 'ri-3x', 'ri-4x', 'ri-5x', 'ri-li', 'text-white', 'text-muted'];
                 var appendClasses = "";
 
-                //check for special classes to add to spinner
-                for (var i = 0; i < specialClasses.length; i++) {
-                    if (mQuery(el).hasClass(specialClasses[i])) {
-                        appendClasses += " " + specialClasses[i];
+                for (var j = 0; j < specialClasses.length; j++) {
+                    if (mQuery(el).hasClass(specialClasses[j])) {
+                        appendClasses += " " + specialClasses[j];
                     }
                 }
                 mQuery(el).removeClass();
-                mQuery(el).addClass('fa fa-spinner fa-spin ' + identifierClass + appendClasses);
+                mQuery(el).addClass('ri-loader-3-line ri-spin ' + identifierClass + appendClasses);
             }
         }
     },
@@ -437,14 +430,13 @@ var Mautic = {
      */
     stopIconSpinPostEvent: function (specificId) {
         if (typeof specificId != 'undefined' && specificId in MauticVars.iconClasses) {
-            mQuery('.' + specificId).removeClass('fa fa-spinner fa-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
+            mQuery('.' + specificId).removeClass('ri-loader-3-line ri-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
             delete MauticVars.iconClasses[specificId];
         } else {
             mQuery.each(MauticVars.iconClasses, function (index, value) {
-                mQuery('.' + index).removeClass('fa fa-spinner fa-spin ' + index).addClass(value);
+                mQuery('.' + index).removeClass('ri-loader-3-line ri-spin ' + index).addClass(value);
+                delete MauticVars.iconClasses[index];
             });
-
-            MauticVars.iconClasses = {};
         }
     },
 
@@ -671,18 +663,22 @@ var Mautic = {
 
     /**
      * Sets flashes
-     * @param flashes
+     * @param flashes The flash message HTML to append
+     * @param autoClose Optional boolean to determine if the flash should automatically close, defaults to true
      */
-    setFlashes: function (flashes) {
+    setFlashes: function (flashes, autoClose = true) {
         mQuery('#flashes').append(flashes);
 
         mQuery('#flashes .alert-new').each(function () {
             var me = this;
-            window.setTimeout(function () {
-                mQuery(me).fadeTo(500, 0).slideUp(500, function () {
-                    mQuery(this).remove();
-                });
-            }, 4000);
+            // Only set the timeout if autoClose is true
+            if (autoClose) {
+                window.setTimeout(function () {
+                    mQuery(me).fadeTo(500, 0).slideUp(500, function () {
+                        mQuery(this).remove();
+                    });
+                }, 4000);
+            }
 
             mQuery(this).removeClass('alert-new');
         });
@@ -700,7 +696,7 @@ var Mautic = {
         elButton.ariaLabel = "Close";
 
         const elI = document.createElement('i');
-        elI.className = 'fa fa-times';
+        elI.className = 'ri-close-line';
 
         const elSpan = document.createElement('span');
         elSpan.innerHTML = message;

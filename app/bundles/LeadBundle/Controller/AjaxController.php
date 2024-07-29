@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -53,10 +54,16 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function contactListAction(Request $request, LeadModel $model): JsonResponse
+    public function contactListAction(Request $request, LeadModel $model, CorePermissions $corePermissions): JsonResponse
     {
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $model->getLookupResults('contact', $filter);
+        $filter['string'] = InputHelper::clean($request->query->get('filter'));
+
+        // Do not show other's contacts if do not have permission.
+        if (!$corePermissions->isGranted(['lead:leads:viewother'], 'MATCH_ONE')) {
+            $filter['force'] = ' '.$this->translator->trans('mautic.core.searchcommand.ismine');
+        }
+
+        $results = $model->getLookupResults('contact', $filter);
 
         $results['success'] = 1;
 

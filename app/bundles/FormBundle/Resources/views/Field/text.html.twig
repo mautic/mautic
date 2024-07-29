@@ -144,6 +144,9 @@
     <textarea {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.defaultValue }}</textarea>
   {% elseif 'number' == field.type %}
       <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} step="{{ step }}"/>
+  {% elseif 'companyLookup' == field.type %}
+      <input class="{{ defaultInputClass }}" placeholder="start typing" data-toggle="field-company-lookup" data-set-id="mauticform_input{{ formName }}_{{ field.alias }}" type="search"  dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" maxlength="191"/>
+      <input type="number" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} style="display: none;">
   {% else %}
     <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
   {% endif %}

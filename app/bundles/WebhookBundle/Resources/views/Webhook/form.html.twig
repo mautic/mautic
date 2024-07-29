@@ -10,7 +10,7 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
-    <div class="col-md-9 bg-auto height-auto">
+    <div class="col-md-9 height-auto">
         <div class="pa-md">
             <div class="row">
                 <div class="col-md-6">
@@ -23,7 +23,7 @@
                             {{ form_row(form.sendTest) }}
                         </div>
                         <div class="col-md-2">
-                            <span id="spinner" class="fa fa-spinner fa-spin hide"></span>
+                            <span id="spinner" class="ri-loader-3-line ri-spin hide"></span>
                         </div>
                         <div class="col-md-5">
                             <div id="tester" class="text-right"></div>
@@ -37,7 +37,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto bdr-l">
+    <div class="col-md-3 height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.category) }}
             {{ form_row(form.eventsOrderbyDir) }}

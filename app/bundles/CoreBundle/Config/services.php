@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\CoreBundle\EventListener\OptimisticLockSubscriber;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -65,5 +66,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.core.model.form', Mautic\CoreBundle\Model\FormModel::class);
     $services->get(Mautic\CoreBundle\EventListener\CacheInvalidateSubscriber::class)
         ->arg('$ormConfiguration', service('doctrine.orm.default_configuration'))
+        ->tag('doctrine.event_subscriber');
+    $services->get(OptimisticLockSubscriber::class)
         ->tag('doctrine.event_subscriber');
 };

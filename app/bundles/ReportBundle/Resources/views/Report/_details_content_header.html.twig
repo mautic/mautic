@@ -10,10 +10,10 @@
 <!--/ report detail header -->
 <!-- report detail collapseable -->
 <div id="report-shelves" class="mb-5" aria-multiselectable="true">
-    <div class="collapse" id="report-details">
+    <div class="collapse pr-md pl-md" id="report-details">
         <div class="pr-md pl-md pb-md">
             <div class="panel shd-none mb-0">
-                <table class="table table-bordered table-striped mb-0">
+                <table class="table table-hover mb-0">
                     <tbody>
                       {{ include('@MauticCore/Helper/details.html.twig', {'entity': report}) }}
                     </tbody>
@@ -41,7 +41,7 @@
     </div>
     <!--/ report detail collapseable -->
 
-    <div class="bg-auto bg-dark-xs">
+    <div>
         <!-- report detail collapseable toggler -->
         <div class="hr-expand nm">
             <a href="#report-details" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">

@@ -6,10 +6,10 @@
 // Base styles
 // ---------------------
 .btn {
-  transition: var(--all);
+  transition: var(--transition-all-productive);
+  width: fit-content;
   &,
-  &:active,
-  &.active {
+  &:active {
     outline: 0;
   }
 
@@ -74,5 +74,13 @@
   &:hover,
   &:focus {
     text-decoration: none;
+  }
+}
+
+.btn-info {
+  color: @gray-dark;
+
+  &:hover {
+    color: @gray-dark;
   }
 }

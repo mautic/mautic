@@ -482,11 +482,11 @@ class ImportController extends FormController
         if (!$complete && $request->query->has('importbatch')) {
             // Ajax request to batch process so just return ajax response unless complete
 
-            return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
+            $response = new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
         } else {
             $viewParameters['step'] = $step;
 
-            return $this->delegateView(
+            $response = $this->delegateView(
                 [
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => $contentTemplate,
@@ -506,6 +506,10 @@ class ImportController extends FormController
                 ]
             );
         }
+        // For uploading file Keep-Alive should not be used.
+        $response->headers->set('Connection', 'close');
+
+        return $response;
     }
 
     /**

@@ -317,6 +317,7 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
             supportAllValues : true
         },
         link: {
+            allowCreatingEmptyLinks: true, // allow creation of empty links, as it was before the 14.x update of cke5
             decorators: {
                 // based on: https://ckeditor.com/docs/ckeditor5/latest/features/link.html#adding-target-and-rel-attributes-to-external-links
                 openInNewTab: {
@@ -328,7 +329,17 @@ Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallbac
                     }
                 }
             }
-        }
+        },
+        htmlSupport: {
+            allow: [
+                {
+                    name: /^(a|span)$/,
+                    attributes: true,
+                    classes: true,
+                    styles: true
+                }
+            ],
+        },
     };
 
 
