@@ -413,13 +413,16 @@
 --spacing-13: 160px;
 
 // Typography //
+@font-size-small: (@font-size - 2);
+@font-size-big: (@font-size + 2);
+
 /// Code, labels, helper text, legal etc
---typography-utility-productive: 12px;
---typography-utility-expressive: 14px;
+--typography-utility-productive: @font-size-small;
+--typography-utility-expressive: @font-size;
 
 /// Body
---typography-body-productive: 13px;
---typography-body-expressive: 15px;
+--typography-body-productive: @font-size;
+--typography-body-expressive: @font-size-big;
 
 // Miscellaneous //
 --border-no-width: 1px solid var(--border-no-color);
