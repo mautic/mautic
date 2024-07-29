@@ -17464,6 +17464,7 @@ a > .fa {
   height: var(--spacing-07);
   width: 100%;
   max-width: 100%;
+  outline: 2px solid transparent;
   transition: var(--transition-all-productive);
 }
 .chosen-container-single .chosen-search input[type="text"]:focus {

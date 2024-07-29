@@ -2969,6 +2969,8 @@ label {
   background-color: var(--field) !important;
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
+  line-height: 32px;
+  height: 32px;
   transition: var(--transition-all-productive);
   outline: 2px solid transparent;
   outline-offset: -2px;
@@ -2993,7 +2995,7 @@ label {
   box-shadow: none;
 }
 .form-control {
-  padding: var(--spacing-04) var(--spacing-05);
+  padding: 0 var(--spacing-05);
   color: var(--text-primary);
 }
 .form-control + .help-text,

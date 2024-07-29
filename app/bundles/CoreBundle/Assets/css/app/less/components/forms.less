@@ -30,6 +30,8 @@ label {
   background-color: var(--field) !important;
   border-width: var(--border-bottom);
   border-color: var(--border-strong);
+  line-height: 32px;
+  height: 32px;
   transition: var(--transition-all-productive);
   outline: 2px solid transparent;
   outline-offset: -2px;
@@ -53,7 +55,7 @@ label {
 }
 
 .form-control {
-  padding: var(--spacing-04) var(--spacing-05);
+  padding: 0 var(--spacing-05);
   color: var(--text-primary);
 
   +.help-text,
@@ -314,7 +316,7 @@ input[type=file].form-control {
         &:checked {
           + span {
             border: 1px solid @gray-dark;
-            &:after { 
+            &:after {
               .scale(1);
               .transition(all .1s ease);
             }
