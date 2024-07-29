@@ -412,6 +412,8 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * @param array<string, mixed> $queryArgs
+     *
      * @throws \Exception
      */
     public function exportResults(string $format, Form $form, array $queryArgs, bool $notAnonymize = true): StreamedResponse|Response
