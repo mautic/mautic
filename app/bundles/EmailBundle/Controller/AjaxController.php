@@ -344,7 +344,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = [];
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        /** @var EmailModel $model */
         $model    = $this->getModel('email');
         $objectId = $request->get('id');
 

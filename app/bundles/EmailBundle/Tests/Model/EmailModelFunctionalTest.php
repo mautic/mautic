@@ -7,14 +7,14 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Mautic\CoreBundle\Entity\IpAddress;
-use DateTime;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -22,8 +22,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
-use Mautic\LeadBundle\Entity\FrequencyRule;
-use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
@@ -155,7 +153,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email                                                  = $this->createEmail($segment);
         [$sentCount, $failedCount, $failedRecipientsByList]     = $emailModel->sendEmailToLists($email, [$segment], null, 2);
         $this->assertEquals($sentCount, 10);
-    }    
+    }
 
     public function testNotOverwriteChildrenTranslationEmailAfterSaveParent(): void
     {
@@ -459,7 +457,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $frequencyRule = new FrequencyRule();
         $frequencyRule->setLead($contact);
-        $frequencyRule->setDateAdded(new DateTime());
+        $frequencyRule->setDateAdded(new \DateTime());
         $frequencyRule->setChannel('email');
         $frequencyRule->setFrequencyNumber(self::EMAILS_A_MONTH);
         $frequencyRule->setFrequencyTime('MONTH');
@@ -475,7 +473,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             $stat->setEmail($email);
             $stat->setLead($contact);
             $stat->setEmailAddress($contact->getEmail());
-            $stat->setDateSent(new DateTime('-1 day'));
+            $stat->setDateSent(new \DateTime('-1 day'));
             $this->em->persist($stat);
         }
     }

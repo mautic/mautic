@@ -236,8 +236,8 @@ class EmailApiController extends CommonApiController
      */
     protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
     {
-        if (array_key_exists('sendToDnc', $parameters) &&
-            !$this->security->isGranted('email:emails:sendtodnc')) {
+        if (array_key_exists('sendToDnc', $parameters)
+            && !$this->security->isGranted('email:emails:sendtodnc')) {
             // do not save user defined value for sendToDnc if user do not have permission
             unset($parameters['sendToDnc']);
         }

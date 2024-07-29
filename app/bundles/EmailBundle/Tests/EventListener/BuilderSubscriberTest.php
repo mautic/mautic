@@ -250,7 +250,7 @@ class BuilderSubscriberTest extends TestCase
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(
-            '<a href="'.'/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash.'">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
+            '<a href="/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash.'">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
             $event->getTokens()['{unsubscribe_text}']
         );
     }
