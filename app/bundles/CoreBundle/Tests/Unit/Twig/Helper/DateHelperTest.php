@@ -47,6 +47,27 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->coreParametersHelper
         );
+
+        // Setup translator mock for humanized dates
+        $this->translator->method('trans')
+            ->willReturnCallback(function ($key, $parameters = []) {
+                switch ($key) {
+                    case 'mautic.core.date.years.ago':
+                        return $parameters['%count%'] . ' year(s) ago';
+                    case 'mautic.core.date.months.ago':
+                        return $parameters['%count%'] . ' month(s) ago';
+                    case 'mautic.core.date.days.ago':
+                        return $parameters['%count%'] . ' day(s) ago';
+                    case 'mautic.core.date.hours.ago':
+                        return $parameters['%count%'] . ' hour(s) ago';
+                    case 'mautic.core.date.minutes.ago':
+                        return $parameters['%count%'] . ' minute(s) ago';
+                    case 'mautic.core.date.just.now':
+                        return 'just now';
+                    default:
+                        return $key;
+                }
+            });
     }
 
     public function testStringToText(): void
@@ -105,6 +126,35 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
         $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+    }
+
+    public function testToHumanized(): void
+    {
+        $this->setDefaultLocalTimezone('UTC');
+
+        // Test "just now"
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->assertEquals('just now', $this->helper->toHumanized($now));
+
+        // Test minutes ago
+        $fiveMinutesAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-5 minutes');
+        $this->assertEquals('5 minute(s) ago', $this->helper->toHumanized($fiveMinutesAgo));
+
+        // Test hours ago
+        $twoHoursAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-2 hours');
+        $this->assertEquals('2 hour(s) ago', $this->helper->toHumanized($twoHoursAgo));
+
+        // Test days ago
+        $threeDaysAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-3 days');
+        $this->assertEquals('3 day(s) ago', $this->helper->toHumanized($threeDaysAgo));
+
+        // Test months ago
+        $fourMonthsAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-4 months');
+        $this->assertEquals('4 month(s) ago', $this->helper->toHumanized($fourMonthsAgo));
+
+        // Test years ago
+        $oneYearAgo = (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-1 year');
+        $this->assertEquals('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
     }
 
     private function setDefaultLocalTimezone(string $timezone): void
