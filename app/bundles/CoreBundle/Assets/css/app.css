@@ -1144,6 +1144,18 @@ h6,
 .fs-56 {
   font-size: 56px !important;
 }
+.fs-b-e {
+  font-size: var(--typography-body-expressive);
+}
+.fs-b-p {
+  font-size: var(--typography-body-productive);
+}
+.fs-u-e {
+  font-size: var(--typography-utility-expressive);
+}
+.fs-u-p {
+  font-size: var(--typography-utility-productive);
+}
 .page-header {
   padding: 15px;
   margin: 16px 0 0 0;
