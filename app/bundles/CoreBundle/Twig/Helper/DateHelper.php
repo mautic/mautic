@@ -235,9 +235,6 @@ final class DateHelper
      * Returns a humanized date string like "X hours ago".
      *
      * @param \DateTime|string $datetime
-     * @param string $timezone
-     * @param string $fromFormat
-     * @return string
      */
     public function toHumanized($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
@@ -249,8 +246,8 @@ final class DateHelper
         $date = $this->helper->getDateTime();
 
         // Use default timezone if 'local' is provided
-        $nowTimezone = ($timezone === 'local') ? date_default_timezone_get() : $timezone;
-        $now = new \DateTime('now', new \DateTimeZone($nowTimezone));
+        $nowTimezone = ('local' === $timezone) ? date_default_timezone_get() : $timezone;
+        $now         = new \DateTime('now', new \DateTimeZone($nowTimezone));
 
         $diff = $now->diff($date);
 

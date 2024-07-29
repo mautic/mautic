@@ -44,9 +44,6 @@ class DateExtension extends AbstractExtension
      * Returns a humanized date string like "X hours ago".
      *
      * @param \DateTime|string $datetime
-     * @param string $timezone
-     * @param string $fromFormat
-     * @return string
      */
     public function toHumanized($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
