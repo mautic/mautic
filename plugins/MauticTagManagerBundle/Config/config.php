@@ -37,7 +37,7 @@ return [
                     'request_stack',
                     'router',
                     'translator',
-                    'monolog.logger.mautic',
+                    'logger',
                     'mautic.helper.encryption',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',

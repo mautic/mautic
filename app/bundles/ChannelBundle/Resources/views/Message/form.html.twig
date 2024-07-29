@@ -51,7 +51,7 @@
             },
         } %}
         {% if formContainsErrors(form.channels[channel]) %}
-            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'ri-alert-fill'}) %}
+            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'fa-warning'}) %}
         {% elseif form.channels[channel].isEnabled.vars.data %}
             {% set tab = tab|merge({'published': true}) %}
         {% endif %}
@@ -73,7 +73,7 @@
 {% block rightFormContent %}
 {{ form_row(form.category) }}
 {{ form_row(form.isPublished) }}
-{{ form_row(form.publishUp, {'label': 'mautic.core.form.available.available_from'}) }}
-{{ form_row(form.publishDown, {'label': 'mautic.core.form.available.unavailable_from'}) }}
+{{ form_row(form.publishUp) }}
+{{ form_row(form.publishDown) }}
 {% endblock %}
 {% block _content %}{% endblock %}

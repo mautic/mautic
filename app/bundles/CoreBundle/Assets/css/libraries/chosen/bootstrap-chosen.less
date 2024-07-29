@@ -40,7 +40,7 @@
   }
 
   .chosen-results {
-    color: var(--text-secondary);
+    color: @gray;
     margin: 0 4px 4px 0;
     max-height: 240px;
     padding: 0 0 0 4px;
@@ -51,12 +51,10 @@
 
     li {
       display: none;
-      line-height: var(--spacing-06);
-      max-height: var(--spacing-07);
+      line-height: @line-height-base; // 15px;
       list-style: none;
       margin: 0;
-      padding: 5px var(--spacing-05);
-      transition: var(--transition-all-productive);
+      padding: 5px 6px;
 
       em {
         background: #feffde;
@@ -80,9 +78,9 @@
       }
 
       &.highlighted {
-        background-color: var(--layer-hover);
+        background-color: @link-color;
         background-image: none;
-        color: var(--text-primary);
+        color: white;
 
         em {
           background: transparent;
@@ -139,21 +137,18 @@
     -moz-background-clip: padding;
     background-clip: padding-box;
     border: @chosen-border;
-    border-width: var(--border-bottom);
-    border-style: solid;
-    border-color: var(--border-strong);
     .border-top-radius(@chosen-border-radius);
     .border-bottom-radius(@chosen-border-radius);
     .box-shadow(@chosen-box-shadow);
+    color: @gray;
     display: block;
     height: @chosen-height;
     overflow: hidden;
     line-height: @chosen-height;
-    padding: 0 0 0 var(--spacing-05);
+    padding: 0 0 0 8px;
     position: relative;
     text-decoration: none;
     white-space: nowrap;
-    color: var(--text-secondary);
 
     span {
       display: block;
@@ -211,15 +206,9 @@
       .border-bottom-radius(@chosen-border-radius);
       .box-shadow(@chosen-box-shadow);
       margin: 1px 0;
-      padding: 4px 20px 4px var(--spacing-05);
-      height: var(--spacing-07);
+      padding: 4px 20px 4px 4px;
       width: 100%;
       max-width: 100%;
-      transition: var(--transition-all-productive);
-
-      &:focus {
-        outline: 2px solid var(--focus);
-      }
     }
   }
 
@@ -244,33 +233,17 @@
 .chosen-container-multi {
   .chosen-choices {
     background-color: @chosen-background;
-    color: var(--text-secondary);
     border: @chosen-border;
-    border-width: var(--border-bottom);
-    border-style: solid;
-    border-color: var(--border-strong);
-    padding: 0 var(--spacing-04);
     .border-top-radius(@chosen-multi-border-radius);
     .border-bottom-radius(@chosen-multi-border-radius);
     .box-shadow(@chosen-box-shadow);
     cursor: text;
     height: auto !important;
     height: 1%;
-    min-height: 32px;
     margin: 0;
     overflow: hidden;
+    padding: 0;
     position: relative;
-    transition: var(--transition-all-productive);
-    outline: 2px solid transparent;
-    outline-offset: -2px;
-
-    &:hover {
-      background-color: var(--field-hover);
-    }
-
-    &:active, &:focus-within {
-      outline: 2px solid var(--focus);
-    }
 
     li {
       float: left;
@@ -286,15 +259,11 @@
         background: transparent !important;
         border: 0 !important;
         .box-shadow(none);
-        color: var(--text-secondary);
+        color: @gray;
         height: @chosen-multi-height - 8px;
         margin: 0;
         padding: 4px;
         outline: 0;
-
-        &:hover, &:active, &:focus {
-          color: var(--text-primary);
-        }
       }
 
       .default {
@@ -364,7 +333,7 @@
   }
 
   &.chosen-with-drop .chosen-single {
-    background-color: var(--field-hover);
+    background-color: @input-bg;
     border: @chosen-focus-border;
     .border-bottom-radius(0);
     .box-shadow(@chosen-focus-box-shadow);
@@ -500,7 +469,7 @@
 
 .chosen-container {
   .default, .chosen-default {
-    color: var(--text-secondary);
+    color: @gray-light !important;
   }
 }
 

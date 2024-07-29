@@ -263,7 +263,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-check-line';
+                    $graphData['iconClass'] = 'fa-check-square-o';
                     $graphData['link']      = 'mautic_form_action';
                     $event->setGraph($g, $graphData);
                     break;

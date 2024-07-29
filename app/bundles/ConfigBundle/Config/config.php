@@ -19,9 +19,8 @@ return [
             'mautic.config.menu.index' => [
                 'route'           => 'mautic_config_action',
                 'routeParameters' => ['objectAction' => 'edit'],
-                'iconClass'       => 'ri-settings-5-fill',
+                'iconClass'       => 'ri-settings-5-line',
                 'id'              => 'mautic_config_index',
-                'parent'          => 'mautic.core.general',
                 'access'          => 'admin',
                 'priority'        => 16,
             ],
@@ -29,7 +28,6 @@ return [
                 'route'     => 'mautic_sysinfo_index',
                 'iconClass' => 'ri-information-2-fill',
                 'id'        => 'mautic_sysinfo_index',
-                'parent'    => 'mautic.core.general',
                 'access'    => 'admin',
                 'priority'  => 04,
                 'checks'    => [

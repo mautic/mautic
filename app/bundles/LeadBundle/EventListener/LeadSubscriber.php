@@ -492,17 +492,17 @@ class LeadSubscriber implements EventSubscriberInterface
                             break;
                         case 'email':
                         case 'newsletter':
-                            $icon = 'ri-mail-open-line';
+                            $icon = 'fa-envelope-o';
                             break;
                         case 'banner':
                         case 'ad':
-                            $icon = 'ri-focus-2-line';
+                            $icon = 'fa-bullseye';
                             break;
                         case 'cpc':
-                            $icon = 'ri-cash-line';
+                            $icon = 'fa-money';
                             break;
                         case 'location':
-                            $icon = 'ri-map-pin-2-line';
+                            $icon = 'fa-map-marker';
                             break;
                         case 'device':
                             $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
@@ -545,7 +545,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 $row['reason'] = $this->dncReasonHelper->toText((int) $row['reason']);
 
                 $template = '@MauticLead/SubscribedEvents/Timeline/donotcontact.html.twig';
-                $icon     = 'ri-prohibited-line';
+                $icon     = 'fa-ban';
 
                 if (!empty($row['channel'])) {
                     if ($channelModel = $this->getChannelModel($row['channel'])) {
@@ -691,7 +691,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventType'  => $eventTypeName,
                         'eventLabel' => $eventTypeName,
                         'timestamp'  => $apiEvent['date_added'],
-                        'icon'       => 'ri-list-settings-line',
+                        'icon'       => 'fa-cogs',
                         'extra'      => $apiEvent,
                         'contactId'  => $apiEvent['lead_id'],
                     ]

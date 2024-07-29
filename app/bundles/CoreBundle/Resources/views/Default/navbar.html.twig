@@ -7,7 +7,7 @@
     <ul class="nav navbar-nav navbar-left">
         <li class="visible-xs">
             <a href="javascript: void(0);" data-toggle="sidebar" data-direction="ltr">
-                <i class="ri-menu-line fs-16"></i>
+                <i class="fa fa-navicon fs-16"></i>
             </a>
         </li>
         {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
@@ -16,9 +16,14 @@
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
+        
         {{ include('@MauticCore/Menu/profile.html.twig') }}
         {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
-        {{ menuRender('admin') }}
+        <li>
+            <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl">
+                <i class="ri-settings-5-line ri-xl"></i>
+            </a>
+        </li>
     </ul>
     <div class="navbar-toolbar pull-right mt-15 mr-10">
     {{ buttonReset(constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}

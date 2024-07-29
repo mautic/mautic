@@ -33,13 +33,11 @@
                     </select>
                 </div>
                 <div class="col-sm-2 mt-lg">
-                    {% if enableExportPermission %}
                     <a class="btn btn-default btn-block mt-lg" href="{{ url('mautic_contact_auditlog_export_action', {'leadId': lead.id}) }}" data-toggle="download">
                         <span>
                             <i class="ri-download-line"></i> <span>{{ 'mautic.core.export'|trans }}</span>
                         </span>
                     </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -56,12 +54,11 @@
       <table class="table table-hover" id="contact-auditlog">
           <thead>
           <tr>
-            <th class="timeline-icon np"></th>
-            <th class="table-expand np">
-                <a class="table-expand-button" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
-                    <span class="ri-arrow-down-s-line"></span>
-                </a>
-            </th>
+              <th class="timeline-icon">
+                  <a class="btn btn-sm btn-nospin btn-default" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
+                      <span class="fa fa-fw ri-corner-right-down-line"></span>
+                  </a>
+              </th>
               {{ include('@MauticCore/Helper/tableheader.html.twig', {
                   'orderBy': 'userName',
                   'text': 'mautic.lead.timeline.user_name',
@@ -90,7 +87,7 @@
           <tbody>
           {% for event in events.events %}
               {% set counter = loop.index0 + 1 %}
-              {% set icon = event.icon|default('ri-history-line') %}
+              {% set icon = event.icon|default('fa-history') %}
               {% set eventLabel = event.eventLabel|default(event.eventType) %}
               {% if eventLabel is iterable %}
                   {% set linkType = eventLabel.isExternal is defined ? 'data-toggle="ajax"' : 'target="_new"' %}
@@ -105,16 +102,13 @@
                   {% endif %}
               {% endfor %}
               <tr class="timeline-row {{ rowStripe }} {% if event.featured is defined %}timeline-featured{% endif %}">
-                <td class="timeline-icon np">
-                    <span class="fa fa-fw {{ icon }}"></span>
-                </td>
-                  <td class="table-expand np">
+                  <td class="timeline-icon">
                       <a href="javascript:void(0);"
                          data-activate-details="{{ counter }}"
-                         class="table-expand-button {% if event.contentTemplate is not defined or hasDetails == false %}disabled{% endif %}"
+                         class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined or hasDetails == false %}disabled{% endif %}"
                          data-toggle="tooltip"
                          title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
-                         <span class="ri-arrow-down-s-line"></span>
+                          <span class="fa fa-fw {{ icon }}"></span>
                       </a>
                   </td>
                   <td class="timeline-name">{{ eventLabel }}</td>
@@ -125,7 +119,7 @@
               {% if event.contentTemplate and hasDetails == true %}
                   <!-- contentTemplate: "{{ event.contentTemplate }}" -->
                   <tr class="timeline-row {{ rowStripe }} timeline-details hide" id="auditlog-details-{{ counter }}">
-                      <td colspan="6">
+                      <td colspan="4">
                         {{ include([event.contentTemplate, event.contentTemplate], {'event': event, 'lead': lead}) }}
                       </td>
                   </tr>

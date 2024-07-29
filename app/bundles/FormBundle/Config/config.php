@@ -114,11 +114,6 @@ return [
                 'path'       => '/form/submit/ajax',
                 'controller' => 'Mautic\FormBundle\Controller\AjaxController::submitAction',
             ],
-            'mautic_form_company_lookup' => [
-                'path'       => '/form/company-lookup/autocomplete',
-                'controller' => 'Mautic\FormBundle\Controller\PublicController::lookupCompanyAction',
-                'method'     => 'POST',
-            ],
         ],
     ],
 

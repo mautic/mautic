@@ -45,7 +45,6 @@ return [
                     'route'     => 'mautic_client_index',
                     'access'    => 'api:clients:view',
                     'parent'    => 'mautic.core.integrations',
-                    'iconClass' => 'ri-terminal-box-fill',
                     'priority'  => 17,
                     'checks'    => [
                         'parameters' => [

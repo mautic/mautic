@@ -280,7 +280,7 @@ Mautic.unlockEntity = function (model, id, parameter) {
 Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     event.preventDefault();
 
-    var wasPublished = mQuery(el).hasClass('ri-toggle-fill');
+    var wasPublished = mQuery(el).hasClass('fa-toggle-on');
     var element = mQuery(el);
 
     element.removeClass('fa-toggle-on fa-toggle-off').addClass('fa-spin fa-spinner');
@@ -312,7 +312,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
             }
         },
         error: function (request, textStatus, errorThrown) {
-            var addClass = (wasPublished) ? 'ri-toggle-fill' : 'ri-toggle-line';
+            var addClass = (wasPublished) ? 'fa-toggle-on' : 'fa-toggle-off';
             element.removeClass('fa-spin fa-spinner').addClass(addClass);
 
             Mautic.processAjaxError(request, textStatus, errorThrown);

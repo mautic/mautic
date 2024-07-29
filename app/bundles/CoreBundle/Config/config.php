@@ -111,30 +111,26 @@ return [
         'main' => [
             'mautic.core.components' => [
                 'id'        => 'mautic_components_root',
-                'iconClass' => 'ri-archive-2-fill',
+                'iconClass' => 'ri-puzzle-fill',
                 'priority'  => 60,
             ],
             'mautic.core.channels' => [
                 'id'        => 'mautic_channels_root',
-                'iconClass' => 'ri-remote-control-fill',
+                'iconClass' => 'ri-rss-fill',
                 'priority'  => 40,
             ],
         ],
         'admin' => [
-            'mautic.core.general' => [
-                'id'        => 'mautic_general_root',
-                'priority'  => 15,
-            ],
             'mautic.theme.menu.index' => [
                 'route'     => 'mautic_themes_index',
-                'iconClass' => 'ri-pantone-fill',
+                'iconClass' => 'ri-palette-fill',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
-                'parent'    => 'mautic.core.general',
                 'priority'  => 18,
             ],
             'mautic.core.integrations' => [
                 'id'        => 'mautic_integrations_root',
+                'iconClass' => 'ri-plug-fill',
                 'priority'  => 15,
             ],
         ],
@@ -199,7 +195,6 @@ return [
                 'class'     => Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
                     'translator',
-                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [

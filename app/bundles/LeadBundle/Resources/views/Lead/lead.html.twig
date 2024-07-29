@@ -142,8 +142,8 @@
             <!--/ lead detail header -->
 
             <!-- lead detail collapseable -->
-            <div class="collapse pr-md pl-md" id="lead-details">
-                <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
+            <div class="collapse" id="lead-details">
+                <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
@@ -253,12 +253,8 @@
                     </div>
                 </div>
             {% endif %}
-            
-        </div>
-
-        <div class="pa-md">
             <!-- tabs controls -->
-            <ul class="nav nav-tabs nav-tabs-contained mt-10">
+            <ul class="nav nav-tabs pr-md pl-md mt-10">
                 <li class="active">
                     <a href="#timeline-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="TimelineCount">
@@ -314,67 +310,65 @@
                 {{ customContent('tabs', _context) }}
             </ul>
             <!--/ tabs controls -->
-
-            <!-- start: tab-content -->
-            <div class="tab-content pa-md">
-                <!-- #history-container -->
-                <div class="tab-pane fade in active bdr-w-0" id="timeline-container">
-                    {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
-                </div>
-                <!--/ #history-container -->
-
-                <!-- #notes-container -->
-                <div class="tab-pane fade bdr-w-0" id="notes-container">
-                    {{ render(controller('Mautic\\LeadBundle\\Controller\\NoteController::indexAction', {'leadId': lead.id, 'ignoreAjax': 1})) }}
-                </div>
-                <!--/ #notes-container -->
-
-                <!-- #social-container -->
-                {% if not isAnonymous and socialProfiles is not empty %}
-                    <div class="tab-pane fade bdr-w-0" id="social-container">
-                        {{ include('@MauticLead/Social/index.html.twig', {
-                            'lead': lead,
-                            'socialProfiles': socialProfiles,
-                            'socialProfileUrls': socialProfileUrls,
-                        }) }}
-                    </div>
-                {% endif %}
-                <!--/ #social-container -->
-
-                <!-- #integration-container -->
-                <div class="tab-pane fade bdr-w-0" id="integration-container">
-                    {{ include('@MauticLead/Integration/index.html.twig', {
-                        'lead': lead,
-                        'integrations': integrations,
-                    }) }}
-                </div>
-                <!--/ #integration-container -->
-
-                <!-- #auditlog-container -->
-                <div class="tab-pane fade bdr-w-0" id="auditlog-container">
-                    {{ include('@MauticLead/Auditlog/_list.html.twig', {
-                        'lead': lead,
-                        'events': auditlog,
-                    }) }}
-                </div>
-                <!--/ #auditlog-container -->
-
-                <!-- custom content -->
-                {{ customContent('tabs.content', _context) }}
-                <!-- end: custom content -->
-
-                <!-- #place-container -->
-                {% if places %}
-                    <div class="tab-pane fade bdr-w-0" id="place-container">
-                        {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
-                    </div>
-                {% endif %}
-                <!--/ #place-container -->
-            </div>
-            <!--/ end: tab-content -->
         </div>
 
-        
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            <!-- #history-container -->
+            <div class="tab-pane fade in active bdr-w-0" id="timeline-container">
+                {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
+            </div>
+            <!--/ #history-container -->
+
+            <!-- #notes-container -->
+            <div class="tab-pane fade bdr-w-0" id="notes-container">
+                {{ render(controller('Mautic\\LeadBundle\\Controller\\NoteController::indexAction', {'leadId': lead.id, 'ignoreAjax': 1})) }}
+            </div>
+            <!--/ #notes-container -->
+
+            <!-- #social-container -->
+            {% if not isAnonymous and socialProfiles is not empty %}
+                <div class="tab-pane fade bdr-w-0" id="social-container">
+                    {{ include('@MauticLead/Social/index.html.twig', {
+                        'lead': lead,
+                        'socialProfiles': socialProfiles,
+                        'socialProfileUrls': socialProfileUrls,
+                    }) }}
+                </div>
+            {% endif %}
+            <!--/ #social-container -->
+
+            <!-- #integration-container -->
+            <div class="tab-pane fade bdr-w-0" id="integration-container">
+                {{ include('@MauticLead/Integration/index.html.twig', {
+                     'lead': lead,
+                     'integrations': integrations,
+                }) }}
+            </div>
+            <!--/ #integration-container -->
+
+            <!-- #auditlog-container -->
+            <div class="tab-pane fade bdr-w-0" id="auditlog-container">
+                {{ include('@MauticLead/Auditlog/_list.html.twig', {
+                      'lead': lead,
+                      'events': auditlog,
+                }) }}
+            </div>
+            <!--/ #auditlog-container -->
+
+            <!-- custom content -->
+            {{ customContent('tabs.content', _context) }}
+            <!-- end: custom content -->
+
+            <!-- #place-container -->
+            {% if places %}
+                <div class="tab-pane fade bdr-w-0" id="place-container">
+                    {{ include('@MauticLead/Lead/_map.html.twig', {'places': places}) }}
+                </div>
+            {% endif %}
+            <!--/ #place-container -->
+        </div>
+        <!--/ end: tab-content -->
     </div>
     <!--/ left section -->
 

@@ -42,7 +42,7 @@
                 <div class="col-xs-12">
 
                     <!-- tabs controls -->
-                    <ul class="nav nav-tabs nav-tabs-contained">
+                    <ul class="nav nav-tabs pr-md pl-md">
                         <li class="active">
                             <a href="#email-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
                         </li>
@@ -123,7 +123,7 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-xs-3 dynamicContentFilterContainer">
-                                          <ul class="nav nav-tabs nav-tabs-contained tabs-left" id="dynamicContentTabs">
+                                          <ul class="nav nav-tabs tabs-left" id="dynamicContentTabs">
                                             <li>
                                               <a href="javascript:void(0);" role="tab" class="btn btn-primary" id="addNewDynamicContent"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
                                             </li>
@@ -157,10 +157,8 @@
                 {% if isVariant %}
                     {{ form_row(form.variantSettings) }}
                     {{ form_row(form.isPublished) }}
-                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
-                    </div>
+                    {{ form_row(form.publishUp) }}
+                    {{ form_row(form.publishDown) }}
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
                         {{ form_row(form.lists) }}
@@ -178,11 +176,8 @@
 
                 {% if not isVariant %}
                     {{ form_row(form.isPublished) }}
-                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
-                    </div>
-                    
+                    {{ form_row(form.publishUp) }}
+                    {{ form_row(form.publishDown) }}
                 {% endif %}
 
                 {{ form_row(form.unsubscribeForm) }}

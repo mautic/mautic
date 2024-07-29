@@ -52,7 +52,6 @@ return [
                     'access'    => 'plugin:plugins:manage',
                     'route'     => 'mautic_plugin_index',
                     'parent'    => 'mautic.core.integrations',
-                    'iconClass' => 'ri-plug-fill',
                 ],
             ],
         ],

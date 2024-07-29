@@ -23,12 +23,14 @@ hr,
     position: relative;
     top: -1px;
     z-index: 1;
-    background-color: var(--layer);
+    background-color: @body-bg;
     padding: 0 15px;
     margin: 0 15px;
+    border: 1px solid @hr-border;
     border-top-width: 0;
     border-bottom-left-radius: @border-radius-base;
     border-bottom-right-radius: @border-radius-base;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
     font-size: 9px;
     line-height: 22px;
     text-transform: uppercase;
@@ -63,7 +65,7 @@ hr,
 // Links
 
 a {
-  transition: var(--transition-all-productive);
+  transition: var(--all);
   &:hover {
     cursor: pointer;
   }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -28,65 +26,65 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use Psr\Log\LoggerInterface;
 
 class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventCollector&MockObject
+     * @var EventCollector|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $eventCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
     /**
-     * @var EventLogger&MockObject
+     * @var EventLogger|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $eventLogger;
+    private \PHPUnit\Framework\MockObject\MockObject $eventLogger;
 
     /**
-     * @var ActionExecutioner&MockObject
+     * @var ActionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $actionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $actionExecutioner;
 
     /**
-     * @var ConditionExecutioner&MockObject
+     * @var ConditionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $conditionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $conditionExecutioner;
 
     /**
-     * @var DecisionExecutioner&MockObject
+     * @var DecisionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $decisionExecutioner;
+    private \PHPUnit\Framework\MockObject\MockObject $decisionExecutioner;
 
     /**
-     * @var LoggerInterface&MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $logger;
+    private \PHPUnit\Framework\MockObject\MockObject $logger;
 
     /**
-     * @var EventScheduler&MockObject
+     * @var EventScheduler|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $eventScheduler;
+    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
 
     /**
-     * @var RemovedContactTracker&MockObject
+     * @var RemovedContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $removedContactTracker;
+    private \PHPUnit\Framework\MockObject\MockObject $removedContactTracker;
 
     /**
-     * @var LeadRepository&MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private MockObject $leadRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
-     * @var EventRepository&MockObject
+     * @var EventRepository|MockBuilder
      */
-    private MockObject $eventRepository;
+    private \PHPUnit\Framework\MockObject\MockObject $eventRepository;
 
     /**
-     * @var Translator&MockObject
+     * @var Translator|MockBuilder
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {
@@ -101,32 +99,13 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventScheduler        = $this->createMock(EventScheduler::class);
         $this->removedContactTracker = $this->createMock(RemovedContactTracker::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
-        $this->eventRepository       = $this->createMock(EventRepository::class);
-        $this->translator            = $this->createMock(Translator::class);
-    }
+        $this->eventRepository       = $this->getMockBuilder(EventRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedMethodOtherwiseItLowersCodeCoverageAsItsNoLongerUsed(): void
-    {
-        $deprecationTriggered = false;
-        $errorHandler         = function (int $errorNumber, string $errorMessage) use (&$deprecationTriggered): bool {
-            if (E_USER_DEPRECATED === $errorNumber && 'EventExecutioner::recordLogsWithError() is deprecated in Mautic:4 and is removed from Mautic:5 as unused' === $errorMessage) {
-                $deprecationTriggered = true;
-            }
-
-            // returning false let the normal error handler continue
-            return false;
-        };
-
-        $this->eventLogger->expects($this->once())->method('persistCollection')->willReturn($this->eventLogger);
-
-        set_error_handler($errorHandler);
-        $this->getEventExecutioner()->recordLogsWithError(new ArrayCollection([]), 'some message'); // @phpstan-ignore-line as recordLogsWithError() is deprecated
-        restore_error_handler();
-
-        $this->assertTrue($deprecationTriggered, 'Deprecation should be triggered');
+        $this->translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     public function testJumpToEventsAreProcessedAfterOtherEvents(): void
@@ -227,7 +206,10 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->getEventExecutioner()->executeEventsForContacts($events, $contacts);
     }
 
-    private function getEventExecutioner(): EventExecutioner
+    /**
+     * @return EventExecutioner
+     */
+    private function getEventExecutioner()
     {
         return new EventExecutioner(
             $this->eventCollector,

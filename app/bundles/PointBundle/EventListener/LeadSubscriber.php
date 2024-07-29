@@ -91,7 +91,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon'      => 'ri-calculator-line',
+                        'icon'      => 'fa-calculator',
                         'contactId' => $log['lead_id'],
                     ]
                 );

@@ -52,7 +52,7 @@
     </div>
     {% else %}
     <div class="col-sm-offset-3 col-sm-6">
-        <div class="bg-white pa-lg text-center" style="margin-top:100px;">
+        <div class="pa-lg text-center" style="margin-top:100px;">
             <i class="ri-alert-line fa-5x"></i>
             <h2>{{ error.message | raw }}</h2>
             {% if error.submessage is defined and error.submessage is not empty %}

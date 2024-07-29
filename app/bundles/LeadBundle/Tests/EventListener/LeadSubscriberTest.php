@@ -201,7 +201,7 @@ class LeadSubscriberTest extends CommonMocks
             'eventType'  => $eventTypeName,
             'eventLabel' => $eventTypeName,
             'timestamp'  => $leadEventLog['date_added'],
-            'icon'       => 'ri-list-settings-line',
+            'icon'       => 'fa-cogs',
             'extra'      => $leadEventLog,
             'contactId'  => $leadEventLog['lead_id'],
         ];

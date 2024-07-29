@@ -472,7 +472,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'ri-money-dollar-circle-line',
+                            'iconClass' => 'fa-dollar',
                         ]
                     );
                     break;
@@ -513,7 +513,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-asterisk';
+                    $graphData['iconClass'] = 'fa-asterisk';
                     $graphData['link']      = 'mautic_contact_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -544,7 +544,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-community-line';
+                    $graphData['iconClass'] = 'fa-university';
                     $event->setGraph($g, $graphData);
                     break;
 
@@ -558,7 +558,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-calendar-line';
+                    $graphData['iconClass'] = 'fa-calendar';
                     $event->setGraph($g, $graphData);
                     break;
 
@@ -572,7 +572,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-flashlight-line';
+                    $graphData['iconClass'] = 'fa-bolt';
                     $event->setGraph($g, $graphData);
                     break;
 
@@ -621,7 +621,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'ri-building-3-line',
+                            'iconClass' => 'fa fa-industry',
                         ]
                     );
                     break;

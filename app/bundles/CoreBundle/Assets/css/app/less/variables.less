@@ -1,8 +1,56 @@
-/////////////////////////////////////////////////////////////////////////
+//
+// Variables
+// --------------------------------------------------
+
+//== General
+//
+
+:root {
+    // Animations
+    --timing:                                    .3s ease;
+    --all:                                       all var(--timing);
+
+    //== Border
+    --border-interactive: #4e5e9e;
+    --border-subtle: #e0e0e0;
+    --border-subtle-alt: #c6c6c6;
+    --border-subtle-selected: #c6c6c6;
+    --border-strong: #8d8d8d;
+    --border-tile: #c6c6c6;
+    --border-tile-alt: #a8a8a8;
+    --border-inverse: #161616;
+    --border-disabled: #c6c6c6;
+
+    //== Layer
+    --layer: #f4f4f4;
+    --layer-alt: #ffffff;
+    --layer-hover: #e8e8e8;
+    --layer-active: #c6c6c6;
+    --layer-selected: #e0e0e0;
+    --layer-selected-hover: #cacaca;
+    --layer-selected-inverse: #161616;
+    --layer-selected-disabled: #8d8d8d;
+
+    //== Icons
+    --icon-primary: #161616;
+    --icon-secondary: #525252;
+    --icon-on-color: #ffffff;
+    --icon-on-color-disabled: #8d8d8d;
+    --icon-interactive: #4e5e9e;
+    --icon-inverse: #ffffff;
+    --icon-disabled: rgba(22, 22, 22, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --timing:                                0;
+    }
+}
+
 //== Bootstrap variable
 //
 //## import bootstrap variable.
-@import "../../libraries/bootstrap/bootstrap-mautic-custom-variables";
+@import "../../../../../../../node_modules/bootstrap/less/variables.less";
 
 //== Logo
 //
@@ -18,15 +66,11 @@
 @mautic-secondary:							#fdb933;
 @mautic-tertiary:							#35b5b9;
 
-@alert-mautic-bg:             @brand-primary;
-@alert-mautic-text:           #fff;
-@alert-mautic-border:         rgba(0,0,0,0.03);
-
 //== Header layout
 //
 //## common main header variable.
 @header-bg:                                 #ffffff;
-@header-height:                             48px;
+@header-height:                             60px;
 @header-zindex:                             @zindex-navbar + 5; // 1005
 
 
@@ -36,7 +80,7 @@
 @sidebar-zindex:                           (@header-zindex - 20 + 5);  // 990
 //** left sidebar option
 @sidebar-left-bg:                           darken(#27303a, 5%);
-@sidebar-left-header-bg:                    @mautic-primary;
+@sidebar-left-header-bg:                    @brand-primary;
 @sidebar-left-width:                        230px;
 @sidebar-left-collapse-width:               60px;
 @sidebar-left-dark:							darken(@sidebar-left-bg, 8%);
@@ -59,10 +103,5 @@
 //
 //## common footer variable.
 @footer-height:                             46px;
-@footer-bg:                                 transparent;
+@footer-bg:                                 lighten(@body-bg, 1%);
 @footer-zindex:                             @content-zindex;  // 1000
-
-
-@brand-facebook:        #3b5998;
-@brand-twitter:         #55acee;
-@brand-google:          #dd4b39;

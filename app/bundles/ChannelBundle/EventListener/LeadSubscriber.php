@@ -66,7 +66,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'log' => $log,
                         ],
                         'contentTemplate' => '@MauticChannel/SubscribedEvents/Timeline/queued_messages.html.twig',
-                        'icon'            => 'ri-question-answer-line',
+                        'icon'            => 'fa-comments-o',
                         'contactId'       => $log['lead_id'],
                     ]
                 );

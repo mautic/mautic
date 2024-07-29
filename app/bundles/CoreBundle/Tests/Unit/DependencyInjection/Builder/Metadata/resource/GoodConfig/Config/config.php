@@ -13,7 +13,7 @@ return [
         'main' => [
             'mautic.core.components' => [
                 'id'        => 'mautic_components_root',
-                'iconClass' => 'ri-puzzle-2-line',
+                'iconClass' => 'fa-puzzle-piece',
                 'priority'  => 60,
             ],
         ],

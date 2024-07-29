@@ -77,7 +77,7 @@
                                 'data-toggle': 'ajax',
                                 'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
                             },
-                            'iconClass': 'ri-send-plane-line-o',
+                            'iconClass': 'fa fa-send-o',
                             'btnText': 'mautic.email.send'
                         } %}
 
@@ -121,13 +121,13 @@
                                data-toggle="ajax">
                                 {{ item.getName() }}
                                 {% if hasVariants %}
-                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="fa fa-fw ri-organization-chart"></i></span>
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="fa fa-fw fa-sitemap"></i></span>
                                 {% endif %}
                                 {% if hasTranslations %}
-                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="fa fa-fw ri-translate"></i></span>
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="fa fa-fw fa-language"></i></span>
                                 {% endif %}
                                 {% if 'list' == type %}
-                                  <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="ri-pie-chart-line"></i></span>
+                                  <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="fa fa-fw fa-pie-chart"></i></span>
                                 {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>

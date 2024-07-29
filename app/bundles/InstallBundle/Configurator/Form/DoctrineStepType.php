@@ -112,7 +112,7 @@ class DoctrineStepType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'ri-lock-fill',
+                    'preaddon' => 'fa fa-lock',
                 ],
                 'required' => false,
             ]
