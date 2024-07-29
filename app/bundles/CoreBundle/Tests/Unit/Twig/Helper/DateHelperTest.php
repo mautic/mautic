@@ -103,25 +103,27 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     public function testToTextWithConfigurationToTime(): void
-    {
-        $this->coreParametersHelper->method('get')
-            ->with('date_format_timeonly')
-            ->willReturn('00:00:00');
+{
+    $this->coreParametersHelper->method('get')
+        ->with('date_format_timeonly')
+        ->willReturn('H:i:s');
 
-        $this->translator->method('trans')
-            ->willReturnCallback(
-                function (string $key, array $parameters = []) {
-                    if (isset($parameters['%time%'])) {
-                        return $parameters['%time%'];
-                    }
-                    return $key;
+    $this->translator->method('trans')
+        ->willReturnCallback(
+            function (string $key, array $parameters = []) {
+                if ($key === 'mautic.core.date.today') {
+                    return 'Today, ' . $parameters['%time%'];
                 }
-            );
+                return $key;
+            }
+        );
 
-        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+    $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        $this->assertSame('00:00:00', $this->helper->toText($dateTime));
-    }
+    $result = $this->helper->toText($dateTime);
+    $this->assertStringStartsWith('Today,', $result);
+    $this->assertMatchesRegularExpression('/\d{2}:\d{2}:\d{2}$/', $result);
+}
 
     public function testFullConcat(): void
     {
