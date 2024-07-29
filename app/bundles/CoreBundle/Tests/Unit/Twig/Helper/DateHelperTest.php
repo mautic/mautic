@@ -53,15 +53,15 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function ($key, $parameters = []) {
                 switch ($key) {
                     case 'mautic.core.date.years.ago':
-                        return $parameters['%count%'] . ' year(s) ago';
+                        return $parameters['%count%'].' year(s) ago';
                     case 'mautic.core.date.months.ago':
-                        return $parameters['%count%'] . ' month(s) ago';
+                        return $parameters['%count%'].' month(s) ago';
                     case 'mautic.core.date.days.ago':
-                        return $parameters['%count%'] . ' day(s) ago';
+                        return $parameters['%count%'].' day(s) ago';
                     case 'mautic.core.date.hours.ago':
-                        return $parameters['%count%'] . ' hour(s) ago';
+                        return $parameters['%count%'].' hour(s) ago';
                     case 'mautic.core.date.minutes.ago':
-                        return $parameters['%count%'] . ' minute(s) ago';
+                        return $parameters['%count%'].' minute(s) ago';
                     case 'mautic.core.date.just.now':
                         return 'just now';
                     default:
