@@ -257,6 +257,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_EMAILS, $data);
         $context = self::CONTEXT_EMAILS;
         $event->addGraph($context, 'pie', 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced');
+        $event->addGraph($context, 'bar', 'mautic.email.graph.bar.read.ingored.unsubscribed.bounced');
         $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
 
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
