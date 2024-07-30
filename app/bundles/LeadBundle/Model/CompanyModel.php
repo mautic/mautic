@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyMergeEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
@@ -73,7 +74,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        private FieldList $fieldList
     ) {
         $this->leadFieldModel = $leadFieldModel;
 
@@ -117,7 +119,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->repoSetup = true;
             $repo->setDispatcher($this->dispatcher);
             // set the point trigger model in order to get the color code for the lead
-            $fields = $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
+            $fields = $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
 
             $searchFields = [];
             foreach ($fields as $groupFields) {

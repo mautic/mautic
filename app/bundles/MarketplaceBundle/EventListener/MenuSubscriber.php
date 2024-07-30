@@ -40,6 +40,7 @@ final class MenuSubscriber implements EventSubscriberInterface
                         'route'     => RouteProvider::ROUTE_LIST,
                         'access'    => MarketplacePermissions::CAN_VIEW_PACKAGES,
                         'parent'    => 'mautic.core.integrations',
+                        'iconClass' => 'ri-shopping-bag-2-fill',
                         'priority'  => 16,
                     ],
                 ],
