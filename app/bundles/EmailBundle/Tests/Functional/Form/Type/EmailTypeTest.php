@@ -108,6 +108,7 @@ class EmailTypeTest extends MauticMysqlTestCase
             ],
         ]);
         $segment->setName('Segment A');
+        $segment->setPublicName('Segment A');
         $segment->setAlias('segment-a');
         $this->em->persist($segment);
         $this->em->flush();
