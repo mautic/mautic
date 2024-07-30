@@ -681,10 +681,8 @@ class Import extends FormEntity
 
     /**
      * Counts speed in items per second.
-     *
-     * @return float
      */
-    public function getSpeed()
+    public function getSpeed(): float
     {
         $runtime       = $this->getRunTimeSeconds();
         $processedRows = $this->getProcessedRows();
