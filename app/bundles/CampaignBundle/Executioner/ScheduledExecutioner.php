@@ -142,11 +142,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                 } catch (NoContactsFoundException) {
                     // All of the events were rescheduled
                 }
-            } else {
-                $this->executioner->recordLogsWithError(
-                    $organizedLogs,
-                    $this->translator->trans('mautic.campaign.event.campaign_unpublished')
-                );
             }
 
             $this->progressBar->advance($organizedLogs->count());
