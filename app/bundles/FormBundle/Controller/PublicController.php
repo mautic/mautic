@@ -6,9 +6,11 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -413,5 +415,26 @@ class PublicController extends CommonFormController
         }
 
         return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
+    }
+
+    public function lookupCompanyAction(Request $request, FieldModel $fieldModel, CompanyModel $companyModel): JsonResponse
+    {
+        $parameters = json_decode($request->getContent(), true);
+        $search     = InputHelper::clean($parameters['search'] ?? '');
+        $formId     = (int) ($parameters['formId'] ?? 0);
+
+        // Intentionally vague message as the JS takes care of this.
+        // Make it hard to abuse this public endpoint.
+        $vagueErrorMessage = ['error' => 'Invalid request param'];
+
+        if (mb_strlen($search) < 3 || !$formId) {
+            return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        if (!$fieldModel->getRepository()->fieldExistsByFormAndType($formId, 'companyLookup')) {
+            return new JsonResponse($vagueErrorMessage, JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse($companyModel->getRepository()->getCompanyLookupData($search));
     }
 }

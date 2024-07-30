@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,9 +15,12 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testCancelScheduledCampaignEventAction(): void
     {
-        $contact  = $this->createContact();
-        $campaign = $this->createCampaign();
-        $this->addContactToCampaign($contact, $campaign);
+        $fixtureHelper = new FixtureHelper($this->em);
+        $contact       = $fixtureHelper->createContact('some@contact.email');
+        $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
+        $fixtureHelper->addContactToCampaign($contact, $campaign);
+        $fixtureHelper->createCampaignWithScheduledEvent($campaign);
+        $this->em->flush();
 
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
@@ -47,102 +47,5 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertSame('{"success":1}', $this->client->getResponse()->getContent());
         Assert::assertFalse($log->getIsScheduled());
-    }
-
-    private function createContact(): Lead
-    {
-        $contact = new Lead();
-
-        $this->em->persist($contact);
-        $this->em->flush();
-
-        return $contact;
-    }
-
-    private function addContactToCampaign(Lead $contact, Campaign $campaign): void
-    {
-        $ref = new CampaignLead();
-        $ref->setCampaign($campaign);
-        $ref->setLead($contact);
-        $ref->setDateAdded(new \DateTime());
-
-        $this->em->persist($ref);
-        $this->em->flush();
-    }
-
-    private function createCampaign(): Campaign
-    {
-        $campaign = new Campaign();
-        $campaign->setName('Campaign A');
-        $campaign->setIsPublished(true);
-
-        $this->em->persist($campaign);
-        $this->em->flush();
-
-        $event = new Event();
-        $event->setCampaign($campaign);
-        $event->setName('Adjust contact points');
-        $event->setType('lead.changepoints');
-        $event->setEventType('action');
-        $event->setTriggerInterval(1);
-        $event->setTriggerIntervalUnit('d');
-        $event->setTriggerMode('interval');
-        $event->setProperties(
-            [
-                'canvasSettings' => [
-                    'droppedX' => '1080',
-                    'droppedY' => '155',
-                ],
-                'name'                       => '',
-                'triggerMode'                => 'interval',
-                'triggerDate'                => null,
-                'triggerInterval'            => '1',
-                'triggerIntervalUnit'        => 'd',
-                'triggerHour'                => '',
-                'triggerRestrictedStartHour' => '',
-                'triggerRestrictedStopHour'  => '',
-                'anchor'                     => 'leadsource',
-                'properties'                 => ['points' => '5'],
-                'type'                       => 'lead.changepoints',
-                'eventType'                  => 'action',
-                'anchorEventType'            => 'source',
-                'campaignId'                 => $campaign->getId(),
-                'buttons'                    => ['save' => ''],
-                'points'                     => 5,
-            ]
-        );
-
-        $this->em->persist($event);
-        $this->em->flush();
-
-        $campaign->addEvent(0, $event);
-        $campaign->setCanvasSettings(
-            [
-                'nodes' => [
-                    [
-                        'id'        => $event->getId(),
-                        'positionX' => '1080',
-                        'positionY' => '155',
-                    ],
-                    [
-                        'id'        => 'lists',
-                        'positionX' => '1180',
-                        'positionY' => '50',
-                    ],
-                ],
-                'connections' => [
-                    [
-                        'sourceId' => 'lists',
-                        'targetId' => $event->getId(),
-                        'anchors'  => [
-                            'source' => 'leadsource',
-                            'target' => 'top',
-                        ],
-                    ],
-                ],
-            ]
-        );
-
-        return $campaign;
     }
 }
