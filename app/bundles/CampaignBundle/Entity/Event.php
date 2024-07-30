@@ -8,7 +8,9 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Event implements ChannelInterface
 {
@@ -400,6 +402,11 @@ class Event implements ChannelInterface
                 ]
             )
              ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new EntityEvent());
     }
 
     /**
