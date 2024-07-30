@@ -132,6 +132,7 @@ class EmailTypeTest extends MauticMysqlTestCase
     {
         $email = new Email();
         $email->setName('Test');
+        $email->setSubject('Test');
         $email->setCustomHtml('html');
         $email->setTemplate('beefree-empty');
         $email->setEmailType('template');

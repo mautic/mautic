@@ -53,32 +53,25 @@ class BuilderSubscriberTest extends TestCase
      */
     private MockObject $mailHelperMock;
 
-    /**
-     * @param array<mixed> $data
-     * @param int|string   $dataName
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    protected function setUp(): void
     {
-        parent::__construct($name, $data, $dataName);
-
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
         $this->trackableModel       = $this->createMock(TrackableModel::class);
         $this->redirectModel        = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->mailHelperMock       = $this->createMock(MailHelper::class);
-        $mailHashHelper             = new MailHashHelper($this->coreParametersHelper);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
             $this->trackableModel,
             $this->redirectModel,
             $this->translator,
-            $mailHashHelper,
+            new MailHashHelper($this->coreParametersHelper),
             $this->mailHelperMock
         );
-        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
-        $this->translator->method('trans')->willReturn('some translation');
+        
+        parent::setUp();
     }
 
     /**
@@ -86,6 +79,8 @@ class BuilderSubscriberTest extends TestCase
      */
     public function testFixEmailAccessibility(string $content, string $expectedContent, ?string $emailLocale): void
     {
+        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
+        $this->translator->method('trans')->willReturn('some translation');
         $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
             if ('locale' === $key) {
                 return 'default_locale';
@@ -182,6 +177,9 @@ class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '{contactfield=companyname} {contactfield=lastname}';
 
+        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
+        $this->translator->method('trans')->willReturn('some translation');
+
         $this->coreParametersHelper->expects($this->exactly(4))
             ->method('get')
             ->withConsecutive(['unsubscribe_text'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
@@ -218,6 +216,7 @@ class BuilderSubscriberTest extends TestCase
 
         $email = new Email();
         $email->setSendToDnc(true);
+        $email->setId(111);
 
         $args = [
             'lead'   => $leadArray,
@@ -228,16 +227,30 @@ class BuilderSubscriberTest extends TestCase
 
         $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
 
-        $this->coreParametersHelper
-            ->method('get')
+        $this->coreParametersHelper->method('get')
             ->withConsecutive(['secret_key'], ['unsubscribe_text'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
             ->willReturnOnConsecutiveCalls('secret', $unsubscribeTokenizedText, 'Just a text', 'Signature', 'jan.kozak@acquia.com');
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
-        $this->emailModel
-            ->method('buildUrl')
-            ->withConsecutive(['mautic_email_unsubscribe', ['idHash' => 'hash', 'urlEmail' => 'lukas.sykora@acquia.com', 'secretHash' => $emailHash]])
-            ->willReturnOnConsecutiveCalls('/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash);
+        $this->emailModel->method('buildUrl')
+            ->withConsecutive(
+                [
+                    'mautic_email_unsubscribe',
+                    ['idHash' => 'hash', 'urlEmail' => 'lukas.sykora@acquia.com', 'secretHash' => $emailHash],
+                ],
+                [
+                    'mautic_email_webview',
+                    ['idHash' => 'hash'],
+                ],
+                [
+                    'mautic_email_preview',
+                    ['objectId' => 111],
+                ]
+            )->willReturnOnConsecutiveCalls(
+                '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
+                '/email/webview/'.$emailHash,
+                '/email/preview/111'
+            );
 
         $this->translator->expects($this->never())
             ->method('trans')
@@ -257,19 +270,16 @@ class BuilderSubscriberTest extends TestCase
 
     public function testNoUnsubscribeTextForTransactionalEmail(): void
     {
-        $args = [
-            'email' => (new Email()),
-        ];
-        $event = new EmailSendEvent(null, $args);
+        $event = new EmailSendEvent(null, ['email' => (new Email())]);
+
+        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
+        $this->translator->method('trans')->willReturn('some translation');
 
         $this->mailHelperMock->expects($this->once())
             ->method('isMarketingEmail')
             ->willReturn(false);
 
         $this->builderSubscriber->onEmailGenerate($event);
-        $this->assertEquals(
-            '',
-            $event->getTokens()['{unsubscribe_text}']
-        );
+        $this->assertEquals('', $event->getTokens()['{unsubscribe_text}']);
     }
 }

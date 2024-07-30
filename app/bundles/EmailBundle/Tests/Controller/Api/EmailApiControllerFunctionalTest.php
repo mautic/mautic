@@ -32,7 +32,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         if ('testCreateEmailWithoutSendToDncPermission' === $this->getName()) {
             $this->clientServer = [
                 'PHP_AUTH_USER' => 'sales',
-                'PHP_AUTH_PW'   => 'mautic',
+                'PHP_AUTH_PW'   => 'Maut1cR0cks!',
             ];
         }
 
@@ -320,7 +320,8 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
+        Assert::assertTrue(isset($response['email']['sendToDnc']), print_r($response, true));
+        Assert::assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
     }
 
     public function testReplyAction(): void

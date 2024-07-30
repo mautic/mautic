@@ -279,9 +279,10 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             // We will replace tokens in unsubscribe text too
             $unsubscribeText = TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
-            $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
+            $unsubscribeLink = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
+            $unsubscribeText = str_replace('|URL|', $unsubscribeLink, $unsubscribeText);
             $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
-            $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+            $event->addToken('{unsubscribe_url}', $unsubscribeLink);
         } else {
             $event->addToken('{unsubscribe_text}', '');
             $event->addToken('{unsubscribe_url}', '');
@@ -291,18 +292,19 @@ class BuilderSubscriber implements EventSubscriberInterface
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
-        $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]), $webviewText);
+        $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]);
+        $webviewText = str_replace('|URL|', $webviewLink, $webviewText);
         $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', ['objectId' => $email->getId()]));
         } else {
-            $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]));
+            $event->addToken('{webview_url}', $webviewLink);
         }
 
         $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
-        $fromName      = $this->coreParametersHelper->get('mailer_from_name');
+        $fromName      = $this->coreParametersHelper->get('mailer_from_name') ?? '';
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
