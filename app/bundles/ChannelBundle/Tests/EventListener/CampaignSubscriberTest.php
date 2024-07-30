@@ -56,7 +56,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $scheduler;
 
-    private \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher $legacyDispatcher;
+    private LegacyEventDispatcher $legacyDispatcher;
 
     protected function setUp(): void
     {

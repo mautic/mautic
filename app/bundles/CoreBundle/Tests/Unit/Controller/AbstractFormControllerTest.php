@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 {
-    private \Mautic\CoreBundle\Controller\AbstractFormController $classFromAbstractFormController;
+    private AbstractFormController $classFromAbstractFormController;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Form

@@ -85,7 +85,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $reportGeneratorEventMock;
 
-    private \Mautic\ChannelBundle\Helper\ChannelListHelper $channelListHelperMock;
+    private ChannelListHelper $channelListHelperMock;
 
     private ReportHelper $reportHelperMock;
 

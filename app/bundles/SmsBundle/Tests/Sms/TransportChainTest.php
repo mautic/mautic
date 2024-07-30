@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class TransportChainTest extends MauticMysqlTestCase
 {
-    private \Mautic\SmsBundle\Sms\TransportChain $transportChain;
+    private TransportChain $transportChain;
 
     /**
      * @var TransportInterface|MockObject

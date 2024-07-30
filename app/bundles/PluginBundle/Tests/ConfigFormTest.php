@@ -131,7 +131,7 @@ class ConfigFormTest extends KernelTestCase
                 ->method('getRepository')
                 ->willReturnMap(
                     [
-                        [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
+                        [Plugin::class, $pluginRepository],
                         [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
                         [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
                     ]

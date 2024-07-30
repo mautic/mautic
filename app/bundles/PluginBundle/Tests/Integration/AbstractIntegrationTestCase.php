@@ -25,82 +25,82 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AbstractIntegrationTestCase extends TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var EventDispatcherInterface|MockObject
      */
     protected $dispatcher;
 
     /**
-     * @var CacheStorageHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var CacheStorageHelper|MockObject
      */
     protected $cache;
 
     /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
+     * @var EntityManager|MockObject
      */
     protected $em;
 
     /**
-     * @var Session|\PHPUnit\Framework\MockObject\MockObject
+     * @var Session|MockObject
      */
     protected $session;
 
     /**
-     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
+     * @var RequestStack|MockObject
      */
     protected $request;
 
     /**
-     * @var Router|\PHPUnit\Framework\MockObject\MockObject
+     * @var Router|MockObject
      */
     protected $router;
 
     /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var TranslatorInterface|MockObject
      */
     protected $translator;
 
     /**
-     * @var Logger|\PHPUnit\Framework\MockObject\MockObject
+     * @var Logger|MockObject
      */
     protected $logger;
 
     /**
-     * @var EncryptionHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var EncryptionHelper|MockObject
      */
     protected $encryptionHelper;
 
     /**
-     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var LeadModel|MockObject
      */
     protected $leadModel;
 
     /**
-     * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var CompanyModel|MockObject
      */
     protected $companyModel;
 
     /**
-     * @var PathsHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var PathsHelper|MockObject
      */
     protected $pathsHelper;
 
     /**
-     * @var NotificationModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var NotificationModel|MockObject
      */
     protected $notificationModel;
 
     /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldModel|MockObject
      */
     protected $fieldModel;
 
     /**
-     * @var IntegrationEntityModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var IntegrationEntityModel|MockObject
      */
     protected $integrationEntityModel;
 
     /**
-     * @var DoNotContact|\PHPUnit\Framework\MockObject\MockObject
+     * @var DoNotContact|MockObject
      */
     protected $doNotContact;
 

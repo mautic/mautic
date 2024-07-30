@@ -650,7 +650,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$form->getId()}");
         $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
-        $this->assertSame(1, $formCrawler->count());
+        $this->assertCount(1, $formCrawler);
         $htmlForm = $formCrawler->form();
         $htmlForm->setValues([
             'mauticform[company]' => 'Acquia',
