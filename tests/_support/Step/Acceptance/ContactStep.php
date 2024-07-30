@@ -24,6 +24,9 @@ class ContactStep extends \AcceptanceTester
         $I->fillField(ContactPage::$emailField, $email);
         $I->fillField(ContactPage::$tagField, $tag);
         $I->pressKey(ContactPage::$tagField, WebDriverKeys::ENTER);
+        $I->click(ContactPage::$ownerField.'> a > span');
+        $I->fillField(ContactPage::$ownerField.' > div > div > input', 'Sales');
+        $I->pressKey(ContactPage::$ownerField.' > div > div > input', WebDriverKeys::ENTER);
     }
 
     /**
