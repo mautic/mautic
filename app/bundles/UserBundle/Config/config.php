@@ -5,18 +5,19 @@ return [
         'admin' => [
             'mautic.user_management' => [
                 'id'        => 'mautic_user_management_root',
-                'iconClass' => 'ri-user-settings-fill',
                 'priority'  => 17,
             ],
             'mautic.user.users' => [
                 'access'    => 'user:users:view',
                 'route'     => 'mautic_user_index',
                 'parent'    => 'mautic.user_management',
+                'iconClass' => 'ri-user-settings-fill',
             ],
             'mautic.user.roles' => [
                 'access'    => 'user:roles:view',
                 'route'     => 'mautic_role_index',
                 'parent'    => 'mautic.user_management',
+                'iconClass' => 'ri-shield-user-fill',
             ],
         ],
     ],
