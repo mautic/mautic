@@ -329,31 +329,6 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(2, count($result));
     }
 
-    public function testUtmTagReportContainsExpression(): void
-    {
-        $report = new Report();
-        $report->setName('UTM tags report');
-        $report->setSource('lead.utmTag');
-        $coulmns = [
-            'utm.utm_campaign',
-        ];
-        $report->setColumns($coulmns);
-        $report->setFilters([
-            [
-                'column'    => 'utm.utm_campaign',
-                'glue'      => 'and',
-                'value'     => 'Test',
-                'condition' => 'contains',
-            ]]
-        );
-
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
-
-        // Check the details page
-        $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
-    }
-
     /**
      * @dataProvider scheduleProvider
      *

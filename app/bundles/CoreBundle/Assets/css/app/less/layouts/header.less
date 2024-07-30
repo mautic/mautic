@@ -109,7 +109,54 @@
             top: 1px;
           }
 
-          
+          // avatar
+          // -------------------------
+          > img,
+          > .img-wrapper {
+            --width: 28px;
+            border-radius: 100%;
+            width: var(--width);
+            height: var(--width);
+            display: inline-block;
+            margin-top: -8px;
+            margin-bottom: -8px;
+          }
+
+          &.user {
+              .info {
+                transform: translateY(-6%);
+                position: relative;
+                transition: transform .3s ease;
+
+                > .position {
+                  opacity: 0;
+                }
+              }
+
+            &:hover {
+              .info {
+                transform: translateY(-20%);
+
+                @keyframes slideDown {
+                  from {
+                    transform: translateY(-10px);
+                  }
+                  to {
+                    transform: translateY(-5px);
+                  }
+                }
+                      
+                > .position {
+                  display: flex;
+                  animation: fadeIn 0.5s ease-in-out forwards, slideDown 0.5s ease-in-out forwards;
+                }
+              }
+          }
+
+            > .text {
+              line-height: 14px;
+            }
+          }
 
           // badge & label
           // -------------------------
@@ -167,20 +214,6 @@
           }
         }
       }
-
-      // avatar
-          // -------------------------
-          img,
-          .img-wrapper {
-            border-radius: 100%;
-            width: 28px;
-            min-width: 28px;
-            aspect-ratio: 1/1;
-          }
-
-          .dropdown-menu-user {
-            .text { line-height: 14px; }
-          }
 
       // dropdown custom
       // -------------------------

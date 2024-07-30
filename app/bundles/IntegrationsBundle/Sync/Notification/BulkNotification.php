@@ -38,7 +38,7 @@ class BulkNotification
                 $this->userNotificationBuilder->formatMessage($message, $link),
                 null,
                 $this->userNotificationBuilder->formatHeader($integrationDisplayName, $objectDisplayName),
-                'ri-refresh-line',
+                'fa-refresh',
                 null,
                 $user
             );

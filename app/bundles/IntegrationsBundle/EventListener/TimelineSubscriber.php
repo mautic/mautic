@@ -73,7 +73,7 @@ class TimelineSubscriber implements EventSubscriberInterface
                 ]
             ),
             'timestamp'       => $log['date_added'],
-            'icon'            => 'ri-refresh-line',
+            'icon'            => 'fa-refresh',
             'contactId'       => $log['lead_id'],
             'contentTemplate' => '@Integrations/Timeline/index.html.twig',
             'extra'           => $properties,

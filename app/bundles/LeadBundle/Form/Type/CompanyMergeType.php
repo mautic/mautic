@@ -19,13 +19,12 @@ class CompanyMergeType extends AbstractType
             'company_to_merge',
             CompanyListType::class,
             [
-                'multiple'            => false,
-                'label'               => 'mautic.company.to.merge.into',
-                'required'            => true,
-                'modal_route'         => false,
-                'main_entity'         => $options['main_entity'],
-                'model_lookup_method' => $options['model_lookup_method'],
-                'constraints'         => [
+                'multiple'    => false,
+                'label'       => 'mautic.company.to.merge.into',
+                'required'    => true,
+                'modal_route' => false,
+                'main_entity' => $options['main_entity'],
+                'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.company.choosecompany.notblank']
                     ),
@@ -50,7 +49,7 @@ class CompanyMergeType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(
-            ['main_entity', 'model_lookup_method']
+            ['main_entity']
         );
     }
 }

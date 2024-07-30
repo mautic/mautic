@@ -51,7 +51,7 @@ class CampaignConditionLeadPageHitType extends AbstractType
                 'label'  => 'mautic.page.campaign.condition.form.startdate',
                 'attr'   => [
                     'class'       => 'form-control',
-                    'preaddon'    => 'ri-calendar-line',
+                    'preaddon'    => 'fa fa-calendar',
                     'data-toggle' => 'datetime',
                 ],
                 'required' => false,
@@ -65,7 +65,7 @@ class CampaignConditionLeadPageHitType extends AbstractType
                 'label'  => 'mautic.page.campaign.condition.form.enddate',
                 'attr'   => [
                     'class'       => 'form-control',
-                    'preaddon'    => 'ri-calendar-line',
+                    'preaddon'    => 'fa fa-calendar',
                     'data-toggle' => 'datetime',
                 ],
                 'required' => false,

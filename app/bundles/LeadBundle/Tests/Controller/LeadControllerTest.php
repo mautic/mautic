@@ -422,13 +422,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testQuickAddAction(): void
-    {
-        $this->client->request('GET', '/s/contacts/quickAdd');
-
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
-    }
-
     public function testAddContactsErrorMessage(): void
     {
         /** @var FieldModel $fieldModel */
@@ -898,30 +891,5 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         self::assertSame('multiple', $multiple);
-    }
-
-    public function testCompanyMergeList(): void
-    {
-        $companyA = new Company();
-        $companyA->setName('Company A');
-
-        $this->em->persist($companyA);
-
-        $companyB = new Company();
-        $companyB->setName('Company B');
-
-        $this->em->persist($companyB);
-
-        $this->em->flush();
-
-        $this->client->request(Request::METHOD_GET, '/s/companies/merge/'.$companyA->getId());
-        $response = $this->client->getResponse();
-
-        Assert::assertTrue($response->isOk());
-
-        $content = $response->getContent();
-
-        Assert::assertStringContainsString('Company B', $content);
-        Assert::assertStringNotContainsString('Company A', $content);
     }
 }

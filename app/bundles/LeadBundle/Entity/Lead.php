@@ -1011,7 +1011,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection<int,CompanyChangeLog>
+     * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     public function getCompanyChangeLog()
     {
@@ -1960,10 +1960,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $rules = [];
         foreach ($frequencyRules as $rule) {
-            $rules[$rule['channel']] = [
-                'frequency' => $rule,
-                'dnc'       => DoNotContact::IS_CONTACTABLE,
-            ];
+            $rules[$rule['channel']] =
+                [
+                    'frequency' => $rule,
+                    'dnc'       => DoNotContact::IS_CONTACTABLE,
+                ];
         }
 
         if (count($dncRules)) {

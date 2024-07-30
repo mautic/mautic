@@ -104,7 +104,7 @@
           </tr>
           <tbody>
           {% for event in events.events %}
-              {% set icon = event.icon is defined ? event.icon : 'ri-history-line' %}
+              {% set icon = event.icon is defined ? event.icon : 'fa-history' %}
               {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
               {% if eventLabel is iterable %}
                   {% set eventLabel %}

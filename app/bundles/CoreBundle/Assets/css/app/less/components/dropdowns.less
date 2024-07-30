@@ -9,10 +9,6 @@
 
 // The dropdown menu (ul)
 .dropdown-menu {
-  padding: 0;
-  overflow: hidden;
-  border-radius: var(--border-radius-sm);
-
   .box-shadow(0 3px 6px rgba(0,0,0,.06));
 
   // Dividers (basically an hr) within the dropdown
@@ -36,36 +32,22 @@
 
   // Links within the dropdown menu
   > li > a {
-    display: inline-flex;
-    inline-size: 100%;
-    align-items: center;
-    height: var(--spacing-08);
     position: relative;
     z-index: 1;
-    padding: 0 var(--spacing-05);
-    outline: 2px solid transparent;
-    outline-offset: -2px;
+    margin-top: -1px;
+    padding: 5px 20px;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
 
-    span {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--spacing-07);
-    }
-
-
-    .fa, i {
-      min-width: var(--spacing-05);
-      order: 2;
-      text-align: center;
+    .fa {
+      min-width: 15px;
     }
 
     [class^="ri-"], [class*=" ri-"] {
       font-size: 1.25em;
       vertical-align: -.05em;
       line-height: 0;
-      padding-left: var(--spacing-01);
+      padding-right: 3px;
     }
   }
 }
@@ -75,14 +57,7 @@
   &:hover,
   &:focus {
     z-index: 2;
-  }
-
-  &:focus {
-    outline: 2px solid var(--focus);
-  }
-
-  &:active {
-    background-color: var(--layer-active);
+    border-color: darken(@dropdown-link-hover-bg, 0.7%);
   }
 }
 
@@ -96,15 +71,6 @@
   }
 }
 
-// Danger item
-.dropdown-menu > li a.danger {
-  &:hover,
-  &:focus {
-    background-color: var(--support-error);
-    color: var(--text-on-color);
-  }
-}
-
 .scrollable-menu {
   height: auto;
   max-height: 200px;
@@ -115,12 +81,4 @@ ul.dropdown-menu-form {
   padding: 0 5px 0 30px;
   max-height: 300px;
   overflow-y: auto;
-}
-
-.dropdown-header {
-  margin: 32px 16px 8px 16px;
-  border-bottom: 1px solid var(--border-strong);
-  padding: 0 0 4px;
-  color: var(--text-secondary);
-  font-size: var(--typography-utility-productive);
 }

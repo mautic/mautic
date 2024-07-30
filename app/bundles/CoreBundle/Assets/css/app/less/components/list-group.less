@@ -2,29 +2,11 @@
 // List groups
 // --------------------------------------------------
 
-.list-group {
-  border: 1px solid var(--border-inverse);
-  border-radius: clamp(4px, var(--border-radius-md), 12px);
-  overflow: hidden;
-}
-
 .list-group-item {
-  transition: var(--transition-all-productive);
-  border: 0;
-
   > a {
     position: relative;
     z-index: 1;
     display: block;
-    color: @list-group-link-color;
-  }
-
-  &:hover {
-    background-color: @list-group-hover-bg;
-
-    > a {
-      color: @list-group-link-hover-color;
-    }
   }
 }
 

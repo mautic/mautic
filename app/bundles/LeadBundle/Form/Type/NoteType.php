@@ -70,7 +70,7 @@ class NoteType extends AbstractType
                 'attr'       => [
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
-                    'preaddon'    => 'ri-calendar-line',
+                    'preaddon'    => 'fa fa-calendar',
                 ],
                 'format' => 'yyyy-MM-dd HH:mm',
                 'html5'  => false,

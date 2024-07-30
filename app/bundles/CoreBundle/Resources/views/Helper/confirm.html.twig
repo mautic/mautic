@@ -1,16 +1,16 @@
 {%- if template is defined %}
-{%- set btnClass = btnClass|default('danger') %}
     {%- if template is same as 'batchdelete' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
         {%- set iconClass = iconClass|default('ri-delete-bin-line text-danger') %}
         {%- set btnText = btnText|default('mautic.core.form.delete_selected'|trans) %}
+        {%- set btnClass = btnClass|default('') %}
         {%- set confirmCallback = confirmCallback|default('executeBatchAction') %}
         {% set wrapOpeningTag = wrapOpeningTag is defined ? wrapOpeningTag : '' %}
         {% set wrapClosingTag = wrapClosingTag is defined ? wrapClosingTag : '' %}
         {%- set precheck = precheck|default('batchActionPrecheck') %}
     {%- elseif template is same as 'delete' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
-        {%- set iconClass = iconClass|default('ri-delete-bin-line') %}
+        {%- set iconClass = iconClass|default('ri-delete-bin-line text-danger') %}
         {%- set btnText = btnText|default('mautic.core.form.delete')|trans %}
     {%- endif %}
 {%- endif %}

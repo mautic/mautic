@@ -121,7 +121,7 @@ class UserStepType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.user.user.form.help.passwordrequirements',
-                    'preaddon' => 'ri-lock-fill',
+                    'preaddon' => 'fa fa-lock',
                 ],
                 'required'    => true,
                 'constraints' => [

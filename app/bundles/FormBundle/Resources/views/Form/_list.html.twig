@@ -27,7 +27,7 @@
                                     'message': 'mautic.form.confirm_batch_rebuild'|trans,
                                     'confirmText': 'mautic.form.rebuild'|trans,
                                     'confirmAction': path('mautic_form_action', {'objectAction': 'batchRebuildHtml'}),
-                                    'iconClass': 'fa fa-fw ri-refresh-line',
+                                    'iconClass': 'fa fa-fw fa-refresh',
                                     'btnText': 'mautic.form.rebuild'|trans,
                                     'precheck': 'batchActionPrecheck',
                                     'confirmCallback': 'executeBatchAction',
@@ -128,7 +128,7 @@
                             <a href="{{ path('mautic_form_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index">
                                 {{ item.name }}
                                 {% if 'campaign' == item.formType %}
-                                    <span data-toggle="tooltip" title="{{ 'mautic.form.icon_tooltip.campaign_form'|trans }}"><i class="fa fa-fw ri-instance-fill"></i></span>
+                                    <span data-toggle="tooltip" title="{{ 'mautic.form.icon_tooltip.campaign_form'|trans }}"><i class="fa fa-fw fa-cube"></i></span>
                                 {% endif %}
                             </a>
                         </div>

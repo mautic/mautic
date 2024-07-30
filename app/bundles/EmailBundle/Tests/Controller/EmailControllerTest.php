@@ -16,8 +16,6 @@ use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
@@ -229,6 +227,11 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->containerMock->method('has')->willReturnCallback($serviceExists);
         $this->containerMock->method('get')->willReturnMap($services);
 
+        $this->modelFactoryMock->expects($this->once())
+            ->method('getModel')
+            ->with('email')
+            ->willReturn($this->modelMock);
+
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(1)
@@ -269,6 +272,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
 
         $request = new Request();
         $this->requestStack->push($request);
-        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FieldModel::class));
+        $this->controller->sendExampleAction($request, 1);
     }
 }

@@ -186,24 +186,24 @@ abstract class AbstractPermissions
      * @param array  $userPermissions
      * @param string $name
      * @param string $level
+     *
+     * @return bool
      */
-    public function isGranted($userPermissions, $name, $level): bool
+    public function isGranted($userPermissions, $name, $level)
     {
         [$name, $level] = $this->getSynonym($name, $level);
 
         if (!isset($userPermissions[$name])) {
             // the user doesn't have implicit access
             return false;
-        }
-
-        if (isset($this->permissions[$name]['full']) && ($this->permissions[$name]['full'] & $userPermissions[$name])) {
+        } elseif (isset($this->permissions[$name]['full']) && $this->permissions[$name]['full'] & $userPermissions[$name]) {
             return true;
+        } else {
+            // otherwise test for specific level
+            $result = ($this->permissions[$name][$level] & $userPermissions[$name]);
+
+            return ($result) ? true : false;
         }
-
-        // otherwise test for specific level
-        $result = ($this->permissions[$name][$level] & $userPermissions[$name]);
-
-        return (bool) $result;
     }
 
     /**

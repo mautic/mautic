@@ -452,6 +452,9 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->executioner->expects($this->never())
             ->method('executeLogs');
 
+        $this->executioner->expects($this->once())
+            ->method('recordLogsWithError');
+
         $this->contactFinder->expects($this->never())
             ->method('hydrateContacts');
 

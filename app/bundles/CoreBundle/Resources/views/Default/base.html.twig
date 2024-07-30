@@ -11,10 +11,12 @@
 
             {{ include('@MauticCore/Notification/flashes.html.twig') }}
 
-            {{ include('@MauticCore/Default/keyboard_shortcuts_modal.html.twig') }}
-
             <aside class="app-sidebar sidebar-left">
                 {{ include('@MauticCore/LeftPanel/index.html.twig') }}
+            </aside>
+
+            <aside class="app-sidebar sidebar-right">
+                {{ include('@MauticCore/RightPanel/index.html.twig') }}
             </aside>
 
             <header id="app-header" class="navbar">

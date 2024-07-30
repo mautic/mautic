@@ -417,20 +417,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
         }
 
-        if (!(isset($parameters['onlyNames']) && $parameters['onlyNames'])) {
-            $labelExpression = '
-            case
-            when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')
-            when (comp.companycountry is not null) then concat(comp.companyname, \' <small>\', comp.companycountry, \'</small>\')
-            when (comp.companycity is not null) then concat(comp.companyname, \' <small>\', comp.companycity, \'</small>\')
-            else comp.companyname
-            end
-            as label';
-        } else {
-            $labelExpression = $prefix.' companyname as label';
-        }
-
-        $q->select($prefix.$valueColumn.' as value, '.$labelExpression)
+        $q->select($prefix.$valueColumn.' as value,
+        case
+        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')
+        when (comp.companycountry is not null) then concat(comp.companyname, \' <small>\', comp.companycountry, \'</small>\')
+        when (comp.companycity is not null) then concat(comp.companyname, \' <small>\', comp.companycity, \'</small>\')
+        else comp.companyname
+        end
+        as label')
             ->from($tableName, $alias)
             ->orderBy($prefix.$labelColumn);
 
@@ -537,23 +531,5 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $entities;
-    }
-
-    /**
-     * @return array<string[]>
-     */
-    public function getCompanyLookupData(string $filterVal): array
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-
-        $q->select('id, companyname, companycity, companystate')
-            ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
-            ->where($q->expr()->eq('is_published', true))
-            ->andWhere($q->expr()->like('companyname', ':filterVar'))
-            ->setParameter('filterVar', '%'.$filterVal.'%')
-            ->orderBy('companyname')
-            ->setMaxResults(50);
-
-        return $q->executeQuery()->fetchAllAssociative();
     }
 }

@@ -1,4 +1,4 @@
-@import "../../libraries/bootstrap/bootstrap-mautic-custom-variables";
+@import "../../../../../../../node_modules/bootstrap/less/variables";
 
 @media (min-width: @screen-md-min) {
   .modal-xl { width: 1140px; }
@@ -11,6 +11,10 @@
 .media-list {
   .media-body {
     width: auto;
+  }
+  .media-object{
+    padding-right: 0;
+    margin-right: 10px;
   }
 }
 
@@ -110,6 +114,40 @@ label.required:after {
   padding: 10px 12px;
 }
 
+//Search
+.search-container {
+  position: relative;
+  line-height: 60px;
+  .transition(all 0.3s ease);
+
+  .search {
+    border: 1px solid #fff;
+    position: absolute;
+    left: 0px;
+    width: 24px;
+    height: 34px;
+    padding: 0 0 0 32px;
+    margin: 12px 0 0 5px;
+    z-index: 1;
+    .transition(all 0.5s ease);
+  }
+  a.search-button {
+    color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    left: 12px;
+    z-index: 5;
+  }
+
+  &.active {
+    .search {
+      width: 225px;
+      border: 1px solid @input-border;
+    }
+    i {
+      color: @brand-primary;
+    }
+  }
+}
 .col-actions {
   width: 100px;
 }
@@ -276,6 +314,11 @@ ul.media-list.media-list-feed div.media-body
   width:auto;
 }
 
+ul.media-list.media-list-feed div.media-object
+{
+  padding: 0px;
+  margin: 10px;
+}
 .ico-email:before {
   font-family: "FontAwesome";
   content: "\f1fa";
@@ -302,6 +345,11 @@ ul.media-list.media-list-feed div.media-body
 .ui-sortable-handle:active {
   cursor: grabbing;
 }
+
+.flex-column-inline {
+  display: inline-flex;
+  flex-direction: column;
+}
 .notification {
   width: inherit !important;
 }
@@ -315,7 +363,6 @@ ul.media-list.media-list-feed div.media-body
 
 .flip-vertically {
   transform: scaleY(-1);
-  display: inline-flex;
 }
 
 .disabled-row {

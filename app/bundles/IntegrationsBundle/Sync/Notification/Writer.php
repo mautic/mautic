@@ -28,7 +28,7 @@ class Writer
             null,
             false,
             $header,
-            'ri-refresh-line',
+            'fa-refresh',
             null,
             $this->em->getReference(User::class, $userId),
             $deduplicateValue,

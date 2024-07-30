@@ -44,13 +44,13 @@ class BuilderSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND  => [
-                ['fixEmailAccessibility', 10000],
+                ['fixEmailAccessibility', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
             ],
             EmailEvents::EMAIL_ON_DISPLAY => [
-                ['fixEmailAccessibility', 10000],
+                ['fixEmailAccessibility', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],

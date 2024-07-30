@@ -268,7 +268,7 @@ class PublicController extends FormController
                                 $ex->getMessage()
                             ),
                             'Clearbit Plugin',
-                            'ri-error-warning-line',
+                            'fa-exclamation',
                             $user
                         );
                     }

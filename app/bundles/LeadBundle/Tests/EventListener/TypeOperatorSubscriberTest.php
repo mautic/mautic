@@ -508,11 +508,10 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 'filter',
                 TextType::class,
                 [
-                    'label'       => false,
-                    'attr'        => ['class' => 'form-control'],
-                    'disabled'    => false,
-                    'data'        => '',
-                    'constraints' => [],
+                    'label'    => false,
+                    'attr'     => ['class' => 'form-control'],
+                    'disabled' => false,
+                    'data'     => '',
                 ]
             );
 

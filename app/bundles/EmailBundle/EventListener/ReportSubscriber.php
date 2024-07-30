@@ -531,7 +531,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'ri-flag-fill',
+                            'iconClass' => 'fa-flag-checkered',
                         ]
                     );
                     break;
@@ -568,7 +568,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'ri-flag-fill',
+                            'iconClass' => 'fa-flag-checkered',
                         ]
                     );
                     break;
@@ -584,7 +584,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-send-plane-line';
+                    $graphData['iconClass'] = 'fa-paper-plane-o';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -620,7 +620,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-alert-line';
+                    $graphData['iconClass'] = 'fa-exclamation-triangle';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -643,7 +643,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-alert-line';
+                    $graphData['iconClass'] = 'fa-exclamation-triangle';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -665,7 +665,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'ri-alert-line';
+                    $graphData['iconClass'] = 'fa-exclamation-triangle';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
