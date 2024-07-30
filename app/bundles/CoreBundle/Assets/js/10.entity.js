@@ -283,7 +283,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     var wasPublished = mQuery(el).hasClass('ri-toggle-fill');
     var element = mQuery(el);
 
-    element.removeClass('fa-toggle-on fa-toggle-off').addClass('fa-spin fa-spinner');
+    element.removeClass('fa-toggle-on fa-toggle-off').addClass('ri-spin ri-loader-3-line');
 
     //destroy tooltips so it can be regenerated
     element.tooltip('destroy');
@@ -313,7 +313,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
         },
         error: function (request, textStatus, errorThrown) {
             var addClass = (wasPublished) ? 'ri-toggle-fill' : 'ri-toggle-line';
-            element.removeClass('fa-spin fa-spinner').addClass(addClass);
+            element.removeClass('ri-spin ri-loader-3-line').addClass(addClass);
 
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }
