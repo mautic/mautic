@@ -9,7 +9,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\BuilderSubscriber;
 use Mautic\EmailBundle\Helper\MailHashHelper;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -48,11 +47,6 @@ class BuilderSubscriberTest extends TestCase
      */
     private MockObject $translator;
 
-    /**
-     * @var MockObject&MailHelper
-     */
-    private MockObject $mailHelperMock;
-
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -60,17 +54,15 @@ class BuilderSubscriberTest extends TestCase
         $this->trackableModel       = $this->createMock(TrackableModel::class);
         $this->redirectModel        = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->mailHelperMock       = $this->createMock(MailHelper::class);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
             $this->trackableModel,
             $this->redirectModel,
             $this->translator,
-            new MailHashHelper($this->coreParametersHelper),
-            $this->mailHelperMock
+            new MailHashHelper($this->coreParametersHelper)
         );
-        
+
         parent::setUp();
     }
 
@@ -254,10 +246,6 @@ class BuilderSubscriberTest extends TestCase
             ->withConsecutive([$unsubscribeTokenizedText], [])
             ->willReturn($unsubscribeTokenizedText);
 
-        $this->mailHelperMock->expects($this->once())
-            ->method('isMarketingEmail')
-            ->willReturn(true);
-
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(
             '<a href="/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash.'">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
@@ -271,10 +259,6 @@ class BuilderSubscriberTest extends TestCase
 
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
-
-        $this->mailHelperMock->expects($this->once())
-            ->method('isMarketingEmail')
-            ->willReturn(false);
 
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals('', $event->getTokens()['{unsubscribe_text}']);

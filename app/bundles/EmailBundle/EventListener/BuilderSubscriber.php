@@ -18,7 +18,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHashHelper;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
@@ -37,7 +36,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         private RedirectModel $pageRedirectModel,
         private TranslatorInterface $translator,
         private MailHashHelper $mailHash,
-        private MailHelper $mailer
     ) {
     }
 

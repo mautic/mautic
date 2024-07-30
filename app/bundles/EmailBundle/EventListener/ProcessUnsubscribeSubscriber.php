@@ -17,9 +17,6 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 
     public const FOLDER_KEY = 'unsubscribes';
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [

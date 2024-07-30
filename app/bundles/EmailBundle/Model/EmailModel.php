@@ -1299,7 +1299,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $tokens              = ArrayHelper::getValue('tokens', $options, []);
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
-        $emailType           = ArrayHelper::getValue('email_type', $options, '');
         $emailPriority       = ArrayHelper::getValue('email_priority', $options, MessageQueue::PRIORITY_NORMAL);
         $messageQueue        = ArrayHelper::getValue('resend_message_queue', $options);
         $returnErrorMessages = ArrayHelper::getValue('return_errors', $options, false);

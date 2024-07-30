@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -780,7 +779,7 @@ class PublicController extends CommonFormController
     /**
      * @return array<mixed>
      */
-    private function getViewParams( Lead $lead, string $idHash): array
+    private function getViewParams(Lead $lead, string $idHash): array
     {
         return [
             'lead'                         => $lead,
@@ -798,7 +797,6 @@ class PublicController extends CommonFormController
      */
     private function getHtml(FormView $formView, Lead $lead, array $viewParameters): string
     {
-
         return $this->render(
             '@MauticEmail/Lead/preference_options.html.twig',
             array_merge(

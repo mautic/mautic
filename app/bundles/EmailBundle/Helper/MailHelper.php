@@ -1314,9 +1314,9 @@ class MailHelper
 
         $email               = $this->getEmail();
         $unsubscribeBodyText = $this->factory->getParameter('unsubscribe_text') ?? '';
-        if (!$email || $email->getSendToDnc() ||
-            $this->factory->getParameter('disable_unsubscribe_link_header') ||
-            !self::isUnsubscribeHeadersRequired($this->getBody(), $unsubscribeBodyText)) {
+        if (!$email || $email->getSendToDnc()
+            || $this->factory->getParameter('disable_unsubscribe_link_header')
+            || !self::isUnsubscribeHeadersRequired($this->getBody(), $unsubscribeBodyText)) {
             return $headers;
         }
 

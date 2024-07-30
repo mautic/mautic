@@ -863,7 +863,6 @@ class MailHelperTest extends TestCase
         $mailer->setEmail($email);
         $mailer->setLead($lead);
 
-        $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
         $headers = $mailer->getCustomHeaders();
 
         $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
