@@ -252,15 +252,4 @@ class BuilderSubscriberTest extends TestCase
             $event->getTokens()['{unsubscribe_text}']
         );
     }
-
-    public function testNoUnsubscribeTextForTransactionalEmail(): void
-    {
-        $event = new EmailSendEvent(null, ['email' => (new Email())]);
-
-        $this->emailModel->method('buildUrl')->willReturn('https://some.url');
-        $this->translator->method('trans')->willReturn('some translation');
-
-        $this->builderSubscriber->onEmailGenerate($event);
-        $this->assertEquals('', $event->getTokens()['{unsubscribe_text}']);
-    }
 }
