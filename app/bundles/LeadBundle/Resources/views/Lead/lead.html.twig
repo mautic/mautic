@@ -143,7 +143,7 @@
 
             <!-- lead detail collapseable -->
             <div class="collapse pr-md pl-md" id="lead-details">
-                <ul class="pt-md nav nav-tabs" role="tablist">
+                <ul class="pt-md nav nav-tabs nav-tabs-contained" role="tablist">
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
@@ -215,7 +215,7 @@
                         </div>
                     {% endif %}
                     <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
-                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                        <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                     </div>
                 </div>
             </div>
@@ -258,7 +258,7 @@
 
         <div class="pa-md">
             <!-- tabs controls -->
-            <ul class="nav nav-tabs mt-10">
+            <ul class="nav nav-tabs nav-tabs-contained mt-10">
                 <li class="active">
                     <a href="#timeline-container" role="tab" data-toggle="tab">
                         <span class="label label-primary mr-sm" id="TimelineCount">

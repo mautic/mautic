@@ -677,20 +677,20 @@
 
 @list-group-disabled-text-color: @list-group-disabled-color;
 //** `.list-group-item` border color
-@list-group-border:             @hr-border;
+@list-group-border:             transparent;
 //** List group border radius
-@list-group-border-radius:      @border-radius-base;
+@list-group-border-radius:      0px;
 
 //** Background color of single list items on hover
-@list-group-hover-bg:           darken(@body-bg, 1%);
+@list-group-hover-bg:           var(--layer-hover);
 //** Text color of active list items
-@list-group-active-color:       @text-color;
+@list-group-active-color:       var(--text-inverse);
 //** Background color of active list items
-@list-group-active-bg:          @list-group-hover-bg;
+@list-group-active-bg:          var(--layer-selected-inverse);
 //** Border color of active list elements
 @list-group-active-border:      @hr-border;
 //** Text color for content within active list items
-@list-group-active-text-color:  lighten(@list-group-active-bg, 40%);
+@list-group-active-text-color:  var(--text-inverse);
 
 //** Text color of disabled list items
 @list-group-disabled-color:      @gray-light;
@@ -699,8 +699,8 @@
 //** Text color for content within disabled list items
 @list-group-disabled-bg:         @gray-lighter;
 
-@list-group-link-color:         #555;
-@list-group-link-hover-color:   @list-group-link-color;
+@list-group-link-color:         var(--text-secondary);
+@list-group-link-hover-color:   var(--text-primary);
 @list-group-link-heading-color: #333;
 
 
