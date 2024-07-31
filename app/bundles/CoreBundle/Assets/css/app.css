@@ -5021,6 +5021,18 @@ lesshat-selector { -lh-property: 0 ;
     border-bottom: 1px solid #ebedf0;
   }
 }
+.bsa-xs {
+  border-spacing: 5px;
+  border-collapse: separate;
+}
+.bsv-xs {
+  border-spacing: 0 5px;
+  border-collapse: separate;
+}
+.bsh-xs {
+  border-spacing: 5px 0;
+  border-collapse: separate;
+}
 .bg-picture {
   position: relative;
   min-height: 260px;
