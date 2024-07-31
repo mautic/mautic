@@ -27,6 +27,7 @@ class ContactManagementCest
         $I->waitForElementVisible(ContactPage::$quickAddModal, 30);
         $I->see('Quick Add', 'h4.modal-title');
 
+        // Fill out the Quick Add form
         $contact->fillContactForm('QuickAddFirstName', 'QuickAddLastName', 'quickadd@example.com', 'TestTag');
 
         // Submit the form
@@ -49,6 +50,7 @@ class ContactManagementCest
         $I->click(ContactPage::$newContactButton);
         $I->waitForText('New Contact', 30);
 
+        // Fill out the contact form
         $contact->fillContactForm('FirstName', 'LastName', 'email@example.com', 'TestTag');
 
         // Scroll back to the top of the page
@@ -131,7 +133,7 @@ class ContactManagementCest
         // Grab the name of the first contact in the list
         $contactName = $contact->grabContactNameFromList(1);
 
-        // Click the delete menu option
+        // Click on the dropdown caret on the first contact and click the delete menu option
         $contact->selectOptionFromDropDown(1, 4);
 
         // Wait for the modal to show and confirm deletion
@@ -207,6 +209,7 @@ class ContactManagementCest
     ): void {
         $I->amOnPage(ContactPage::$URL);
 
+        // Get initial contact count
         $initialContactCount = $I->grabNumRecords('leads');
 
         // Click on the import button
@@ -259,7 +262,6 @@ class ContactManagementCest
         ContactStep $contact,
         Campaign $campaign
     ): void {
-        // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the names of the first and second contacts from the list
@@ -283,7 +285,10 @@ class ContactManagementCest
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
+        // Select add to campaign option from dropdown for multiple selections
         $contact->selectOptionFromDropDownForMultipleSelections(1);
+
+        // Add the contacts to the campaign
         $campaign->addContactsToCampaign();
 
         // Navigate back to the campaign page and click on the "Contacts" tab
@@ -301,14 +306,16 @@ class ContactManagementCest
         ContactStep $contact,
         Campaign $campaign
     ): void {
-        // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
 
         // Select the first and second contacts from the list
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
+        // Select change campaign option from dropdown for multiple selections
         $contact->selectOptionFromDropDownForMultipleSelections(1);
+
+        // Add the selected contacts to a campaign (to be removed later)
         $campaign->addContactsToCampaign();
 
         // Return to the contacts page
@@ -322,11 +329,14 @@ class ContactManagementCest
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
 
+        // // Select change campaign option from dropdown for multiple selections
         $contact->selectOptionFromDropDownForMultipleSelections(1);
 
         // Wait for the modal to appear and click the "Remove from campaign" option
         $I->waitForElementVisible(ContactPage::$campaignsModalAddOption, 5);
         $I->click(ContactPage::$campaignsModalRemoveOption);
+
+        // Select the first campaign from the list and click save
         $I->click(ContactPage::$firstCampaignFromRemoveList);
         $I->click(ContactPage::$campaignsModalSaveButton);
 
@@ -343,20 +353,29 @@ class ContactManagementCest
         AcceptanceTester $I,
         ContactStep $contact,
     ): void {
+        // Check the current owner of the first and second contacts, it should be the sales user
         $contact->checkOwner(1);
-
         $contact->checkOwner(2);
 
+        // Navigate back to contacts page
         $I->amOnPage(ContactPage::$URL);
+
+        // Select the first and second contacts from the list
         $contact->selectContactFromList(1);
         $contact->selectContactFromList(2);
+
+        // Select change owner option from dropdown for multiple selections
         $contact->selectOptionFromDropDownForMultipleSelections(4);
 
+        // Wait for the modal to appear
         $I->waitForElementClickable(ContactPage::$addToTheFollowing, 5);
+
+        // Select the new owner as "Admin User" from the options
         $I->click(ContactPage::$addToTheFollowing);
         $I->click(ContactPage::$adminUser);
         $I->click(ContactPage::$changeOwnerModalSaveButton);
 
+        // Verify that the owner of the first and second contacts has been changed
         $contact->verifyOwner(1);
         $contact->verifyOwner(2);
     }
