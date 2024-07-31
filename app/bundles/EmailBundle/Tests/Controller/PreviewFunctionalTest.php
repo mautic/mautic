@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PreviewFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testPreviewPage(): void
     {
         $lead  = $this->createLead();
@@ -118,6 +120,128 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         // Admin user
         $this->assertPageContent($url, $contentNoContactInfo);
         $this->assertPageContent($urlWithContact, $contentWithContactInfo);
+    }
+
+    public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
+    {
+        // Create custom field
+        $this->client->request(
+            'POST',
+            '/api/fields/contact/new',
+            [
+                'label'      => 'bool',
+                'type'       => 'boolean',
+                'properties' => [
+                    'no'  => 'No',
+                    'yes' => 'Yes',
+                ],
+            ]
+        );
+        self::assertSame(201, $this->client->getResponse()->getStatusCode());
+        self::assertJson($this->client->getResponse()->getContent());
+
+        // Create some contacts
+        $this->client->request(
+            'POST',
+            '/api/contacts/batch/new',
+            [
+                [
+                    'firstname' => 'John',
+                    'lastname'  => 'A',
+                    'email'     => 'john.a@email.com',
+                    'bool'      => true,
+                ],
+                [
+                    'firstname' => 'John',
+                    'lastname'  => 'B',
+                    'email'     => 'john.b@email.com',
+                    'bool'      => false,
+                ],
+                [
+                    'firstname' => 'John',
+                    'lastname'  => 'C',
+                    'email'     => 'john.c@email.com',
+                    'bool'      => null,
+                ],
+            ]
+        );
+        self::assertSame(
+            201,
+            $this->client->getResponse()->getStatusCode(),
+            $this->client->getResponse()->getContent()
+        );
+        $contacts = json_decode($this->client->getResponse()->getContent(), true);
+
+        // Create email with dynamic content variant
+        $email          = $this->createEmail();
+        $dynamicContent = [
+            [
+                'tokenName' => 'Dynamic Content 1',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => null,
+                        'filters' => [],
+                    ],
+                ],
+            ],
+            [
+                'tokenName' => 'Dynamic Content 2',
+                'content'   => '<p>Default Dynamic Content</p>',
+                'filters'   => [
+                    [
+                        'content' => '<p>Variant 1 Dynamic Content</p>',
+                        'filters' => [
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'bool',
+                                'object'   => 'lead',
+                                'type'     => 'boolean',
+                                'filter'   => '1',
+                                'display'  => null,
+                                'operator' => '=',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $email->setCustomHtml('<div>{dynamiccontent="Dynamic Content 2"}</div>');
+        $email->setDynamicContent($dynamicContent);
+        $this->em->flush();
+
+        $url            = "/email/preview/{$email->getId()}";
+        $defaultContent = 'Default Dynamic Content';
+        $variantContent = 'Variant 1 Dynamic Content';
+
+        // Non admin user - show default content
+        $this->assertPageContent($url, $defaultContent);
+
+        // Non admin user with contact preview - show default content
+        $urlWithContact1 = "{$url}?contactId={$contacts['contacts'][0]['id']}";
+        $this->assertPageContent($urlWithContact1, $defaultContent);
+
+        // Login admin user
+        $this->loginUser('admin');
+
+        // Admin user with contact preview - show variant content - true filter matches
+        $urlWithContact1 = "{$url}?contactId={$contacts['contacts'][0]['id']}";
+        $this->assertPageContent($urlWithContact1, $variantContent);
+
+        // Admin user with contact preview - show variant content - false filter doesn't matches
+        $urlWithContact2 = "{$url}?contactId={$contacts['contacts'][1]['id']}";
+        $this->assertPageContent($urlWithContact2, $defaultContent);
+
+        // Admin user with contact preview - show variant content - null filter doesn't matches
+        $urlWithContact3 = "{$url}?contactId={$contacts['contacts'][2]['id']}";
+        $this->assertPageContent($urlWithContact3, $defaultContent);
+    }
+
+    public function testPreviewEmailWithInvalidIdThrows404Error(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/preview/5009');
+        self::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
     }
 
     private function createSegment(string $name = 'Segment 1'): LeadList

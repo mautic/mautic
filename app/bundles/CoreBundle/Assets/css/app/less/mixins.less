@@ -259,3 +259,19 @@
     background-color: @bgcolor;
   }
 }
+
+// Alerts
+
+.alert-variant(@background; @border; @text-color) {
+  color: var(--text-primary);
+  background-color: var(--layer);
+  border-color: @border;
+
+  hr {
+    border-top-color: var(--border-subtle);
+  }
+
+  .alert-link {
+    color: var(--text-primary);
+  }
+}
