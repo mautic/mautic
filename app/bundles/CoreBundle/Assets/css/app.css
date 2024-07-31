@@ -1368,7 +1368,7 @@ code {
   outline-offset: -2px;
   border-radius: var(--border-radius-sm);
   display: inline-flex;
-  align-items: flex-start;
+  align-items: center;
   height: var(--spacing-08);
   line-height: var(--spacing-08);
   font-weight: normal;
@@ -1447,6 +1447,9 @@ code {
 }
 .btn.btn-outline.btn-info {
   color: #35B4B9;
+}
+.btn.btn-block {
+  width: 100%;
 }
 .btn-primary,
 .btn-primary + .dropdown-toggle {
