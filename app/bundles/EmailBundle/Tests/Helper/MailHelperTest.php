@@ -1021,6 +1021,7 @@ class MailHelperTest extends TestCase
                         ['mailer_reply_to_email', false, '{tracking_pixel}'],
                         ['mailer_from_email', null, 'nobody@nowhere.com'],
                         ['mailer_from_name', null, 'No Body'],
+                        ['disable_unsubscribe_link_header', null, false],
                     ]
                 )
             );
@@ -1030,8 +1031,9 @@ class MailHelperTest extends TestCase
 
         $email = new Email();
         $email->setSubject('Test');
-        $email->setCustomHtml('content');
+        $email->setCustomHtml('<html>{unsubscribe_url}</html>');
         $email->setHeaders(['X-Mautic-Test-2' => '{tracking_pixel}']);
+        $email->setSendToDnc(false);
         $smtpMailHelper->setEmail($email);
         $smtpMailHelper->send();
 
