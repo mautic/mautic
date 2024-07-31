@@ -382,7 +382,7 @@ class ContactManagementCest
         $contact->verifyOwner(2);
     }
 
-    public function batchAddSegment(
+    public function batchAddAndRemoveSegment(
         AcceptanceTester $I,
         ContactStep $contact,
     ): void {
@@ -428,5 +428,36 @@ class ContactManagementCest
         // Verify that the selected contacts are now in the 'segment-test-3' segment
         $I->see("$contactName1");
         $I->see("$contactName2");
+
+        // Clear the search bar
+        $I->click(ContactPage::$clearSearch);
+        $I->waitForElementVisible('#leadTable', 10);
+
+        // Now lets remove the contacts we just added to the "segment test 3"
+
+        $I->amOnPage(ContactPage::$URL);
+
+        // Select the first and second contacts from the list
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
+
+        // Select change segment option from dropdown for multiple selections
+        $contact->selectOptionFromDropDownForMultipleSelections(5);
+
+        // Wait for the "Remove from the following segment" modal to appear and click it
+        $I->waitForElementClickable(ContactPage::$removeFromTheFollowingSegment, 10);
+        $I->click(ContactPage::$removeFromTheFollowingSegment);
+        // Fill in the segment name and save
+        $I->fillField(ContactPage::$removeFromTheFollowingSegmentInput, 'Segment Test 3');
+        $I->pressKey(ContactPage::$removeFromTheFollowingSegmentInput, WebDriverKeys::ENTER);
+        $I->click(ContactPage::$changeSegmentModalSaveButton);
+
+        // Search for contacts in the "Segment Test 3" segment
+        $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
+        $I->pressKey(ContactPage::$searchBar, WebDriverKeys::ENTER);
+        $I->wait(5); // Wait for search results to load
+        // Verify that the first and second contacts are not in the segment
+        $I->dontsee("$contactName1");
+        $I->dontsee("$contactName2");
     }
 }

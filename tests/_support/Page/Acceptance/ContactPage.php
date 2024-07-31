@@ -63,9 +63,11 @@ class ContactPage
     public static $changeOwnerModalSaveButton = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
 
     // Change Segment Form
-    public static $addToTheFollowingSegment      = '#lead_batch_add_chosen';
-    public static $addToTheFollowingSegmentInput = '#lead_batch_add_chosen > ul > li > input';
-    public static $changeSegmentModalSaveButton  = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
+    public static $addToTheFollowingSegment           = '#lead_batch_add_chosen';
+    public static $addToTheFollowingSegmentInput      = '#lead_batch_add_chosen > ul > li > input';
+    public static $changeSegmentModalSaveButton       = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
+    public static $removeFromTheFollowingSegment      = '#lead_batch_remove_chosen';
+    public static $removeFromTheFollowingSegmentInput = '#lead_batch_remove_chosen > ul > li > input';
 
     // Search bar
     public static $searchBar   = '#list-search';
