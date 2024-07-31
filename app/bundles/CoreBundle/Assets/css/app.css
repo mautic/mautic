@@ -1343,6 +1343,7 @@ blockquote > p:after {
 }
 code {
   padding: var(--spacing-01) var(--spacing-03);
+  cursor: pointer;
 }
 .touchevents .scroll-content {
   height: 100%;
