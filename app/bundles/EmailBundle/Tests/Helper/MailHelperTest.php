@@ -838,6 +838,7 @@ class MailHelperTest extends TestCase
                     'List-Unsubscribe' => '<mailto:list@host.com?subject=unsubscribe>',
                 ]],
             ['secret_key', null, 'secret'],
+            ['disable_unsubscribe_link_header', null, false],
         ];
         $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
 
@@ -856,7 +857,8 @@ class MailHelperTest extends TestCase
 
         $email = new Email();
         $email->setSubject('Test');
-        $email->setCustomHtml('<html></html>');
+        $email->setCustomHtml('<html>{unsubscribe_url}</html>');
+        $email->setSendToDnc(false);
         $lead = new Lead();
         $lead->setEmail('someemail@email.test');
         $mailer->setIdHash('hash');
