@@ -188,10 +188,20 @@ class PublicController extends CommonFormController
                     $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $this->translator, $urlEmail);
                 }
             } elseif ($lead) {
-                $unsubscribeHash = $mailHash->getEmailHash($urlEmail);
-                $action          = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $urlEmail, 'secretHash' => $unsubscribeHash]);
+                $params = ['idHash' => $idHash, 'urlEmail' => $urlEmail];
+
+                if ($urlEmail) {
+                    $params['secretHash'] = $mailHash->getEmailHash($urlEmail);
+                }
+
+                $action          = $this->generateUrl('mautic_email_unsubscribe', $params);
                 $viewParameters  = $this->getViewParams($lead, $idHash);
                 $form            = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
+
+                if ($session->get($successSessionName)) {
+                    $viewParameters['successMessage'] = $this->translator->trans('mautic.email.preferences_center_success_message.text');
+                }
+
                 if (true === $form) {
                     $session->set($successSessionName, 1);
 
