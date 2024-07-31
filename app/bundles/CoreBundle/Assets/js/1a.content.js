@@ -659,9 +659,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
         mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-ltr');
         });
-        mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
-            mQuery("html").removeClass('sidebar-open-rtl');
-        });
     }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
@@ -844,11 +841,6 @@ Mautic.onPageUnload = function (container, response) {
                 ckEditors.clear();
             }
         }
-
-        //turn off shuffle events
-        mQuery('html')
-            .off('fa.sidebar.minimize')
-            .off('fa.sidebar.maximize');
 
         mQuery(container + " input[data-toggle='color']").each(function() {
             mQuery(this).minicolors('destroy');
