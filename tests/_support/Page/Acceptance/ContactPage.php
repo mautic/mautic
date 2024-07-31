@@ -57,6 +57,11 @@ class ContactPage
     public static $firstCampaignFromRemoveList ='#lead_batch_remove_chosen > div > ul > li';
     public static $campaignsModalSaveButton    = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-default.btn-save.btn-copy';
 
+    // Change Owner From
+    public static $addToTheFollowing          = '#lead_batch_owner_addowner_chosen';
+    public static $adminUser                  = '#lead_batch_owner_addowner_chosen > div > ul > li:nth-child(1)';
+    public static $changeOwnerModalSaveButton = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
+
     /**
      * Basic route example for your current URL
      * You can append any additional parameter to URL

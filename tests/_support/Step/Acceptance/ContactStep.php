@@ -114,4 +114,24 @@ class ContactStep extends \AcceptanceTester
         $I->fillField(ContactPage::$country.' > div > div > input', 'country');
         $I->pressKey(ContactPage::$country.' > div > div > input', WebDriverKeys::ENTER);
     }
+
+    public function checkOwner($place)
+    {
+        $I = $this;
+        $I->amOnPage(ContactPage::$URL);
+        $contactName=$I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
+        $I->click("#leadTable > tbody > tr:nth-child($place) > td:nth-child(2) > a > div");
+        $I->waitForText($contactName, 10, '#app-content > div > div.page-header > div > div.col-xs-5.col-sm-6.col-md-5.va-m > h1 > div > span:nth-child(1)');
+        $I->see('Sales User', '#app-content > div > div.box-layout > div.col-md-3.bdr-l.height-auto > div.panel.bg-transparent.shd-none.bdr-rds-0.bdr-w-0.mb-0 > div.panel-body.pt-sm > p:nth-child(2)');
+    }
+
+    public function verifyOwner($place)
+    {
+        $I = $this;
+        $I->amOnPage('/s/contacts');
+        $contactName=$I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
+        $I->click("#leadTable > tbody > tr:nth-child($place) > td:nth-child(2) > a > div");
+        $I->waitForText($contactName, 10, '#app-content > div > div.page-header > div > div.col-xs-5.col-sm-6.col-md-5.va-m > h1 > div > span:nth-child(1)');
+        $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]');
+    }
 }

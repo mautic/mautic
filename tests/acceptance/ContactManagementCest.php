@@ -338,4 +338,26 @@ class ContactManagementCest
         $I->dontSee($contactName1, CampaignPage::$firstContactFromContactsTab);
         $I->dontSee($contactName2, CampaignPage::$secondContactFromContactsTab);
     }
+
+    public function batchChangeOwner(
+        AcceptanceTester $I,
+        ContactStep $contact,
+    ): void {
+        $contact->checkOwner(1);
+
+        $contact->checkOwner(2);
+
+        $I->amOnPage(ContactPage::$URL);
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
+        $contact->selectOptionFromDropDownForMultipleSelections(4);
+
+        $I->waitForElementClickable(ContactPage::$addToTheFollowing, 5);
+        $I->click(ContactPage::$addToTheFollowing);
+        $I->click(ContactPage::$adminUser);
+        $I->click(ContactPage::$changeOwnerModalSaveButton);
+
+        $contact->verifyOwner(1);
+        $contact->verifyOwner(2);
+    }
 }
