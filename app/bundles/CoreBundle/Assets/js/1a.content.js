@@ -845,11 +845,6 @@ Mautic.onPageUnload = function (container, response) {
             }
         }
 
-        //turn off shuffle events
-        mQuery('html')
-            .off('fa.sidebar.minimize')
-            .off('fa.sidebar.maximize');
-
         mQuery(container + " input[data-toggle='color']").each(function() {
             mQuery(this).minicolors('destroy');
         });
