@@ -15,15 +15,18 @@ class ContactStep extends \AcceptanceTester
      * @param string $email
      * @param string $tag
      */
-    public function fillContactForm($firstName, $lastName, $email, $tag)
+    public function fillContactForm($firstName, $lastName, $email, $tag): void
     {
         $I = $this;
+        // Wait for the first name field to be visible
         $I->waitForElementVisible(ContactPage::$firstNameField, 10);
+        // Fill in the form fields
         $I->fillField(ContactPage::$firstNameField, $firstName);
         $I->fillField(ContactPage::$lastNameField, $lastName);
         $I->fillField(ContactPage::$emailField, $email);
         $I->fillField(ContactPage::$tagField, $tag);
         $I->pressKey(ContactPage::$tagField, WebDriverKeys::ENTER);
+        // // Set the owner to "Sales User"
         $I->click(ContactPage::$ownerField.'> a > span');
         $I->fillField(ContactPage::$ownerField.' > div > div > input', 'Sales');
         $I->pressKey(ContactPage::$ownerField.' > div > div > input', WebDriverKeys::ENTER);
@@ -32,9 +35,7 @@ class ContactStep extends \AcceptanceTester
     /**
      * Grab the name of a contact from the contact list.
      *
-     * @param int $place the position of the contact in the list (starting from 1)
-     *
-     * @return string
+     * @return string the name of the contact
      */
     public function grabContactNameFromList($place)
     {
@@ -48,25 +49,21 @@ class ContactStep extends \AcceptanceTester
 
     /**
      * Select an option from the dropdown menu for a specific contact.
-     *
-     * @param int $place  the position of the contact in the list (starting from 1)
-     * @param int $option the option to select (1-> Edit, 2-> Details, 3-> Send Email, 4-> Delete)
      */
-    public function selectOptionFromDropDown($place, $option)
+    public function selectOptionFromDropDown($place, $option): void
     {
-        // Option: 1-> Edit, 2-> Details, 3-> Send Email, 4-> Delete
         $I = $this;
+        // Click the dropdown menu
         $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/button");
+        // Select the desired option
         $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a", 30);
         $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a");
     }
 
     /**
      * Select a contact from the contact list.
-     *
-     * @param int $place the position of the contact in the list (starting from 1)
      */
-    public function selectContactFromList($place)
+    public function selectContactFromList($place): void
     {
         $I = $this;
         $I->checkOption("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/span/input");
@@ -74,63 +71,88 @@ class ContactStep extends \AcceptanceTester
 
     /**
      * Select an option from the dropdown menu for multiple selected contacts.
-     *
-     * @param int $option The option to select (e.g., 11 for batch delete).
      */
     public function selectOptionFromDropDownForMultipleSelections($option)
     {
         $I = $this;
+        // Click the dropdown button for bulk actions
         $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button/i');
+        // Select the desired option from the dropdown menu
         $I->click("//*[@id='leadTable']/thead/tr/th[1]/div/div/ul/li[$option]/a/span/span");
     }
 
-    public function selectOptionFromDropDownContactsPage($option)
+    /**
+     * Select an option from the dropdown menu (beside the Quick Add, +New button) on the contacts page.
+     *
+     * @param int $option the option to select (1-> Export to CSV, 2-> Export to Excel, 3-> Import, 4-> Import History)
+     */
+    public function selectOptionFromDropDownContactsPage($option): void
     {
         $I = $this;
         $I->click('#toolbar > div.std-toolbar.btn-group > button');
         $I->click("//*[@id='toolbar']/div[1]/ul/li[$option]/a/span/span");
     }
 
-    public function fillImportFormFields()
+    /**
+     * Fill out the import form fields with specified placeholder data.
+     */
+    public function fillImportFormFields(): void
     {
         $I = $this;
+        // Fill out the first name field in the import form
         $I->click(ContactPage::$firstName.'> a > span');
         $I->fillField(ContactPage::$firstName.' > div > div > input', 'first name');
         $I->pressKey(ContactPage::$firstName.' > div > div > input', WebDriverKeys::ENTER);
-
+        // Fill out the last name field in the import form
         $I->click(ContactPage::$lastName.'> a > span');
         $I->fillField(ContactPage::$lastName.' > div > div > input', 'last name');
         $I->pressKey(ContactPage::$lastName.' > div > div > input', WebDriverKeys::ENTER);
-
+        // Fill out the email field in the import form
         $I->click(ContactPage::$email.'> a > span');
         $I->fillField(ContactPage::$email.' > div > div > input', 'email');
         $I->pressKey(ContactPage::$email.' > div > div > input', WebDriverKeys::ENTER);
-
+        // Fill out the company field in the import form
         $I->click(ContactPage::$company.'> a > span');
         $I->fillField(ContactPage::$company.' > div > div > input', 'company name');
         $I->pressKey(ContactPage::$company.' > div > div > input', WebDriverKeys::ENTER);
-
+        // Fill out the country field in the import form
         $I->click(ContactPage::$country.'> a > span');
         $I->fillField(ContactPage::$country.' > div > div > input', 'country');
         $I->pressKey(ContactPage::$country.' > div > div > input', WebDriverKeys::ENTER);
     }
 
-    public function checkOwner($place)
+    /**
+     * Check the owner of a specific contact.
+     *
+     * @param int $place the position of the contact in the list (starting from 1)
+     */
+    public function checkOwner($place): void
     {
         $I = $this;
+        // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
-        $contactName=$I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
-        $I->click("#leadTable > tbody > tr:nth-child($place) > td:nth-child(2) > a > div");
+        // Grab the contact's name and navigate to their details page
+        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
+        $I->click(['link' => $contactName]);
         $I->waitForText($contactName, 10, '#app-content > div > div.page-header > div > div.col-xs-5.col-sm-6.col-md-5.va-m > h1 > div > span:nth-child(1)');
+        // Wait for the contact's name to appear on the details page and verify the owner is "Sales User"
         $I->see('Sales User', '#app-content > div > div.box-layout > div.col-md-3.bdr-l.height-auto > div.panel.bg-transparent.shd-none.bdr-rds-0.bdr-w-0.mb-0 > div.panel-body.pt-sm > p:nth-child(2)');
     }
 
-    public function verifyOwner($place)
+    /**
+     * Verify that the owner of a contact has changed to "Admin User".
+     *
+     * @param int $place the position of the contact in the list (starting from 1)
+     */
+    public function verifyOwner($place): void
     {
         $I = $this;
+        // Navigate to the contacts page
         $I->amOnPage('/s/contacts');
-        $contactName=$I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
-        $I->click("#leadTable > tbody > tr:nth-child($place) > td:nth-child(2) > a > div");
+        // Grab the contact's name and navigate to their details page
+        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
+        $I->click(['link' => $contactName]);
+        // Wait for the contact's name to appear on the details page and verify the owner has changed to "Admin User"
         $I->waitForText($contactName, 10, '#app-content > div > div.page-header > div > div.col-xs-5.col-sm-6.col-md-5.va-m > h1 > div > span:nth-child(1)');
         $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]');
     }
