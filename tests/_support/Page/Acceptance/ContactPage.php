@@ -53,14 +53,23 @@ class ContactPage
     // Campaigns
     public static $campaignsModalAddOption     = '//*[@id="lead_batch_add_chosen"]/ul/li/input';
     public static $campaignsModalRemoveOption  = '//*[@id="lead_batch_remove_chosen"]/ul/li/input';
-    public static $firstCampaignFromAddList    ='#lead_batch_add_chosen > div > ul > li';
-    public static $firstCampaignFromRemoveList ='#lead_batch_remove_chosen > div > ul > li';
+    public static $firstCampaignFromAddList    = '#lead_batch_add_chosen > div > ul > li';
+    public static $firstCampaignFromRemoveList = '#lead_batch_remove_chosen > div > ul > li';
     public static $campaignsModalSaveButton    = '#MauticSharedModal > div > div > div.modal-footer > div > button.btn.btn-default.btn-save.btn-copy';
 
     // Change Owner From
     public static $addToTheFollowing          = '#lead_batch_owner_addowner_chosen';
     public static $adminUser                  = '#lead_batch_owner_addowner_chosen > div > ul > li:nth-child(1)';
     public static $changeOwnerModalSaveButton = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
+
+    // Change Segment Form
+    public static $addToTheFollowingSegment      = '#lead_batch_add_chosen';
+    public static $addToTheFollowingSegmentInput = '#lead_batch_add_chosen > ul > li > input';
+    public static $changeSegmentModalSaveButton  = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
+
+    // Search bar
+    public static $searchBar   = '#list-search';
+    public static $clearSearch = '#btn-filter';
 
     /**
      * Basic route example for your current URL

@@ -1,5 +1,7 @@
 <?php
 
+use Facebook\WebDriver\WebDriverKeys;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Page\Acceptance\CampaignPage;
 use Page\Acceptance\ContactPage;
 use PHPUnit\Framework\Assert;
@@ -378,5 +380,53 @@ class ContactManagementCest
         // Verify that the owner of the first and second contacts has been changed
         $contact->verifyOwner(1);
         $contact->verifyOwner(2);
+    }
+
+    public function batchAddSegment(
+        AcceptanceTester $I,
+        ContactStep $contact,
+    ): void {
+        $I->amOnPage(ContactPage::$URL);
+
+        // Grab the names of the first and second contacts in the list
+        $contactName1 = $contact->grabContactNameFromList(1);
+        $contactName2 = $contact->grabContactNameFromList(2);
+
+        // Search for contacts in the "Segment Test 3" segment
+        $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
+        $I->pressKey(ContactPage::$searchBar, WebDriverKeys::ENTER);
+        $I->wait(5); // Wait for search results to load
+
+        // Verify that the first and second contacts are not in the segment
+        $I->dontsee("$contactName1");
+        $I->dontsee("$contactName2");
+
+        // Clear the search bar
+        $I->click(ContactPage::$clearSearch);
+        $I->waitForElementVisible('#leadTable', 10); // Wait for the contact list to be visible
+
+        // Select the first and second contacts from the list
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
+
+        // Select change segment option from dropdown for multiple selections
+        $contact->selectOptionFromDropDownForMultipleSelections(5);
+
+        // Wait for the "Add to the following segment" modal to appear and click it
+        $I->waitForElementClickable(ContactPage::$addToTheFollowingSegment, 10);
+        $I->click(ContactPage::$addToTheFollowingSegment);
+        // Fill in the segment name and save
+        $I->fillField(ContactPage::$addToTheFollowingSegmentInput, 'Segment Test 3');
+        $I->pressKey(ContactPage::$addToTheFollowingSegmentInput, WebDriverKeys::ENTER);
+        $I->click(ContactPage::$changeSegmentModalSaveButton);
+
+        // Search again for contacts in the "Segment Test 3" segment
+        $I->fillField(ContactPage::$searchBar, 'segment:segment-test-3');
+        $I->pressKey(ContactPage::$searchBar, WebDriverKeys::ENTER);
+        $I->wait(5);
+
+        // Verify that the selected contacts are now in the 'segment-test-3' segment
+        $I->see("$contactName1");
+        $I->see("$contactName2");
     }
 }
