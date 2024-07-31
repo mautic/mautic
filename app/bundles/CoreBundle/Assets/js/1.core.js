@@ -190,7 +190,7 @@ var Mautic = {
             var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
         });
-        
+
     },
 
     /**
@@ -283,7 +283,7 @@ var Mautic = {
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
         if (!button.find('.ri-loader-3-line.ri-spin').length) {
-            button.append(mQuery('<i class="ri-loader-3-line ri-spin"></i>'));
+            button.append(mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>'));
         }
     },
 
@@ -304,7 +304,7 @@ var Mautic = {
      */
     activateLabelLoadingIndicator: function (el) {
         var labelSpinner = mQuery("label[for='" + el + "']");
-        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin"></i>');
+        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
