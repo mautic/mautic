@@ -1342,7 +1342,7 @@ class MailHelper
         if (!str_contains($content, '{unsubscribe_url}')) {
             return str_contains($content, '{unsubscribe_text}') && str_contains($unsubscribeTextBody, '|URL|');
         }
-        
+
         return true;
     }
 
