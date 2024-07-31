@@ -25,82 +25,82 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AbstractIntegrationTestCase extends TestCase
 {
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var EventDispatcherInterface&MockObject
      */
     protected $dispatcher;
 
     /**
-     * @var CacheStorageHelper|MockObject
+     * @var CacheStorageHelper&MockObject
      */
     protected $cache;
 
     /**
-     * @var EntityManager|MockObject
+     * @var EntityManager&MockObject
      */
     protected $em;
 
     /**
-     * @var Session|MockObject
+     * @var Session&MockObject
      */
     protected $session;
 
     /**
-     * @var RequestStack|MockObject
+     * @var RequestStack&MockObject
      */
     protected $request;
 
     /**
-     * @var Router|MockObject
+     * @var Router&MockObject
      */
     protected $router;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var TranslatorInterface&MockObject
      */
     protected $translator;
 
     /**
-     * @var Logger|MockObject
+     * @var Logger&MockObject
      */
     protected $logger;
 
     /**
-     * @var EncryptionHelper|MockObject
+     * @var EncryptionHelper&MockObject
      */
     protected $encryptionHelper;
 
     /**
-     * @var LeadModel|MockObject
+     * @var LeadModel&MockObject
      */
     protected $leadModel;
 
     /**
-     * @var CompanyModel|MockObject
+     * @var CompanyModel&MockObject
      */
     protected $companyModel;
 
     /**
-     * @var PathsHelper|MockObject
+     * @var PathsHelper&MockObject
      */
     protected $pathsHelper;
 
     /**
-     * @var NotificationModel|MockObject
+     * @var NotificationModel&MockObject
      */
     protected $notificationModel;
 
     /**
-     * @var FieldModel|MockObject
+     * @var FieldModel&MockObject
      */
     protected $fieldModel;
 
     /**
-     * @var IntegrationEntityModel|MockObject
+     * @var IntegrationEntityModel&MockObject
      */
     protected $integrationEntityModel;
 
     /**
-     * @var DoNotContact|MockObject
+     * @var DoNotContact&MockObject
      */
     protected $doNotContact;
 

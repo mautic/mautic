@@ -917,7 +917,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                             $parameters[$settings['refresh_token']] = $this->keys[$settings['refresh_token']];
                         }
 
-                        if ('authorization_code' == $grantType) {
+                        if ('authorization_code' === $grantType) {
                             $parameters['code'] = $this->request->get('code');
                         }
                         if (empty($settings['ignore_redirecturi'])) {

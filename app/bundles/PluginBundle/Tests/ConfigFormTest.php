@@ -11,8 +11,10 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Entity\PluginRepository;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
+use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
@@ -40,6 +42,16 @@ class ConfigFormTest extends KernelTestCase
 
     public function testOauth(): void
     {
+        $connectWiseHeader = ['appcookie' => 'rookie'];
+        self::getContainer()->get('event_dispatcher')->addListener(
+            PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
+            function (PluginIntegrationKeyEvent $event) use ($connectWiseHeader): PluginIntegrationKeyEvent {
+                $event->setKeys($connectWiseHeader);
+
+                return $event;
+            }
+        );
+
         $plugins    = $this->getIntegrationObject()->getIntegrationObjects();
         $url        = 'https://test.com';
         $parameters = ['a' => 'testa', 'b' => 'testb'];
@@ -47,7 +59,7 @@ class ConfigFormTest extends KernelTestCase
         $authType   = 'oauth2';
 
         $expected                = [];
-        $expected['Connectwise'] = $this->getOauthData('');
+        $expected['Connectwise'] = $this->getOauthData('', ['clientId' => $connectWiseHeader['appcookie']]);
         $expected['OneSignal']   = $this->getOauthData('');
         $expected['Twilio']      = $this->getOauthData('');
         $expected['Vtiger']      = $this->getOauthData('sessionName');
@@ -58,16 +70,18 @@ class ConfigFormTest extends KernelTestCase
         $expected['Hubspot']     = $this->getOauthData('hapikey');
 
         foreach ($plugins as $index => $integration) {
-            $this->assertSame($expected[$index], $integration->prepareRequest($url, $parameters, $method, [], $authType));
+            $this->assertSame($expected[$index], $integration->prepareRequest($url, $parameters, $method, ['appcookie' => 'ololo'], $authType));
         }
     }
 
     /**
+     * @param array<string> $headers
+     *
      * @return array<mixed>
      */
-    private function getOauthData(string $key): array
+    private function getOauthData(string $key, array $headers = []): array
     {
-        return [
+        $result = [
             [
                 'a'   => 'testa',
                 'b'   => 'testb',
@@ -77,6 +91,12 @@ class ConfigFormTest extends KernelTestCase
                 'Authorization: OAuth ',
             ],
         ];
+
+        if ([] !== $headers) {
+            $result[1] = array_merge($result[1], $headers);
+        }
+
+        return $result;
     }
 
     public function testAmendLeadDataBeforeMauticPopulate(): void

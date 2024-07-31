@@ -152,7 +152,7 @@ class PublicController extends AbstractFormController
                         if (!empty($variantCookie)) {
                             if (isset($variants[$variantCookie])) {
                                 // if not the parent, show the specific variant already displayed to the visitor
-                                if ((int) $variantCookie !== $entity->getId()) {
+                                if ((string) $variantCookie !== (string) $entity->getId()) {
                                     $entity = $childrenVariants[$variantCookie];
                                 } // otherwise proceed with displaying parent
                             }

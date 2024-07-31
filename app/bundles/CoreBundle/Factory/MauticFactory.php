@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -46,6 +47,7 @@ class MauticFactory
         private ThemeHelper $themeHelper,
         private IntegrationHelper $integrationHelper,
         private SlotsHelper $slotsHelper,
+        private AssetsHelper $assetsHelper,
         private LoggerInterface $logger
     ) {
     }
@@ -361,6 +363,8 @@ class MauticFactory
                 return $this->integrationHelper;
             case 'template.slots':
                 return $this->slotsHelper;
+            case 'template.assets':
+                return $this->assetsHelper;
             default:
                 @trigger_error('MauticFactory::getHelper with "'.$helper.'" is deprecated.', E_USER_DEPRECATED);
 
