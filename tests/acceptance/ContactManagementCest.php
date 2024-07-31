@@ -460,4 +460,28 @@ class ContactManagementCest
         $I->dontsee("$contactName1");
         $I->dontsee("$contactName2");
     }
+
+    public function batchSetDoNotContact(
+        AcceptanceTester $I,
+        ContactStep $contact,
+    ): void {
+        $I->amOnPage(ContactPage::$URL);
+        $I->dontSeeElement(ContactPage::$firstContactDoNotContact);
+        $I->dontSeeElement(ContactPage::$secondContactDoNotContact);
+
+        // Select the first and second contacts from the list
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
+
+        // Select change segment option from dropdown for multiple selections
+        $contact->selectOptionFromDropDownForMultipleSelections(10);
+
+        $I->waitForElementClickable(ContactPage::$doNotContactSaveButton, 5);
+        $I->click(ContactPage::$doNotContactSaveButton);
+
+        $I->reloadPage();
+
+        $I->seeElement(ContactPage::$firstContactDoNotContact);
+        $I->seeElement(ContactPage::$secondContactDoNotContact);
+    }
 }

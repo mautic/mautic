@@ -73,6 +73,11 @@ class ContactPage
     public static $searchBar   = '#list-search';
     public static $clearSearch = '#btn-filter';
 
+    // Do Not Contact
+    public static $firstContactDoNotContact  = '#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.pull-right > span';
+    public static $secondContactDoNotContact = '#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.pull-right > span';
+    public static $doNotContactSaveButton    = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
+
     /**
      * Basic route example for your current URL
      * You can append any additional parameter to URL
