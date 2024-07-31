@@ -483,12 +483,12 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
             foreach ($utmTags['results'] as $utmTag) {
-                $icon = 'fa-tag';
+                $icon = 'ri-hashtag';
                 if (isset($utmTag['utm_medium'])) {
                     switch (strtolower($utmTag['utm_medium'])) {
                         case 'social':
                         case 'socialmedia':
-                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
+                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-line');
                             break;
                         case 'email':
                         case 'newsletter':
@@ -505,7 +505,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             $icon = 'ri-map-pin-2-line';
                             break;
                         case 'device':
-                            $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
+                            $icon = 'ri-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet-line');
                             break;
                     }
                 }
