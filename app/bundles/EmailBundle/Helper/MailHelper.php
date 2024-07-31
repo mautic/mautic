@@ -1313,9 +1313,10 @@ class MailHelper
         */
 
         $email               = $this->getEmail();
-        $unsubscribeBodyText = $this->factory->getParameter('unsubscribe_text') ?? '';
-        if (!$email || $email->getSendToDnc()
-            || $this->factory->getParameter('disable_unsubscribe_link_header')
+        $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
+        if (!$email
+            || $email->getSendToDnc()
+            || $this->coreParametersHelper->get('disable_unsubscribe_link_header')
             || !self::isUnsubscribeHeadersRequired($this->getBody(), $unsubscribeBodyText)) {
             return $headers;
         }
@@ -1339,13 +1340,9 @@ class MailHelper
     public static function isUnsubscribeHeadersRequired(string $content, string $unsubscribeTextBody): bool
     {
         if (!str_contains($content, '{unsubscribe_url}')) {
-            if (str_contains($content, '{unsubscribe_text}') && str_contains($unsubscribeTextBody, '|URL|')) {
-                return true;
-            }
-
-            return false;
+            return str_contains($content, '{unsubscribe_text}') && str_contains($unsubscribeTextBody, '|URL|');
         }
-
+        
         return true;
     }
 
