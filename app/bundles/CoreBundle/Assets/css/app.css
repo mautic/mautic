@@ -409,16 +409,9 @@ body > #app-wrapper {
 .no-csstransforms3d.sidebar-open-ltr .app-sidebar.sidebar-left {
   left: 0;
 }
-.csstransforms3d.sidebar-open-rtl .app-sidebar.sidebar-right {
-  -webkit-transform: translate3d(-230px, 0, 0);
-  transform: translate3d(-230px, 0, 0);
-}
 .csstransforms3d.sidebar-open-rtl .app-sidebar.sidebar-left {
   -webkit-transform: translate3d(-230px, 0, 0);
   transform: translate3d(-230px, 0, 0);
-}
-.no-csstransforms3d.sidebar-open-rtl .app-sidebar.sidebar-right {
-  right: 0;
 }
 .no-csstransforms3d.sidebar-open-rtl .app-sidebar.sidebar-left {
   left: -230px;
@@ -518,77 +511,6 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left .nav.sidebar-left-dark,
 .app-sidebar.sidebar-left .nav.sidebar-left-dark > li > a:hover {
   background: #0c0f12;
-}
-.app-sidebar.sidebar-right {
-  width: 230px;
-  right: -230px;
-  background-color: #1d232b;
-  box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.05);
-  color: rgba(255, 255, 255, 0.55);
-  -webkit-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-.app-sidebar.sidebar-right .sidebar-header,
-.app-sidebar.sidebar-right .sidebar-footer {
-  width: 230px;
-  background-color: #232b34;
-}
-.app-sidebar.sidebar-right .sidebar-content {
-  padding-left: 1px;
-  top: 48px;
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li.nav-group:after {
-  content: '';
-  position: absolute;
-  right: 0;
-  left: 50px;
-  bottom: 0;
-  border-bottom: 1px solid #202830;
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > a {
-  color: rgba(255, 255, 255, 0.5);
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:hover,
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:focus {
-  background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > a,
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > a {
-  background-color: #1d232b;
-  color: rgba(255, 255, 255, 0.75);
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > .nav-submenu,
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > .nav-submenu {
-  background-color: #171c22;
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu {
-  background-color: #1a2026;
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu:after {
-  background-color: #212831;
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li:after {
-  background-color: #222a32;
-  box-shadow: 0 0 0 2px #1a2026;
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a {
-  color: rgba(255, 255, 255, 0.5);
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a:hover,
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a:focus {
-  color: rgba(255, 255, 255, 0.8);
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li.active > a,
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li.open > a {
-  color: rgba(255, 255, 255, 0.8);
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav .nav-heading {
-  color: rgba(255, 255, 255, 0.25);
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav .nav-divider {
-  background-color: rgba(255, 255, 255, 0.06);
 }
 .app-sidebar .sidebar-header {
   z-index: 100;

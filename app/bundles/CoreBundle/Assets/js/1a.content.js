@@ -659,10 +659,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
         mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
             mQuery("html").removeClass('sidebar-open-ltr');
         });
-        mQuery('.sidebar-right a[data-toggle="ajax"]').on('click.ajax', function (event) {
-            mQuery("html").removeClass('sidebar-open-rtl');
-        });
-    }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
         if (inModal || typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
