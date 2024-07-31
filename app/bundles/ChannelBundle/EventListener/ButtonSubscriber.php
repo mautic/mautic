@@ -37,7 +37,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                         'data-header' => $this->translator->trans('mautic.lead.batch.channels'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.lead.batch.channels'),
-                    'iconClass' => 'ri-rss-line',
+                    'iconClass' => 'ri-remote-control-line',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );

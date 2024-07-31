@@ -342,7 +342,7 @@ return [
             'mautic.lead.export_scheduled_logger_subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ContactExportSchedulerLoggerSubscriber::class,
                 'arguments' => [
-                    'logger',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.lead.export_scheduled_notification_subscriber' => [
@@ -970,5 +970,6 @@ return [
         'contact_export_dir'                                                                    => '%mautic.application_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
         'contact_allow_multiple_companies'                                                      => true,
+        'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
     ],
 ];

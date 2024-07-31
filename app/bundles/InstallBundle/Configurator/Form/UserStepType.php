@@ -72,7 +72,7 @@ class UserStepType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                 ],
                 'required'    => true,
                 'data'        => (!empty($storedData->email)) ? $storedData->email : '',
@@ -121,7 +121,7 @@ class UserStepType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.user.user.form.help.passwordrequirements',
-                    'preaddon' => 'fa fa-lock',
+                    'preaddon' => 'ri-lock-fill',
                 ],
                 'required'    => true,
                 'constraints' => [
@@ -154,7 +154,7 @@ class UserStepType extends AbstractType
                         'type'  => 'submit',
                         'attr'  => [
                             'class'   => 'btn btn-success pull-right btn-next',
-                            'icon'    => 'fa fa-arrow-circle-right',
+                            'icon'    => 'ri-arrow-right-circle-line',
                             'onclick' => 'MauticInstaller.showWaitMessage(event);',
                         ],
                     ],

@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
+use Mautic\CoreBundle\Validator\EntityEvent;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -270,6 +271,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                 }
             },
         ]));
+
+        $metadata->addConstraint(new EntityEvent());
     }
 
     /**

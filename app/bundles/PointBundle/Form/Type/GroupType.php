@@ -47,6 +47,7 @@ class GroupType extends AbstractType
             $data = $options['data']->isPublished(false);
         }
         $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label'     => 'mautic.core.form.available',
             'data'      => $data,
         ]);
 

@@ -5,7 +5,7 @@
 <div class="box-layout">
     <div class="col-md-1 va-m">
         {% set requiredTitle = field.isRequired ? 'mautic.core.required' : 'mautic.core.not_required' %}
-        <h3><span class="fa fa-{% if field.isRequired %}check{% else %}times{% endif %} text-white dark-xs" data-toggle="tooltip"
+        <h3><span class="{% if field.isRequired %}ri-check-line{% else %}ri-close-line{% endif %} text-white dark-xs" data-toggle="tooltip"
                   data-placement="left"
                   title="{{ requiredTitle|trans }}"></span>
         </h3>
