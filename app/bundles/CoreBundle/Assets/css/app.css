@@ -54,6 +54,31 @@
   font-weight: 700;
   src: url('../../../../assets/fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700italic.woff2') format('woff2');
 }
+.ri-spin {
+  -webkit-animation: ri-spin 2s infinite linear;
+  animation: ri-spin 2s infinite linear;
+  display: block;
+}
+@-webkit-keyframes ri-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@keyframes ri-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
 html,
 body {
   width: 100%;
@@ -1332,6 +1357,7 @@ blockquote > p:after {
 }
 code {
   padding: var(--spacing-01) var(--spacing-03);
+  cursor: pointer;
 }
 .touchevents .scroll-content {
   height: 100%;
@@ -1352,6 +1378,7 @@ code {
 }
 .btn {
   transition: var(--transition-all-productive);
+  width: fit-content;
 }
 .btn,
 .btn:active {
@@ -2723,6 +2750,13 @@ ul.dropdown-menu-form {
 .dropdown-toggle:active,
 .dropdown-toggle:focus {
   outline: 2px solid var(--focus) !important;
+}
+.dropdown-header {
+  margin: 32px 16px 8px 16px;
+  border-bottom: 1px solid var(--border-strong);
+  padding: 0 0 4px;
+  color: var(--text-secondary);
+  font-size: var(--typography-utility-productive);
 }
 .nav > li > a {
   font-weight: normal;

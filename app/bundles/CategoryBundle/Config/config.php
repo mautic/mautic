@@ -43,6 +43,7 @@ return [
                 'access'    => 'category:categories:view',
                 'iconClass' => 'ri-folder-6-fill',
                 'id'        => 'mautic_category_index',
+                'parent'    => 'mautic.core.general',
                 'priority'  => 20,
             ],
         ],
