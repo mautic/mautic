@@ -1022,15 +1022,6 @@ hr.hr-w-3,
 a {
   transition: var(--transition-all-productive);
   color: var(--link-primary);
-  outline: 2px solid transparent !important;
-  outline-offset: -2px;
-}
-a:hover {
-  outline: 2px solid transparent;
-}
-a:active,
-a:focus {
-  outline: 2px solid var(--focus) !important;
 }
 a:hover {
   color: var(--link-primary-hover);
