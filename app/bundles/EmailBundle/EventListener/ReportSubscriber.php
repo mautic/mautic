@@ -540,7 +540,8 @@ class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.email.graph.bar.read.clicked.unsubscribed.bounced':
-                    $queryBuilder->select('e.id, e.name, e.sent_count, e.read_count,
+                    $this->addTrackableTablesForEmailStats($queryBuilder);
+                    $queryBuilder->select('e.id, e.name, e.sent_count, e.read_count, tr.unique_hits as `unique_clicks`,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     )
@@ -550,15 +551,18 @@ class ReportSubscriber implements EventSubscriberInterface
 
                     $data = $queryBuilder->execute()->fetchAllAssociative();
 
+                    dump($data);
                     if (is_array($data)) {
                         $names        = array_column($data, 'name');
                         $sentCount    = array_column($data, 'sent_count');
                         $readCount    = array_column($data, 'read_count');
+                        $clickedCount = array_column($data, 'unique_clicks');
                         $unsubscribed = array_column($data, 'unsubscribed');
                         $bounced      = array_column($data, 'bounced');
 
                         $sentCount[]    = 0;
                         $readCount[]    = 0;
+                        $clickedCount[] = 0;
                         $unsubscribed[] = 0;
                         $bounced[]      = 0;
 
@@ -566,6 +570,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
                         $chart->setDataset('Sent Count', $sentCount);
                         $chart->setDataset('Read Count', $readCount);
+                        $chart->setDataset('Clicked Count', $clickedCount);
                         $chart->setDataset('Unsubscribed Count', $unsubscribed);
                         $chart->setDataset('Bounced Count', $bounced);
 
