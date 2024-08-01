@@ -550,33 +550,34 @@ class ReportSubscriber implements EventSubscriberInterface
 
                     $data = $queryBuilder->execute()->fetchAllAssociative();
 
-                    $names        = array_column($data, 'name');
-                    $sentCount    = array_column($data, 'sent_count');
-                    $readCount    = array_column($data, 'read_count');
-                    $unsubscribed = array_column($data, 'unsubscribed');
-                    $bounced      = array_column($data, 'bounced');
+                    if (is_array($data)) {
+                        $names        = array_column($data, 'name');
+                        $sentCount    = array_column($data, 'sent_count');
+                        $readCount    = array_column($data, 'read_count');
+                        $unsubscribed = array_column($data, 'unsubscribed');
+                        $bounced      = array_column($data, 'bounced');
 
-                    array_push($sentCount, 0);
-                    array_push($readCount, 0);
-                    array_push($unsubscribed, 0);
-                    array_push($bounced, 0);
+                        $sentCount[]    = 0;
+                        $readCount[]    = 0;
+                        $unsubscribed[] = 0;
+                        $bounced[]      = 0;
 
-                    $chart  = new BarChart($names);
+                        $chart = new BarChart($names);
 
-                    $chart->setDataset('Sent Count', $sentCount);
-                    $chart->setDataset('Read Count', $readCount);
-                    $chart->setDataset('Unsubscribed Count', $unsubscribed);
-                    $chart->setDataset('Bounced Count', $bounced);
+                        $chart->setDataset('Sent Count', $sentCount);
+                        $chart->setDataset('Read Count', $readCount);
+                        $chart->setDataset('Unsubscribed Count', $unsubscribed);
+                        $chart->setDataset('Bounced Count', $bounced);
 
-                    $event->setGraph(
-                        $g,
-                        [
-                            'data'      => $chart->render(),
-                            'name'      => $g,
-                            'iconClass' => 'fa-flag-checkered',
-                        ]
-                    );
-
+                        $event->setGraph(
+                            $g,
+                            [
+                                'data'      => $chart->render(),
+                                'name'      => $g,
+                                'iconClass' => 'fa-flag-checkered',
+                            ]
+                        );
+                    }
                     break;
                 case 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced':
                     $queryBuilder->select('SUM(DISTINCT e.sent_count) as sent_count,
