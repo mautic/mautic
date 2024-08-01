@@ -258,7 +258,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_EMAILS, $data);
         $context = self::CONTEXT_EMAILS;
         $event->addGraph($context, 'pie', 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced');
-        $event->addGraph($context, 'bar', 'mautic.email.graph.bar.read.ingored.unsubscribed.bounced');
+        $event->addGraph($context, 'bar', 'mautic.email.graph.bar.read.clicked.unsubscribed.bounced');
         $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
 
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
@@ -477,7 +477,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         if ($event->checkContext(self::CONTEXT_EMAILS)
             && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)
-            && !in_array('mautic.email.graph.bar.read.ingored.unsubscribed.bounced', $graphs)
+            && !in_array('mautic.email.graph.bar.read.clicked.unsubscribed.bounced', $graphs)
             && !in_array('mautic.email.table.most.emails.clicks', $graphs)) {
             return;
         }
@@ -539,7 +539,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     break;
 
-                case 'mautic.email.graph.bar.read.ingored.unsubscribed.bounced':
+                case 'mautic.email.graph.bar.read.clicked.unsubscribed.bounced':
                     $queryBuilder->select('e.id, e.name, e.sent_count, e.read_count,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
