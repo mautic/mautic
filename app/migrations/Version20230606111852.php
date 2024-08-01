@@ -13,7 +13,7 @@ final class Version20230606111852 extends PreUpAssertionMigration
 
     public const NEW_STRING = 'Connect a Send Email action to the top of this decision.';
 
-    protected static string $tableName = 'campaign_events';
+    protected const TABLE_NAME = 'campaign_events';
 
     protected function preUpAssertions(): void
     {

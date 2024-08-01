@@ -78,7 +78,7 @@
                                 'data-toggle': 'ajax',
                                 'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
                             },
-                            'iconClass': 'fa fa-send-o',
+                            'iconClass': 'ri-send-plane-line-o',
                             'btnText': 'mautic.email.send'
                         } %}
 
@@ -122,13 +122,13 @@
                                data-toggle="ajax">
                                 {{ item.getName() }}
                                 {% if hasVariants %}
-                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="fa fa-fw fa-sitemap"></i></span>
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="ri-fw ri-organization-chart fs-14"></i></span>
                                 {% endif %}
                                 {% if hasTranslations %}
-                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="fa fa-fw fa-language"></i></span>
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="ri-fw ri-translate fs-14"></i></span>
                                 {% endif %}
                                 {% if 'list' == type %}
-                                  <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="fa fa-fw fa-pie-chart"></i></span>
+                                  <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="ri-pie-chart-line fs-14"></i></span>
                                 {% endif %}
                                 {% if isDraftEnabled and hasDraft %}
                                 <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">

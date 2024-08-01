@@ -236,11 +236,13 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
+        mQuery('#scheduleOptions').removeClass('hide');
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
         mQuery('#leadList').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
+        mQuery('#scheduleOptions').addClass('hide');
     }
 
     mQuery('#emailform_emailType').val(emailType);
@@ -365,7 +367,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
         });
     }
 
-    tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
+    tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('fa-plus text-success');
     newTab.find('a').tab('show');
 
     firstInput.focus();
@@ -532,7 +534,7 @@ Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
     let checkedRadio = mQuery(radioSelector+':checked');
     let globalMailerIsOwnerValue = checkedRadio.attr('data-global-mailer-is-onwer') ? '1' : '0';
     let warningMessageId = 'mailer-is-owner-waring';
-    
+
     mQuery('#'+warningMessageId).remove();
 
     if (checkedRadio.val() !== globalMailerIsOwnerValue) {
@@ -620,9 +622,9 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     prototype = mQuery(prototype);
 
     if (fieldObject == 'company') {
-        prototype.find('.object-icon').removeClass('fa-user').addClass('fa-building');
+        prototype.find('.object-icon').removeClass('ri-user-6-fill').addClass('ri-building-2-line');
     } else {
-        prototype.find('.object-icon').removeClass('fa-building').addClass('fa-user');
+        prototype.find('.object-icon').removeClass('ri-building-2-line').addClass('ri-user-6-fill');
     }
 
     var filterBase  = "emailform[dynamicContent][" + dynamicContentIndex + "][filters][" + dynamicContentFilterIndex + "][filters][" + filterNum + "]";
@@ -630,7 +632,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
 
     if (isSpecial) {
         var templateField = fieldType;
-        if (fieldType == 'boolean' || fieldType == 'multiselect') {
+        if (fieldType == 'boolean' || fieldType == 'multiselect' || fieldType == 'leadlist') {
             templateField = 'select';
         }
         var template = mQuery('#templates .' + templateField + '-template').clone();
@@ -668,7 +670,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     var fieldOptions = fieldCallback = '';
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'boolean' || fieldType == 'multiselect') {
+        if (fieldType == 'select' || fieldType == 'boolean' || fieldType == 'multiselect' || fieldType == 'leadlist') {
             // Generate the options
             fieldOptions = selectedOption.data("field-list");
 
@@ -744,84 +746,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     });
 
     // Convert based on first option in list
-    Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator', mQuery);
-};
-
-Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
-    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
-    var operator = mQuery(el).val();
-    // Extract the filter number
-    var regExp    = /emailform_dynamicContent_(\d+)_filters_(\d+)_filters_(\d+)_operator/;
-    var matches   = regExp.exec(mQuery(el).attr('id'));
-
-    var dynamicContentIndex       = matches[1];
-    var dynamicContentFilterIndex = matches[2];
-    var filterNum                 = matches[3];
-
-    var filterId       = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + dynamicContentFilterIndex + '_filters_' + filterNum + '_filter';
-    var filterEl       = mQuery(filterId);
-    var filterElParent = filterEl.parent();
-
-    // Reset has-error
-    if (filterElParent.hasClass('has-error')) {
-        filterElParent.find('div.help-block').hide();
-        filterElParent.removeClass('has-error');
-    }
-
-    var disabled = (operator == 'empty' || operator == '!empty');
-    filterEl.prop('disabled', disabled);
-
-    if (disabled) {
-        filterEl.val('');
-    }
-
-    var newName = '';
-    var lastPos;
-
-    if (filterEl.is('select')) {
-        var isMultiple  = filterEl.attr('multiple');
-        var multiple    = (operator == 'in' || operator == '!in');
-        var placeholder = filterEl.attr('data-placeholder');
-
-        if (multiple && !isMultiple) {
-            filterEl.attr('multiple', 'multiple');
-
-            // Update the name
-            newName =  filterEl.attr('name') + '[]';
-            filterEl.attr('name', newName);
-
-            placeholder = mauticLang['chosenChooseMore'];
-        } else if (!multiple && isMultiple) {
-            filterEl.removeAttr('multiple');
-
-            // Update the name
-            newName = filterEl.attr('name');
-            lastPos = newName.lastIndexOf('[]');
-            newName = newName.substring(0, lastPos);
-
-            filterEl.attr('name', newName);
-
-            placeholder = mauticLang['chosenChooseOne'];
-        }
-
-        if (multiple) {
-            // Remove empty option
-            filterEl.find('option[value=""]').remove();
-
-            // Make sure none are selected
-            filterEl.find('option:selected').removeAttr('selected');
-        } else {
-            // Add empty option
-            filterEl.prepend("<option value='' selected></option>");
-        }
-
-        // Destroy the chosen and recreate
-        Mautic.destroyChosen(filterEl);
-
-        filterEl.attr('data-placeholder', placeholder);
-
-        Mautic.activateChosenSelect(filterEl, false, mQuery);
-    }
+    Mautic.convertDwcFilterInput('#' + filterIdBase + '_operator', mQuery);
 };
 
 Mautic.copySubjectToName = function(elemSubject) {

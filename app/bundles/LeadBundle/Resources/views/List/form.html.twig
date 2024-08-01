@@ -26,12 +26,12 @@
     <div class="col-md-9 height-auto">
         <div class="row">
             <div class="col-xs-12">
-                <ul class="nav nav-tabs pr-md pl-md">
+                <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
                         <a href="#details" role="tab" data-toggle="tab" class="{% if formContainsErrors(form, ['filters']) %}text-danger{% endif %}">
                             {{ 'mautic.core.details'|trans }}
                             {% if formContainsErrors(form, ['filters']) %}
-                              <i class="fa fa-warning"></i>
+                              <i class="ri-alert-line"></i>
                             {% endif %}
                         </a>
                     </li>
@@ -39,7 +39,7 @@
                         <a href="#filters" role="tab" data-toggle="tab" class="{% if formContainsErrors(form.filters) %}text-danger{% endif %}">
                             {{ 'mautic.core.filters'|trans }}
                             {% if formContainsErrors(form.filters) %}
-                                <i class="fa fa-warning"></i>
+                                <i class="ri-alert-line"></i>
                             {% endif %}
                         </a>
                     </li>

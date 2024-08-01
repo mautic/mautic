@@ -195,13 +195,13 @@ Mautic.generatePageTitle = function(route){
         var currentModule = route.split('/')[3];
 
         //check if we find spans
-        var titleWithHTML = mQuery('.page-header h3').find('span.span-block');
+        var titleWithHTML = mQuery('.page-header h1').find('span.span-block');
         var currentModuleItem = '';
 
         if( 1 < titleWithHTML.length ){
             currentModuleItem = titleWithHTML.eq(0).text() + ' - ' + titleWithHTML.eq(1).text();
         } else {
-            currentModuleItem = mQuery('.page-header h3').text();
+            currentModuleItem = mQuery('.page-header h1').text();
         }
 
         // Encoded entites are decoded by this process and can cause a XSS
@@ -210,7 +210,7 @@ Mautic.generatePageTitle = function(route){
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title
-        mQuery('title').html( mQuery('.page-header h3').text() + ' | Mautic' );
+        mQuery('title').html( mQuery('.page-header h1').text() + ' | Mautic' );
     }
 };
 
@@ -353,7 +353,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         var elementParent = thisTooltip.parent();
 
         if (elementParent.get(0).tagName === 'LABEL') {
-            elementParent.append('<i class="fa fa-question-circle"></i>');
+            elementParent.append('<i class="ri-question-line"></i>');
 
             elementParent.hover(function () {
                 thisTooltip.tooltip('show')
@@ -1469,10 +1469,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
         if (mQuery(el).val()) {
             mQuery(btn).attr('data-livesearch-action', 'clear');
-            mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
+            mQuery(btn + ' i').removeClass('ri-search-line').addClass('ri-eraser-line');
         } else {
             mQuery(btn).attr('data-livesearch-action', 'search');
-            mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
+            mQuery(btn + ' i').removeClass('ri-eraser-line').addClass('ri-search-line');
         }
     }
 };
