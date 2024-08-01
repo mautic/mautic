@@ -16,35 +16,86 @@ class PieChart extends AbstractChart implements ChartInterface
      */
     public function render($withCounts = true): array
     {
-        $data = ['data' => [], 'backgroundColor' => [], 'hoverBackgroundColor' => []];
+        $data      = ['data' => [], 'backgroundColor' => [], 'hoverBackgroundColor' => []];
+        $dataset   = [];
+        $labelKey  = 0;
+        $fullLabel = [];
 
         foreach ($this->datasets as $datasetId => $value) {
-            $color                          = $this->configureColorHelper($datasetId);
-            $data['data'][]                 = $value;
-            $data['backgroundColor'][]      = $color->toRgba(0.8);
-            $data['hoverBackgroundColor'][] = $color->toRgba(0.9);
-            if ($withCounts) {
-                $this->labels[$datasetId] = $this->buildFullLabel($this->labels[$datasetId], $value);
+            if (is_array($value)) {
+                $data        = ['data' => [], 'backgroundColor' => [], 'hoverBackgroundColor' => []];
+                $stringCount = 0;
+
+                foreach ($value as $key => $item) {
+                    if (is_string($key)) {
+                        $this->labels[$labelKey] = $key;
+
+                        if ($withCounts) {
+                            $fullLabel[] = $this->buildFullLabel($this->labels[$labelKey], $item);
+                        }
+
+                        ++$labelKey;
+                    }
+
+                    $labelRevers = array_flip($this->labels);
+
+                    if (is_string($key)) {
+                        $colorKey = $labelRevers[$key];
+                        ++$stringCount;
+                    } else {
+                        $colorKey = $key + $stringCount;
+                    }
+
+                    $color = $this->configureColorHelper($colorKey); // count($this->datasets)+$value $labelKey
+
+                    $data['data'][]                 = $item;
+                    $data['backgroundColor'][]      = $color->toRgba(0.8);
+                    $data['hoverBackgroundColor'][] = $color->toRgba(0.9);
+                }
+
+                $data['label'] = $this->labels[$datasetId];
+                $dataset[]     = $data;
+            } else {
+                $color                          = $this->configureColorHelper($datasetId);
+                $data['data'][]                 = $value;
+                $data['backgroundColor'][]      = $color->toRgba(0.8);
+                $data['hoverBackgroundColor'][] = $color->toRgba(0.9);
+                if ($withCounts) {
+                    $this->labels[$datasetId] = $this->buildFullLabel($this->labels[$datasetId], $value);
+                }
             }
         }
 
+        if (empty($dataset)) {
+            $dataset[] = $data;
+        }
+
         return [
-            'labels'   => $this->labels,
-            'datasets' => [$data],
+            'labels'   => empty($fullLabel) ? $this->labels : $fullLabel,
+            'datasets' => $dataset,
         ];
     }
 
     /**
      * Define a dataset by name and count number. Method will add the rest.
      *
-     * @param string $label
-     * @param int    $value
+     * @param string                 $label
+     * @param int|array<string, int> $value
      *
      * @return $this
      */
     public function setDataset($label, $value)
     {
-        $this->totalCount += $value;
+        if (is_array($value)) {
+            if (0 == $this->totalCount) {
+                foreach ($value as $item) {
+                    $this->totalCount += $item;
+                }
+            }
+        } else {
+            $this->totalCount += $value;
+        }
+
         $this->datasets[] = $value;
         $this->labels[]   = $label;
 

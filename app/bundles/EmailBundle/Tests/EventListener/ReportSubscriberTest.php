@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -45,6 +46,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $statRepository;
 
     /**
+     * @var MockObject|EmailRepository
+     */
+    private MockObject $emailRepository;
+
+    /**
      * @var MockObject&GeneratedColumnsProviderInterface
      */
     private MockObject $generatedColumnsProvider;
@@ -72,15 +78,17 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->connectionMock           = $this->getMockedConnection();
-        $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
-        $this->statRepository           = $this->createMock(StatRepository::class);
-        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
-        $this->fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
-        $this->subscriber               = new ReportSubscriber(
+        $this->connectionMock            = $this->getMockedConnection();
+        $this->companyReportDataMock     = $this->createMock(CompanyReportData::class);
+        $this->statRepository            = $this->createMock(StatRepository::class);
+        $this->emailRepository           = $this->createMock(EmailRepository::class);
+        $this->generatedColumnsProvider  = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->fieldsBuilderMock         = $this->createMock(FieldsBuilder::class);
+        $this->subscriber                = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
             $this->statRepository,
+            $this->emailRepository,
             $this->generatedColumnsProvider,
             $this->fieldsBuilderMock
         );
