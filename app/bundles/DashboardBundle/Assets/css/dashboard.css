@@ -1,5 +1,8 @@
-body:has(.dashboard-widgets) { background-color: var(--layer);}
-.form-control, .chosen-container-single .chosen-single, .form-control.search.tt-input { background-color: var(--field-alternate) !important;}
+body:has(.dashboard-widgets) {
+    background-color: var(--layer);
+    --field: var(--field-alternate);
+    --field-hover: var(--field-hover-alternate);
+}
 
 .input-group-addon label {
     margin-bottom: 0px;
@@ -30,9 +33,8 @@ body:has(.dashboard-widgets) { background-color: var(--layer);}
     padding: 10px;
 }
 .dashboard-widgets .tile {
+    --layer: var(--background);
     margin: 5px;
-    background: var(--background);
-    
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -73,7 +75,7 @@ body:has(.dashboard-widgets) { background-color: var(--layer);}
     top: 0;
     left: 0;
     transition: var(--transition-all-expressive);
-    backdrop-filter: blur(0px);
+    backdrop-filter: blur(0);
     pointer-events: none;
     opacity: 0;
 }
