@@ -27,6 +27,9 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
+use Mautic\SmsBundle\Stat\Interface\DeliverySupportInterface;
+use Mautic\SmsBundle\Stat\Interface\FailedSupportInterface;
+use Mautic\SmsBundle\Stat\Interface\ReadSupportInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -447,8 +450,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$flag || 'total_and_unique' === $flag) {
-            $filter['is_failed'] = 0;
-            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', array_merge($filter, ['is_failed' => 0]));
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -458,15 +460,47 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.sms.show.total.sent'), $data);
         }
 
-        if (!$flag || 'failed' === $flag) {
-            $filter['is_failed'] = 1;
-            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+        $transport = $this->transport->getPrimaryTransport();
+
+        if ($transport instanceof DeliverySupportInterface && (!$flag || 'delivered' === $flag)) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+            $q->andWhere($q->expr()->eq('t.is_delivered', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.sms.stat.delivered'), $data);
+        }
+
+        if ($transport instanceof ReadSupportInterface && (!$flag || 'read' === $flag)) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
 
+            $q->andWhere($q->expr()->eq('t.is_read', ':true'))
+                ->setParameter('true', true, 'boolean');
+
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.sms.show.failed'), $data);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.read'), $data);
+        }
+
+        if ($transport instanceof FailedSupportInterface && (!$flag || 'failed' === $flag)) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.failed'), $data);
         }
 
         return $chart->render();

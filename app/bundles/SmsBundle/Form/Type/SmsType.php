@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @extends AbstractType<Sms>
@@ -68,6 +69,13 @@ class SmsType extends AbstractType
                     'data-token-activator' => '{',
                     'data-token-visual'    => 'false',
                     'rows'                 => 6,
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
                 ],
             ]
         );

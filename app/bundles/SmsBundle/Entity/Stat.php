@@ -74,6 +74,10 @@ class Stat
      */
     private $isFailed = false;
 
+    private bool $isDelivered = false;
+
+    private bool $isRead = false;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -107,6 +111,14 @@ class Stat
         $builder->createField('isFailed', 'boolean')
             ->columnName('is_failed')
             ->nullable()
+            ->build();
+
+        $builder->createField('isDelivered', Types::BOOLEAN)
+            ->columnName('is_delivered')
+            ->build();
+
+        $builder->createField('isRead', Types::BOOLEAN)
+            ->columnName('is_read')
             ->build();
 
         $builder->createField('trackingHash', 'string')
@@ -377,6 +389,30 @@ class Stat
     public function addDetail($type, $detail)
     {
         $this->details[$type][] = $detail;
+
+        return $this;
+    }
+
+    public function isDelivered(): bool
+    {
+        return $this->isDelivered;
+    }
+
+    public function setIsDelivered(bool $isDelivered): static
+    {
+        $this->isDelivered = $isDelivered;
+
+        return $this;
+    }
+
+    public function isRead(): bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }
