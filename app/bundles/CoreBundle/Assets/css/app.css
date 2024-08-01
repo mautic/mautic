@@ -469,14 +469,6 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left .sidebar-content {
   padding-right: 1px;
 }
-.app-sidebar.sidebar-left .nav-sidebar > .nav > li.nav-group:after {
-  content: '';
-  position: absolute;
-  right: 0;
-  left: 50px;
-  bottom: 0;
-  border-bottom: 1px solid #202830;
-}
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -543,14 +535,6 @@ body > #app-wrapper {
 .app-sidebar.sidebar-right .sidebar-content {
   padding-left: 1px;
   top: 48px;
-}
-.app-sidebar.sidebar-right .nav-sidebar > .nav > li.nav-group:after {
-  content: '';
-  position: absolute;
-  right: 0;
-  left: 50px;
-  bottom: 0;
-  border-bottom: 1px solid #202830;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
