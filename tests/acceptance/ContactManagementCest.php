@@ -459,6 +459,10 @@ class ContactManagementCest
         // Verify that the first and second contacts are not in the segment
         $I->dontsee("$contactName1");
         $I->dontsee("$contactName2");
+
+        // Clear the search bar
+        $I->click(ContactPage::$clearSearch);
+        $I->waitForElementVisible('#leadTable', 10);
     }
 
     public function batchSetDoNotContact(

@@ -11,7 +11,7 @@ class ContactPage
     public static $lastNameField      = '#lead_lastname';
     public static $emailField         = '#lead_email';
     public static $tagField           = '#lead_tags_chosen input';
-    public static $ownerField         = '#lead_owner_chosen input';
+    public static $ownerField         = '#lead_owner_chosen';
 
     // Form buttons (+New, Edit)
     public static $cancelButton       = '#lead_buttons_cancel_toolbar';
