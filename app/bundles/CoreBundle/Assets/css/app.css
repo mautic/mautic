@@ -6620,7 +6620,6 @@ a.inline-token .text-muted {
 }
 .accordion {
   --layout-density-padding-inline-local: 16px;
-  box-sizing: border-box;
   padding: 0;
   border: 0;
   margin: 0;
@@ -6647,13 +6646,7 @@ a.inline-token .text-muted {
 .accordion .panel:not(.panel--active):last-child:hover {
   border-block-end-color: var(--layer-hover);
 }
-.accordion *,
-.accordion *::before,
-.accordion *::after {
-  box-sizing: inherit;
-}
 .accordion-heading {
-  box-sizing: border-box;
   font-family: inherit;
   font-size: 100%;
   vertical-align: baseline;
@@ -6678,11 +6671,6 @@ a.inline-token .text-muted {
   padding-inline-end: var(--layout-density-padding-inline-local);
   transition: background-color cubic-bezier(0.2, 0, 0.38, 0.9) 110ms;
 }
-.accordion-heading *,
-.accordion-heading *::before,
-.accordion-heading *::after {
-  box-sizing: inherit;
-}
 .accordion-heading::-moz-focus-inner {
   border: 0;
 }
@@ -6693,7 +6681,7 @@ a.inline-token .text-muted {
 .accordion-heading:focus {
   position: relative;
   z-index: 2;
-  box-shadow: 0 -1px 0 0 var(--focus, #0f62fe), inset 0 1px 0 0 var(--focus, #0f62fe), inset 2px 0 0 0 var(--focus, #0f62fe), 0 1px 0 0 var(--focus, #0f62fe), inset 0 -1px 0 0 var(--focus, #0f62fe), inset -2px 0 0 0 var(--focus, #0f62fe);
+  box-shadow: 0 -1px 0 0 var(--focus, #4e5e9e), inset 0 1px 0 0 var(--focus, #4e5e9e), inset 2px 0 0 0 var(--focus, #4e5e9e), 0 1px 0 0 var(--focus, #4e5e9e), inset 0 -1px 0 0 var(--focus, #4e5e9e), inset -2px 0 0 0 var(--focus, #4e5e9e);
   outline: none;
 }
 .accordion-heading[disabled] {
@@ -6714,7 +6702,7 @@ a.inline-token .text-muted {
   inline-size: 1rem;
   -webkit-transform: scaleY(-1);
   transform: scaleY(-1);
-  transition: all 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: var(--transition-all-productive);
 }
 .accordion-heading.collapsed .accordion-arrow {
   fill: var(--icon-primary, #161616);
@@ -6722,8 +6710,8 @@ a.inline-token .text-muted {
   transform: scaleY(1);
 }
 .accordion-title {
-  font-weight: var(--body-01-font-weight, 400);
-  line-height: var(--body-01-line-height, 1.42857);
+  font-weight: 400;
+  line-height: 1.42857;
   z-index: 1;
   inline-size: 100%;
   -webkit-padding-start: var(--layout-density-padding-inline-local);
