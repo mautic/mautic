@@ -1,5 +1,16 @@
 {% if chartType is defined and chartData is defined %}
     {% set dataValues = chartData.datasets[0].data %}
+
+    {% if showTotal is defined %}
+        {% set totalSum = dataValues|reduce((carry, v) => carry + v) %}
+        <div class="text-right mt-2 mr-md">
+            <span class="fs-36">{{ totalSum }} {{'mautic.dashboard.widget.total'|trans}}</span>
+        </div>
+        {% if chartHeight is defined %}
+            {% set chartHeight = chartHeight - 40 %}
+        {% endif %}
+    {% endif %}
+
     {% if dataValues|reduce((carry, v) => carry + v) > 0 %}
         <div class="chart-wrapper">
             <div class="pt-sd pr-md pb-md pl-md">

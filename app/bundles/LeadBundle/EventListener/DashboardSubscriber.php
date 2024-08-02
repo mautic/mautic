@@ -92,6 +92,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['filter'],
                         $canViewOthers
                     ),
+                    'showTotal'   => 'true',
                 ]);
             }
 
