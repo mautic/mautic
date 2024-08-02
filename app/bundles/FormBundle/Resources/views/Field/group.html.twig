@@ -222,7 +222,7 @@
     {% set labelAttributes = labelAttributes|merge({
             'for': firstId,
     }) %}
-    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>
+    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>
   {% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
 
@@ -248,7 +248,7 @@
             'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
             'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
     }) %}
-    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel }}</label>
+    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel|purify }}</label>
 
     {% if wrapDiv %}</div>{% endif %}
   {% endfor %}

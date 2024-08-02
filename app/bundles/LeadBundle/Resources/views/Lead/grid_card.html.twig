@@ -27,10 +27,10 @@
                         </a>
                     </h4>
                     <div class="text-muted mb-1 ellipsis">
-                        <i class="fa fa-fw ri-building-2-line mr-xs"></i>{{ fields.core.company.value|default('') }}
+                        <i class="ri-fw ri-building-2-line mr-xs"></i>{{ fields.core.company.value|default('') }}
                     </div>
                     <div class="text-muted mb-1 ellipsis">
-                        <i class="fa fa-fw ri-map-pin-2-line mr-xs"></i>
+                        <i class="ri-fw ri-map-pin-2-line mr-xs"></i>
                         {% set location = [] %}
                         {% if fields.core.city is defined %}
                           {% set location = location|merge([fields.core.city.value]) %}

@@ -422,6 +422,13 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
     }
 
+    public function testQuickAddAction(): void
+    {
+        $this->client->request('GET', '/s/contacts/quickAdd');
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+    }
+
     public function testAddContactsErrorMessage(): void
     {
         /** @var FieldModel $fieldModel */
