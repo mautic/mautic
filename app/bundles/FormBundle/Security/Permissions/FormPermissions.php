@@ -7,13 +7,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class FormPermissions extends AbstractPermissions
 {
-    /**
-     * @param array $params
-     */
-    public function __construct($params)
+    public function __construct(array $params)
     {
         parent::__construct($params);
-        $this->addCustomPermission('export', ['enable' => 1024]);
+        $this->addCustomPermission('export', ['enable' => 1024, 'notAnonymize' => 2]);
         $this->addExtendedPermissions('forms');
         $this->addStandardPermissions('categories');
     }
@@ -32,7 +29,10 @@ class FormPermissions extends AbstractPermissions
             'export',
             $builder,
             'mautic.core.permissions.export',
-            ['mautic.core.permissions.enable' => 'enable'],
+            [
+                'mautic.core.permissions.enable'       => 'enable',
+                'mautic.core.permissions.notAnonymize' => 'notAnonymize',
+            ],
             $data
         );
     }

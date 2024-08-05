@@ -1996,6 +1996,7 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:export:notAnonymize',
             ],
             'RETURN_ARRAY'
         );
@@ -2005,6 +2006,8 @@ class LeadController extends FormController
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
             return $this->accessDenied();
         }
+
+        $notAnonymize = $permissions['lead:export:notAnonymize'];
 
         $fileType = $request->get('filetype', 'csv');
 
@@ -2057,7 +2060,7 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
+        $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact, $notAnonymize));
 
         return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
     }
@@ -2072,6 +2075,7 @@ class LeadController extends FormController
             [
                 'lead:leads:viewown',
                 'lead:leads:viewother',
+                'lead:exports:notAnonymize',
             ],
             'RETURN_ARRAY'
         );
@@ -2082,6 +2086,8 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
+        $notAnonymize = $permissions['lead:exports:notAnonymize'];
+
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
         $lead      = $leadModel->getEntity($contactId);
@@ -2090,8 +2096,7 @@ class LeadController extends FormController
         if (empty($lead)) {
             return $this->notFound();
         }
-
-        $contactFields = $lead->getProfileFields();
+        $contactFields = $notAnonymize ? $lead->getProfileFields() : $lead->getAnonymizationProfileFields();
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
             $export[] = [

@@ -206,11 +206,11 @@ class ExportHelper
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, string|null>
      */
-    public function parseLeadToExport(Lead $lead): array
+    public function parseLeadToExport(Lead $lead, ?bool $notAnonymize = null): array
     {
-        $leadExport = $lead->getProfileFields();
+        $leadExport = $notAnonymize ? $lead->getProfileFields() : $lead->getAnonymizationProfileFields();
 
         $stage               = $lead->getStage();
         $leadExport['stage'] = $stage ? $stage->getName() : null;

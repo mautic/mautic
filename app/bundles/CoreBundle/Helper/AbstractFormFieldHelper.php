@@ -264,4 +264,17 @@ abstract class AbstractFormFieldHelper
 
         return $list;
     }
+
+    public static function anonimizationFields(string $fieldName, ?string $fieldValue, ?string $email, ?string $anonimEmail): ?string
+    {
+        if (in_array($fieldName, ['first_name', 'last_name', 'userip'])) {
+            return '*';
+        }
+
+        if ($email && $fieldValue && str_contains($fieldValue, $email)) {
+            return str_replace($email, $anonimEmail, $fieldValue);
+        }
+
+        return htmlspecialchars_decode($fieldValue, ENT_QUOTES);
+    }
 }

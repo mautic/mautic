@@ -48,15 +48,9 @@ class ReportModel extends FormModel
 {
     public const CHANNEL_FEATURE = 'reporting';
 
-    /**
-     * @var array
-     */
-    private $reportBuilderData;
+    private array $reportBuilderData;
 
-    /**
-     * @var mixed
-     */
-    protected $defaultPageLimit;
+    protected mixed $defaultPageLimit;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -631,8 +625,26 @@ class ReportModel extends FormModel
         }
 
         foreach ($data as $keys => $lead) {
+            $email = $lead['email'] ?? null;
+            if ($email) {
+                $pos         = strpos($email, '@');
+                $anonimEmail = '*'.substr($email, $pos);
+            }
+
             foreach ($lead as $key => $field) {
                 $data[$keys][$key] = html_entity_decode((string) $field, ENT_QUOTES);
+                $field             = html_entity_decode((string) $field, ENT_QUOTES);
+                if (isset($options['notAnonymize']) && false === $options['notAnonymize']) {
+                    if ('firstname' === $key || 'lastname' === $key || 'userip' === $key || 'ip_address' === $key) {
+                        $data[$keys][$key] = '*';
+                    } elseif ($email && str_contains($field, $email)) {
+                        $data[$keys][$key] = str_replace($email, $anonimEmail, $field);
+                    } else {
+                        $data[$keys][$key] = $field;
+                    }
+                } else {
+                    $data[$keys][$key] = $field;
+                }
             }
         }
 
