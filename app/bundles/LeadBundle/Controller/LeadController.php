@@ -1433,32 +1433,47 @@ class LeadController extends FormController
 
                     $bodyCheck = trim(strip_tags($email['body']));
                     if (!empty($bodyCheck)) {
-                        $mailer = $mailHelper->getMailer();
+                        $mailer      = $mailHelper->getMailer();
+                        $emailEntity = null;
+                        $subject     = $email['subject'];
 
+                        // Set the email entity template so the email configuration like preheader would apply.
+                        if ($email['templates']) {
+                            $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
+                        }
+
+                        // Overwrite the mailer with the values from the form.
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            // The reply to address must be set into an email entity in order to take an effect. Otherwise it's overridden.
-                            $emailEntity = new Email();
-                            $emailEntity->setSubject($email['subject']);
+                            $emailEntity = $emailEntity ?? new Email();
                             $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
+                        }
+
+                        if (!empty($email['from'])) {
+                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity->setFromAddress($email['from']);
+                        }
+
+                        if (!empty($email['fromname'])) {
+                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity->setFromName($email['fromname']);
+                        }
+
+                        if ($emailEntity) {
+                            $emailEntity->setSubject($subject);
                             $mailer->setEmail($emailEntity);
                         }
 
-                        $mailer->setFrom(
-                            $email['from'],
-                            empty($email['fromname']) ? null : $email['fromname']
-                        );
-
                         // Set Content
+                        $mailer->setReplyTo($email['from']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-                        $mailer->setSubject($email['subject']);
+                        $mailer->setSubject($subject);
 
                         // Ensure safe emoji for notification
-                        $subject = $email['subject'];
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
                             $this->addFlashMessage(
