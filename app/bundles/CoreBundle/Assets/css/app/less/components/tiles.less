@@ -39,6 +39,23 @@
         .tile-icon { inset-block-end: var(--layout-density-padding-inline-local); }
     }
 
+    &.tile-slug {
+        background: linear-gradient(to top, var(--layer, var(--mi-popover-background, #ffffff)) 0%, var(--mi-aura-start, rgba(69, 137, 255, 0.1)) 0%, 15%, var(--mi-aura-end, rgba(255, 255, 255, 0)) 50%) padding-box, linear-gradient(to top, var(--layer, var(--mi-popover-background, #ffffff)), var(--layer, var(--mi-popover-background, #ffffff))) padding-box, linear-gradient(to bottom, var(--mi-border-start, rgba(166, 200, 255, 0.64)), var(--mi-border-end, #78a9ff)) border-box, linear-gradient(to top, var(--layer, var(--mi-popover-background, #ffffff)), var(--layer, var(--mi-popover-background, #ffffff))) border-box;
+        border: 1px solid transparent;
+        box-shadow: inset 0 -80px 70px -65px var(--mi-inner-shadow, rgba(69, 137, 255, 0.1)), 0 4px 8px 0 var(--mi-drop-shadow, rgba(15, 98, 254, 0.1));
+    }
+
+    &.tile-popover {
+        --layout-density-padding-inline-local: 24px;
+        background: linear-gradient(to top, var(--mi-popover-background, var(--mi-popover-background, #ffffff)) 0%, var(--mi-aura-start, rgba(69, 137, 255, 0.1)) 0%, 15%, var(--mi-aura-end, rgba(255, 255, 255, 0)) 50%) padding-box, linear-gradient(to top, var(--mi-popover-background, var(--mi-popover-background, #ffffff)), var(--mi-popover-background, var(--mi-popover-background, #ffffff))) padding-box, linear-gradient(to bottom, var(--mi-border-start, rgba(166, 200, 255, 0.64)), var(--mi-border-end, #78a9ff)) border-box, linear-gradient(to top, var(--mi-popover-background, var(--mi-popover-background, #ffffff)), var(--mi-popover-background, var(--mi-popover-background, #ffffff))) border-box;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        width: 320px;
+        box-shadow: inset 0 -80px 70px -65px var(--mi-inner-shadow, rgba(69, 137, 255, 0.1)), -40px 44px 60px -24px var(--mi-popover-shadow-outer-01, rgba(0, 67, 206, 0.06)), -56px 64px 64px -24px var(--mi-popover-shadow-outer-02, rgba(0, 0, 0, 0.04));
+        color: var(--text-primary, #161616);
+        min-inline-size: 17.5rem;
+    }
+
     &.tile-clickable {
         color: var(--text-primary, #161616);
         text-decoration: none;
@@ -67,3 +84,5 @@
         }
     }
 }
+
+.dropdown-menu:has(.tile) {background-color: transparent;}

@@ -5,7 +5,7 @@
 @secondary-color: #fdb933;
 @border-radius: 0px;
 
- 
+
 
 // Themes
 /// Light theme
@@ -88,7 +88,7 @@
     --icon-primary: #161616;
     --icon-secondary: #525252;
     --icon-on-color: contrast(@primary-60);
-    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d); 
+    --icon-on-color-disabled: contrast(@primary-60, #16161640, #8d8d8d);
     --icon-interactive: var(--primary-60);
     --icon-inverse: #ffffff;
     --icon-disabled: #16161640;
@@ -307,6 +307,8 @@
     --overlay: #161616;
     --skeleton-element: #525252;
     --skeleton-background: #353535;
+    --white: #fff;
+    --black: #000;
 
     /// Tag
     --label-background-gray: #525252;
@@ -349,11 +351,31 @@
     --label-color-green: #a7f0ba;
     --label-background-hover-green: #11742f;
     --label-border-green: #24a148;
+
+    /// MI
+    --mi-aura-start: fade(@primary-50, 10%);
+    --mi-aura-start-sm: fade(@primary-50, 16%);
+    --mi-aura-end: var(--white);
+    --mi-aura-hover-start: fade(@primary-50, 32%);
+    --mi-aura-hover-end: var(--white);
+    --mi-aura-hover-background: @primary-10;
+    --mi-border-start: fade(@primary-30, 64%);
+    --mi-border-end: @primary-40;
+    --mi-border-strong: @primary-50;
+    --mi-drop-shadow: fade(@primary-60, 10%);
+    --mi-inner-shadow: fade(@primary-50, 10%);
+    --mi-popover-background: var(--white);
+    --mi-popover-shadow-outer-01: fade(@primary-70, 6%);
+    --mi-popover-shadow-outer-02: #00000A;
+    --mi-skeleton-element: @primary-50;
+    --mi-skeleton-background: @primary-20;
+    --mi-overlay: fade(@primary-100, 50%);
 }
 
 // General
 //
 // Brand palette //
+@primary-10: lighten(@primary-color, 50%);
 @primary-20: lighten(@primary-color, 40%);
 @primary-30: lighten(@primary-color, 30%);
 @primary-40: lighten(@primary-color, 20%);
@@ -362,6 +384,8 @@
 @primary-70: darken(@primary-color, 10%);
 @primary-80: darken(@primary-color, 20%);
 @primary-90: darken(@primary-color, 30%);
+@primary-100: darken(@primary-color, 40%);
+@secondary-10: lighten(@secondary-color, 50%);
 @secondary-20: lighten(@secondary-color, 40%);
 @secondary-30: lighten(@secondary-color, 30%);
 @secondary-40: lighten(@secondary-color, 20%);
@@ -370,6 +394,7 @@
 @secondary-70: darken(@secondary-color, 10%);
 @secondary-80: darken(@secondary-color, 20%);
 @secondary-90: darken(@secondary-color, 30%);
+@secondary-100: darken(@secondary-color, 40%);
 
 :root {
 --primary-20: @primary-20;
