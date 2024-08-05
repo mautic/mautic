@@ -69,7 +69,8 @@ class EmailSubscriberTest extends TestCase
             ->method('isSaveAsDraft')
             ->willReturn(true);
 
-        $this->grapesJsBuilderRepo->method('findOneBy')->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
+        $this->grapesJsBuilderRepo->method('findOneBy')
+            ->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
             ->method('isPublished')
@@ -93,7 +94,8 @@ class EmailSubscriberTest extends TestCase
             ->method('isSaveAsDraft')
             ->willReturn(true);
 
-        $this->grapesJsBuilderRepo->method('findOneBy')->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
+        $this->grapesJsBuilderRepo->method('findOneBy')
+            ->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
             ->method('isPublished')
@@ -121,7 +123,8 @@ class EmailSubscriberTest extends TestCase
             ->method('hasDraft')
             ->willReturn(true);
 
-        $this->grapesJsBuilderRepo->method('findOneBy')->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
+        $this->grapesJsBuilderRepo->method('findOneBy')
+            ->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
             ->method('isPublished')
