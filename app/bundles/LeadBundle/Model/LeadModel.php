@@ -1619,7 +1619,7 @@ class LeadModel extends FormModel
 
         array_walk($tags, function (&$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
-            $val = InputHelper::clean($val);
+            $val = InputHelper::_($val, 'string');
         });
 
         // See which tags already exist
@@ -1657,7 +1657,7 @@ class LeadModel extends FormModel
 
             array_walk($removeTags, function (&$val): void {
                 $val = html_entity_decode(trim($val), ENT_QUOTES);
-                $val = InputHelper::clean($val);
+                $val = InputHelper::_($val, 'string');
             });
 
             // See which tags really exist
