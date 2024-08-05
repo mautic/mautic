@@ -6,8 +6,7 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
-use Mautic\EmailBundle\Helper\EmailConfig;
-use Mautic\EmailBundle\Model\EmailDraftModel;
+use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\EmailBundle\Model\EmailModel;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
@@ -22,7 +21,7 @@ class EmailSubscriber implements EventSubscriberInterface
         private Config $config,
         private GrapesJsBuilderModel $grapesJsBuilderModel,
         private EmailModel $emailModel,
-        private EmailConfig $emailConfig
+        private EmailConfigInterface $emailConfig
     ) {
     }
 

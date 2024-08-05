@@ -442,7 +442,7 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function previewAction(AnalyticsHelper $analyticsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null, EmailModel $model)
+    public function previewAction(AnalyticsHelper $analyticsHelper, EmailConfig $emailConfig, EmailModel $model, Request $request, string $objectId, string $objectType = null)
     {
         $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
