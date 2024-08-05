@@ -971,6 +971,9 @@ body > #app-wrapper {
     margin-left: 60px !important;
   }
 }
+body {
+  color: var(--text-primary);
+}
 hr,
 .hr-expand {
   margin-top: 15px;
@@ -1018,8 +1021,10 @@ hr.hr-w-3,
 }
 a {
   transition: var(--transition-all-productive);
+  color: var(--link-primary);
 }
 a:hover {
+  color: var(--link-primary-hover);
   cursor: pointer;
 }
 a:hover,
@@ -2771,6 +2776,9 @@ label.list-group-item:focus {
   line-height: 0;
   padding-left: var(--spacing-01);
 }
+.dropdown-menu > li > a:focus {
+  outline: 2px solid var(--focus);
+}
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
   z-index: 2;
@@ -2801,6 +2809,17 @@ ul.dropdown-menu-form {
   padding: 0 5px 0 30px;
   max-height: 300px;
   overflow-y: auto;
+}
+.dropdown-toggle {
+  outline: 2px solid transparent !important;
+  outline-offset: -2px;
+}
+.dropdown-toggle:hover {
+  outline: 2px solid transparent;
+}
+.dropdown-toggle:active,
+.dropdown-toggle:focus {
+  outline: 2px solid var(--focus) !important;
 }
 .dropdown-header {
   margin: 32px 16px 8px 16px;
@@ -3039,6 +3058,9 @@ label {
 .label-tag {
   white-space: normal;
   text-align: left;
+}
+.control-label {
+  color: var(--text-secondary);
 }
 .control-label.text-left {
   text-align: left;
