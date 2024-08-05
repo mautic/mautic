@@ -36,7 +36,7 @@ class EmailSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Stores the current MJML for use when managing drafts
+     * Stores the current MJML for use when managing drafts.
      */
     public function onEmailPreSave(Events\EmailEvent $event): void
     {

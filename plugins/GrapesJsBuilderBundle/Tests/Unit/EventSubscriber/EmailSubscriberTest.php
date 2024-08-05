@@ -11,23 +11,24 @@ use Mautic\EmailBundle\Model\EmailModel;
 use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class EmailSubscriberTest extends TestCase
 {
-    private Config $config;
-    private GrapesJsBuilderModel $grapesJsBuilderModel;
-    private EmailModel $emailModel;
-    private EmailConfigInterface $emailConfig;
-    private EmailSubscriber $subscriber;
+    private Config|MockObject $config;
+    private GrapesJsBuilderModel|MockObject $grapesJsBuilderModel;
+    private EmailModel|MockObject $emailModel;
+    private EmailConfigInterface|MockObject $emailConfig;
+    private EmailSubscriber|MockObject $subscriber;
 
     public function setUp(): void
     {
-        $this->config = $this->createMock(Config::class);
+        $this->config               = $this->createMock(Config::class);
         $this->grapesJsBuilderModel = $this->createMock(GrapesJsBuilderModel::class);
-        $this->emailModel = $this->createMock(EmailModel::class);
-        $this->emailConfig = $this->createMock(EmailConfigInterface::class);
-        $this->subscriber = new EmailSubscriber($this->config, $this->grapesJsBuilderModel, $this->emailModel, $this->emailConfig);
+        $this->emailModel           = $this->createMock(EmailModel::class);
+        $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
+        $this->subscriber           = new EmailSubscriber($this->config, $this->grapesJsBuilderModel, $this->emailModel, $this->emailConfig);
 
 
 
@@ -73,7 +74,6 @@ class EmailSubscriberTest extends TestCase
 
         $this->subscriber->manageEmailDraft($event);
     }
-
 
     public function testManageEmailDraftHandlesApply(): void
     {
