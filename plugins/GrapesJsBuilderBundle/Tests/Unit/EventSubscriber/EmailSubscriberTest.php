@@ -31,7 +31,7 @@ class EmailSubscriberTest extends TestCase
         $this->grapesJsBuilderModel = $this->createMock(GrapesJsBuilderModel::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
         $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
-        $this->grapeJsbuilderRepo   = $this->createMock(GrapesJsBuilderRepository::class);
+        $this->grapesJsBuilderRepo  = $this->createMock(GrapesJsBuilderRepository::class);
         $this->subscriber           = new EmailSubscriber($this->config, $this->grapesJsBuilderModel, $this->emailModel, $this->emailConfig);
 
         $this->config->expects($this->once())
@@ -70,14 +70,14 @@ class EmailSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->grapesJsBuilderRepo->method('findOneBy')
-            ->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
+            ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
 
-        $grapeJsBuilder->expects($this->once())->method('setDraftCustomMjml');
-        $grapeJsBuilder->expects($this->once())->method('setCustomMjml');
+        $grapesJsBuilder->expects($this->once())->method('setDraftCustomMjml');
+        $grapesJsBuilder->expects($this->once())->method('setCustomMjml');
 
         $this->subscriber->manageEmailDraft($event);
     }
@@ -95,14 +95,14 @@ class EmailSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->grapesJsBuilderRepo->method('findOneBy')
-            ->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
+            ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
 
-        $grapeJsBuilder->expects($this->once())->method('setDraftCustomMjml');
-        $grapeJsBuilder->expects($this->never())->method('setCustomMjml');
+        $grapesJsBuilder->expects($this->once())->method('setDraftCustomMjml');
+        $grapesJsBuilder->expects($this->never())->method('setCustomMjml');
 
         $this->subscriber->manageEmailDraft($event);
     }
@@ -124,13 +124,13 @@ class EmailSubscriberTest extends TestCase
             ->willReturn(true);
 
         $this->grapesJsBuilderRepo->method('findOneBy')
-            ->willReturn($grapeJsBuilder = $this->createMock(GrapesJsBuilder::class));
+            ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
 
         $this->config->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
 
-        $grapeJsBuilder->expects($this->once())
+        $grapesJsBuilder->expects($this->once())
             ->method('setDraftCustomMjml')
             ->with(null);
 
