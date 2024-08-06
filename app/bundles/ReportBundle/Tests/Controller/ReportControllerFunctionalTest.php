@@ -446,6 +446,9 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         $this->assertResponseStatusCodeSame(200);
         $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+
+        $this->client->request('GET', '/s/reports/view/'.$report->getId().'/export/html');
+        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
     }
 
     /**
