@@ -67,6 +67,30 @@ mQuery(document).ready(function() {
         });
     }
 
+    // Absurdly aggressive method to ensure tooltips always work anywhere
+    function initTooltips() {
+        mQuery('[data-toggle="tooltip"]').tooltip({
+            container: 'body',
+            trigger: 'hover'
+        });
+    }
+
+    initTooltips();
+
+    mQuery(document).on('shown.bs.dropdown', '.dropdown', function () {
+        setTimeout(initTooltips, 0);
+    });
+
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                setTimeout(initTooltips, 0);
+            }
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
         if (e.which === 8 && !mQuery(e.target).is("input:not([readonly]):not([type=radio]):not([type=checkbox]), textarea, [contentEditable], [contentEditable=true]")) {
