@@ -14,8 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    private ?string $existingMjml;
-    private ?string $existingHtml;
+    private string $existingMjml = '';
+    private string $existingHtml = '';
 
     public function __construct(
         private Config $config,
@@ -105,7 +105,7 @@ class EmailSubscriber implements EventSubscriberInterface
             $grapesJsBuilder->setDraftCustomMjml(null);
         }
 
-        if ($event->isDiscardDraft() && $event->getCurrentEmail()->hasDraft()) {
+        if ($event->isDiscardDraft() && $email->hasDraft()) {
             $grapesJsBuilder->setDraftCustomMjml(null);
         }
 

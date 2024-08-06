@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\EventSubscriber;
 
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -34,10 +35,8 @@ class EmailSubscriberTest extends TestCase
         $this->grapesJsBuilderRepo  = $this->createMock(GrapesJsBuilderRepository::class);
         $this->subscriber           = new EmailSubscriber($this->config, $this->grapesJsBuilderModel, $this->emailModel, $this->emailConfig);
 
-        $this->config->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(false);
-
+        $this->emailModel->method('getRepository')
+            ->willReturn($this->createMock(EmailRepository::class));
 
         $this->grapesJsBuilderModel->method('getRepository')
             ->willReturn($this->grapesJsBuilderRepo);
@@ -91,7 +90,7 @@ class EmailSubscriberTest extends TestCase
             ->willReturn($this->createMock(Email::class));
 
         $event->expects($this->once())
-            ->method('isSaveAsDraft')
+            ->method('isApplyDraft')
             ->willReturn(true);
 
         $this->grapesJsBuilderRepo->method('findOneBy')
