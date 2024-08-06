@@ -10,6 +10,14 @@
   background-color: var(--layer-translucent);
 }
 
+.outline() {
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  &:hover { outline: 2px solid transparent; }
+  &:active, &.active,
+  &:focus, &.focus { outline: 2px solid var(--focus); }
+}
+
 .bg-color(@bg-color; @color) {
   background-color: @bg-color !important;
   border-color: darken(@bg-color, 3%) !important;

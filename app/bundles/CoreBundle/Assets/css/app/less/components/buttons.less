@@ -84,3 +84,114 @@
     color: @gray-dark;
   }
 }
+
+.slug-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  color: var(--text-primary, #161616);
+  font-weight: 600;
+  transition: var(--transition-all-productive);
+  line-height: normal;
+  .outline();
+
+  &.slug-default {
+    justify-content: center;
+    border: 1px solid var(--border-inverse, #161616);
+    aspect-ratio: 1/1;
+
+    &:hover {
+      background: var(--border-inverse, #161616);
+      color: var(--text-inverse, #ffffff);
+    }
+    // Standard sizes
+    &[size="mini"] {
+      height: 16px;
+      font-size: 9px;
+    }
+    &[size="2xs"] {
+      height: 20px;
+      font-size: 12px;
+    }
+    &[size="xs"] {
+      height: 24px;
+      font-size: 12px;
+    }
+    &[size="sm"] {
+      height: 32px;
+      font-size: 16px;
+    }
+    &[size="md"] {
+      height: 40px;
+      font-size: 16px;
+    }
+    &[size="lg"] {
+      height: 48px;
+      font-size: 16px;
+    }
+    &[size="xl"] {
+      height: 64px;
+      font-size: 20px;
+    }
+  }
+
+  &.slug-inline {
+    border: 1px solid transparent;
+    border-radius: .0625rem;
+    background: transparent;
+    block-size: initial;
+    color: var(--text-primary, #161616);
+    font-size: .875rem;
+    inline-size: initial;
+    line-height: initial;
+    padding-inline: .25rem;
+    &:hover {
+      border-color: var(--icon-secondary, #525252);
+      background: transparent;
+      box-shadow: none;
+      color: var(--text-secondary, #525252);
+    }
+
+    &:before {
+      position: absolute;
+      display: inline-block;
+      background: var(--icon-primary, #161616);
+      block-size: .25rem;
+      content: "";
+      inline-size: .25rem;
+      inset-block-start: 50%;
+      inset-inline-start: 0;
+      opacity: 1;
+      -webkit-transform: translateY(-50%);
+      transform: translateY(-50%);
+      transition: var(--transition-all-productive);
+      &:hover {background: var(--icon-secondary,#525252);}
+    }
+
+    &[size="sm"] {
+      height: 16px;
+      font-size: 12px;
+    }
+    &[size="md"] {
+      height: 18px;
+      font-size: 14px;
+    }
+    &[size="lg"] {
+      height: 22px;
+      font-size: 16px;
+      &:before {
+        block-size: .5rem;
+        inline-size: .5rem;
+      }
+    }
+  }
+
+  &.slug-content {
+    border: 1px solid var(--border-inverse, #161616);
+    padding-block: .125rem;
+    padding-inline: .5rem;
+
+    .slug-additional-text {font-weight: normal;}
+  }
+}
