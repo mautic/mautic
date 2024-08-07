@@ -136,14 +136,20 @@ is defined %}
 
                 <!-- Growth stability -->
                 <div class="mb-sm">
-                    {% set growthThreshold = 10 %} {# Defina o limite para crescimento/queda significativo #}
+                    {% set growthThreshold = 10 %} {# Define the threshold for significant growth/decline #}
 
-                    {% if growthRate|abs >= growthThreshold %}
+                    {% if growthRate == 0 %}
                     <div>
-                        <i class="{% if growthRate >= 0 %}ri-arrow-up-line{% else %}ri-arrow-down-line{% endif %}"></i>
-                        {% if growthRate >= 0 %}
-                        <strong>{{ 'mautic.widget.created_leads_in_time.growth_alert'|trans }}:</strong> {{
-                        'mautic.widget.created_leads_in_time.growth_message'|trans({'%rate%': growthRate|round(2)}) }}
+                        <i class="ri-equals-line"></i>
+                        {{ 'mautic.widget.created_leads_in_time.no_change_message'|trans }}
+                    </div>
+                    {% elseif growthRate|abs >= growthThreshold %}
+                    <div>
+                        <i class="{% if growthRate > 0 %}ri-arrow-up-line{% else %}ri-arrow-down-line{% endif %}"></i>
+                        {% if growthRate > 0 %}
+                        <strong>{{ 'mautic.widget.created_leads_in_time.growth_alert'|trans }}:</strong>
+                        {{ 'mautic.widget.created_leads_in_time.growth_message'|trans({'%rate%': growthRate|round(2)})
+                        }}
                         {% if growthRate >= 50 %}
                         {{ 'mautic.widget.created_leads_in_time.exceptional_growth'|trans }}
                         {% elseif growthRate >= 25 %}
@@ -152,9 +158,9 @@ is defined %}
                         {{ 'mautic.widget.created_leads_in_time.keep_up'|trans }}
                         {% endif %}
                         {% else %}
-                        <strong>{{ 'mautic.widget.created_leads_in_time.decline_alert'|trans }}:</strong> {{
-                        'mautic.widget.created_leads_in_time.decline_message'|trans({'%rate%': growthRate|abs|round(2)})
-                        }}
+                        <strong>{{ 'mautic.widget.created_leads_in_time.decline_alert'|trans }}:</strong>
+                        {{ 'mautic.widget.created_leads_in_time.decline_message'|trans({'%rate%':
+                        growthRate|abs|round(2)}) }}
                         {% if growthRate|abs >= 50 %}
                         {{ 'mautic.widget.created_leads_in_time.significant_drop'|trans }}
                         {% elseif growthRate|abs >= 25 %}
@@ -167,8 +173,9 @@ is defined %}
                     {% else %}
                     <div>
                         <i class="ri-information-2-line"></i>
-                        <strong>{{ 'mautic.widget.created_leads_in_time.steady_performance'|trans }}:</strong> {{
-                        'mautic.widget.created_leads_in_time.stable_message'|trans({'%rate%': growthRate|round(2)}) }}
+                        <strong>{{ 'mautic.widget.created_leads_in_time.steady_performance'|trans }}:</strong>
+                        {{ 'mautic.widget.created_leads_in_time.stable_message'|trans({'%rate%': growthRate|round(2)})
+                        }}
                     </div>
                     {% endif %}
                 </div>
