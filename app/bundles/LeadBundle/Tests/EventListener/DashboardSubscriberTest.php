@@ -22,11 +22,11 @@ class DashboardSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->leadModel = $this->createMock(LeadModel::class);
+        $this->leadModel     = $this->createMock(LeadModel::class);
         $this->leadListModel = $this->createMock(ListModel::class);
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->dateHelper = $this->createMock(DateHelper::class);
+        $this->router        = $this->createMock(RouterInterface::class);
+        $this->translator    = $this->createMock(TranslatorInterface::class);
+        $this->dateHelper    = $this->createMock(DateHelper::class);
 
         $this->dashboardSubscriber = new DashboardSubscriber(
             $this->leadModel,
@@ -40,14 +40,14 @@ class DashboardSubscriberTest extends TestCase
     public function testOnWidgetDetailGenerateCreatedLeadsInTime(): void
     {
         $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $event  = $this->createMock(WidgetDetailEvent::class);
 
         $widget->method('getParams')->willReturn([
-            'timeUnit' => 'day',
-            'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
+            'timeUnit'   => 'day',
+            'dateFrom'   => new \DateTime('-7 days'),
+            'dateTo'     => new \DateTime(),
             'dateFormat' => 'Y-m-d',
-            'filter' => [],
+            'filter'     => [],
         ]);
 
         $event->method('getType')->willReturn('created.leads.in.time');
@@ -60,9 +60,9 @@ class DashboardSubscriberTest extends TestCase
             ->willReturn([
                 'datasets' => [
                     [
-                        'data' => [10, 20, 30, 40, 50, 60, 70]
-                    ]
-                ]
+                        'data' => [10, 20, 30, 40, 50, 60, 70],
+                    ],
+                ],
             ]);
 
         $event->expects($this->once())
@@ -82,11 +82,11 @@ class DashboardSubscriberTest extends TestCase
     public function testOnWidgetDetailGenerateAnonymousVsIdentifiedLeads(): void
     {
         $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $event  = $this->createMock(WidgetDetailEvent::class);
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
+            'dateTo'   => new \DateTime(),
         ]);
 
         $event->method('getType')->willReturn('anonymous.vs.identified.leads');
@@ -99,9 +99,9 @@ class DashboardSubscriberTest extends TestCase
             ->willReturn([
                 'datasets' => [
                     [
-                        'data' => [60, 40]
-                    ]
-                ]
+                        'data' => [60, 40],
+                    ],
+                ],
             ]);
 
         $event->expects($this->once())
@@ -121,11 +121,11 @@ class DashboardSubscriberTest extends TestCase
     public function testOnWidgetDetailGenerateMapOfLeads(): void
     {
         $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $event  = $this->createMock(WidgetDetailEvent::class);
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
+            'dateTo'   => new \DateTime(),
         ]);
 
         $event->method('getType')->willReturn('map.of.leads');
@@ -154,12 +154,12 @@ class DashboardSubscriberTest extends TestCase
     public function testOnWidgetDetailGenerateTopLists(): void
     {
         $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $event  = $this->createMock(WidgetDetailEvent::class);
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
-            'limit' => 5,
+            'dateTo'   => new \DateTime(),
+            'limit'    => 5,
         ]);
 
         $event->method('getType')->willReturn('top.lists');
@@ -188,13 +188,13 @@ class DashboardSubscriberTest extends TestCase
     public function testOnWidgetDetailGenerateLeadLifetime(): void
     {
         $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $event  = $this->createMock(WidgetDetailEvent::class);
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
-            'limit' => 5,
-            'filter' => ['flag' => []],
+            'dateTo'   => new \DateTime(),
+            'limit'    => 5,
+            'filter'   => ['flag' => []],
         ]);
 
         $event->method('getType')->willReturn('lead.lifetime');
@@ -226,12 +226,12 @@ class DashboardSubscriberTest extends TestCase
     public function testOnWidgetDetailGenerateTopOwners(): void
     {
         $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $event  = $this->createMock(WidgetDetailEvent::class);
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
-            'limit' => 5,
+            'dateTo'   => new \DateTime(),
+            'limit'    => 5,
         ]);
 
         $event->method('getType')->willReturn('top.owners');
@@ -259,14 +259,14 @@ class DashboardSubscriberTest extends TestCase
 
     public function testOnWidgetDetailGenerateTopCreators(): void
     {
-        $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $widget        = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
+        $event         = $this->createMock(WidgetDetailEvent::class);
         $canViewOthers = true;
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
-            'limit' => 5,
+            'dateTo'   => new \DateTime(),
+            'limit'    => 5,
         ]);
 
         $event->method('getType')->willReturn('top.creators');
@@ -303,14 +303,14 @@ class DashboardSubscriberTest extends TestCase
 
     public function testOnWidgetDetailGenerateCreatedLeads(): void
     {
-        $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $widget        = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
+        $event         = $this->createMock(WidgetDetailEvent::class);
         $canViewOthers = true;
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
-            'limit' => 5,
+            'dateTo'   => new \DateTime(),
+            'limit'    => 5,
         ]);
 
         $event->method('getType')->willReturn('created.leads');
@@ -347,15 +347,15 @@ class DashboardSubscriberTest extends TestCase
 
     public function testOnWidgetDetailGenerateSegmentsBuildTime(): void
     {
-        $widget = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
-        $event = $this->createMock(WidgetDetailEvent::class);
+        $widget        = $this->createMock(\Mautic\DashboardBundle\Entity\Widget::class);
+        $event         = $this->createMock(WidgetDetailEvent::class);
         $canViewOthers = true;
 
         $widget->method('getParams')->willReturn([
             'dateFrom' => new \DateTime('-7 days'),
-            'dateTo' => new \DateTime(),
-            'limit' => 5,
-            'order' => 'desc',
+            'dateTo'   => new \DateTime(),
+            'limit'    => 5,
+            'order'    => 'desc',
             'segments' => [],
         ]);
 
@@ -368,8 +368,8 @@ class DashboardSubscriberTest extends TestCase
             ->method('getSegmentsBuildTime')
             ->willReturn([
                 $this->createConfiguredMock(\Mautic\LeadBundle\Entity\LeadList::class, [
-                    'getId' => 1,
-                    'getName' => 'Segment 1',
+                    'getId'            => 1,
+                    'getName'          => 'Segment 1',
                     'getCreatedByUser' => 'User 1',
                     'getLastBuiltTime' => 3600,
                 ]),

@@ -116,7 +116,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Volatility
                 $data          = $chartData['datasets'][0]['data'];
                 $maxLead       = max($data);
-                $minLead       = min(array_filter($data, fn($val) => $val > 0) ?: [0]);
+                $minLead       = min(array_filter($data, fn ($val) => $val > 0) ?: [0]);
                 $avgDailyLeads = $currentTotal / $totalDays;
 
                 $leadVolatility = 0;
@@ -126,8 +126,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 // Standard Deviation
                 $mean         = array_sum($data) / count($data);
-                $sumOfSquares = array_reduce($data, function($carry, $item) use ($mean) {
-
+                $sumOfSquares = array_reduce($data, function ($carry, $item) use ($mean) {
                     return $carry + pow($item - $mean, 2);
                 }, 0);
                 $standardDeviation = sqrt($sumOfSquares / count($data));
