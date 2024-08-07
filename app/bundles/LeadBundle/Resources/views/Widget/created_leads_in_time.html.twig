@@ -17,18 +17,14 @@ Variables
 
 {% if chartType is defined and chartData is defined and chartData.datasets is defined and chartData.datasets[0].data is
 defined %}
-{% set dataValues = chartData.datasets[0].data %}
-{% if dataValues|reduce((carry, v) => carry + v) > 0 %}
 
+{% if currentTotal > 0 %}
 <!-- Total count -->
 {% if showTotal is defined %}
-{% set totalSum = dataValues|reduce((carry, v) => carry + v) %}
 <div class="text-right mt-2 mr-md">
-    <span class="fs-36 fw-t">{{ totalSum }} {{'mautic.dashboard.widget.total'|trans}}</span>
+    <span class="fs-36 fw-t">{{ currentTotal }} {{'mautic.dashboard.widget.total'|trans}}</span>
 </div>
-{% if chartHeight is defined %}
 {% set chartHeight = chartHeight - 60 %}
-{% endif %}
 {% endif %}
 <!--/ Total count -->
 
@@ -37,8 +33,6 @@ defined %}
 is defined %}
 {% set currentDataValues = chartData.datasets[0].data %}
 {% set previousDataValues = previousPeriodData.datasets[0].data %}
-{% set currentTotal = currentDataValues|reduce((carry, v) => carry + v) %}
-{% set previousTotal = previousDataValues|reduce((carry, v) => carry + v) %}
 
 <div class="d-flex gap-xs jc-end text-right mt-2 mr-md">
     {% if previousTotal != currentTotal %}
