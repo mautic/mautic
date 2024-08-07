@@ -38,7 +38,7 @@ class ContactManagementCest
         $I->waitForElementNotVisible(ContactPage::$quickAddModal, 30);
 
         // Confirm the contact is in the database
-        $I->seeInDatabase('leads', ['firstname' => 'QuickAddFirstName', 'email' => 'quickadd@example.com']);
+        $I->seeInDatabase('test_leads', ['firstname' => 'QuickAddFirstName', 'email' => 'quickadd@example.com']);
     }
 
     public function createContactFromForm(
@@ -67,7 +67,7 @@ class ContactManagementCest
         $I->see('FirstName LastName', '.page-header-title .span-block');
 
         // Check the database for the created contact
-        $I->seeInDatabase('leads', ['firstname' => 'FirstName', 'email' => 'email@example.com']);
+        $I->seeInDatabase('test_leads', ['firstname' => 'FirstName', 'email' => 'email@example.com']);
     }
 
     public function accessEditContactFormFromList(
@@ -212,7 +212,7 @@ class ContactManagementCest
         $I->amOnPage(ContactPage::$URL);
 
         // Get initial contact count
-        $initialContactCount = $I->grabNumRecords('leads');
+        $initialContactCount = $I->grabNumRecords('test_leads');
 
         // Click on the import button
         $contact->selectOptionFromDropDownContactsPage(3);
@@ -249,7 +249,7 @@ class ContactManagementCest
         $expectedContactsAdded = isset($matches[1]) ? (int) $matches[1] : 0;
 
         // Get the count of contacts after import
-        $finalContactCount = $I->grabNumRecords('leads');
+        $finalContactCount = $I->grabNumRecords('test_leads');
 
         // Calculate the expected final contact count
         $expectedContactCount = $initialContactCount + $expectedContactsAdded;

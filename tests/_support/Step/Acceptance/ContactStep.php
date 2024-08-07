@@ -134,9 +134,9 @@ class ContactStep extends \AcceptanceTester
         // Grab the contact's name and navigate to their details page
         $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
         $I->click(['link' => $contactName]);
-        $I->waitForText($contactName, 10, '#app-content > div > div.page-header > div > div.col-xs-5.col-sm-6.col-md-5.va-m > h1 > div > span:nth-child(1)');
+        $I->waitForText($contactName, 10, '#app-content');
         // Wait for the contact's name to appear on the details page and verify the owner is "Sales User"
-        $I->see('Sales User', '#app-content > div > div.box-layout > div.col-md-3.bdr-l.height-auto > div.panel.bg-transparent.shd-none.bdr-rds-0.bdr-w-0.mb-0 > div.panel-body.pt-sm > p:nth-child(2)');
+        $I->see('Sales User', '//*[@id="app-content"]/div/div[2]/div[2]/div[1]/div[4]/p[1]');
     }
 
     /**
@@ -153,7 +153,7 @@ class ContactStep extends \AcceptanceTester
         $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
         $I->click(['link' => $contactName]);
         // Wait for the contact's name to appear on the details page and verify the owner has changed to "Admin User"
-        $I->waitForText($contactName, 10, '#app-content > div > div.page-header > div > div.col-xs-5.col-sm-6.col-md-5.va-m > h1 > div > span:nth-child(1)');
+        $I->waitForText($contactName, 10, '#app-content');
         $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]');
     }
 }
