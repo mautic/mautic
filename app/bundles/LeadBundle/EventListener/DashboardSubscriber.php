@@ -128,9 +128,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Calculate Standard Deviation
                 $mean         = array_sum($data) / count($data);
                 $sumOfSquares = array_reduce($data, function($carry, $item) use ($mean) {
-                    $carry += pow($item - $mean, 2);
-
-                    return $carry;
+                    
+                    return $carry + pow($item - $mean, 2);
                 }, 0);
                 $standardDeviation = sqrt($sumOfSquares / count($data));
 
