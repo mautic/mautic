@@ -1621,6 +1621,8 @@ class LeadModel extends FormModel
             $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::_($val, 'string');
         });
+        // Remove any tags that became empty after filtering
+        $tags = array_filter($tags, 'strlen');
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1659,6 +1661,8 @@ class LeadModel extends FormModel
                 $val = html_entity_decode(trim($val), ENT_QUOTES);
                 $val = InputHelper::_($val, 'string');
             });
+            // Remove any tags that became empty after filtering
+            $removeTags = array_filter($removeTags, 'strlen');
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
