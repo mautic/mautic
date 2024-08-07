@@ -7,7 +7,6 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
-use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class PasswordSubscriber implements EventSubscriberInterface
@@ -18,9 +17,7 @@ final class PasswordSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [
-            UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION => ['onUserFormAuthentication', 0],
-        ];
+        return [];
     }
 
     public function onUserFormAuthentication(AuthenticationEvent $authenticationEvent): void

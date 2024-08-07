@@ -9,8 +9,6 @@ use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
-use Mautic\UserBundle\UserEvents;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -47,11 +45,6 @@ final class PasswordSubscriberTest extends TestCase
         $this->authenticationEvent->expects($this->any())
             ->method('getToken')
             ->willReturn($this->pluginToken);
-    }
-
-    public function testThatItIsSubscribedToEvents(): void
-    {
-        Assert::assertArrayHasKey(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION, PasswordSubscriber::getSubscribedEvents());
     }
 
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void
