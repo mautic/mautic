@@ -90,10 +90,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $canViewOthers
                 );
 
-                $interval = $params['dateFrom']->diff($params['dateTo']);
+                $interval  = $params['dateFrom']->diff($params['dateTo']);
                 $totalDays = $interval->days + 1; // +1 to include the last day
 
-                $previousDateTo = clone $params['dateFrom'];
+                $previousDateTo   = clone $params['dateFrom'];
                 $previousDateFrom = (clone $previousDateTo)->sub($interval);
 
                 $previousPeriodData = $this->leadModel->getLeadsLineChartData(
@@ -105,18 +105,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $canViewOthers
                 );
 
-                $currentTotal = array_sum($chartData['datasets'][0]['data']);
+                $currentTotal  = array_sum($chartData['datasets'][0]['data']);
                 $previousTotal = array_sum($previousPeriodData['datasets'][0]['data']);
 
                 $growthRate = 0;
-                if ($previousTotal != 0) {
+                if (0 != $previousTotal) {
                     $growthRate = (($currentTotal - $previousTotal) / $previousTotal) * 100;
                 }
 
                 // Volatility
-                $data = $chartData['datasets'][0]['data'];
-                $maxLead = max($data);
-                $minLead = min(array_filter($data, fn($val) => $val > 0) ?: [0]);
+                $data          = $chartData['datasets'][0]['data'];
+                $maxLead       = max($data);
+                $minLead       = min(array_filter($data, fn($val) => $val > 0) ?: [0]);
                 $avgDailyLeads = $currentTotal / $totalDays;
 
                 $leadVolatility = 0;
@@ -126,31 +126,32 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
 
                 // Calculate Standard Deviation
-                $mean = array_sum($data) / count($data);
+                $mean         = array_sum($data) / count($data);
                 $sumOfSquares = array_reduce($data, function($carry, $item) use ($mean) {
                     $carry += pow($item - $mean, 2);
+
                     return $carry;
                 }, 0);
                 $standardDeviation = sqrt($sumOfSquares / count($data));
 
                 $event->setTemplateData([
-                    'chartType'   => 'line',
-                    'chartHeight' => $widget->getHeight() - 80,
-                    'chartData'   => $chartData,
+                    'chartType'          => 'line',
+                    'chartHeight'        => $widget->getHeight() - 80,
+                    'chartData'          => $chartData,
                     'previousPeriodData' => $previousPeriodData,
-                    'showTotal'   => 'true',
-                    'showComparison' => 'true',
-                    'dateFrom'    => $params['dateFrom']->format('Y-m-d'),
-                    'dateTo'      => $params['dateTo']->format('Y-m-d'),
-                    'totalDays'   => $totalDays,
-                    'currentTotal' => $currentTotal,
-                    'previousTotal' => $previousTotal,
-                    'avgDailyLeads' => $avgDailyLeads,
-                    'growthRate'  => $growthRate,
-                    'leadVolatility' => $leadVolatility,
-                    'maxLead' => $maxLead,
-                    'minLead' => $minLead,
-                    'standardDeviation' => $standardDeviation,
+                    'showTotal'          => 'true',
+                    'showComparison'     => 'true',
+                    'dateFrom'           => $params['dateFrom']->format('Y-m-d'),
+                    'dateTo'             => $params['dateTo']->format('Y-m-d'),
+                    'totalDays'          => $totalDays,
+                    'currentTotal'       => $currentTotal,
+                    'previousTotal'      => $previousTotal,
+                    'avgDailyLeads'      => $avgDailyLeads,
+                    'growthRate'         => $growthRate,
+                    'leadVolatility'     => $leadVolatility,
+                    'maxLead'            => $maxLead,
+                    'minLead'            => $minLead,
+                    'standardDeviation'  => $standardDeviation,
                 ]);
             }
 
