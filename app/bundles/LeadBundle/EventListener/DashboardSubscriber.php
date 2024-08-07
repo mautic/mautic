@@ -113,16 +113,17 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $growthRate = (($currentTotal - $previousTotal) / $previousTotal) * 100;
                 }
 
-                // Cálculo da volatilidade de geração de leads
+                // Volatility
                 $data = $chartData['datasets'][0]['data'];
                 $maxLead = max($data);
-                $minLead = min(array_filter($data) ?: [0]); // Filtra zeros, usa 0 se todos forem zero
+                $minLead = min(array_filter($data, fn($val) => $val > 0) ?: [0]);
                 $avgDailyLeads = $currentTotal / $totalDays;
 
                 $leadVolatility = 0;
                 if ($avgDailyLeads > 0) {
                     $leadVolatility = ($maxLead - $minLead) / $avgDailyLeads * 100;
                 }
+
 
                 // Calculate Standard Deviation
                 $mean = array_sum($data) / count($data);

@@ -174,22 +174,16 @@ is defined %}
                     {% endif %}
                 </div>
 
-
                 <!-- Volatility -->
                 <div class="smart-tips">
-                    {% if leadVolatility is defined %}
+                    {% if leadVolatility is defined and leadVolatility > 0 %}
                     <div id="lead-volatility">
-                        <i class="ri-lightbulb-line"></i>
-                        <strong>{{ 'mautic.widget.created_leads_in_time.lead_generation_volatility'|trans }}:</strong>
                         {% if leadVolatility > 100 %}
-                        {{ 'mautic.widget.created_leads_in_time.high_volatility'|trans({'%volatility%':
-                        leadVolatility|round(0), '%maxLead%': maxLead, '%minLead%': minLead}) }}
+                            {{ 'mautic.widget.created_leads_in_time.high_volatility'|trans({'%maxLead%': maxLead, '%minLead%': minLead}) }}
                         {% elseif leadVolatility > 50 %}
-                        {{ 'mautic.widget.created_leads_in_time.moderate_volatility'|trans({'%volatility%':
-                        leadVolatility|round(0)}) }}
+                            {{ 'mautic.widget.created_leads_in_time.moderate_volatility'|trans }}
                         {% else %}
-                        {{ 'mautic.widget.created_leads_in_time.low_volatility'|trans({'%volatility%':
-                        leadVolatility|round(0)}) }}
+                            {{ 'mautic.widget.created_leads_in_time.low_volatility'|trans }}
                         {% endif %}
                     </div>
                     {% endif %}
