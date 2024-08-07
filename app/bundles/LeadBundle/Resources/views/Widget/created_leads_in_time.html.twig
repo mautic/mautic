@@ -261,171 +261,87 @@ is defined %}
                 {% set lowestCount = null %}
 
                 {% for i in 0..(chartData.datasets[0].data|length - 1) %}
-                    {% set count = chartData.datasets[0].data[i] %}
-                    {% set date = chartData.labels[i] %}
-                    {% set dayName = date|date('l') %}
+                {% set count = chartData.datasets[0].data[i] %}
+                {% set date = chartData.labels[i] %}
+                {% set dayName = date|date('l') %}
 
-                    {% if lowestCount is null or count < lowestCount %}
-                        {% set lowestCount = count %}
-                        {% set worstDaysCurrent = [{'day': dayName, 'count': count}] %}
-                    {% elseif count == lowestCount %}
-                        {% set worstDaysCurrent = worstDaysCurrent|merge([{'day': dayName, 'count': count}]) %}
-                    {% endif %}
-                {% endfor %}
-
-                {# Find the worst days of the week for the previous period #}
-                {% set worstDaysPrevious = [] %}
-                {% set lowestCountPrevious = null %}
-
-                {% for i in 0..(previousPeriodData.datasets[0].data|length - 1) %}
-                    {% set count = previousPeriodData.datasets[0].data[i] %}
-                    {% set date = previousPeriodData.labels[i] %}
-                    {% set dayName = date|date('l') %}
-
-                    {% if lowestCountPrevious is null or count < lowestCountPrevious %}
-                        {% set lowestCountPrevious = count %}
-                        {% set worstDaysPrevious = [{'day': dayName, 'count': count}] %}
-                    {% elseif count == lowestCountPrevious %}
-                        {% set worstDaysPrevious = worstDaysPrevious|merge([{'day': dayName, 'count': count}]) %}
-                    {% endif %}
-                {% endfor %}
-
-                {# Ensure both periods have the same number of days for comparison #}
-                {% set previousDaysCount = previousPeriodData.datasets[0].data|length %}
-                {% set currentDaysCount = chartData.datasets[0].data|length %}
-                {% if previousDaysCount > currentDaysCount %}
+                {% if lowestCount is null or count < lowestCount %} {% set lowestCount=count %} {% set
+                    worstDaysCurrent=[{'day': dayName, 'count' : count}] %} {% elseif count==lowestCount %} {% set
+                    worstDaysCurrent=worstDaysCurrent|merge([{'day': dayName, 'count' : count}]) %} {% endif %} {%
+                    endfor %} {# Find the worst days of the week for the previous period #} {% set worstDaysPrevious=[]
+                    %} {% set lowestCountPrevious=null %} {% for i in 0..(previousPeriodData.datasets[0].data|length -
+                    1) %} {% set count=previousPeriodData.datasets[0].data[i] %} {% set
+                    date=previousPeriodData.labels[i] %} {% set dayName=date|date('l') %} {% if lowestCountPrevious is
+                    null or count < lowestCountPrevious %} {% set lowestCountPrevious=count %} {% set
+                    worstDaysPrevious=[{'day': dayName, 'count' : count}] %} {% elseif count==lowestCountPrevious %} {%
+                    set worstDaysPrevious=worstDaysPrevious|merge([{'day': dayName, 'count' : count}]) %} {% endif %} {%
+                    endfor %} {# Ensure both periods have the same number of days for comparison #} {% set
+                    previousDaysCount=previousPeriodData.datasets[0].data|length %} {% set
+                    currentDaysCount=chartData.datasets[0].data|length %} {% if previousDaysCount> currentDaysCount %}
                     {% set worstDaysPrevious = worstDaysPrevious|slice(0, currentDaysCount) %}
-                {% endif %}
+                    {% endif %}
 
-                {# Generate smart tip #}
-                {% set smartTip %}
+                    {# Generate smart tip #}
+                    {% set smartTip %}
                     {% if worstDaysCurrent|length > 0 %}
-                        {% if worstDaysCurrent|length == totalDays %}
-                            {{ 'mautic.widget.created_leads_in_time.worst_day.all_equal'|trans({'%count%': worstDaysCurrent[0].count}) }}
-                        {% else %}
-                            {% set worstDaysString = worstDaysCurrent|map(day => day.day)|join(', ') %}
-                            {% if worstDaysCurrent[0].count == 0 %}
-                                {{ 'mautic.widget.created_leads_in_time.worst_day.zero_days'|trans({'%days%': worstDaysString, '%count%': worstDaysCurrent|length}) }}
-                            {% else %}
-                                {{ 'mautic.widget.created_leads_in_time.worst_day.identified'|trans({'%days%': worstDaysString, '%count%': worstDaysCurrent[0].count}) }}
-                            {% endif %}
-                        {% endif %}
+                    {% if worstDaysCurrent|length == totalDays %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.all_equal'|trans({'%count%':
+                    worstDaysCurrent[0].count}) }}
                     {% else %}
-                        {{ 'mautic.widget.created_leads_in_time.worst_day.no_data'|trans }}
+                    {% set worstDaysString = worstDaysCurrent|map(day => day.day)|join(', ') %}
+                    {% if worstDaysCurrent[0].count == 0 %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.zero_days'|trans({'%days%': worstDaysString,
+                    '%count%': worstDaysCurrent|length}) }}
+                    {% else %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.identified'|trans({'%days%': worstDaysString,
+                    '%count%': worstDaysCurrent[0].count}) }}
                     {% endif %}
-                {% endset %}
+                    {% endif %}
+                    {% else %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.no_data'|trans }}
+                    {% endif %}
+                    {% endset %}
 
-                {# Generate comparison tip #}
-                {% set comparisonTip %}
+                    {# Generate comparison tip #}
+                    {% set comparisonTip %}
                     {% if worstDaysCurrent|length > 0 and worstDaysPrevious|length > 0 %}
-                        {% if worstDaysCurrent|length == 1 and worstDaysPrevious|length == 1 %}
-                            {% if worstDaysCurrent[0].day == worstDaysPrevious[0].day %}
-                                {{ 'mautic.widget.created_leads_in_time.worst_day.same_single'|trans({'%day%': worstDaysCurrent[0].day}) }}
-                            {% else %}
-                                {{ 'mautic.widget.created_leads_in_time.worst_day.changed_single'|trans({'%currentDay%': worstDaysCurrent[0].day, '%previousDay%': worstDaysPrevious[0].day}) }}
-                            {% endif %}
-                        {% else %}
-                            {% set currentCount = worstDaysCurrent|length %}
-                            {% set previousCount = worstDaysPrevious|length %}
-                            {% if currentCount == previousCount %}
-                                {{ 'mautic.widget.created_leads_in_time.worst_day.same_count'|trans({'%count%': currentCount}) }}
-                            {% else %}
-                                {{ 'mautic.widget.created_leads_in_time.worst_day.changed_count'|trans({'%currentCount%': currentCount, '%previousCount%': previousCount}) }}
-                            {% endif %}
-                        {% endif %}
+                    {% if worstDaysCurrent|length == 1 and worstDaysPrevious|length == 1 %}
+                    {% if worstDaysCurrent[0].day == worstDaysPrevious[0].day %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.same_single'|trans({'%day%':
+                    worstDaysCurrent[0].day}) }}
+                    {% else %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.changed_single'|trans({'%currentDay%':
+                    worstDaysCurrent[0].day, '%previousDay%': worstDaysPrevious[0].day}) }}
+                    {% endif %}
+                    {% else %}
+                    {% set currentCount = worstDaysCurrent|length %}
+                    {% set previousCount = worstDaysPrevious|length %}
+                    {% if currentCount == previousCount %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.same_count'|trans({'%count%': currentCount}) }}
+                    {% else %}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.changed_count'|trans({'%currentCount%':
+                    currentCount, '%previousCount%': previousCount}) }}
+                    {% endif %}
+                    {% endif %}
                     {% elseif worstDaysCurrent|length > 0 %}
-                        {{ 'mautic.widget.created_leads_in_time.worst_day.new_worst_days'|trans({'%count%': worstDaysCurrent|length}) }}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.new_worst_days'|trans({'%count%':
+                    worstDaysCurrent|length}) }}
                     {% elseif worstDaysPrevious|length > 0 %}
-                        {{ 'mautic.widget.created_leads_in_time.worst_day.improved'|trans }}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.improved'|trans }}
                     {% else %}
-                        {{ 'mautic.widget.created_leads_in_time.worst_day.no_comparison'|trans }}
+                    {{ 'mautic.widget.created_leads_in_time.worst_day.no_comparison'|trans }}
                     {% endif %}
-                {% endset %}
+                    {% endset %}
 
-                {# Display the smart tip and comparison tip #}
-                <div class="smart-tip">
-                    <p>{{ smartTip }}</p>
-                    <p>{{ comparisonTip }}</p>
-                </div>
-
-                <!-- Best day of the week (last 6 months) -->
-                {% set sixMonthsAgo = "now"|date_modify("-6 months")|date('Y-m-d') %}
-                {% set dailyTotals = {} %}
-                {% set daysCounted = {} %}
-
-                {% for date, value in chartData.datasets[0].data %}
-                {% if date >= sixMonthsAgo %}
-                {% set dayOfWeek = date|date('l') %} {# This returns the full name of the day #}
-                {% if dailyTotals[dayOfWeek] is not defined %}
-                {% set dailyTotals = dailyTotals|merge({(dayOfWeek): 0}) %}
-                {% set daysCounted = daysCounted|merge({(dayOfWeek): 0}) %}
-                {% endif %}
-                {% set dailyTotals = dailyTotals|merge({(dayOfWeek): dailyTotals[dayOfWeek] + value}) %}
-                {% set daysCounted = daysCounted|merge({(dayOfWeek): daysCounted[dayOfWeek] + 1}) %}
-                {% endif %}
-                {% endfor %}
-
-                {% set bestDay = '' %}
-                {% set bestDayAvg = 0 %}
-                {% for day, total in dailyTotals %}
-                {% set avg = daysCounted[day] > 0 ? (total / daysCounted[day])|round(0, 'floor') : 0 %}
-                {% if avg > bestDayAvg %}
-                {% set bestDay = day %}
-                {% set bestDayAvg = avg %}
-                {% endif %}
-                {% endfor %}
-
-                <div id="best-day-metric">
-                    {% if bestDay != '' %}
-                    <p>{{ 'mautic.widget.created_leads_in_time.best_day_result'|trans({'%day%': bestDay}) }}</p>
-                    {% else %}
-                    <p>{{ 'mautic.widget.created_leads_in_time.no_best_day'|trans }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Weekdays vs weekends -->
-                {% set sixMonthsAgo = "now"|date_modify("-6 months")|date('Y-m-d') %}
-                {% set weekdayTotal = 0 %}
-                {% set weekdayCount = 0 %}
-                {% set weekendTotal = 0 %}
-                {% set weekendCount = 0 %}
-
-                {% for date, value in chartData.datasets[0].data %}
-                {% if date >= sixMonthsAgo %}
-                {% set dayOfWeek = date|date('N') %} {# 1 (Monday) to 7 (Sunday) #}
-                {% if dayOfWeek < 6 %} {# Weekday #} {% set weekdayTotal=weekdayTotal + value %} {% set
-                    weekdayCount=weekdayCount + 1 %} {% else %} {# Weekend #} {% set weekendTotal=weekendTotal + value
-                    %} {% set weekendCount=weekendCount + 1 %} {% endif %} {% endif %} {% endfor %} {% set
-                    weekdayAvg=weekdayCount> 0 ? (weekdayTotal / weekdayCount)|round(0, 'floor') : 0 %}
-                    {% set weekendAvg = weekendCount > 0 ? (weekendTotal / weekendCount)|round(0, 'floor') : 0 %}
-
-                    {% set tendency = '' %}
-                    {% if weekdayAvg > weekendAvg %}
-                    {% set tendency = 'weekdays' %}
-                    {% set difference = weekdayAvg - weekendAvg %}
-                    {% elseif weekendAvg > weekdayAvg %}
-                    {% set tendency = 'weekends' %}
-                    {% set difference = weekendAvg - weekdayAvg %}
-                    {% endif %}
-
-                    <div id="weekend-vs-weekday-metric">
-                        {% if weekdayAvg == 0 and weekendAvg == 0 %}
-                        <p>{{ 'mautic.widget.created_leads_in_time.no_data'|trans }}</p>
-                        {% elseif tendency != '' %}
-                        <p>{{ 'mautic.widget.created_leads_in_time.tendency'|trans({'%tendency%': tendency}) }}</p>
-                        {% if weekdayAvg > 0 or weekendAvg > 0 %}
-                        <p>{{ 'mautic.widget.created_leads_in_time.weekday_avg'|trans({'%avg%': weekdayAvg}) }}</p>
-                        <p>{{ 'mautic.widget.created_leads_in_time.weekend_avg'|trans({'%avg%': weekendAvg}) }}</p>
-                        {% endif %}
-                        <p>{{ 'mautic.widget.created_leads_in_time.difference'|trans({'%diff%': difference}) }}</p>
-                        {% else %}
-                        <p>{{ 'mautic.widget.created_leads_in_time.no_significant_difference'|trans }}</p>
-                        {% if weekdayAvg > 0 or weekendAvg > 0 %}
-                        <p>{{ 'mautic.widget.created_leads_in_time.weekday_avg'|trans({'%avg%': weekdayAvg}) }}</p>
-                        <p>{{ 'mautic.widget.created_leads_in_time.weekend_avg'|trans({'%avg%': weekendAvg}) }}</p>
-                        {% endif %}
-                        {% endif %}
+                    {# Display the smart tip and comparison tip #}
+                    <div class="smart-tip">
+                        <p>{{ smartTip }}</p>
+                        <p>{{ comparisonTip }}</p>
                     </div>
+
+
+
+
             </div>
             {% endif %}
 
