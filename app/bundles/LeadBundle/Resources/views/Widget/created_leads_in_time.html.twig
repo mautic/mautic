@@ -255,15 +255,6 @@ is defined %}
             <div class="weekly-metrics">
                 <div class="h4 mb-sm">{{ 'mautic.widget.created_leads_in_time.weekly_insights'|trans }}</div>
 
-
-                <!-- Generated leads (average) -->
-                {% set avgDailyLeads = currentTotal / totalDays %}
-                <div class="mt-md mb-xs">
-                    <i class="ri-contacts-book-upload-line ri-lg"></i>
-                    <strong>{{ 'mautic.widget.created_leads_in_time.average_daily_lead_generation'|trans }}</strong>: {{
-                    avgDailyLeads|round(2) }}
-                </div>
-
                 <!-- Best day of the week (last 6 months) -->
                 {% set sixMonthsAgo = "now"|date_modify("-6 months")|date('Y-m-d') %}
                 {% set dailyTotals = {} %}
