@@ -17,4 +17,4 @@
     {%- endif -%}
 {% endset %}
 {% set labelText = ('mautic.core.form.' ~ (entity.getPublishStatus() == 'published' ? 'active' : 'inactive'))|trans %}
-<span title="{{ labelText }}" aria-label="{{ labelText }}" class="bg-{{ labelColor }} mt-sm publishstatus_pulse"> </span>
+<span title="{{ labelText }}" aria-label="{{ labelText }}" class="bg-{{ labelColor }} publishstatus_pulse"> </span>
