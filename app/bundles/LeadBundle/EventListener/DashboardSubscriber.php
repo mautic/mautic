@@ -124,11 +124,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $leadVolatility = ($maxLead - $minLead) / $avgDailyLeads * 100;
                 }
 
-
-                // Calculate Standard Deviation
+                // Standard Deviation
                 $mean         = array_sum($data) / count($data);
                 $sumOfSquares = array_reduce($data, function($carry, $item) use ($mean) {
-                    
+
                     return $carry + pow($item - $mean, 2);
                 }, 0);
                 $standardDeviation = sqrt($sumOfSquares / count($data));
