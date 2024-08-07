@@ -121,20 +121,14 @@ is defined %}
                     <div id="high-performance-days">
                         <strong>{{ 'mautic.widget.created_leads_in_time.high_performance_days'|trans }}</strong>
                         <p>
-                            {% if highPerformanceDays > 0 %}
                             {{ 'mautic.widget.created_leads_in_time.high_performance_days_message'|trans({
                             '%count%': highPerformanceDays,
-                            '%days%': highPerformanceDays == 1 ? 'mautic.widget.created_leads_in_time.day'|trans :
-                            'mautic.widget.created_leads_in_time.days'|trans,
                             '%percentage%': highPerformancePercentage
                             }) }}
                             {% if highPerformanceDays >= 3 %}
                             {{ 'mautic.widget.created_leads_in_time.great_job'|trans }}
                             {% elseif highPerformanceDays > 0 %}
                             {{ 'mautic.widget.created_leads_in_time.good_work'|trans }}
-                            {% endif %}
-                            {% else %}
-                            {{ 'mautic.widget.created_leads_in_time.no_high_performance_days'|trans }}
                             {% endif %}
                         </p>
                     </div>
