@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PreviewFunctionalTest extends MauticMysqlTestCase
 {
+    private const PREHEADER_TEXT = 'Preheader text';
+
     protected $useCleanupRollback = false;
 
     public function testPreviewPage(): void
@@ -28,21 +30,23 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $contentWithContactInfo = sprintf('Contact emails is %s', $lead->getEmail());
 
         // Anonymous visitor
-        $this->assertPageContent($url, $contentNoContactInfo);
-        $this->assertPageContent($urlWithContact, $contentNoContactInfo);
+        $this->assertPageContent($url, $contentNoContactInfo, self::PREHEADER_TEXT);
+        $this->assertPageContent($urlWithContact, $contentNoContactInfo, self::PREHEADER_TEXT);
 
         $this->loginUser('admin');
 
         // Admin user
-        $this->assertPageContent($url, $contentNoContactInfo);
-        $this->assertPageContent($urlWithContact, $contentWithContactInfo);
+        $this->assertPageContent($url, $contentNoContactInfo, self::PREHEADER_TEXT);
+        $this->assertPageContent($urlWithContact, $contentWithContactInfo, self::PREHEADER_TEXT);
     }
 
-    private function assertPageContent(string $url, string $expectedContent): void
+    private function assertPageContent(string $url, string ...$expectedContents): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, $url);
         self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        self::assertStringContainsString($expectedContent, $crawler->text());
+        foreach ($expectedContents as $expectedContent) {
+            self::assertStringContainsString($expectedContent, $crawler->text());
+        }
     }
 
     private function createEmail(bool $publicPreview = true): Email
@@ -53,7 +57,8 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $email->setSubject('Email subject');
         $email->setTemplate('Blank');
         $email->setPublicPreview($publicPreview);
-        $email->setCustomHtml('Contact emails is {contactfield=email}');
+        $email->setCustomHtml('<html><body>Contact emails is {contactfield=email}</body></html>');
+        $email->setPreheaderText(self::PREHEADER_TEXT);
         $this->em->persist($email);
 
         return $email;
@@ -73,9 +78,8 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $segment1 = $this->createSegment('Segment 1');
         $segment2 = $this->createSegment('Segment 2');
         $lead     = $this->createLead();
-        $email    = $this->createEmail();
-
         $this->addLeadToSegment($lead, $segment1);
+        $email = $this->createEmail();
 
         $email->setDynamicContent([
             [
@@ -102,7 +106,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ]);
-        $email->setCustomHtml('{dynamiccontent="Dynamic Content 1"}');
+        $email->setCustomHtml('<html><body>{dynamiccontent="Dynamic Content 1"}</body></html>');
         $this->em->persist($email);
         $this->em->flush();
 
@@ -112,14 +116,14 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $contentWithContactInfo = 'Variation 1';
 
         // Anonymous visitor
-        $this->assertPageContent($url, $contentNoContactInfo);
-        $this->assertPageContent($urlWithContact, $contentNoContactInfo);
+        $this->assertPageContent($url, $contentNoContactInfo, self::PREHEADER_TEXT);
+        $this->assertPageContent($urlWithContact, $contentNoContactInfo, self::PREHEADER_TEXT);
 
         $this->loginUser('admin');
 
         // Admin user
-        $this->assertPageContent($url, $contentNoContactInfo);
-        $this->assertPageContent($urlWithContact, $contentWithContactInfo);
+        $this->assertPageContent($url, $contentNoContactInfo, self::PREHEADER_TEXT);
+        $this->assertPageContent($urlWithContact, $contentWithContactInfo, self::PREHEADER_TEXT);
     }
 
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
@@ -206,7 +210,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ];
-        $email->setCustomHtml('<div>{dynamiccontent="Dynamic Content 2"}</div>');
+        $email->setCustomHtml('<html><body><div>{dynamiccontent="Dynamic Content 2"}</div></body></html>');
         $email->setDynamicContent($dynamicContent);
         $this->em->flush();
 

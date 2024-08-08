@@ -1339,6 +1339,15 @@
         "review",
         "userTesting"
       ]
+    },
+    {
+      "login": "vinzent",
+      "name": "Thomas Mueller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/296297?v=4",
+      "profile": "https://github.com/vinzent",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
