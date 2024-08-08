@@ -18,7 +18,7 @@ class DateExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator           = $this->createMock(TranslatorInterface::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->dateHelper = new DateHelper(
@@ -57,28 +57,28 @@ class DateExtensionTest extends TestCase
     public function testToText(): void
     {
         $datetime = '2023-12-31 23:59:59';
-        $result = $this->dateExtension->toText($datetime, 'UTC', 'Y-m-d H:i:s', true);
+        $result   = $this->dateExtension->toText($datetime, 'UTC', 'Y-m-d H:i:s', true);
         $this->assertStringContainsString('December 31, 2023', $result);
     }
 
     public function testToHumanized(): void
     {
         $datetime = '2023-12-31 23:59:59';
-        $result = $this->dateExtension->toHumanized($datetime, 'UTC', 'Y-m-d H:i:s');
+        $result   = $this->dateExtension->toHumanized($datetime, 'UTC', 'Y-m-d H:i:s');
         $this->assertStringContainsString('ago', $result);
     }
 
     public function testToFull(): void
     {
         $datetime = '2023-12-31 23:59:59';
-        $result = $this->dateExtension->toFull($datetime, 'UTC', 'Y-m-d H:i:s');
+        $result   = $this->dateExtension->toFull($datetime, 'UTC', 'Y-m-d H:i:s');
         $this->assertStringContainsString('December 31, 2023', $result);
     }
 
     public function testToFullConcat(): void
     {
         $datetime = '2023-12-31 23:59:59';
-        $result = $this->dateExtension->toFullConcat($datetime, 'UTC', 'Y-m-d H:i:s');
+        $result   = $this->dateExtension->toFullConcat($datetime, 'UTC', 'Y-m-d H:i:s');
         $this->assertStringContainsString('2023', $result);
         $this->assertStringContainsString('23:59', $result);
     }
@@ -86,27 +86,27 @@ class DateExtensionTest extends TestCase
     public function testToDate(): void
     {
         $datetime = '2023-12-31 23:59:59';
-        $result = $this->dateExtension->toDate($datetime, 'UTC', 'Y-m-d H:i:s');
+        $result   = $this->dateExtension->toDate($datetime, 'UTC', 'Y-m-d H:i:s');
         $this->assertStringContainsString('2023', $result);
     }
 
     public function testToTime(): void
     {
         $datetime = '2023-12-31 23:59:59';
-        $result = $this->dateExtension->toTime($datetime, 'UTC', 'Y-m-d H:i:s');
+        $result   = $this->dateExtension->toTime($datetime, 'UTC', 'Y-m-d H:i:s');
         $this->assertStringContainsString('23:59', $result);
     }
 
     public function testToShort(): void
     {
         $datetime = '2023-12-31 23:59:59';
-        $result = $this->dateExtension->toShort($datetime, 'UTC', 'Y-m-d H:i:s');
+        $result   = $this->dateExtension->toShort($datetime, 'UTC', 'Y-m-d H:i:s');
         $this->assertStringContainsString('Dec', $result);
     }
 
     public function testFormatRange(): void
     {
-        $range = new \DateInterval('P1Y2M3DT4H5M6S');
+        $range  = new \DateInterval('P1Y2M3DT4H5M6S');
         $result = $this->dateExtension->formatRange($range);
         $this->assertStringContainsString('year', $result);
         $this->assertStringContainsString('month', $result);
