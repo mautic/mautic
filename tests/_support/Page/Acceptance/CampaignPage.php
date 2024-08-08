@@ -4,7 +4,6 @@ namespace Page\Acceptance;
 
 class CampaignPage
 {
-    // include url of current page
     public static $URL = 's/campaigns/view/1';
 
     public static $contactsTab                  = '//*[@id="app-content"]/div/div[2]/div[1]/div[2]/ul/li[2]/a';
