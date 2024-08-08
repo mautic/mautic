@@ -6,7 +6,7 @@
         </span>
         {% else %}
         {% set tooltip = n.type ? ' data-toggle="tooltip" title="{% trans %}mautic.notifications.type.{{ n.type }}{% endtrans %}' : '' %}
-        <i class="fa ri-2x {{ n.iconClass ? n.iconClass : 'fa-star' }}"{{ tooltip }}></i>
+        <i class="ri-2x {{ n.iconClass ? n.iconClass : 'ri-star-line' }}"{{ tooltip }}></i>
         {% endif %}
     </span>
     <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right do-not-close" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clear{% endtrans %}" onclick="Mautic.clearNotification({{ n.id }});"><i class="ri-close-line do-not-close"></i></a>
