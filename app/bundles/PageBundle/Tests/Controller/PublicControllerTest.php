@@ -266,7 +266,7 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $container = $this->createMock(Container::class);
         $container->expects(self::never())
-            ->method('has'); // THIS CAN FAIL!!!!!!!!!!!!!!
+            ->method('has');
         $container->expects(self::never())
             ->method('get');
 

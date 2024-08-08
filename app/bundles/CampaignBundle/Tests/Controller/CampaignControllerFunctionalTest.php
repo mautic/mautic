@@ -47,8 +47,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->getName(), $functionForUseRange);
         parent::setUp();
 
-        $model = static::getContainer()->get('mautic.model.factory')->getModel('campaign');
-        \assert($model instanceof CampaignModel);
+        $model = static::getContainer()->get(CampaignModel::class);
 
         $this->campaignModel                                           = $model;
         $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
