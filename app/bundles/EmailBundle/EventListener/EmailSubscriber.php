@@ -13,6 +13,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
+    public const PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
+    public const PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
+    public const PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
+    public const PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
+
     private const RETRY_COUNT = 3;
 
     public function __construct(
@@ -27,6 +32,8 @@ class EmailSubscriber implements EventSubscriberInterface
     {
         return [
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
+            EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
+            EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
@@ -49,6 +56,26 @@ class EmailSubscriber implements EventSubscriberInterface
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
             $this->auditLogModel->writeToLog($log);
+        }
+    }
+
+    /**
+     * Add preheader text to email body.
+     */
+    public function onEmailSendAddPreheaderText(Events\EmailSendEvent $event): void
+    {
+        $email = $event->getEmail();
+        $html  = $event->getContent();
+
+        if ($email && $email->getPreheaderText()) {
+            $preheaderTextElement = self::PREHEADER_HTML_ELEMENT_BEFORE.$email->getPreheaderText().self::PREHEADER_HTML_ELEMENT_AFTER;
+            $preheaderExists      = preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $html, $preheaderMatches);
+            if ($preheaderExists) {
+                $html = preg_replace(self::PREHEADER_HTML_REPLACE_PATTERN, $preheaderTextElement, $html);
+            } elseif (preg_match('/(<body[^\>]*>)/i', $html, $contentMatches)) {
+                $html = str_ireplace($contentMatches[0], $contentMatches[0]."\n".$preheaderTextElement, $html);
+            }
+            $event->setContent($html);
         }
     }
 

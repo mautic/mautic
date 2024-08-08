@@ -17,7 +17,7 @@
            style="border-radius: 0;"
             {% if button.attr is not empty %}{{ button.attr }}{% endif %}
         >
-            <i class="fa fa-fw {{ button.icon }}"></i>{{ button.text }}
+            <i class="ri-fw {{ button.icon }}"></i>{{ button.text }}
         </a>
     {% if button.extra is not empty %}{{ button.extra }}{% endif %}
     </div>
@@ -46,7 +46,7 @@
                 <a href="#{{ tab['id'] }}" role="tab" data-toggle="tab" class="{{ class }}">
                     <span>{{ tab['name'] }}</span>
                     {% if tab.icon is not empty %}
-                        <i class="fa fa-fw {{ tab['icon'] }}"></i>
+                        <i class="ri-fw {{ tab['icon'] }}"></i>
                     {% endif %}
                 </a>
             </li>
