@@ -18,7 +18,18 @@ class DateExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $translator           = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')
+            ->willReturnCallback(function ($id, $parameters = []) {
+                if (0 === strpos($id, 'mautic.core.date.')) {
+                    $unit = str_replace('mautic.core.date.', '', $id);
+
+                    return $parameters['%count%'].' '.$unit.($parameters['%count%'] > 1 ? 's' : '');
+                }
+
+                return $id;
+            });
+
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->dateHelper = new DateHelper(
@@ -31,6 +42,12 @@ class DateExtensionTest extends TestCase
         );
 
         $this->dateExtension = new DateExtension($this->dateHelper);
+    }
+
+    // Add this method to allow injection of a mocked DateHelper
+    protected function createDateExtensionWithMockedHelper(DateHelper $mockedHelper): DateExtension
+    {
+        return new DateExtension($mockedHelper);
     }
 
     public function testGetFunctions(): void
@@ -80,7 +97,7 @@ class DateExtensionTest extends TestCase
         $datetime = '2023-12-31 23:59:59';
         $result   = $this->dateExtension->toFullConcat($datetime, 'UTC', 'Y-m-d H:i:s');
         $this->assertStringContainsString('2023', $result);
-        $this->assertStringContainsString('23:59', $result);
+        $this->assertStringContainsString('11:59 pm', $result);
     }
 
     public function testToDate(): void
@@ -94,7 +111,7 @@ class DateExtensionTest extends TestCase
     {
         $datetime = '2023-12-31 23:59:59';
         $result   = $this->dateExtension->toTime($datetime, 'UTC', 'Y-m-d H:i:s');
-        $this->assertStringContainsString('23:59', $result);
+        $this->assertStringContainsString('11:59 pm', $result);
     }
 
     public function testToShort(): void
@@ -108,8 +125,12 @@ class DateExtensionTest extends TestCase
     {
         $range  = new \DateInterval('P1Y2M3DT4H5M6S');
         $result = $this->dateExtension->formatRange($range);
-        $this->assertStringContainsString('year', $result);
-        $this->assertStringContainsString('month', $result);
-        $this->assertStringContainsString('day', $result);
+
+        $this->assertStringContainsString('1 year', $result);
+        $this->assertStringContainsString('2 months', $result);
+        $this->assertStringContainsString('3 days', $result);
+        $this->assertStringContainsString('4 hours', $result);
+        $this->assertStringContainsString('5 minutes', $result);
+        $this->assertStringContainsString('6 seconds', $result);
     }
 }
