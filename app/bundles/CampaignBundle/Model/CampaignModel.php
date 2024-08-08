@@ -793,6 +793,44 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * @return array<int, int>
+     */
+    public function getCampaignIdsWithDependenciesOnTagName(string $tagName): array
+    {
+        $entities = $this->getEventRepository()->getEntities(
+            [
+                'filter' => [
+                    'force'  => [
+                        [
+                            'column' => 'e.type',
+                            'expr'   => 'IN',
+                            'value'  => ['lead.changetags', 'lead.tags'],
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $dependents = [];
+        /** @var Event $entity */
+        foreach ($entities as $entity) {
+            $type       = $entity->getType();
+            $properties = $entity->getProperties();
+            if ('lead.changetags' === $type) {
+                $eventTags = array_merge([], $properties['add_tags'], $properties['remove_tags']);
+            }
+            if ('lead.tags' === $type) {
+                $eventTags = $properties['tags'];
+            }
+            if (in_array($tagName, $eventTags)) {
+                $dependents[] = $entity->getCampaign()->getId();
+            }
+        }
+
+        return array_unique($dependents);
+    }
+
+    /**
      * @return array<string, array<int, array<string, int|string>>>
      *
      * @throws Exception

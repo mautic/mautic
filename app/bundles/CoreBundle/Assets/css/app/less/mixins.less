@@ -259,3 +259,27 @@
     background-color: @bgcolor;
   }
 }
+
+.outline() {
+  outline: 2px solid transparent !important;
+  outline-offset: -2px;
+  &:hover { outline: 2px solid transparent; }
+  &:active,
+  &:focus { outline: 2px solid var(--focus) !important; }
+}
+
+// Alerts
+
+.alert-variant(@background; @border; @text-color) {
+  color: var(--text-primary);
+  background-color: var(--layer);
+  border-color: @border;
+
+  hr {
+    border-top-color: var(--border-subtle);
+  }
+
+  .alert-link {
+    color: var(--text-primary);
+  }
+}

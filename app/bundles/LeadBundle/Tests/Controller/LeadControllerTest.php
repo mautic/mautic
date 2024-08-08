@@ -422,6 +422,13 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
     }
 
+    public function testQuickAddAction(): void
+    {
+        $this->client->request('GET', '/s/contacts/quickAdd');
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+    }
+
     public function testAddContactsErrorMessage(): void
     {
         /** @var FieldModel $fieldModel */
@@ -891,5 +898,70 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
         self::assertSame('multiple', $multiple);
+    }
+
+    public function testCompanyMergeList(): void
+    {
+        $companyA = new Company();
+        $companyA->setName('Company A');
+
+        $this->em->persist($companyA);
+
+        $companyB = new Company();
+        $companyB->setName('Company B');
+
+        $this->em->persist($companyB);
+
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/companies/merge/'.$companyA->getId());
+        $response = $this->client->getResponse();
+
+        Assert::assertTrue($response->isOk());
+
+        $content = $response->getContent();
+
+        Assert::assertStringContainsString('Company B', $content);
+        Assert::assertStringNotContainsString('Company A', $content);
+    }
+
+    public function testAuditLogBatchExportContact(): void
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals(true, strlen($content) > 10000);
+
+        /** @var AuditLog $auditLog */
+        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([
+            'object' => 'ContactExports',
+            'bundle' => 'lead',
+            'userId' => 1,
+            'action' => 'create',
+        ]);
+        $this->assertNotNull($auditLog);
+        Assert::assertTrue(isset($auditLog->getDetails()['args']), json_encode($auditLog, JSON_PRETTY_PRINT));
+        Assert::assertSame(
+            [
+                'start'  => 0,
+                'limit'  => 200,
+                'filter' => [
+                    'string' => '',
+                    'force'  => ' !is:anonymous',
+                ],
+                'orderBy'        => 'l.last_active, l.id',
+                'orderByDir'     => 'DESC',
+                'withTotalCount' => true,
+            ],
+            $auditLog->getDetails()['args']
+        );
     }
 }
