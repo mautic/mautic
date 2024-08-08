@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Event\ContactExportEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
@@ -1983,6 +1984,8 @@ class LeadController extends FormController
 
     /**
      * Bulk export contacts.
+     *
+     * @throws \Exception
      */
     public function batchExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher): Response
     {
@@ -2059,13 +2062,23 @@ class LeadController extends FormController
 
         $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
 
-        return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $response              = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+
+        $details['total'] = $iterator->getTotal();
+        $details['args']  = $iterator->getArgs();
+
+        $dispatcher->dispatch(
+            new ContactExportEvent($details, 'ContactExports'),
+            LeadEvents::POST_CONTACT_EXPORT
+        );
+
+        return $response;
     }
 
     /**
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, $contactId)
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId)
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2092,6 +2105,11 @@ class LeadController extends FormController
         }
 
         $contactFields = $lead->getProfileFields();
+        $args[]        = [
+            'lead'          => $contactId,
+            'dataType'      => $dataType,
+        ];
+
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
             $export[] = [
@@ -2099,6 +2117,11 @@ class LeadController extends FormController
                 'value' => $contactField,
             ];
         }
+
+        $dispatcher->dispatch(
+            new ContactExportEvent($args, 'ContactExport'),
+            LeadEvents::POST_CONTACT_EXPORT
+        );
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
     }
