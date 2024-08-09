@@ -4,15 +4,28 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Mautic\EmailBundle\EventListener\EmailSubscriber;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -186,5 +199,116 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
         Assert::assertSame(5, $stat->getRetryCount());
         Assert::assertFalse($event->shouldTryAgain());
+    }
+
+    public function testOnEmailSendAddPreheaderText(): void
+    {
+        $this->runPreheaderEvent(
+            <<<'CONTENT'
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <body style="margin: 0px; cursor: auto;" class="ui-sortable">
+        <div data-section-wrapper="1">
+            <center>
+                <table data-section="1" style="width: 600;" width="600" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div data-slot-container="1" style="min-height: 30px">
+                                    <div data-slot="text"><br /><h2>Hello there!</h2><br />{test} test We haven't heard from you for a while...<a href="https://google.com">check this link</a><br /><br />{unsubscribe_text} | {webview_text}</div>{dynamiccontent="Dynamic Content 2"}<div data-slot="codemode">
+                                    <div id="codemodeHtmlContainer">
+    <p>Place your content here {test}</p></div>
+
+                                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </center>
+        </div>
+</body></html>
+CONTENT,
+            function (string $content): void {
+                $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
+                $this->assertStringContainsString($preheaderTextHtml, $content);
+                $this->assertMatchesRegularExpression(EmailSubscriber::PREHEADER_HTML_SEARCH_PATTERN, $content);
+            }
+        );
+    }
+
+    public function testOnEmailSendAddPreheaderTextWithPreheaderPresent(): void
+    {
+        $this->runPreheaderEvent(
+            <<<'CONTENT'
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <body style="margin: 0px; cursor: auto;" class="ui-sortable">
+        <div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">Original Preheader here</div>
+        <div data-section-wrapper="1">
+            <center>
+                <table data-section="1" style="width: 600;" width="600" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div data-slot-container="1" style="min-height: 30px">
+                                    <div data-slot="text"><br /><h2>Hello there!</h2><br />{test} test We haven't heard from you for a while...<a href="https://google.com">check this link</a><br /><br />{unsubscribe_text} | {webview_text}</div>{dynamiccontent="Dynamic Content 2"}<div data-slot="codemode">
+                                    <div id="codemodeHtmlContainer"><p>Place your content here {test}</p></div>
+                                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </center>
+        </div>
+</body></html>
+CONTENT,
+
+            function (string $content): void {
+                $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
+                $this->assertStringContainsString($preheaderTextHtml, $content);
+                $this->assertStringNotContainsString('Original Preheader here', $content);
+                $this->assertMatchesRegularExpression(EmailSubscriber::PREHEADER_HTML_SEARCH_PATTERN, $content);
+            }
+        );
+    }
+
+    private function runPreheaderEvent(string $html, callable $assert): void
+    {
+        /** @var MockObject&FromEmailHelper $fromEmailHelper */
+        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
+
+        /** @var MockObject&CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
+        /** @var MockObject&Mailbox $mailbox */
+        $mailbox = $this->createMock(Mailbox::class);
+
+        /** @var MockObject&RouterInterface $router */
+        $router = $this->createMock(RouterInterface::class);
+
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_from_name', null, 'No Body'],
+                ]
+            );
+        $mockFactory = $this->createMock(MauticFactory::class); /** @phpstan-ignore-line MauticFactory is deprecated */
+        $mailer      = new Mailer(new BatchTransport());
+        $mailHelper  = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, new NullLogger(), new MailHashHelper($coreParametersHelper), $router);
+
+        $email = new Email();
+        $email->setCustomHtml($html);
+        $email->setPreheaderText('this is a nice preheader text');
+        $mailHelper->setEmail($email);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($this->subscriber);
+
+        $event = new EmailSendEvent($mailHelper);
+
+        $this->subscriber->onEmailSendAddPreheaderText($event);
+
+        $assert($event->getContent());
     }
 }

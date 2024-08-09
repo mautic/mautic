@@ -24,8 +24,9 @@ body:
       label: Mautic Version
       description: What version of Mautic you are using? Please test to reproduce your bug with the [latest stable version of Mautic](https://www.mautic.org/mautic-releases) which might contain new fixes.  If you are able, please also check the latest development release.
       options:
+        - 5.1.x series
         - 5.0.x series
-        - 4.4.x series
+        - 4.4.x series (not supported)
         - 4.3.x series (not supported)
         - 4.2.x series (not supported)
         - 4.1.x series (not supported)
