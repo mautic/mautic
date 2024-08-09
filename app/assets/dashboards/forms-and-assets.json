@@ -1,7 +1,7 @@
 {
     "name": "Forms and Assets",
     "description": "Start with a dashboard of 14 widgets that help you to check form submissions and identified contacts.",
-    "widgets": {
+    "widgets": [
         {
             "name": "Contacts Created",
             "width": 100,
@@ -134,5 +134,5 @@
             "params": [],
             "template": null
         }
-    }
+    ]
 }

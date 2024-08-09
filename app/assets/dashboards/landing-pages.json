@@ -1,7 +1,7 @@
 {
     "name": "Landing pages",
     "description": "Start with a dashboard of 17 widgets that provide insights related to landing pages and interactions.",
-    "widgets": {
+    "widgets": [
         {
             "name": "Downloads in time",
             "width": 100,
@@ -174,5 +174,5 @@
             "params": [],
             "template": null
         }
-    }
+    ]
 }
