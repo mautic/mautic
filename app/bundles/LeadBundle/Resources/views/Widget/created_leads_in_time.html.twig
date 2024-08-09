@@ -213,38 +213,14 @@ is defined %}
             {% elseif dateRange == 'week' %}
 
             <!-- Best day of the week -->
-            {% set dailyTotals = {} %}
-            {% set daysCounted = {} %}
-
-            {% for date, value in chartData.datasets[0].data %}
-            {% set dayOfWeek = date|date('l') %} {# This returns the full name of the day #}
-            {% if dailyTotals[dayOfWeek] is not defined %}
-            {% set dailyTotals = dailyTotals|merge({(dayOfWeek): 0}) %}
-            {% set daysCounted = daysCounted|merge({(dayOfWeek): 0}) %}
-            {% endif %}
-            {% set dailyTotals = dailyTotals|merge({(dayOfWeek): dailyTotals[dayOfWeek] + value}) %}
-            {% set daysCounted = daysCounted|merge({(dayOfWeek): daysCounted[dayOfWeek] + 1}) %}
-            {% endfor %}
-
-            {% set bestDay = '' %}
-            {% set bestDayAvg = 0 %}
-            {% for day, total in dailyTotals %}
-            {% set avg = daysCounted[day] > 0 ? (total / daysCounted[day])|round(0, 'floor') : 0 %}
-            {% if avg > bestDayAvg %}
-            {% set bestDay = day %}
-            {% set bestDayAvg = avg %}
-            {% endif %}
-            {% endfor %}
-
             <div class="text-muted">
                 {% if bestDay != '' %}
-                <p>{{ 'mautic.widget.created_leads_in_time.best_day.result'|trans({'%day%': bestDay, '%avg%':
-                    bestDayAvg})
-                    }}</p>
+                    <p>{{ 'mautic.widget.created_leads_in_time.best_day.result'|trans({'%day%': bestDay, '%avg%': bestDayAvg}) }}</p>
                 {% else %}
-                <p>{{ 'mautic.widget.created_leads_in_time.best_day.no_result'|trans }}</p>
+                    <p>{{ 'mautic.widget.created_leads_in_time.best_day.no_result'|trans }}</p>
                 {% endif %}
             </div>
+            
             <hr>
             <div class="weekly-metrics">
                 <div class="h4 mb-sm">{{ 'mautic.widget.created_leads_in_time.weekly_insights'|trans }}</div>

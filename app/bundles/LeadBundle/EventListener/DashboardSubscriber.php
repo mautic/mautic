@@ -131,6 +131,31 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 }, 0);
                 $standardDeviation = sqrt($sumOfSquares / count($data));
 
+                // Best day of the week calculation
+                $dailyTotals = [];
+                $daysCounted = [];
+
+                foreach ($chartData['datasets'][0]['data'] as $index => $value) {
+                    $date      = $chartData['labels'][$index];
+                    $dayOfWeek = date('l', strtotime($date));
+                    if (!isset($dailyTotals[$dayOfWeek])) {
+                        $dailyTotals[$dayOfWeek] = 0;
+                        $daysCounted[$dayOfWeek] = 0;
+                    }
+                    $dailyTotals[$dayOfWeek] += $value;
+                    ++$daysCounted[$dayOfWeek];
+                }
+
+                $bestDay    = '';
+                $bestDayAvg = 0;
+                foreach ($dailyTotals as $day => $total) {
+                    $avg = $daysCounted[$day] > 0 ? $total / $daysCounted[$day] : 0;
+                    if ($avg > $bestDayAvg) {
+                        $bestDay    = $day;
+                        $bestDayAvg = $avg;
+                    }
+                }
+
                 $event->setTemplateData([
                     'chartType'          => 'line',
                     'chartHeight'        => $widget->getHeight() - 80,
@@ -149,6 +174,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'maxLead'            => $maxLead,
                     'minLead'            => $minLead,
                     'standardDeviation'  => $standardDeviation,
+                    'bestDay'            => $bestDay,
+                    'bestDayAvg'         => $bestDayAvg,
                 ]);
             }
 
