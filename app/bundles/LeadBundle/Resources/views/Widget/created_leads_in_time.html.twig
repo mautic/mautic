@@ -101,16 +101,6 @@ is defined %}
                 <div class="h4 mb-sm">{{ 'mautic.widget.created_leads_in_time.monthly_insights'|trans }}</div>
 
                 <!-- High performance days -->
-                {# Set a threshold for "high performance" (now 50% above average) #}
-                {% set highPerformanceThreshold = avgDailyLeads * 1.5 %}
-                {% set highPerformanceDays = 0 %}
-                {% for dailyValue in chartData.datasets[0].data %}
-                {% if dailyValue > highPerformanceThreshold %}
-                {% set highPerformanceDays = highPerformanceDays + 1 %}
-                {% endif %}
-                {% endfor %}
-                {% set highPerformancePercentage = (highPerformanceDays / totalDays * 100)|round(1) %}
-
                 <div class="smart-tips">
                     <div id="high-performance-days">
                         <p>
@@ -220,7 +210,7 @@ is defined %}
                     <p>{{ 'mautic.widget.created_leads_in_time.best_day.no_result'|trans }}</p>
                 {% endif %}
             </div>
-            
+
             <hr>
             <div class="weekly-metrics">
                 <div class="h4 mb-sm">{{ 'mautic.widget.created_leads_in_time.weekly_insights'|trans }}</div>

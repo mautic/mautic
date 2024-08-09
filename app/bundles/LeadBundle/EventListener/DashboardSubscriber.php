@@ -156,26 +156,40 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     }
                 }
 
+                // Calculate high-performance days
+                $highPerformanceThreshold = $avgDailyLeads * 1.5;
+                $highPerformanceDays      = 0;
+
+                foreach ($chartData['datasets'][0]['data'] as $dailyValue) {
+                    if ($dailyValue > $highPerformanceThreshold) {
+                        ++$highPerformanceDays;
+                    }
+                }
+
+                $highPerformancePercentage = round(($highPerformanceDays / $totalDays) * 100, 1);
+
                 $event->setTemplateData([
-                    'chartType'          => 'line',
-                    'chartHeight'        => $widget->getHeight() - 80,
-                    'chartData'          => $chartData,
-                    'previousPeriodData' => $previousPeriodData,
-                    'showTotal'          => 'true',
-                    'showComparison'     => 'true',
-                    'dateFrom'           => $params['dateFrom']->format('Y-m-d'),
-                    'dateTo'             => $params['dateTo']->format('Y-m-d'),
-                    'totalDays'          => $totalDays,
-                    'currentTotal'       => $currentTotal,
-                    'previousTotal'      => $previousTotal,
-                    'avgDailyLeads'      => $avgDailyLeads,
-                    'growthRate'         => $growthRate,
-                    'leadVolatility'     => $leadVolatility,
-                    'maxLead'            => $maxLead,
-                    'minLead'            => $minLead,
-                    'standardDeviation'  => $standardDeviation,
-                    'bestDay'            => $bestDay,
-                    'bestDayAvg'         => $bestDayAvg,
+                    'chartType'                 => 'line',
+                    'chartHeight'               => $widget->getHeight() - 80,
+                    'chartData'                 => $chartData,
+                    'previousPeriodData'        => $previousPeriodData,
+                    'showTotal'                 => 'true',
+                    'showComparison'            => 'true',
+                    'dateFrom'                  => $params['dateFrom']->format('Y-m-d'),
+                    'dateTo'                    => $params['dateTo']->format('Y-m-d'),
+                    'totalDays'                 => $totalDays,
+                    'currentTotal'              => $currentTotal,
+                    'previousTotal'             => $previousTotal,
+                    'avgDailyLeads'             => $avgDailyLeads,
+                    'growthRate'                => $growthRate,
+                    'leadVolatility'            => $leadVolatility,
+                    'maxLead'                   => $maxLead,
+                    'minLead'                   => $minLead,
+                    'standardDeviation'         => $standardDeviation,
+                    'bestDay'                   => $bestDay,
+                    'bestDayAvg'                => $bestDayAvg,
+                    'highPerformanceDays'       => $highPerformanceDays,
+                    'highPerformancePercentage' => $highPerformancePercentage,
                 ]);
             }
 
