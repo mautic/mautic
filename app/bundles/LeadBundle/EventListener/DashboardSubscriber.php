@@ -199,6 +199,42 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $trend = 'stability';
                 }
 
+                // Checks if worst day last week is the same this week
+                // / Find the worst days for the current period
+                $worstDaysCurrent = [];
+                $lowestCount      = null;
+                foreach ($chartData['datasets'][0]['data'] as $index => $count) {
+                    $date    = $chartData['labels'][$index];
+                    $dayName = date('l', strtotime($date));
+                    if (null === $lowestCount || $count < $lowestCount) {
+                        $lowestCount      = $count;
+                        $worstDaysCurrent = [['day' => $dayName, 'count' => $count]];
+                    } elseif ($count == $lowestCount) {
+                        $worstDaysCurrent[] = ['day' => $dayName, 'count' => $count];
+                    }
+                }
+
+                // / Find the worst days for the previous period
+                $worstDaysPrevious   = [];
+                $lowestCountPrevious = null;
+                foreach ($previousPeriodData['datasets'][0]['data'] as $index => $count) {
+                    $date    = $previousPeriodData['labels'][$index];
+                    $dayName = date('l', strtotime($date));
+                    if (null === $lowestCountPrevious || $count < $lowestCountPrevious) {
+                        $lowestCountPrevious = $count;
+                        $worstDaysPrevious   = [['day' => $dayName, 'count' => $count]];
+                    } elseif ($count == $lowestCountPrevious) {
+                        $worstDaysPrevious[] = ['day' => $dayName, 'count' => $count];
+                    }
+                }
+
+                // / Ensure both periods have the same number of days for comparison
+                $currentDaysCount  = count($chartData['datasets'][0]['data']);
+                $previousDaysCount = count($previousPeriodData['datasets'][0]['data']);
+                if ($previousDaysCount > $currentDaysCount) {
+                    $worstDaysPrevious = array_slice($worstDaysPrevious, 0, $currentDaysCount);
+                }
+
                 $event->setTemplateData([
                     'chartType'                 => 'line',
                     'chartHeight'               => $widget->getHeight() - 80,
@@ -226,6 +262,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'firstThreeDaysAvg'         => $firstThreeDaysAvg,
                     'lastThreeDaysAvg'          => $lastThreeDaysAvg,
                     'trend'                     => $trend,
+                    'worstDaysCurrent'          => $worstDaysCurrent,
+                    'worstDaysPrevious'         => $worstDaysPrevious,
                 ]);
             }
 
