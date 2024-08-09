@@ -183,6 +183,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $bestDate       = $bestDayValue > 0 ? $labels[$bestDayIndex] : null;
                 $bestDayOfMonth = $bestDate ? date('d', strtotime($bestDate)) : null;
 
+                // General weekly growth direction
+                $data                = $chartData['datasets'][0]['data'];
+                $firstThreeDaysTotal = array_sum(array_slice($data, 0, 3));
+                $firstThreeDaysAvg   = floor($firstThreeDaysTotal / 3);
+                $lastThreeDaysTotal  = array_sum(array_slice($data, -3, 3));
+                $lastThreeDaysAvg    = floor($lastThreeDaysTotal / 3);
+
+                $trend = '';
+                if ($lastThreeDaysAvg > $firstThreeDaysAvg) {
+                    $trend = 'growth';
+                } elseif ($lastThreeDaysAvg < $firstThreeDaysAvg) {
+                    $trend = 'decline';
+                } else {
+                    $trend = 'stability';
+                }
+
                 $event->setTemplateData([
                     'chartType'                 => 'line',
                     'chartHeight'               => $widget->getHeight() - 80,
@@ -207,6 +223,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'highPerformancePercentage' => $highPerformancePercentage,
                     'bestDayOfMonth'            => $bestDayOfMonth,
                     'bestDayValue'              => $bestDayValue,
+                    'firstThreeDaysAvg'         => $firstThreeDaysAvg,
+                    'lastThreeDaysAvg'          => $lastThreeDaysAvg,
+                    'trend'                     => $trend,
                 ]);
             }
 

@@ -13,6 +13,19 @@ Variables
 - previousTotal
 - avgDailyLeads
 - growthRate
+- leadVolatility
+- maxLead
+- minLead
+- standardDeviation
+- bestDay
+- bestDayAvg
+- highPerformanceDays
+- highPerformancePercentage
+- bestDayOfMonth
+- bestDayValue
+- firstThreeDaysAvg
+- lastThreeDaysAvg
+- trend
 #}
 
 {% if chartType is defined and chartData is defined and chartData.datasets is defined and chartData.datasets[0].data is
@@ -194,9 +207,10 @@ is defined %}
             <!-- Best day of the week -->
             <div class="text-muted">
                 {% if bestDay != '' %}
-                    <p>{{ 'mautic.widget.created_leads_in_time.best_day.result'|trans({'%day%': bestDay, '%avg%': bestDayAvg}) }}</p>
+                <p>{{ 'mautic.widget.created_leads_in_time.best_day.result'|trans({'%day%': bestDay, '%avg%':
+                    bestDayAvg}) }}</p>
                 {% else %}
-                    <p>{{ 'mautic.widget.created_leads_in_time.best_day.no_result'|trans }}</p>
+                <p>{{ 'mautic.widget.created_leads_in_time.best_day.no_result'|trans }}</p>
                 {% endif %}
             </div>
 
@@ -289,41 +303,26 @@ is defined %}
                     </div>
 
                     <!-- General weekly growth direction -->
-                    {# Calculate the average leads for the first three days #}
-                    {% set firstThreeDaysTotal = 0 %}
-                    {% for i in 0..2 %}
-                    {% set firstThreeDaysTotal = firstThreeDaysTotal + chartData.datasets[0].data[i] %}
-                    {% endfor %}
-                    {% set firstThreeDaysAvg = (firstThreeDaysTotal / 3)|round(0, 'floor') %}
-
-                    {# Calculate the average leads for the last three days #}
-                    {% set lastThreeDaysTotal = 0 %}
-                    {% for i in (chartData.datasets[0].data|length - 3)..(chartData.datasets[0].data|length - 1) %}
-                    {% set lastThreeDaysTotal = lastThreeDaysTotal + chartData.datasets[0].data[i] %}
-                    {% endfor %}
-                    {% set lastThreeDaysAvg = (lastThreeDaysTotal / 3)|round(0, 'floor') %}
-
-                    {# Determine the trend #}
-                    {% set trend %}
-                    {% if lastThreeDaysAvg > firstThreeDaysAvg %}
-                    {{ 'mautic.widget.created_leads_in_time.trend.growth.part1'|trans }}
-                    <i class="ri-arrow-up-line text-success"></i>
-                    {{ 'mautic.widget.created_leads_in_time.trend.growth.part2'|trans({'%firstAvg%': firstThreeDaysAvg,
-                    '%lastAvg%': lastThreeDaysAvg}) }}
-                    {% elseif lastThreeDaysAvg < firstThreeDaysAvg %}
-                        {{ 'mautic.widget.created_leads_in_time.trend.decline.part1' |trans }} <i
-                        class="ri-arrow-down-line text-danger"></i>
-                        {{ 'mautic.widget.created_leads_in_time.trend.decline.part2'|trans({'%firstAvg%':
-                        firstThreeDaysAvg, '%lastAvg%': lastThreeDaysAvg}) }}
-                        {% else %}
-                        {{ 'mautic.widget.created_leads_in_time.trend.stability'|trans({'%avg%': firstThreeDaysAvg}) }}
-                        {% endif %}
-                        {% endset %}
-
-                        {# Display the trend #}
-                        <div id="weekly-growth-trend">
-                            <p>{{ trend }}</p>
-                        </div>
+                    <div id="weekly-growth-trend">
+                        <p>
+                            {% if trend == 'growth' %}
+                            {{ 'mautic.widget.created_leads_in_time.trend.growth.part1'|trans }}
+                            <i class="ri-arrow-up-line text-success"></i>
+                            {{ 'mautic.widget.created_leads_in_time.trend.growth.part2'|trans({'%firstAvg%':
+                            firstThreeDaysAvg,
+                            '%lastAvg%': lastThreeDaysAvg}) }}
+                            {% elseif trend == 'decline' %}
+                            {{ 'mautic.widget.created_leads_in_time.trend.decline.part1'|trans }}
+                            <i class="ri-arrow-down-line text-danger"></i>
+                            {{ 'mautic.widget.created_leads_in_time.trend.decline.part2'|trans({'%firstAvg%':
+                            firstThreeDaysAvg,
+                            '%lastAvg%': lastThreeDaysAvg}) }}
+                            {% else %}
+                            {{ 'mautic.widget.created_leads_in_time.trend.stability'|trans({'%avg%': firstThreeDaysAvg})
+                            }}
+                            {% endif %}
+                        </p>
+                    </div>
 
             </div>
             {% endif %}
