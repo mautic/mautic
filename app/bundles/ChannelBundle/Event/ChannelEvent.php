@@ -1,23 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Event;
 
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\LeadBundle\Model\LeadModel;
 
-/**
- * Class ChannelEvent.
- */
 class ChannelEvent extends CommonEvent
 {
     /**
@@ -84,8 +71,10 @@ class ChannelEvent extends CommonEvent
 
         // if not defined, try the classic naming convention
         $channel = ucfirst($channel);
+        $class   = "\Mautic\\{$channel}Bundle\Entity\\{$channel}";
+        \assert(class_exists($class));
 
-        return "Mautic{$channel}Bundle:{$channel}";
+        return $class;
     }
 
     /**
@@ -97,44 +86,14 @@ class ChannelEvent extends CommonEvent
      */
     public function getNameColumn($channel)
     {
-        if (isset($this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'])) {
-            return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'];
-        }
-
-        return 'name';
+        return $this->channels[$channel][MessageModel::CHANNEL_FEATURE]['nameColumn'] ?? 'name';
     }
 
     /**
-     * @param $feature
-     *
      * @return array
      */
     public function getFeatureChannels()
     {
         return $this->featureChannels;
-    }
-
-    /**
-     * Set a preference center channel.
-     *
-     * @deprecated 2.4 to be removed 3.0; use addChannel()
-     *
-     * @param $channel
-     */
-    public function setChannel($channel)
-    {
-        $this->addChannel($channel, [LeadModel::CHANNEL_FEATURE => []]);
-    }
-
-    /**
-     * Returns a list of channels.
-     *
-     * @deprecated 2.4 to be removed 3.0; use getChannelConfigs()
-     *
-     * @return string
-     */
-    public function getChannels()
-    {
-        return array_keys($this->channels);
     }
 }

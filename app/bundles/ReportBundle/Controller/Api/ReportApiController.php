@@ -1,37 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class ReportApiController.
+ * @extends CommonApiController<Report>
  */
 class ReportApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var ReportModel|null
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $model;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
-        $this->model            = $this->getModel('report');
-        $this->entityClass      = 'Mautic\ReportBundle\Entity\Report';
+        $reportModel = $modelFactory->getModel('report');
+        \assert($reportModel instanceof ReportModel);
+
+        $this->model            = $reportModel;
+        $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
@@ -39,9 +49,9 @@ class ReportApiController extends CommonApiController
      *
      * @param int $id Report ID
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function getReportAction($id)
+    public function getEntityAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -49,15 +59,52 @@ class ReportApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $reportData = $this->model->getReportData($entity, $this->container->get('form.factory'), ['paginate' => false, 'ignoreGraphData' => true]);
+        $reportData = $this->model->getReportData($entity, $this->formFactory, $this->getOptionsFromRequest($request));
 
         // Unset keys that we don't need to send back
-        foreach (['graphs', 'contentTemplate', 'columns', 'limit'] as $key) {
+        foreach (['graphs', 'contentTemplate', 'columns'] as $key) {
             unset($reportData[$key]);
         }
 
-        $view = $this->view($reportData, Codes::HTTP_OK);
+        // Include report metadata
+        $reportData[$this->entityNameOne] = $entity;
 
-        return $this->handleView($view);
+        return $this->handleView(
+            $this->view($reportData, Response::HTTP_OK)
+        );
+    }
+
+    public function getReportAction(Request $request, int $id): Response
+    {
+        return $this->getEntityAction($request, $id);
+    }
+
+    /**
+     * This method is careful to add new options from the request to keep BC.
+     * It originally loaded all rows without any filter or pagination applied.
+     */
+    private function getOptionsFromRequest(Request $request): array
+    {
+        $options = ['paginate'=> false, 'ignoreGraphData' => true];
+
+        if ($request->query->has('dateFrom')) {
+            $options['dateFrom'] = new \DateTimeImmutable($request->query->get('dateFrom'), new \DateTimeZone('UTC'));
+        }
+
+        if ($request->query->has('dateTo')) {
+            $options['dateTo']   = new \DateTimeImmutable($request->query->get('dateTo'), new \DateTimeZone('UTC'));
+        }
+
+        if ($request->query->has('page')) {
+            $options['page']     = $request->query->getInt('page');
+            $options['paginate'] = true;
+        }
+
+        if ($request->query->has('limit')) {
+            $options['limit']    = $request->query->getInt('limit');
+            $options['paginate'] = true;
+        }
+
+        return $options;
     }
 }

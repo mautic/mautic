@@ -1,57 +1,30 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ChannelSubscriber.
- */
-class ChannelSubscriber extends CommonSubscriber
+class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * ChannelSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     */
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
+    public function __construct(
+        private IntegrationHelper $integrationHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 70],
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
@@ -60,14 +33,14 @@ class ChannelSubscriber extends CommonSubscriber
                 'notification',
                 [
                     MessageModel::CHANNEL_FEATURE => [
-                        'campaignAction'             => 'notification.send_notification',
+                        'campaignAction'             => CampaignSubscriber::EVENT_ACTION_SEND_NOTIFICATION,
                         'campaignDecisionsSupported' => [
                             'page.pagehit',
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'notification_list',
-                        'repository'     => 'MauticNotificationBundle:Notification',
+                        'lookupFormType' => NotificationListType::class,
+                        'repository'     => \Mautic\NotificationBundle\Entity\Notification::class,
                         'lookupOptions'  => [
                             'mobile'  => false,
                             'desktop' => true,
@@ -78,30 +51,30 @@ class ChannelSubscriber extends CommonSubscriber
                     ],
                 ]
             );
-        }
 
-        $supportedFeatures = $integration->getSupportedFeatures();
+            $supportedFeatures = $integration->getSupportedFeatures();
 
-        if (in_array('mobile', $supportedFeatures)) {
-            $event->addChannel(
-                'mobile_notification',
-                [
-                    MessageModel::CHANNEL_FEATURE => [
-                        'campaignAction'             => 'notification.send_mobile_notification',
-                        'campaignDecisionsSupported' => [
-                            'page.pagehit',
-                            'asset.download',
-                            'form.submit',
+            if (in_array('mobile', $supportedFeatures)) {
+                $event->addChannel(
+                    'mobile_notification',
+                    [
+                        MessageModel::CHANNEL_FEATURE => [
+                            'campaignAction'             => CampaignSubscriber::EVENT_ACTION_SEND_MOBILE_NOTIFICATION,
+                            'campaignDecisionsSupported' => [
+                                'page.pagehit',
+                                'asset.download',
+                                'form.submit',
+                            ],
+                            'lookupFormType'             => NotificationListType::class,
+                            'repository'                 => \Mautic\NotificationBundle\Entity\Notification::class,
+                            'lookupOptions'              => [
+                                'mobile'  => true,
+                                'desktop' => false,
+                            ],
                         ],
-                        'lookupFormType' => 'notification_list',
-                        'repository'     => 'MauticNotificationBundle:Notification',
-                        'lookupOptions'  => [
-                            'mobile'  => true,
-                            'desktop' => false,
-                        ],
-                    ],
-                ]
-            );
+                    ]
+                );
+            }
         }
     }
 }

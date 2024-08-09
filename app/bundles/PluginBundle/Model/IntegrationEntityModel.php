@@ -1,34 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Integration\IntegrationObject;
 
 /**
- * Class IntegrationEntityModel.
+ * @extends FormModel<IntegrationEntity>
  */
 class IntegrationEntityModel extends FormModel
 {
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        return $this->em->getRepository(IntegrationEntity::class);
     }
 
-    public function logDataSync(IntegrationObject $integrationObject)
+    public function logDataSync(IntegrationObject $integrationObject): void
     {
     }
 
-    public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList)
+    public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList, $internalEntityId = null)
     {
         if (!$formattedRecords = $this->formatListOfContacts($recordList)) {
             return [];
@@ -36,11 +28,11 @@ class IntegrationEntityModel extends FormModel
 
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
-        $syncedRecords = $integrationEntityRepo->getIntegrationsEntityId(
+        return $integrationEntityRepo->getIntegrationsEntityId(
             $integrationName,
             $integrationObject->getType(),
             $integrationObject->getInternalType(),
-            null,
+            $internalEntityId,
             null,
             null,
             false,
@@ -48,11 +40,12 @@ class IntegrationEntityModel extends FormModel
             0,
             $formattedRecords
         );
-
-        return $syncedRecords;
     }
 
-    public function getRecordList($integrationObject)
+    /**
+     * @return array<mixed, array<'id', mixed>>
+     */
+    public function getRecordList($integrationObject): array
     {
         $recordList = [];
 
@@ -65,16 +58,15 @@ class IntegrationEntityModel extends FormModel
         return $recordList;
     }
 
-    public function formatListOfContacts($recordList)
+    public function formatListOfContacts($recordList): ?string
     {
         if (empty($recordList)) {
             return null;
         }
 
         $csList = is_array($recordList) ? implode('", "', array_keys($recordList)) : $recordList;
-        $csList = '"'.$csList.'"';
 
-        return $csList;
+        return '"'.$csList.'"';
     }
 
     public function getMauticContactsById($mauticContactIds, $integrationName, $internalObject)
@@ -83,7 +75,8 @@ class IntegrationEntityModel extends FormModel
             return [];
         }
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $mauticContacts        = $integrationEntityRepo->getIntegrationsEntityId(
+
+        return $integrationEntityRepo->getIntegrationsEntityId(
             $integrationName,
             null,
             $internalObject,
@@ -95,7 +88,20 @@ class IntegrationEntityModel extends FormModel
             0,
             $formattedRecords
         );
+    }
 
-        return $mauticContacts;
+    /**
+     * @param int $id
+     *
+     * @return IntegrationEntity|null
+     */
+    public function getEntityByIdAndSetSyncDate($id, \DateTime $dateTime)
+    {
+        $entity = $this->getIntegrationEntityRepository()->find($id);
+        if ($entity) {
+            $entity->setLastSyncDate($dateTime);
+        }
+
+        return $entity;
     }
 }

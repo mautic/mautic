@@ -1,58 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigEvent extends CommonEvent
 {
     /**
+     * @var mixed[]
+     */
+    private array $preserve = [];
+
+    /**
+     * @var mixed[]
+     */
+    private array $errors = [];
+
+    /**
+     * @var mixed[]
+     */
+    private array $fieldErrors = [];
+
+    /**
+     * Data got from build form before update.
+     */
+    private ?array $originalNormData = null;
+
+    /**
+     * Data got from build form after update.
+     *
      * @var array
      */
-    private $preserve = [];
+    private $normData;
 
     /**
-     * @param array $config
+     * @param mixed[]|null $config
      */
-    private $config;
-
-    /**
-     * @param \Symfony\Component\HttpFoundation\ParameterBag $post
-     */
-    private $post;
-
-    /**
-     * @var array
-     */
-    private $errors = [];
-
-    /**
-     * @var array
-     */
-    private $fieldErrors = [];
-
-    /**
-     * @param array        $config
-     * @param ParameterBag $post
-     */
-    public function __construct(array $config, ParameterBag $post)
-    {
-        $this->config = $config;
-        $this->post   = $post;
+    public function __construct(
+        private ?array $config,
+        private ParameterBag $post
+    ) {
     }
 
     /**
@@ -65,7 +54,7 @@ class ConfigEvent extends CommonEvent
     public function getConfig($key = null)
     {
         if ($key) {
-            return (isset($this->config[$key])) ? $this->config[$key] : [];
+            return $this->config[$key] ?? [];
         }
 
         return $this->config;
@@ -74,10 +63,9 @@ class ConfigEvent extends CommonEvent
     /**
      * Sets the config array.
      *
-     * @param array $config
-     * @param null  $key
+     * @param string $key
      */
-    public function setConfig(array $config, $key = null)
+    public function setConfig(array $config, $key = null): void
     {
         if ($key) {
             $this->config[$key] = $config;
@@ -86,12 +74,7 @@ class ConfigEvent extends CommonEvent
         }
     }
 
-    /**
-     * Returns the POST.
-     *
-     * @return \Symfony\Component\HttpFoundation\ParameterBag
-     */
-    public function getPost()
+    public function getPost(): ParameterBag
     {
         return $this->post;
     }
@@ -102,7 +85,7 @@ class ConfigEvent extends CommonEvent
      *
      * @param array|string $fields
      */
-    public function unsetIfEmpty($fields)
+    public function unsetIfEmpty($fields): void
     {
         if (!is_array($fields)) {
             $fields = [$fields];
@@ -125,8 +108,12 @@ class ConfigEvent extends CommonEvent
     /**
      * Set error message.
      *
-     * @param string $message     (untranslated)
-     * @param array  $messageVars for translation
+     * @param string      $message     (untranslated)
+     * @param array       $messageVars for translation
+     * @param string|null $key
+     * @param string|null $field
+     *
+     * @return ConfigEvent
      */
     public function setError($message, $messageVars = [], $key = null, $field = null)
     {
@@ -166,12 +153,7 @@ class ConfigEvent extends CommonEvent
         return $this->fieldErrors;
     }
 
-    /**
-     * @param UploadedFile $file
-     *
-     * @return string
-     */
-    public function getFileContent(UploadedFile $file)
+    public function getFileContent(UploadedFile $file): string
     {
         $tmpFile = $file->getRealPath();
         $content = trim(file_get_contents($tmpFile));
@@ -180,13 +162,42 @@ class ConfigEvent extends CommonEvent
         return $content;
     }
 
-    /**
-     * @param $content
-     *
-     * @return string
-     */
-    public function encodeFileContents($content)
+    public function encodeFileContents($content): string
     {
         return base64_encode($content);
+    }
+
+    /**
+     * @return array
+     */
+    public function getOriginalNormData()
+    {
+        return $this->originalNormData;
+    }
+
+    /**
+     * @return ConfigEvent
+     */
+    public function setOriginalNormData(array $normData)
+    {
+        $this->originalNormData = $normData;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNormData()
+    {
+        return $this->normData;
+    }
+
+    /**
+     * @param array $normData
+     */
+    public function setNormData($normData): void
+    {
+        $this->normData = $normData;
     }
 }

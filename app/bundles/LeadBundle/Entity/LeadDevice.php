@@ -1,32 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class LeadDevice.
- */
 class LeadDevice
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     private $lead;
 
@@ -36,59 +24,56 @@ class LeadDevice
     private $clientInfo = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $device;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsShortName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsVersion;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsPlatform;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceBrand;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceModel;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $deviceFingerprint;
+    private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_devices')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadDeviceRepository')
+            ->setCustomRepositoryClass(LeadDeviceRepository::class)
             ->addIndex(['date_added'], 'date_added_search')
             ->addIndex(['device'], 'device_search')
             ->addIndex(['device_os_name'], 'device_os_name_search')
@@ -96,10 +81,9 @@ class LeadDevice
             ->addIndex(['device_os_version'], 'device_os_version_search')
             ->addIndex(['device_os_platform'], 'device_os_platform_search')
             ->addIndex(['device_brand'], 'device_brand_search')
-            ->addIndex(['device_model'], 'device_model_search')
-            ->addIndex(['device_fingerprint'], 'device_fingerprint_search');
+            ->addIndex(['device_model'], 'device_model_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->addLead(false, 'CASCADE', false);
 
@@ -142,18 +126,17 @@ class LeadDevice
             ->nullable()
             ->build();
 
-        $builder->createField('deviceFingerprint', 'string')
-            ->columnName('device_fingerprint')
+        $builder->createField('trackingId', 'string')
+            ->columnName('tracking_id')
+            ->unique()
             ->nullable()
             ->build();
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadDevice')
             ->addProperties(
@@ -173,12 +156,14 @@ class LeadDevice
             ->build();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
+    }
+
+    public function getSignature(): string
+    {
+        return md5(json_encode($this->clientInfo).$this->device.$this->deviceOsName.$this->deviceOsPlatform.$this->deviceBrand.$this->deviceModel);
     }
 
     /**
@@ -192,7 +177,7 @@ class LeadDevice
     /**
      * @param mixed $clientInfo
      */
-    public function setClientInfo($clientInfo)
+    public function setClientInfo($clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }
@@ -208,7 +193,7 @@ class LeadDevice
     /**
      * @param mixed $device
      */
-    public function setDevice($device)
+    public function setDevice($device): void
     {
         $this->device = $device;
     }
@@ -221,10 +206,7 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    /**
-     * @param mixed $isFailed
-     */
-    public function setDeviceBrand($brand)
+    public function setDeviceBrand($brand): void
     {
         $this->deviceBrand = $brand;
     }
@@ -240,7 +222,7 @@ class LeadDevice
     /**
      * @param mixed $deviceModel
      */
-    public function setDeviceModel($deviceModel)
+    public function setDeviceModel($deviceModel): void
     {
         $this->deviceModel = $deviceModel;
     }
@@ -334,9 +316,9 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $deviceOs
+     * @param array $deviceOs
      */
-    public function setDeviceOs($deviceOs)
+    public function setDeviceOs($deviceOs): void
     {
         if (isset($deviceOs['name'])) {
             $this->deviceOsName = $deviceOs['name'];
@@ -353,19 +335,23 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDeviceFingerprint()
+    public function getTrackingId()
     {
-        return $this->deviceFingerprint;
+        return $this->trackingId;
     }
 
     /**
-     * @param string $deviceFingerprint
+     * @param string $trackingId
+     *
+     * @return self
      */
-    public function setDeviceFingerprint($deviceFingerprint)
+    public function setTrackingId($trackingId)
     {
-        $this->deviceFingerprint = $deviceFingerprint;
+        $this->trackingId = $trackingId;
+
+        return $this;
     }
 
     /**
@@ -377,8 +363,6 @@ class LeadDevice
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead)
@@ -399,28 +383,8 @@ class LeadDevice
     /**
      * @param mixed $dateAdded
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): void
     {
         $this->dateAdded = $dateAdded;
-    }
-
-    /**
-     * @return mixed
-     *
-     * @deprecated 2.4.0 to be removed 3.0; use getDateAdded instead
-     */
-    public function getDateOpen()
-    {
-        return $this->getDateAdded();
-    }
-
-    /**
-     * @param mixed $dateOpen
-     *
-     * @deprecated 2.4.0 to be removed 3.0; use setDateAdded instead
-     */
-    public function setDateOpen($dateOpen)
-    {
-        $this->setDateAdded($dateOpen);
     }
 }

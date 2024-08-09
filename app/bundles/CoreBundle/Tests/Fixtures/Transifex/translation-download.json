@@ -1,0 +1,35 @@
+{
+  "data": {
+    "attributes": {
+      "date_created": "XXXX-XX-XXTXX:XX:XXZ",
+      "date_modified": "XXXX-XX-XXTXX:XX:XXZ",
+      "errors": [],
+      "status": "pending"
+    },
+    "id": "4abfc726-6a27-4c33-9d99-e5254c8df748",
+    "links": {
+      "self": "/resource_translations_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748"
+    },
+    "relationships": {
+      "language": {
+        "data": {
+          "id": "l:cs",
+          "type": "languages"
+        },
+        "links": {
+          "related": "/languages/l:cs"
+        }
+      },
+      "resource": {
+        "data": {
+          "id": "o:mautic:p:mautic:r:webhookbundle-messages",
+          "type": "resources"
+        },
+        "links": {
+          "related": "/resources/o:mautic:p:mautic:r:webhookbundle-messages"
+        }
+      }
+    },
+    "type": "resource_translations_async_downloads"
+  }
+}

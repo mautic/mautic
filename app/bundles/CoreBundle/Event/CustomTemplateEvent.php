@@ -1,42 +1,24 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class CustomTemplateEvent.
- */
 class CustomTemplateEvent extends AbstractCustomRequestEvent
 {
     /**
-     * @var
+     * @var string|null
      */
     protected $template;
 
     /**
-     * @var
+     * @param string|null $template
      */
-    protected $vars;
-
-    /**
-     * CustomTemplateEvent constructor.
-     *
-     * @param Request $request
-     * @param         $template
-     * @param array   $vars
-     */
-    public function __construct(Request $request = null, $template = null, array $vars = [])
-    {
+    public function __construct(
+        Request $request = null,
+        $template = null,
+        protected array $vars = []
+    ) {
         parent::__construct($request);
 
         if (empty($template)) {
@@ -44,11 +26,10 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
         }
 
         $this->template = $template;
-        $this->vars     = $vars;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -56,7 +37,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @param mixed $template
+     * @param string|null $template
      *
      * @return CustomTemplateEvent
      */
@@ -70,7 +51,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getVars()
     {
@@ -78,7 +59,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @param mixed $vars
+     * @param array<string, mixed> $vars
      *
      * @return CustomTemplateEvent
      */

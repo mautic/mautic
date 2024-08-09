@@ -1,20 +1,32 @@
+Mautic.builderTokensForCkEditor = {};
 Mautic.builderTokens = {};
 Mautic.dynamicContentTokens = {};
 Mautic.builderTokensRequestInProgress = false;
+Mautic.imageManagerLoadURL = mauticBaseUrl + 's/file/list';
+Mautic.imageUploadURL = mauticBaseUrl + 's/file/upload';
+Mautic.imageManagerDeleteURL = mauticBaseUrl + 's/file/delete';
+Mautic.elfinderURL = mauticBaseUrl + 'elfinder';
 
-    /**
+
+/**
  * Activate Froala options
  */
 Mautic.activateGlobalFroalaOptions = function() {
+
+    if (!mauticFroalaEnabled) {
+        return;
+    }
+
     Mautic.basicFroalaOptions = {
         enter: mQuery.FroalaEditor.ENTER_BR,
-        imageUploadURL: mauticBaseUrl + 's/file/upload',
-        imageManagerLoadURL: mauticBaseUrl + 's/file/list',
-        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
+        imageUploadURL: Mautic.imageUploadURL,
+        imageManagerLoadURL: Mautic.imageManagerLoadURL,
+        imageManagerDeleteURL: Mautic.imageManagerDeleteURL,
         imageDefaultWidth: 0,
         pastePlain: true,
         htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
-        htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'allowfullscreen', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'frameborder', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'mozallowfullscreen', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'webkitallowfullscreen', 'width', 'wrap']
+        htmlAllowedAttrs: ['data-atwho-at-query', 'data-section', 'data-section-wrapper', 'accept', 'accept-charset', 'accesskey', 'action', 'align', 'allowfullscreen', 'alt', 'async', 'autocomplete', 'autofocus', 'autoplay', 'autosave', 'background', 'bgcolor', 'border', 'charset', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'color', 'cols', 'colspan', 'content', 'contenteditable', 'contextmenu', 'controls', 'coords', 'data', 'data-.*', 'datetime', 'default', 'defer', 'dir', 'dirname', 'disabled', 'download', 'draggable', 'dropzone', 'enctype', 'for', 'form', 'formaction', 'frameborder', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'http-equiv', 'icon', 'id', 'ismap', 'itemprop', 'keytype', 'kind', 'label', 'lang', 'language', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'mozallowfullscreen', 'multiple', 'name', 'novalidate', 'open', 'optimum', 'pattern', 'ping', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'reversed', 'rows', 'rowspan', 'sandbox', 'scope', 'scoped', 'scrolling', 'seamless', 'selected', 'shape', 'size', 'sizes', 'span', 'src', 'srcdoc', 'srclang', 'srcset', 'start', 'step', 'summary', 'spellcheck', 'style', 'tabindex', 'target', 'title', 'type', 'translate', 'usemap', 'value', 'valign', 'webkitallowfullscreen', 'width', 'wrap', 'mautic:disable-tracking'],
+        htmlRemoveTags: []
     };
 
     // Gated video style
@@ -145,3 +157,308 @@ Mautic.configureDynamicContentAtWhoTokens = function() {
         });
     }
 };
+
+Mautic.insertTextInEditor = function (obj, text) {
+    const ckEditor = ckEditors.get( obj[0] );
+    ckEditor.model.change( writer => {
+        writer.insertText( text, ckEditor.model.document.selection.getFirstPosition() );
+    });
+}
+
+Mautic.MentionLinks =  function (editor) {
+
+    editor.conversion.for( 'upcast' ).elementToAttribute( {
+        view: {
+            name: 'span',
+            key: 'data-fr-verified',
+            classes: 'atwho-inserted'
+        },
+        model: {
+            key: 'mention',
+            value: viewItem => editor.plugins.get( 'Mention' ).toMentionAttribute( viewItem )
+        },
+        converterPriority: 'high'
+    } );
+
+    editor.conversion.for( 'downcast' ).attributeToElement( {
+        model: 'mention',
+        view: ( modelAttributeValue, { writer } ) => {
+            if ( !modelAttributeValue ) {
+                return;
+            }
+
+            return writer.createAttributeElement( 'span', {
+                class: 'atwho-inserted',
+                'data-fr-verified': true
+            }, {
+                priority: 20,
+                id: modelAttributeValue.uid
+            } );
+        },
+        converterPriority: 'high'
+
+    } );
+}
+
+/*
+ * Customizes the way the list of user suggestions is displayed.
+ *
+ * @deprecated: will be removed in M6
+ */
+Mautic.customItemRenderer = function (item) {
+    let tokenId = item.id;
+    let tokenName = item.name;
+    const itemElement = document.createElement( 'span' );
+    const idElement = document.createElement( 'span' );
+    idElement.classList.add( 'custom-item-id' );
+    itemElement.classList.add( 'custom-item' );
+
+    if (tokenName.startsWith('a:')) {
+        tokenName = tokenName.substring(2);
+    }
+
+    if (tokenId.match(/dwc=/i)){
+        const tn = tokenId.substr(5, tokenId.length - 6);
+        tokenName = tokenName + ' (' + tn + ')';
+    } else if (tokenId.match(/contactfield=company/i) && !tokenName.match(/company/i)){
+        tokenName = 'Company ' + tokenName;
+    }
+
+    itemElement.textContent = tokenName;
+    idElement.textContent = tokenId;
+    itemElement.appendChild( idElement );
+    return itemElement;
+}
+
+/*
+ * @deprecated: will be removed in M6
+ */
+Mautic.getFeedItems = function (queryText) {
+    return new Promise( resolve => {
+        setTimeout( () => {
+            const itemsToDisplay = Mautic.builderTokensForCkEditor
+                .filter( isItemMatching )
+                .slice( 0, 5 );
+            resolve( itemsToDisplay );
+        }, 100 );
+    } );
+
+    function isItemMatching(item) {
+        const searchString = queryText.toLowerCase();
+        return (
+            item.name.toLowerCase().includes( searchString ) ||
+            item.id.toLowerCase().includes( searchString )
+        );
+    }
+}
+
+Mautic.getTokensForPlugIn = function(method) {
+    method = typeof method != 'undefined' ? method : 'page:getBuilderTokens';
+    // OK, let's fetch the tokens.
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        data: 'action=' + method,
+        async: false,
+        success: function (response) {
+            if (typeof response.tokens === 'object') {
+                Mautic.builderTokens = response.tokens;
+                Mautic.configureDynamicContentAtWhoTokens();
+                mQuery.extend(Mautic.builderTokens, Mautic.dynamicContentTokens);
+                Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
+                    return {'id':i, 'name':value};
+                });
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        },
+        complete: function() {
+            Mautic.builderTokensRequestInProgress = false;
+        }
+    });
+    return Mautic.builderTokensForCkEditor;
+};
+
+Mautic.getCKEditorFonts = function(fonts) {
+    fonts = Array.isArray(fonts) ? fonts : [];
+    const CKEditorFonts = [];
+
+    for (let i = 0; i < fonts.length; i++) {
+        if ('undefined' != typeof fonts[i].name) {
+            CKEditorFonts.push(fonts[i].name);
+        }
+    }
+
+    return CKEditorFonts;
+}
+
+Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
+    if (ckEditors.has( textarea[0] ))
+    {
+        ckEditors.get( textarea[0] ).destroy();
+        ckEditors.delete( textarea[0] )
+    }
+    const tokenCallback = textarea.attr('data-token-callback');
+    Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback));
+}
+
+Mautic.GetCkEditorConfigOptions  = function(ckEditorToolbarOptions, tokenCallback) {
+    const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
+    const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
+
+    const ckEditorOption = {
+        toolbar: {
+            items: ckEditorToolbar,
+            shouldNotGroupWhenFull: true
+        },
+        fontFamily: {
+            options: Mautic.getCKEditorFonts(mauticEditorFonts),
+            shouldNotGroupWhenFull: true
+        },
+        fontSize: {
+            options: [8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48, 72],
+            supportAllValues : true
+        },
+        link: {
+            allowCreatingEmptyLinks: true, // allow creation of empty links, as it was before the 14.x update of cke5
+            decorators: {
+                // based on: https://ckeditor.com/docs/ckeditor5/latest/features/link.html#adding-target-and-rel-attributes-to-external-links
+                openInNewTab: {
+                    mode: 'manual',
+                    label: 'Open in a new tab',
+                    attributes: {
+                        target: '_blank',
+                        rel: 'noopener noreferrer'
+                    }
+                }
+            }
+        },
+        htmlSupport: {
+            allow: [
+                {
+                    name: /^(a|span)$/,
+                    attributes: true,
+                    classes: true,
+                    styles: true
+                }
+            ],
+        },
+    };
+
+
+    mQuery.extend(ckEditorOption, {
+        autosave: {
+            save( editor ) {
+                editor.updateSourceElement();
+            }
+        }
+    });
+
+    if (ckEditorToolbar.indexOf('ckfinder') > -1)
+    {
+        mQuery.extend(ckEditorOption, {
+            ckfinder: {
+                uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor'
+            },
+            image: {
+                toolbar: [
+                    'imageResize',
+                    'imageTextAlternative',
+                    '|',
+                    'imageStyle:inline',
+                    'imageStyle:block',
+                    'imageStyle:side',
+                    '|',
+                    'linkImage'
+                ],
+            }
+        });
+    } else {
+        mQuery.extend(ckEditorOption, {
+            removePlugins: ["Image", "ImageCaption", "ImageInsert", "ImageResize", "ImageStyle", "ImageToolbar", "AutoImage", "ImageInline"]
+        });
+    }
+
+    if (ckEditorToolbar.indexOf('insertTable') > -1)
+    {
+        mQuery.extend(ckEditorOption, {
+            table: {
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells'
+                ]
+            }
+        });
+    }
+
+    if (ckEditorToolbar.indexOf('TokenPlugin') > -1)
+    {
+        const tokens = Mautic.getTokensForPlugIn(tokenCallback);
+        mQuery.extend(ckEditorOption, {
+            extraPlugins: [Mautic.MentionLinks],
+            dynamicTokenLabel: 'Insert token',
+            dynamicToken: tokens,
+            mention: {
+                feeds: [
+                    {
+                        marker: '{',
+                        feed: Mautic.getFeedItems,
+                        itemRenderer: Mautic.customItemRenderer
+                    }
+                ]
+            }
+        });
+    }
+    return ckEditorOption;
+}
+
+Mautic.InitCkEditor  = function(textarea, options) {
+    ClassicEditor
+        .create( textarea[0], options)
+        .then( editor => {
+            ckEditors.set( textarea[0], editor);
+            if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
+                editor.editing.view.document.on('change:isFocused', (evt, data, isFocused) => {
+                    Mautic.showChangeThemeWarning = isFocused;
+                });
+            }
+
+            const ckf = editor.commands.get('ckfinder');
+            if (ckf) {
+                ckf.execute = () => {
+                    const width = screen.width * 0.7;
+                    const height = screen.height * 0.7;
+                    const iLeft = (screen.width - width) / 2 ;
+                    const iTop = (screen.height - height) / 2 ;
+                    let sOptions = "toolbar=no,status=no,resizable=yes,dependent=yes" ;
+                    sOptions += ",width=" + width ;
+                    sOptions += ",height=" + height ;
+                    sOptions += ",left=" + iLeft ;
+                    sOptions += ",top=" + iTop ;
+                    const elPopup = window.open( Mautic.elfinderURL+ '?editor=ckeditor', "BrowseWindow", sOptions ) ;
+                    elPopup.addEventListener('load', function(){
+                        elPopup.editor = editor;
+                    });
+                };
+            }
+        } )
+        .catch( err => {
+            console.error( err.stack );
+        } );
+}
+
+window.document.ckEditorInsertImages = function(editor, imageUrl) {
+    const ntf = editor.plugins.get('Notification'),
+        i18 = editor.locale.t,
+        imgCmd = editor.commands.get('imageUpload');
+
+    if (!imgCmd.isEnabled) {
+        ntf.showWarning(i18('Could not insert image at the current position.'), {
+            title: i18('Inserting image failed'),
+            namespace: 'ckfinder'
+        });
+        return;
+    }
+    editor.execute('imageInsert', { source: imageUrl });
+}

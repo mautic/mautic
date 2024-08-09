@@ -1,29 +1,24 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public function __construct(
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private MessageQueueRepository $messageQueueRepository
+    ) {
+    }
+
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -32,19 +27,8 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
-    {
-        $this->addChannelMessageEvents($event);
-    }
-
-    /**
-     * @param LeadTimelineEvent $event
-     * @param                   $state
-     */
-    protected function addChannelMessageEvents(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $eventTypeKey  = 'message.queue';
         $eventTypeName = $this->translator->trans('mautic.message.queue');
@@ -59,9 +43,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
-        $messageQueueRepository = $this->em->getRepository('MauticChannelBundle:MessageQueue');
-        $logs                   = $messageQueueRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
+        $logs = $this->messageQueueRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);
@@ -83,8 +65,8 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'contentTemplate' => 'MauticChannelBundle:SubscribedEvents\Timeline:queued_messages.html.php',
-                        'icon'            => 'fa-comments-o',
+                        'contentTemplate' => '@MauticChannel/SubscribedEvents/Timeline/queued_messages.html.twig',
+                        'icon'            => 'ri-question-answer-line',
                         'contactId'       => $log['lead_id'],
                     ]
                 );

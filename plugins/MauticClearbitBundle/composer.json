@@ -1,0 +1,17 @@
+{
+    "name": "mautic/plugin-clearbit",
+    "description": "Clearbit Plugin",
+    "type": "mautic-plugin",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "integration"
+    ],
+    "extra": {
+        "install-directory-name": "MauticClearbitBundle"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "mautic/core-lib": "^5.0"
+    }
+}

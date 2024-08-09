@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/themes/smoothness/jquery-ui.min.css") }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset("#{prefix}/../../media/bundles/fmelfinder/css/elfinder.min.css") }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset("#{prefix}/../../media/bundles/fmelfinder/css/theme.css") }}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <script src="{{ asset("#{prefix}/../../media/js/libraries.js") }}"></script>
+    <script src="{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/elfinder.min.js") }}"></script>
+<script type="text/javascript" charset="utf-8">
+    var editor = null;
+
+    {# based on https://github.com/Studio-42/elFinder/wiki/Client-configuration-options-2.1#lang #}
+    {% if locale not in ['ar', 'bg', 'ca', 'cs', 'de', 'en', 'es', 'fr', 'hu', 'jp', 'nl', 'pl', 'pt_BR', 'ru', 'sk', 'zh_CN'] %}
+    {% set locale =  'en' %}
+    {% endif %}
+    jQuery().ready(function() {
+        var $f = jQuery('.elfinder').elfinder({
+            url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
+            lang : '{{locale}}',
+            i18nBaseUrl : '{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/i18n/") }}',
+            onlyMimes: {{ onlyMimes|raw }},
+            getFileCallback : function(file, fm) {
+                let fileUrl = file.url;
+                if (file.baseUrl == '' && typeof window.opener.mauticImagesPath !== 'undefined') {
+                    fileUrl = window.opener.mauticImagesPath+'/'+file.name;
+                } else if (file.baseUrl != '') {
+                    fileUrl = file.baseUrl + '' + (file.path).replace('//', '');
+                }
+
+                const editorParam = new RegExp('(?:[\?&]|&amp;)editor=([^&]+)', 'i');
+                const editorMatch = window.location.search.match(editorParam);
+                if (editorMatch && editorMatch.length > 1 && editorMatch[1] == 'ckeditor') {
+                    window.opener.document.ckEditorInsertImages(editor, fileUrl);
+                } else {
+                    window.opener.document.fileManagerInsertImageCallback('textarea.editor', fileUrl);
+                }
+
+                window.close();
+            }
+        });
+
+        {% if fullscreen %}
+        var $window = jQuery(window);
+        $window.resize(function(){
+            var $win_height = $window.height();
+            if( $f.height() != $win_height ){
+                $f.height($win_height).resize();
+            }
+        });
+        $window.resize();
+        {% endif %}
+    });
+</script>
+<div class="elfinder"></div>
+</body>
+</html>

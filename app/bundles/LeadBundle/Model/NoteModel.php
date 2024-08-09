@@ -1,74 +1,63 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
+use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class NoteModel
- * {@inheritdoc}
+ * @extends FormModel<LeadNote>
  */
 class NoteModel extends FormModel
 {
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @param Session $session
-     */
-    public function setSession(Session $session)
-    {
-        $this->session = $session;
+    public function __construct(
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private RequestStack $requestStack
+    ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getRepository()
+    public function getRepository(): LeadNoteRepository
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadNote');
+        return $this->em->getRepository(LeadNote::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:notes';
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
-     *
-     * @return null|object
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?LeadNote
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadNote();
         }
 
@@ -76,18 +65,12 @@ class NoteModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
-     *
-     * @return mixed
+     * @param string|null $action
+     * @param array       $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -97,20 +80,13 @@ class NoteModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadnote', $entity, $options);
+        return $formFactory->create(NoteType::class, $entity, $options);
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -139,7 +115,7 @@ class NoteModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -148,16 +124,18 @@ class NoteModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     * @param      $useFilters
-     *
      * @return mixed
      */
     public function getNoteCount(Lead $lead, $useFilters = false)
     {
-        $filter   = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
-        $noteType = ($useFilters) ? $this->session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
+        $filter   = ($useFilters) ? $this->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
+        $noteType = ($useFilters) ? $this->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
 
         return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType);
+    }
+
+    private function getSession(): SessionInterface
+    {
+        return $this->requestStack->getSession();
     }
 }

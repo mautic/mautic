@@ -1,45 +1,19 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
-    /**
-     * @var
-     */
-    protected $formModel;
-
-    /**
-     * TokenHelper constructor.
-     *
-     * @param FormModel $model
-     */
-    public function __construct(FormModel $formModel)
-    {
-        $this->formModel = $formModel;
+    public function __construct(
+        protected FormModel $formModel,
+        protected CorePermissions $security
+    ) {
     }
 
-    /**
-     * @param $content
-     * @param $clickthrough
-     *
-     * @return array
-     */
-    public function findFormTokens($content)
+    public function findFormTokens($content): array
     {
         $tokens = [];
 
@@ -53,18 +27,18 @@ class TokenHelper
                     continue;
                 }
                 $form = $this->formModel->getEntity($id);
-                if ($form !== null &&
-                    (
-                        $form->isPublished(false) ||
-                        $this->security->hasEntityAccess(
+                if (null !== $form
+                    && (
+                        $form->isPublished(false)
+                        || $this->security->hasEntityAccess(
                             'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form, false) :
+                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form) :
                         '';
 
-                    //pouplate get parameters
+                    // pouplate get parameters
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
 
                     $tokens[$token] = $formHtml;

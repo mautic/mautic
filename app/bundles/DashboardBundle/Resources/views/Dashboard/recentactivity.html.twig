@@ -1,0 +1,37 @@
+{% if logs is defined and logs is iterable %}
+    <div class="pt-md pr-md pb-md pl-md">
+        <ul class="media-list media-list-feed">
+            {% for log in logs %}
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <span class="figure featured {% if 'create' == log.action %}bg-success{% endif %}">
+                            <span class="fa {{ icons[log.bundle]|default('') }}"></span>
+                        </span>
+                    </div>
+                    <div class="media-body">
+                        {% if log.userId is defined and log.userId is not empty %}
+                            <a href="{{ path('mautic_user_action', {'objectAction': 'edit', 'objectId': log.userId}) }}" data-toggle="ajax">
+                                {{ log.userName }}
+                            </a>
+                        {% elseif log.userName %}
+                            {{ log.userName }}
+                        {% else %}
+                            {{ 'mautic.core.system'|trans }}
+                        {% endif %}
+                        {{ ('mautic.dashboard.'~log.action~'.past.tense')|trans }}
+
+                        {% if log.route is defined %}
+                            <a href="{{ log.route }}" data-toggle="ajax">
+                                {{ log.objectName }}
+                            </a>
+                        {% elseif log.objectName is defined %}
+                            {{ log.objectName }}
+                        {% endif %}
+                        {{ log.object }}
+                        <p class="fs-12 dark-sm"><small> {{ dateToFull(log.dateAdded) }}</small></p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

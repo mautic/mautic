@@ -1,68 +1,37 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigBuilderEvent extends Event
 {
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $forms = [];
+    private array $forms = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $formThemes = [
-        'MauticConfigBundle:FormTheme',
+    private array $formThemes = [
+        '@MauticConfig/FormTheme/_config_file_row.html.twig',
+        '@MauticConfig/FormTheme/dsn_row.html.twig',
     ];
 
     /**
-     * @var PathsHelper
+     * @var string[]
      */
-    private $pathsHelper;
+    protected array $encodedFields = [];
 
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
-
-    /**
-     * @var array
-     */
-    protected $encodedFields = [];
-
-    /**
-     * ConfigBuilderEvent constructor.
-     *
-     * @param PathsHelper  $pathsHelper
-     * @param BundleHelper $bundleHelper
-     */
-    public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
-    {
-        $this->pathsHelper  = $pathsHelper;
-        $this->bundleHelper = $bundleHelper;
+    public function __construct(
+        private BundleHelper $bundleHelper
+    ) {
     }
 
     /**
      * Set new form to the forms array.
-     *
-     * @param array $form
      *
      * @return $this
      */
@@ -81,10 +50,8 @@ class ConfigBuilderEvent extends Event
      * Remove a form to the forms array.
      *
      * @param string $formAlias
-     *
-     * @return bool
      */
-    public function removeForm($formAlias)
+    public function removeForm($formAlias): bool
     {
         if (isset($this->forms[$formAlias])) {
             unset($this->forms[$formAlias]);
@@ -116,38 +83,7 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * Helper method can load $parameters array from a config file.
-     *
-     * @param string $path (relative from the root dir)
-     *
-     * @return array
-     */
-    public function getParameters($path = null)
-    {
-        $paramsFile = $this->pathsHelper->getSystemPath('app').$path;
-
-        if (file_exists($paramsFile)) {
-            // Import the bundle configuration, $parameters is defined in this file
-            include $paramsFile;
-        }
-
-        if (!isset($parameters)) {
-            $parameters = [];
-        }
-
-        $fields     = $this->getBase64EncodedFields();
-        $checkThese = array_intersect(array_keys($parameters), $fields);
-        foreach ($checkThese as $checkMe) {
-            if (!empty($parameters[$checkMe])) {
-                $parameters[$checkMe] = base64_decode($parameters[$checkMe]);
-            }
-        }
-
-        return $parameters;
-    }
-
-    /**
-     * @param $bundle
+     * Get default parameters from config defined in bundles.
      *
      * @return array
      */
@@ -167,8 +103,6 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * @param $fields
-     *
      * @return $this
      */
     public function addFileFields($fields)

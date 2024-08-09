@@ -1,35 +1,58 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class UserListType.
+ * @extends AbstractType<array<mixed>>
  */
 class UserListType extends AbstractType
 {
-    private $choices = [];
+    /**
+     * @var array<string,int>
+     */
+    private array $choices = [];
+
+    public function __construct(
+        private UserModel $userModel
+    ) {
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults(
+            [
+                'choices'           => $this->getUserChoices(),
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'placeholder'       => 'mautic.core.form.chooseone',
+            ]
+        );
+    }
 
     /**
-     * UserListType constructor.
-     *
-     * @param UserModel $model
+     * @return string
      */
-    public function __construct(UserModel $model)
+    public function getParent()
     {
-        $choices = $model->getRepository()->getEntities(
+        return ChoiceType::class;
+    }
+
+    /**
+     * @return array<string,int>
+     */
+    private function getUserChoices(): array
+    {
+        if ($this->choices) {
+            return $this->choices;
+        }
+
+        $users = $this->userModel->getRepository()->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -43,43 +66,13 @@ class UserListType extends AbstractType
             ]
         );
 
-        foreach ($choices as $choice) {
-            $this->choices[$choice->getId()] = $choice->getName(true);
+        foreach ($users as $user) {
+            $this->choices[$user->getName(true)] = $user->getId();
         }
 
-        //sort by language
+        // sort by user name
         ksort($this->choices);
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            [
-                'choices'     => $this->choices,
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'empty_value' => 'mautic.core.form.chooseone',
-            ]
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'user_list';
-    }
-
-    /**
-     * @return string
-     */
-    public function getParent()
-    {
-        return 'choice';
+        return $this->choices;
     }
 }

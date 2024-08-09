@@ -1,0 +1,9 @@
+{
+  "version": "4.0.2",
+  "stability": "stable",
+  "minimum_php_version": "7.4.0",
+  "maximum_php_version": "8.0.99",
+  "show_php_version_warning_if_under": "7.4.0",
+  "minimum_mautic_version": "3.2.0",
+  "announcement_url": "https://github.com/mautic/mautic/releases/tag/4.0.2"
+}

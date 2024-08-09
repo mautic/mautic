@@ -1,0 +1,26 @@
+{#
+  Variables
+    - results
+    - variants
+#}
+{% set support = results.support %}
+{% set label = variants.criteria[results.basedOn].label %}
+{% set chart = barChartInitialize(support.labels) %}
+{% if support.data is defined and support.data is iterable %}
+    {% for datasetLabel, values in support.data %}
+        {% do chart.setDataset(datasetLabel, values) %}
+    {% endfor %}
+{% endif %}
+<div class="panel ovf-h bg-light-xs abtest-bar-chart">
+    <div class="panel-body box-layout">
+        <div class="col-xs-8 va-m">
+            <h5 class="text-white dark-md fw-sb mb-xs">
+                {{ label|trans }}
+            </h5>
+        </div>
+        <div class="col-xs-4 va-t text-right">
+            <h3 class="text-white dark-sm"><span class="ri-bar-chart-box-line"></span></h3>
+        </div>
+    </div>
+    {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': chart.render, 'chartType': 'bar', 'chartHeight': 300}) }}
+</div>

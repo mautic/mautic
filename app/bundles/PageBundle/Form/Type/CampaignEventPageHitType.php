@@ -1,30 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignEventPageHitType.
+ * @extends AbstractType<array<mixed>>
  */
 class CampaignEventPageHitType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('pages', 'page_list', [
+        $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.campaign.event.form.pages',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -33,7 +22,7 @@ class CampaignEventPageHitType extends AbstractType
             ],
         ]);
 
-        $builder->add('url', 'text', [
+        $builder->add('url', TextType::class, [
             'label'      => 'mautic.page.campaign.event.form.url',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
@@ -43,7 +32,7 @@ class CampaignEventPageHitType extends AbstractType
             ],
         ]);
 
-        $builder->add('referer', 'text', [
+        $builder->add('referer', TextType::class, [
             'label'      => 'mautic.page.campaign.event.form.referer',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
@@ -54,10 +43,7 @@ class CampaignEventPageHitType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_pagehit';
     }

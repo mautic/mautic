@@ -1,0 +1,50 @@
+<div class="panel-toolbar np">
+    <ul class="nav nav-tabs nav-tabs-contained">
+        <li class="active">
+            <a href="#TwitterProfile" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.profile'|trans }}
+            </a>
+        </li>
+        <li>
+            <a href="#TwitterTweets" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.twitter.tweets'|trans }}
+            </a>
+        </li>
+        <li>
+            <a href="#TwitterPhotos" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.photos'|trans }}
+            </a>
+        </li>
+        <li>
+            <a href="#TwitterTags" role="tab" data-toggle="tab">
+               {{ 'mautic.lead.lead.social.tags'|trans }}
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="np panel-body tab-content">
+    <div class="pa-20 tab-pane active" id="TwitterProfile">
+        {{ include('@MauticSocial/Integration/Twitter/Profile/profile.html.twig', {
+            'lead': lead,
+            'profile': details.profile,
+        }) }}
+    </div>
+    <div class="tab-pane" id="TwitterTweets">
+        {{ include('@MauticSocial/Integration/Twitter/Profile/tweets.html.twig', {
+            'lead': lead,
+            'activity': details.activity.tweets|default([]),
+        }) }}
+    </div>
+    <div class="pa-20 tab-pane" id="TwitterPhotos">
+        {{ include('@MauticSocial/Integration/Twitter/Profile/photos.html.twig', {
+            'lead': lead,
+             'activity': details.activity.photos|default([]),
+        }) }}
+    </div>
+    <div class="pa-20 tab-pane" id="TwitterTags">
+        {{ include('@MauticSocial/Integration/Twitter/Profile/tags.html.twig', {
+            'lead': lead,
+            'activity': details.activity.tags|default([]),
+        }) }}
+    </div>
+</div>

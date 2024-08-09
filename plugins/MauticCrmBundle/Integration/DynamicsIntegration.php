@@ -1,54 +1,41 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 class DynamicsIntegration extends CrmAbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Dynamics';
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         return 'Dynamics CRM';
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return ['push_lead', 'get_leads', 'push_leads'];
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth2';
     }
@@ -57,9 +44,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'resource'      => 'mautic.integration.dynamics.resource',
@@ -73,67 +60,60 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
         $builder->add(
             'updateBlanks',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
+                    'mautic.integrations.blanks' => 'updateBlanks',
                 ],
-                'expanded'    => true,
-                'multiple'    => true,
-                'label'       => 'mautic.integrations.form.blanks',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
+                'expanded'          => true,
+                'multiple'          => true,
+                'label'             => 'mautic.integrations.form.blanks',
+                'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => false,
+                'required'          => false,
             ]
         );
-        if ($formArea === 'features') {
+        if ('features' === $formArea) {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'contacts' => 'mautic.dynamics.object.contact',
-                        'company'  => 'mautic.dynamics.object.company',
+                        'mautic.dynamics.object.contact'  => 'contacts',
+                        'mautic.dynamics.object.company'  => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.dynamics.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.dynamics.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'placeholder'       => false,
+                    'required'          => false,
                 ]
             );
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function sortFieldsAlphabetically()
+    public function sortFieldsAlphabetically(): bool
     {
         return false;
     }
 
     /**
      * Get the array key for the auth token.
-     *
-     * @return string
      */
-    public function getAuthTokenKey()
+    public function getAuthTokenKey(): string
     {
         return 'access_token';
     }
 
     /**
      * Get the keys for the refresh token and expiry.
-     *
-     * @return array
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return ['refresh_token', 'expires_on'];
     }
@@ -146,40 +126,24 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $this->keys['resource'];
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/token';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationUrl()
+    public function getAuthenticationUrl(): string
     {
         return 'https://login.microsoftonline.com/common/oauth2/authorize';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $url = parent::getAuthLoginUrl();
-        $url .= '&resource='.urlencode($this->keys['resource']);
 
-        return $url;
+        return $url.('&resource='.urlencode($this->keys['resource']));
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param bool $inAuthorization
      */
     public function getBearerToken($inAuthorization = false)
@@ -191,30 +155,20 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function getDataPriority()
+    public function getDataPriority(): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $section
-     *
      * @return string|array
      */
     public function getFormNotes($section)
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticCrmBundle:Integration:dynamics.html.php',
+                'template'   => '@MauticCrm/Integration/dynamics.html.twig',
                 'parameters' => [
-
                 ],
             ];
         }
@@ -223,9 +177,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $lead
-     * @param $config
-     *
      * @return array
      */
     public function populateLeadData($lead, $config = [], $object = 'Contacts')
@@ -257,30 +208,28 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        return  $this->getFormFieldsByObject('contacts', $settings);
+        return $this->getFormFieldsByObject('contacts', $settings);
     }
 
     /**
      * @param array $settings
      *
-     * @return array|bool
-     *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         $dynamicsFields    = [];
-        $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = $settings['silence_exceptions'] ?? true;
         if (isset($settings['feature_settings']['objects'])) {
             $dynamicsObjects = $settings['feature_settings']['objects'];
         } else {
             $settings        = $this->settings->getFeatureSettings();
-            $dynamicsObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $dynamicsObjects = $settings['objects'] ?? ['contacts'];
         }
         try {
             if ($this->isAuthorized()) {
                 if (!empty($dynamicsObjects) && is_array($dynamicsObjects)) {
-                    foreach ($dynamicsObjects as $key => $dynamicsObject) {
+                    foreach ($dynamicsObjects as $dynamicsObject) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
@@ -291,24 +240,23 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         if (null === $leadObject || !array_key_exists('value', $leadObject)) {
                             return [];
                         }
-                        /** @var array $opts */
                         $fields = $leadObject['value'];
                         foreach ($fields as $field) {
                             $type      = 'string';
                             $fieldType = $field['AttributeTypeName']['Value'];
                             if (in_array($fieldType, [
-                                 'LookupType',
-                                 'OwnerType',
-                                 'PicklistType',
-                                 'StateType',
-                                 'StatusType',
-                                 'UniqueidentifierType',
+                                'LookupType',
+                                'OwnerType',
+                                'PicklistType',
+                                'StateType',
+                                'StatusType',
+                                'UniqueidentifierType',
                             ], true)) {
                                 continue;
                             } elseif (in_array($fieldType, [
                                 'DoubleType',
-                                 'IntegerType',
-                                 'MoneyType',
+                                'IntegerType',
+                                'MoneyType',
                             ], true)) {
                                 $type = 'int';
                             } elseif ('Boolean' === $fieldType) {
@@ -333,7 +281,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 throw $exception;
             }
 
-            return false;
+            return [];
         }
 
         return $dynamicsFields;
@@ -365,7 +313,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $object = 'contacts';
                 /** @var IntegrationEntityRepository $integrationEntityRepo */
-                $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
                 $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
                 if (!empty($integrationId)) {
                     $integrationEntityId = $integrationId[0]['integration_entity_id'];
@@ -373,10 +321,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
                     return $integrationEntityId;
                 }
-                /** @var Response $response */
+                /** @var ResponseInterface $response */
                 $response = $this->getApiHelper()->createLead($mappedData, $lead);
                 // OData-EntityId: https://clientname.crm.dynamics.com/api/data/v8.2/contacts(9844333b-c955-e711-80f1-c4346bad526c)
-                $header = $response->headers['OData-EntityId'];
+                $header = $response->getHeader('OData-EntityId');
                 if (preg_match('/contacts\((.+)\)/', $header, $out)) {
                     $id = $out[1];
                     if (empty($integrationId)) {
@@ -408,13 +356,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array      $params
-     * @param null|array $query
-     *
-     * @return int|null
+     * @param array|null $query
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts'): int
     {
-        if ('Contact' === $object) {
+        if ('Contacts' === $object) {
             $object = 'contacts';
         }
         $executed    = 0;
@@ -434,7 +380,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, '-6'));
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, -6));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -482,10 +428,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $params
-     *
-     * @return int|null
      */
-    public function getCompanies($params = [])
+    public function getCompanies($params = []): int
     {
         $executed    = 0;
         $MAX_RECORDS = 200; // Default max records is 5000
@@ -506,7 +450,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, '-6'));
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, -6));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -556,10 +500,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @param array  $data
      * @param string $object
-     *
-     * @return array
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object = null)
+    public function amendLeadDataBeforeMauticPopulate($data, $object = null): array
     {
         if ('company' === $object) {
             $object = 'accounts';
@@ -571,10 +513,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $result = [];
         if (isset($data['value'])) {
-            $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
+            $this->em->getConnection()->getConfiguration()->setMiddlewares([]);
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
-            $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+            $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
             $objects               = $data['value'];
             $integrationEntities   = [];
             /** @var array $objects */
@@ -619,7 +561,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         }
 
                         if (count($newMatchedFields)) {
-                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false);
                             $this->companyModel->saveEntity($entity, false);
                             $isModified = true;
                         }
@@ -643,7 +585,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
                         if (!empty($fieldsToUpdateInMautic)) {
-                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdateInMautic));
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
                             $newMatchedFields = $matchedFields;
@@ -735,7 +677,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
             }
 
             $integrationEntityRepo->saveEntities($integrationEntities);
-            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
             $this->em->clear();
 
             unset($integrationEntityRepo, $integrationEntities);
@@ -747,9 +688,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function pushLeads($params = [])
+    public function pushLeads($params = []): array
     {
         $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {
@@ -758,9 +699,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
         $object                = 'contacts';
         $config                = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(IntegrationEntity::class);
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
-        $leadFields            = array_unique(array_values($config['leadFields']));
+        $leadFields            = array_unique(array_values($config['leadFields'] ?? []));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
 
         if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
@@ -779,11 +720,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $availableFields         = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$object]]]);
         $fieldsToUpdate[$object] = array_values(array_intersect(array_keys($availableFields[$object]), $fieldsToUpdateInCrm));
-        $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate[$object]));
+        $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdate[$object]));
 
         $progress      = false;
-        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, false, $params['start'], $params['end'], [$object]));
-        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, false, $params['start'], $params['end']);
+        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
+        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, 0, $params['start'], $params['end']);
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -801,7 +742,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $leadsToUpdateInD    = [];
         $integrationEntities = [];
 
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'],  $object, [])[$object];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'], $object, [])[$object];
 
         if (is_array($toUpdate)) {
             $totalUpdated += count($toUpdate);
@@ -811,14 +752,14 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     $lead                       = $this->getCompoundMauticFields($lead);
                     $lead['integration_entity'] = $object;
                     $leadsToUpdateInD[$key]     = $lead;
-                    $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+                    $integrationEntity          = $this->em->getReference(IntegrationEntity::class, $lead['id']);
                     $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
                 }
             }
         }
         unset($toUpdate);
 
-        //create lead records, including deleted on D side (last_sync = null)
+        // create lead records, including deleted on D side (last_sync = null)
         /** @var array $leadsToCreate */
         $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, $totalToCreate, $params['start'], $params['end']);
         if (is_array($leadsToCreate)) {
@@ -837,13 +778,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
         if (count($integrationEntities)) {
             // Persist updated entities if applicable
             $integrationEntityRepo->saveEntities($integrationEntities);
-            $this->em->clear(IntegrationEntity::class);
+            $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
         }
 
         // update contacts
         $leadData = [];
         $rowNum   = 0;
-        foreach ($leadsToUpdateInD as $email => $lead) {
+        foreach ($leadsToUpdateInD as $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
@@ -880,10 +821,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
         // create  contacts
         $leadData = [];
         $rowNum   = 0;
-        foreach ($leadsToCreateInD as $email => $lead) {
+        foreach ($leadsToCreateInD as $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
+            }
+            if (!isset($config['leadFields']) || !is_iterable($config['leadFields'])) {
+                continue;
             }
             // Match that data with mapped lead fields
             foreach ($config['leadFields'] as $k => $v) {
@@ -920,11 +864,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $ids
-     * @param $object
+     * @param array                       $ids
      * @param IntegrationEntityRepository $integrationEntityRepo
      */
-    private function createIntegrationEntities($ids, $object, $integrationEntityRepo)
+    private function createIntegrationEntities($ids, $object, $integrationEntityRepo): void
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);
@@ -938,6 +881,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             }
         }
     }
+
     private function getExistingRecord($seachColumn, $searchValue, $object = 'contacts')
     {
         $availableFields    = $this->getAvailableLeadFields();

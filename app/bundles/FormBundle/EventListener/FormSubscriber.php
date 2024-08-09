@@ -1,68 +1,43 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
+use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MailHelper
-     */
-    protected $mailer;
+    private MailHelper $mailer;
 
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * FormSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     * @param MailHelper     $mailer
-     */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->mailer         = $mailer->getMailer();
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        MailHelper $mailer,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private LanguageHelper $languageHelper
+    ) {
+        $this->mailer = $mailer->getMailer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
@@ -77,10 +52,8 @@ class FormSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\FormEvent $event
      */
-    public function onFormPostSave(Events\FormEvent $event)
+    public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         if ($details = $event->getChanges()) {
@@ -94,14 +67,15 @@ class FormSubscriber extends CommonSubscriber
             ];
             $this->auditLogModel->writeToLog($log);
         }
+        if (!array_key_exists($form->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
+            $this->languageHelper->extractLanguagePackage($form->getLanguage());
+        }
     }
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\FormEvent $event
      */
-    public function onFormDelete(Events\FormEvent $event)
+    public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
         $log  = [
@@ -117,32 +91,28 @@ class FormSubscriber extends CommonSubscriber
 
     /**
      * Add a simple email form.
-     *
-     * @param Events\FormBuilderEvent $event
      */
-    public function onFormBuilder(Events\FormBuilderEvent $event)
+    public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
-        $action = [
+        $event->addSubmitAction('form.email', [
             'group'              => 'mautic.email.actions',
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
-            'formType'           => 'form_submitaction_sendemail',
-            'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
+            'formType'           => SubmitActionEmailType::class,
+            'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
-                'message' => 'html',
+                'message' => 'raw',
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
-        ];
+        ]);
 
-        $event->addSubmitAction('form.email', $action);
-
-        $action = [
+        $event->addSubmitAction('form.repost', [
             'group'              => 'mautic.form.actions',
             'label'              => 'mautic.form.action.repost',
             'description'        => 'mautic.form.action.repost.descr',
             'formType'           => SubmitActionRepostType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
+            'formTheme'          => '@MauticForm/FormTheme/SubmitAction/_submit_action_repost_widget.html.twig',
             'formTypeCleanMasks' => [
                 'post_url'             => 'url',
                 'failure_email'        => 'string',
@@ -150,15 +120,10 @@ class FormSubscriber extends CommonSubscriber
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
-        ];
-
-        $event->addSubmitAction('form.repost', $action);
+        ]);
     }
 
-    /**
-     * @param Events\SubmissionEvent $event
-     */
-    public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event)
+    public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.email')) {
             return;
@@ -166,32 +131,43 @@ class FormSubscriber extends CommonSubscriber
 
         // replace line brakes with <br> for textarea values
         if ($tokens = $event->getTokens()) {
-            foreach ($tokens as $token => &$value) {
-                $value = nl2br(html_entity_decode($value));
+            foreach ($tokens as &$value) {
+                $value = nl2br(html_entity_decode($value, ENT_QUOTES));
             }
+            unset($value);
         }
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
-        $leadEmail = $lead->getEmail();
+        $leadEmail = null !== $lead ? $lead->getEmail() : null;
+        $ccEmails  = $bccEmails = [];
         $emails    = $this->getEmailsFromString($config['to']);
 
-        if (!empty($emails)) {
-            $this->setMailer($config, $tokens, $emails);
+        if (isset($config['cc']) && '' !== $config['cc']) {
+            $ccEmails = $this->getEmailsFromString($config['cc']);
+            unset($config['cc']);
+        }
 
-            if (!empty($leadEmail)) {
+        if (isset($config['bcc']) && '' !== $config['bcc']) {
+            $bccEmails = $this->getEmailsFromString($config['bcc']);
+            unset($config['bcc']);
+        }
+
+        if (count($emails) > 0 || count($ccEmails) > 0 || count($bccEmails) > 0) {
+            $this->setMailer($config, $tokens, $emails, $lead);
+
+            // Check for !isset to keep BC to existing behavior prior to 2.13.0
+            if ((!isset($config['set_replyto']) || !empty($config['set_replyto'])) && !empty($leadEmail)) {
                 // Reply to lead for user convenience
                 $this->mailer->setReplyTo($leadEmail);
             }
 
-            if (!empty($config['cc'])) {
-                $emails = $this->getEmailsFromString($config['cc']);
-                $this->mailer->setCc($emails);
+            if (count($ccEmails) > 0) {
+                $this->mailer->setCc($ccEmails);
             }
 
-            if (!empty($config['bcc'])) {
-                $emails = $this->getEmailsFromString($config['bcc']);
-                $this->mailer->setBcc($emails);
+            if (count($bccEmails) > 0) {
+                $this->mailer->setBcc($bccEmails);
             }
 
             $this->mailer->send(true);
@@ -199,27 +175,21 @@ class FormSubscriber extends CommonSubscriber
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
-            $this->setMailer($config, $tokens, $leadEmail);
-
-            $this->mailer->setLead($lead->getProfileFields());
+            $this->setMailer($config, $tokens, [$leadEmail => null], $lead, false);
 
             $this->mailer->send(true);
         }
 
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && $lead->getOwner()) {
+        $owner = null !== $lead ? $lead->getOwner() : null;
+        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
             // Send copy to owner
-            $this->setMailer($config, $tokens, $lead->getOwner()->getEmail());
-
-            $this->mailer->setLead($lead->getProfileFields());
+            $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
             $this->mailer->send(true);
         }
     }
 
-    /**
-     * @param Events\SubmissionEvent $event
-     */
-    public function onFormSubmitActionRepost(Events\SubmissionEvent $event)
+    public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {
             return;
@@ -249,18 +219,22 @@ class FormSubscriber extends CommonSubscriber
             $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
 
             // Use the cleaned value by default - but if set to not save result, get from post
-            $value               = (isset($results[$field['alias']])) ? $results[$field['alias']] : $post[$field['alias']];
+            $value               = $results[$field['alias']] ?? $post[$field['alias']];
             $matchedFields[$key] = $field['alias'];
-            $payload[$key]       = $value;
+
+            // decode html chars and quotes before posting to next form
+            $payload[$key]       = html_entity_decode(htmlspecialchars_decode($value, ENT_QUOTES), ENT_QUOTES);
         }
+
+        $event->setPostSubmitPayload($payload);
 
         $headers = [
             'X-Forwarded-For' => $event->getSubmission()->getIpAddress()->getIpAddress(),
         ];
 
         if (!empty($config['authorization_header'])) {
-            if (strpos($config['authorization_header'], ':') !== false) {
-                list($key, $value) = explode(':', $config['authorization_header']);
+            if (str_contains($config['authorization_header'], ':')) {
+                [$key, $value] = explode(':', $config['authorization_header']);
             } else {
                 $key   = 'Authorization';
                 $value = $config['authorization_header'];
@@ -281,7 +255,7 @@ class FormSubscriber extends CommonSubscriber
             if ($redirect = $this->parseResponse($response, $matchedFields)) {
                 $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
-        } catch (ServerException $exception) {
+        } catch (ClientException|ServerException $exception) {
             $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {
@@ -334,9 +308,6 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param Response $response
-     * @param array    $matchedFields
-     *
      * @return bool|mixed
      */
     private function parseResponse(Response $response, array $matchedFields = [])
@@ -348,8 +319,11 @@ class FormSubscriber extends CommonSubscriber
 
         if ($json = json_decode($body, true)) {
             $body = $json;
-        } elseif ($params = parse_str($body)) {
-            $body = $params;
+        } else {
+            parse_str($body, $output);
+            if ($output) {
+                $body = $output;
+            }
         }
 
         if (is_array($body)) {
@@ -362,7 +336,6 @@ class FormSubscriber extends CommonSubscriber
                 $formViolations = $body['violations'];
 
                 // Ensure the violations match up to Mautic's
-                $violations = [];
                 foreach ($formViolations as $field => $violation) {
                     if (isset($matchedFields[$field])) {
                         $violations[$matchedFields[$field]] = $violation;
@@ -389,12 +362,7 @@ class FormSubscriber extends CommonSubscriber
         return $redirect;
     }
 
-    /**
-     * @param $post
-     *
-     * @return string
-     */
-    private function postToHtml($post)
+    private function postToHtml($post): string
     {
         $output = '<table>';
         foreach ($post as $key => $row) {
@@ -406,34 +374,38 @@ class FormSubscriber extends CommonSubscriber
             }
             $output .= '</td></tr>';
         }
-        $output .= '</table>';
 
-        return $output;
+        return $output.'</table>';
     }
 
     /**
-     * @param $emailString
-     *
-     * @return array
+     * @return array<string, null>
      */
-    private function getEmailsFromString($emailString)
+    private function getEmailsFromString($emailString): array
     {
         return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
     }
 
     /**
-     * @param array $config
-     * @param array $tokens
-     * @param       $to
+     * @param array<mixed>               $config
+     * @param array<mixed>               $tokens
+     * @param array<string, string|null> $to
      */
-    private function setMailer(array $config, array $tokens, $to)
+    private function setMailer(array $config, array $tokens, array $to, Lead $lead = null, bool $internalSend = true): void
     {
         $this->mailer->reset();
 
-        $this->mailer->setTo($to);
+        if (count($to)) {
+            $this->mailer->setTo($to);
+        }
+
         $this->mailer->setSubject($config['subject']);
         $this->mailer->addTokens($tokens);
         $this->mailer->setBody($config['message']);
         $this->mailer->parsePlainText($config['message']);
+
+        if ($lead) {
+            $this->mailer->setLead($lead->getProfileFields(), $internalSend);
+        }
     }
 }

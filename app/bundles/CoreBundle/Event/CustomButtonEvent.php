@@ -1,54 +1,24 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 class CustomButtonEvent extends AbstractCustomRequestEvent
 {
     /**
-     * Button location requested.
-     *
-     * @var
-     */
-    protected $location;
-
-    /**
      * @var array
      */
     protected $buttons = [];
 
-    /**
-     * Entity for list/view actions.
-     *
-     * @var mixed
-     */
-    protected $item;
-
-    /**
-     * CustomButtonEvent constructor.
-     *
-     * @param         $location
-     * @param Request $request
-     * @param array   $buttons
-     * @param null    $item
-     */
-    public function __construct($location, Request $request, array $buttons = [], $item = null)
-    {
+    public function __construct(
+        protected $location,
+        Request $request,
+        array $buttons = [],
+        protected $item = null
+    ) {
         parent::__construct($request);
-
-        $this->location = $location;
-        $this->item     = $item;
 
         foreach ($buttons as $button) {
             $this->buttons[$this->generateButtonKey($button)] = $button;
@@ -74,10 +44,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add an array of buttons.
      *
-     * @param array $buttons
-     * @param null  $location
-     * @param null  $route
-     *
      * @return $this
      */
     public function addButtons(array $buttons, $location = null, $route = null)
@@ -86,7 +52,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
             return $this;
         }
 
-        foreach ($buttons as $key => $button) {
+        foreach ($buttons as $button) {
             if (!isset($button['priority'])) {
                 $button['priority'] = 0;
             }
@@ -100,9 +66,8 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add a single button.
      *
-     * @param array $button
-     * @param null  $location
-     * @param null  $route
+     * @param string|null $location
+     * @param string|null $route
      *
      * @return $this
      */
@@ -121,10 +86,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this;
     }
 
-    /**
-     * @param $button
-     */
-    public function removeButton($button)
+    public function removeButton($button): void
     {
         $buttonKey = $this->generateButtonKey($button);
         if (isset($this->buttons[$buttonKey])) {
@@ -140,12 +102,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this->item;
     }
 
-    /**
-     * @param $location
-     *
-     * @return bool
-     */
-    public function checkLocationContext($location)
+    public function checkLocationContext($location): bool
     {
         if (null !== $location) {
             if ((is_array($location) && !in_array($this->location, $location)) || (is_string($location) && $location !== $this->location)) {
@@ -158,12 +115,8 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Generate a button ID that can be overridden by other plugins.
-     *
-     * @param $button
-     *
-     * @return string
      */
-    protected function generateButtonKey($button)
+    protected function generateButtonKey($button): string
     {
         $buttonKey = '';
         if (!empty($button['btnText'])) {
@@ -193,7 +146,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
         if (ButtonHelper::LOCATION_NAVBAR !== $this->location) {
             // Include the request
-            list($currentRoute, $routeParams) = $this->getRoute(true);
+            [$currentRoute, $routeParams] = $this->getRoute(true);
 
             $buttonKey .= $currentRoute;
 

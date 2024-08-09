@@ -1,72 +1,44 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private CampaignAuditService $campaignAuditService,
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
-            CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
-            CampaignEvents::CAMPAIGN_ON_BUILD    => ['onCampaignBuild', 0],
+            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
+            CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\CampaignEvent $event
      */
-    public function onCampaignPostSave(Events\CampaignEvent $event)
+    public function onCampaignPostSave(Events\CampaignEvent $event): void
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
 
-        //don't set leads
+        if ($campaign->isPublished()) {
+            $this->campaignAuditService->addWarningForUnpublishedEmails($campaign);
+        }
+
+        // don't set leads
         unset($details['leads']);
 
         if (!empty($details)) {
@@ -84,10 +56,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\CampaignEvent $event
      */
-    public function onCampaignDelete(Events\CampaignEvent $event)
+    public function onCampaignDelete(Events\CampaignEvent $event): void
     {
         $campaign = $event->getCampaign();
         $log      = [
@@ -99,25 +69,5 @@ class CampaignSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
-    }
-
-    /**
-     * Add event triggers and actions.
-     *
-     * @param Events\CampaignBuilderEvent $event
-     */
-    public function onCampaignBuild(Events\CampaignBuilderEvent $event)
-    {
-        //Add action to actually add/remove lead to a specific lists
-        $addRemoveLeadAction = [
-            'label'           => 'mautic.campaign.event.addremovelead',
-            'description'     => 'mautic.campaign.event.addremovelead_descr',
-            'formType'        => 'campaignevent_addremovelead',
-            'formTypeOptions' => [
-                'include_this' => true,
-            ],
-            'callback' => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead',
-        ];
-        $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
     }
 }

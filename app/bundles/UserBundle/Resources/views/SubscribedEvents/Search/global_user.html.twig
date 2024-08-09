@@ -1,0 +1,21 @@
+{% if showMore is defined and showMore is not empty %}
+<a href="{{ url('mautic_user_index', {'filter-user' : searchString}) }}" data-toggle="ajax">
+    <span><{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
+</a>
+{% else %}
+<div>
+    <span class="pull-left pr-xs pt-xs" style="width:36px">
+        <span class="img-wrapper img-rounded"><img src="{{ gravatarGetImage(user.getEmail(), '100') }}" /></span>
+    </span>
+    {% if canEdit %}
+        <a href="{{ url('mautic_user_action', {'objectAction' : 'edit', 'objectId' : user.getId()}) }}" data-toggle="ajax">
+            {{ user.getName(true) }}
+        </a>
+    {% else %}
+        {{ user.getName(true) }}
+    {% endif %}
+
+    <div><small>{{ user.getPosition() }}</small></div>
+    <div class="clearfix"></div>
+</div>
+{% endif %}

@@ -1,47 +1,25 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
+use Mautic\PageBundle\Form\Type\PointActionPageHitType;
+use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
+use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
-    protected $pointModel;
-
-    /**
-     * PointSubscriber constructor.
-     *
-     * @param PointModel $pointModel
-     */
-    public function __construct(PointModel $pointModel)
-    {
-        $this->pointModel = $pointModel;
+    public function __construct(
+        private PointModel $pointModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
@@ -49,17 +27,14 @@ class PointSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param PointBuilderEvent $event
-     */
-    public function onPointBuild(PointBuilderEvent $event)
+    public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
             'group'       => 'mautic.page.point.action',
             'label'       => 'mautic.page.point.action.pagehit',
             'description' => 'mautic.page.point.action.pagehit_descr',
-            'callback'    => ['\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'validatePageHit'],
-            'formType'    => 'pointaction_pagehit',
+            'callback'    => [PointActionHelper::class, 'validatePageHit'],
+            'formType'    => PointActionPageHitType::class,
         ];
 
         $event->addAction('page.hit', $action);
@@ -68,9 +43,9 @@ class PointSubscriber extends CommonSubscriber
             'group'       => 'mautic.page.point.action',
             'label'       => 'mautic.page.point.action.urlhit',
             'description' => 'mautic.page.point.action.urlhit_descr',
-            'callback'    => ['\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'validateUrlHit'],
-            'formType'    => 'pointaction_urlhit',
-            'formTheme'   => 'MauticPageBundle:FormTheme\Point',
+            'callback'    => [PointActionHelper::class, 'validateUrlHit'],
+            'formType'    => PointActionUrlHitType::class,
+            'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
         ];
 
         $event->addAction('url.hit', $action);
@@ -78,17 +53,15 @@ class PointSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for page hits.
-     *
-     * @param Events\PageHitEvent $event
      */
-    public function onPageHit(Events\PageHitEvent $event)
+    public function onPageHit(Events\PageHitEvent $event): void
     {
         if ($event->getPage()) {
             // Mautic Landing Page was hit
-            $this->pointModel->triggerAction('page.hit', $event->getHit());
+            $this->pointModel->triggerAction('page.hit', $event->getHit(), null, $event->getLead());
         } else {
             // Mautic Tracking Pixel was hit
-            $this->pointModel->triggerAction('url.hit', $event->getHit());
+            $this->pointModel->triggerAction('url.hit', $event->getHit(), null, $event->getLead());
         }
     }
 }

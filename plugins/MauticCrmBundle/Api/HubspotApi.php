@@ -4,31 +4,50 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 
+/**
+ * @property HubspotIntegration $integration
+ */
 class HubspotApi extends CrmApi
 {
-    private $module = 'contacts';
-
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
 
     protected function request($operation, $parameters = [], $method = 'GET', $object = 'contacts')
     {
-        $hapikey = $this->integration->getHubSpotApiKey();
-        $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
+        if ('oauth2' === $this->integration->getAuthenticationType()) {
+            $url     = sprintf('%s/%s/%s/', $this->integration->getApiUrl(), $object, $operation);
+        } else {
+            $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $this->integration->getHubSpotApiKey());
+        }
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
-        if (isset($request['status']) && $request['status'] == 'error') {
+        if (isset($request['status']) && 'error' == $request['status']) {
             $message = $request['message'];
             if (isset($request['validationResults'])) {
                 $message .= " \n ".print_r($request['validationResults'], true);
             }
-            if (isset($request['validationResults'][0]['error']) && $request['validationResults'][0]['error'] == 'PROPERTY_DOESNT_EXIST') {
+            if (isset($request['validationResults'][0]['error']) && 'PROPERTY_DOESNT_EXIST' == $request['validationResults'][0]['error']) {
                 $this->createProperty($request['validationResults'][0]['name']);
                 $this->request($operation, $parameters, $method, $object);
             } else {
                 throw new ApiErrorException($message);
             }
+        }
+
+        if (isset($request['error']) && 401 == $request['error']['code']) {
+            $response = json_decode($request['error']['message'] ?? null, true);
+
+            if (isset($response)) {
+                throw new ApiErrorException($response['message'], $request['error']['code']);
+            } else {
+                throw new ApiErrorException('401 Unauthorized - Error with Hubspot API', $request['error']['code']);
+            }
+        }
+
+        if (isset($request['error'])) {
+            throw new ApiErrorException($request['error']['message']);
         }
 
         return $request;
@@ -39,8 +58,8 @@ class HubspotApi extends CrmApi
      */
     public function getLeadFields($object = 'contacts')
     {
-        if ($object == 'company') {
-            $object = 'companies'; //hubspot company object name
+        if ('company' == $object) {
+            $object = 'companies'; // hubspot company object name
         }
 
         return $this->request('v2/properties', [], 'GET', $object);
@@ -48,8 +67,6 @@ class HubspotApi extends CrmApi
 
     /**
      * Creates Hubspot lead.
-     *
-     * @param array $data
      *
      * @return mixed
      */
@@ -61,9 +78,9 @@ class HubspotApi extends CrmApi
          */
         $email  = $data['email'];
         $result = [];
-        //Check if the is a valid email
+        // Check if the is a valid email
         MailHelper::validateEmail($email);
-        //Format data for request
+        // Format data for request
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
         if ($formattedLeadData) {
             $result = $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');
@@ -75,8 +92,6 @@ class HubspotApi extends CrmApi
     /**
      * gets Hubspot contact.
      *
-     * @param array $data
-     *
      * @return mixed
      */
     public function getContacts($params = [])
@@ -86,8 +101,6 @@ class HubspotApi extends CrmApi
 
     /**
      * gets Hubspot company.
-     *
-     * @param array $data
      *
      * @return mixed
      */
@@ -101,7 +114,6 @@ class HubspotApi extends CrmApi
     }
 
     /**
-     * @param        $propertyName
      * @param string $object
      *
      * @return mixed|string

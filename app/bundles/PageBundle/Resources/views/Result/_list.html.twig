@@ -1,0 +1,95 @@
+{#
+  Variables
+    - activePage
+    - items
+#}
+{% set pageId = activePage.id %}
+<div class="table-responsive table-responsive-force">
+    <table class="table table-hover pageresult-list" id="pageResultsTable">
+        <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'pageresult.' ~ pageId,
+                    'orderBy': 's.id',
+                    'text': 'mautic.form.report.submission.id',
+                    'class': 'col-pageresult-id',
+                    'filterBy': 's.id',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'pageresult.' ~ pageId,
+                    'orderBy': 's.lead_id',
+                    'text': 'mautic.lead.report.contact_id',
+                    'class': 'col-pageresult-lead-id',
+                    'filterBy': 's.lead_id',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'pageresult.' ~ pageId,
+                    'orderBy': 's.form_id',
+                    'text': 'mautic.form.report.form_id',
+                    'class': 'col-pageresult-form-id',
+                    'filterBy': 's.form_id',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'pageresult.' ~ pageId,
+                    'orderBy': 's.date_submitted',
+                    'text': 'mautic.form.result.thead.date',
+                    'class': 'col-pageresult-date',
+                    'default': true,
+                    'filterBy': 's.date_submitted',
+                    'dataToggle': 'date',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'pageresult.' ~ pageId,
+                    'orderBy': 'i.ip_address',
+                    'text': 'mautic.core.ipaddress',
+                    'class': 'col-pageresult-ip',
+                    'filterBy': 'i.ip_address',
+                }) }}
+            </tr>
+        </thead>
+        <tbody>
+        {% if items|length > 0 %}
+          {% for item in items %}
+              <tr>
+                  <td>{{ item.id|e }}</td>
+                  <td>
+                      {% if item.leadId is defined %}
+                        <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.leadId}) }}" data-toggle="ajax">
+                            {{- item.leadId|e -}}
+                        </a>
+                      {% endif %}
+                  </td>
+                  <td>
+                      {% if item.formId is defined %}
+                      <a href="{{ path('mautic_form_action', {'objectAction': 'view', 'objectId': item.formId}) }}" data-toggle="ajax">
+                          {{- item.formId|e -}}
+                      </a>
+                      {% endif %}
+                  </td>
+                  <td>{{ dateToFull(item.dateSubmitted, 'UTC') }}</td>
+                  <td>{{ item.ipAddress|e }}</td>
+              </tr>
+          {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">
+                    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+                </td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+<div class="panel-footer">
+    {{ include('@MauticCore/Helper/pagination.html.twig', {
+        'totalItems': totalCount,
+        'page': page,
+        'limit': limit,
+        'baseUrl': path('mautic_page_results', {'objectId': activePage.id}),
+        'sessionVar': 'pageresult.' ~ pageId,
+    }) }}
+</div>

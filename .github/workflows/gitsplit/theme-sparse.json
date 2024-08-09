@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-sparse",
+            "directory": "themes/sparse",
+            "target": "git@github.com:mautic/theme-sparse.git"
+        }
+    ]
+}

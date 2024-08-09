@@ -1,49 +1,29 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class FocusShowType.
+ * @extends AbstractType<array<string, mixed>>
  */
 class FocusShowType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @param RouterInterface $router
-     */
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'focus',
-            'focus_list',
+            FocusListType::class,
             [
                 'label'      => 'mautic.focus.focusitem.selectitem',
                 'label_attr' => ['class' => 'control-label'],
@@ -59,7 +39,7 @@ class FocusShowType extends AbstractType
                         ['message' => 'mautic.focus.choosefocus.notblank']
                     ),
                 ],
-                'data' => $options['data']['properties']['focus'],
+                'data' => $options['data']['focus'] ?? null,
             ]
         );
 
@@ -75,14 +55,14 @@ class FocusShowType extends AbstractType
 
             $builder->add(
                 'newFocusButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
                         'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
-                        'icon' => 'fa fa-plus',
+                        'icon' => 'ri-add-line',
                     ],
                     'label' => 'mautic.focus.show.new.item',
                 ]
@@ -101,13 +81,13 @@ class FocusShowType extends AbstractType
 
             $builder->add(
                 'editFocusButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardFocusUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
                         'disabled' => !isset($options['data']['focus']),
-                        'icon'     => 'fa fa-edit',
+                        'icon'     => 'ri-edit-line',
                     ],
                     'label' => 'mautic.focus.show.edit.item',
                 ]
@@ -115,10 +95,7 @@ class FocusShowType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined(['update_select']);
     }
@@ -126,7 +103,7 @@ class FocusShowType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focusshow_list';
     }

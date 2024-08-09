@@ -1,60 +1,30 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Event\Exception\KeyAlreadyRegisteredException;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CampaignBuilderEvent.
- */
 class CampaignBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
-    /**
-     * @var array
-     */
-    private $decisions = [];
+    private array $decisions = [];
 
-    /**
-     * @var array
-     */
-    private $conditions = [];
+    private array $conditions = [];
 
-    /**
-     * @var array
-     */
-    private $actions = [];
-
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
+    private array $actions = [];
 
     /**
      * Holds info if some property has been already sorted or not.
-     *
-     * @var array
      */
-    private $sortCache = [];
+    private array $sortCache = [];
 
-    /**
-     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
-     */
-    public function __construct($translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
 
     /**
@@ -77,13 +47,13 @@ class CampaignBuilderEvent extends Event
      *                         ]
      *                         ]
      */
-    public function addDecision($key, array $decision)
+    public function addDecision($key, array $decision): void
     {
         if (array_key_exists($key, $this->decisions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['eventName', 'callback']],
             $decision,
@@ -97,34 +67,11 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Get decisions.
-     *
      * @return mixed
      */
     public function getDecisions()
     {
         return $this->sort('decisions');
-    }
-
-    /**
-     * @deprecated - use addDecision instead
-     *
-     * @param       $key
-     * @param array $decision
-     */
-    public function addLeadDecision($key, array $decision)
-    {
-        $this->addDecision($key, $decision);
-    }
-
-    /**
-     * @deprecated - use getDecisions instead
-     *
-     * @return array
-     */
-    public function getLeadDecisions()
-    {
-        return $this->getDecisions();
     }
 
     /**
@@ -147,13 +94,13 @@ class CampaignBuilderEvent extends Event
      *                      ]
      *                      ]
      */
-    public function addCondition($key, array $event)
+    public function addCondition($key, array $event): void
     {
         if (array_key_exists($key, $this->conditions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another contact action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another contact action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
             ['label', ['eventName', 'callback']],
             $event,
@@ -177,27 +124,6 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * @deprecated use addCondition instead
-     *
-     * @param       $key
-     * @param array $event
-     */
-    public function addLeadCondition($key, array $event)
-    {
-        $this->addCondition($key, $event);
-    }
-
-    /**
-     * @deprecated use getConditions() instead
-     *
-     * @return array
-     */
-    public function getLeadConditions()
-    {
-        return $this->getConditions();
-    }
-
-    /**
      * Add an action to the list of available .
      *
      * @param string $key    a unique identifier; it is recommended that it be namespaced i.e. lead.action
@@ -218,20 +144,20 @@ class CampaignBuilderEvent extends Event
      *                       ]
      *                       ]
      */
-    public function addAction($key, array $action)
+    public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new KeyAlreadyRegisteredException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['label', ['eventName', 'callback']],
+            ['label', ['batchEventName', 'eventName', 'callback']],
             $action,
             ['callback']
         );
 
-        //translate the group
+        // translate the group
         $action['label']       = $this->translator->trans($action['label']);
         $action['description'] = (isset($action['description'])) ? $this->translator->trans($action['description']) : '';
 
@@ -260,12 +186,10 @@ class CampaignBuilderEvent extends Event
         if (empty($this->sortCache[$property])) {
             uasort(
                 $this->{$property},
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
+                fn ($a, $b): int => strnatcasecmp(
+                    $a['label'],
+                    $b['label']
+                )
             );
             $this->sortCache[$property] = true;
         }

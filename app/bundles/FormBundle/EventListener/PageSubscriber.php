@@ -1,49 +1,30 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
-    private $formRegex = '{form=(.*?)}';
+    private string $formRegex = '{form=(.*?)}';
 
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * PageSubscriber constructor.
-     *
-     * @param FormModel $formModel
-     */
-    public function __construct(FormModel $formModel)
-    {
-        $this->formModel = $formModel;
+    public function __construct(
+        private FormModel $formModel,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private TranslatorInterface $translator,
+        private CorePermissions $security
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
@@ -53,31 +34,26 @@ class PageSubscriber extends CommonSubscriber
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param PageBuilderEvent $event
      */
-    public function onPageBuild(PageBuilderEvent $event)
+    public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
-            //add AB Test Winner Criteria
+            // add AB Test Winner Criteria
             $formSubmissions = [
                 'group'    => 'mautic.form.abtest.criteria',
                 'label'    => 'mautic.form.abtest.criteria.submissions',
-                'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner',
+                'event'    => FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
         }
 
         if ($event->tokensRequested($this->formRegex)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('form');
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name');
         }
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
         $page    = $event->getPage();
@@ -86,12 +62,12 @@ class PageSubscriber extends CommonSubscriber
         preg_match_all($regex, $content, $matches);
 
         if (count($matches[0])) {
-            foreach ($matches[1] as $k => $id) {
+            foreach ($matches[1] as $id) {
                 $form = $this->formModel->getEntity($id);
-                if ($form !== null &&
-                    (
-                        $form->isPublished(false) ||
-                        $this->security->hasEntityAccess(
+                if (null !== $form
+                    && (
+                        $form->isPublished(false)
+                        || $this->security->hasEntityAccess(
                             'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
                         )
                     )
@@ -101,16 +77,15 @@ class PageSubscriber extends CommonSubscriber
                         $this->translator->trans('mautic.form.form.pagetoken.notpublished').
                         '</div>';
 
-                    //add the hidden page input
+                    // add the hidden page input
                     $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";
                     $formHtml  = preg_replace('#</form>#', $pageInput.'</form>', $formHtml);
 
-                    //pouplate get parameters
+                    // pouplate get parameters
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
-
-                    $content = preg_replace('#{form='.$id.'}#', $formHtml, $content);
+                    $content = str_replace('{form='.$id.'}', $formHtml, $content);
                 } else {
-                    $content = preg_replace('#{form='.$id.'}#', '', $content);
+                    $content = str_replace('{form='.$id.'}', '', $content);
                 }
             }
         }

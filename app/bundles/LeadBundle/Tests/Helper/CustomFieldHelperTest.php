@@ -1,21 +1,13 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
-class CustomFieldHelperTest extends \PHPUnit_Framework_TestCase
+class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testFixValueTypeForBooleans()
+    public function testFixValueTypeForBooleans(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, null));
         $this->assertTrue(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, 1));
@@ -27,7 +19,7 @@ class CustomFieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, 0));
     }
 
-    public function testFixValueTypeForNumbers()
+    public function testFixValueTypeForNumbers(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_NUMBER, null));
         $this->assertEquals(1, CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_NUMBER, 1));
@@ -38,7 +30,7 @@ class CustomFieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_NUMBER, '0'));
     }
 
-    public function testFixValueTypeForSelect()
+    public function testFixValueTypeForSelect(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, null));
         $this->assertEquals('1', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, true));
@@ -46,5 +38,133 @@ class CustomFieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, 1));
         $this->assertEquals('1', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, '1'));
         $this->assertEquals('one', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, 'one'));
+    }
+
+    public function testFieldsValuesTransformerWithoutRelativesDates(): void
+    {
+        $values = [
+            'customdate'         => '2020-11-01',
+            'customdatetime'     => '2020-11-02 23:59:00',
+            'customtime'         => '23:59:00',
+            'customnulldatetime' => null,
+        ];
+
+        $fields = [
+            'customdate'         => [
+                'type' => 'date',
+            ],
+            'customdatetime'     => [
+                'type' => 'datetime',
+            ],
+            'customtime'         => [
+                'type' => 'time',
+            ],
+            'customnulldatetime' => [
+                'type' => 'datetime',
+            ],
+        ];
+
+        $this->assertSame($values, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
+    }
+
+    public function testFieldsValuesTransformerWithRelativesDates(): void
+    {
+        $values = [
+            'customdate'         => '-1 day',
+            'customdatetime'     => '-1 day',
+            'customtime'         => '-20 minutes',
+            'customnulldatetime' => null,
+        ];
+
+        $fields = [
+            'customdate'         => [
+                'type' => 'date',
+            ],
+            'customdatetime'     => [
+                'type' => 'datetime',
+            ],
+            'customtime'         => [
+                'type' => 'time',
+            ],
+            'customnulldatetime' => [
+                'type' => 'datetime',
+            ],
+        ];
+
+        $expected = [
+            'customdate'         => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d'),
+            'customdatetime'     => (new DateTimeHelper('-1 day'))->toLocalString('Y-m-d H:i:s'),
+            'customtime'         => (new DateTimeHelper('-20 minutes'))->toLocalString('H:i:s'),
+            'customnulldatetime' => null,
+        ];
+
+        $this->assertSame($expected, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
+    }
+
+    public function testFieldsValuesWithNullsOrEmptyStringsAreNotTransformedToRelativesDates(): void
+    {
+        $values = [
+            'customdate'        => null,
+            'customdatetime'    => null,
+            'customtime'        => null,
+            'customemptystring' => '',
+        ];
+
+        $fields = [
+            'customdate'        => [
+                'type' => 'date',
+            ],
+            'customdatetime'    => [
+                'type' => 'datetime',
+            ],
+            'customtime'        => [
+                'type' => 'time',
+            ],
+            'customemptystring' => [
+                'type' => 'datetime',
+            ],
+        ];
+
+        $expected = [
+            'customdate'        => null,
+            'customdatetime'    => null,
+            'customtime'        => null,
+            'customemptystring' => null,
+        ];
+
+        $this->assertSame($expected, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
+    }
+
+    public function testFieldsValuesTransformerForDifferingValueTypes(): void
+    {
+        $fields = [
+            'select'      => [
+                'type' => 'select',
+            ],
+            'multiselect' => [
+                'type' => 'multiselect',
+            ],
+            'number'      => [
+                'type' => 'number',
+            ],
+            'string'      => [
+                'type' => 'text',
+            ],
+            'boolean'     => [
+                'type' => 'boolean',
+            ],
+        ];
+
+        $values = [
+            'select'      => 'string',
+            'multiselect' => [
+                'array',
+            ],
+            'number'      => 100,
+            'string'      => 'string',
+            'boolean'     => 0,
+        ];
+
+        $this->assertSame($values, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
     }
 }

@@ -1,29 +1,19 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
     // Used for querying stats
-    const TYPE_FORM         = 'submission';
-    const TYPE_CLICK        = 'click';
-    const TYPE_NOTIFICATION = 'view';
+    public const TYPE_FORM         = 'submission';
+
+    public const TYPE_CLICK        = 'click';
+
+    public const TYPE_NOTIFICATION = 'view';
 
     /**
      * @var int
@@ -41,29 +31,26 @@ class Stat
     private $type;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $typeId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var
+     * @var ?Lead
      */
     private $lead;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('focus_stats')
-            ->setCustomRepositoryClass('MauticPlugin\MauticFocusBundle\Entity\StatRepository')
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['type'], 'focus_type')
             ->addIndex(['type', 'type_id'], 'focus_type_id')
             ->addIndex(['date_added'], 'focus_date_added');
@@ -172,7 +159,7 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return ?Lead
      */
     public function getLead()
     {
@@ -180,8 +167,6 @@ class Stat
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return Stat
      */
     public function setLead(Lead $lead)

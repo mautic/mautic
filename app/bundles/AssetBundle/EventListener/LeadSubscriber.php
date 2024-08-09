@@ -1,47 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class AssetBundle.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetModel
-     */
-    protected $assetModel;
-
-    /**
-     * LeadSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
-     */
-    public function __construct(AssetModel $assetModel)
-    {
-        $this->assetModel = $assetModel;
+    public function __construct(
+        private AssetModel $assetModel,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private DownloadRepository $downloadRepository
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -52,10 +33,8 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey  = 'asset.download';
@@ -68,15 +47,12 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
-        $downloadRepository = $this->em->getRepository('MauticAssetBundle:Download');
-        $downloads          = $downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
+        $downloads = $this->downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $downloads);
 
         if (!$event->isEngagementCount()) {
-
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
                 $asset = $this->assetModel->getEntity($download['asset_id']);
@@ -94,8 +70,8 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'eventType'       => $eventTypeName,
                         'timestamp'       => $download['dateDownload'],
-                        'icon'            => 'fa-download',
-                        'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
+                        'icon'            => 'ri-download-line',
+                        'contentTemplate' => '@MauticAsset/SubscribedEvents/Timeline/index.html.twig',
                         'contactId'       => $download['lead_id'],
                     ]
                 );
@@ -103,10 +79,7 @@ class LeadSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadChangeEvent $event
-     */
-    public function onLeadChange(LeadChangeEvent $event)
+    public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
             $event->getNewLead()->getId(),
@@ -115,10 +88,7 @@ class LeadSubscriber extends CommonSubscriber
         );
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }

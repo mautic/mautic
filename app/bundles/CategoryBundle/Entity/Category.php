@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -18,9 +9,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Category.
- */
 class Category extends FormEntity
 {
     /**
@@ -34,7 +22,7 @@ class Category extends FormEntity
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -44,7 +32,7 @@ class Category extends FormEntity
     private $alias;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $color;
 
@@ -53,15 +41,12 @@ class Category extends FormEntity
      */
     private $bundle;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('categories')
-            ->setCustomRepositoryClass('Mautic\CategoryBundle\Entity\CategoryRepository')
+            ->setCustomRepositoryClass(CategoryRepository::class)
             ->addIndex(['alias'], 'category_alias_search');
 
         $builder->addIdColumns('title');
@@ -78,10 +63,7 @@ class Category extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'title',
@@ -104,10 +86,8 @@ class Category extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('category')
             ->addListProperties(
@@ -149,6 +129,7 @@ class Category extends FormEntity
      */
     public function setTitle($title)
     {
+        $this->isChanged('title', $title);
         $this->title = $title;
 
         return $this;
@@ -173,6 +154,7 @@ class Category extends FormEntity
      */
     public function setAlias($alias)
     {
+        $this->isChanged('alias', $alias);
         $this->alias = $alias;
 
         return $this;
@@ -197,6 +179,7 @@ class Category extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -213,14 +196,11 @@ class Category extends FormEntity
     }
 
     /**
-     * Set color.
-     *
      * @param string $color
-     *
-     * @return Category
      */
-    public function setColor($color)
+    public function setColor($color): void
     {
+        $this->isChanged('color', $color);
         $this->color = $color;
     }
 
@@ -238,11 +218,10 @@ class Category extends FormEntity
      * Set bundle.
      *
      * @param string $bundle
-     *
-     * @return Category
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): void
     {
+        $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;
     }
 

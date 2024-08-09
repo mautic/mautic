@@ -1,34 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
-use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
+use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class WebhookSubscriber.
- */
-class WebhookSubscriber extends CommonSubscriber
+class WebhookSubscriber implements EventSubscriberInterface
 {
-    use WebhookModelTrait;
+    public function __construct(
+        private WebhookModel $webhookModel
+    ) {
+    }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
@@ -38,10 +26,8 @@ class WebhookSubscriber extends CommonSubscriber
 
     /**
      * Add event triggers and actions.
-     *
-     * @param WebhookBuilderEvent $event
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
         $formSubmit = [
@@ -53,10 +39,7 @@ class WebhookSubscriber extends CommonSubscriber
         $event->addEvent(FormEvents::FORM_ON_SUBMIT, $formSubmit);
     }
 
-    /**
-     * @param SubmissionEvent $event
-     */
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             FormEvents::FORM_ON_SUBMIT,

@@ -1,0 +1,17 @@
+{
+    "name": "mautic/plugin-zapier",
+    "description": "Zapier Plugin",
+    "type": "mautic-plugin",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "integration"
+    ],
+    "extra": {
+        "install-directory-name": "MauticZapierBundle"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "mautic/core-lib": "^5.0"
+    }
+}

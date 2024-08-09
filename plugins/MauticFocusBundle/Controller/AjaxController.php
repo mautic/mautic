@@ -1,91 +1,131 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * This method produces HTTP request checking headers which are blocking availability for iframe inheritance for other pages.
      */
-    protected function getWebsiteSnapshotAction(Request $request)
+    public function checkIframeAvailabilityAction(Request $request, IframeAvailabilityChecker $availabilityChecker): JsonResponse
     {
-        $data = ['success' => 0];
+        $url = $request->query->get('website');
 
-        if ($this->get('mautic.security')->isGranted('plugin:focus:items:create')) {
-            $website = InputHelper::url($request->request->get('website'));
-
-            if ($website) {
-                // Let's try to extract colors from image
-                $id = InputHelper::int($request->request->get('id'));
-                if (!empty($id)) {
-                    // Tell the JS to not populate with default colors
-                    $data['ignoreDefaultColors'] = true;
-                }
-
-                $snapshotUrl = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_url');
-                $snapshotKey = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_key');
-
-                $http     = $this->get('mautic.http.connector');
-                $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);
-
-                if ($response->code === 200) {
-                    $package = json_decode($response->body, true);
-                    if (isset($package['images'])) {
-                        $data['image']['desktop'] = $package['images']['desktop'];
-                        $data['image']['mobile']  = $package['images']['mobile'];
-                        $palette                  = $package['palette'];
-                        $data['colors']           = [
-                            'primaryColor'    => $palette[0],
-                            'textColor'       => FocusModel::isLightColor($palette[0]) ? '#000000' : '#ffffff',
-                            'buttonColor'     => $palette[1],
-                            'buttonTextColor' => FocusModel::isLightColor($palette[1]) ? '#000000' : '#ffffff',
-                        ];
-                        $data['success'] = 1;
-                    }
-                }
-            }
-        }
-
-        return $this->sendJsonResponse($data);
+        return $availabilityChecker->check($url, $request->getScheme());
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function generatePreviewAction(Request $request)
+    public function generatePreviewAction(Request $request): JsonResponse
     {
-        $data  = ['html' => '', 'style' => ''];
-        $focus = $request->request->all();
+        $responseContent  = ['html' => '', 'style' => ''];
+        $focus            = $request->request->all();
 
         if (isset($focus['focus'])) {
             $focusArray = InputHelper::_($focus['focus']);
 
             if (!empty($focusArray['style']) && !empty($focusArray['type'])) {
-                /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
-                $model            = $this->getModel('focus');
-                $focusArray['id'] = 'preview';
-                $data['html']     = $model->getContent($focusArray, true);
+                /** @var FocusModel $model */
+                $model                    = $this->getModel('focus');
+                $focusArray['id']         = 'preview';
+                $responseContent['html']  = $model->getContent($focusArray, true);
+                $responseContent['style'] = $focusArray['style']; // Required by JS in response
             }
         }
 
-        return $this->sendJsonResponse($data);
+        return $this->sendJsonResponse($responseContent);
+    }
+
+    public function getViewsCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    {
+        $focusId = (int) InputHelper::clean($request->query->get('focusId'));
+
+        if (0 === $focusId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $cacheProvider->getItem('focus.viewsCount.'.$focusId);
+
+        if ($cacheItem->isHit()) {
+            $cacheItemValue   = $cacheItem->get();
+            $viewsCount       = $cacheItemValue['views'];
+            $uniqueViewsCount = $cacheItemValue['uniqueViews'];
+        } else {
+            /** @var FocusModel $model */
+            $model   = $this->getModel('focus');
+
+            $focus = $model->getEntity($focusId);
+            if (null === $focus) {
+                return $this->sendJsonResponse([
+                    'success' => 0,
+                    'message' => $this->translator->trans('mautic.api.call.notfound'),
+                ], 404);
+            }
+            $viewsCount       = $model->getViewsCount($focus);
+            $uniqueViewsCount = $model->getUniqueViewsCount($focus);
+            $cacheItem->set([
+                'views'       => $viewsCount,
+                'uniqueViews' => $uniqueViewsCount,
+            ]);
+            $cacheItem->tag("focus.{$focusId}");
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $cacheProvider->save($cacheItem);
+        }
+
+        return $this->sendJsonResponse([
+            'success'     => 1,
+            'views'       => $viewsCount,
+            'uniqueViews' => $uniqueViewsCount,
+        ]);
+    }
+
+    public function getClickThroughCountAction(Request $request, CacheProvider $cacheProvider): JsonResponse
+    {
+        $focusId = (int) InputHelper::clean($request->query->get('focusId'));
+
+        if (0 === $focusId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $cacheProvider->getItem('focus.clickThroughCount.'.$focusId);
+
+        if ($cacheItem->isHit()) {
+            $clickThroughCount = $cacheItem->get();
+        } else {
+            /** @var FocusModel $model */
+            $model   = $this->getModel('focus');
+
+            $focus = $model->getEntity($focusId);
+            if (null === $focus) {
+                return $this->sendJsonResponse([
+                    'success' => 0,
+                    'message' => $this->translator->trans('mautic.api.call.notfound'),
+                ], 404);
+            }
+            $clickThroughCount = $model->getClickThroughCount($focus);
+            $cacheItem->set($clickThroughCount);
+            $cacheItem->tag("focus.{$focusId}");
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $cacheProvider->save($cacheItem);
+        }
+
+        return $this->sendJsonResponse([
+            'success'        => 1,
+            'clickThrough'   => $clickThroughCount,
+        ]);
     }
 }

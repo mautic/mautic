@@ -1,56 +1,29 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TweetListType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ChannelSubscriber.
- */
-class ChannelSubscriber extends CommonSubscriber
+class ChannelSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $helper;
-
-    /**
-     * ChannelSubscriber constructor.
-     *
-     * @param IntegrationHelper $helper
-     */
-    public function __construct(IntegrationHelper $helper)
-    {
-        $this->helper = $helper;
+    public function __construct(
+        private IntegrationHelper $helper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::ADD_CHANNEL => ['onAddChannel', 80],
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
-    public function onAddChannel(ChannelEvent $event)
+    public function onAddChannel(ChannelEvent $event): void
     {
         $integration = $this->helper->getIntegrationObject('Twitter');
         if ($integration && $integration->getIntegrationSettings()->isPublished()) {
@@ -64,7 +37,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'tweet_list',
+                        'lookupFormType' => TweetListType::class,
                         'repository'     => 'MauticSocialBundle:Tweet',
                     ],
                 ]

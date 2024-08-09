@@ -1,33 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\PluginEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -35,38 +21,38 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
-            'formType'    => 'integration_list',
-            'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
+            'formType'    => IntegrationsListType::class,
+            'formTheme'   => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
             'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
 
         $event->addAction('plugin.leadpush', $action);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     *
-     * @return $this
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
-        $config  = $event->getConfig();
-        $lead    = $event->getLead();
-        $errors  = [];
-        $success = $this->pushToIntegration($config, $lead, $errors);
+        $config                  = $event->getConfig();
+        $config['campaignEvent'] = $event->getEvent();
+        $config['leadEventLog']  = $event->getLogEntry();
+        $lead                    = $event->getLead();
+        $errors                  = [];
+        $success                 = $this->pushToIntegration($config, $lead, $errors);
 
         if (count($errors)) {
-            $event->setFailed(implode('<br />', $errors));
+            $log = $event->getLogEntry();
+            $log->appendToMetadata(
+                [
+                    'failed' => 1,
+                    'reason' => implode('<br />', $errors),
+                ]
+            );
         }
 
-        return $event->setResult($success);
+        $event->setResult($success);
     }
 }

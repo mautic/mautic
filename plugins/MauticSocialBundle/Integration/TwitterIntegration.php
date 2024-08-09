@@ -1,51 +1,29 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Mautic\CoreBundle\Helper\EmojiHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
-/**
- * Class TwitterIntegration.
- */
 class TwitterIntegration extends SocialIntegration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public const NAME = 'Twitter';
+
+    public function getName(): string
     {
-        return 'Twitter';
+        return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 5000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifierFields()
+    public function getIdentifierFields(): string
     {
         return 'twitter';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'public_profile',
@@ -55,18 +33,12 @@ class TwitterIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAccessTokenUrl()
+    public function getAccessTokenUrl(): string
     {
         return 'https://api.twitter.com/oauth/access_token';
     }
 
-    /**
-     * @return string
-     */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $url = 'https://api.twitter.com/oauth/authorize';
 
@@ -80,62 +52,39 @@ class TwitterIntegration extends SocialIntegration
         return $url;
     }
 
-    /**
-     * @return string
-     */
-    public function getRequestTokenUrl()
+    public function getRequestTokenUrl(): string
     {
         return 'https://api.twitter.com/oauth/request_token';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'oauth1a';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param $url
-     * @param $parameters
-     * @param $method
-     * @param $settings
-     * @param $authType
-     */
     public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
         // Prevent SSL issues
         $settings['ssl_verifypeer'] = false;
 
-        if (empty($settings['authorize_session']) && $authType != 'access_token') {
+        if (empty($settings['authorize_session']) && 'access_token' != $authType) {
             // Twitter requires oauth_token_secret to be part of composite key
             if (isset($this->keys['oauth_token_secret'])) {
                 $settings['token_secret'] = $this->keys['oauth_token_secret'];
             }
 
-            //Twitter also requires double encoding of parameters in building base string
+            // Twitter also requires double encoding of parameters in building base string
             $settings['double_encode_basestring_parameters'] = true;
         }
 
         return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
-    /**
-     * @param $endpoint
-     *
-     * @return string
-     */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint): string
     {
         return "https://api.twitter.com/1.1/$endpoint.json";
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUserData($identifier, &$socialCache)
     {
         $accessToken = $this->getContactAccessToken($socialCache);
@@ -175,7 +124,7 @@ class TwitterIntegration extends SocialIntegration
 
             $info                  = $this->matchUpData($data);
             $info['profileHandle'] = $data['screen_name'];
-            //remove the size variant
+            // remove the size variant
             $image                = $data['profile_image_url_https'];
             $image                = str_replace(['_normal', '_bigger', '_mini'], '', $image);
             $info['profileImage'] = $image;
@@ -189,10 +138,7 @@ class TwitterIntegration extends SocialIntegration
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity($identifier, &$socialCache): void
     {
         if (!isset($socialCache['id'])) {
             $this->getUserData($identifier, $socialCache);
@@ -204,7 +150,7 @@ class TwitterIntegration extends SocialIntegration
 
         $id = $socialCache['id'];
 
-        //due to the way Twitter filters, get more than 10 tweets
+        // due to the way Twitter filters, get more than 10 tweets
         $data = $this->makeRequest($this->getApiUrl('/statuses/user_timeline'), [
             'user_id'         => $id,
             'exclude_replies' => 'true',
@@ -221,12 +167,12 @@ class TwitterIntegration extends SocialIntegration
             ];
 
             foreach ($data as $k => $d) {
-                if ($k == 10) {
+                if (10 == $k) {
                     break;
                 }
 
                 $tweet = [
-                    'tweet'       => EmojiHelper::toHtml($d['text']),
+                    'tweet'       => $d['text'],
                     'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
                     'coordinates' => $d['coordinates'],
                     'published'   => $d['created_at'],
@@ -234,12 +180,12 @@ class TwitterIntegration extends SocialIntegration
 
                 $socialCache['activity']['tweets'][] = $tweet;
 
-                //images
+                // images
                 if (isset($d['entities']['media'])) {
                     foreach ($d['entities']['media'] as $m) {
-                        if ($m['type'] == 'photo') {
+                        if ('photo' == $m['type']) {
                             $photo = [
-                                'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url']),
+                                'url' => ($m['media_url_https'] ?? $m['media_url']),
                             ];
 
                             $socialCache['activity']['photos'][] = $photo;
@@ -247,7 +193,7 @@ class TwitterIntegration extends SocialIntegration
                     }
                 }
 
-                //hastags
+                // hastags
                 if (isset($d['entities']['hashtags'])) {
                     foreach ($d['entities']['hashtags'] as $h) {
                         if (isset($socialCache['activity']['tags'][$h['text']])) {
@@ -264,10 +210,7 @@ class TwitterIntegration extends SocialIntegration
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = []): array
     {
         return [
             'profileHandle' => ['type' => 'string'],
@@ -281,15 +224,12 @@ class TwitterIntegration extends SocialIntegration
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function cleanIdentifier($identifier)
+    public function cleanIdentifier($identifier): string
     {
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
-            //extract the handle
+            // extract the handle
             $identifier = $match[1];
-        } elseif (substr($identifier, 0, 1) == '@') {
+        } elseif (str_starts_with($identifier, '@')) {
             $identifier = substr($identifier, 1);
         }
 
@@ -297,8 +237,6 @@ class TwitterIntegration extends SocialIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param string $data
      * @param bool   $postAuthorization
      *
@@ -313,5 +251,10 @@ class TwitterIntegration extends SocialIntegration
         }
 
         return json_decode($data, true);
+    }
+
+    public function getFormType(): string
+    {
+        return TwitterType::class;
     }
 }

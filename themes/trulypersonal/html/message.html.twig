@@ -1,0 +1,12 @@
+{% extends "@themes/"~template~"/html/base.html.twig" %}
+{% block stylesheets %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" />
+{% endblock %}
+{% block content %}
+    <div>
+        {{ message|raw }}
+        {% if content is defined %}
+        <div>{{ content|raw }}</div>
+        {% endif %}
+    </div>
+{% endblock %}

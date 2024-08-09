@@ -1,63 +1,82 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Field\Helper\IndexHelper;
+use Mautic\LeadBundle\Field\IdentifierFields;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\IsFalse;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Class FieldType.
+ * @extends AbstractType<LeadField>
  */
 class FieldType extends AbstractType
 {
-    private $translator;
-    private $em;
+    /**
+     * For which types will be character limits applicable.
+     *
+     * @var array<string>
+     */
+    private array $indexableFieldsWithLimits = [
+        'text',
+        'select',
+        'phone',
+        'url',
+        'email',
+    ];
 
     /**
-     * @param MauticFactory $factory
+     * @var string[]
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
+    private static array $fieldsWithNoLengthLimit = [
+        'textarea',
+        'html',
+    ];
+
+    public function __construct(
+        private EntityManagerInterface $em,
+        private Translator $translator,
+        private IdentifierFields $identifierFields,
+        private IndexHelper $indexHelper,
+    ) {
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
 
         $builder->add(
             'label',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.lead.field.label',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'length' => 50],
+                'attr'       => ['class' => 'form-control', 'length' => 191],
             ]
         );
 
@@ -65,13 +84,13 @@ class FieldType extends AbstractType
 
         $builder->add(
             'group',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
-                    'core'         => 'mautic.lead.field.group.core',
-                    'social'       => 'mautic.lead.field.group.social',
-                    'personal'     => 'mautic.lead.field.group.personal',
-                    'professional' => 'mautic.lead.field.group.professional',
+                    'mautic.lead.field.group.core'         => 'core',
+                    'mautic.lead.field.group.social'       => 'social',
+                    'mautic.lead.field.group.personal'     => 'personal',
+                    'mautic.lead.field.group.professional' => 'professional',
                 ],
                 'attr' => [
                     'class'   => 'form-control',
@@ -80,26 +99,28 @@ class FieldType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.group',
-                'empty_value' => false,
+                'placeholder' => false,
                 'required'    => false,
                 'disabled'    => $disabled,
             ]
         );
 
-        $new         = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
+        $new         = $options['data']->getId() ? false : true;
         $type        = $options['data']->getType();
+        $isIndex     = $options['data']->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
+
         $builder->add(
             'type',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'     => $fieldHelper->getChoiceList(),
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.type',
-                'empty_value' => false,
+                'placeholder' => false,
                 'disabled'    => ($disabled || !$new),
                 'attr'        => [
                     'class'    => 'form-control',
@@ -112,7 +133,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'properties_select_template',
-            'sortablelist',
+            SortableListType::class,
             [
                 'mapped'          => false,
                 'label'           => 'mautic.lead.field.form.properties.select',
@@ -123,7 +144,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'properties_lookup_template',
-            'sortablelist',
+            SortableListType::class,
             [
                 'mapped'          => false,
                 'label'           => 'mautic.lead.field.form.properties.select',
@@ -132,18 +153,30 @@ class FieldType extends AbstractType
             ]
         );
 
-        $listChoices = [
-            'country'  => FormFieldHelper::getCountryChoices(),
-            'region'   => FormFieldHelper::getRegionChoices(),
-            'timezone' => FormFieldHelper::getTimezonesChoices(),
-            'locale'   => FormFieldHelper::getLocaleChoices(),
-            'select'   => [],
-        ];
+        $builder->add(
+            'properties_textarea_template',
+            YesNoButtonGroupType::class,
+            [
+                'label'       => 'mautic.lead.field.form.properties.allowhtml',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'mapped'      => false,
+                'data'        => $options['data']->getProperties()['allowHtml'] ?? false,
+            ]
+        );
 
+        $listChoices = [
+            'country'       => FormFieldHelper::getCountryChoices(),
+            'region'        => FormFieldHelper::getRegionChoices(),
+            'timezone'      => FormFieldHelper::getTimezonesChoices(),
+            'locale'        => FormFieldHelper::getLocaleChoices(),
+            'select'        => [],
+        ];
         foreach ($listChoices as $listType => $choices) {
             $builder->add(
                 'default_template_'.$listType,
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'    => $choices,
                     'label'      => 'mautic.core.defaultvalue',
@@ -157,7 +190,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'default_template_text',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -169,7 +202,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'default_template_textarea',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -181,7 +214,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'default_template_boolean',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.core.defaultvalue',
                 'label_attr'  => ['class' => 'control-label'],
@@ -189,13 +222,13 @@ class FieldType extends AbstractType
                 'required'    => false,
                 'mapped'      => false,
                 'data'        => '',
-                'empty_value' => ' x ',
+                'placeholder' => ' x ',
             ]
         );
 
         $builder->add(
             'properties',
-            'collection',
+            CollectionType::class,
             [
                 'required'       => false,
                 'allow_add'      => true,
@@ -203,9 +236,10 @@ class FieldType extends AbstractType
             ]
         );
 
+        $disableDefaultValue = (!$new && in_array($options['data']->getAlias(), $this->identifierFields->getFieldList($options['data']->getObject())));
         $builder->add(
             'defaultValue',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -213,46 +247,67 @@ class FieldType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.field.help.defaultvalue',
                 ],
-                'required' => false,
+                'required'    => false,
+                'disabled'    => $disableDefaultValue,
+                'constraints' => [
+                    new Assert\Callback([$this, 'validateDefaultValue']),
+                ],
             ]
         );
 
-        $formModifier = function (FormEvent $event) use ($listChoices) {
-            $form = $event->getForm();
-            $data = $event->getData();
-            $type = (is_array($data)) ? (isset($data['type']) ? $data['type'] : null) : $data->getType();
+        /**
+         * @see FormEvents::PRE_SET_DATA
+         * Used as as form modifier before trying to set data
+         */
+        $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue, $new): array {
+            $cleaningRules = [];
+            $form          = $event->getForm();
+            $data          = $event->getData();
+            $type          = (is_array($data)) ? ($data['type'] ?? $type) : $data->getType();
+            $constraints   = [];
 
             switch ($type) {
-                case 'multiselect':
                 case 'select':
                 case 'lookup':
+                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    // no break
+                case 'multiselect':
+                    $cleaningRules['defaultValue'] = 'raw';
+
                     if (is_array($data)) {
-                        $properties = isset($data['properties']) ? $data['properties'] : [];
+                        $properties = $data['properties'] ?? [];
                     } else {
                         $properties = $data->getProperties();
                     }
 
+                    $propertiesList['list'] = isset($properties['list']) && 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list'];
+
                     $form->add(
                         'properties',
-                        'sortablelist',
+                        SortableListType::class,
                         [
-                            'required'    => false,
-                            'label'       => 'mautic.lead.field.form.properties.select',
-                            'data'        => $properties,
-                            'with_labels' => ('lookup' !== $type),
+                            'required'          => false,
+                            'label'             => 'mautic.lead.field.form.properties.select',
+                            'data'              => $propertiesList,
+                            'with_labels'       => ('lookup' !== $type),
+                            'option_constraint' => [],
                         ]
                     );
 
                     $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list']) : [];
                     $form->add(
                         'defaultValue',
-                        'choice',
+                        ChoiceType::class,
                         [
-                            'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label is-chosen'],
-                            'attr'       => ['class' => 'form-control'],
-                            'required'   => false,
-                            'choices'    => $list,
+                            'label'       => 'mautic.core.defaultvalue',
+                            'label_attr'  => ['class' => 'control-label is-chosen'],
+                            'attr'        => ['class' => 'form-control'],
+                            'required'    => false,
+                            'choices'     => array_flip($list),
+                            'multiple'    => 'multiselect' === $type,
+                            'data'        => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
+                            'disabled'    => $disableDefaultValue,
+                            'constraints' => $constraints,
                         ]
                     );
                     break;
@@ -262,19 +317,20 @@ class FieldType extends AbstractType
                 case 'region':
                     $form->add(
                         'defaultValue',
-                        'choice',
+                        ChoiceType::class,
                         [
                             'choices'    => $listChoices[$type],
                             'label'      => 'mautic.core.defaultvalue',
                             'label_attr' => ['class' => 'control-label'],
                             'attr'       => ['class' => 'form-control'],
                             'required'   => false,
+                            'disabled'   => $disableDefaultValue,
                         ]
                     );
                     break;
                 case 'boolean':
                     if (is_array($data)) {
-                        $value    = isset($data['defaultValue']) ? $data['defaultValue'] : false;
+                        $value    = $data['defaultValue'] ?? false;
                         $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'mautic.core.form.yes';
                         $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'mautic.core.form.no';
                     } else {
@@ -284,13 +340,13 @@ class FieldType extends AbstractType
                         $noLabel  = !empty($props['no']) ? $props['no'] : 'mautic.core.form.no';
                     }
 
-                    if ($value !== '' && $value !== null) {
+                    if ('' !== $value && null !== $value) {
                         $value = (int) $value;
                     }
 
                     $form->add(
                         'defaultValue',
-                        'yesno_button_group',
+                        YesNoButtonGroupType::class,
                         [
                             'label'       => 'mautic.core.defaultvalue',
                             'label_attr'  => ['class' => 'control-label'],
@@ -299,7 +355,7 @@ class FieldType extends AbstractType
                             'data'        => $value,
                             'no_label'    => $noLabel,
                             'yes_label'   => $yesLabel,
-                            'empty_value' => ' x ',
+                            'placeholder' => ' x ',
                         ]
                     );
                     break;
@@ -311,8 +367,8 @@ class FieldType extends AbstractType
                         case 'datetime':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
-                                        if (!empty($object) && \DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
+                                    function ($object, ExecutionContextInterface $context): void {
+                                        if (!empty($object) && false === \DateTime::createFromFormat('Y-m-d H:i', $object)) {
                                             $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
                                         }
                                     }
@@ -322,10 +378,10 @@ class FieldType extends AbstractType
                         case 'date':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object)) {
-                                            $validator = $context->getValidator();
-                                            $violations = $validator->validateValue($object, new Assert\Date());
+                                            $validator  = $context->getValidator();
+                                            $violations = $validator->validate($object, new Assert\Date());
 
                                             if (count($violations) > 0) {
                                                 $context->buildViolation('mautic.lead.date.invalid')->addViolation();
@@ -338,10 +394,10 @@ class FieldType extends AbstractType
                         case 'time':
                             $constraints = [
                                 new Assert\Callback(
-                                    function ($object, ExecutionContextInterface $context) {
+                                    function ($object, ExecutionContextInterface $context): void {
                                         if (!empty($object)) {
-                                            $validator = $context->getValidator();
-                                            $violations = $validator->validateValue(
+                                            $validator  = $context->getValidator();
+                                            $violations = $validator->validate(
                                                 $object,
                                                 new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/'])
                                             );
@@ -358,11 +414,11 @@ class FieldType extends AbstractType
 
                     $form->add(
                         'defaultValue',
-                        'text',
+                        TextType::class,
                         [
-                            'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label'],
-                            'attr'       => [
+                            'label'       => 'mautic.core.defaultvalue',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'attr'        => [
                                 'class'       => 'form-control',
                                 'data-toggle' => $type,
                             ],
@@ -371,13 +427,15 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
-                case 'number':
                 case 'tel':
                 case 'url':
                 case 'email':
+                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    // no break
+                case 'number':
                     $form->add(
                         'defaultValue',
-                        'text',
+                        TextType::class,
                         [
                             'label'      => 'mautic.core.defaultvalue',
                             'label_attr' => ['class' => 'control-label'],
@@ -385,52 +443,74 @@ class FieldType extends AbstractType
                                 'class' => 'form-control',
                                 'type'  => $type,
                             ],
-                            'required' => false,
+                            'required'    => false,
+                            'disabled'    => $disableDefaultValue,
+                            'constraints' => $constraints,
                         ]
                     );
-
-                break;
+                    break;
             }
+
+            if (in_array($type, $this->indexableFieldsWithLimits)) {
+                $this->addLengthValidationField($form, $new);
+            }
+
+            return $cleaningRules;
         };
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
+            function (FormEvent $event) use ($formModifier): void {
                 $formModifier($event);
             }
         );
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
-                $formModifier($event);
+            function (FormEvent $event) use ($formModifier, $disableDefaultValue): void {
+                $data          = $event->getData();
+                $cleaningRules = $formModifier($event);
+                $masks         = !empty($cleaningRules) ? $cleaningRules : 'clean';
+                // clean the data
+                $data = InputHelper::_($data, $masks);
+
+                if ((isset($data['group']) && 'social' === $data['group']) || !empty($data['isUniqueIdentifer']) || $disableDefaultValue) {
+                    // Don't allow a default for social or unique identifiers
+                    $data['defaultValue'] = null;
+                }
+
+                if (isset($data['type']) && !in_array($data['type'], $this->indexableFieldsWithLimits)) {
+                    $data['charLengthLimit'] = null;
+                }
+
+                $event->setData($data);
             }
         );
 
-        //get order list
-        $transformer = new FieldToOrderTransformer($this->em);
+        /** @var LeadFieldRepository $leadFieldRepository */
+        $leadFieldRepository = $this->em->getRepository(LeadField::class);
+
+        // get order list
+        $transformer = new FieldToOrderTransformer($leadFieldRepository);
         $builder->add(
             $builder->create(
                 'order',
-                'entity',
+                EntityType::class,
                 [
-                    'label'         => 'mautic.core.order',
-                    'class'         => 'MauticLeadBundle:LeadField',
-                    'property'      => 'label',
+                    'label'         => 'mautic.core.order.field',
+                    'class'         => LeadField::class,
+                    'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
-                    'attr'          => ['class' => 'form-control'],
-                    'query_builder' => function (EntityRepository $er) {
-                        return $er->createQueryBuilder('f')
-                            ->orderBy('f.order', 'ASC');
-                    },
-                    'required' => false,
+                    'attr'          => ['class' => 'form-control', 'tooltip' => 'mautic.core.order.field.tooltip'],
+                    'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC),
+                    'required'      => false,
                 ]
             )->addModelTransformer($transformer)
         );
 
         $builder->add(
             'alias',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.alias',
                 'label_attr' => ['class' => 'control-label'],
@@ -439,23 +519,32 @@ class FieldType extends AbstractType
                     'length'  => 25,
                     'tooltip' => 'mautic.lead.field.help.alias',
                 ],
-                'required' => false,
-                'disabled' => ($disabled || !$new),
+                'required'   => false,
+                'disabled'   => ($disabled || !$new),
             ]
         );
 
+        $attr = [];
+        if ($options['data']->getColumnIsNotCreated()) {
+            $attr = [
+                'tooltip' => 'mautic.lead.field.being_created_in_background',
+            ];
+        }
+
         $builder->add(
             'isPublished',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
-                'disabled' => ($options['data']->getAlias() == 'email'),
-                'data'     => ($options['data']->getAlias() == 'email') ? true : $options['data']->getIsPublished(),
+                'disabled' => $options['data']->disablePublishChange(),
+                'attr'     => $attr,
+                'data'     => ('email' == $options['data']->getAlias()) ? true : $options['data']->getIsPublished(),
+                'label'    => 'mautic.core.form.available',
             ]
         );
 
         $builder->add(
             'isRequired',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.required',
             ]
@@ -463,7 +552,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isVisible',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.isvisible',
             ]
@@ -471,7 +560,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isShortVisible',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.isshortvisible',
                 'attr'  => [
@@ -482,16 +571,38 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isListable',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.islistable',
+            ]
+        );
+
+        $constraints = [];
+
+        if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
+            $constraints[] = new IsFalse(['message' => 'mautic.lead.field.form.index_count.error']);
+        }
+
+        $builder->add(
+            'isIndex',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.lead.field.indexable',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => $this->translator->trans('mautic.lead.field.form.isIndex.tooltip', ['%indexCount%' => $this->indexHelper->getIndexCount(), '%maxCount%' => $this->indexHelper->getMaxCount()]),
+                    'readonly'=> (false === $isIndex && $this->indexHelper->getIndexCount() >= $this->indexHelper->getMaxCount()),
+                ],
+                'required'    => false,
+                'constraints' => $constraints,
             ]
         );
 
         $data = $options['data']->isUniqueIdentifier();
         $builder->add(
             'isUniqueIdentifer',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.isuniqueidentifer',
                 'attr'  => [
@@ -504,7 +615,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isPubliclyUpdatable',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.ispubliclyupdatable',
                 'attr'  => [
@@ -515,40 +626,45 @@ class FieldType extends AbstractType
 
         $builder->add(
             'object',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'mautic.lead.contact'    => 'lead',
                     'mautic.company.company' => 'company',
                 ],
-                'choices_as_values' => true,
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.lead.field.object',
-                'empty_value'       => false,
-                'attr'              => [
-                    'class' => 'form-control',
-                ],
-                'required' => false,
-                'disabled' => ($disabled || !$new),
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.lead.field.object',
+                'placeholder' => false,
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'disabled'    => ($disabled || !$new),
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\LeadBundle\Entity\LeadField',
+                'data_class'        => LeadField::class,
+                'validation_groups' => function (FormInterface $form): array {
+                    $data = $form->getData();
+
+                    $groups = ['Default'];
+
+                    if (in_array($data->getType(), $this->indexableFieldsWithLimits)) {
+                        $groups[] = 'indexableFieldWithLimits';
+                    }
+
+                    return $groups;
+                },
             ]
         );
     }
@@ -556,8 +672,68 @@ class FieldType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadfield';
+    }
+
+    public static function validateDefaultValue(?string $value, ExecutionContextInterface $context): void
+    {
+        if (empty($value)) {
+            return;
+        }
+
+        /** @var LeadField $field */
+        $field = $context->getRoot()->getViewData();
+
+        if (in_array($field->getType(), self::$fieldsWithNoLengthLimit)) {
+            return;
+        }
+
+        $limit              = $field->getCharLengthLimit();
+        $defaultValueLength = mb_strlen($value);
+
+        if ($defaultValueLength <= $limit) {
+            return;
+        }
+
+        $translationParameters = [
+            '%currentLength%'           => $defaultValueLength,
+            '%defaultValueLengthLimit%' => $limit,
+        ];
+
+        $context
+            ->buildViolation('mautic.lead.defaultValue.maxlengthexceeded', $translationParameters)
+            ->addViolation();
+    }
+
+    private function addLengthValidationField(FormInterface $form, bool $new = true): void
+    {
+        $typesWithMaxLength = implode('","', $this->indexableFieldsWithLimits);
+
+        $attr = [
+            'class'        => 'form-control',
+            'data-show-on' => '{
+                "leadfield_type":["'.$typesWithMaxLength.'"]
+             }',
+        ];
+
+        if (false === $new) {
+            $attr['readonly'] = 'readonly';
+        }
+
+        $form->add(
+            'charLengthLimit',
+            NumberType::class,
+            [
+                'label'       => 'mautic.lead.field.form.maximum.character.length',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => $attr,
+                'constraints' => [
+                    new Assert\NotBlank(['groups' => 'indexableFieldWithLimits']),
+                    new Assert\Range(['min' => 1, 'max' => 255, 'groups' => 'indexableFieldWithLimits']),
+                ],
+            ]
+        );
     }
 }

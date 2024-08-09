@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -18,77 +10,54 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
+use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Exception\ImportDelayedException;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class ImportModel.
+ * @extends FormModel<Import>
  */
 class ImportModel extends FormModel
 {
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected LeadEventLogRepository $leadEventLogRepo;
 
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $config;
-
-    /**
-     * @var LeadEventLogRepository
-     */
-    protected $leadEventLogRepo;
-
-    /**
-     * ImportModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param LeadModel            $leadModel
-     * @param NotificationModel    $notificationModel
-     * @param CoreParametersHelper $config
-     * @param CompanyModel         $companyModel
-     */
     public function __construct(
-        PathsHelper $pathsHelper,
-        LeadModel $leadModel,
-        NotificationModel $notificationModel,
-        CoreParametersHelper $config,
-        CompanyModel $companyModel
+        protected PathsHelper $pathsHelper,
+        protected LeadModel $leadModel,
+        protected NotificationModel $notificationModel,
+        protected CoreParametersHelper $config,
+        protected CompanyModel $companyModel,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        private ProcessSignalService $processSignalService
     ) {
-        $this->pathsHelper       = $pathsHelper;
-        $this->leadModel         = $leadModel;
-        $this->notificationModel = $notificationModel;
-        $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
-        $this->companyModel      = $companyModel;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $config);
     }
 
     /**
@@ -109,10 +78,8 @@ class ImportModel extends FormModel
 
     /**
      * Compares current number of imports in progress with the limit from the configuration.
-     *
-     * @return bool
      */
-    public function checkParallelImportLimit()
+    public function checkParallelImportLimit(): bool
     {
         $parallelImportLimit = $this->getParallelImportLimit();
         $importsInProgress   = $this->getRepository()->countImportsInProgress();
@@ -129,21 +96,17 @@ class ImportModel extends FormModel
      */
     public function getParallelImportLimit($default = 1)
     {
-        return $this->config->getParameter('parallel_import_limit', $default);
+        return $this->config->get('parallel_import_limit', $default);
     }
 
     /**
      * Generates a HTML link to the import detail.
-     *
-     * @param Import $import
-     *
-     * @return string
      */
-    public function generateLink(Import $import)
+    public function generateLink(Import $import): string
     {
         return '<a href="'.$this->router->generate(
-            'mautic_contact_import_action',
-            ['objectAction' => 'view', 'objectId' => $import->getId()]
+            'mautic_import_action',
+            ['objectAction' => 'view', 'object' => 'lead', 'objectId' => $import->getId()]
         ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>';
     }
 
@@ -174,9 +137,9 @@ class ImportModel extends FormModel
                     'info',
                     false,
                     $this->translator->trans('mautic.lead.import.failed'),
-                    'fa-download',
+                    'ri-download-line',
                     null,
-                    $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
                 );
             }
         }
@@ -188,27 +151,26 @@ class ImportModel extends FormModel
      * Start import. This is meant for the CLI command since it will import
      * the whole file at once.
      *
-     * @param Import   $import
-     * @param Progress $progress
-     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
+     * @param int $limit Number of records to import before delaying the import. 0 will import all
      *
-     * @return bool
+     * @throws ImportFailedException
+     * @throws ImportDelayedException
      */
-    public function startImport(Import $import, Progress $progress, $limit = 0)
+    public function beginImport(Import $import, Progress $progress, $limit = 0): void
     {
         $this->setGhostImportsAsFailed();
 
         if (!$import) {
-            $this->logDebug('import is empty, closing the import process');
-
-            return false;
+            $msg = 'import is empty, closing the import process';
+            $this->logDebug($msg, $import);
+            throw new ImportFailedException($msg);
         }
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
-
-            return false;
+            $msg = 'import cannot be processed because '.$import->getStatusInfo();
+            $this->logDebug($msg, $import);
+            throw new ImportFailedException($msg);
         }
 
         if (!$this->checkParallelImportLimit()) {
@@ -218,9 +180,9 @@ class ImportModel extends FormModel
             );
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
-
-            return false;
+            $msg = 'import is delayed because parrallel limit was hit. '.$import->getStatusInfo();
+            $this->logDebug($msg, $import);
+            throw new ImportDelayedException($msg);
         }
 
         $processed = $import->getProcessedRows();
@@ -243,7 +205,7 @@ class ImportModel extends FormModel
 
         try {
             if (!$this->process($import, $progress, $limit)) {
-                return false;
+                throw new ImportFailedException($import->getStatusInfo());
             }
         } catch (ORMException $e) {
             // The EntityManager is probably closed. The entity cannot be saved.
@@ -254,9 +216,7 @@ class ImportModel extends FormModel
 
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
 
-            $this->logDebug('Database had been overloaded', $import);
-
-            return false;
+            throw new ImportFailedException('Database had been overloaded');
         }
 
         $import->end();
@@ -274,60 +234,56 @@ class ImportModel extends FormModel
                 'info',
                 false,
                 $this->translator->trans('mautic.lead.import.completed'),
-                'fa-download',
+                'ri-download-line',
                 null,
-                $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+                $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
             );
         }
-
-        return true;
     }
 
     /**
      * Import the CSV file from configuration in the $import entity.
      *
-     * @param Import   $import
-     * @param Progress $progress
-     * @param int      $limit    Number of records to import before delaying the import
-     *
-     * @return bool
+     * @param int $limit Number of records to import before delaying the import
      */
-    public function process(Import $import, Progress $progress, $limit = 0)
+    public function process(Import $import, Progress $progress, $limit = 0): bool
     {
         try {
             $file = new \SplFileObject($import->getFilePath());
         } catch (\Exception $e) {
-            $import->setStatusInfo('SplFileObject cannot read the file');
+            $import->setStatusInfo('SplFileObject cannot read the file. '.$e->getMessage());
             $import->setStatus(Import::FAILED);
             $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
 
-        $lineNumber  = $progress->getDone();
-        $headers     = $import->getHeaders();
-        $headerCount = count($headers);
-        $config      = $import->getParserConfig();
-        $counter     = 0;
+        $lastImportedLine = $import->getLastLineImported();
+        $headers          = $import->getHeaders();
+        $headerCount      = count($headers);
+        $config           = $import->getParserConfig();
+        $counter          = 0;
 
+        $file->seek($lastImportedLine);
+
+        $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
-
-        if ($lineNumber > 0) {
-            $file->seek($lineNumber);
-        }
 
         $batchSize = $config['batchlimit'];
 
         // Convert to field names
-        array_walk($headers, function (&$val) {
+        array_walk($headers, function (&$val): void {
             $val = strtolower(InputHelper::alphanum($val, false, '_'));
         });
 
         while ($batchSize && !$file->eof()) {
-            $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+            $string = $file->current();
+            $file->next();
+            $data = str_getcsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
+            $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
-            if ($lineNumber === 0) {
+            if (1 === $lineNumber) {
                 ++$lineNumber;
                 continue;
             }
@@ -357,19 +313,11 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $entityModel = $import->getObject() === 'company' ? $this->companyModel : $this->leadModel;
+                    $event = new ImportProcessEvent($import, $eventLog, $data);
 
-                    $merged = $entityModel->import(
-                        $import->getMatchedFields(),
-                        $data,
-                        $import->getDefault('owner'),
-                        $import->getDefault('list'),
-                        $import->getDefault('tags'),
-                        true,
-                        $eventLog
-                    );
+                    $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_PROCESS);
 
-                    if ($merged) {
+                    if ($event->wasMerged()) {
                         $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);
                         $import->increaseUpdatedCount();
                     } else {
@@ -383,20 +331,39 @@ class ImportModel extends FormModel
             }
 
             if ($errorMessage) {
+                // Log the error first
                 $import->increaseIgnoredCount();
-                $this->logImportRowError($eventLog, $errorMessage);
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+                if (!$this->em->isOpen()) {
+                    // Something bad must have happened if the entity manager is closed.
+                    // We will not be able to save any entities.
+                    throw new ORMException($errorMessage);
+                }
+                // This should be called only if the entity manager is open
+                $this->logImportRowError($eventLog, $errorMessage);
+            } else {
+                $this->leadEventLogRepo->saveEntity($eventLog);
             }
 
             // Release entities in Doctrine's memory to prevent memory leak
             $this->em->detach($eventLog);
+            if (null !== $leadEntity = $eventLog->getLead()) {
+                $this->em->detach($leadEntity);
+
+                $company        = $leadEntity->getCompany();
+                $primaryCompany = $leadEntity->getPrimaryCompany();
+                if ($company instanceof Company) {
+                    $this->em->detach($company);
+                }
+                if ($primaryCompany instanceof Company) {
+                    $this->em->detach($primaryCompany);
+                }
+            }
             $eventLog = null;
             $data     = null;
-            $this->em->clear(Lead::class);
-            $this->em->clear(Company::class);
 
             // Save Import entity once per batch so the user could see the progress
-            if ($batchSize === 0 && $import->isBackgroundProcess()) {
+            if (0 === $batchSize && $import->isBackgroundProcess()) {
                 $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
 
                 if (!$isPublished) {
@@ -415,13 +382,19 @@ class ImportModel extends FormModel
                 $batchSize = $config['batchlimit'];
             }
 
-            ++$counter;
-            if ($limit && $counter >= $limit) {
-                $import->setStatus($import::DELAYED);
-                $this->saveEntity($import);
-
+            if ($this->processSignalService->isSignalCaught()) {
                 break;
             }
+
+            ++$counter;
+            if ($limit && $counter >= $limit) {
+                break;
+            }
+        }
+
+        if ($import->getLastLineImported() < $import->getLineCount()) {
+            $import->setStatus($import::DELAYED);
+            $this->saveEntity($import);
         }
 
         // Close the file
@@ -435,12 +408,9 @@ class ImportModel extends FormModel
      * If it is less, generate empty values for the rest of the missing values.
      * If it is more, return true.
      *
-     * @param array &$data
-     * @param int   $headerCount
-     *
-     * @return bool
+     * @param int $headerCount
      */
-    public function hasMoreValuesThanColumns(array &$data, $headerCount)
+    public function hasMoreValuesThanColumns(array &$data, $headerCount): bool
     {
         $dataCount = count($data);
 
@@ -461,12 +431,8 @@ class ImportModel extends FormModel
 
     /**
      * Trim all values in a one dymensional array.
-     *
-     * @param array $data
-     *
-     * @return array
      */
-    public function trimArrayValues(array $data)
+    public function trimArrayValues(array $data): array
     {
         return array_map('trim', $data);
     }
@@ -475,29 +441,26 @@ class ImportModel extends FormModel
      * Decide whether the CSV row is empty.
      *
      * @param mixed $row
-     *
-     * @return bool
      */
-    public function isEmptyCsvRow($row)
+    public function isEmptyCsvRow($row): bool
     {
         if (!is_array($row) || empty($row)) {
             return true;
         }
 
-        if (count($row) === 1 && ($row[0] === '' || $row[0] === null)) {
+        if (1 === count($row) && ('' === $row[0] || null === $row[0])) {
             return true;
         }
 
-        return false;
+        return !array_filter($row);
     }
 
     /**
      * Save log about errored line.
      *
-     * @param LeadEventLog $eventLog
-     * @param string       $errorMessage
+     * @param string $errorMessage
      */
-    public function logImportRowError(LeadEventLog $eventLog, $errorMessage)
+    public function logImportRowError(LeadEventLog $eventLog, $errorMessage): void
     {
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');
@@ -508,17 +471,14 @@ class ImportModel extends FormModel
     /**
      * Initialize LeadEventLog object and configure it as the import event.
      *
-     * @param Import $import
-     * @param int    $lineNumber
-     *
-     * @return LeadEventLog
+     * @param int $lineNumber
      */
-    public function initEventLog(Import $import, $lineNumber)
+    public function initEventLog(Import $import, $lineNumber): LeadEventLog
     {
         $eventLog = new LeadEventLog();
         $eventLog->setUserId($import->getCreatedBy())
             ->setUserName($import->getCreatedByUser())
-            ->setBundle('lead')
+            ->setBundle($import->getObject())
             ->setObject('import')
             ->setObjectId($import->getId())
             ->setProperties(
@@ -534,20 +494,18 @@ class ImportModel extends FormModel
     /**
      * Get line chart data of imported rows.
      *
-     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     *
-     * @return array
+     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
      */
-    public function getImportedRowsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
 
         // Clear the times for display by minutes
+        /** @var \DateTime $dateFrom */
+        /** @var \DateTime $dateTo */
         $dateFrom->modify('-1 minute');
         $dateFrom->setTime($dateFrom->format('H'), $dateFrom->format('i'), 0);
         $dateTo->modify('+1 minute');
@@ -565,17 +523,18 @@ class ImportModel extends FormModel
     /**
      * Returns a list of failed rows for the import.
      *
-     * @param int $importId
+     * @param int    $importId
+     * @param string $object
      *
      * @return array|null
      */
-    public function getFailedRows($importId = null)
+    public function getFailedRows($importId = null, $object = 'lead')
     {
         if (!$importId) {
             return null;
         }
 
-        return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id']);
+        return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
     /**
@@ -583,7 +542,7 @@ class ImportModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:Import');
+        return $this->em->getRepository(Import::class);
     }
 
     /**
@@ -591,51 +550,36 @@ class ImportModel extends FormModel
      */
     public function getEventLogRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadEventLog');
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'lead:imports';
     }
 
     /**
      * Returns a unique name of a CSV file based on time.
-     *
-     * @return string
      */
-    public function getUniqueFileName()
+    public function getUniqueFileName(): string
     {
         return (new DateTimeHelper())->toUtcString('YmdHis').'.csv';
     }
 
     /**
      * Returns a full path to the import dir.
-     *
-     * @return string
      */
-    public function getImportDir()
+    public function getImportDir(): string
     {
-        $tmpDir = $this->pathsHelper->getSystemPath('tmp', true);
-
-        return $tmpDir.'/imports';
+        return $this->pathsHelper->getImportLeadsPath();
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
-     *
-     * @return null|object
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Import
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Import();
         }
 
@@ -643,16 +587,9 @@ class ImportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Import) {
             throw new MethodNotAllowedHttpException(['Import']);
@@ -684,7 +621,7 @@ class ImportModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -696,7 +633,6 @@ class ImportModel extends FormModel
      * Logs a debug message if in dev environment.
      *
      * @param string $msg
-     * @param Import $import
      */
     protected function logDebug($msg, Import $import = null)
     {

@@ -1,0 +1,20 @@
+{
+  "env": {
+    "browser": true
+  },
+  "extends": ["airbnb/base","prettier"],
+  "parser": "babel-eslint",
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "no-restricted-syntax": 0
+  },
+  "ignorePatterns": ["Assets/library/js/dist","node_modules","*.min.js"],
+  "globals": {
+    "mQuery": true,
+    // "grapesjs": true,
+    "Mousetrap":true,
+    "Mautic":true,
+    "mauticAjaxCsrf":true
+  }
+}

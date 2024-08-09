@@ -1,96 +1,69 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class PageListType.
+ * @extends AbstractType<array<mixed>>
  */
 class PageListType extends AbstractType
 {
-    /**
-     * @var \Mautic\PageBundle\Model\PageModel
-     */
-    private $model;
-
     /**
      * @var bool
      */
     private $canViewOther = false;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->model        = $factory->getModel('page');
-        $this->canViewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
+    public function __construct(
+        private PageModel $model,
+        CorePermissions $corePermissions
+    ) {
+        $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $model        = $this->model;
         $canViewOther = $this->canViewOther;
 
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) use ($model, $canViewOther) {
-                    $choices = [];
-                    $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
+                'choices' => function (Options $options) use ($model, $canViewOther): array {
+                    $choices       = [];
+                    $publishedOnly = $options['published_only'] ?? false;
+                    $pages         = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], [], $publishedOnly);
                     foreach ($pages as $page) {
-                        $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
+                        $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
                     }
 
-                    //sort by language
+                    // sort by language
                     ksort($choices);
 
-                    foreach ($choices as $lang => &$pages) {
+                    foreach ($choices as &$pages) {
                         ksort($pages);
                     }
 
                     return $choices;
                 },
-                'empty_value' => false,
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'top_level'   => 'variant',
-                'ignore_ids'  => [],
+                'placeholder'       => false,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'top_level'         => 'variant',
+                'ignore_ids'        => [],
             ]
         );
 
-        $resolver->setDefined(['top_level', 'ignore_ids']);
+        $resolver->setDefined(['top_level', 'ignore_ids', 'published_only']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'page_list';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

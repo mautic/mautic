@@ -1,41 +1,29 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
- * Class TrackableRepository.
+ * @extends CommonRepository<Trackable>
  */
 class TrackableRepository extends CommonRepository
 {
     /**
      * Find redirects that are trackable.
      *
-     * @param $channel
-     * @param $channelId
-     *
-     * @return mixed
+     * @return mixed[]
      */
-    public function findByChannel($channel, $channelId)
+    public function findByChannel($channel, $channelId): array
     {
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tableAlias = $this->getTableAlias();
 
-        return $q->select('r.redirect_id, r.url, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
+        return $q->select('r.redirect_id, r.url, r.id, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $tableAlias,
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('r.id', 't.redirect_id'),
                     $q->expr()->eq('t.channel', ':channel'),
                     $q->expr()->eq('t.channel_id', (int) $channelId)
@@ -43,16 +31,12 @@ class TrackableRepository extends CommonRepository
             )
             ->setParameter('channel', $channel)
             ->orderBy('r.url')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery()
+            ->fetchAllAssociative();
     }
 
     /**
      * Get a Trackable by Redirect URL.
-     *
-     * @param $url
-     * @param $channel
-     * @param $channelId
      *
      * @return array
      */
@@ -80,10 +64,6 @@ class TrackableRepository extends CommonRepository
     /**
      * Get an array of Trackable entities by Redirect URLs.
      *
-     * @param array $urls
-     * @param       $channel
-     * @param       $channelId
-     *
      * @return array
      */
     public function findByUrls(array $urls, $channel, $channelId)
@@ -108,20 +88,17 @@ class TrackableRepository extends CommonRepository
     /**
      * Up the hit count.
      *
-     * @param      $redirectId
-     * @param      $channel
-     * @param      $channelId
      * @param int  $increaseBy
      * @param bool $unique
      */
-    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false)
+    public function upHitCount($redirectId, $channel, $channelId, $increaseBy = 1, $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'channel_url_trackables')
             ->set('hits', 'hits + '.(int) $increaseBy)
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('redirect_id', (int) $redirectId),
                     $q->expr()->eq('channel', ':channel'),
                     $q->expr()->eq('channel_id', (int) $channelId)
@@ -133,23 +110,21 @@ class TrackableRepository extends CommonRepository
             $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
         }
 
-        $q->execute();
+        $q->executeStatement();
     }
 
     /**
      * Get hit count.
      *
-     * @param                 $channel
-     * @param                 $channelIds
-     * @param                 $listId
-     * @param ChartQuery|null $chartQuery
+     * @param bool   $combined
+     * @param string $countColumn
      *
      * @return array|int
      */
-    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false)
+    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false, $countColumn = 'ph.id')
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('count(ph.id) as click_count')
+            ->select('count('.$countColumn.') as click_count')
             ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut')
             ->innerJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id AND ph.source = cut.channel AND ph.source_id = cut.channel_id');
 
@@ -200,7 +175,7 @@ class TrackableRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_hit', 'ph');
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return array of results
@@ -215,10 +190,7 @@ class TrackableRepository extends CommonRepository
         return (isset($results[0])) ? $results[0]['click_count'] : 0;
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 't';
     }

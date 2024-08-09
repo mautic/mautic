@@ -1,90 +1,92 @@
 <?php
 
-/*
- * Created by PhpStorm.
- * User: alan
- * Date: 9/14/16
- * Time: 5:42 PM.
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Transport\AbstractTokenArrayTransport;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Mailer\Transport\TokenTransportTrait;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\AbstractTransport;
 
-class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Transport
+class BatchTransport extends AbstractTransport implements TokenTransportInterface
 {
-    private $fromAddresses = [];
-    private $metadatas     = [];
-    private $validate      = false;
+    use TokenTransportTrait;
 
     /**
-     * BatchTransport constructor.
-     *
-     * @param bool $validate
+     * @var array<string, mixed>
      */
-    public function __construct($validate = false)
+    private $transports = []; // @phpstan-ignore-line
+
+    private $metadatas  = [];
+
+    /**
+     * @var string[]
+     */
+    private array $fromAddresses = [];
+
+    /**
+     * @var string[]
+     */
+    private array $fromNames = [];
+
+    public function __construct(private bool $validate = false, private int $maxRecipients = 4, private int $numberToFail = 1)
     {
-        $this->validate = true;
+        $this->transports['main'] = $this;
     }
 
-    /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
-     */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function __toString(): string
     {
-        $this->message         = $message;
-        $this->fromAddresses[] = key($message->getFrom());
-        $this->metadatas[]     = $this->getMetadata();
+        return 'batch://';
+    }
 
-        $messageArray = $this->messageToArray();
+    protected function doSend(SentMessage $message): void
+    {
+        $message = $message->getOriginalMessage();
 
-        if ($this->validate) {
-            if (empty($messageArray['subject'])) {
-                $this->throwException('Subject empty');
-            }
+        if (!$message instanceof MauticMessage) {
+            return;
+        }
 
-            if (empty($messageArray['recipients']['to'])) {
-                $this->throwException('To empty');
+        $this->metadatas[] = $message->getMetadata();
+
+        if ($this->validate && $this->numberToFail) {
+            --$this->numberToFail;
+
+            if (!$message->getSubject()) {
+                throw new TransportException('Subject empty');
             }
         }
 
-        return true;
+        $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
     }
 
-    /**
-     * @return int
-     */
-    public function getMaxBatchLimit()
+    public function getMaxBatchLimit(): int
     {
-        return 4;
+        return $this->maxRecipients;
     }
 
-    /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
-     *
-     * @return int
-     */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    public function getMetadatas(): array
     {
-        return count($message->getTo()) + $toBeAdded;
+        return $this->metadatas;
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getFromAddresses()
+    public function getFromAddresses(): array
     {
         return $this->fromAddresses;
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getMetadatas()
+    public function getFromNames(): array
     {
-        return $this->metadatas;
+        return $this->fromNames;
     }
 }

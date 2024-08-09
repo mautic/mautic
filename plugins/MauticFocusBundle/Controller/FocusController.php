@@ -1,56 +1,79 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\PageBundle\Model\TrackableModel;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class FocusController.
- */
-class FocusController extends FormController
+class FocusController extends AbstractStandardFormController
 {
-    public function __construct()
+    /**
+     * @phpstan-ignore-next-line
+     */
+    public function __construct(
+        private CacheProvider $cacheProvider,
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
+    protected function getTemplateBase(): string
     {
-        $this->setStandardParameters(
-            'focus',
-            'plugin:focus:items',
-            'mautic_focus',
-            'mautic_focus',
-            'mautic.focus',
-            'MauticFocusBundle:Focus',
-            null,
-            'focus'
-        );
+        return '@MauticFocus/Focus';
+    }
+
+    protected function getModelName(): string
+    {
+        return 'focus';
     }
 
     /**
      * @param int $page
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
-        return parent::indexStandard($page);
+        return parent::indexStandard($request, $page);
     }
 
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return JsonResponse|Response
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
-        return parent::newStandard();
+        return parent::newStandard($request);
     }
 
     /**
@@ -59,23 +82,21 @@ class FocusController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return JsonResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
      * Displays details on a Focus.
      *
-     * @param $objectId
-     *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function viewAction($objectId)
+    public function viewAction(Request $request, $objectId)
     {
-        return parent::viewStandard($objectId, 'focus', 'plugin.focus');
+        return parent::viewStandard($request, $objectId, 'focus', 'plugin.focus');
     }
 
     /**
@@ -83,11 +104,11 @@ class FocusController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
-        return parent::cloneStandard($objectId);
+        return parent::cloneStandard($request, $objectId);
     }
 
     /**
@@ -95,37 +116,38 @@ class FocusController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        return parent::deleteStandard($objectId);
+        return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        return parent::batchDeleteStandard();
+        return parent::batchDeleteStandard($request);
     }
 
     /**
-     * @param $args
-     * @param $view
+     * @throws \Exception
      */
-    public function customizeViewArguments($args, $view)
+    public function getViewArguments(array $args, $action): array
     {
-        if ($view == 'view') {
-            /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $item */
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+
+        if ('view' == $action) {
+            /** @var Focus $item */
             $item = $args['viewParameters']['item'];
 
             // For line graphs in the view
-            $dateRangeValues = $this->request->get('daterange', []);
-            $dateRangeForm   = $this->get('form.factory')->create(
-                'daterange',
+            $dateRangeValues = $this->getCurrentRequest()->get('daterange', []);
+            $dateRangeForm   = $this->formFactory->create(
+                DateRangeType::class,
                 $dateRangeValues,
                 [
                     'action' => $this->generateUrl(
@@ -138,20 +160,43 @@ class FocusController extends FormController
                 ]
             );
 
-            /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
-            $model = $this->getModel('focus');
-            $stats = $model->getStats(
-                $item,
-                null,
-                new \DateTime($dateRangeForm->get('date_from')->getData()),
-                new \DateTime($dateRangeForm->get('date_to')->getData())
-            );
+            $statsDateFrom = new \DateTime($dateRangeForm->get('date_from')->getData());
+            $statsDateTo   = new \DateTime($dateRangeForm->get('date_to')->getData());
+            $cacheKey      = "focus.viewArguments.{$item->getId()}.{$statsDateFrom->getTimestamp()}.{$statsDateTo->getTimestamp()}";
+            $cacheItem     = $this->cacheProvider->getItem($cacheKey);
 
-            $args['viewParameters']['stats']         = $stats;
-            $args['viewParameters']['dateRangeForm'] = $dateRangeForm->createView();
+            if ($cacheItem->isHit()) {
+                [$stats, $trackables] = $cacheItem->get();
+            } else {
+                // invalidate cache for entire focus item to keep AJAX loaded data consistent
+                $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
 
-            if ('link' == $item->getType()) {
-                $args['viewParameters']['trackables'] = $this->getModel('page.trackable')->getTrackableList('focus', $item->getId());
+                /** @var FocusModel $model */
+                $model = $this->getModel('focus');
+                $stats = $model->getStats(
+                    $item,
+                    null,
+                    $statsDateFrom,
+                    $statsDateTo
+                );
+
+                if ('link' === $item->getType()) {
+                    $trackableModel = $this->getModel('page.trackable');
+                    \assert($trackableModel instanceof TrackableModel);
+                    $trackables = $trackableModel->getTrackableList('focus', $item->getId());
+
+                    $cacheItem->set([$stats, $trackables]);
+                    $cacheItem->expiresAfter($cacheTimeout * 60);
+                    $cacheItem->tag("focus.{$item->getId()}");
+                    $this->cacheProvider->save($cacheItem);
+                }
+            }
+
+            $args['viewParameters']['stats']                 = $stats;
+            $args['viewParameters']['dateRangeForm']         = $dateRangeForm->createView();
+            $args['viewParameters']['showConversionRate']    = true;
+            if (isset($trackables)) {
+                $args['viewParameters']['trackables'] = $trackables;
             }
         }
 
@@ -159,19 +204,15 @@ class FocusController extends FormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
-     *
-     * @return array
+     * @return mixed[]
      */
-    protected function getPostActionRedirectArguments(array $args, $action)
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
-        $updateSelect = ($this->request->getMethod() == 'POST')
-            ? $this->request->request->get('focus[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
+            ? ($focus['updateSelect'] ?? false)
+            : $this->getCurrentRequest()->get('updateSelect', false);
+
         if ($updateSelect) {
             switch ($action) {
                 case 'new':
@@ -198,12 +239,11 @@ class FocusController extends FormController
      */
     protected function getEntityFormOptions()
     {
-        $updateSelect = ($this->request->getMethod() == 'POST')
-            ? $this->request->request->get('focus[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
+        $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
+            ? ($focus['updateSelect'] ?? false)
+            : $this->getCurrentRequest()->get('updateSelect', false);
+
         if ($updateSelect) {
             return ['update_select' => $updateSelect];
         }
@@ -216,17 +256,13 @@ class FocusController extends FormController
      * @param object $entity
      * @param string $nameMethod   name of the entity method holding the name
      * @param string $groupMethod  name of the entity method holding the select group
-     *
-     * @return array
      */
-    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage')
+    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage'): array
     {
-        $options = [
+        return [
             'updateSelect' => $updateSelect,
             'id'           => $entity->getId(),
             'name'         => $entity->$nameMethod(),
         ];
-
-        return $options;
     }
 }

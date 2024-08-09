@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -23,12 +15,12 @@ class UtmTag
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     private $lead;
 
@@ -38,93 +30,72 @@ class UtmTag
     private $query = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $referer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $remoteHost;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $userAgent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmCampaign;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmContent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmMedium;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmSource;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $utmTerm;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_utmtags')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\UtmTagRepository');
-
+        $builder->setTable('lead_utmtags');
+        $builder->setCustomRepositoryClass(UtmTagRepository::class);
         $builder->addId();
-
         $builder->addDateAdded();
-
         $builder->addLead(false, 'CASCADE', false, 'utmtags');
-
-        $builder->addNullableField('query', 'array');
-
-        $builder->addNullableField('referer', 'text');
-
-        $builder->addNullableField('remoteHost', 'string', 'remote_host');
-
-        $builder->addNullableField('url', 'string');
-
-        $builder->addNullableField('userAgent', 'text', 'user_agent');
-
-        $builder->addNullableField('utmCampaign', 'string', 'utm_campaign');
-
-        $builder->addNullableField('utmContent', 'string', 'utm_content');
-
-        $builder->addNullableField('utmMedium', 'string', 'utm_medium');
-
-        $builder->addNullableField('utmSource', 'string', 'utm_source');
-
-        $builder->addNullableField('utmTerm', 'string', 'utm_term');
+        $builder->addNullableField('query', Types::ARRAY);
+        $builder->addNullableField('referer', Types::TEXT);
+        $builder->addNullableField('remoteHost', Types::STRING, 'remote_host');
+        $builder->addNullableField('url', Types::TEXT);
+        $builder->addNullableField('userAgent', Types::TEXT, 'user_agent');
+        $builder->addNullableField('utmCampaign', Types::STRING, 'utm_campaign');
+        $builder->addNullableField('utmContent', Types::STRING, 'utm_content');
+        $builder->addNullableField('utmMedium', Types::STRING, 'utm_medium');
+        $builder->addNullableField('utmSource', Types::STRING, 'utm_source');
+        $builder->addNullableField('utmTerm', Types::STRING, 'utm_term');
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('utmtags')
             ->addListProperties(
@@ -159,11 +130,9 @@ class UtmTag
     /**
      * Set date added.
      *
-     * @param \DateTime $dateHit
-     *
      * @return UtmTag
      */
-    public function setDateAdded(\DateTime $date)
+    public function setDateAdded(\DateTimeInterface $date)
     {
         $this->dateAdded = $date;
 
@@ -173,7 +142,7 @@ class UtmTag
     /**
      * Get date added.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -189,8 +158,6 @@ class UtmTag
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return UtmTag
      */
     public function setLead(Lead $lead)
@@ -351,6 +318,7 @@ class UtmTag
      */
     public function setUtmContent($utmContent)
     {
+        $utmContent       = mb_strlen($utmContent) <= ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH ? $utmContent : mb_substr($utmContent, 0, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH);
         $this->utmContent = $utmContent;
 
         return $this;
@@ -416,12 +384,15 @@ class UtmTag
         return $this;
     }
 
+    public function hasUtmTags(): bool
+    {
+        return !empty($this->utmCampaign) || !empty($this->utmSource) || !empty($this->utmMedium) || !empty($this->utmContent) || !empty($this->utmTerm);
+    }
+
     /**
      * Available fields and it's setters.
-     *
-     * @return array
      */
-    public function getFieldSetterList()
+    public function getFieldSetterList(): array
     {
         return [
             'utm_campaign' => 'setUtmCampaign',

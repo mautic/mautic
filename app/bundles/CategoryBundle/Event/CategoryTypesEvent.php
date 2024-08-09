@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Event;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class CategoryTypesEvent.
- */
 class CategoryTypesEvent extends CommonEvent
 {
     /**
@@ -50,9 +38,13 @@ class CategoryTypesEvent extends CommonEvent
      * @param string $type
      * @param string $label
      */
-    public function addCategoryType($type, $label = null)
+    public function addCategoryType($type, $label = null): void
     {
-        if ($label === null) {
+        if (is_int($type)) {
+            $type = $label;
+        }
+
+        if (null === $label) {
             $label = 'mautic.'.$type.'.'.$type;
         }
 

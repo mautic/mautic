@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
+use Symfony\Component\Console\Input\ArgvInput;
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$input  = new ArgvInput();
+$output = (false !== $input->getParameterOption(['--no-interaction', '-n'])) ? new ConsoleDatetimeOutput() : null;
+
+$reflection  = new \ReflectionClass(AppKernel::class);
+$project_dir = dirname($reflection->getFileName(), 2);
+
+$application = include $project_dir.'/app/console-application.php';
+$application->run($input, $output);

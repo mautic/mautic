@@ -59,7 +59,8 @@
     top: 6px;
     right: 3px;
 }
-.dashboard-widgets .card-header .dropdown-toggle .fa-ellipsis-v {
+.dashboard-widgets .card-header .dropdown-toggle .ri-more-2-fill {
+    display: inline-block;
     font-size: 15px;
     color: rgba(0, 0, 0, 0.6);
     width: 30px;
@@ -127,3 +128,8 @@
     }
 }
 
+#dashboard-widgets .spinner {
+    text-align: center;
+    line-height: 250px;
+    font-size: 24px;
+}

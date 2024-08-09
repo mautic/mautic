@@ -1,53 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * ReportSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_POST_SAVE   => ['onReportPostSave', 0],
@@ -57,10 +26,8 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param ReportEvent $event
      */
-    public function onReportPostSave(ReportEvent $event)
+    public function onReportPostSave(ReportEvent $event): void
     {
         $report = $event->getReport();
         if ($details = $event->getChanges()) {
@@ -78,10 +45,8 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param ReportEvent $event
      */
-    public function onReportDelete(ReportEvent $event)
+    public function onReportDelete(ReportEvent $event): void
     {
         $report = $event->getReport();
         $log    = [

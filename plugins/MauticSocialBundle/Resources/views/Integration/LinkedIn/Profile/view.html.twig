@@ -1,0 +1,21 @@
+<div class="panel-toolbar np">
+    <ul class="nav nav-tabs nav-tabs-contained">
+        <li class="active">
+            <a href="#LinkedInProfile" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.profile'|trans }}
+            </a>
+        </li>
+        <li>
+            <a href="#LinkedInPhotos" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.photos'|trans }}
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="np panel-body tab-content">
+    <div class="pa-20 tab-pane active" id="LinkedInProfile">
+        {{ include('@MauticSocial/Integration/LinkedIn/Profile/profile.html.twig', {
+            'profile': details.profile,
+        }) }}
+    </div>
+</div>

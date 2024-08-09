@@ -1,34 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFullContactBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FullContactIntegration extends AbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'FullContact';
     }
 
     /**
      * Return's authentication method such as oauth2, oauth1a, key, etc.
-     *
-     * @return string
      */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
@@ -37,9 +29,9 @@ class FullContactIntegration extends AbstractIntegration
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         // Do not rename field. fullcontact.js depends on it
         return [
@@ -52,12 +44,12 @@ class FullContactIntegration extends AbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
-        if ($formArea === 'keys') {
+        if ('keys' === $formArea) {
             $builder->add(
                 'test_api',
-                'button',
+                ButtonType::class,
                 [
                     'label' => 'mautic.plugin.fullcontact.test_api',
                     'attr'  => [
@@ -70,7 +62,7 @@ class FullContactIntegration extends AbstractIntegration
 
             $builder->add(
                 'stats',
-                'textarea',
+                TextareaType::class,
                 [
                     'label_attr' => ['class' => 'control-label'],
                     'label'      => 'mautic.plugin.fullcontact.stats',
@@ -85,10 +77,10 @@ class FullContactIntegration extends AbstractIntegration
 
             $builder->add(
                 'auto_update',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.fullcontact.auto_update',
-                    'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+                    'data'  => isset($data['auto_update']) && (bool) $data['auto_update'],
                     'attr'  => [
                         'tooltip' => 'mautic.plugin.fullcontact.auto_update.tooltip',
                     ],
@@ -97,25 +89,21 @@ class FullContactIntegration extends AbstractIntegration
         }
     }
 
-    public function shouldAutoUpdate()
+    public function shouldAutoUpdate(): bool
     {
         $featureSettings = $this->getKeys();
 
-        return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+        return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $section
-     *
      * @return string|array
      */
     public function getFormNotes($section)
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticFullContactBundle:Integration:form.html.php',
+                'template'   => '@MauticFullContact/Integration/form.html.twig',
                 'parameters' => [
                     'mauticUrl' => $this->router->generate('mautic_plugin_fullcontact_index', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 ],

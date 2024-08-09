@@ -1,0 +1,63 @@
+{% block _config_messengerconfig_widget %}
+
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#transport-configuration' } %}mautic.messenger.config.dsn_help_general{% endtrans %}
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dsn_email'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(form.messenger_dsn_email) }}
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dsn_hit'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(form.messenger_dsn_hit) }}
+    </div>
+</div>
+
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#retries-failures' } %}mautic.messenger.config.dsn_help_retry_strategy{% endtrans %}
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.retry_strategy'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_max_retries) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_delay) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_multiplier) }}
+            </div>
+            <div class="col-md-6 col-lg-3">
+                {{ form_row(form.messenger_retry_strategy_max_delay) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info" role="alert">
+    {% trans with {'%link%': 'https://symfony.com/doc/5.4/messenger.html#saving-retrying-failed-messages' } %}mautic.messenger.config.dsn_help_failed{% endtrans %}
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.messenger.config.dsn_failed'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_row(form.messenger_dsn_failed) }}
+    </div>
+</div>
+{% endblock %}

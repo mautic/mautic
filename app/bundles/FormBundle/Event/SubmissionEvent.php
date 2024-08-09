@@ -1,123 +1,83 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerBag;
 
-/**
- * Class SubmissionEvent.
- */
 class SubmissionEvent extends CommonEvent
 {
     /**
-     * Raw POST results.
-     *
-     * @var array
-     */
-    private $post = [];
-
-    /**
-     * @var array
-     */
-    private $server = [];
-
-    /**
      * Cleaned post results.
-     *
-     * @var array
      */
-    private $results = [];
+    private array $results = [];
 
     /**
      * Form fields.
-     *
-     * @var array
      */
-    private $fields = [];
+    private array $fields = [];
 
     /**
      * Results converted to tokens.
-     *
-     * @var array
      */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * Callback for post form submit.
      *
-     * @var mixed
+     * @var array<string, mixed[]>
      */
-    private $callbacks = [];
+    private array $callbacks = [];
 
     /**
-     * @var mixed
+     * @var mixed[]
      */
-    private $callbackResponses = [];
+    private array $callbackResponses = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $contactFieldMatches = [];
+    private array $contactFieldMatches = [];
 
     /**
      * Array to hold information set by other actions that may be useful to subsequent actions.
      *
-     * @var array
+     * @var mixed[]
      */
-    private $feedback = [];
+    private array $feedback = [];
+
+    private ?Action $action = null;
+
+    private ?string $context = null;
 
     /**
-     * Configuration for the action.
-     *
-     * @var array
+     * @var array|Response|null
      */
-    private $actionConfig = [];
+    private $postSubmitResponse;
 
     /**
-     * Active action.
-     *
-     * @var
+     * @var array<mixed>
      */
-    private $action;
+    private ?array $postSubmitPayload = null;
 
     /**
-     * @var Request
+     * @param mixed[]                 $post   raw POST results
+     * @param mixed[]|array|ServerBag $server
      */
-    private $request;
-
-    /**
-     * SubmissionEvent constructor.
-     *
-     * @param Submission $submission
-     * @param            $post
-     * @param            $server
-     * @param Request    $request
-     */
-    public function __construct(Submission $submission, $post, $server, Request $request)
-    {
+    public function __construct(
+        Submission $submission,
+        private $post,
+        private $server,
+        private Request $request
+    ) {
         $this->entity  = $submission;
-        $this->post    = $post;
-        $this->server  = $server;
-        $this->request = $request;
     }
 
-    /**
-     * Returns the Submission entity.
-     *
-     * @return Submission
-     */
-    public function getSubmission()
+    public function getSubmission(): Submission
     {
         return $this->entity;
     }
@@ -234,11 +194,7 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @param $key
-     * @param $feedback
-     */
-    public function setActionFeedback($key, $feedback)
+    public function setActionFeedback($key, $feedback): void
     {
         $this->feedback[$key] = $feedback;
     }
@@ -246,13 +202,11 @@ class SubmissionEvent extends CommonEvent
     /**
      * Get feedback injected by another action.
      *
-     * @param null $key
-     *
      * @return array|bool|mixed
      */
     public function getActionFeedback($key = null)
     {
-        if (null == $key) {
+        if (null === $key) {
             return $this->feedback;
         } elseif (isset($this->feedback[$key])) {
             return $this->feedback[$key];
@@ -261,44 +215,43 @@ class SubmissionEvent extends CommonEvent
         return false;
     }
 
-    /**
-     * @param $action
-     *
-     * @return bool
-     */
-    public function checkContext($action)
+    public function checkContext(string $context): bool
     {
-        return $this->action === $action;
+        return $this->context === $context;
     }
 
-    /**
-     * @param array $config
-     */
-    public function setActionConfig($action, array $config)
+    public function setContext(string $context): void
     {
-        $this->action       = $action;
-        $this->actionConfig = $config;
+        $this->context = $context;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getActionConfig()
+    public function setAction(?Action $action = null): void
     {
-        return $this->actionConfig;
+        $this->action = $action;
+        if (!is_null($action)) {
+            $this->setContext($action->getType());
+        }
+    }
+
+    public function getAction(): ?Action
+    {
+        return $this->action;
+    }
+
+    public function getActionConfig(): array
+    {
+        return $this->action ? $this->action->getProperties() : [];
     }
 
     /**
      * Set an post submit callback - include $callback['eventName' => '', 'anythingElse' ...].
      *
      * @param string $key
-     * @param array  $callback
      */
-    public function setPostSubmitCallback($key, array $callback)
+    public function setPostSubmitCallback($key, array $callback): void
     {
-        // support for `callback` is @deprecated and should be removed in 3.0
-        if (!array_key_exists('eventName', $callback) && !array_key_exists('callback', $callback)) {
-            throw new \InvalidArgumentException('eventName or callback required');
+        if (!array_key_exists('eventName', $callback)) {
+            throw new \InvalidArgumentException('eventName required');
         }
 
         $this->callbacks[$key] = $callback;
@@ -312,10 +265,7 @@ class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbacks : $this->callbacks[$key];
     }
 
-    /**
-     * @return int
-     */
-    public function hasPostSubmitCallbacks()
+    public function hasPostSubmitCallbacks(): bool
     {
         return count($this->callbacks) || count($this->callbackResponses);
     }
@@ -338,5 +288,36 @@ class SubmissionEvent extends CommonEvent
         $this->callbackResponses[$key] = $callbackResponse;
 
         return $this;
+    }
+
+    public function hasPostSubmitResponse(): bool
+    {
+        return null !== $this->postSubmitResponse;
+    }
+
+    public function getPostSubmitResponse()
+    {
+        return $this->postSubmitResponse;
+    }
+
+    public function setPostSubmitResponse($response): void
+    {
+        $this->postSubmitResponse = $response;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getPostSubmitPayload(): array
+    {
+        return $this->postSubmitPayload;
+    }
+
+    /**
+     * @param mixed[] $postSubmitPayload
+     */
+    public function setPostSubmitPayload(array $postSubmitPayload): void
+    {
+        $this->postSubmitPayload = $postSubmitPayload;
     }
 }

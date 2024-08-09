@@ -1,99 +1,212 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Command;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
+    private int $runLimit = 0;
+
+    private ContactLimiter $contactLimiter;
+
+    private bool $quiet = false;
+
+    public function __construct(
+        private CampaignRepository $campaignRepository,
+        private TranslatorInterface $translator,
+        private MembershipBuilder $membershipBuilder,
+        private LoggerInterface $logger,
+        private FormatterHelper $formatterHelper,
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        parent::__construct($pathsHelper, $coreParametersHelper);
+    }
+
     protected function configure()
     {
         $this
             ->setName('mautic:campaigns:rebuild')
             ->setAliases(['mautic:campaigns:update'])
-            ->setDescription('Rebuild campaigns based on contact segments.')
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
             ->addOption(
                 '--max-contacts',
                 '-m',
                 InputOption::VALUE_OPTIONAL,
                 'Set max number of contacts to process per campaign for this script execution. Defaults to all.',
-                false
+                0
             )
-            ->addOption('--campaign-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
+            ->addOption(
+                '--campaign-id',
+                '-i',
+                InputOption::VALUE_OPTIONAL,
+                'Build membership for a specific campaign.  Otherwise, all campaigns will be rebuilt.',
+                null
+            )
+            ->addOption(
+                '--contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Build membership for a specific contact.',
+                null
+            )
+            ->addOption(
+                '--contact-ids',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'CSV of contact IDs to evaluate.'
+            )
+            ->addOption(
+                '--min-contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Build membership starting at a specific contact ID.',
+                null
+            )
+            ->addOption(
+                '--max-contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Build membership up to a specific contact ID.',
+                null
+            )
+            ->addOption(
+                '--thread-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The number of this current process if running multiple in parallel.'
+            )
+            ->addOption(
+                '--max-threads',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The maximum number of processes you intend to run in parallel.'
+            )
+            ->addOption(
+                'exclude',
+                'd',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude a specific campaign from being rebuilt. Otherwise, all campaigns will be rebuilt.',
+                []
+            );
 
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $container  = $this->getContainer();
-        $translator = $container->get('translator');
-        $em         = $container->get('doctrine')->getManager();
+        $id               = $input->getOption('campaign-id');
+        $batchLimit       = $input->getOption('batch-limit');
+        $contactMinId     = $input->getOption('min-contact-id');
+        $contactMaxId     = $input->getOption('max-contact-id');
+        $contactId        = $input->getOption('contact-id');
+        $contactIds       = $this->formatterHelper->simpleCsvToArray($input->getOption('contact-ids'), 'int');
+        $threadId         = $input->getOption('thread-id');
+        $maxThreads       = $input->getOption('max-threads');
+        $this->runLimit   = $input->getOption('max-contacts');
+        $this->quiet      = (bool) $input->getOption('quiet');
+        $this->output     = ($this->quiet) ? new NullOutput() : $output;
+        $excludeCampaigns = $input->getOption('exclude');
 
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $container->get('mautic.campaign.model.campaign');
+        if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
+            $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-        $id    = $input->getOption('campaign-id');
-        $batch = $input->getOption('batch-limit');
-        $max   = $input->getOption('max-contacts');
-
-        if (!$this->checkRunStatus($input, $output, $id)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
+        if (!$this->checkRunStatus($input, $output, $id)) {
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
+        }
+
+        $this->contactLimiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
+
         if ($id) {
-            $campaign = $campaignModel->getEntity($id);
-            if ($campaign !== null) {
-                $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', ['%id%' => $id]).'</info>');
-                $processed = $campaignModel->rebuildCampaignLeads($campaign, $batch, $max, $output);
-                $output->writeln(
-                    '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
-                );
-            } else {
-                $output->writeln('<error>'.$translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+            $campaign = $this->campaignRepository->getEntity($id);
+            if (null === $campaign) {
+                $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+
+                return \Symfony\Component\Console\Command\Command::FAILURE;
             }
+
+            $this->updateCampaign($campaign);
         } else {
-            $campaigns = $campaignModel->getEntities(
-                [
-                    'iterator_mode' => true,
-                ]
-            );
+            $filter = [
+                'iterable_mode' => true,
+            ];
 
-            while (($c = $campaigns->next()) !== false) {
-                // Get first item; using reset as the key will be the ID and not 0
-                $c = reset($c);
-
-                if ($c->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.campaign.rebuild.rebuilding', ['%id%' => $c->getId()]).'</info>');
-
-                    $processed = $campaignModel->rebuildCampaignLeads($c, $batch, $max, $output);
-                    $output->writeln(
-                        '<comment>'.$translator->trans('mautic.campaign.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
-                    );
-                }
-
-                $em->detach($c);
-                unset($c);
+            if (is_array($excludeCampaigns) && count($excludeCampaigns) > 0) {
+                $filter['filter'] = [
+                    'force' => [
+                        [
+                            'expr'   => 'notIn',
+                            'column' => $this->campaignRepository->getTableAlias().'.id',
+                            'value'  => $excludeCampaigns,
+                        ],
+                    ],
+                ];
             }
+            $campaigns = $this->campaignRepository->getEntities($filter);
 
-            unset($campaigns);
+            foreach ($campaigns as $campaign) {
+                $this->updateCampaign($campaign);
+
+                unset($campaign);
+            }
         }
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+
+    /**
+     * @throws \Exception
+     */
+    private function updateCampaign(Campaign $campaign): void
+    {
+        if (!$campaign->isPublished()) {
+            return;
+        }
+
+        try {
+            $this->output->writeln(
+                '<info>'.$this->translator->trans('mautic.campaign.rebuild.rebuilding', ['%id%' => $campaign->getId()]).'</info>'
+            );
+
+            // Reset batch limiter
+            $this->contactLimiter->resetBatchMinContactId();
+
+            $this->membershipBuilder->build($campaign, $this->contactLimiter, $this->runLimit, ($this->quiet) ? null : $this->output);
+        } catch (\Exception $exception) {
+            if ('prod' !== MAUTIC_ENV) {
+                // Throw the exception for dev/test mode
+                throw $exception;
+            }
+
+            $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+        }
+
+        // Don't detach in tests since this command will be ran multiple times in the same process
+        if ('test' !== MAUTIC_ENV) {
+            $this->campaignRepository->detachEntity($campaign);
+        }
+
+        $this->output->writeln('');
+    }
+
+    protected static $defaultDescription = 'Rebuild campaigns based on contact segments.';
 }

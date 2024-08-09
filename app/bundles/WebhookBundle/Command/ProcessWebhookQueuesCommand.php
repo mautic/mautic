@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,48 +12,63 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to process queued webhook payloads.
  */
-class ProcessWebhookQueuesCommand extends ContainerAwareCommand
+class ProcessWebhookQueuesCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    public const COMMAND_NAME = 'mautic:webhooks:process';
+
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private WebhookModel $webhookModel
+    ) {
+        parent::__construct();
+    }
+
     protected function configure()
     {
-        $this->setName('mautic:webhooks:process')
-            ->setDescription('Process queued webhook payloads')
+        $this->setName(self::COMMAND_NAME)
             ->addOption(
                 '--webhook-id',
                 '-i',
                 InputOption::VALUE_OPTIONAL,
                 'Process payload for a specific webhook.  If not specified, all webhooks will be processed.',
                 null
+            )
+            ->addOption(
+                '--min-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Sets the minimum webhook queue ID to process (so called range mode).',
+                null
+            )
+            ->addOption(
+                '--max-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Sets the maximum webhook queue ID to process (so called range mode).',
+                null
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-        $model  = $this->getContainer()->get('mautic.webhook.model.webhook');
-        $params = $this->getContainer()->get('mautic.helper.core_parameters');
-
         // check to make sure we are in queue mode
-        if ($params->getParameter('queue_mode') != $model::COMMAND_PROCESS) {
+        if ($this->coreParametersHelper->get('queue_mode') != $this->webhookModel::COMMAND_PROCESS) {
             $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
-        $id = $input->getOption('webhook-id');
+        $id    = $input->getOption('webhook-id');
+        $minId = (int) $input->getOption('min-id');
+        $maxId = (int) $input->getOption('max-id');
 
         if ($id) {
-            $webhook  = $model->getEntity($id);
-            $webhooks = ($webhook !== null && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $webhook        = $this->webhookModel->getEntity($id);
+            $webhooks       = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $queueRangeMode = $minId && $maxId;
         } else {
             // make sure we only get published webhook entities
-            $webhooks = $model->getEntities(
+            $webhooks = $this->webhookModel->getEntities(
                 [
                     'filter' => [
                         'force' => [
@@ -78,21 +86,40 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
         if (!count($webhooks)) {
             $output->writeln('<error>No published webhooks found. Try again later.</error>');
 
-            return 0;
+            return Command::FAILURE;
         }
 
         $output->writeLn('<info>Processing Webhooks</info>');
 
         try {
-            $model->processWebhooks($webhooks);
+            if ($queueRangeMode) {
+                $webhookLimit = $this->webhookModel->getWebhookLimit();
+
+                if (1 > $webhookLimit) {
+                    throw new \InvalidArgumentException('`webhook limit` parameter must be greater than zero.');
+                }
+
+                for (; $minId <= $maxId; $minId += $webhookLimit) {
+                    $this->webhookModel
+                        ->setMinQueueId($minId)
+                        ->setMaxQueueId(min($minId + $webhookLimit - 1, $maxId));
+
+                    $this->webhookModel->processWebhook(current($webhooks));
+                }
+            } else {
+                $this->webhookModel->processWebhooks($webhooks);
+            }
         } catch (\Exception $e) {
             $output->writeLn('<error>'.$e->getMessage().'</error>');
+            $output->writeLn('<error>'.$e->getTraceAsString().'</error>');
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $output->writeLn('<info>Webhook Processing Complete</info>');
 
-        return 0;
+        return Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Process queued webhook payloads';
 }

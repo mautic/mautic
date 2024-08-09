@@ -1,44 +1,35 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+use MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType;
+use MauticPlugin\MauticSocialBundle\Integration\Config;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public function __construct(private Config $config)
+    {
+    }
+
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_ON_BUILD => ['onFormBuild', 0],
         ];
     }
 
-    /**
-     * @param FormBuilderEvent $event
-     */
-    public function onFormBuild(FormBuilderEvent $event)
+    public function onFormBuild(FormBuilderEvent $event): void
     {
+        if (!$this->config->isPublished()) {
+            return;
+        }
         $action = [
             'label'          => 'mautic.plugin.actions.socialLogin',
-            'formType'       => 'sociallogin',
-            'template'       => 'MauticSocialBundle:Integration:login.html.php',
+            'formType'       => SocialLoginType::class,
+            'template'       => '@MauticSocial/Integration/login.html.twig',
             'builderOptions' => [
                 'addLeadFieldList' => false,
                 'addIsRequired'    => false,

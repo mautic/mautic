@@ -1,27 +1,19 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class StatRepository.
+ * @extends CommonRepository<Stat>
  */
 class StatRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
-     * @param $trackingHash
-     *
      * @return mixed
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -43,13 +35,7 @@ class StatRepository extends CommonRepository
         return (!empty($result)) ? $result[0] : null;
     }
 
-    /**
-     * @param      $smsId
-     * @param null $listId
-     *
-     * @return array
-     */
-    public function getSentStats($smsId, $listId = null)
+    public function getSentStats($smsId, $listId = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
@@ -62,9 +48,9 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->executeQuery()->fetchAllAssociative();
 
-        //index by lead
+        // index by lead
         $stats = [];
         foreach ($result as $r) {
             $stats[$r['lead_id']] = $r['lead_id'];
@@ -104,7 +90,7 @@ class StatRepository extends CommonRepository
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -112,8 +98,7 @@ class StatRepository extends CommonRepository
     /**
      * Get a lead's email stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *
@@ -122,86 +107,81 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = [])
     {
-        $query = $this->createQueryBuilder('s');
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 's')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'sms_messages', 'e', 's.sms_id = e.id');
 
-        $query->select('IDENTITY(s.sms) AS sms_id, s.id, s.dateSent, e.title, IDENTITY(s.list) AS list_id, l.name as list_name, s.trackingHash as idHash')
-            ->leftJoin('MauticSmsBundle:Sms', 'e', 'WITH', 'e.id = s.sms')
-            ->leftJoin('MauticLeadBundle:LeadList', 'l', 'WITH', 'l.id = s.list')
-            ->where(
-                $query->expr()->eq('IDENTITY(s.lead)', $leadId)
+        if ($leadId) {
+            $query->andWhere(
+                $query->expr()->eq('s.lead_id', (int) $leadId)
             );
+        }
+
+        if (!empty($options['basic_select'])) {
+            $query->select(
+                's.sms_id, s.id, s.date_sent as dateSent, e.name, e.name as sms_name,  s.is_failed as isFailed'
+            );
+        } else {
+            $query->select(
+                's.sms_id, s.id, s.date_sent as dateSent, e.name, e.name as sms_name, e.message, e.sms_type as type, s.is_failed as isFailed, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.lead_id, s.details'
+            )
+                ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
+        }
+
+        if (isset($options['state'])) {
+            $state = $options['state'];
+            if ('failed' == $state) {
+                $query->andWhere(
+                    $query->expr()->eq('s.is_failed', 1)
+                );
+            }
+        }
+        $state = 'sent';
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('e.title', $query->expr()->literal('%'.$options['search'].'%'))
+                $query->expr()->or(
+                    $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%'))
+                )
             );
-        }
-
-        if (isset($options['order'])) {
-            list($orderBy, $orderByDir) = $options['order'];
-
-            switch ($orderBy) {
-                case 'eventLabel':
-                    $orderBy = 'e.title';
-                    break;
-                case 'timestamp':
-                default:
-                    $orderBy = 's.dateSent';
-                    break;
-            }
-
-            $query->orderBy($orderBy, $orderByDir);
-        }
-
-        if (!empty($options['limit'])) {
-            $query->setMaxResults($options['limit']);
-
-            if (!empty($options['start'])) {
-                $query->setFirstResult($options['start']);
-            }
         }
 
         if (isset($options['fromDate']) && $options['fromDate']) {
             $dt = new DateTimeHelper($options['fromDate']);
             $query->andWhere(
-                $query->expr()->gte('s.dateSent', $query->expr()->literal($dt->toUtcString()))
+                $query->expr()->gte('s.date_sent', $query->expr()->literal($dt->toUtcString()))
             );
         }
 
-        $stats = $query->getQuery()->getArrayResult();
-
-        return $stats;
+        return $this->getTimelineResults(
+            $query,
+            $options,
+            'e.name',
+            's.date_'.$state
+        );
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param $fromLeadId
-     * @param $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId)
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'sms_message_stats')
             ->set('sms_id', (int) $toLeadId)
             ->where('sms_id = '.(int) $fromLeadId)
-            ->execute();
+            ->executeStatement();
     }
 
     /**
      * Delete a stat.
-     *
-     * @param $id
      */
-    public function deleteStat($id)
+    public function deleteStat($id): void
     {
         $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'sms_message_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }

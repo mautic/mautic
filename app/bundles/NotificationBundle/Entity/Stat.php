@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -17,43 +8,41 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
+    public const TABLE_NAME = 'push_notification_stats';
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var Notification
+     * @var Notification|null
      */
     private $notification;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList
+     * @var \Mautic\LeadBundle\Entity\LeadList|null
      */
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateRead;
 
@@ -63,27 +52,27 @@ class Stat
     private $isClicked = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateClicked;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingHash;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -93,7 +82,7 @@ class Stat
     private $tokens = [];
 
     /**
-     * @var int
+     * @var int|null
      */
     private $clickCount;
 
@@ -103,25 +92,22 @@ class Stat
     private $clickDetails = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastClicked;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('push_notification_stats')
-            ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\StatRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
             ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
             ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_notification_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('notification', 'Notification')
             ->inversedBy('stats')
@@ -130,7 +116,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToOne('list', \Mautic\LeadBundle\Entity\LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -186,10 +172,8 @@ class Stat
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -223,7 +207,7 @@ class Stat
     /**
      * @param mixed $dateClicked
      */
-    public function setDateClicked($dateClicked)
+    public function setDateClicked($dateClicked): void
     {
         $this->dateClicked = $dateClicked;
     }
@@ -239,7 +223,7 @@ class Stat
     /**
      * @param mixed $dateSent
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -252,24 +236,18 @@ class Stat
         return $this->notification;
     }
 
-    /**
-     * @param Notification $notification
-     */
-    public function setNotification(Notification $notification = null)
+    public function setNotification(Notification $notification = null): void
     {
         $this->notification = $notification;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -279,7 +257,7 @@ class Stat
     /**
      * @param mixed $ip
      */
-    public function setIpAddress(IpAddress $ip)
+    public function setIpAddress(IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -295,7 +273,7 @@ class Stat
     /**
      * @param mixed $isClicked
      */
-    public function setIsClicked($isClicked)
+    public function setIsClicked($isClicked): void
     {
         $this->isClicked = $isClicked;
     }
@@ -311,7 +289,7 @@ class Stat
     /**
      * @param mixed $lead
      */
-    public function setLead(Lead $lead = null)
+    public function setLead(Lead $lead = null): void
     {
         $this->lead = $lead;
     }
@@ -327,7 +305,7 @@ class Stat
     /**
      * @param mixed $trackingHash
      */
-    public function setTrackingHash($trackingHash)
+    public function setTrackingHash($trackingHash): void
     {
         $this->trackingHash = $trackingHash;
     }
@@ -343,7 +321,7 @@ class Stat
     /**
      * @param mixed $list
      */
-    public function setList($list)
+    public function setList($list): void
     {
         $this->list = $list;
     }
@@ -359,12 +337,12 @@ class Stat
     /**
      * @param mixed $retryCount
      */
-    public function setRetryCount($retryCount)
+    public function setRetryCount($retryCount): void
     {
         $this->retryCount = $retryCount;
     }
 
-    public function upRetryCount()
+    public function upRetryCount(): void
     {
         ++$this->retryCount;
     }
@@ -380,7 +358,7 @@ class Stat
     /**
      * @param mixed $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         $this->source = $source;
     }
@@ -396,7 +374,7 @@ class Stat
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }
@@ -412,7 +390,7 @@ class Stat
     /**
      * @param mixed $tokens
      */
-    public function setTokens($tokens)
+    public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
     }
@@ -437,10 +415,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @param $details
-     */
-    public function addClickDetails($details)
+    public function addClickDetails($details): void
     {
         $this->clickDetails[] = $details;
 
@@ -469,8 +444,6 @@ class Stat
     }
 
     /**
-     * @param \DateTime $lastClicked
-     *
      * @return Stat
      */
     public function setLastClicked(\DateTime $lastClicked)
@@ -501,7 +474,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateRead()
     {

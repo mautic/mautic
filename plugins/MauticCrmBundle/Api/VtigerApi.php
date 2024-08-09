@@ -50,7 +50,7 @@ class VtigerApi extends CrmApi
      */
     public function getLeadFields($object)
     {
-        if ($object === 'company') {
+        if ('company' === $object) {
             $object = 'Accounts';
         } else {
             $object = $this->element;
@@ -60,8 +60,6 @@ class VtigerApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return mixed
      */
     public function createLead(array $data)

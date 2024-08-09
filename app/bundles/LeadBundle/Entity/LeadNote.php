@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -18,9 +9,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadNote.
- */
 class LeadNote extends FormEntity
 {
     /**
@@ -29,7 +17,7 @@ class LeadNote extends FormEntity
     private $id;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     private $lead;
 
@@ -39,24 +27,21 @@ class LeadNote extends FormEntity
     private $text;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $type = 'general';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateTime;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_notes')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadNoteRepository');
+            ->setCustomRepositoryClass(LeadNoteRepository::class);
 
         $builder->addId();
 
@@ -77,10 +62,8 @@ class LeadNote extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadNote')
             ->addProperties(
@@ -157,10 +140,8 @@ class LeadNote extends FormEntity
 
     /**
      * Form validation rules.
-     *
-     * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('text', new NotBlank(
             ['message' => 'mautic.lead.note.text.notblank']
@@ -175,18 +156,12 @@ class LeadNote extends FormEntity
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
@@ -202,7 +177,7 @@ class LeadNote extends FormEntity
     /**
      * @param mixed $dateTime
      */
-    public function setDateTime($dateTime)
+    public function setDateTime($dateTime): void
     {
         $this->dateTime = $dateTime;
     }

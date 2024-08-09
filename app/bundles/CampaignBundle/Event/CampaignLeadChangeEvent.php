@@ -1,61 +1,37 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class CampaignLeadChangeEvent.
- */
 class CampaignLeadChangeEvent extends Event
 {
     /**
-     * @var Campaign
-     */
-    private $campaign;
-
-    /**
-     * @var Lead
+     * @var ?Lead
      */
     private $lead;
 
     /**
-     * @var array
+     * @var Lead[]
      */
-    private $leads = [];
+    private array $leads = [];
 
     /**
-     * @var string
+     * @param Lead|Lead[] $leads
+     * @param ?string     $action
      */
-    private $action;
-
-    /**
-     * CampaignLeadChangeEvent constructor.
-     *
-     * @param Campaign $campaign
-     * @param          $leads
-     * @param          $action
-     */
-    public function __construct(Campaign $campaign, $leads, $action)
-    {
-        $this->campaign = $campaign;
+    public function __construct(
+        private Campaign $campaign,
+        $leads,
+        private $action
+    ) {
         if (is_array($leads)) {
             $this->leads = $leads;
         } else {
             $this->lead = $leads;
         }
-        $this->action = $action;
     }
 
     /**
@@ -71,7 +47,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * Returns the Lead entity.
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -81,7 +57,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * If this is a batch event, return array of leads.
      *
-     * @return array
+     * @return Lead[]|null
      */
     public function getLeads()
     {
@@ -91,7 +67,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * Returns added or removed.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getAction()
     {
@@ -100,21 +76,17 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Lead was removed from the campaign.
-     *
-     * @return bool
      */
-    public function wasRemoved()
+    public function wasRemoved(): bool
     {
-        return $this->action == 'removed';
+        return 'removed' === $this->action;
     }
 
     /**
      * Lead was added to the campaign.
-     *
-     * @return bool
      */
-    public function wasAdded()
+    public function wasAdded(): bool
     {
-        return $this->action == 'added';
+        return 'added' === $this->action;
     }
 }

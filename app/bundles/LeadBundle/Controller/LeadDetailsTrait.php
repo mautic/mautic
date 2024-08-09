@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -17,20 +8,18 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait LeadDetailsTrait
 {
+    private ?RequestStack $requestStack = null;
+
     /**
-     * @param array      $leads
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     *
-     * @return array
+     * @param int $page
      */
-    protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -81,7 +70,7 @@ trait LeadDetailsTrait
             foreach ($events as &$event) {
                 $event['leadId']    = $lead->getId();
                 $event['leadEmail'] = $lead->getEmail();
-                $event['leadName']  = $lead->getName() ? $lead->getName() : $lead->getEmail();
+                $event['leadName']  = $lead->getName() ?: $lead->getEmail();
             }
 
             $result['events'] = array_merge($result['events'], $events);
@@ -131,33 +120,19 @@ trait LeadDetailsTrait
         return $filters;
     }
 
-    /**
-     * @param $a
-     * @param $b
-     *
-     * @return int
-     */
-    private function cmp($a, $b)
+    private function cmp($a, $b): int
     {
-        if ($a['timestamp'] === $b['timestamp']) {
-            return 0;
-        }
-
-        return ($a['timestamp'] < $b['timestamp']) ? +1 : -1;
+        return $b['timestamp'] <=> $a['timestamp'];
     }
 
     /**
      * Get a list of places for the lead based on IP location.
-     *
-     * @param Lead $lead
-     *
-     * @return array
      */
-    protected function getPlaces(Lead $lead)
+    protected function getPlaces(Lead $lead): array
     {
         // Get Places from IP addresses
         $places = [];
-        if ($lead->getIpAddresses()) {
+        if ($lead->getIpAddresses()->count() > 0) {
             foreach ($lead->getIpAddresses() as $ip) {
                 if ($details = $ip->getIpDetails()) {
                     if (!empty($details['latitude']) && !empty($details['longitude'])) {
@@ -181,15 +156,11 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead           $lead
-     * @param \DateTime|null $fromDate
-     * @param \DateTime|null $toDate
-     *
-     * @return mixed
+     * @return mixed[]
      */
-    protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
+    protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
     {
-        $translator = $this->get('translator');
+        $translator = $this->translator;
 
         if (null == $fromDate) {
             $fromDate = new \DateTime('first day of this month 00:00:00');
@@ -200,31 +171,25 @@ trait LeadDetailsTrait
         }
 
         $lineChart  = new LineChart(null, $fromDate, $toDate);
-        $chartQuery = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+        $chartQuery = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements['byUnit']);
 
-        $pointStats = $chartQuery->fetchTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()]);
+        $pointStats = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
 
         return $lineChart->render();
     }
 
     /**
-     * @param Lead       $lead
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
-     *
-     * @return array
+     * @return mixed[]
      */
-    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, int $page = 1, int $limit = 25): array
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -251,21 +216,19 @@ trait LeadDetailsTrait
 
         // Audit Log
         /** @var AuditLogModel $auditlogModel */
-        $auditlogModel = $this->getModel('core.auditLog');
+        $auditlogModel = $this->getModel('core.auditlog');
         /** @var AuditLogRepository $repo */
         $repo     = $auditlogModel->getRepository();
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(function ($l) {
-            return [
-                'eventType'       => $l['action'],
-                'eventLabel'      => $l['userName'],
-                'timestamp'       => $l['dateAdded'],
-                'details'         => $l['details'],
-                'contentTemplate' => 'MauticLeadBundle:Auditlog:details.html.php',
-            ];
-        }, $logs);
+        $logEvents = array_map(fn ($l): array => [
+            'eventType'       => $l['action'],
+            'eventLabel'      => $l['userName'],
+            'timestamp'       => $l['dateAdded'],
+            'details'         => $l['details'],
+            'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
+        ], $logs);
 
         $types = [
             'delete'     => $this->translator->trans('mautic.lead.event.delete'),
@@ -289,17 +252,12 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead       $lead
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
-     *
-     * @return array
+     * @param int $page
+     * @param int $limit
      */
-    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25): array
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -330,15 +288,94 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead $lead
-     *
-     * @return array
+     * Get an array with engagements and points of a contact.
      */
-    protected function getScheduledCampaignEvents(Lead $lead)
+    protected function getStatsCount(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null): array
+    {
+        if (null == $fromDate) {
+            $fromDate = new \DateTime('first day of this month 00:00:00');
+            $fromDate->modify('-6 months');
+        }
+        if (null == $toDate) {
+            $toDate = new \DateTime();
+        }
+
+        /** @var LeadModel $model */
+        $model       = $this->getModel('lead');
+        $chartQuery  = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
+
+        $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
+        $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
+
+        return [
+            'engagements' => $engagements,
+            'points'      => $pointStats,
+        ];
+    }
+
+    /**
+     * Get an array to create company's engagements graph.
+     *
+     * @param array $contacts
+     */
+    protected function getCompanyEngagementData($contacts): array
+    {
+        $engagements = [0, 0, 0, 0, 0, 0];
+        $points      = [0, 0, 0, 0, 0, 0];
+        foreach ($contacts as $contact) {
+            /** @var LeadModel $model */
+            $model = $this->getModel('lead.lead');
+
+            if (!isset($contact['lead_id'])) {
+                continue;
+            }
+
+            $lead = $model->getEntity($contact['lead_id']);
+            $model->getRepository()->refetchEntity($lead);
+            if (!$lead instanceof Lead) {
+                continue;
+            }
+            $engagementsData = $this->getStatsCount($lead);
+
+            $engagements = array_map(fn ($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
+            $points      = array_map(fn ($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
+        }
+
+        return [
+            'engagements' => $engagements,
+            'points'      => $points,
+        ];
+    }
+
+    /**
+     * Get company graph for points and engagements.
+     *
+     * @return array<string, mixed>
+     */
+    protected function getCompanyEngagementsForGraph($contacts): array
+    {
+        $graphData  = $this->getCompanyEngagementData($contacts);
+        $translator = $this->translator;
+
+        $fromDate = new \DateTime('first day of this month 00:00:00');
+        $fromDate->modify('-6 months');
+
+        $toDate = new \DateTime();
+
+        $lineChart  = new LineChart(null, $fromDate, $toDate);
+
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $graphData['engagements']);
+
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $graphData['points']);
+
+        return $lineChart->render();
+    }
+
+    protected function getScheduledCampaignEvents(Lead $lead): array
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
 
         return $leadEventLogRepository->getUpcomingEvents(
             [
@@ -346,5 +383,11 @@ trait LeadDetailsTrait
                 'eventType' => ['action', 'condition'],
             ]
         );
+    }
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setRequestStackLeadDetailsTrait(?RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
     }
 }

@@ -1,52 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class LeadListsSubscriber.
- */
-class LeadListSubscriber extends CommonSubscriber
+class LeadListSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $helper;
-
-    protected $listModel;
-
-    /**
-     * ChannelSubscriber constructor.
-     *
-     * @param IntegrationHelper $helper
-     */
-    public function __construct(IntegrationHelper $helper, ListModel $listModel)
-    {
-        $this->helper    = $helper;
-        $this->listModel = $listModel;
+    public function __construct(
+        private IntegrationHelper $helper,
+        private ListModel $listModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onFilterChoiceFieldsGenerate', 0],
@@ -54,10 +30,7 @@ class LeadListSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param LeadListFiltersChoicesEvent $event
-     */
-    public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
+    public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event): void
     {
         $services = $this->helper->getIntegrationObjects();
         $choices  = [];
@@ -76,12 +49,12 @@ class LeadListSubscriber extends CommonSubscriber
                     if ('Salesforce' !== $integrationName) {
                         array_walk(
                             $integrationChoices,
-                            function (&$choice) use ($integrationName) {
+                            function (&$choice) use ($integrationName): void {
                                 $choice['value'] = $integrationName.'::'.$choice['value'];
                             }
                         );
                     }
-
+                    $integrationChoices                      = FormFieldHelper::parseListForChoices($integrationChoices);
                     $choices[$integration->getDisplayName()] = $integrationChoices;
                 }
             }
@@ -111,15 +84,15 @@ class LeadListSubscriber extends CommonSubscriber
      */
     public function onLeadListProcessList(ListPreProcessListEvent $event)
     {
-        //get Integration Campaign members
+        // get Integration Campaign members
         $list    = $event->getList();
         $success = false;
         $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
 
         foreach ($filters as $filter) {
-            if ($filter['field'] == 'integration_campaigns') {
-                if (strpos($filter['filter'], '::') !== false) {
-                    list($integrationName, $campaignId) = explode('::', $filter['filter']);
+            if ('integration_campaigns' == $filter['field']) {
+                if (str_contains($filter['filter'], '::')) {
+                    [$integrationName, $campaignId] = explode('::', $filter['filter']);
                 } else {
                     // Assuming this is a Salesforce integration for BC with pre 2.11.0
                     $integrationName = 'Salesforce';
@@ -133,7 +106,7 @@ class LeadListSubscriber extends CommonSubscriber
                     }
 
                     if (method_exists($integrationObject, 'getCampaignMembers')) {
-                        if ($integrationObject->getCampaignMembers($campaignId, [])) {
+                        if ($integrationObject->getCampaignMembers($campaignId)) {
                             $success = true;
                         }
                     }

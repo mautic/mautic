@@ -1,31 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class PointEventHelper.
- */
 class PointEventHelper
 {
-    /**
-     * @param $eventDetails
-     * @param $action
-     *
-     * @return int
-     */
-    public static function validateEmail($eventDetails, $action)
+    public static function validateEmail($eventDetails, $action): bool
     {
         if (null === $eventDetails) {
             return false;
@@ -38,21 +20,14 @@ class PointEventHelper
         }
 
         if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
-            //no points change
+            // no points change
             return false;
         }
 
         return true;
     }
 
-    /**
-     * @param               $event
-     * @param Lead          $lead
-     * @param MauticFactory $factory
-     *
-     * @return bool
-     */
-    public static function sendEmail($event, Lead $lead, MauticFactory $factory)
+    public static function sendEmail($event, Lead $lead, MauticFactory $factory): bool
     {
         $properties = $event['properties'];
         $emailId    = (int) $properties['email'];
@@ -61,13 +36,11 @@ class PointEventHelper
         $model = $factory->getModel('email');
         $email = $model->getEntity($emailId);
 
-        //make sure the email still exists and is published
-        if ($email != null && $email->isPublished()) {
+        // make sure the email still exists and is published
+        if (null != $email && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel             = $factory->getModel('lead');
-                $leadCredentials       = $leadModel->flattenFields($leadFields);
+                $leadCredentials       = $lead->getProfileFields();
                 $leadCredentials['id'] = $lead->getId();
 
                 $options   = ['source' => ['trigger', $event['id']]];

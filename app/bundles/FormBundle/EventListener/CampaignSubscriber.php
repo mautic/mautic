@@ -1,64 +1,32 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
+use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * @var SubmissionModel
-     */
-    protected $formSubmissionModel;
-
-    /**
-     * @var EventModel
-     */
-    protected $campaignEventModel;
-
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param FormModel       $formModel
-     * @param SubmissionModel $formSubmissionModel
-     * @param EventModel      $campaignEventModel
-     */
-    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, EventModel $campaignEventModel)
-    {
-        $this->formModel           = $formModel;
-        $this->formSubmissionModel = $formSubmissionModel;
-        $this->campaignEventModel  = $campaignEventModel;
+    public function __construct(
+        private FormModel $formModel,
+        private SubmissionModel $formSubmissionModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private FormFieldHelper $formFieldHelper
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
@@ -70,15 +38,13 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add the option to the list.
-     *
-     * @param CampaignBuilderEvent $event
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $trigger = [
             'label'       => 'mautic.form.campaign.event.submit',
             'description' => 'mautic.form.campaign.event.submit_descr',
-            'formType'    => 'campaignevent_formsubmit',
+            'formType'    => CampaignEventFormSubmitType::class,
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         ];
         $event->addDecision('form.submit', $trigger);
@@ -86,8 +52,8 @@ class CampaignSubscriber extends CommonSubscriber
         $trigger = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
-            'formType'    => 'campaignevent_form_field_value',
-            'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
+            'formType'    => CampaignEventFormFieldValueType::class,
+            'formTheme'   => '@MauticForm/FormTheme/FieldValueCondition/_campaignevent_form_field_value_widget.html.twig',
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('form.field_value', $trigger);
@@ -95,29 +61,24 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Trigger campaign event for when a form is submitted.
-     *
-     * @param SubmissionEvent $event
      */
-    public function onFormSubmit(SubmissionEvent $event)
+    public function onFormSubmit(SubmissionEvent $event): void
     {
         $form = $event->getSubmission()->getForm();
-        $this->campaignEventModel->triggerEvent('form.submit', $form, 'form', $form->getId());
+        $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
 
-        if ($eventDetails === null) {
+        if (null === $eventDetails) {
             return $event->setResult(true);
         }
 
         $limitToForms = $event->getConfig()['forms'];
 
-        //check against selected forms
+        // check against selected forms
         if (!empty($limitToForms) && !in_array($eventDetails->getId(), $limitToForms)) {
             return $event->setResult(false);
         }
@@ -125,9 +86,6 @@ class CampaignSubscriber extends CommonSubscriber
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         $lead = $event->getLead();
@@ -143,13 +101,19 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
+        $field = $this->formModel->findFormFieldByAlias($form, $event->getConfig()['field']);
+
+        $filter = $this->formFieldHelper->getFieldFilter($field->getType());
+        $value  = InputHelper::_($event->getConfig()['value'], $filter);
+
         $result = $this->formSubmissionModel->getRepository()->compareValue(
             $lead->getId(),
             $form->getId(),
             $form->getAlias(),
             $event->getConfig()['field'],
-            $event->getConfig()['value'],
-            $operators[$event->getConfig()['operator']]['expr']
+            $value,
+            $operators[$event->getConfig()['operator']]['expr'],
+            $field ? $field->getType() : null
         );
 
         $event->setChannel('form', $form->getId());

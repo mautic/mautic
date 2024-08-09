@@ -1,77 +1,95 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
-use FOS\OAuthServerBundle\Event\OAuthEvent;
+use FOS\OAuthServerBundle\Event\PreAuthorizationEvent;
+use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
+use FOS\OAuthServerBundle\Model\ClientManagerInterface;
+use OAuth2\OAuth2;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Twig\Environment;
 
-/**
- * Class AuthorizeController.
- */
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
     /**
-     * Authorize.
-     *
-     * @param Request $request
-     *
-     * @return \FOS\OAuthServerBundle\Controller\Response|\Symfony\Component\HttpFoundation\Response
+     * This constructor must be duplicated from the extended class so our custom code could access the properties.
+     */
+    public function __construct(
+        RequestStack $requestStack,
+        private Form $authorizeForm,
+        private AuthorizeFormHandler $authorizeFormHandler,
+        private OAuth2 $oAuth2Server,
+        private TokenStorageInterface $tokenStorage,
+        UrlGeneratorInterface $router,
+        ClientManagerInterface $clientManager,
+        private EventDispatcherInterface $eventDispatcher,
+        private Environment $twig,
+        SessionInterface $session = null
+    ) {
+        parent::__construct(
+            $requestStack,
+            $authorizeForm,
+            $authorizeFormHandler,
+            $oAuth2Server,
+            $tokenStorage,
+            $router,
+            $clientManager,
+            $eventDispatcher,
+            $twig,
+            $session
+        );
+    }
+
+    /**
+     * @return \FOS\OAuthServerBundle\Controller\Response|Response
      *
      * @throws \OAuth2\OAuth2RedirectException
      * @throws AccessDeniedException
-     *
-     * @author Chris Jones <leeked@gmail.com>
      */
     public function authorizeAction(Request $request)
     {
-        $user = $this->container->get('security.context')->getToken()->getUser();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {
             throw new AccessDeniedException('This user does not have access to this section.');
         }
 
-        if (true === $this->container->get('session')->get('_fos_oauth_server.ensure_logout')) {
-            $this->container->get('session')->invalidate(600);
-            $this->container->get('session')->set('_fos_oauth_server.ensure_logout', true);
+        if (true === $request->getSession()->get('_fos_oauth_server.ensure_logout')) {
+            $request->getSession()->invalidate(600);
+            $request->getSession()->set('_fos_oauth_server.ensure_logout', true);
         }
 
-        $form        = $this->container->get('fos_oauth_server.authorize.form');
-        $formHandler = $this->container->get('fos_oauth_server.authorize.form.handler');
-
-        $event = $this->container->get('event_dispatcher')->dispatch(
-            OAuthEvent::PRE_AUTHORIZATION_PROCESS,
-            new OAuthEvent($user, $this->getClient())
+        $event = $this->eventDispatcher->dispatch(
+            new PreAuthorizationEvent($user, $this->getClient())
         );
 
         if ($event->isAuthorizedClient()) {
             $scope = $request->get('scope', null);
 
-            return $this->container
-                ->get('fos_oauth_server.server')
-                ->finishClientAuthorization(true, $user, $request, $scope);
+            return $this->oAuth2Server->finishClientAuthorization(true, $user, $request, $scope);
         }
 
-        if (true === $formHandler->process()) {
-            return $this->processSuccess($user, $formHandler, $request);
+        if (true === $this->authorizeFormHandler->process()) {
+            return $this->processSuccess($user, $this->authorizeFormHandler, $request);
         }
 
-        return $this->container->get('templating')->renderResponse(
-            'MauticApiBundle:Authorize:oAuth2/authorize.html.php',
+        $contents =  $this->twig->render(
+            '@MauticApi/Authorize/oAuth2/authorize.html.twig',
             [
-                'form'   => $form->createView(),
+                'form'   => $this->authorizeForm->createView(),
                 'client' => $this->getClient(),
             ]
         );
+
+        return new Response($contents);
     }
 }

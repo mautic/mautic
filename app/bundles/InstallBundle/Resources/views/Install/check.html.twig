@@ -1,0 +1,104 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+
+{#use Mautic\InstallBundle\Configurator\Step\CheckStep;#}
+
+{% if 'index' == tmpl %}
+    {% extends '@MauticInstall/Install/content.html.twig' %}
+{% endif %}
+
+{% block content %}
+<div class="panel-heading">
+    <h2 class="panel-title">
+        {{ 'mautic.install.heading.check.environment'|trans }}
+    </h2>
+</div>
+{% autoescape false %}
+<div class="panel-body">
+    {% if majors|length %}
+    <div class="panel-group" id="minors">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title" style="font-size: 1em;">
+                    {{ 'mautic.install.heading.major.problems'|trans }}
+                </h3>
+            </div>
+            <div class="panel-body alert-warning">
+                {{ 'mautic.install.sentence.major.problems'|trans ({'%majors%' : majors|length}) }}
+            </div>
+            <ul class="list-group">
+                {% for message in majors %}
+                    {% if message == 'mautic.install.cache.unwritable' %}
+                        <li class="list-group-item">{{ 'mautic.install.directory.unwritable'|trans ({'%path%' : cacheDir}) }}</li>
+                    {% elseif message == 'mautic.install.config.unwritable' %}
+                        <li class="list-group-item">{{ message|trans ({'%path%' : configFile}) }}</li>
+                    {% elseif message == 'mautic.install.logs.unwritable' %}
+                        <li class="list-group-item">{{ 'mautic.install.directory.unwritable'|trans ({'%path%' : logDir}) }}</li>
+                    {% elseif message == 'mautic.install.apc.version' %}
+                        {% set minAPCverison = (constant('PHP_VERSION') >= '5.4.0') ? '3.1.13' : '3.0.17' %}
+                        <li class="list-group-item">{{ message|trans ({'%minapc%' : minAPCverison, '%currentapc%' : 'apc'|phpversion}) }}</li>
+                    {% else %}
+                        <li class="list-group-item">{{ message|trans }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not (majors|length) %}
+        <div class="alert alert-success">
+            <h4><i class="ri-check-line"></i> {{ 'mautic.install.heading.ready'|trans }}</h4>
+            <p>{{ 'mautic.install.sentence.ready'|trans }}</p>
+        </div>
+    {% endif %}
+
+    {% if minors|length %}
+    <div class="panel-group" id="minors">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title" style="font-size: 1em;">
+                    <a data-toggle="collapse" style="display: block; " href="#minorDetails"><i class="ri-arrow-down-s-line"></i> {{ 'mautic.install.heading.minor.problems'|trans }}</a>
+                </h3>
+            </div>
+            <div id="minorDetails" class="panel-collapse collapse">
+                <div class="panel-body alert-warning">
+                    <p>{{ 'mautic.install.sentence.minor.problems'|trans }}</p>
+                </div>
+                 <ul class="list-group">
+                     {% for message in minors %}
+                         {% if message == 'mautic.install.pcre.version' %}
+                            <li class="list-group-item">{{ message|trans ({'%pcreversion%' : constant('PCRE_VERSION')}) }}</li>
+                         {% elseif message == 'mautic.install.php.version.not.supported' %}
+                             <li class="list-group-item">{{ message|trans ({'%phpversion%' : constant('PHP_VERSION')}) }}</li>
+                         {% elseif message == 'mautic.install.php.version.has.only.security.support' %}
+                             <li class="list-group-item">{{ message|trans ({'%phpversion%' : constant('PHP_VERSION')}) }}</li>
+                         {% elseif message == 'mautic.install.memory.limit' %}
+                             <li class="list-group-item">{{ message|trans ({'%min_memory_limit%' : constant('Mautic\\InstallBundle\\Configurator\\Step\\CheckStep::RECOMMENDED_MEMORY_LIMIT')}) }}</li>
+                         {% else %}
+                             <li class="list-group-item">{{ message|trans }}</li>
+                         {% endif %}
+                     {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not (majors|length) %}
+    {{ form_start(form) }}
+
+        <div class="row mt-20">
+            <div class="col-sm-12">
+                {{ form_row(form.buttons) }}
+            </div>
+        </div>
+    {{ form_end(form) }}
+    {% endif %}
+</div>
+{% endautoescape %}
+{% endblock %}

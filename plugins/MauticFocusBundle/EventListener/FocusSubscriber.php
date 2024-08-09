@@ -1,141 +1,69 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class FocusSubscriber.
- */
-class FocusSubscriber extends CommonSubscriber
+class FocusSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var PageTokenHelper
-     */
-    protected $pageTokenHelper;
-
-    /**
-     * @var AssetTokenHelper
-     */
-    protected $assetTokenHelper;
-
-    /**
-     * @var FormTokenHelper
-     */
-    protected $formTokenHelper;
-
-    /**
-     * @var FocusModel
-     */
-    protected $focusModel;
-
-    /**
-     * FocusSubscriber constructor.
-     *
-     * @param RouterInterface  $router
-     * @param IpLookupHelper   $ipLookupHelper
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     * @param FormTokenHelper  $formTokenHelper
-     * @param FocusModel       $focusModel
-     */
     public function __construct(
-        RouterInterface $router,
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        TrackableModel $trackableModel,
-        PageTokenHelper $pageTokenHelper,
-        AssetTokenHelper $assetTokenHelper,
-        FormTokenHelper $formTokenHelper,
-        FocusModel $focusModel
+        private RouterInterface $router,
+        private IpLookupHelper $ipHelper,
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private FocusModel $focusModel,
+        private RequestStack $requestStack
     ) {
-        $this->router           = $router;
-        $this->ipHelper         = $ipLookupHelper;
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->formTokenHelper  = $formTokenHelper;
-        $this->focusModel       = $focusModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST          => ['onKernelRequest', 0],
             FocusEvents::POST_SAVE         => ['onFocusPostSave', 0],
             FocusEvents::POST_DELETE       => ['onFocusDelete', 0],
             FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            ReportEvents::REPORT_ON_BUILD  => ['onReportBuild', -10],
         ];
     }
 
     /*
      * Check and hijack the form's generate link if the ID has mf- in it
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             // get the current event request
             $request    = $event->getRequest();
             $requestUri = $request->getRequestUri();
 
             $formGenerateUrl = $this->router->generate('mautic_form_generateform');
 
-            if (strpos($requestUri, $formGenerateUrl) !== false) {
-                $id = InputHelper::_($this->request->get('id'));
-                if (strpos($id, 'mf-') === 0) {
+            if (str_contains($requestUri, $formGenerateUrl)) {
+                $id = InputHelper::_($this->requestStack->getCurrentRequest()->get('id'));
+                if (str_starts_with($id, 'mf-')) {
                     $mfId             = str_replace('mf-', '', $id);
                     $focusGenerateUrl = $this->router->generate('mautic_focus_generate', ['id' => $mfId]);
 
@@ -147,10 +75,8 @@ class FocusSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param FocusEvent $event
      */
-    public function onFocusPostSave(FocusEvent $event)
+    public function onFocusPostSave(FocusEvent $event): void
     {
         $entity = $event->getFocus();
         if ($details = $event->getChanges()) {
@@ -168,10 +94,8 @@ class FocusSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param FocusEvent $event
      */
-    public function onFocusDelete(FocusEvent $event)
+    public function onFocusDelete(FocusEvent $event): void
     {
         $entity = $event->getFocus();
         $log    = [
@@ -185,10 +109,20 @@ class FocusSubscriber extends CommonSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param MauticEvents\TokenReplacementEvent $event
-     */
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    public function onReportBuild(ReportBuilderEvent $event): void
+    {
+        $tables = $event->getTables();
+
+        if (!isset($tables['audit.log']['columns']['al.bundle']['list'])) {
+            return;
+        }
+
+        $tables['audit.log']['columns']['al.object']['list']['focus'] = 'focus';
+
+        $event->addTable('audit.log', $tables['audit.log']);
+    }
+
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
@@ -205,7 +139,7 @@ class FocusSubscriber extends CommonSubscriber
                 $tokens = array_merge($tokens, TokenHelper::findLeadTokens($content, $lead->getProfileFields()));
             }
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'focus',
@@ -215,7 +149,7 @@ class FocusSubscriber extends CommonSubscriber
             $focus = $this->focusModel->getEntity($clickthrough['focus_id']);
 
             /**
-             * @var string
+             * @var string    $token
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {

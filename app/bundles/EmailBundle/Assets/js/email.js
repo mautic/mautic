@@ -1,5 +1,8 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
+    Mautic.internalDynamicContentItemCreateListeners = [];
+    Mautic.internalDynamicContentFilterCreateListeners = [];
+
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
         var plaintext = mQuery('#emailform_plainText');
@@ -28,35 +31,71 @@ Mautic.emailOnLoad = function (container, response) {
     }
 
     if (mQuery('table.email-list').length) {
+        var ids = [];
         mQuery('td.col-stats').each(function () {
             var id = mQuery(this).attr('data-stats');
-            // Process the request one at a time or the xhr will cancel the previous
+            ids.push(id);
+        });
+
+        // Get all stats numbers in batches of 10
+        while (ids.length > 0) {
+            let batchIds = ids.splice(0, 1);
             Mautic.ajaxActionRequest(
                 'email:getEmailCountStats',
-                {id: id},
+                {ids: batchIds},
                 function (response) {
-                    if (response.success && mQuery('#sent-count-' + id + ' div').length) {
-                        if (response.pending) {
-                            mQuery('#pending-' + id + ' > a').html(response.pending);
-                            mQuery('#pending-' + id).removeClass('hide');
-                        }
+                    if (response.success && response.stats) {
+                        for (var i = 0; i < response.stats.length; i++) {
+                            var stat = response.stats[i];
+                            if (mQuery('#sent-count-' + stat.id).length) {
+                                if (stat.pending) {
+                                    mQuery('#pending-' + stat.id + ' > a').html(stat.pending);
+                                    mQuery('#pending-' + stat.id).removeClass('hide');
+                                }
 
-                        if (response.queued) {
-                            mQuery('#queued-' + id + ' > a').html(response.queued);
-                            mQuery('#queued-' + id).removeClass('hide');
-                        }
+                                if (stat.queued) {
+                                    mQuery('#queued-' + stat.id + ' > a').html(stat.queued);
+                                    mQuery('#queued-' + stat.id).removeClass('hide');
+                                }
 
-                        mQuery('#sent-count-' + id + ' > a').html(response.sentCount);
-                        mQuery('#read-count-' + id + ' > a').html(response.readCount);
-                        mQuery('#read-percent-' + id + ' > a').html(response.readPercent);
+                                mQuery('#sent-count-' + stat.id + ' > a').html(stat.sentCount);
+                                mQuery('#read-count-' + stat.id + ' > a').html(stat.readCount);
+                                mQuery('#read-percent-' + stat.id + ' > a').html(stat.readPercent);
+                            }
+                        }
                     }
                 },
                 false,
-                true
+                true,
+                "GET"
             );
+        }
+    }
 
+    if (mQuery('#emailGraphStats').length) {
+        // Email detail graph - loaded via AJAX not to block loading a whole page
+        var graphUrl = mQuery('#emailGraphStats').attr('data-graph-url');
+        mQuery("#emailGraphStats").load(graphUrl, function () {
+            Mautic.renderCharts();
+            Mautic.initDateRangePicker('#emailGraphStats #daterange_date_from', '#emailGraphStats #daterange_date_to');
         });
     }
+
+    var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
+    if ($loadDeliveredElements.length) {
+        $loadDeliveredElements.each(function(i, el) {
+           Mautic.loadEmailDeliveredStat(mQuery(el));
+        });
+    }
+
+    var $loadEmailUsage = mQuery('[data-fetch-email-usages]');
+    if ($loadEmailUsage.length) {
+        $loadEmailUsage.each(function(i, el) {
+           Mautic.loadEmailUsages(mQuery(el));
+        });
+    }
+
+    Mautic.initMailerIsOwnerGlobalCheck();
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -197,11 +236,13 @@ Mautic.selectEmailType = function(emailType) {
         mQuery('#segmentTranslationParent').removeClass('hide');
         mQuery('#templateTranslationParent').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newListEmail);
+        mQuery('#scheduleOptions').removeClass('hide');
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
         mQuery('#leadList').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
+        mQuery('#scheduleOptions').addClass('hide');
     }
 
     mQuery('#emailform_emailType').val(emailType);
@@ -220,7 +261,7 @@ Mautic.getTotalAttachmentSize = function() {
         };
         Mautic.ajaxActionRequest('email:getAttachmentsSize', assets, function(response) {
             mQuery('#attachment-size').text(response.size);
-        });
+        }, false, false, "GET");
     } else {
         mQuery('#attachment-size').text('0');
     }
@@ -311,14 +352,22 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     var textarea      = itemContainer.find('.editor');
     var firstInput    = itemContainer.find('input[type="text"]').first();
 
-    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-        // Set custom buttons with separator between them.
-        toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-        heightMin: 100
-    }));
+    if (mauticFroalaEnabled && textarea.hasClass('legacy-builder')) {
+        textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+            // Set custom buttons with separator between them.
+            toolbarSticky: false,
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
+            heightMin: 100
+        }));
+    }
 
-    tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
+    if (Mautic.internalDynamicContentItemCreateListeners) {
+        Mautic.internalDynamicContentItemCreateListeners.forEach(function(callback) {
+            callback(textarea);
+        });
+    }
+
+    tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('fa-plus text-success');
     newTab.find('a').tab('show');
 
     firstInput.focus();
@@ -329,6 +378,10 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
 
     return tabId;
 };
+
+Mautic.dynamicContentAddNewItemListener = function(callback) {
+    Mautic.internalDynamicContentItemCreateListeners.push(callback);
+}
 
 Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     // To support the parent.mQuery from the builder
@@ -374,12 +427,20 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
         }
     });
 
-    altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-        // Set custom buttons with separator between them.
-        toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
-        heightMin: 100
-    }));
+    if (mauticFroalaEnabled && altTextarea.hasClass('legacy-builder')) {
+        altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+            // Set custom buttons with separator between them.
+            toolbarSticky: false,
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'],
+            heightMin: 100
+        }));
+    }
+
+    if (Mautic.internalDynamicContentFilterCreateListeners) {
+        Mautic.internalDynamicContentFilterCreateListeners.forEach(function(callback) {
+            callback(altTextarea);
+        });
+    }
 
     Mautic.initRemoveEvents(removeButton, mQuery);
 
@@ -388,12 +449,16 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     return filterContainerId;
 };
 
+Mautic.dynamicContentAddNewFilterListener = function(callback) {
+    Mautic.internalDynamicContentFilterCreateListeners.push(callback);
+}
+
 Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
     // To support the parent.mQuery from the builder
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
 
     var $el = mQuery('#dynamic-content-container');
-    if ($el.size() == 0){
+    if ($el.length === 0){
         mQuery = parent.mQuery;
         $el = mQuery('#dynamic-content-container');
     }
@@ -402,6 +467,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         $el = mQuery(tabId);
     }
 
+    // add a click event listener for adding a new dynamic content variant
     $el.find('.addNewDynamicContentFilter').on('click', function (e) {
         e.preventDefault();
 
@@ -412,7 +478,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         $el.find('.dynamic-content-token-name').val(tokenName);
     }
 
-    if ($el.find('.dynamic-content-token-name').val() == '') {
+    if ($el.find('.dynamic-content-token-name').val() === '') {
         var dynamicContent = $el.attr('id').match(/\d+$/);
         if (dynamicContent) {
             var dynamicContentIndex  = dynamicContent[0];
@@ -456,6 +522,30 @@ Mautic.updateDynamicContentDropdown = function () {
     mQuery('button[data-cmd="dynamicContent"]').next().find('ul').html(options.join(''));
 };
 
+Mautic.initMailerIsOwnerGlobalCheck = function() {
+    let radioSelector = '.mailer-is-owner-local';
+    Mautic.toggleMailerIsOwnerWarningMessage(radioSelector);
+    mQuery(radioSelector).on('change', function() {
+        Mautic.toggleMailerIsOwnerWarningMessage(radioSelector);
+    });
+}
+
+Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
+    let checkedRadio = mQuery(radioSelector+':checked');
+    let globalMailerIsOwnerValue = checkedRadio.attr('data-global-mailer-is-onwer') ? '1' : '0';
+    let warningMessageId = 'mailer-is-owner-waring';
+
+    mQuery('#'+warningMessageId).remove();
+
+    if (checkedRadio.val() !== globalMailerIsOwnerValue) {
+        let warning = mQuery('<div/>');
+        warning.attr('id', warningMessageId);
+        warning.html(checkedRadio.attr('data-warning'));
+        warning.addClass('alert alert-warning mt-md');
+        checkedRadio.closest('.form-group').append(warning);
+    }
+}
+
 Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
@@ -484,7 +574,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             parentElement.remove();
             tabLink.remove();
             // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
-            if (tabContainer.hasClass('tabs-left')) {
+            if (tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter')) {
                 tabContainer.find('li').first().next().find('a').tab('show');
             } else {
                 tabContainer.find('li').first().find('a').tab('show');
@@ -514,7 +604,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     var prototype   = mQuery('#filterSelectPrototype').data('prototype');
     var fieldObject = selectedOption.data('field-object');
     var fieldType   = selectedOption.data('field-type');
-    var isSpecial   = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
+    var isSpecial   = (mQuery.inArray(fieldType, ['leadlist', 'assets', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     // Update the prototype settings
     prototype = prototype.replace(/__name__/g, filterNum)
@@ -532,9 +622,9 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     prototype = mQuery(prototype);
 
     if (fieldObject == 'company') {
-        prototype.find('.object-icon').removeClass('fa-user').addClass('fa-building');
+        prototype.find('.object-icon').removeClass('ri-user-6-fill').addClass('ri-building-2-line');
     } else {
-        prototype.find('.object-icon').removeClass('fa-building').addClass('fa-user');
+        prototype.find('.object-icon').removeClass('ri-building-2-line').addClass('ri-user-6-fill');
     }
 
     var filterBase  = "emailform[dynamicContent][" + dynamicContentIndex + "][filters][" + dynamicContentFilterIndex + "][filters][" + filterNum + "]";
@@ -542,7 +632,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
 
     if (isSpecial) {
         var templateField = fieldType;
-        if (fieldType == 'boolean' || fieldType == 'multiselect') {
+        if (fieldType == 'boolean' || fieldType == 'multiselect' || fieldType == 'leadlist') {
             templateField = 'select';
         }
         var template = mQuery('#templates .' + templateField + '-template').clone();
@@ -580,7 +670,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
     var fieldOptions = fieldCallback = '';
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'boolean' || fieldType == 'multiselect') {
+        if (fieldType == 'select' || fieldType == 'boolean' || fieldType == 'multiselect' || fieldType == 'leadlist') {
             // Generate the options
             fieldOptions = selectedOption.data("field-list");
 
@@ -600,6 +690,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'date') {
@@ -609,6 +700,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -619,6 +711,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if (fieldType == 'lookup_id') {
@@ -639,7 +732,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
         var fieldCallback = selectedOption.data("field-callback");
         if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
             fieldOptions = selectedOption.data("field-list");
-            Mautic[fieldCallback](filterIdBase + '_display', selectedFilter, fieldOptions);
+            Mautic[fieldCallback](filterIdBase + '_display', selectedFilter, fieldOptions, mQuery);
         }
     } else {
         mQuery(filter).attr('type', fieldType);
@@ -647,90 +740,36 @@ Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
 
     var operators = mQuery(selectedOption).data('field-operators');
     mQuery('#' + filterIdBase + '_operator').html('');
-    mQuery.each(operators, function (value, label) {
+    mQuery.each(operators, function (label, value) {
         var newOption = mQuery('<option/>').val(value).text(label);
         newOption.appendTo(mQuery('#' + filterIdBase + '_operator'));
     });
 
     // Convert based on first option in list
-    Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator', mQuery);
+    Mautic.convertDwcFilterInput('#' + filterIdBase + '_operator', mQuery);
 };
 
-Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
-    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
-    var operator = mQuery(el).val();
-    // Extract the filter number
-    var regExp    = /emailform_dynamicContent_(\d+)_filters_(\d+)_filters_(\d+)_operator/;
-    var matches   = regExp.exec(mQuery(el).attr('id'));
-
-    var dynamicContentIndex       = matches[1];
-    var dynamicContentFilterIndex = matches[2];
-    var filterNum                 = matches[3];
-
-    var filterId       = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + dynamicContentFilterIndex + '_filters_' + filterNum + '_filter';
-    var filterEl       = mQuery(filterId);
-    var filterElParent = filterEl.parent();
-
-    // Reset has-error
-    if (filterElParent.hasClass('has-error')) {
-        filterElParent.find('div.help-block').hide();
-        filterElParent.removeClass('has-error');
+Mautic.copySubjectToName = function(elemSubject) {
+    let elemName = mQuery("#emailform_name");
+    if (elemName.val() === "") {
+        elemName.val(elemSubject.val());
     }
+};
 
-    var disabled = (operator == 'empty' || operator == '!empty');
-    filterEl.prop('disabled', disabled);
-
-    if (disabled) {
-        filterEl.val('');
-    }
-
-    var newName = '';
-    var lastPos;
-
-    if (filterEl.is('select')) {
-        var isMultiple  = filterEl.attr('multiple');
-        var multiple    = (operator == 'in' || operator == '!in');
-        var placeholder = filterEl.attr('data-placeholder');
-
-        if (multiple && !isMultiple) {
-            filterEl.attr('multiple', 'multiple');
-
-            // Update the name
-            newName =  filterEl.attr('name') + '[]';
-            filterEl.attr('name', newName);
-
-            placeholder = mauticLang['chosenChooseMore'];
-        } else if (!multiple && isMultiple) {
-            filterEl.removeAttr('multiple');
-
-            // Update the name
-            newName = filterEl.attr('name');
-            lastPos = newName.lastIndexOf('[]');
-            newName = newName.substring(0, lastPos);
-
-            filterEl.attr('name', newName);
-
-            placeholder = mauticLang['chosenChooseOne'];
+Mautic.loadEmailDeliveredStat = function($el) {
+    var emailId = $el.data('email-stat-delivered-for');
+    Mautic.ajaxActionRequest('email:getEmailDeliveredCount', {id: emailId}, function(response){
+        if (response.success) {
+            var delivered = response.delivered;
+            $el.html(delivered);
         }
+    }, false, true, "GET");
+};
 
-        if (multiple) {
-            // Remove empty option
-            filterEl.find('option[value=""]').remove();
-
-            // Make sure none are selected
-            filterEl.find('option:selected').removeAttr('selected');
-        } else {
-            // Add empty option
-            filterEl.prepend("<option value='' selected></option>");
-        }
-
-        // Destroy the chosen and recreate
-        if (mQuery(filterId + '_chosen').length) {
-            filterEl.chosen('destroy');
-        }
-
-        filterEl.attr('data-placeholder', placeholder);
-
-        Mautic.activateChosenSelect(filterEl, false, mQuery);
-    }
+Mautic.loadEmailUsages = function($el) {
+    var emailId = $el.data('fetch-email-usages');
+    Mautic.ajaxActionRequest('email:getEmailUsages', {id: emailId}, function(response){
+        var usagesHtml = response.usagesHtml;
+        $el.html(usagesHtml);
+    }, false, true, "GET");
 };

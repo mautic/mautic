@@ -1,0 +1,55 @@
+<!--
+some stats: need more input on what type of form data to show.
+delete if it is not require
+-->
+<div class="pa-md">
+    <div class="row">
+        <div class="col-sm-12">
+            {% if showVariants %}
+            <div class="text-right small">
+                <span>
+                    {% if isVariant %}
+                        <span data-chart="variant">{% trans %}mautic.email.variant.graph.variant{% endtrans %}</span>
+                    {% else %}
+                        <a data-chart="variant" href="javascript:void(0)">{% trans %}mautic.email.variant.graph.variant{% endtrans %}</a>
+                    {% endif %}
+                </span>
+                </span> | </span>
+                <span>
+                    {% if isVariant %}
+                        <a data-chart="all" href="javascript:void(0)">{% trans %}mautic.email.variant.graph.all{% endtrans %}</a>
+                    {% else %}
+                        <span data-chart="all">{% trans %}mautic.email.variant.graph.all{% endtrans %}</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+            <div class="panel">
+                <div class="panel-body box-layout">
+                    <div class="col-xs-4 va-m">
+                        <h5 class="text-white dark-md fw-sb mb-xs">
+                            <span class="ri-mail-line"></span>
+                            {% trans %}mautic.email.stats{% endtrans %}
+                        </h5>
+                    </div>
+                    <div class="col-xs-8 va-m">
+                        {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                            'dateRangeForm'     : dateRangeForm,
+                            'class'             : 'pull-right'
+                        })
+                        -}}
+                    </div>
+                </div>
+                <div class="pt-0 pl-15 pb-10 pr-15">
+                    {{- include('@MauticCore/Helper/chart.html.twig', {
+                        'chartData'     : stats,
+                        'chartType'     : 'line',
+                        'chartHeight'   : 300
+                    })
+                    -}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ some stats -->

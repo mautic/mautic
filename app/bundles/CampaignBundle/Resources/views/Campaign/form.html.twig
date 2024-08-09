@@ -1,0 +1,55 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}
+    {% if entity.id %}
+      {{ 'mautic.campaign.menu.edit'|trans({
+            '%name%': entity.name|trans,
+      }) }}
+    {% else %}
+      {{ 'mautic.campaign.menu.new'|trans }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{{ form_start(form) }}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 height-auto bdr-r">
+        <div class="pa-md">
+            {% if entity.id and entity.isPublished %}
+                <div class="alert alert-danger"><p>{{ 'mautic.campaign.modify.warning'|trans }}</p></div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.name) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form_row(form.description) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {{ form_row(form.category) }}
+            {{ form_row(form.allowRestart) }}
+            {{ form_row(form.isPublished) }}
+            {{ form_row(form.publishUp) }}
+            {{ form_row(form.publishDown) }}
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{{- include('@MauticCampaign/Campaign/_builder.html.twig', {
+    'campaignId': form.sessionId.vars['data'],
+    'campaignEvents': campaignEvents,
+    'campaignSources': campaignSources,
+    'eventSettings': eventSettings,
+    'canvasSettings': entity.canvasSettings,
+}) -}}
+{% endblock %}

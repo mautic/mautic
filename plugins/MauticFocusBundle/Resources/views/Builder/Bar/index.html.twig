@@ -1,0 +1,65 @@
+{% set props = focus.properties %}
+{% set color = (props.colors.primary is not empty and props.colors.primary is color light) ? '000000' : 'ffffff' %}
+{% set animate = preview is not empty and props.animate is not empty ? ' mf-animate' : '' %}
+
+<div class="mautic-focus mf-bar mf-bar-{{ props.bar.size }} mf-bar-{{ props.bar.placement }} {% if props.bar.sticky %}mf-bar-sticky{% endif %} {{ animate }}" style="background-color: #{{ props.colors.primary }};">
+    <div class="mf-content">
+        {% if htmlMode in ['editor', 'html'] %}
+            {{ focus[htmlMode]|raw }}
+        {% else %}
+            <div class="mf-headline">{{ props.content.headline }}</div>
+            {% if 'form' == focus.type %}
+                {focus_form}
+            {% elseif 'link' == focus.type %}
+                <a href="{% if preview is empty %}{{ clickUrl }}{% else %}#{% endif %}" class="mf-link" target="{% if props.content.link_new_window %}_new{% else %}_parent{% endif %}">
+                    {{ props.content.link_text }}
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="mf-bar-collapse"></div>
+</div>
+
+{% if props.bar.allow_hide %}
+    <div class="mf-copy-to-parent mf-bar-collapser mf-bar-collapser-{{ props.bar.placement }} mf-bar-collapser-{{ props.bar.size }} {% if props.bar.sticky %}mf-bar-collapser-sticky{% endif %} mf-bar-collapser-{{ focus.id }}"
+         style="background-color: #{{ props.colors.primary }}; color: #{{ props.colors.text }};">
+        <style scoped>
+            .mf-bar-collapser-icon {
+                color: #{{ color }};
+            }
+
+            .mf-bar-collapser-icon:hover {
+                color: #{{ color }};
+            }
+        </style>
+        <a class="mf-bar-collapser-icon" href="javascript:void(0)" {% if preview is not empty %}onclick="Mautic.toggleBarCollapse()"{% endif %}>
+            {% set size = 'large' == props.bar.size ? 40 : 24 %}
+            {% set transformSize = 20 %}
+            {% set scale = 'large' == props.bar.size ? 1 : 0.6 %}
+            {% set direction = 'top' == props.bar.placement ? '-90' : '90' %}
+            <svg style="overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="{{ size }}" version="1.1"
+                 height="{{ size }}" data-transform-size="{{ transformSize }}" data-transform-direction="{{ direction }}" data-transform-scale="{{ scale }}">
+                <g transform="scale({{ scale }}) rotate({{ direction }} {{ transformSize }} {{ transformSize }})">
+                    <desc>Created with Raphaël 2.1.2</desc>
+                    <defs>
+                        <linearGradient gradientTransform="matrix(1,0,0,1,-4,-4)" y2="0" x2="6.123233995736766e-17" y1="1" x1="0" id="1390-_0050af-_002c62">
+                            <stop stop-color="#{{ color }}" offset="0%"></stop>
+                            <stop stop-color="#{{ color }}" offset="100%"></stop>
+                        </linearGradient>
+                    </defs>
+                    <path transform="matrix(1,0,0,1,4,4)" opacity="0" stroke-linejoin="round" stroke-width="3"
+                          d="M16,1.466C7.973,1.466,1.466,7.973,1.466,16C1.466,24.027,7.973,30.534,16,30.534C24.027,30.534,30.534,24.027,30.534,15.999999999999998C30.534,7.973,24.027,1.466,16,1.466ZM13.665,25.725L10.129,22.186L16.316,15.998999999999999L10.128999999999998,9.811999999999998L13.664999999999997,6.275999999999998L23.388999999999996,15.998999999999999L13.665,25.725Z"
+                          stroke="#ffffff" fill="none" style="stroke-linejoin: round; opacity: 0;"></path>
+                    <path fill-opacity="1" opacity="1" transform="matrix(1,0,0,1,4,4)"
+                          d="M16,1.466C7.973,1.466,1.466,7.973,1.466,16C1.466,24.027,7.973,30.534,16,30.534C24.027,30.534,30.534,24.027,30.534,15.999999999999998C30.534,7.973,24.027,1.466,16,1.466ZM13.665,25.725L10.129,22.186L16.316,15.998999999999999L10.128999999999998,9.811999999999998L13.664999999999997,6.275999999999998L23.388999999999996,15.998999999999999L13.665,25.725Z"
+                          stroke="none" fill="url(#1390-_0050af-_002c62)" style="opacity: 1; fill-opacity: 1;"></path>
+                    <rect opacity="0" style="opacity: 0;" stroke="#000" fill="#000000" ry="0" rx="0" r="0" y="0" x="0"></rect>
+                </g>
+            </svg>
+        </a>
+    </div>
+{% endif %}
+
+{% if props.bar.push_page and 'top' == props.bar.placement %}
+    <div class="mf-move-to-parent mf-bar-spacer mf-bar-spacer-{{ props.bar.size }} mf-bar-spacer-{{ focus.id }}"></div>
+{% endif %}

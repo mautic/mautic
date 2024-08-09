@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\FormBundle\Model\FieldModel;
@@ -26,29 +17,20 @@ trait FormFieldTrait
      */
     protected $formModel;
 
-    /**
-     * @param FieldModel $fieldModel
-     */
-    public function setFieldModel(FieldModel $fieldModel)
+    public function setFieldModel(FieldModel $fieldModel): void
     {
         $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * @param FormModel $formModel
-     */
-    public function setFormModel(FormModel $formModel)
+    public function setFormModel(FormModel $formModel): void
     {
         $this->formModel = $formModel;
     }
 
     /**
-     * @param      $formId
      * @param bool $asTokens
-     *
-     * @return array
      */
-    protected function getFormFields($formId, $asTokens = true)
+    protected function getFormFields($formId, $asTokens = true): array
     {
         $fields   = $this->fieldModel->getSessionFields($formId);
         $viewOnly = $this->formModel->getCustomComponents()['viewOnlyFields'];

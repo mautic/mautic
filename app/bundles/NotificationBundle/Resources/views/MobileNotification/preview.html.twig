@@ -1,0 +1,23 @@
+{#
+  Variables
+    - notification
+#}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {{ notification.heading }}
+            {% if notification.url %}
+            <span class="pull-right">
+                <a href="{{ notification.url }}" target="_blank"><span class="ri-external-link-line"></span></a>
+            </span>
+            {% endif %}
+        </h3>
+    </div>
+    <div class="panel-body">
+        <p>{{ notification.message }}</p>
+        {% if notification.url and notification.button %}
+            <br>
+            <p><a href="{{ notification.url }}" class="btn btn-primary">{{ notification.button }}</a></p>
+        {% endif %}
+    </div>
+</div>

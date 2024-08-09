@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\Channel;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,18 +14,16 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<Channel>
+ */
 class ChannelType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $formModifier = function (FormEvent $event) use ($options) {
+        $formModifier = function (FormEvent $event) use ($options): void {
             $form = $event->getForm();
 
-            /** @var Channel $channel */
             $data = $event->getData();
             if (is_array($data)) {
                 $channelName = $data['channel'];
@@ -58,7 +48,7 @@ class ChannelType extends AbstractType
 
             $form->add(
                 'isEnabled',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.channel.message.form.enabled',
                     'attr'  => [
@@ -75,11 +65,11 @@ class ChannelType extends AbstractType
                         'multiple'    => false,
                         'label'       => 'mautic.channel.message.form.message',
                         'constraints' => ($enabled) ? [
-                             new NotBlank(
-                                 [
+                            new NotBlank(
+                                [
                                     'message' => 'mautic.core.value.required',
-                                 ]
-                             ),
+                                ]
+                            ),
                         ] : [],
                     ]
                 );
@@ -106,20 +96,12 @@ class ChannelType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $formModifier);
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['channels'] = $options['channels'];
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['channels']);
         $resolver->setDefaults(

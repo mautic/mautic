@@ -1,0 +1,48 @@
+{
+    "name": "Default",
+    "description": "Mautic's default layout.",
+    "widgets":
+    [
+        {
+            "name": "Contacts Created",
+            "width": 100,
+            "height": 330,
+            "ordering": 0,
+            "type": "created.leads.in.time",
+            "params": {
+                "lists": "identifiedVsAnonymous"
+            }
+        },
+        {
+            "name": "Page Visits",
+            "width": 50,
+            "height": 330,
+            "ordering": 1,
+            "type": "page.hits.in.time",
+            "params": {
+                "flag": "unique"
+            }
+        },
+        {
+            "name": "Form Submissions",
+            "width": 50,
+            "height": 330,
+            "ordering": 2,
+            "type": "submissions.in.time"
+        },
+        {
+            "name": "Recent Activity",
+            "width": 50,
+            "height": 330,
+            "ordering": 3,
+            "type": "recent.activity"
+        },
+        {
+            "name": "Upcoming Emails",
+            "width": 50,
+            "height": 330,
+            "ordering": 4,
+            "type": "upcoming.emails"
+        }
+    ]
+}

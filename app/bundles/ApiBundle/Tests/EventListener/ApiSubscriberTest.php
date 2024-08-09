@@ -1,71 +1,118 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\CampaignBundle\Tests\EventListener;
+namespace Mautic\ApiBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Tests\CommonMocks;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use Mautic\CoreBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class ApiSubscriberTest extends CommonMocks
 {
-    public function testIsBasicAuthWithValidBasicAuth()
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
+    private MockObject $coreParametersHelper;
+
+    /**
+     * @var Translator&MockObject
+     */
+    private MockObject $translator;
+
+    /**
+     * @var Request&MockObject
+     */
+    private MockObject $request;
+
+    /**
+     * @var RequestEvent&MockObject
+     */
+    private MockObject $event;
+
+    private ApiSubscriber $subscriber;
+
+    protected function setUp(): void
     {
-        $subscriber = new ApiSubscriber(
-            $this->getIpLookupHelperMock(),
-            $this->getCoreParametersHelperMock(),
-            $this->getAuditLogModelMock()
+        parent::setUp();
+
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->translator           = $this->createMock(Translator::class);
+        $this->request              = $this->createMock(Request::class);
+        $this->request->headers     = new ParameterBag();
+        $this->event                = $this->createMock(RequestEvent::class);
+        $this->subscriber           = new ApiSubscriber(
+            $this->coreParametersHelper,
+            $this->translator
         );
-
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $request->headers = new HeaderBag(['Authorization' => 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=']);
-
-        $this->assertTrue($subscriber->isBasicAuth($request));
     }
 
-    public function testIsBasicAuthWithInvalidBasicAuth()
+    public function testOnKernelRequestWhenNotMasterRequest(): void
     {
-        $subscriber = new ApiSubscriber(
-            $this->getIpLookupHelperMock(),
-            $this->getCoreParametersHelperMock(),
-            $this->getAuditLogModelMock()
-        );
+        $this->event->expects($this->once())
+            ->method('isMainRequest')
+            ->willReturn(false);
 
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->coreParametersHelper->expects($this->never())
+            ->method('get');
 
-        $request->headers = new HeaderBag(['Authorization' => 'Invalid Basic Auth value']);
-
-        $this->assertFalse($subscriber->isBasicAuth($request));
+        $this->subscriber->onKernelRequest($this->event);
     }
 
-    public function testIsBasicAuthWithMissingBasicAuth()
+    public function testOnKernelRequestOnApiRequestWhenApiDisabled(): void
     {
-        $subscriber = new ApiSubscriber(
-            $this->getIpLookupHelperMock(),
-            $this->getCoreParametersHelperMock(),
-            $this->getAuditLogModelMock()
-        );
+        $this->event->expects($this->once())
+            ->method('isMainRequest')
+            ->willReturn(true);
 
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event->expects($this->once())
+            ->method('getRequest')
+            ->willReturn($this->request);
 
-        $request->headers = new HeaderBag([]);
+        $this->request->expects($this->once())
+            ->method('getRequestUri')
+            ->willReturn('/api/endpoint');
 
-        $this->assertFalse($subscriber->isBasicAuth($request));
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('api_enabled')
+            ->willReturn(false);
+
+        $this->event->expects($this->once())
+            ->method('setResponse')
+            ->with($this->isInstanceOf(JsonResponse::class))
+            ->willReturnCallback(
+                function (JsonResponse $response): void {
+                    $this->assertEquals(403, $response->getStatusCode());
+                }
+            );
+
+        $this->subscriber->onKernelRequest($this->event);
+    }
+
+    public function testOnKernelRequestOnApiRequestWhenApiEnabled(): void
+    {
+        $this->event->expects($this->once())
+            ->method('isMainRequest')
+            ->willReturn(true);
+
+        $this->event->expects($this->once())
+            ->method('getRequest')
+            ->willReturn($this->request);
+
+        $this->request->expects($this->once())
+            ->method('getRequestUri')
+            ->willReturn('/api/endpoint');
+
+        $this->coreParametersHelper->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(['api_enabled'], ['api_enable_basic_auth'])
+            ->willReturnOnConsecutiveCalls(true, true);
+
+        $this->subscriber->onKernelRequest($this->event);
     }
 }

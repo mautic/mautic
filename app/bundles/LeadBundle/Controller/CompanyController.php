@@ -1,69 +1,58 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Form\Type\CompanyMergeType;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class CompanyController.
- */
 class CompanyController extends FormController
 {
+    use LeadDetailsTrait;
+
     /**
      * @param int $page
      *
      * @return JsonResponse|Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
     {
-        //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(
+        // set some permissions
+        $permissions = $this->security->isGranted(
             [
+                'lead:leads:viewown',
                 'lead:leads:viewother',
                 'lead:leads:create',
                 'lead:leads:editother',
+                'lead:leads:editown',
+                'lead:leads:deleteown',
                 'lead:leads:deleteother',
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewother'] && !$permissions['lead:leads:viewown']) {
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get(
-            'mautic.company.limit',
-            $this->factory->getParameter('default_pagelimit')
-        );
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        $pageHelper = $pageHelperFactory->make('mautic.company', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.company.filter', ''));
-        $this->get('session')->set('mautic.company.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $request->get('search', $request->getSession()->get('mautic.company.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
-        $orderBy    = $this->get('session')->get('mautic.company.orderby', 'comp.companyname');
-        $orderByDir = $this->get('session')->get('mautic.company.orderbydir', 'ASC');
+        $orderBy    = $request->getSession()->get('mautic.company.orderby', 'comp.companyname');
+        $orderByDir = $request->getSession()->get('mautic.company.orderbydir', 'ASC');
 
         $companies = $this->getModel('lead.company')->getEntities(
             [
@@ -76,19 +65,21 @@ class CompanyController extends FormController
             ]
         );
 
+        $request->getSession()->set('mautic.company.filter', $search);
+
         $count     = $companies['count'];
         $companies = $companies['results'];
 
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.company.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticLeadBundle:Company:index',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
@@ -97,11 +88,11 @@ class CompanyController extends FormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.company.page', $page);
+        $pageHelper->rememberPage($page);
 
-        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $model      = $this->getModel('lead.company');
+        $tmpl  = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
+        $model = $this->getModel('lead.company');
+        \assert($model instanceof CompanyModel);
         $companyIds = array_keys($companies);
         $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : [];
 
@@ -117,7 +108,7 @@ class CompanyController extends FormController
                     'tmpl'        => $tmpl,
                     'totalItems'  => $count,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:list.html.php',
+                'contentTemplate' => '@MauticLead/Company/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
@@ -128,63 +119,119 @@ class CompanyController extends FormController
     }
 
     /**
-     * Generates new form and processes post data.
+     * Refresh contacts list in company view with new parameters like order or page.
      *
-     * @param \Mautic\LeadBundle\Entity\Company $entity
+     * @param int $objectId company id
+     * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction($entity = null)
+    public function contactsListAction(Request $request, $objectId, $page = 1)
     {
-        $model = $this->getModel('lead.company');
-
-        if (!($entity instanceof Company)) {
-            /** @var \Mautic\LeadBundle\Entity\Company $entity */
-            $entity = $model->getEntity();
-        }
-
-        if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
+        if (empty($objectId)) {
             return $this->accessDenied();
         }
 
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.company.page', 1);
-
-        $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
-
-        $updateSelect = InputHelper::clean(
-            ($this->request->getMethod() == 'POST')
-                ? $this->request->request->get('company[updateSelect]', false, true)
-                : $this->request->get(
-                'updateSelect',
-                false
-            )
+        $permissions = $this->security->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
         );
 
-        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('company');
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        /** @var CompanyModel $model */
+        $model  = $this->getModel('lead.company');
+
+        /** @var Company $company */
+        $company = $model->getEntity($objectId);
+
+        $companiesRepo  = $model->getCompanyLeadRepository();
+        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+
+        $leadIds = array_column($contacts, 'lead_id');
+
+        $data = $this->getCompanyContacts($request, $objectId, $page, $leadIds);
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'company'     => $company,
+                    'page'        => $data['page'],
+                    'contacts'    => $data['items'],
+                    'totalItems'  => $data['count'],
+                    'limit'       => $data['limit'],
+                    'permissions' => $permissions,
+                    'security'    => $this->security,
+                ],
+                'contentTemplate' => '@MauticLead/Company/list_rows_contacts.html.twig',
+            ]
+        );
+    }
+
+    /**
+     * Generates new form and processes post data.
+     *
+     * @param Company $entity
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function newAction(Request $request, $entity = null)
+    {
+        $model = $this->getModel('lead.company');
+        \assert($model instanceof CompanyModel);
+
+        if (!($entity instanceof Company)) {
+            /** @var Company $entity */
+            $entity = $model->getEntity();
+        }
+
+        if (!$this->security->isGranted('lead:leads:create')) {
+            return $this->accessDenied();
+        }
+
+        // set the page we came from
+        $page         = $request->getSession()->get('mautic.company.page', 1);
+        $method       = $request->getMethod();
+        $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
+        $company      = $request->request->get('company') ?? [];
+        $updateSelect = InputHelper::clean(
+            'POST' === $method
+                ? ($company['updateSelect'] ?? false)
+                : $request->get('updateSelect', false)
+        );
+
+        $leadFieldModel = $this->getModel('lead.field');
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $form   = $model->createForm($entity, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
-        $template       = 'MauticLeadBundle:Company:index';
+        $template       = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
 
-        ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        // /Check for a submitted form and process it
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
-                    //get custom field values
-                    $data = $this->request->request->get('company');
-                    //pull the data from the form in order to apply the form's formatting
+                    // form is valid so process the data
+                    // get custom field values
+                    $data = $request->request->get('company');
+                    // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
                         $data[$f->getName()] = $f->getData();
                     }
                     $model->setFieldValues($entity, $data, true);
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -199,12 +246,12 @@ class CompanyController extends FormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'MauticLeadBundle:Company:index';
+                        $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
                     } else {
-                        //return edit view so that all the session stuff is loaded
-                        return $this->editAction($entity->getId(), true);
+                        // return edit view so that all the session stuff is loaded
+                        return $this->editAction($request, $entity->getId(), true);
                     }
                 }
             }
@@ -227,7 +274,7 @@ class CompanyController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -242,12 +289,12 @@ class CompanyController extends FormController
         $fields = $model->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+        $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),
                     'fields' => $fields,
@@ -257,11 +304,11 @@ class CompanyController extends FormController
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
-                    'updateSelect'  => ($this->request->getMethod() == 'POST') ? $updateSelect : null,
+                    'updateSelect'  => ('POST' === $request->getMethod()) ? $updateSelect : null,
                     'route'         => $this->generateUrl(
                         'mautic_company_action',
                         [
-                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
+                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
                             'objectId'     => $entity->getId(),
                         ]
                     ),
@@ -278,31 +325,32 @@ class CompanyController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        $model  = $this->getModel('lead.company');
+        $model = $this->getModel('lead.company');
+        \assert($model instanceof CompanyModel);
         $entity = $model->getEntity($objectId);
 
-        //set the page we came from
-        $page = $this->get('session')->get('mautic.company.page', 1);
+        // set the page we came from
+        $page = $request->getSession()->get('mautic.company.page', 1);
 
         $viewParameters = ['page' => $page];
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
             ],
         ];
 
-        //form not found
-        if ($entity === null) {
+        // form not found
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -317,61 +365,51 @@ class CompanyController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $entity->getOwner())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
+            // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'lead.company');
         }
 
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $updateSelect = ($this->request->getMethod() == 'POST')
-            ? $this->request->request->get('company[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $method       = $request->getMethod();
+        $company      = $request->request->get('company') ?? [];
+        $updateSelect = 'POST' === $method
+            ? ($company['updateSelect'] ?? false)
+            : $request->get('updateSelect', false);
 
-        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('company');
+        $leadFieldModel = $this->getModel('lead.field');
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('company');
         $form   = $model->createForm(
             $entity,
-            $this->get('form.factory'),
+            $this->formFactory,
             $action,
             ['fields' => $fields, 'update_select' => $updateSelect]
         );
 
-        ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        // /Check for a submitted form and process it
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data = $this->request->request->get('company');
-                    //pull the data from the form in order to apply the form's formatting
+                    $data = $request->request->get('company');
+                    // pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        $name = $f->getName();
-                        if (strpos($name, 'field_') === 0) {
-                            $data[$name] = $f->getData();
-                        }
-                    }
-                    $model->setFieldValues($entity, $data, true);
-                    //form is valid so process the data
-                    $data = $this->request->request->get('company');
-
-                    //pull the data from the form in order to apply the form's formatting
-                    foreach ($form as $f) {
-                        $name = $f->getName();
-                        if (strpos($name, 'field_') === 0) {
-                            $data[$name] = $f->getData();
-                        }
+                        $data[$f->getName()] = $f->getData();
                     }
 
                     $model->setFieldValues($entity, $data, true);
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash(
+                    // form is valid so process the data
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),
@@ -379,24 +417,24 @@ class CompanyController extends FormController
                             '%url%'       => $this->generateUrl(
                                 'mautic_company_action',
                                 [
-                                    'objectAction' => 'edit',
+                                    'objectAction' => 'view',
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'MauticLeadBundle:Company:index';
+                        $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
                     }
                 }
             } else {
-                //unlock the entity
+                // unlock the entity
                 $model->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                $template  = 'MauticLeadBundle:Company:index';
+                $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
             }
 
             $passthrough = [
@@ -417,7 +455,7 @@ class CompanyController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -429,22 +467,22 @@ class CompanyController extends FormController
             } elseif ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $company = $model->getEntity($objectId);
-                $form    = $model->createForm($company, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+                $form    = $model->createForm($company, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
         $fields = $model->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+        $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'entity' => $entity,
                     'form'   => $form->createView(),
                     'fields' => $fields,
@@ -454,7 +492,7 @@ class CompanyController extends FormController
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
-                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'updateSelect'  => InputHelper::clean($request->query->get('updateSelect')),
                     'route'         => $this->generateUrl(
                         'mautic_company_action',
                         [
@@ -468,26 +506,176 @@ class CompanyController extends FormController
     }
 
     /**
+     * Loads a specific company into the detailed panel.
+     *
+     * @return JsonResponse|Response
+     */
+    public function viewAction(Request $request, $objectId)
+    {
+        /** @var CompanyModel $model */
+        $model  = $this->getModel('lead.company');
+
+        $company = $model->getEntity($objectId);
+
+        // set the return URL
+        $returnUrl = $this->generateUrl('mautic_company_index');
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company',
+            ],
+        ];
+
+        if (null === $company) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.company.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        /** @var Company $company */
+        $model->getRepository()->refetchEntity($company);
+
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$this->security->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            $company->getPermissionUser()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $fields         = $company->getFields();
+        $companiesRepo  = $model->getCompanyLeadRepository();
+        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+
+        $leadIds = array_column($contacts, 'lead_id');
+
+        $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
+
+        $contacts = $this->getCompanyContacts($request, $objectId, 0, $leadIds);
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'company'           => $company,
+                    'fields'            => $fields,
+                    'items'             => $contacts['items'],
+                    'permissions'       => $permissions,
+                    'engagementData'    => $engagementData,
+                    'security'          => $this->security,
+                    'page'              => $contacts['page'],
+                    'totalItems'        => $contacts['count'],
+                    'limit'             => $contacts['limit'],
+                ],
+                'contentTemplate' => '@MauticLead/Company/company.html.twig',
+            ]
+        );
+    }
+
+    /**
+     * Get company's contacts for company view.
+     *
+     * @param int        $companyId
+     * @param int        $page
+     * @param array<int> $leadIds   filter to get only company's contacts
+     */
+    public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = []): array
+    {
+        $this->setListFilters();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model   = $this->getModel('lead');
+        $session = $request->getSession();
+        // set limits
+        $limit = $session->get('mautic.company.'.$companyId.'.contacts.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        // do some default sorting
+        $orderBy    = $session->get('mautic.company.'.$companyId.'.contacts.orderby', 'l.last_active');
+        $orderByDir = $session->get('mautic.company.'.$companyId.'.contacts.orderbydir', 'DESC');
+
+        // filter by company contacts
+        $filter = [
+            'force' => [
+                ['column' => 'l.id', 'expr' => 'in', 'value' => $leadIds],
+            ],
+        ];
+
+        $results = $model->getEntities([
+            'start'          => $start,
+            'limit'          => $limit,
+            'filter'         => $filter,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+        ]);
+
+        $count = $results['count'];
+        unset($results['count']);
+
+        $leads = $results['results'];
+        unset($results);
+
+        return [
+            'items' => $leads,
+            'page'  => $page,
+            'count' => $count,
+            'limit' => $limit,
+        ];
+    }
+
+    /**
      * Clone an entity.
      *
      * @param int $objectId
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
         $model  = $this->getModel('lead.company');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
-            if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
+        if (null != $entity) {
+            if (!$this->security->isGranted('lead:leads:create')) {
                 return $this->accessDenied();
             }
 
             $entity = clone $entity;
         }
 
-        return $this->newAction($entity);
+        return $this->newAction($request, $entity);
     }
 
     /**
@@ -495,35 +683,36 @@ class CompanyController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        $page      = $this->get('session')->get('mautic.company.page', 1);
+        $page      = $request->getSession()->get('mautic.company.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
         $flashes   = [];
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
-            $model  = $this->getModel('lead.company');
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $model = $this->getModel('lead.company');
+            \assert($model instanceof CompanyModel);
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.company.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
+            } elseif (!$this->security->isGranted('lead:leads:deleteother')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'lead.company');
@@ -539,7 +728,7 @@ class CompanyController extends FormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -554,40 +743,41 @@ class CompanyController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        $page      = $this->get('session')->get('mautic.company.page', 1);
+        $page      = $request->getSession()->get('mautic.company.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
         $flashes   = [];
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
-            $model     = $this->getModel('lead.company');
-            $ids       = json_decode($this->request->query->get('ids', '{}'));
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $model = $this->getModel('lead.company');
+            \assert($model instanceof CompanyModel);
+            $ids       = json_decode($request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.company.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->get('mautic.security')->isGranted('lead:leads:deleteother')) {
+                } elseif (!$this->security->isGranted('lead:leads:deleteother')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.company', true);
@@ -600,15 +790,14 @@ class CompanyController extends FormController
             if (!empty($deleteIds)) {
                 $entities = $model->deleteEntities($deleteIds);
                 $deleted  = count($entities);
-                $this->addFlash(
+                $this->addFlashMessage(
                     'mautic.company.notice.batch_deleted',
                     [
-                        'pluralCount' => $deleted,
                         '%count%'     => $deleted,
                     ]
                 );
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -623,15 +812,14 @@ class CompanyController extends FormController
     /**
      * Company Merge function.
      *
-     * @param   $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction($objectId)
+    public function mergeAction(Request $request, $objectId)
     {
-        //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(
+        // set some permissions
+        $permissions = $this->security->isGranted(
             [
+                'lead:leads:viewown',
                 'lead:leads:viewother',
                 'lead:leads:create',
                 'lead:leads:editother',
@@ -639,25 +827,30 @@ class CompanyController extends FormController
             ],
             'RETURN_ARRAY'
         );
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var CompanyModel $model */
         $model            = $this->getModel('lead.company');
         $secondaryCompany = $model->getEntity($objectId);
-        $page             = $this->get('session')->get('mautic.lead.page', 1);
+        $page             = $request->getSession()->get('mautic.lead.page', 1);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_company_index',
                 'mauticContent' => 'company',
             ],
         ];
 
-        if ($secondaryCompany === null) {
+        if (null === $secondaryCompany) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -665,7 +858,7 @@ class CompanyController extends FormController
                         'flashes' => [
                             [
                                 'type'    => 'error',
-                                'msg'     => 'mautic.lead.company.error.notfound',
+                                'msg'     => 'mautic.company.error.notfound',
                                 'msgVars' => ['%id%' => $objectId],
                             ],
                         ],
@@ -676,16 +869,17 @@ class CompanyController extends FormController
 
         $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'merge', 'objectId' => $secondaryCompany->getId()]);
 
-        $form = $this->get('form.factory')->create(
-            'company_merge',
+        $form = $this->formFactory->create(
+            CompanyMergeType::class,
             [],
             [
-                'action'      => $action,
-                'main_entity' => $secondaryCompany->getId(),
+                'action'              => $action,
+                'main_entity'         => $secondaryCompany->getId(),
+                'model_lookup_method' => 'getSimpleLookupResults',
             ]
         );
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' === $request->getMethod()) {
             $valid = true;
             if (!$this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -693,7 +887,7 @@ class CompanyController extends FormController
                     $primaryMergeId = $data['company_to_merge'];
                     $primaryCompany = $model->getEntity($primaryMergeId);
 
-                    if ($primaryCompany === null) {
+                    if (null === $primaryCompany) {
                         return $this->postActionRedirect(
                             array_merge(
                                 $postActionVars,
@@ -701,7 +895,7 @@ class CompanyController extends FormController
                                     'flashes' => [
                                         [
                                             'type'    => 'error',
-                                            'msg'     => 'mautic.lead.company.error.notfound',
+                                            'msg'     => 'mautic.company.error.notfound',
                                             'msgVars' => ['%id%' => $primaryCompany->getId()],
                                         ],
                                     ],
@@ -711,27 +905,27 @@ class CompanyController extends FormController
                     } elseif (!$permissions['lead:leads:editother']) {
                         return $this->accessDenied();
                     } elseif ($model->isLocked($secondaryCompany)) {
-                        //deny access if the entity is locked
+                        // deny access if the entity is locked
                         return $this->isLocked($postActionVars, $primaryCompany, 'lead.company');
                     } elseif ($model->isLocked($primaryCompany)) {
-                        //deny access if the entity is locked
+                        // deny access if the entity is locked
                         return $this->isLocked($postActionVars, $primaryCompany, 'lead.company');
                     }
 
-                    //Both leads are good so now we merge them
-                    $mainCompany = $model->companyMerge($primaryCompany, $secondaryCompany, false);
+                    // Both leads are good so now we merge them
+                    $model->companyMerge($primaryCompany, $secondaryCompany);
                 }
 
                 if ($valid) {
                     $viewParameters = [
                         'objectId'     => $primaryCompany->getId(),
-                        'objectAction' => 'edit',
+                        'objectAction' => 'view',
                     ];
                 }
             } else {
                 $viewParameters = [
                     'objectId'     => $secondaryCompany->getId(),
-                    'objectAction' => 'edit',
+                    'objectAction' => 'view',
                 ];
             }
 
@@ -739,7 +933,7 @@ class CompanyController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticLeadBundle:Company:edit',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::viewAction',
                     'passthroughVars' => [
                         'closeModal' => 1,
                     ],
@@ -747,7 +941,7 @@ class CompanyController extends FormController
             );
         }
 
-        $tmpl = $this->request->get('tmpl', 'index');
+        $tmpl = $request->get('tmpl', 'index');
 
         return $this->delegateView(
             [
@@ -763,12 +957,53 @@ class CompanyController extends FormController
                         ]
                     ),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:merge.html.php',
+                'contentTemplate' => '@MauticLead/Company/merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
-                    'target' => ($tmpl == 'update') ? '.company-merge-options' : null,
+                    'target' => ('update' == $tmpl) ? '.company-merge-options' : null,
                 ],
             ]
         );
+    }
+
+    /**
+     * Export company's data.
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId)
+    {
+        // set some permissions
+        $permissions = $this->security->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var CompanyModel $companyModel */
+        $companyModel  = $this->getModel('lead.company');
+        $company       = $companyModel->getEntity($companyId);
+        $dataType      = $request->get('filetype', 'csv');
+
+        if (empty($company)) {
+            return $this->notFound();
+        }
+
+        $companyFields = $company->getProfileFields();
+        $export        = [];
+        foreach ($companyFields as $alias=>$companyField) {
+            $export[] = [
+                'alias' => $alias,
+                'value' => $companyField,
+            ];
+        }
+
+        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']), $exportHelper);
     }
 }

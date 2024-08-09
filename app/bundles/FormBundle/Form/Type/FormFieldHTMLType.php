@@ -1,31 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class FormFieldHTMLType.
+ * @extends AbstractType<mixed>
  */
 class FormFieldHTMLType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('text', 'textarea', [
+        $builder->add('text', TextareaType::class, [
             'label'      => 'mautic.form.field.type.freehtml',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control', 'style' => 'min-height:150px'],
@@ -33,20 +22,14 @@ class FormFieldHTMLType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'editor' => false,
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formfield_html';
     }

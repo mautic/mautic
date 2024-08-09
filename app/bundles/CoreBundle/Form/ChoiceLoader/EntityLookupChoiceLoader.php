@@ -1,36 +1,24 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\ChoiceLoader;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class EntityLookupChoiceLoader.
- */
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
     /**
      * @var array
      */
-    protected $selected;
+    protected $selected = [];
 
     /**
      * @var array
@@ -38,52 +26,26 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $choices = [];
 
     /**
-     * @var Options
+     * @param ModelFactory<object> $modelFactory
+     * @param array                $options
      */
-    protected $options;
-
-    /**
-     * @var ModelFactory
-     */
-    protected $modelFactory;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * EntityLookupChoiceLoader constructor.
-     *
-     * @param ModelFactory        $modelFactory
-     * @param TranslatorInterface $translator
-     * @param Connection          $connection
-     * @param array               $options
-     */
-    public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
-    {
-        $this->modelFactory = $modelFactory;
-        $this->translator   = $translator;
-        $this->connection   = $connection;
-        $this->options      = $options;
+    public function __construct(
+        protected ModelFactory $modelFactory,
+        protected TranslatorInterface $translator,
+        protected Connection $connection,
+        protected $options = []
+    ) {
     }
 
     /**
      * @param Options|array $options
      */
-    public function setOptions($options)
+    public function setOptions($options): void
     {
         $this->options = $options;
     }
 
     /**
-     * @param null $value
-     *
      * @return ArrayChoiceList
      */
     public function loadChoiceList($value = null)
@@ -96,9 +58,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      *
-     * @param array $values
-     * @param null  $value
-     *
      * @return array
      */
     public function loadChoicesForValues(array $values, $value = null)
@@ -109,9 +68,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
      *
-     * @param array $choices
-     * @param null  $value
-     *
      * @return array
      */
     public function loadValuesForChoices(array $choices, $value = null)
@@ -121,23 +77,21 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * Take note of the selected values for loadChoiceList.
-     *
-     * @param FormEvent $event
      */
-    public function onFormPostSetData(FormEvent $event)
+    public function onFormPostSetData(FormEvent $event): void
     {
-        $this->selected = $event->getData();
+        $this->selected = (array) $event->getData();
     }
 
     /**
-     * @param null $data
-     * @param bool $includeNew
+     * @param array|null $data
+     * @param bool       $includeNew
      *
      * @return array
      */
     protected function getChoices($data = null, $includeNew = false)
     {
-        if (null == $data) {
+        if (null === $data) {
             $data = $this->selected;
         }
 
@@ -150,9 +104,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if ($data) {
                 $data = array_map(
-                    function ($v) {
-                        return (int) $v;
-                    },
+                    fn ($v): int => (int) $v,
                     (array) $data
                 );
             }
@@ -190,9 +142,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         // must be [$label => $id]
-        $prepped = $this->prepareChoices($this->choices[$modelName]);
+        $prepped      = $this->prepareChoices($this->choices[$modelName]);
+        $prepped_keys = array_keys($prepped);
 
-        array_multisort(array_keys($prepped), SORT_NATURAL | SORT_FLAG_CASE, $prepped);
+        array_multisort($prepped_keys, SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
             $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
@@ -202,15 +155,13 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $choices
-     *
      * @return array
      */
     protected function prepareChoices($choices)
     {
         $prepped   = $choices;
         $isGrouped = false;
-        foreach ($prepped as $key => &$choice) {
+        foreach ($prepped as &$choice) {
             if (is_array($choice)) {
                 $isGrouped = true;
                 $choice    = $this->prepareChoices($choice);
@@ -224,9 +175,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $counts     = array_count_values($prepped);
             $duplicates = array_filter(
                 $prepped,
-                function ($value) use ($counts) {
-                    return $counts[$value] > 1;
-                }
+                fn ($value): bool => $counts[$value] > 1
             );
 
             if (count($duplicates)) {
@@ -242,9 +191,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * @param $modelName
-     * @param $data
-     *
      * @return array|mixed
      */
     protected function fetchChoices($modelName, $data = [])
@@ -257,10 +203,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
         $model = $this->modelFactory->getModel($modelName);
         if (!$model instanceof AjaxLookupModelInterface) {
-            throw new \InvalidArgumentException(get_class($model).' must implement '.AjaxLookupModelInterface::class);
+            throw new \InvalidArgumentException($model::class.' must implement '.AjaxLookupModelInterface::class);
         }
 
-        $args = (isset($this->options['lookup_arguments'])) ? $this->options['lookup_arguments'] : [];
+        $args = $this->options['lookup_arguments'] ?? [];
         if ($dataPlaceholder = array_search('$data', $args)) {
             $args[$dataPlaceholder] = $data;
         }
@@ -270,22 +216,24 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $args['limit'] = 100;
         }
 
-        if (isset($this->options['model_lookup_method'])) {
+        // Check if the method exists in the model
+        $methodName = $this->options['model_lookup_method'] ?? null;
+        if ($methodName && method_exists($model, $methodName)) {
             $choices = call_user_func_array([$model, $this->options['model_lookup_method']], $args);
         } elseif (isset($this->options['repo_lookup_method'])) {
             $choices = call_user_func_array([$model->getRepository(), $this->options['repo_lookup_method']], $args);
         } else {
+            // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $expr->andX();
+            $composite = null;
 
             $limit = 100;
             if ($data) {
-                $composite->add(
-                    $expr->in($alias.'.id', $data)
-                );
+                $composite = CompositeExpression::and($expr->in($alias.'.id', $data));
+
                 if (count($data) > $limit) {
-                    $limit = $data;
+                    $limit = count($data);
                 }
             }
 
@@ -295,14 +243,9 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         return $choices;
     }
 
-    /**
-     * @param array $choices
-     */
     protected function formatChoices(array &$choices)
     {
-        // Get the first key
-        reset($choices);
-        $firstKey = key($choices);
+        $firstKey = array_key_first($choices);
 
         if (is_array($choices[$firstKey])) {
             $validChoices = [];

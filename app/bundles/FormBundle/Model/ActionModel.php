@@ -1,48 +1,33 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Form\Type\ActionType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * Class ActionModel.
+ * @extends CommonFormModel<Action>
  */
 class ActionModel extends CommonFormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\FormBundle\Entity\ActionRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Action');
+        return $this->em->getRepository(Action::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Action
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Action();
         }
 
@@ -50,12 +35,10 @@ class ActionModel extends CommonFormModel
     }
 
     /**
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
-     * @param array                               $options
+     * @param object $entity
+     * @param array  $options
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');
@@ -65,10 +48,98 @@ class ActionModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        if (empty($options['formId']) && $entity->getForm() !== null) {
+        if (empty($options['formId']) && null !== $entity->getForm()) {
             $options['formId'] = $entity->getForm()->getId();
         }
 
-        return $formFactory->create('formaction', $entity->convertToArray(), $options);
+        return $formFactory->create(ActionType::class, $entity->convertToArray(), $options);
+    }
+
+    /**
+     * Get segments which are dependent on given segment.
+     *
+     * @param int $segmentId
+     */
+    public function getFormsIdsWithDependenciesOnSegment($segmentId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'LIKE', 'value'=>'lead.changelist'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            foreach ($properties as $property) {
+                if (in_array($segmentId, $property)) {
+                    $dependents[] = $entity->getForm()->getId();
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getFormsIdsWithDependenciesOnEmail(int $emailId): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'LIKE', 'value' => 'email.send%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $formIds = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
+                $formIds[] = $entity->getForm()->getid();
+            }
+            if (isset($properties['useremail']['email']) && (int) $properties['useremail']['email'] === $emailId) {
+                $formIds[] = $entity->getForm()->getid();
+            }
+        }
+
+        return array_unique($formIds);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function getFormsIdsWithDependenciesOnTag(string $tagName): array
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'EQ', 'value' => 'lead.changetags'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            foreach ($properties as $property) {
+                if (in_array($tagName, $property)) {
+                    $dependents[] = $entity->getForm()->getId();
+                }
+            }
+        }
+
+        return $dependents;
     }
 }

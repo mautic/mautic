@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-fresh-fixed",
+  "description": "Mautic Fresh Fixed Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "fresh-fixed"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

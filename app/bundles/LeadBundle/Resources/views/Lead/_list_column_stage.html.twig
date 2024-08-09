@@ -1,0 +1,5 @@
+<td class="{{ class }} text-center">
+    {% if item.stage %}
+        <span size="sm" class="label label-gray" style="{% if item.color %}backgroud-color:{{ item.color }}{% endif %}">{{ item.stage.name|purify }}</span>
+    {% endif %}
+</td>

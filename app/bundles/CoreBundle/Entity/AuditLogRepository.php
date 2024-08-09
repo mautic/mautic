@@ -1,31 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\UserBundle\Entity\User;
 
 /**
- * AuditLogRepository.
+ * @extends CommonRepository<AuditLog>
  */
 class AuditLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * @param Lead  $lead
-     * @param array $filters
-     *
      * @return int
      */
     public function getAuditLogsCount(Lead $lead, array $filters = null)
@@ -51,15 +41,12 @@ class AuditLogRepository extends CommonRepository
             $query->andWhere('al.action not in ('.$excludeList.')');
         }
 
-        return $query->execute()->fetchColumn();
+        return $query->executeQuery()->fetchOne();
     }
 
     /**
-     * @param Lead       $lead
-     * @param array      $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
+     * @param int $page
+     * @param int $limit
      *
      * @return array
      */
@@ -101,7 +88,56 @@ class AuditLogRepository extends CommonRepository
             if (isset($orderBy[1])) {
                 $orderdir = $orderBy[1];
             }
-            if (0 !== strpos($order, 'al.')) {
+            if (!str_starts_with($order, 'al.')) {
+                $order = 'al.'.$order;
+            }
+
+            $query->orderBy($order, $orderdir);
+        }
+
+        return $query->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @return array
+     */
+    public function getAuditLogsForLeads(array $listOfContacts, array $filters = null, array $orderBy = null, $dateAdded = null)
+    {
+        $query = $this->createQueryBuilder('al')
+            ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
+            ->where('al.bundle = \'lead\'')
+            ->andWhere('al.object = \'lead\'');
+        $query
+            ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
+
+        if (is_array($filters) && !empty($filters['search'])) {
+            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+        }
+
+        if (is_array($filters) && !empty($filters['includeEvents'])) {
+            $includeList = "'".implode("','", $filters['includeEvents'])."'";
+            $query->andWhere('al.action in ('.$includeList.')');
+        }
+
+        if ($dateAdded) {
+            $query->andWhere($query->expr()->gte('al.dateAdded', ':dateAdded'))->setParameter('dateAdded', $dateAdded);
+        }
+
+        if (is_array($filters) && !empty($filters['excludeEvents'])) {
+            $excludeList = "'".implode("','", $filters['excludeEvents'])."'";
+            $query->andWhere('al.action not in ('.$excludeList.')');
+        }
+
+        if (is_array($orderBy)) {
+            $orderdir = 'DESC';
+            $order    = 'id';
+            if (isset($orderBy[0])) {
+                $order = $orderBy[0];
+            }
+            if (isset($orderBy[1])) {
+                $orderdir = $orderBy[1];
+            }
+            if (!str_starts_with($order, 'al.')) {
                 $order = 'al.'.$order;
             }
 
@@ -114,11 +150,9 @@ class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      *
-     * @param null $object
-     * @param null $id
-     * @param int  $limit
-     * @param null $afterDate
-     * @param null $bundle
+     * @param string|null $object
+     * @param string|null $id
+     * @param int         $limit
      *
      * @return array
      */
@@ -150,16 +184,13 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', 'DESC')
+        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();
     }
 
     /**
-     * @param Lead|null $lead
-     * @param array     $options
-     *
      * @return array
      */
     public function getLeadIpLogs(Lead $lead = null, array $options = [])
@@ -171,7 +202,7 @@ class AuditLogRepository extends CommonRepository
             ->select('MAX(l.date_added) as date_added, MIN(l.id) as id, l.ip_address, l.object_id as lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'l')
             ->where(
-                $sqb->expr()->andX(
+                $sqb->expr()->and(
                     $sqb->expr()->eq('l.bundle', $sqb->expr()->literal('lead')),
                     $sqb->expr()->eq('l.object', $sqb->expr()->literal('lead')),
                     $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded'))
@@ -180,13 +211,15 @@ class AuditLogRepository extends CommonRepository
             ->groupBy('l.ip_address');
 
         if ($lead instanceof Lead) {
+            $dateTimeFormat = 'Y-m-d H:i:s';
+
             // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
-            $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
+            $dateTimeHelper = new DateTimeHelper($lead->getDateAdded(), $dateTimeFormat, 'local');
 
             $sqb->andWhere(
-                $sqb->expr()->andX(
+                $sqb->expr()->and(
                     $sqb->expr()->eq('l.object_id', $lead->getId()),
-                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
+                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );
         }
@@ -196,5 +229,34 @@ class AuditLogRepository extends CommonRepository
             ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');
 
         return $this->getTimelineResults($qb, $options, 'ip.ip_address', 'ip.date_added', [], ['date_added']);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getLogsForUser(User $user, int $limit = 15): array
+    {
+        $query = $this->createQueryBuilder('al')
+            ->select('al.userName, al.userId, al.bundle, al.object,
+            al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
+            ->where('al.bundle = \'user\'')
+            ->andWhere('al.userId = :user_id')
+            ->setParameter('user_id', $user->getId())
+            ->orderBy('al.dateAdded', 'DESC')
+            ->setMaxResults($limit);
+
+        return $query->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function anonymizeAllIpAddress(): int
+    {
+        $table_name = $this->getTableName();
+        $sql        = "UPDATE {$table_name} SET ip_address = '*.*.*.*' WHERE ip_address != '*.*.*.*'";
+        $conn       = $this->getEntityManager()->getConnection();
+
+        return $conn->executeQuery($sql)->rowCount();
     }
 }

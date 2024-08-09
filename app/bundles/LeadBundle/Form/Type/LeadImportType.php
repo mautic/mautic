@@ -1,34 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Validator\Constraints\FileEncoding as EncodingValidation;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class LeadImportType.
+ * @extends AbstractType<mixed>
  */
 class LeadImportType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'file',
-            'file',
+            FileType::class,
             [
                 'label' => 'mautic.lead.import.file',
                 'attr'  => [
@@ -38,9 +30,18 @@ class LeadImportType extends AbstractType
                 'constraints' => [
                     new File(
                         [
-                            'mimeTypes'        => ['text/csv', 'text/plain'],
+                            'mimeTypes'        => ['text/*', 'application/octet-stream', 'application/csv'],
                             'mimeTypesMessage' => 'mautic.core.invalid_file_type',
                         ]
+                    ),
+                    new EncodingValidation(
+                        [
+                            'encodingFormat'        => ['UTF-8'],
+                            'encodingFormatMessage' => 'mautic.core.invalid_file_encoding',
+                        ]
+                    ),
+                    new NotBlank(
+                        ['message' => 'mautic.import.file.required']
                     ),
                 ],
                 'error_bubbling' => true,
@@ -48,7 +49,7 @@ class LeadImportType extends AbstractType
         );
 
         $constraints = [
-            new \Symfony\Component\Validator\Constraints\NotBlank(
+            new NotBlank(
                 ['message' => 'mautic.core.value.required']
             ),
         ];
@@ -56,25 +57,27 @@ class LeadImportType extends AbstractType
         $default = (empty($options['data']['delimiter'])) ? ',' : htmlspecialchars($options['data']['delimiter']);
         $builder->add(
             'delimiter',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.delimiter',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.delimiter.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
             ]
         );
 
-        $default = (empty($options['data']['enclosure'])) ? '&quot;' : htmlspecialchars($options['data']['enclosure']);
+        $default = (empty($options['data']['enclosure'])) ? '"' : htmlspecialchars($options['data']['enclosure']);
         $builder->add(
             'enclosure',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.enclosure',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.enclosure.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -84,11 +87,12 @@ class LeadImportType extends AbstractType
         $default = (empty($options['data']['escape'])) ? '\\' : $options['data']['escape'];
         $builder->add(
             'escape',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.escape',
                 'attr'  => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.import.escape.help',
                 ],
                 'data'        => $default,
                 'constraints' => $constraints,
@@ -98,7 +102,7 @@ class LeadImportType extends AbstractType
         $default = (empty($options['data']['batchlimit'])) ? 100 : (int) $options['data']['batchlimit'];
         $builder->add(
             'batchlimit',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.batchlimit',
                 'attr'  => [
@@ -112,11 +116,11 @@ class LeadImportType extends AbstractType
 
         $builder->add(
             'start',
-            'submit',
+            SubmitType::class,
             [
                 'attr' => [
                     'class'   => 'btn btn-primary',
-                    'icon'    => 'fa fa-upload',
+                    'icon'    => 'ri-import-line',
                     'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'lead_import\']').submit();",
                 ],
                 'label' => 'mautic.lead.import.upload',
@@ -126,13 +130,5 @@ class LeadImportType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'lead_import';
     }
 }

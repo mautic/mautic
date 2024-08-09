@@ -1,23 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -34,7 +24,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'page.hits.in.time' => [
-            'formAlias' => 'page_dashboard_hits_in_time_widget',
+            'formAlias' => DashboardHitsInTimeWidgetType::class,
         ],
         'unique.vs.returning.leads' => [],
         'dwell.times'               => [],
@@ -53,32 +43,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'page:pages:viewother',
     ];
 
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
-
-    /**
-     * DashboardSubscriber constructor.
-     *
-     * @param PageModel $pageModel
-     */
-    public function __construct(PageModel $pageModel)
-    {
-        $this->pageModel = $pageModel;
+    public function __construct(
+        protected PageModel $pageModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');
 
-        if ($event->getType() == 'page.hits.in.time') {
+        if ('page.hits.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -101,25 +80,25 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'unique.vs.returning.leads') {
+        if ('unique.vs.returning.leads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $this->pageModel->getNewVsReturningPieChartData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
+                    'chartData'   => $this->pageModel->getUniqueVsReturningPieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers),
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'dwell.times') {
+        if ('dwell.times' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
@@ -129,11 +108,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'popular.pages') {
+        if ('popular.pages' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -148,38 +127,36 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($pages) {
-                    foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
-                        $row     = [
-                            [
-                                'value' => $page['title'],
-                                'type'  => 'link',
-                                'link'  => $pageUrl,
-                            ],
-                            [
-                                'value' => $page['hits'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($pages as &$page) {
+                    $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                    $row     = [
+                        [
+                            'value' => $page['title'],
+                            'type'  => 'link',
+                            'link'  => $pageUrl,
+                        ],
+                        [
+                            'value' => $page['hits'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.dashboard.label.hits'),
+                        'mautic.dashboard.label.title',
+                        'mautic.dashboard.label.hits',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $pages,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.pages') {
+        if ('created.pages' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -194,34 +171,32 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($pages) {
-                    foreach ($pages as &$page) {
-                        $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
-                        $row     = [
-                            [
-                                'value' => $page['name'],
-                                'type'  => 'link',
-                                'link'  => $pageUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($pages as &$page) {
+                    $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
+                    $row     = [
+                        [
+                            'value' => $page['name'],
+                            'type'  => 'link',
+                            'link'  => $pageUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $pages,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'device.granularity') {
+        if ('device.granularity' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -238,7 +213,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
     }

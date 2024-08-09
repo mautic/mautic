@@ -1,28 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ReportRepository.
+ * @extends CommonRepository<Report>
  */
 class ReportRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -37,10 +26,7 @@ class ReportRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -51,15 +37,12 @@ class ReportRepository extends CommonRepository
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
-        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        $returnParameter         = false; // returning a parameter that is not used will lead to a Doctrine error
+        [$expr, $parameters]     = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
@@ -95,9 +78,9 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -108,35 +91,29 @@ class ReportRepository extends CommonRepository
         return array_merge($commands, parent::getSearchCommands());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['r.name', 'ASC'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'r';
     }
 
     /**
-     * @param $viewOther
+     * @return mixed[]
      */
-    public function findReportsWithGraphs($ownedBy = null)
+    public function findReportsWithGraphs($ownedBy = null): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb->select('r.id, r.name, r.graphs')
             ->from(MAUTIC_TABLE_PREFIX.'reports', 'r')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->isNotNull('r.graphs'),
                     $qb->expr()->neq('r.graphs', $qb->expr()->literal('a:0:{}')),
                     $qb->expr()->eq('r.is_published', ':true')
@@ -152,6 +129,6 @@ class ReportRepository extends CommonRepository
 
         $qb->orderBy('r.name');
 
-        return $qb->execute()->fetchAll();
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

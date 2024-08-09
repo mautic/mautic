@@ -1,68 +1,36 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class BuildJsSubscriber.
- */
-class BuildJsSubscriber extends CommonSubscriber
+class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var NotificationHelper
-     */
-    protected $notificationHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * BuildJsSubscriber constructor.
-     *
-     * @param NotificationHelper $notificationHelper
-     * @param IntegrationHelper  $integrationHelper
-     */
-    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper)
-    {
-        $this->notificationHelper = $notificationHelper;
-        $this->integrationHelper  = $integrationHelper;
+    public function __construct(
+        private NotificationHelper $notificationHelper,
+        private IntegrationHelper $integrationHelper,
+        private RouterInterface $router
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => ['onBuildJs', 254],
         ];
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
-    public function onBuildJs(BuildJsEvent $event)
+    public function onBuildJs(BuildJsEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 

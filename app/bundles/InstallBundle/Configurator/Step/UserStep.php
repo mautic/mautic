@@ -1,23 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\UserStepType;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * User Step.
- */
 class UserStep implements StepInterface
 {
     /**
@@ -45,52 +32,27 @@ class UserStep implements StepInterface
      */
     public $password;
 
-    /**
-     * @var Session
-     */
-    private $session;
-
-    public function __construct(Session $session)
+    public function getFormType(): string
     {
-        $this->session = $session;
+        return UserStepType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormType()
-    {
-        return new UserStepType($this->session);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkRequirements()
+    public function checkRequirements(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function checkOptionalSettings()
+    public function checkOptionalSettings(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
-        return 'MauticInstallBundle:Install:user.html.php';
+        return '@MauticInstall/Install/user.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update(StepInterface $data)
+    public function update(StepInterface $data): array
     {
         return [];
     }

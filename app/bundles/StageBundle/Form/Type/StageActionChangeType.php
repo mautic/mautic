@@ -1,44 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class EmailSendType.
+ * @extends AbstractType<array<mixed>>
  */
 class StageActionChangeType extends AbstractType
 {
-    protected $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $this->factory = $factory;
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->add('stage', 'stageaction_list', [
+        $builder->add('stage', StageActionListType::class, [
             'label'      => 'mautic.stage.selectstage',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -55,15 +31,15 @@ class StageActionChangeType extends AbstractType
         ]);
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setOptional(['update_select']);
+        $resolver->setDefined(['update_select']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'stageaction_change';
     }

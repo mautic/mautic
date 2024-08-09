@@ -1,22 +1,14 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Used by SSO auth plugins that use OAuth2, etc means of logins.
- *
- * Class AbstractSsoIntegration
  */
 abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 {
@@ -33,7 +25,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Get the user role for new users.
      *
-     * @return bool|\Doctrine\Common\Proxy\Proxy|null|object
+     * @return bool|\Doctrine\Common\Proxy\Proxy|object|null
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -41,10 +33,10 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
-        $role = (isset($featureSettings['new_user_role'])) ? $featureSettings['new_user_role'] : false;
+        $role = $featureSettings['new_user_role'] ?? false;
 
         if ($role) {
-            return $this->factory->getEntityManager()->getReference('MauticUserBundle:Role', $role);
+            return $this->em->getReference(Role::class, $role);
         }
 
         throw new AuthenticationException('mautic.integration.sso.error.no_role');
@@ -52,14 +44,12 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
     /**
      * Returns if a new user should be created if authenticated and not found locally.
-     *
-     * @return bool
      */
-    public function shouldAutoCreateNewUser()
+    public function shouldAutoCreateNewUser(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
 
-        return (isset($featureSettings['auto_create_user'])) ? (bool) $featureSettings['auto_create_user'] : false;
+        return isset($featureSettings['auto_create_user']) && (bool) $featureSettings['auto_create_user'];
     }
 
     /**
@@ -67,9 +57,9 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      */
     public function getAuthCallbackUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_sso_login_check',
+        return $this->router->generate('mautic_sso_login_check',
             ['integration' => $this->getName()],
-            true //absolute
+            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL // absolute
         );
     }
 
@@ -90,9 +80,6 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Don't save the keys as they are only used to validate user login.
      *
-     * @param      $data
-     * @param null $tokenOverride
-     *
      * @return array
      */
     public function extractAuthKeys($data, $tokenOverride = null)
@@ -100,15 +87,15 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
         // Prepare the keys for extraction such as renaming, setting expiry, etc
         $data = $this->prepareResponseForExtraction($data);
 
-        //parse the response
-        $authTokenKey = ($tokenOverride) ? $tokenOverride : $this->getAuthTokenKey();
+        // parse the response
+        $authTokenKey = $tokenOverride ?: $this->getAuthTokenKey();
         if (is_array($data) && isset($data[$authTokenKey])) {
             return $data;
         }
 
         $error = $this->getErrorsFromResponse($data);
         if (empty($error)) {
-            $error = $this->factory->getTranslator()->trans('mautic.integration.error.genericerror', [], 'flashes');
+            $error = $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
         }
 
         throw new AuthenticationException($error);
@@ -127,9 +114,9 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Get form settings; authorization is not needed since it is done when a user logs in.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getFormSettings()
+    public function getFormSettings(): array
     {
         return [
             'requires_callback'      => true,
@@ -138,20 +125,18 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param Form|\Symfony\Component\Form\FormBuilder $builder
      * @param array                                    $data
      * @param string                                   $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add('auto_create_user',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.integration.sso.auto_create_user',
-                    'data'  => (isset($data['auto_create_user'])) ? (bool) $data['auto_create_user'] : false,
+                    'data'  => isset($data['auto_create_user']) && (bool) $data['auto_create_user'],
                     'attr'  => [
                         'tooltip' => 'mautic.integration.sso.auto_create_user.tooltip',
                     ],
@@ -160,7 +145,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
             $builder->add(
                 'new_user_role',
-                'role_list',
+                RoleListType::class,
                 [
                     'label'      => 'mautic.integration.sso.new_user_role',
                     'label_attr' => ['class' => 'control-label'],

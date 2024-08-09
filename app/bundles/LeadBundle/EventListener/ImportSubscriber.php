@@ -1,53 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ImportSubscriber.
- */
-class ImportSubscriber extends CommonSubscriber
+class ImportSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * ImportSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::IMPORT_POST_SAVE   => ['onImportPostSave', 0],
@@ -57,10 +26,8 @@ class ImportSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param ImportEvent $event
      */
-    public function onImportPostSave(ImportEvent $event)
+    public function onImportPostSave(ImportEvent $event): void
     {
         $entity = $event->getEntity();
         if ($details = $event->getChanges()) {
@@ -78,10 +45,8 @@ class ImportSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param ImportEvent $event
      */
-    public function onImportDelete(ImportEvent $event)
+    public function onImportDelete(ImportEvent $event): void
     {
         $entity = $event->getEntity();
         $log    = [
@@ -94,7 +59,7 @@ class ImportSubscriber extends CommonSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
 
-        //In case of batch delete, this method call remove the uploaded file
+        // In case of batch delete, this method call remove the uploaded file
         $entity->removeFile();
     }
 }

@@ -1,29 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 /**
- * Class PointEventHelper.
+ * @deprecated It will be removed in Mautic 6.0
  */
 class PointEventHelper
 {
-    /**
-     * @param $event
-     * @param $factory
-     * @param $lead
-     *
-     * @return bool
-     */
-    public static function changeLists($event, $factory, $lead)
+    public static function changeLists($event, $factory, $lead): bool
     {
         $properties = $event['properties'];
 

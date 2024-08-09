@@ -1,78 +1,30 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
+use Psr\Http\Message\ResponseInterface;
 
-/**
- * Class PluginIntegrationRequestEvent.
- */
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var
-     */
-    private $url;
+    private ?ResponseInterface $response = null;
 
     /**
-     * @var array
+     * @param mixed[] $parameters
+     * @param string  $method
+     * @param mixed[] $settings
+     * @param string  $authType
      */
-    private $parameters;
-
-    /**
-     * @var
-     */
-    private $headers;
-
-    /**
-     * @var string
-     */
-    private $method;
-
-    /**
-     * @var array
-     */
-    private $settings;
-
-    /**
-     * @var string
-     */
-    private $authType;
-
-    /**
-     * @var
-     */
-    private $response;
-
-    /**
-     * PluginIntegrationRequestEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     * @param                     $url
-     * @param                     $parameters
-     * @param                     $headers
-     * @param                     $method
-     * @param                     $settings
-     * @param                     $authType
-     */
-    public function __construct(AbstractIntegration $integration, $url, $parameters, $headers, $method, $settings, $authType)
-    {
+    public function __construct(
+        UnifiedIntegrationInterface $integration,
+        private $url,
+        private $parameters,
+        private $headers,
+        private $method,
+        private $settings,
+        private $authType
+    ) {
         $this->integration = $integration;
-        $this->url         = $url;
-        $this->parameters  = $parameters;
-        $this->headers     = $headers;
-        $this->method      = $method;
-        $this->settings    = $settings;
-        $this->authType    = $authType;
     }
 
     /**
@@ -91,10 +43,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->parameters;
     }
 
-    /**
-     * @param array $parameters
-     */
-    public function setParameters(array $parameters)
+    public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
     }
@@ -123,18 +72,12 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->authType;
     }
 
-    /**
-     * @param $response
-     */
-    public function setResponse($response)
+    public function setResponse(ResponseInterface $response): void
     {
         $this->response = $response;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getResponse()
+    public function getResponse(): ResponseInterface
     {
         return $this->response;
     }
@@ -147,10 +90,7 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->headers;
     }
 
-    /**
-     * @param array $headers
-     */
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): void
     {
         $this->headers = $headers;
     }

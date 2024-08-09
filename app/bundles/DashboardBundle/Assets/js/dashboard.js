@@ -1,7 +1,83 @@
-//DashboardBundle
+// DashboardBundle
+// Use absolute path to keep dashboard working when app is in subdir
+Mautic.widgetUrl = mauticBasePath + '/s/dashboard/widget/';
+
+/**
+ * @type jQuery DOM element to be replaced with spinner
+ */
+Mautic.dashboardSubmitButton = false; // Button text, to be get and shown instead of spinner
+
+/**
+ * Init dashboard events
+ * @param container
+ */
 Mautic.dashboardOnLoad = function (container) {
-    Mautic.initWidgetSorting();
-    Mautic.initWidgetRemoveButtons(mQuery('#dashboard-widgets'));
+    Mautic.loadWidgets();
+};
+
+/**
+ * Load all widgets on initial page render
+ */
+Mautic.loadWidgets = function () {
+    Mautic.dashboardFilterPreventSubmit();
+
+    jQuery('.widget').each(function() {
+        let widgetId = jQuery(this).attr('data-widget-id');
+        let container = jQuery('.widget[data-widget-id="'+widgetId+'"]');
+        jQuery.ajax({
+            url: Mautic.widgetUrl+widgetId+'?ignoreAjax=true',
+        }).done(function(response) {
+            Mautic.widgetOnLoad(container, response);
+        });
+    });
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.initDashboardFilter();
+    });
+};
+
+/**
+ * Init dashboard filter events after widget load
+ */
+Mautic.initDashboardFilter = function () {
+    let form = jQuery('form[name="daterange"]');
+    form.find('button')
+        .replaceWith(Mautic.dashboardSubmitButton);
+    form
+        .unbind('submit')
+        .on('submit', function(e){
+            e.preventDefault();
+            Mautic.dashboardFilterPreventSubmit();
+            jQuery('.widget').each(function() {
+                let widgetId = jQuery(this).attr('data-widget-id');
+                let element = jQuery('.widget[data-widget-id="' + widgetId + '"]');
+                jQuery.ajax({
+                    type: 'POST',
+                    url: Mautic.widgetUrl + widgetId + '?ignoreAjax=true',
+                    data: form.serializeArray(),
+                    success: function (response) {
+                        Mautic.widgetOnLoad(element, response);
+                    }
+                });
+            });
+        });
+};
+
+/**
+ * Prevent filter from submit, show spinner instead of send button
+ */
+Mautic.dashboardFilterPreventSubmit = function() {
+    let form = jQuery('form[name="daterange"]');
+    let button = form.find('button:first');
+    Mautic.dashboardSubmitButton = button.clone();
+    button.width(button.width()+'px'); // Keep button width
+    button.html('<i class="ri-loader-3-line ri-spin"></i>');
+    jQuery('.widget').find('.card-body').html('<div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>');
+    form
+        .unbind('submit')
+        .on('submit', function(e){
+            e.preventDefault();
+        });
 };
 
 Mautic.dashboardOnUnload = function(id) {
@@ -9,9 +85,17 @@ Mautic.dashboardOnUnload = function(id) {
     mQuery('.jvectormap-tip').remove();
 };
 
+/**
+ * Render widget from XHR to DOM
+ *
+ * @param container
+ * @param response
+ */
 Mautic.widgetOnLoad = function(container, response) {
     if (!response.widgetId) return;
-    var widget = mQuery('[data-widget-id=' + response.widgetId + ']');
+    // target in DOM
+    var widget = mQuery('.widget[data-widget-id="' + response.widgetId + '"]');
+    // source from response
     var widgetHtml = mQuery(response.widgetHtml);
 
     // initialize edit button modal again
@@ -32,10 +116,30 @@ Mautic.widgetOnLoad = function(container, response) {
         .css('width', response.widgetWidth + '%')
         .css('height', response.widgetHeight + '%');
     Mautic.renderCharts(widgetHtml);
-    Mautic.renderMaps(widgetHtml);
-    Mautic.initWidgetRemoveButtons(widgetHtml);
-    Mautic.saveWidgetSorting();
-}
+
+    const map = widgetHtml.find('.vector-map').first();
+    if (map.length && !map.hasClass('map-rendered')) {
+        Mautic.initMap(widgetHtml, 'regions');
+    }
+
+    Mautic.initWidgetRemoveEvents();
+    Mautic.initWidgetSorting();
+    Mautic.initDashboardFilter();
+};
+
+Mautic.initWidgetRemoveEvents = function () {
+    jQuery('.remove-widget')
+        .unbind('click')
+        .on('click', function(e) {
+            e.preventDefault();
+            element = jQuery(this);
+            let url = element.attr('href');
+            element.closest('.widget').remove();
+            jQuery.ajax({
+                url: url,
+            });
+        });
+};
 
 Mautic.initWidgetSorting = function () {
     var widgetsWrapper = mQuery('#dashboard-widgets');
@@ -177,46 +281,26 @@ Mautic.updateWidgetForm = function (element) {
     });
 };
 
-Mautic.initWidgetRemoveButtons = function (scope) {
-    scope.find('.remove-widget').on('click', function(e) {
-        e.preventDefault();
-        var button = mQuery(this);
-        var wrapper = button.closest('.widget');
-        var widgetId = wrapper.attr('data-widget-id');
-        wrapper.hide('slow');
-        Mautic.ajaxActionRequest('dashboard:delete', {widget: widgetId}, function(response) {
-            if (!response.success) {
-                wrapper.show('slow');
-            }
-        });
-    });
-
-};
-
-Mautic.exportDashboardLayout = function(text, baseUrl, save) {
+Mautic.exportDashboardLayout = function(text, baseUrl) {
     var name = prompt(text, "");
 
     if (name !== null) {
         if (name) {
-            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
-        } else if (save) {
-            baseUrl = baseUrl + "?save=1";
+            baseUrl = baseUrl + "?name=" + encodeURIComponent(name);
         }
 
         window.location = baseUrl;
     }
 };
 
-Mautic.confirmDeleteDashboard = function(text, baseUrl, save) {
+Mautic.saveDashboardLayout = function(text) {
     var name = prompt(text, "");
 
-    if (name !== null) {
-        if (name) {
-            baseUrl = baseUrl + "?name=" + encodeURIComponent(name) + (save ? '&save=1' : '');
-        } else if (save) {
-            baseUrl = baseUrl + "?save=1";
-        }
-
-        window.location = baseUrl;
+    if (name) {
+        mQuery.ajax({
+            type: 'POST',
+            url: mauticBaseUrl+'s/dashboard/save',
+            data: {name: name}
+        });
     }
 };

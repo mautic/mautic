@@ -1,0 +1,61 @@
+{#
+  Variables
+    - item: Item to render
+    - actionRoute
+#}
+{% set objectRoute = null %}
+{% if 'lead' == item.object %}
+  {% set objectRoute = 'mautic_contact_index' %}
+{% endif %}
+<tr>
+    <td class="col-actions text-center">
+        <span class="label label-{{ item.satusLabelClass }}">
+            {{ ('mautic.lead.import.status.'~item.status)|trans }}
+        </span>
+    </td>
+    <td>
+        <div>
+            {% if item.status not in [constant('FAILED', item), constant('IMPORTED', item), constant('MANUAL', item)] and permissions[permissionBase~':publish'] %}
+              {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.import'}) }}
+            {% endif %}
+            {% if securityHasEntityAccess(true, permissions[permissionBase~':viewother'], item.createdBy) %}
+              <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': item.id, 'object': app.request.get('object', 'contacts')}) }}" data-toggle="ajax">
+                {{ item.name }}
+              </a>
+            {% else %}
+              {{ item.name }}
+            {% endif %}
+        </div>
+    </td>
+    <td class="visible-md visible-lg">{% if item.runTime %}{{ dateFormatRange(item.runTime) }}{% endif %}</td>
+    <td class="visible-md visible-lg">{{ item.progressPercentage }}%</td>
+    <td class="visible-md visible-lg">
+        {% if objectRoute is not null %}
+            <a size="sm" class="mt-xs label label-gray" href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id}) }}">{{ item.lineCount }}</a>
+        {% else %}
+            {{ item.lineCount }}
+        {% endif %}
+    </td>
+    <td class="visible-md visible-lg">
+        {% if objectRoute is not null %}
+            <a size="sm" class="mt-xs label label-gray" href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':inserted'}) }}">{{ item.insertedCount }}</a>
+        {% else %}
+            {{ item.insertedCount }}
+        {% endif %}
+    </td>
+    <td class="visible-md visible-lg">
+        {% if objectRoute is not null %}
+            <a size="sm" class="mt-xs label label-gray" href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':updated'}) }}">{{ item.updatedCount }}</a>
+        {% else %}
+            {{ item.updatedCount }}
+        {% endif %}
+    </td>
+    <td class="visible-md visible-lg">{{ item.ignoredCount }}</td>
+    <td class="visible-md visible-lg">{{ item.createdByUser }}</td>
+    <td class="visible-md visible-lg">
+        <abbr title="{{ dateToFull(item.dateAdded) }}">
+            {{ dateToText(item.dateAdded) }}
+        </abbr>
+    </td>
+    <td class="visible-md visible-lg">{{ item.id }}</td>
+</tr>

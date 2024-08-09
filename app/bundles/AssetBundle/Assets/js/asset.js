@@ -1,6 +1,6 @@
 //AssetBundle
 Mautic.assetOnLoad = function (container) {
-    if (typeof mauticAssetUploadEndpoint !== 'undefined' && mQuery('div#dropzone').length) {
+    if (typeof mauticAssetUploadEndpoint !== 'undefined' && typeof Mautic.assetDropzone == 'undefined' && mQuery('div#dropzone').length) {
         Mautic.initializeDropzone();
     }
 };
@@ -14,7 +14,7 @@ Mautic.assetOnUnload = function(id) {
 Mautic.updateRemoteBrowser = function(provider, path) {
     path = typeof path !== 'undefined' ? path : '';
 
-    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+    var spinner = mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>');
     spinner.appendTo('#tab' + provider + ' a');
 
     mQuery.ajax({
@@ -91,6 +91,7 @@ Mautic.initializeDropzone = function() {
     var preview = mQuery('.preview div.text-center');
 
     Mautic.assetDropzone.on("sending", function (file, request, formData) {
+        request.setRequestHeader('X-CSRF-Token', mauticAjaxCsrf);
         formData.append('tempId', mQuery('#asset_tempId').val());
     }).on("addedfile", function (file) {
         preview.fadeOut('fast');

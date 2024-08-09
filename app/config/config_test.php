@@ -1,83 +1,81 @@
 <?php
 
-use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
-use Symfony\Component\Dotenv\Dotenv;
+use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
+use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Test\EnvLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+/** @var Symfony\Component\DependencyInjection\ContainerBuilder $container */
+
+// Include path settings
+$root          = $container->getParameter('mautic.application_dir').'/app';
+$configBaseDir = ParameterLoader::getLocalConfigBaseDir($root);
+
 $loader->import('config.php');
 
-// Load environment variables from .env.test file
-$env     = new Dotenv();
-$root    = __DIR__.'/../../';
-$envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
-
-$env->load($envFile);
+EnvLoader::load();
 
 // Define some constants from .env
-defined('MAUTIC_DB_PREFIX') || define('MAUTIC_DB_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
+
+// Twig Configuration
+$container->loadFromExtension('twig', [
+    'cache'            => false,
+    'debug'            => '%kernel.debug%',
+    'strict_variables' => true,
+    'paths'            => [
+        '%mautic.application_dir%/app/bundles'                  => 'bundles',
+        '%mautic.application_dir%/app/bundles/CoreBundle'       => 'MauticCore',
+        '%mautic.application_dir%/themes'                       => 'themes',
+    ],
+    'form_themes' => [
+        // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
+        '@MauticCore/FormTheme/mautic_form_layout.html.twig',
+    ],
+]);
 
 $container->loadFromExtension('framework', [
     'test'    => true,
     'session' => [
-        'storage_id' => 'session.storage.filesystem',
+        'storage_id' => 'session.storage.mock_file',
+        'name'       => 'MOCKSESSION',
     ],
     'profiler' => [
         'collect' => false,
     ],
     'translator' => [
-        'enabled' => false,
+        'enabled' => true,
     ],
     'csrf_protection' => [
-        'enabled' => false,
+        'enabled' => true,
     ],
 ]);
 
-$container->setParameter('mautic.famework.csrf_protection', false);
-
-$container->register('mautic_integration.pipedrive.guzzle.client', Client::class);
+$container->setParameter('mautic.famework.csrf_protection', true);
 
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
     'intercept_redirects' => false,
 ]);
 
-$container->loadFromExtension('swiftmailer', [
-    'disable_delivery' => true,
-]);
-
+$connectionSettings = [
+    'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
+    'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
+    'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
+    'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
+    'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
+    'options'  => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
-        'default_connection' => 'default',
-        'connections'        => [
-            'default' => [
-                'driver'   => 'pdo_mysql',
-                'host'     => getenv('DB_HOST') ?: '%mautic.db_host%',
-                'port'     => getenv('DB_PORT') ?: '%mautic.db_port%',
-                'dbname'   => getenv('DB_NAME') ?: '%mautic.db_name%',
-                'user'     => getenv('DB_USER') ?: '%mautic.db_user%',
-                'password' => getenv('DB_PASSWD') ?: '%mautic.db_password%',
-                'charset'  => 'UTF8',
-                // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
-                'mapping_types' => [
-                    'enum'  => 'string',
-                    'point' => 'string',
-                    'bit'   => 'string',
-                ],
-
-            ],
+        'connections' => [
+            'default'    => $connectionSettings,
+            'unbuffered' => $connectionSettings,
         ],
     ],
 ]);
 
-// Ensure the mautic.db_table_prefix is set to our phpunit configuration.
 $container->setParameter('mautic.db_table_prefix', MAUTIC_TABLE_PREFIX);
 
 $container->loadFromExtension('monolog', [
@@ -89,7 +87,7 @@ $container->loadFromExtension('monolog', [
             'formatter' => 'mautic.monolog.fulltrace.formatter',
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/%kernel.environment%.php',
-            'level'     => 'debug',
+            'level'     => getenv('MAUTIC_DEBUG_LEVEL') ?: 'error',
             'channels'  => [
                 '!mautic',
             ],
@@ -103,7 +101,7 @@ $container->loadFromExtension('monolog', [
             'formatter' => 'mautic.monolog.fulltrace.formatter',
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/mautic_%kernel.environment%.php',
-            'level'     => 'debug',
+            'level'     => getenv('MAUTIC_DEBUG_LEVEL') ?: 'error',
             'channels'  => [
                 'mautic',
             ],
@@ -112,16 +110,46 @@ $container->loadFromExtension('monolog', [
     ],
 ]);
 
-$container->loadFromExtension('liip_functional_test', [
-    'cache_sqlite_db' => true,
+$container->loadFromExtension('liip_test_fixtures', [
+    'cache_db' => [
+        'sqlite' => 'liip_functional_test.services_database_backup.sqlite',
+    ],
+    'keep_database_and_schema' => true,
 ]);
 
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists(__DIR__.'/config_override.php')) {
-    $loader->import('config_override.php');
+if (file_exists($configBaseDir.'/config/config_override.php')) {
+    $loader->import($configBaseDir.'/config/config_override.php');
 }
 
-//Add required parameters
+// Add required parameters
 $container->setParameter('mautic.secret_key', '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0');
+$container->setParameter('mautic.security.disableUpdates', true);
+$container->setParameter('mautic.rss_notification_url', null);
+$container->setParameter('mautic.batch_sleep_time', 0);
+
+// Turn off creating of indexes in lead field fixtures
+$container->register('mautic.install.fixture.lead_field', Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class)
+    ->addArgument(new Reference('translator'))
+    ->addTag(FixturesCompilerPass::FIXTURE_TAG)
+    ->setPublic(true);
+
+// Use static namespace for token manager
+$container->register('security.csrf.token_manager', Symfony\Component\Security\Csrf\CsrfTokenManager::class)
+    ->addArgument(new Reference('security.csrf.token_generator'))
+    ->addArgument(new Reference('security.csrf.token_storage'))
+    ->addArgument('test')
+    ->setPublic(true);
+
+// HTTP client mock handler providing response queue
+$container->register(GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
+
+$container->register('http_client', Symfony\Component\HttpClient\MockHttpClient::class)
+    ->setPublic(true);
+
+$container->register('test.service_container', Mautic\CoreBundle\Test\Container\TestContainer::class)
+    ->setArgument('$kernel', new Reference('kernel'))
+    ->setArgument('$privateServicesLocatorId', 'test.private_services_locator')
+    ->setPublic(true);

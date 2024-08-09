@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,9 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Event.
- */
 class Event
 {
     /**
@@ -32,7 +20,7 @@ class Event
     private $webhook;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\WebhookQueue>
      */
     private $queues;
 
@@ -46,10 +34,7 @@ class Event
         $this->queues = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_events')
@@ -79,10 +64,8 @@ class Event
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('event')
             ->addListProperties(
@@ -102,7 +85,7 @@ class Event
     }
 
     /**
-     * @return mixed
+     * @return Webhook
      */
     public function getWebhook()
     {
@@ -110,9 +93,9 @@ class Event
     }
 
     /**
-     * @param mixed $webhook
+     * @return $this
      */
-    public function setWebhook($webhook)
+    public function setWebhook(Webhook $webhook)
     {
         $this->webhook = $webhook;
 
@@ -135,5 +118,25 @@ class Event
         $this->eventType = $eventType;
 
         return $this;
+    }
+
+    /**
+     * @param ArrayCollection $queues
+     *
+     * @return self
+     */
+    public function setQueues($queues)
+    {
+        $this->queues = $queues;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getQueues()
+    {
+        return $this->queues;
     }
 }

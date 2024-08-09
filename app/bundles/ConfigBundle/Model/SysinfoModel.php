@@ -1,48 +1,35 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SysinfoModel.
- */
-class SysinfoModel extends AbstractCommonModel
+class SysinfoModel
 {
+    /**
+     * @var string|null
+     */
     protected $phpInfo;
+
+    /**
+     * @var array<string,bool>|null
+     */
     protected $folders;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * SysinfoModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->pathsHelper          = $pathsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        protected PathsHelper $pathsHelper,
+        protected CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        protected Connection $connection,
+        private InstallService $installService,
+        private CheckStep $checkStep
+    ) {
     }
 
     /**
@@ -56,7 +43,7 @@ class SysinfoModel extends AbstractCommonModel
             return $this->phpInfo;
         }
 
-        if (function_exists('phpinfo')) {
+        if (function_exists('phpinfo') && 'cli' !== php_sapi_name()) {
             ob_start();
             $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');
@@ -72,7 +59,7 @@ class SysinfoModel extends AbstractCommonModel
             $output        = str_replace('</table>', '</tbody></table>', $output);
             $output        = str_replace('</div>', '', $output);
             $this->phpInfo = $output;
-            //ensure TZ is set back to default
+            // ensure TZ is set back to default
             date_default_timezone_set($currentTz);
         } elseif (function_exists('phpversion')) {
             $this->phpInfo = $this->translator->trans('mautic.sysinfo.phpinfo.phpversion', ['%phpversion%' => phpversion()]);
@@ -81,6 +68,22 @@ class SysinfoModel extends AbstractCommonModel
         }
 
         return $this->phpInfo;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->installService->checkOptionalSettings($this->checkStep);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequirements(): array
+    {
+        return $this->installService->checkRequirements($this->checkStep);
     }
 
     /**
@@ -95,23 +98,18 @@ class SysinfoModel extends AbstractCommonModel
         }
 
         $importantFolders = [
-            $this->pathsHelper->getSystemPath('local_config'),
-            $this->coreParametersHelper->getParameter('cache_path'),
-            $this->coreParametersHelper->getParameter('log_path'),
-            $this->coreParametersHelper->getParameter('upload_dir'),
+            ParameterLoader::getLocalConfigFile($this->pathsHelper->getSystemPath('root').'/app'),
+            $this->coreParametersHelper->get('cache_path'),
+            $this->coreParametersHelper->get('log_path'),
+            $this->coreParametersHelper->get('upload_dir'),
             $this->pathsHelper->getSystemPath('images', true),
             $this->pathsHelper->getSystemPath('translations', true),
         ];
 
-        // Show the spool folder only if the email queue is configured
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
-            $importantFolders[] = $this->coreParametersHelper->getParameter('mailer_spool_path');
-        }
-
         foreach ($importantFolders as $folder) {
             $folderPath = realpath($folder);
-            $folderKey  = ($folderPath) ? $folderPath : $folder;
-            $isWritable = ($folderPath) ? is_writable($folderPath) : false;
+            $folderKey  = $folderPath ?: $folder;
+            $isWritable = $folderPath && is_writable($folderPath);
 
             $this->folders[$folderKey] = $isWritable;
         }
@@ -123,12 +121,10 @@ class SysinfoModel extends AbstractCommonModel
      * Method to tail (a few last rows) of a file.
      *
      * @param int $lines
-     *
-     * @return array|null
      */
-    public function getLogTail($lines = 10)
+    public function getLogTail($lines = 10): ?string
     {
-        $log = $this->coreParametersHelper->getParameter('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
+        $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
         if (!file_exists($log)) {
             return null;
@@ -137,25 +133,30 @@ class SysinfoModel extends AbstractCommonModel
         return $this->tail($log, $lines);
     }
 
+    public function getDbInfo(): array
+    {
+        return [
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
+            'driver'   => $this->connection->getParams()['driver'],
+            'platform' => $this->connection->getDatabasePlatform()::class,
+        ];
+    }
+
     /**
      * Method to tail (a few last rows) of a file.
      *
-     * @param     $filename
      * @param int $lines
      * @param int $buffer
-     *
-     * @return string
      */
-    public function tail($filename, $lines = 10, $buffer = 4096)
+    public function tail($filename, $lines = 10, $buffer = 4096): string
     {
         $f      = fopen($filename, 'rb');
         $output = '';
-        $chunk  = '';
 
         fseek($f, -1, SEEK_END);
 
-        if (fread($f, 1) != "\n") {
-            $lines -= 1;
+        if ("\n" != fread($f, 1)) {
+            --$lines;
         }
 
         while (ftell($f) > 0 && $lines >= 0) {

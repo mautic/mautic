@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Lead.
- */
 class Lead
 {
     /**
@@ -31,12 +19,12 @@ class Lead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $dateAdded;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLastExited;
 
@@ -55,21 +43,18 @@ class Lead
      */
     private $rotation = 1;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaign_leads')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadRepository')
+            ->setCustomRepositoryClass(LeadRepository::class)
             ->addIndex(['date_added'], 'campaign_leads_date_added')
             ->addIndex(['date_last_exited'], 'campaign_leads_date_exited')
             ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
 
         $builder->createManyToOne('campaign', 'Campaign')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->inversedBy('leads')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
             ->build();
@@ -93,32 +78,30 @@ class Lead
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('campaignLead')
-                 ->addListProperties(
-                     [
-                         'dateAdded',
-                         'manuallyRemoved',
-                         'manuallyAdded',
-                         'rotation',
-                         'dateLastExited',
-                     ]
-                 )
-                ->addProperties(
-                    [
-                        'lead',
-                        'campaign',
-                    ]
-                )
-                 ->build();
+            ->addListProperties(
+                [
+                    'dateAdded',
+                    'manuallyRemoved',
+                    'manuallyAdded',
+                    'rotation',
+                    'dateLastExited',
+                ]
+            )
+            ->addProperties(
+                [
+                    'lead',
+                    'campaign',
+                ]
+            )
+            ->build();
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -128,23 +111,20 @@ class Lead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date)
+    public function setDateAdded($date): void
     {
         $this->dateAdded = $date;
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -157,10 +137,7 @@ class Lead
         return $this->campaign;
     }
 
-    /**
-     * @param Campaign $campaign
-     */
-    public function setCampaign($campaign)
+    public function setCampaign(Campaign $campaign): void
     {
         $this->campaign = $campaign;
     }
@@ -176,7 +153,7 @@ class Lead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved($manuallyRemoved)
+    public function setManuallyRemoved($manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -200,7 +177,7 @@ class Lead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded($manuallyAdded)
+    public function setManuallyAdded($manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }
@@ -234,7 +211,18 @@ class Lead
     }
 
     /**
-     * @return \DateTime
+     * @return $this
+     */
+    public function startNewRotation()
+    {
+        ++$this->rotation;
+        $this->dateAdded = new \DateTime();
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeInterface|null
      */
     public function getDateLastExited()
     {
@@ -242,11 +230,9 @@ class Lead
     }
 
     /**
-     * @param \DateTime $dateLastExited
-     *
      * @return Lead
      */
-    public function setDateLastExited(\DateTime $dateLastExited)
+    public function setDateLastExited(\DateTime $dateLastExited = null)
     {
         $this->dateLastExited = $dateLastExited;
 

@@ -1,22 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Gaufrette\Adapter;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
 
-/**
- * Class CloudStorageIntegration.
- */
 abstract class CloudStorageIntegration extends AbstractIntegration
 {
     /**
@@ -24,26 +13,26 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     protected $adapter;
 
-    /**
-     * @param FormBuilder|Form $builder
-     */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
-        if ($formArea == 'features') {
-            $name = strtolower($this->getName());
-            if ($this->factory->serviceExists('mautic.form.type.cloudstorage.'.$name)) {
-                $builder->add('provider', 'cloudstorage_'.$name, [
+        if ('features' !== $formArea) {
+            return;
+        }
+
+        try {
+            $builder->add(
+                'provider',
+                $this->getForm(),
+                [
                     'label'    => 'mautic.integration.form.provider.settings',
                     'required' => false,
-                    'data'     => (isset($data['provider'])) ? $data['provider'] : [],
-                ]);
-            }
+                    'data'     => $data['provider'] ?? [],
+                ]
+            );
+        } catch (NoFormNeededException) {
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthenticationType()
     {
         return 'api';
@@ -57,6 +46,13 @@ abstract class CloudStorageIntegration extends AbstractIntegration
     abstract public function getAdapter();
 
     /**
+     * Retrieves FQCN form type class name.
+     *
+     * @throws NoFormNeededException
+     */
+    abstract public function getForm(): string;
+
+    /**
      * Retrieves the public URL for a given key.
      *
      * @param string $key
@@ -65,9 +61,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      */
     abstract public function getPublicUrl($key);
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSupportedFeatures()
     {
         return ['cloud_storage'];

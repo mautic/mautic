@@ -1,27 +1,14 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\NotificationBundle\Entity\Notification;
 
-/**
- * Class NotificationEvent.
- */
 class NotificationEvent extends CommonEvent
 {
     /**
-     * @param Notification $notification
-     * @param bool         $isNew
+     * @param bool $isNew
      */
     public function __construct(Notification $notification, $isNew = false)
     {
@@ -41,10 +28,8 @@ class NotificationEvent extends CommonEvent
 
     /**
      * Sets the Notification entity.
-     *
-     * @param Notification $notification
      */
-    public function setNotification(Notification $notification)
+    public function setNotification(Notification $notification): void
     {
         $this->entity = $notification;
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
@@ -16,6 +7,9 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends FormController
@@ -25,10 +19,10 @@ class PublicController extends FormController
      *
      * @param string    $message   Message of the notification
      * @param string    $header    Header for message
-     * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param string    $iconClass Font Awesome CSS class for the icon (e.g. ri-eye-line)
      * @param User|null $user      User object; defaults to current user
      */
-    public function addNewNotification($message, $header, $iconClass, User $user)
+    public function addNewNotification($message, $header, $iconClass, User $user): void
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $notificationModel */
         $notificationModel = $this->getModel('core.notification');
@@ -36,31 +30,27 @@ class PublicController extends FormController
     }
 
     /**
-     * @return Response
-     *
      * @throws \InvalidArgumentException
      */
-    public function callbackAction()
+    public function callbackAction(Request $request, LoggerInterface $mauticLogger, LookupHelper $lookupHelper): Response
     {
-        $logger = $this->get('monolog.logger.mautic');
-
-        if (!$this->request->request->has('body') || !$this->request->request->has('id')
-            || !$this->request->request->has('type')
-            || !$this->request->request->has('status')
-            || 200 !== $this->request->request->get('status')
+        if (!$request->request->has('body') || !$request->request->has('id')
+            || !$request->request->has('type')
+            || !$request->request->has('status')
+            || 200 !== $request->request->get('status')
         ) {
-            $logger->log('error', 'ERROR on Clearbit callback: Malformed request variables: '.json_encode($this->request->request->all(), JSON_PRETTY_PRINT));
+            $mauticLogger->log('error', 'ERROR on Clearbit callback: Malformed request variables: '.json_encode($request->request->all(), JSON_PRETTY_PRINT));
 
             return new Response('ERROR');
         }
 
         /** @var array $result */
-        $result           = $this->request->request->get('body', []);
-        $oid              = $this->request->request->get('id');
-        $validatedRequest = $this->get('mautic.plugin.clearbit.lookup_helper')->validateRequest($oid, $this->request->request->get('type'));
+        $result           = $request->request->get('body') ?? [];
+        $oid              = $request->request->get('id');
+        $validatedRequest = $lookupHelper->validateRequest($oid, $request->request->get('type'));
 
         if (!$validatedRequest || !is_array($result)) {
-            $logger->log('error', 'ERROR on Clearbit callback: Wrong body or id in request: id='.$oid.' body='.json_encode($result, JSON_PRETTY_PRINT));
+            $mauticLogger->log('error', 'ERROR on Clearbit callback: Wrong body or id in request: id='.$oid.' body='.json_encode($result, JSON_PRETTY_PRINT));
 
             return new Response('ERROR');
         }
@@ -68,13 +58,13 @@ class PublicController extends FormController
         $notify = $validatedRequest['notify'];
 
         try {
-            if ('person' === $this->request->request->get('type')) {
+            if ('person' === $request->request->get('type')) {
                 /** @var \Mautic\LeadBundle\Model\LeadModel $model */
                 $model = $this->getModel('lead');
                 /** @var Lead $lead */
                 $lead       = $validatedRequest['entity'];
                 $currFields = $lead->getFields(true);
-                $logger->log('debug', 'CURRFIELDS: '.var_export($currFields, true));
+                $mauticLogger->log('debug', 'CURRFIELDS: '.var_export($currFields, true));
 
                 $loc = [];
                 if (array_key_exists('geo', $result)) {
@@ -84,11 +74,10 @@ class PublicController extends FormController
                 $data = [];
 
                 foreach ([
-                             'facebook' => 'http://www.facebook.com/',
-                             'googleplus' => 'http://plus.google.com/',
-                             'linkedin' => 'http://www.linkedin.com/',
-                             'twitter' => 'http://www.twitter.com/',
-                         ] as $p => $u) {
+                    'facebook' => 'http://www.facebook.com/',
+                    'linkedin' => 'http://www.linkedin.com/',
+                    'twitter'  => 'http://www.twitter.com/',
+                ] as $p => $u) {
                     foreach ($result as $type => $socialProfile) {
                         if ($type === $p && empty($currFields[$p]['value'])) {
                             $data[$p] = (array_key_exists('handle', $socialProfile) && $socialProfile['handle']) ? $u.$socialProfile['handle'] : '';
@@ -152,7 +141,7 @@ class PublicController extends FormController
                     $data['country'] = $loc['country'];
                 }
 
-                $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
+                $mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                 // Unset the nonce so that it's not used again
                 $socialCache = $lead->getSocialCache();
@@ -169,16 +158,15 @@ class PublicController extends FormController
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),
                             'Clearbit Plugin',
-                            'fa-search',
+                            'ri-search-line',
                             $user
                         );
                     }
                 }
             } else {
-
                 /******************  COMPANY STUFF  *********************/
 
-                if ('company' === $this->request->request->get('type', [], true)) {
+                if ('company' === $request->request->get('type')) {
                     /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
                     $model = $this->getModel('lead.company');
                     /** @var Company $company */
@@ -239,15 +227,11 @@ class PublicController extends FormController
                         $data['companycountry'] = $loc['country'];
                     }
 
-                    if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode']['value'])) {
-                        $loc['postalCode'];
-                    }
-
                     if (array_key_exists('state', $loc) && empty($currFields['companystate']['value'])) {
                         $data['companystate'] = $loc['state'];
                     }
 
-                    $logger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
+                    $mauticLogger->log('debug', 'SETTING FIELDS: '.print_r($data, true));
 
                     // Unset the nonce so that it's not used again
                     $socialCache = $company->getSocialCache();
@@ -264,7 +248,7 @@ class PublicController extends FormController
                             $this->addNewNotification(
                                 sprintf($this->translator->trans('mautic.plugin.clearbit.company_retrieved'), $company->getName()),
                                 'Clearbit Plugin',
-                                'fa-search',
+                                'ri-search-line',
                                 $user
                             );
                         }
@@ -272,7 +256,7 @@ class PublicController extends FormController
                 }
             }
         } catch (\Exception $ex) {
-            $logger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
+            $mauticLogger->log('error', 'ERROR on Clearbit callback: '.$ex->getMessage());
             try {
                 if ($notify) {
                     /** @var UserModel $userModel */
@@ -284,13 +268,13 @@ class PublicController extends FormController
                                 $ex->getMessage()
                             ),
                             'Clearbit Plugin',
-                            'fa-exclamation',
+                            'ri-error-warning-line',
                             $user
                         );
                     }
                 }
             } catch (\Exception $ex2) {
-                $this->get('monolog.logger.mautic')->log('error', 'Clearbit: '.$ex2->getMessage());
+                $mauticLogger->log('error', 'Clearbit: '.$ex2->getMessage());
             }
         }
 

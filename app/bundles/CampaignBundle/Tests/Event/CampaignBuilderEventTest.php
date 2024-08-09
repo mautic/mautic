@@ -1,23 +1,16 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Event;
 
+use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
 class CampaignBuilderEventTest extends CampaignTestAbstract
 {
-    public function testAddGetDecision()
+    public function testAddGetDecision(): void
     {
         $decisionKey = 'email.open';
         $decision    = [
@@ -42,10 +35,9 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         $this->assertSame([$decisionKey => $decision], $decisions);
     }
 
-    public function testEventDecisionSort()
+    public function testEventDecisionSort(): void
     {
-        $decisionKey = 'email.open';
-        $decision    = [
+        $decision = [
             'label'                  => 'mautic.email.campaign.event.open',
             'description'            => 'mautic.email.campaign.event.open_descr',
             'eventName'              => 'mautic.email.on_campaign_trigger_decision',
@@ -68,7 +60,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $decisions = $event->getDecisions();
 
-        $this->assertSame(3, count($decisions));
+        $this->assertCount(3, $decisions);
 
         $shouldBe = 1;
         foreach ($decisions as $key => $resultDecision) {
@@ -77,14 +69,13 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    public function testEventConditionSort()
+    public function testEventConditionSort(): void
     {
-        $conditionKey = 'form.field_value';
-        $condition    = [
+        $condition = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
-            'formType'    => 'campaignevent_form_field_value',
-            'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
+            'formType'    => CampaignEventFormFieldValueType::class,
+            'formTheme'   => '@MauticForm/FormTheme/FieldValueCondition/_campaignevent_form_field_value_widget.html.twig',
             'eventName'   => 'mautic.form.on_campaign_trigger_condition',
         ];
         $event = $this->initEvent();
@@ -98,7 +89,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $conditions = $event->getConditions();
 
-        $this->assertSame(3, count($conditions));
+        $this->assertCount(3, $conditions);
 
         $shouldBe = 1;
         foreach ($conditions as $key => $resultCondition) {
@@ -107,15 +98,14 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    public function testEventActionSort()
+    public function testEventActionSort(): void
     {
-        $actionKey = 'asset.download';
-        $action    = [
+        $action = [
             'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
-            'callback'    => ['\\Mautic\\AssetBundle\\Helper\\PointActionHelper', 'validateAssetDownload'],
-            'formType'    => 'pointaction_assetdownload',
+            'callback'    => [\Mautic\AssetBundle\Helper\PointActionHelper::class, 'validateAssetDownload'],
+            'formType'    => PointActionAssetDownloadType::class,
         ];
         $event = $this->initEvent();
 
@@ -128,7 +118,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $actions = $event->getActions();
 
-        $this->assertSame(3, count($actions));
+        $this->assertCount(3, $actions);
 
         $shouldBe = 1;
         foreach ($actions as $key => $resultAction) {

@@ -1,45 +1,24 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Twig\Environment;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
-
-    /**
-     * SearchSubscriber constructor.
-     *
-     * @param CampaignModel $campaignModel
-     */
-    public function __construct(CampaignModel $campaignModel)
-    {
-        $this->campaignModel = $campaignModel;
+    public function __construct(
+        private CampaignModel $campaignModel,
+        private CorePermissions $security,
+        private Environment $twig
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
@@ -47,10 +26,7 @@ class SearchSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
-    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         if ($this->security->isGranted('campaign:campaigns:view')) {
             $str = $event->getSearchString();
@@ -67,22 +43,22 @@ class SearchSubscriber extends CommonSubscriber
             if (count($campaigns) > 0) {
                 $campaignResults = [];
                 foreach ($campaigns as $campaign) {
-                    $campaignResults[] = $this->templating->renderResponse(
-                        'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
+                    $campaignResults[] = $this->twig->render(
+                        '@MauticCampaign/SubscribedEvents/Search/global.html.twig',
                         [
                             'campaign' => $campaign,
                         ]
-                    )->getContent();
+                    );
                 }
                 if (count($campaigns) > 5) {
-                    $campaignResults[] = $this->templating->renderResponse(
-                        'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
+                    $campaignResults[] = $this->twig->render(
+                        '@MauticCampaign/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($campaigns) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $campaignResults['count'] = count($campaigns);
                 $event->addResults('mautic.campaign.campaigns', $campaignResults);
@@ -90,10 +66,7 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
-    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         $security = $this->security;
         if ($security->isGranted('campaign:campaigns:view')) {

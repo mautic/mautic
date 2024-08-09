@@ -1,60 +1,33 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\HttpKernel\Kernel;
-
-/**
- * Class BundleHelper.
- */
 class BundleHelper
 {
     /**
-     * @var CoreParametersHelper
+     * @var mixed[]
      */
-    protected $coreParametersHelper;
+    private array $allBundles;
 
     /**
-     * @var Kernel
+     * @param mixed[] $coreBundles
+     * @param mixed[] $pluginBundles
      */
-    protected $kernel;
-
-    /**
-     * BundleHelper constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param Kernel               $kernel
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper, Kernel $kernel)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->kernel               = $kernel;
+    public function __construct(
+        private array $coreBundles,
+        private array $pluginBundles
+    ) {
+        $this->allBundles    = array_merge($coreBundles, $pluginBundles);
     }
 
     /**
      * @param bool $includePlugins
      *
-     * @return mixed
+     * @return mixed[]
      */
-    public function getMauticBundles($includePlugins = true)
+    public function getMauticBundles($includePlugins = true): array
     {
-        $bundles = $this->coreParametersHelper->getParameter('mautic.bundles');
-
-        if ($includePlugins) {
-            $plugins = $this->coreParametersHelper->getParameter('mautic.plugin.bundles');
-            $bundles = array_merge($bundles, $plugins);
-        }
-
-        return $bundles;
+        return $includePlugins ? $this->allBundles : $this->coreBundles;
     }
 
     /**
@@ -64,13 +37,12 @@ class BundleHelper
      */
     public function getPluginBundles()
     {
-        return $this->kernel->getPluginBundles();
+        return $this->pluginBundles;
     }
 
     /**
      * Gets an array of a specific bundle's config settings.
      *
-     * @param        $bundleName
      * @param string $configKey
      * @param bool   $includePlugins
      *

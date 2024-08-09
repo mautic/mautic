@@ -1,55 +1,46 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class Notification.
- */
 class Notification
 {
-    /** @var int */
+    /**
+     * @var int|null
+     */
     protected $id;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User
+     * @var User|null
      */
     protected $user;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $type;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $header;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $message;
 
     /**
-     * @var \DateTiem
+     * @var \DateTimeInterface|null
      */
     protected $dateAdded;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $iconClass;
 
@@ -59,49 +50,58 @@ class Notification
     protected $isRead = false;
 
     /**
-     * @param ORM\ClassMetadata $metadata
+     * @var string|null
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    protected $deduplicate;
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('notifications')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\NotificationRepository')
+            ->setCustomRepositoryClass(NotificationRepository::class)
             ->addIndex(['is_read'], 'notification_read_status')
             ->addIndex(['type'], 'notification_type')
-            ->addIndex(['is_read', 'user_id'], 'notification_user_read_status');
+            ->addIndex(['is_read', 'user_id'], 'notification_user_read_status')
+            ->addIndex(['deduplicate', 'date_added'], 'deduplicate_date_added');
 
         $builder->addId();
 
-        $builder->createManyToOne('user', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToOne('user', User::class)
             ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createField('type', 'string')
+        $builder->createField('type', Types::STRING)
             ->nullable()
             ->length(25)
             ->build();
 
-        $builder->createField('header', 'string')
+        $builder->createField('header', Types::STRING)
             ->nullable()
+            ->length(512)
             ->build();
 
-        $builder->addField('message', 'text');
+        $builder->addField('message', Types::TEXT);
 
         $builder->addDateAdded();
 
-        $builder->createField('iconClass', 'string')
+        $builder->createField('iconClass', Types::STRING)
             ->columnName('icon_class')
             ->nullable()
             ->build();
 
-        $builder->createField('isRead', 'boolean')
+        $builder->createField('isRead', Types::BOOLEAN)
             ->columnName('is_read')
+            ->build();
+
+        $builder->createField('deduplicate', 'string')
+            ->nullable()
+            ->length(32)
             ->build();
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -109,23 +109,20 @@ class Notification
     }
 
     /**
-     * @return mixed
+     * @return User|null
      */
     public function getUser()
     {
         return $this->user;
     }
 
-    /**
-     * @param mixed $user
-     */
-    public function setUser(User $user)
+    public function setUser(User $user): void
     {
         $this->user = $user;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getType()
     {
@@ -133,15 +130,15 @@ class Notification
     }
 
     /**
-     * @param mixed $type
+     * @param string|null $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getMessage()
     {
@@ -149,15 +146,15 @@ class Notification
     }
 
     /**
-     * @param mixed $message
+     * @param string|null $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -165,15 +162,15 @@ class Notification
     }
 
     /**
-     * @param mixed $dateAdded
+     * @param \DateTime|null $dateAdded
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getIconClass()
     {
@@ -181,15 +178,15 @@ class Notification
     }
 
     /**
-     * @param mixed $iconClass
+     * @param string|null $iconClass
      */
-    public function setIconClass($iconClass)
+    public function setIconClass($iconClass): void
     {
         $this->iconClass = $iconClass;
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
     public function getIsRead()
     {
@@ -197,15 +194,15 @@ class Notification
     }
 
     /**
-     * @param mixed $isRead
+     * @param bool|null $isRead
      */
-    public function setIsRead($isRead)
+    public function setIsRead($isRead): void
     {
         $this->isRead = (bool) $isRead;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getHeader()
     {
@@ -213,10 +210,20 @@ class Notification
     }
 
     /**
-     * @param mixed $header
+     * @param string|null $header
      */
-    public function setHeader($header)
+    public function setHeader($header): void
     {
         $this->header = $header;
+    }
+
+    public function getDeduplicate(): ?string
+    {
+        return $this->deduplicate;
+    }
+
+    public function setDeduplicate(?string $deduplicate): void
+    {
+        $this->deduplicate = $deduplicate;
     }
 }

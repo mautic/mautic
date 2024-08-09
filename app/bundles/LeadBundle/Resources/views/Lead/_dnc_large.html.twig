@@ -1,0 +1,30 @@
+{#
+  Variables
+    - doNotContact
+#}
+<div id="bounceLabel{{ doNotContact.id }}">
+    <div class="panel-heading text-center">
+        <h4 class="fw-sb">
+            {% if constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::UNSUBSCRIBED') == doNotContact.reason %}
+              <span class="label label-danger" data-toggle="tooltip" title="{{ dncReasonToText(doNotContact.reason) }}">
+                {{ 'mautic.lead.do.not.contact_channel'|trans({'%channel%': doNotContact.channel|upper}) }}
+              </span>
+            {% elseif constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::MANUAL') == doNotContact.reason %}
+              <span class="label label-danger" data-toggle="tooltip" title="{{ dncReasonToText(doNotContact.reason) }}">
+                {{ 'mautic.lead.do.not.contact_channel'|trans({'%channel%': doNotContact.channel|upper}) }}
+                <span data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.lead.remove_dnc_status'|trans }}">
+                  <i class="ri-close-line" onclick="Mautic.removeBounceStatus(this, {{ doNotContact.id }}, '{{ doNotContact.channel }}');"></i>
+                </span>
+              </span>
+            {% elseif constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::BOUNCED') == doNotContact.reason %}
+              <span class="label label-warning" data-toggle="tooltip" title="{{ doNotContact.comments|purify }}">
+                {{ 'mautic.lead.do.not.contact_bounced_channel'|trans({'%channel%': doNotContact.channel|upper}) }}
+                <span data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.lead.remove_dnc_status'|trans }}">
+                  <i class="ri-close-line" onclick="Mautic.removeBounceStatus(this, {{ doNotContact.id }}, '{{ doNotContact.channel }}');"></i>
+                </span>
+              </span>
+            {% endif %}
+        </h4>
+        <hr>
+    </div>
+</div>

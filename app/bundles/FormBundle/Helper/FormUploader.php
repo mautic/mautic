@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -21,33 +12,20 @@ use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
 {
-    /**
-     * @var FileUploader
-     */
-    private $fileUploader;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(FileUploader $fileUploader, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->fileUploader         = $fileUploader;
-        $this->coreParametersHelper = $coreParametersHelper;
+    public function __construct(
+        private FileUploader $fileUploader,
+        private CoreParametersHelper $coreParametersHelper
+    ) {
     }
 
     /**
-     * @param UploadFileCrate $filesToUpload
-     * @param Submission      $submission
-     *
      * @throws FileUploadException
      */
-    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission)
+    public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission): void
     {
         $uploadedFiles = [];
         $result        = $submission->getResults();
-        $alias         = ''; //Only for IDE - will be overriden by foreach
+        $alias         = ''; // Only for IDE - will be overriden by foreach
 
         try {
             foreach ($filesToUpload as $fileFieldCrate) {
@@ -56,10 +34,12 @@ class FormUploader
                 $uploadDir       = $this->getUploadDir($field);
                 $fileName        = $this->fileUploader->upload($uploadDir, $fileFieldCrate->getUploadedFile());
                 $result[$alias]  = $fileName;
-                $uploadedFiles[] = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+                $uploadedFile    = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+                $this->fixRotationJPG($uploadedFile);
+                $uploadedFiles[] =$uploadedFile;
             }
             $submission->setResults($result);
-        } catch (FileUploadException $e) {
+        } catch (FileUploadException) {
             foreach ($uploadedFiles as $filePath) {
                 $this->fileUploader->delete($filePath);
             }
@@ -68,19 +48,16 @@ class FormUploader
     }
 
     /**
-     * @param Field  $field
      * @param string $fileName
-     *
-     * @return string
      */
-    public function getCompleteFilePath(Field $field, $fileName)
+    public function getCompleteFilePath(Field $field, $fileName): string
     {
         $uploadDir = $this->getUploadDir($field);
 
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName;
     }
 
-    public function deleteAllFilesOfFormField(Field $field)
+    public function deleteAllFilesOfFormField(Field $field): void
     {
         if (!$field->isFileType()) {
             return;
@@ -90,18 +67,17 @@ class FormUploader
         $this->fileUploader->delete($uploadDir);
     }
 
-    public function deleteFilesOfForm(Form $form)
+    public function deleteFilesOfForm(Form $form): void
     {
-        $formUploadDir = $this->getUploadDirOfForm($form);
+        $formId        = $form->getId() ?: $form->deletedId;
+        $formUploadDir = $this->getUploadDirOfForm($formId);
         $this->fileUploader->delete($formUploadDir);
     }
 
     /**
-     * @param Submission $submission
-     *
      * @todo Refactor code that result can be accessed normally and not only as a array of values
      */
-    public function deleteUploadedFiles(Submission $submission)
+    public function deleteUploadedFiles(Submission $submission): void
     {
         $fields = $submission->getForm()->getFields();
         foreach ($fields as $field) {
@@ -109,7 +85,7 @@ class FormUploader
         }
     }
 
-    private function deleteFileOfFormField(Submission $submission, Field $field)
+    private function deleteFileOfFormField(Submission $submission, Field $field): void
     {
         $alias   = $field->getAlias();
         $results = $submission->getResults();
@@ -123,24 +99,56 @@ class FormUploader
         $this->fileUploader->delete($filePath);
     }
 
-    /**
-     * @param Field $field
-     *
-     * @return string
-     */
-    private function getUploadDir(Field $field)
+    private function getUploadDir(Field $field): string
     {
         $fieldId       = $field->getId();
-        $formUploadDir = $this->getUploadDirOfForm($field->getForm());
+        $formUploadDir = $this->getUploadDirOfForm($field->getForm()->getId());
 
         return $formUploadDir.DIRECTORY_SEPARATOR.$fieldId;
     }
 
-    private function getUploadDirOfForm(Form $form)
+    /**
+     * @throws \LogicException If formId is null
+     */
+    private function getUploadDirOfForm(int $formId): string
     {
-        $formId    = $form->getId();
-        $uploadDir = $this->coreParametersHelper->getParameter('form_upload_dir');
+        $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
 
         return $uploadDir.DIRECTORY_SEPARATOR.$formId;
+    }
+
+    /**
+     * Fix iOS picture orientation after upload PHP
+     * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
+     */
+    private function fixRotationJPG($filename): void
+    {
+        if (IMAGETYPE_JPEG != exif_imagetype($filename)) {
+            return;
+        }
+        $exif = exif_read_data($filename);
+        if (empty($exif['Orientation'])) {
+            return;
+        }
+        $ort  = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
+        $ort1 = $ort;
+        if (!empty($ort1)) {
+            $image = imagecreatefromjpeg($filename);
+            $ort   = $ort1;
+            switch ($ort) {
+                case 3:
+                    $image = imagerotate($image, 180, 0);
+                    break;
+
+                case 6:
+                    $image = imagerotate($image, -90, 0);
+                    break;
+
+                case 8:
+                    $image = imagerotate($image, 90, 0);
+                    break;
+            }
+        }
+        imagejpeg($image, $filename, 90);
     }
 }

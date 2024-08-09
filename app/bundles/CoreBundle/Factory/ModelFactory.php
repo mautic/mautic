@@ -1,67 +1,55 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\CoreBundle\Model\MauticModelInterface;
+use Psr\Container\ContainerInterface;
 
 /**
- * Class ModelFactory.
+ * @template M of object
  */
 class ModelFactory
 {
-    /**
-     * ModelFactory constructor.
-     *
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container
+    ) {
     }
 
     /**
-     * @param $modelNameKey
-     *
-     * @return AbstractCommonModel
+     * @return AbstractCommonModel<M>
      */
-    public function getModel($modelNameKey)
+    public function getModel(string $modelNameKey): MauticModelInterface
     {
+        if (class_exists($modelNameKey) && $this->container->has($modelNameKey)) {
+            return $this->container->get($modelNameKey);
+        }
+
         // Shortcut for models with the same name as the bundle
-        if (strpos($modelNameKey, '.') === false) {
+        if (!str_contains($modelNameKey, '.')) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
         $parts = explode('.', $modelNameKey);
 
-        if (count($parts) !== 2) {
+        if (2 !== count($parts)) {
             throw new \InvalidArgumentException($modelNameKey.' is not a valid model key.');
         }
 
-        list($bundle, $name) = $parts;
+        [$bundle, $name] = $parts;
 
-        $containerKey = str_replace(['%bundle%', '%name%'], [$bundle, $name], 'mautic.%bundle%.model.%name%');
+        // The container is now case sensitive
+        $containerKey = sprintf('mautic.%s.model.%s', $bundle, $name);
 
         if ($this->container->has($containerKey)) {
             return $this->container->get($containerKey);
         }
 
-        throw new \InvalidArgumentException($containerKey.' is not a registered container key.');
+        throw new \InvalidArgumentException($containerKey.' is not a registered model container key.');
     }
 
     /**
      * Check if a model exists.
-     *
-     * @param $modelNameKey
      */
     public function hasModel($modelNameKey)
     {
@@ -69,7 +57,7 @@ class ModelFactory
             $this->getModel($modelNameKey);
 
             return true;
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             return false;
         }
     }

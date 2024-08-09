@@ -1,62 +1,31 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    protected $assetToken = '{assetlink=(.*?)}';
+    private string $assetToken = '{assetlink=(.*?)}';
 
-    /**
-     * @var TokenHelper
-     */
-    protected $tokenHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * BuilderSubscriber constructor.
-     *
-     * @param TokenHelper $tokenHelper
-     * @param LeadModel   $leadModel
-     */
-    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel)
-    {
-        $this->tokenHelper = $tokenHelper;
-        $this->leadModel   = $leadModel;
+    public function __construct(
+        private CorePermissions $security,
+        private TokenHelper $tokenHelper,
+        private ContactTracker $contactTracker,
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD   => ['onBuilderBuild', 0],
@@ -67,71 +36,57 @@ class BuilderSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param BuilderEvent $event
-     */
-    public function onBuilderBuild(BuilderEvent $event)
+    public function onBuilderBuild(BuilderEvent $event): void
     {
         if ($event->tokensRequested($this->assetToken)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
-            $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', false, true);
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('asset');
+            $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', true);
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $lead   = $event->getLead();
-        $leadId = ($lead !== null) ? $lead['id'] : null;
+        $leadId = (int) (null !== $lead ? $lead['id'] : null);
         $email  = $event->getEmail();
-        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), ($email === null) ? null : $email->getId());
+        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), null === $email ? null : $email->getId());
         $event->addTokens($tokens);
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
+        if (!$lead = $event->getLead()) {
+            $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        }
+
+        $leadId  = $lead ? $lead->getId() : null;
         $page    = $event->getPage();
-        $lead    = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead() : null;
-        $leadId  = ($lead) ? $lead->getId() : null;
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
 
-        if (!empty($tokens)) {
+        if ([] !== $tokens) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
         $event->setContent($content);
     }
 
     /**
-     * @param       $event
-     * @param       $leadId
-     * @param array $source
-     * @param null  $emailId
+     * @param PageDisplayEvent|EmailSendEvent $event
+     * @param array                           $source
+     * @param int|null                        $emailId
      *
-     * @return array
+     * @return mixed[]
      */
-    private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null)
+    private function generateTokensFromContent($event, ?int $leadId, $source = [], $emailId = null): array
     {
-        $content = $event->getContent();
-
-        $clickthrough = [];
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
-            $clickthrough = ['source' => $source];
-
-            if ($leadId !== null) {
-                $clickthrough['lead'] = $leadId;
-            }
-
-            if (!empty($emailId)) {
-                $clickthrough['email'] = $emailId;
-            }
+            $clickthrough = [
+                'source' => $source,
+                'lead'   => $leadId ?? false,
+                'email'  => $emailId ?? false,
+            ];
         }
 
-        return $this->tokenHelper->findAssetTokens($content, $clickthrough);
+        return $this->tokenHelper->findAssetTokens($event->getContent(), array_filter($clickthrough ?? []));
     }
 }

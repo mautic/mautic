@@ -1,24 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class WidgetTypeListEvent.
- */
 class WidgetTypeListEvent extends CommonEvent
 {
     /**
@@ -34,7 +22,7 @@ class WidgetTypeListEvent extends CommonEvent
     /**
      * @var CorePermissions
      */
-    protected $security = null;
+    protected $security;
 
     /**
      * Adds a new widget type to the widget types list.
@@ -42,7 +30,7 @@ class WidgetTypeListEvent extends CommonEvent
      * @param string $widgetType
      * @param string $bundle     name (widget category)
      */
-    public function addType($widgetType, $bundle = 'others')
+    public function addType($widgetType, $bundle = 'others'): void
     {
         $bundle         = 'mautic.'.$bundle.'.dashboard.widgets';
         $widgetTypeName = 'mautic.widget.'.$widgetType;
@@ -61,32 +49,24 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Set translator if you want the strings to be translated.
-     *
-     * @param TranslatorInterface $translator
      */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(TranslatorInterface $translator): void
     {
         $this->translator = $translator;
     }
 
     /**
      * Set security object to check the perimissions.
-     *
-     * @param CorePermissions $security
      */
-    public function setSecurity(CorePermissions $security)
+    public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }
 
     /**
      * Check if the user has permission to see the widgets.
-     *
-     * @param array $permissions
-     *
-     * @return bool
      */
-    public function hasPermissions(array $permissions)
+    public function hasPermissions(array $permissions): bool
     {
         if (!$this->security) {
             return true;

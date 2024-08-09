@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -23,9 +15,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Sms.
- */
 class Sms extends FormEntity
 {
     /**
@@ -39,7 +28,7 @@ class Sms extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -54,12 +43,12 @@ class Sms extends FormEntity
     private $message;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -69,31 +58,35 @@ class Sms extends FormEntity
     private $sentCount = 0;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\SmsBundle\Entity\Stat>
      */
     private $stats;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $smsType = 'template';
+
+    /**
+     * @var int
+     */
+    private $pendingCount = 0;
 
     public function __clone()
     {
         $this->id        = null;
         $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
-        $this->readCount = 0;
 
         parent::__clone();
     }
@@ -107,20 +100,17 @@ class Sms extends FormEntity
     /**
      * Clear stats.
      */
-    public function clearStats()
+    public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('sms_messages')
-            ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\SmsRepository');
+            ->setCustomRepositoryClass(SmsRepository::class);
 
         $builder->addIdColumns();
 
@@ -144,7 +134,7 @@ class Sms extends FormEntity
 
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('sms_message_list_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
@@ -160,10 +150,7 @@ class Sms extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
             'name',
@@ -175,43 +162,38 @@ class Sms extends FormEntity
         );
 
         $metadata->addConstraint(new Callback([
-            'callback' => function (Sms $sms, ExecutionContextInterface $context) {
+            'callback' => function (Sms $sms, ExecutionContextInterface $context): void {
                 $type = $sms->getSmsType();
-                if ($type == 'list') {
-                    $validator = $context->getValidator();
+                if ('list' == $type) {
+                    $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $sms->getLists(),
                         [
-                            new LeadListAccess(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
                             new NotBlank(
                                 [
                                     'message' => 'mautic.lead.lists.required',
                                 ]
                             ),
+                            new LeadListAccess(),
                         ]
                     );
 
-                    if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
+                    foreach ($violations as $violation) {
+                        $context->buildViolation($violation->getMessage())
                             ->atPath('lists')
                             ->addViolation();
                     }
                 }
             },
         ]));
+
+        $metadata->addConstraint(new EntityEvent());
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('sms')
             ->addListProperties(
@@ -233,16 +215,12 @@ class Sms extends FormEntity
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'category' || $prop == 'list') {
+        if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -285,7 +263,7 @@ class Sms extends FormEntity
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -310,8 +288,6 @@ class Sms extends FormEntity
     }
 
     /**
-     * @param $category
-     *
      * @return $this
      */
     public function setCategory($category)
@@ -333,7 +309,7 @@ class Sms extends FormEntity
     /**
      * @param string $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->isChanged('message', $message);
         $this->message = $message;
@@ -348,8 +324,6 @@ class Sms extends FormEntity
     }
 
     /**
-     * @param $language
-     *
      * @return $this
      */
     public function setLanguage($language)
@@ -369,8 +343,6 @@ class Sms extends FormEntity
     }
 
     /**
-     * @param $publishDown
-     *
      * @return $this
      */
     public function setPublishDown($publishDown)
@@ -390,8 +362,6 @@ class Sms extends FormEntity
     }
 
     /**
-     * @param $publishUp
-     *
      * @return $this
      */
     public function setPublishUp($publishUp)
@@ -411,8 +381,6 @@ class Sms extends FormEntity
     }
 
     /**
-     * @param $sentCount
-     *
      * @return $this
      */
     public function setSentCount($sentCount)
@@ -433,8 +401,6 @@ class Sms extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Sms
      */
     public function addList(LeadList $list)
@@ -446,10 +412,8 @@ class Sms extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
-    public function removeList(LeadList $list)
+    public function removeList(LeadList $list): void
     {
         $this->lists->removeElement($list);
     }
@@ -473,9 +437,29 @@ class Sms extends FormEntity
     /**
      * @param string $smsType
      */
-    public function setSmsType($smsType)
+    public function setSmsType($smsType): void
     {
         $this->isChanged('smsType', $smsType);
         $this->smsType = $smsType;
+    }
+
+    /**
+     * @param int $pendingCount
+     *
+     * @return Sms
+     */
+    public function setPendingCount($pendingCount)
+    {
+        $this->pendingCount = $pendingCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPendingCount()
+    {
+        return $this->pendingCount;
     }
 }

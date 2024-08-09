@@ -1,26 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class CommonEvent.
- */
 class CommonEvent extends Event
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManagerInterface
      */
     protected $em;
 
@@ -40,11 +29,16 @@ class CommonEvent extends Event
     protected $changes;
 
     /**
+     * @var string
+     */
+    protected $failed;
+
+    /**
      * Sets the entity manager for the event to use.
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param EntityManagerInterface $em
      */
-    public function setEntityManager($em)
+    public function setEntityManager($em): void
     {
         $this->em = $em;
     }
@@ -57,6 +51,11 @@ class CommonEvent extends Event
     public function isNew()
     {
         return $this->isNew;
+    }
+
+    public function setFailed(string $reason): void
+    {
+        $this->failed = $reason;
     }
 
     /**
@@ -81,7 +80,7 @@ class CommonEvent extends Event
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {

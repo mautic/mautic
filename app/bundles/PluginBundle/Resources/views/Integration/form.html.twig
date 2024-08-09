@@ -1,0 +1,160 @@
+{#
+  Variables
+     - form
+     - description
+     - formSettings
+     - formNotes
+     - callbackUrl
+     - activeTab
+     - formThemes (array)
+         May include one or more form themes that need to be applied
+#}
+{%- form_theme form with formThemes -%}
+<!-- form themes: {{ formThemes|join(', ') }} -->
+{%- set nSupportedFeatures = form.supportedFeatures is defined ? form.supportedFeatures|length : 0 -%}
+{%- set hasSupportedFeatures = nSupportedFeatures > 0 -%}
+{%- set nFeatureSettings = form.featureSettings is defined ? form.featureSettings|length : 0 -%}
+{%- set hasFields = ((formSettings.dynamic_contact_fields is defined and formSettings.dynamic_contact_fields is not empty) or form.featureSettings is defined) and form.featureSettings.leadFields|length > 0
+-%}
+{# Unset if set to prevent features tab from showing when there's no feature to show #}
+{%- if not hasFields %}{% do form.featureSettings.leadFields.setRendered() %}{% set nFeatureSettings = nFeatureSettings - 1 %}{% endif -%}
+{%- set hideContactFieldTab = (hasFields and formSettings.dynamic_contact_fields is defined and formSettings.dynamic_contact_fields is not empty and form.featureSettings.leadFields|length == 0) -%}
+{%- set hasFeatureSettings = (
+          form.featureSettings is defined
+          and (
+            (hasFields and nFeatureSettings > 1)
+            or
+            (not hasFields and nFeatureSettings > 0)
+          )
+) -%}
+{%- if not hasFeatureSettings and form.featureSettings is defined %}{% do form.featureSettings.setRendered() %}{% endif -%}
+{%- set hasCompanyFields = form.featureSettings.companyFields is defined and form.featureSettings.companyFields|length > 0 -%}
+{%- set companyFieldHtml = hasCompanyFields ? form_row(form.featureSettings.companyFields) : '' -%}
+{%- set fieldHtml = hasFields ? form_row(form.featureSettings.leadFields) -%}
+{%- set fieldLabel = hasFields ? form.featureSettings.leadFields.vars.label -%}
+{%- set fieldTabClass = (hasFields and hideContactFieldTab == false) ?: 'hide' -%}
+{%- set hasLeadFieldErrors    = hasFields and formContainsErrors(form.featureSettings.leadFields) -%}
+{%- set hasCompanyFieldErrors = hasCompanyFields and formContainsErrors(form.featureSettings.companyFields) -%}
+{%- if form.featureSettings.leadFields is defined %}{% do form.featureSettings.leadFields.setRendered() %}{% endif -%}
+{%- if form.featureSettings.companyFields is defined %}{% do form.featureSettings.companyFields.setRendered() %}{% endif -%}
+
+{%- if description is not empty -%}
+    <div class="alert alert-info">
+        {{- description|purify -}}
+    </div>
+{%- endif -%}
+
+<!-- tabs controls -->
+<ul class="nav nav-tabs nav-tabs-line">
+    <li class="{% if 'details-container' == activeTab %}active{% endif %}" id="details-tab">
+        <a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.plugin.integration.tab.details'|trans }}</a>
+    </li>
+
+    {%- if hasSupportedFeatures or hasFeatureSettings -%}
+        <li class="" id="features-tab">
+            <a href="#features-container" role="tab" data-toggle="tab">
+                {{- 'mautic.plugin.integration.tab.features'|trans -}}
+                {%- if (hasSupportedFeatures and formContainsErrors(form.supportedFeatures)) or (hasFeatureSettings and formContainsErrors(form.featureSettings, ['leadFields'])) -%}
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
+                {%- endif -%}
+            </a>
+        </li>
+    {%- endif -%}
+
+    {%- if hasFields -%}
+        <li class="{{ fieldTabClass }} {% if 'leadFieldsContainer' == activeTab %}active{% endif %}" id="fields-tab">
+            <a href="#fields-container" role="tab" data-toggle="tab">
+                {{- 'mautic.plugin.integration.tab.fieldmapping'|trans -}}
+                {%- if hasLeadFieldErrors -%}
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
+                {%- endif -%}
+            </a>
+        </li>
+    {%- endif -%}
+
+    {%- if companyFieldHtml is not empty -%}
+        <li class="{{ fieldTabClass }} {% if 'companyFieldsContainer' == activeTab %}active{% endif %}" id="company-fields-tab">
+            <a href="#company-fields-container" role="tab" data-toggle="tab">
+                {{- 'mautic.plugin.integration.tab.companyfieldmapping'|trans -}}
+                {%- if hasCompanyFieldErrors -%}
+                    <i class="ri-fw ri-alert-fill text-danger"></i>
+                {% endif %}
+            </a>
+        </li>
+    {%- endif -%}
+</ul>
+<!--/ tabs controls -->
+
+{{- form_start(form) -}}
+<div class="tab-content pa-md">
+    <div class="tab-pane fade {% if 'details-container' == activeTab %}in active{% endif %} bdr-w-0" id="details-container">
+        {{- form_row(form.isPublished) -}}
+        {%- if form.virtual is defined %}{{ form_row(form.virtual) }}{% endif %}
+        {%- if form.apiKeys is defined -%}
+            {{- form_row(form.apiKeys) -}}
+            {%- if formNotes.authorization is defined -%}
+                <div class="alert alert-{{ formNotes.authorization.type }}">
+                    {{- formNotes.authorization.note|purify -}}
+                </div>
+            {%- endif -%}
+
+            {%- if form.apiKeys|length > 0 and callbackUrl is not empty -%}
+                <div class="well well-sm">
+                    {{- 'mautic.integration.callbackuri'|trans }}<br/>
+                    <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="{{ callbackUrl|e }}" class="form-control"/>
+                </div>
+            {%- endif -%}
+
+            {%- if form.authButton is defined -%}
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        {{- form_widget(form.authButton, {'attr': {'class': 'btn btn-success btn-lg'}}) -}}
+                    </div>
+                </div>
+            {%- endif -%}
+        {%- endif -%}
+
+        {%- if formNotes.custom is defined -%}
+            {%- if formNotes.custom is string -%}
+                {{ formNotes.custom|purify }}
+            {%- elseif formNotes.custom.custom is defined and formNotes.custom.template is string -%}
+                <!-- start: "{{ formNotes.custom.template }}" -->
+                {{ include(formNotes.custom.template, formNotes.custom.parameters|default([]), ignore_missing=true) }}
+                <!-- end: "{{ formNotes.custom.template }}" -->
+            {%- endif -%}
+        {%- endif -%}
+    </div>
+
+    {%- if hasSupportedFeatures or hasFeatureSettings -%}
+        <div class="tab-pane fade bdr-w-0" id="features-container">
+            {%- if hasSupportedFeatures -%}
+                {{- form_row(form.supportedFeatures, {
+                      'formSettings': formSettings,
+                      'formNotes': formNotes,
+                }) -}}
+            {%- endif -%}
+
+            {%- if hasFeatureSettings -%}
+                {{ form_row(form.featureSettings, {
+                        'formSettings': formSettings,
+                        'formNotes': formNotes,
+                }) -}}
+            {%- endif -%}
+        </div>
+    {%- endif -%}
+
+    {%- if hasFields -%}
+        <div class="tab-pane fade {% if 'leadFieldsContainer' == activeTab %}in active{% endif %}  bdr-w-0" id="fields-container">
+            <h4 class="mb-sm">{{ fieldLabel|trans }}</h4>
+            {{- fieldHtml|raw -}}
+        </div>
+    {%- endif -%}
+
+    {%- if hasCompanyFields -%}
+        <div class="tab-pane fade {% if 'companyFieldsContainer' == activeTab %}in active{% endif %} bdr-w-0" id="company-fields-container">
+            <h4 class="mb-sm">{{ 'mautic.integration.companyfield_matches'|trans }}</h4>
+            {{- companyFieldHtml|raw -}}
+        </div>
+    {%- endif -%}
+</div>
+{{ form_end(form) }}

@@ -1,97 +1,85 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Form\Type\AssetType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class AssetModel.
+ * @extends FormModel<Asset>
  */
 class AssetModel extends FormModel
 {
-    /**
-     * @var CategoryModel
-     */
-    protected $categoryModel;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
     /**
      * @var int
      */
     protected $maxAssetSize;
 
-    /***
-     * AssetModel constructor.
-     *
-     * @param LeadModel $leadModel
-     * @param CategoryModel $categoryModel
-     * @param RequestStack $requestStack
-     * @param IpLookupHelper $ipLookupHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function __construct(LeadModel $leadModel, CategoryModel $categoryModel, RequestStack $requestStack, IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->leadModel      = $leadModel;
-        $this->categoryModel  = $categoryModel;
-        $this->request        = $requestStack->getCurrentRequest();
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->maxAssetSize   = $coreParametersHelper->getParameter('mautic.max_size');
+    public function __construct(
+        protected LeadModel $leadModel,
+        protected CategoryModel $categoryModel,
+        private RequestStack $requestStack,
+        protected IpLookupHelper $ipLookupHelper,
+        private DeviceCreatorServiceInterface $deviceCreatorService,
+        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private DeviceTrackingServiceInterface $deviceTrackingService,
+        private ContactTracker $contactTracker,
+        EntityManager $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
                 $alias = $entity->getTitle();
             }
-            $alias = $this->cleanAlias($alias, '', false, '-');
+            $alias = $this->cleanAlias($alias, '', 0, '-');
 
-            //make sure alias is not already taken
+            // make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $count     = $repo->checkUniqueAlias($testAlias, $entity);
@@ -109,7 +97,7 @@ class AssetModel extends FormModel
         }
 
         if (!$entity->isNew()) {
-            //increase the revision
+            // increase the revision
             $revision = $entity->getRevision();
             ++$revision;
             $entity->setRevision($revision);
@@ -119,48 +107,55 @@ class AssetModel extends FormModel
     }
 
     /**
-     * @param $asset
-     * @param null   $request
      * @param string $code
      * @param array  $systemEntry
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = [])
+    public function trackDownload($asset, $request = null, $code = '200', $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
             return;
         }
 
-        if ($request == null) {
-            $request = $this->request;
+        if (null == $request) {
+            $request = $this->requestStack->getCurrentRequest();
         }
 
         $download = new Download();
-        $download->setDateDownload(new \Datetime());
+        $download->setDateDownload(new \DateTime());
+        $download->setUtmCampaign($request->get('utm_campaign'));
+        $download->setUtmContent($request->get('utm_content'));
+        $download->setUtmMedium($request->get('utm_medium'));
+        $download->setUtmSource($request->get('utm_source'));
+        $download->setUtmTerm($request->get('utm_term'));
 
         // Download triggered by lead
         if (empty($systemEntry)) {
-
-            //check for any clickthrough info
+            // check for any clickthrough info
             $clickthrough = $request->get('ct', false);
             if (!empty($clickthrough)) {
                 $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
-                    if ($lead !== null) {
-                        $this->leadModel->setLeadCookie($clickthrough['lead']);
-                        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+                    if (null !== $lead) {
+                        $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
+                        $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
+                        $deviceDetector->parse();
+                        $currentDevice                             = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+                        $trackedDevice                             = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+                        $trackingId                                = $trackedDevice->getTrackingId();
+                        $trackingNewlyGenerated                    = !$wasTrackedAlready;
                         $leadClickthrough                          = true;
 
-                        $this->leadModel->setCurrentLead($lead);
+                        $this->contactTracker->setTrackedContact($lead);
                     }
                 }
                 if (!empty($clickthrough['channel'])) {
-                    if (count($clickthrough['channel']) === 1) {
+                    if (1 === count($clickthrough['channel'])) {
                         $channelId = reset($clickthrough['channel']);
                         $channel   = key($clickthrough['channel']);
                     } else {
@@ -175,7 +170,7 @@ class AssetModel extends FormModel
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->em->getRepository('MauticEmailBundle:Email');
+                    $emailRepo = $this->em->getRepository(Email::class);
                     if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
@@ -183,7 +178,15 @@ class AssetModel extends FormModel
             }
 
             if (empty($leadClickthrough)) {
-                list($lead, $trackingId, $trackingNewlyGenerated) = $this->leadModel->getCurrentLead(true);
+                $wasTrackedAlready         = $this->deviceTrackingService->isTracked();
+                $lead                      = $this->contactTracker->getContact();
+                $trackedDevice             = $this->deviceTrackingService->getTrackedDevice();
+                $trackingId                = null;
+                $trackingNewlyGenerated    = false;
+                if (null !== $trackedDevice) {
+                    $trackingId             = $trackedDevice->getTrackingId();
+                    $trackingNewlyGenerated = !$wasTrackedAlready;
+                }
             }
 
             $download->setLead($lead);
@@ -194,7 +197,7 @@ class AssetModel extends FormModel
                 $lead = $systemEntry['lead'];
                 if (!$lead instanceof Lead) {
                     $leadId = is_array($lead) ? $lead['id'] : $lead;
-                    $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                    $lead   = $this->em->getReference(Lead::class, $leadId);
                 }
 
                 $download->setLead($lead);
@@ -209,7 +212,7 @@ class AssetModel extends FormModel
                 $email = $systemEntry['email'];
                 if (!$email instanceof Email) {
                     $emailId = is_array($email) ? $email['id'] : $email;
-                    $email   = $this->em->getReference('MauticEmailBundle:Email', $emailId);
+                    $email   = $this->em->getReference(Email::class, $emailId);
                 }
 
                 $download->setEmail($email);
@@ -221,7 +224,13 @@ class AssetModel extends FormModel
             } elseif ($this->security->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
-                list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+                $deviceWasTracked       = $this->deviceTrackingService->isTracked();
+                $deviceDetector         = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
+                $deviceDetector->parse();
+                $currentDevice          = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+                $trackedDevice          = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+                $trackingId             = $trackedDevice->getTrackingId();
+                $trackingNewlyGenerated = !$deviceWasTracked;
             }
         }
 
@@ -242,26 +251,26 @@ class AssetModel extends FormModel
             $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
         }
 
-        //check for existing IP
+        // check for existing IP
         $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
 
-        if ($request !== null) {
+        if (null !== $request) {
             $download->setReferer($request->server->get('HTTP_REFERER'));
         }
 
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
             $event = new AssetLoadEvent($download, $isUnique);
-            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_LOAD, $event);
+            $this->dispatcher->dispatch($event, AssetEvents::ASSET_ON_LOAD);
         }
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($download);
-            $this->em->flush($download);
+            $this->em->flush();
         } catch (\Exception $e) {
             if (MAUTIC_ENV === 'dev') {
                 throw $e;
@@ -276,11 +285,10 @@ class AssetModel extends FormModel
     /**
      * Increase the download count.
      *
-     * @param            $asset
      * @param int        $increaseBy
      * @param bool|false $unique
      */
-    public function upDownloadCount($asset, $increaseBy = 1, $unique = false)
+    public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
     {
         $id = ($asset instanceof Asset) ? $asset->getId() : (int) $asset;
 
@@ -292,7 +300,7 @@ class AssetModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticAssetBundle:Asset');
+        return $this->em->getRepository(Asset::class);
     }
 
     /**
@@ -300,31 +308,23 @@ class AssetModel extends FormModel
      */
     public function getDownloadRepository()
     {
-        return $this->em->getRepository('MauticAssetBundle:Download');
+        return $this->em->getRepository(Download::class);
     }
 
-    /**
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'asset:assets';
     }
 
-    /**
-     * @return string
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getTitle';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -334,19 +334,15 @@ class AssetModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('asset', $entity, $options);
+        return $formFactory->create(AssetType::class, $entity, $options);
     }
 
     /**
      * Get a specific entity or generate a new one if id is empty.
-     *
-     * @param $id
-     *
-     * @return null|Asset
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Asset
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Asset();
         } else {
             $entity = parent::getEntity($id);
@@ -356,16 +352,9 @@ class AssetModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -394,7 +383,7 @@ class AssetModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -405,10 +394,6 @@ class AssetModel extends FormModel
     /**
      * Get list of entities for autopopulate fields.
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
-     *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
@@ -417,8 +402,15 @@ class AssetModel extends FormModel
         switch ($type) {
             case 'asset':
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
+                $request   = $this->requestStack->getCurrentRequest();
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
+                // During the form submit & edit, make sure that the data is checked against available assets
+                if ('mautic_segment_action' === $request->get('_route')
+                    && (Request::METHOD_POST === $request->getMethod() || 'edit' === $request->get('objectAction'))
+                ) {
+                    $limit = 0;
+                }
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
@@ -460,7 +452,7 @@ class AssetModel extends FormModel
     public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
         $maxAssetSize  = $this->maxAssetSize;
-        $maxAssetSize  = ($maxAssetSize == -1 || $maxAssetSize === 0) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
+        $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : FileHelper::convertMegabytesToBytes($maxAssetSize);
         $maxPostSize   = Asset::getIniValue('post_max_size');
         $maxUploadSize = Asset::getIniValue('upload_max_filesize');
         $memoryLimit   = Asset::getIniValue('memory_limit');
@@ -469,15 +461,13 @@ class AssetModel extends FormModel
         if ($humanReadable) {
             $number = Asset::convertBytesToHumanReadable($maxAllowed);
         } else {
-            list($number, $unit) = Asset::convertBytesToUnit($maxAllowed, $unit);
+            [$number, $unit] = Asset::convertBytesToUnit($maxAllowed, $unit);
         }
 
         return $number;
     }
 
     /**
-     * @param $assets
-     *
      * @return int|string
      */
     public function getTotalFilesize($assets)
@@ -512,16 +502,12 @@ class AssetModel extends FormModel
     /**
      * Get line chart data of downloads.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
-     *
-     * @return array
+     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string      $dateFormat
+     * @param array       $filter
+     * @param bool        $canViewOthers
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -548,10 +534,8 @@ class AssetModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
+    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true): array
     {
         $chart   = new PieChart();
         $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -585,10 +569,8 @@ class AssetModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      * @param bool   $canViewOthers
-     *
-     * @return array
      */
-    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularAssets($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
@@ -607,19 +589,15 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -639,8 +617,6 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAllAssociative();
     }
 }

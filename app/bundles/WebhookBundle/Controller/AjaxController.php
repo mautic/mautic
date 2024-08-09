@@ -1,29 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Controller;
 
-use Joomla\Http\Http;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\WebhookBundle\Http\Client;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    protected function sendHookTestAction(Request $request)
+    public function sendHookTestAction(Request $request, Client $client): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $url = InputHelper::url($request->request->get('url'));
 
         // validate the URL
-        if ($url == '' || !$url) {
+        if ('' == $url || !$url) {
             // default to an error message
             $dataArray = [
                 'success' => 1,
@@ -37,22 +28,15 @@ class AjaxController extends CommonAjaxController
 
         // get the selected types
         $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
-
-        $payloadPaths = $this->getPayloadPaths($selectedTypes);
-        $payloads     = $this->loadPayloads($payloadPaths);
-
-        $now = new \DateTime();
+        $payloadPaths  = $this->getPayloadPaths($selectedTypes);
+        $payloads      = $this->loadPayloads($payloadPaths);
+        $now           = new \DateTime();
 
         $payloads['timestamp'] = $now->format('c');
 
-        // Set up custom headers
-        $headers = ['Content-Type' => 'application/json'];
-
-        // instantiate new http class
-        $http = new Http();
-
         // set the response
-        $response = $http->post($url, json_encode($payloads), $headers);
+        /** @var Psr\Http\Message\ResponseInterface $response */
+        $response = $client->post($url, $payloads, InputHelper::string($request->request->get('secret')));
 
         // default to an error message
         $dataArray = [
@@ -62,8 +46,8 @@ class AjaxController extends CommonAjaxController
                 .'</span></div>',
         ];
 
-        // if we get a 200 response convert to success message
-        if ($response->code == 200) {
+        // if we get a 2xx response convert to success message
+        if (2 == substr($response->getStatusCode(), 0, 1)) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')
@@ -79,7 +63,10 @@ class AjaxController extends CommonAjaxController
      * @param $types array
      * @return array
      */
-    public function getPayloadPaths($types)
+    /**
+     * @return non-falsy-string[]
+     */
+    public function getPayloadPaths($types): array
     {
         $payloadPaths = [];
 
@@ -108,7 +95,7 @@ class AjaxController extends CommonAjaxController
 
             $prefixParts = explode('.', $prefix);
 
-            $bundleName = (array_pop($prefixParts));
+            $bundleName = array_pop($prefixParts);
 
             $payloadPath .= '/'.ucfirst($bundleName).'Bundle/Assets/WebhookPayload/'.$bundleName.'_'.$eventName.'.json';
 
@@ -124,7 +111,10 @@ class AjaxController extends CommonAjaxController
      * @param  $paths array
      * @return $payload array
      */
-    public function loadPayloads($paths)
+    /**
+     * @return mixed[]
+     */
+    public function loadPayloads($paths): array
     {
         $payloads = [];
 

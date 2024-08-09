@@ -1,15 +1,6 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\EmailBundle\Test\EventListener;
+namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\EventListener\EmailToUserSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -18,9 +9,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 
-class EmailToUserSubscriberTest extends \PHPUnit_Framework_TestCase
+class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $config = [
         'useremail' => [
             'email' => 33,
@@ -31,7 +24,7 @@ class EmailToUserSubscriberTest extends \PHPUnit_Framework_TestCase
         'bcc'      => 'hidden@translation.in',
     ];
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
+    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
         $lead = new Lead();
 
@@ -59,7 +52,7 @@ class EmailToUserSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($event->getResult());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithError()
+    public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
         $lead = new Lead();
 

@@ -1,23 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -49,32 +38,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'asset:assets:viewother',
     ];
 
-    /**
-     * @var AssetModel
-     */
-    protected $assetModel;
-
-    /**
-     * DashboardSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
-     */
-    public function __construct(AssetModel $assetModel)
-    {
-        $this->assetModel = $assetModel;
+    public function __construct(
+        protected AssetModel $assetModel,
+        protected RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('asset:assets:viewother');
 
-        if ($event->getType() == 'asset.downloads.in.time') {
+        if ('asset.downloads.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -92,14 +70,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'unique.vs.repetitive.downloads') {
+        if ('unique.vs.repetitive.downloads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $model  = $this->factory->getModel('asset');
                 $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
@@ -107,11 +84,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'popular.assets') {
+        if ('popular.assets' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -126,38 +103,36 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                if ($assets) {
-                    foreach ($assets as &$asset) {
-                        $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
-                        $row      = [
-                            [
-                                'value' => $asset['title'],
-                                'type'  => 'link',
-                                'link'  => $assetUrl,
-                            ],
-                            [
-                                'value' => $asset['download_count'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($assets as &$asset) {
+                    $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
+                    $row      = [
+                        [
+                            'value' => $asset['title'],
+                            'type'  => 'link',
+                            'link'  => $assetUrl,
+                        ],
+                        [
+                            'value' => $asset['download_count'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.dashboard.label.downloads'),
+                        'mautic.dashboard.label.title',
+                        'mautic.dashboard.label.downloads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $assets,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.assets') {
+        if ('created.assets' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -172,30 +147,28 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                if ($assets) {
-                    foreach ($assets as &$asset) {
-                        $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
-                        $row      = [
-                            [
-                                'value' => $asset['name'],
-                                'type'  => 'link',
-                                'link'  => $assetUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($assets as &$asset) {
+                    $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
+                    $row      = [
+                        [
+                            'value' => $asset['name'],
+                            'type'  => 'link',
+                            'link'  => $assetUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $assets,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
     }

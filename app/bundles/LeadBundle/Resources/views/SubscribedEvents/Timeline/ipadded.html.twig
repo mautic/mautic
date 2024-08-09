@@ -1,0 +1,12 @@
+{#
+  Variables
+    - event
+#}
+{% set ip = event.extra.ipDetails %}
+{% if ip is object %}
+  {% set details = ip.ipDetails %}
+
+  {% if details.organization is defined and details.organization is not empty %}
+      <i class="ri-building-2-line"> {{ details['organization'] }}</i><br />
+  {% endif %}
+{% endif %}

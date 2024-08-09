@@ -1,58 +1,29 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-/**
- * Class SocialMonitorEvent.
- */
 class SocialMonitorEvent extends CommonEvent
 {
-    /**
-     * @var
-     */
-    protected $integrationName;
+    protected int $newLeadCount;
+
+    protected int $updatedLeadCount;
 
     /**
-     * @var int
+     * @param string $integrationName
+     * @param int    $newLeadCount
+     * @param int    $updatedLeadCount
      */
-    protected $newLeadCount = 0;
-
-    /**
-     * @var int
-     */
-    protected $updatedLeadCount = 0;
-
-    /**
-     * @var array
-     */
-    protected $leadIds = [];
-
-    /**
-     * SocialMonitorEvent constructor.
-     *
-     * @param            $integrationName
-     * @param Monitoring $monitoring
-     * @param array      $leadIds
-     * @param            $newLeadCount
-     * @param            $updatedLeadCount
-     */
-    public function __construct($integrationName, Monitoring $monitoring, array $leadIds, $newLeadCount, $updatedLeadCount)
-    {
-        $this->integrationName  = $integrationName;
+    public function __construct(
+        protected $integrationName,
+        Monitoring $monitoring,
+        protected array $leadIds,
+        $newLeadCount,
+        $updatedLeadCount
+    ) {
         $this->entity           = $monitoring;
-        $this->leadIds          = $this->leadIds;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;
     }
@@ -69,28 +40,21 @@ class SocialMonitorEvent extends CommonEvent
 
     /**
      * Get count of new leads.
-     *
-     * @return int
      */
-    public function getNewLeadCount()
+    public function getNewLeadCount(): int
     {
         return $this->newLeadCount;
     }
 
     /**
      * Get count of updated leads.
-     *
-     * @return int
      */
-    public function getUpdatedLeadCount()
+    public function getUpdatedLeadCount(): int
     {
         return $this->updatedLeadCount;
     }
 
-    /**
-     * @return array|int
-     */
-    public function getTotalLeadCount()
+    public function getTotalLeadCount(): int
     {
         return $this->updatedLeadCount + $this->newLeadCount;
     }

@@ -1,10 +1,15 @@
 //set global Chart defaults
 if (typeof Chart != 'undefined') {
     // configure global Chart options
-    Chart.defaults.global.elements.line.borderWidth = 1;
-    Chart.defaults.global.elements.point.radius = 2;
+    Chart.defaults.global.elements.line.borderWidth = 2;
+    Chart.defaults.global.elements.point.radius = 0;
     Chart.defaults.global.legend.labels.boxWidth = 12;
     Chart.defaults.global.maintainAspectRatio = false;
+    Chart.defaults.scale.ticks.padding = 10;
+    Chart.defaults.global.elements.point.hoverRadius = 6;
+    Chart.defaults.global.elements.point.hitRadius = 20;
+    Chart.defaults.global.legend.labels.usePointStyle = true;
+    Chart.defaults.global.legend.labels.pointStyle = 'circle';
 }
 
 /**
@@ -53,7 +58,7 @@ Mautic.renderCharts = function(scope) {
  * @param mQuery element canvas
  */
 Mautic.renderLineChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     if (!data.labels.length || !data.datasets.length) return;
     var chart = new Chart(canvas, {
         type: 'line',
@@ -61,10 +66,50 @@ Mautic.renderLineChart = function(canvas) {
         options: {
             lineTension : 0.2,
             borderWidth: 1,
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
             scales: {
-                yAxes: [{
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    },
                     ticks: {
-                        beginAtZero: true
+                        maxRotation: 0,
+                        callback: function(value, index, values) {
+                            if (index === 0 || index === values.length - 1) {
+                                return value;
+                            }
+                            return '';
+                        }
+                    }
+                }],
+                yAxes: [{
+                    afterBuildTicks: function(scale) {
+                        scale.ticks = [];
+                        scale.ticks.push(scale.min);
+                        scale.ticks.push((scale.max - scale.min) / 2);
+                        scale.ticks.push(scale.max);
+                    },
+                    gridLines: {
+                        drawBorder: false,
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value, index, values) {
+                            if (index === 0 || index === values.length - 1) {
+                                return value;
+                            }
+                            if (/^\d+\.5$/.test(value.toString())) {
+                                return '';
+                            }
+                            if (index === Math.floor(values.length / 2)) {
+                                return value !== 0.5 ? value : '';
+                            }
+                            return '';
+                        }
+                        
                     }
                 }]
             }
@@ -79,7 +124,7 @@ Mautic.renderLineChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderPieChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var options = {borderWidth: 1};
     var disableLegend = canvas.attr('data-disable-legend');
     if (typeof disableLegend !== 'undefined' && disableLegend !== false) {
@@ -102,7 +147,7 @@ Mautic.renderPieChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderBarChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'bar',
         data: data,
@@ -125,7 +170,7 @@ Mautic.renderBarChart = function(canvas) {
 Mautic.renderLifechartBarChart = function(canvas) {
     var canvasWidth = mQuery(canvas).parent().width();
     var barWidth    = (canvasWidth < 300) ? 5 : 25;
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'bar',
         data: data,
@@ -148,7 +193,7 @@ Mautic.renderLifechartBarChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderSimpleBarChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'bar',
         data: data,
@@ -181,7 +226,7 @@ Mautic.renderSimpleBarChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderHorizontalBarChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'horizontalBar',
         data: data,
@@ -227,7 +272,7 @@ Mautic.renderHorizontalBarChart = function(canvas) {
 
 /**
  * Render vector maps
- *
+ * @deprecated please use MauticMap class
  * @param mQuery element scope
  */
 Mautic.renderMaps = function(scope) {
@@ -249,7 +294,7 @@ Mautic.renderMaps = function(scope) {
 };
 
 /**
- *
+ * @deprecated please use MauticMap class
  * @param wrapper
  * @returns {*}
  */
@@ -260,7 +305,7 @@ Mautic.renderMap = function(wrapper) {
         var data = wrapper.data('map-data');
         if (typeof data === 'undefined' || !data.length) {
             try {
-                data = mQuery.parseJSON(wrapper.text());
+                data = JSON.parse(wrapper.text());
                 wrapper.data('map-data', data);
             } catch (error) {
 
@@ -333,6 +378,7 @@ Mautic.renderMap = function(wrapper) {
 
 /**
  * Destroy a jVector map
+ * @deprecated please use MauticMap class
  */
 Mautic.destroyMap = function(wrapper) {
     if (wrapper.hasClass('map-rendered')) {
@@ -359,7 +405,9 @@ Mautic.initDateRangePicker = function (fromId, toId) {
                     maxDate: dateTo.val() ? new Date(dateTo.val()) : false
                 });
             },
-            timepicker: false
+            timepicker: false,
+            scrollMonth: false,
+            scrollInput: false
         });
 
         dateTo.datetimepicker({
@@ -370,7 +418,9 @@ Mautic.initDateRangePicker = function (fromId, toId) {
                     minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
                 });
             },
-            timepicker: false
+            timepicker: false,
+            scrollMonth: false,
+            scrollInput: false
         });
     }
 };

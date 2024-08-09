@@ -1,39 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 
-/**
- * Class WebhookQueueEvent.
- */
 class WebhookQueueEvent extends CommonEvent
 {
     /**
-     * @var Webhook
+     * @param bool $isNew
      */
-    protected $webhook;
-
-    /**
-     * @param WebhookQueue $webhookQueue
-     * @param Webhook      $webhook
-     * @param bool         $isNew
-     */
-    public function __construct(WebhookQueue $webhookQueue, Webhook $webhook,  $isNew = false)
-    {
+    public function __construct(
+        WebhookQueue $webhookQueue,
+        protected Webhook $webhook,
+        $isNew = false
+    ) {
         $this->entity  = $webhookQueue;
-        $this->webhook = $webhook;
         $this->isNew   = $isNew;
     }
 
@@ -44,15 +27,13 @@ class WebhookQueueEvent extends CommonEvent
      */
     public function getWebhookQueue()
     {
-        return $this->getWebhookQueue();
+        return $this->entity;
     }
 
     /**
      * Sets the WebhookQueue entity.
-     *
-     * @param WebhookQueue $webhookQueue
      */
-    public function setWebhookQueue(WebhookQueue $webhookQueue)
+    public function setWebhookQueue(WebhookQueue $webhookQueue): void
     {
         $this->entity = $webhookQueue;
     }
@@ -64,15 +45,13 @@ class WebhookQueueEvent extends CommonEvent
      */
     public function getWebhook()
     {
-        return $this->getWebhook();
+        return $this->webhook;
     }
 
     /**
      * Sets the Webhook entity.
-     *
-     * @param Webhook $webhook
      */
-    public function setWebhook(Webhook $webhook)
+    public function setWebhook(Webhook $webhook): void
     {
         $this->webhook = $webhook;
     }

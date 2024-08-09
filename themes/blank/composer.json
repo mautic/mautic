@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-blank",
+  "description": "Mautic Blank Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "blank"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

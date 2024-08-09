@@ -1,17 +1,9 @@
 <?php
 
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraint;
@@ -19,41 +11,33 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class FormFieldFileType.
+ * @extends AbstractType<mixed>
  */
 class FormFieldFileType extends AbstractType
 {
-    const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
-    const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
+    public const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
 
-    /** @var CoreParametersHelper */
-    private $coreParametersHelper;
+    public const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS])) {
-            $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS] = $this->coreParametersHelper->getParameter('allowed_extensions');
+            $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS] = $this->coreParametersHelper->get('allowed_extensions');
         }
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_SIZE])) {
-            $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE] = $this->coreParametersHelper->getParameter('max_size');
+            $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE] = $this->coreParametersHelper->get('max_size');
         }
 
         $arrayStringTransformer = new ArrayStringTransformer();
@@ -89,6 +73,23 @@ class FormFieldFileType extends AbstractType
                 ],
                 'data'        => $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE],
                 'constraints' => [new LessThanOrEqual(['value' => $maxUploadSize])],
+            ]
+        );
+
+        $builder->add(
+            'public',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.field.file.public',
+            ]
+        );
+
+        $builder->add(
+            self::PROPERTY_PREFERED_PROFILE_IMAGE,
+            YesNoButtonGroupType::class,
+            [
+                'label'       => 'mautic.form.field.file.set_as_profile_image',
+                'data'        => $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] ?? false,
             ]
         );
     }

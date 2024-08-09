@@ -1,48 +1,20 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved.
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class NotificationSendEvent.
- */
 class NotificationSendEvent extends CommonEvent
 {
     /**
-     * @var string
-     */
-    protected $message;
-
-    /**
-     * @var
-     */
-    protected $heading;
-
-    /**
-     * @var Lead
-     */
-    protected $lead;
-
-    /**
      * @param string $message
-     * @param Lead   $lead
      */
-    public function __construct($message, $heading, Lead $lead)
-    {
-        $this->message = $message;
-        $this->heading = $heading;
-        $this->lead    = $lead;
+    public function __construct(
+        protected $message,
+        protected $heading,
+        protected Lead $lead
+    ) {
     }
 
     /**
@@ -56,7 +28,7 @@ class NotificationSendEvent extends CommonEvent
     /**
      * @param string $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
     }
@@ -77,10 +49,12 @@ class NotificationSendEvent extends CommonEvent
     public function setHeading($heading)
     {
         $this->heading = $heading;
+
+        return $this;
     }
 
     /**
-     * @return array
+     * @return Lead
      */
     public function getLead()
     {

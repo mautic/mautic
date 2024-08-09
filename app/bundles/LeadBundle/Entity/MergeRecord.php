@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -27,7 +18,7 @@ class MergeRecord
     private $contact;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -41,15 +32,12 @@ class MergeRecord
      */
     private $mergedId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('contact_merge_records')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\MergeRecordRepository')
+            ->setCustomRepositoryClass(MergeRecordRepository::class)
             ->addIndex(['date_added'], 'contact_merge_date_added')
             ->addIndex(['merged_id'], 'contact_merge_ids');
 
@@ -81,8 +69,6 @@ class MergeRecord
     }
 
     /**
-     * @param Lead $contact
-     *
      * @return MergeRecord
      */
     public function setContact(Lead $contact)
@@ -93,7 +79,7 @@ class MergeRecord
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -101,8 +87,6 @@ class MergeRecord
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return MergeRecord
      */
     public function setDateAdded(\DateTime $dateAdded = null)

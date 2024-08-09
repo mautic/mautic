@@ -1,0 +1,45 @@
+{% set inline = menuRender('profile') %}
+<li class="dropdown">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        <i class="ri-account-circle-line ri-xl"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+            <div class="dropdown-menu-user row-no-gutters fw-nowrap ma-md">
+                <span class="img-wrapper"><img onerror="this.classList.add('hide')" src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
+                <span class="d-flex fd-column jc-center ml-sm info">
+                    <span class="text text-nowrap fw-sb">{{ app.getUser().getName() }}</span>
+                    {% if app.getUser().getPosition() %}
+                        <span class="text-nowrap small">{{ app.getUser().getPosition() }}</span>
+                    {% endif %}
+                </span>
+            </div>
+        </li>
+        
+        <li>
+            <a href="{{ path('mautic_user_account') }}" data-toggle="ajax">
+                <i class="ri-user-smile-line ri-lg"></i><span>{% trans %}mautic.user.account.settings{% endtrans %}</span>
+            </a>
+        </li>
+
+        {% if securityIsGranted('user:users:create') %}
+        <li>
+            <a href="{{ path('mautic_user_action', {objectAction: 'new'}) }}">
+                <i class="ri-team-line"></i>
+                <span>{{ 'mautic.user.profile.invite'|trans }}</span>
+            </a>
+        </li>
+        {% endif %}
+
+        <li>
+            <a href="{{ path('mautic_user_logout') }}">
+                <i class="ri-logout-circle-r-line ri-lg"></i><span>{% trans %}mautic.user.auth.logout{% endtrans %}</span>
+            </a>
+        </li>
+
+        {% if inline %}
+        <li role="separator" class="divider"></li>
+        {{ inline }}
+        {% endif %}
+    </ul>
+</li>

@@ -1,0 +1,24 @@
+changelog:
+  exclude:
+    labels:
+      - chore
+    authors:
+      - github-actions
+  categories:
+    - title: ⚠️ Breaking Changes 
+      labels:
+        - bc-break
+    - title: 🔧 Refactoring 
+      labels:
+        - refactoring
+    - title: 🔒 Security
+      labels:
+        - security
+    - title: ✨ Features and enhancements
+      labels:
+        - feature
+        - enhancement
+    - title: 🐛 Bugs
+      labels:
+        - bug
+        - regression

@@ -1,44 +1,33 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Helper\InputHelper;
 
-/**
- * Class DoNotContact.
- */
 class DoNotContact
 {
     /**
      * Lead is contactable.
      */
-    const IS_CONTACTABLE = 0;
+    public const IS_CONTACTABLE = 0;
 
     /**
      * Lead unsubscribed themselves.
      */
-    const UNSUBSCRIBED = 1;
+    public const UNSUBSCRIBED = 1;
 
     /**
      * Lead was unsubscribed due to an unsuccessful send.
      */
-    const BOUNCED = 2;
+    public const BOUNCED = 2;
 
     /**
      * Lead was manually unsubscribed by user.
      */
-    const MANUAL = 3;
+    public const MANUAL = 3;
 
     /**
      * @var int
@@ -46,12 +35,12 @@ class DoNotContact
     private $id;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -61,7 +50,7 @@ class DoNotContact
     private $reason = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $comments;
 
@@ -72,16 +61,13 @@ class DoNotContact
 
     private $channelId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_donotcontact')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\DoNotContactRepository')
-            ->addIndex(['reason'], 'dnc_reason_search');
+            ->setCustomRepositoryClass(DoNotContactRepository::class)
+            ->addIndex(['lead_id', 'channel', 'reason'], 'leadid_reason_channel');
 
         $builder->addId();
 
@@ -104,10 +90,8 @@ class DoNotContact
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('doNotContact')
             ->addListProperties(
@@ -145,8 +129,6 @@ class DoNotContact
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return DoNotContact
      */
     public function setLead(Lead $lead)
@@ -157,7 +139,7 @@ class DoNotContact
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -165,8 +147,6 @@ class DoNotContact
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return DoNotContact
      */
     public function setDateAdded(\DateTime $dateAdded)
@@ -211,7 +191,7 @@ class DoNotContact
      */
     public function setComments($comments)
     {
-        $this->comments = $comments;
+        $this->comments = InputHelper::string((string) $comments);
 
         return $this;
     }

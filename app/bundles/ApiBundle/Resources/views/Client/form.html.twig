@@ -1,0 +1,18 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}client{% endblock %}
+{% set id = form.vars.data.getId() %}
+{% if id is empty %}
+    {% set header = 'mautic.api.client.header.edit'|trans({'%name%' : form.vars.data.getName()}) %}
+{% else %}
+    {% set header = 'mautic.api.client.header.new'|trans %}
+{% endif %}
+{% block headerTitle %}{{ header }}{% endblock %}
+{% block content %}
+<div class="col-sm-9 pt-lg">
+    <div class="row">
+        <div class="col-xs-12">
+            {{ form(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+categoryname,categorybundle,categoryalias,published
+Segment Test Category 1,segment,segment-test-category-1,1
+Segment Test Category 2,segment,segment-test-category-2,1
+Form Test Category 1,form,segment-form-category-1,1
+Form Test Category 2,form,segment-form-category-2,1
+Asset Test Category 1,asset,segment-asset-category-1,1
+Asset Test Category 2,asset,segment-asset-category-2,1
+Email Test Category 1,email,segment-email-category-1,1
+Email Test Category 2,email,segment-email-category-2,1

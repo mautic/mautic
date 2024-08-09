@@ -1,44 +1,24 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
-/**
- * Interface CustomFieldEntityInterface.
- */
 interface CustomFieldEntityInterface
 {
     /**
-     * Set fields.
-     *
-     * @param $fields
+     * @param mixed[] $fields
      *
      * @return mixed
      */
     public function setFields($fields);
 
     /**
-     * Get fields.
-     *
-     * @param $fields
-     *
      * @return mixed
      */
-    public function getFields($fields);
+    public function getFields();
 
     /**
-     * Update field value.
-     *
-     * @param        $alias
-     * @param        $value
+     * @param string $alias
+     * @param mixed  $value
      * @param string $oldValue
      *
      * @return mixed
@@ -46,8 +26,6 @@ interface CustomFieldEntityInterface
     public function addUpdatedField($alias, $value, $oldValue = '');
 
     /**
-     * Get updated fields.
-     *
      * @return mixed
      */
     public function getUpdatedFields();
@@ -55,8 +33,8 @@ interface CustomFieldEntityInterface
     /**
      * Get a field value (should include those in updated fields).
      *
-     * @param      $field
-     * @param null $group
+     * @param string      $field alias
+     * @param string|null $group
      *
      * @return mixed
      */

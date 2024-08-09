@@ -1,0 +1,12 @@
+{#
+  Variables
+    - items
+    - columns
+    - security
+    - currentList
+    - permissions
+    - noContactList
+#}
+{% for item in items %}
+  {{ include('@MauticLead/Lead/_list_row.html.twig') }}
+{% endfor %}

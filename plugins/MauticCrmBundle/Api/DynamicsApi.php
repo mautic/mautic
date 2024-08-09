@@ -2,16 +2,13 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Psr\Http\Message\ResponseInterface;
 
 class DynamicsApi extends CrmApi
 {
-    /**
-     * @return string
-     */
-    private function getUrl()
+    private function getUrl(): string
     {
         $keys = $this->integration->getKeys();
 
@@ -19,12 +16,10 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param $operation
-     * @param array  $parameters
      * @param string $method
      * @param string $moduleobject
      *
-     * @return mixed|string
+     * @return array|ResponseInterface
      *
      * @throws ApiErrorException
      */
@@ -51,15 +46,15 @@ class DynamicsApi extends CrmApi
             'request_timeout'   => 300,
         ]);
 
-        /** @var Response $response */
+        /** @var ResponseInterface $response */
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if ('POST' === $method && (!is_object($response) || !in_array($response->code, [200, 204], true))) {
-            throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response));
+        if ('POST' === $method && (!($response instanceof ResponseInterface) || !in_array($response->getStatusCode(), [200, 204], true))) {
+            throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response->getBody()));
         }
 
-        if ('GET' === $method && is_object($response) && property_exists($response, 'body')) {
-            return json_decode($response->body, true);
+        if ('GET' === $method && $response instanceof ResponseInterface) {
+            return json_decode($response->getBody(), true);
         }
 
         return $response;
@@ -90,24 +85,14 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param $data
      * @param Lead $lead
-     * @param $object
-     *
-     * @return Response
      */
-    public function createLead($data, $lead, $object = 'contacts')
+    public function createLead($data, $lead, $object = 'contacts'): ResponseInterface
     {
         return $this->request('', $data, 'POST', $object);
     }
 
-    /**
-     * @param $data
-     * @param $objectId
-     *
-     * @return Response
-     */
-    public function updateLead($data, $objectId)
+    public function updateLead($data, $objectId): ResponseInterface
     {
         //        $settings['headers']['If-Match'] = '*'; // prevent create new contact
         return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', []);
@@ -116,21 +101,16 @@ class DynamicsApi extends CrmApi
     /**
      * gets leads.
      *
-     * @param array $params
-     *
      * @return mixed
      */
     public function getLeads(array $params)
     {
-        $data = $this->request('', $params, 'GET', 'contacts');
-
-        return $data;
+        return $this->request('', $params, 'GET', 'contacts');
     }
 
     /**
      * gets companies.
      *
-     * @param array  $params
      * @param string $id
      *
      * @return mixed
@@ -153,10 +133,8 @@ class DynamicsApi extends CrmApi
      * @param array  $data
      * @param string $object
      * @param bool   $isUpdate
-     *
-     * @return array
      */
-    public function createLeads($data, $object = 'contacts', $isUpdate = false)
+    public function createLeads($data, $object = 'contacts', $isUpdate = false): array
     {
         if (0 === count($data)) {
             return [];
@@ -180,7 +158,7 @@ class DynamicsApi extends CrmApi
             $odata .= 'Content-Type: application/http'.PHP_EOL;
             $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
             $odata .= 'Content-ID: '.$objectId.PHP_EOL.PHP_EOL;
-//            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
+            //            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
             $returnIds[$objectId] = $contentId;
             if (!$isUpdate) {
                 $oid                  = $objectId;
@@ -214,27 +192,20 @@ class DynamicsApi extends CrmApi
 
     /**
      * @param array $data
-     * @param $object
-     *
-     * @return array
      */
-    public function updateLeads($data, $object = 'contacts')
+    public function updateLeads($data, $object = 'contacts'): array
     {
         return $this->createLeads($data, $object, true);
     }
 
     /**
-     * @link https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
-     *
-     * @param Response $response
-     *
-     * @return array
+     * @see https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
      */
-    public function parseRawHttpResponse(Response $response)
+    public function parseRawHttpResponse(ResponseInterface $response): array
     {
         $a_data      = [];
-        $input       = $response->body;
-        $contentType = $response->headers['Content-Type'];
+        $input       = $response->getBody();
+        $contentType = $response->getHeaders()['Content-Type'];
         // grab multipart boundary from content type header
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
@@ -243,10 +214,10 @@ class DynamicsApi extends CrmApi
         array_pop($a_blocks);
         // there is only one batchresponse
         $input                = array_pop($a_blocks);
-        list($header, $input) = explode("\r\n\r\n", $input, 2);
+        [$header, $input]     = explode("\r\n\r\n", $input, 2);
         foreach (explode("\r\n", $header) as $r) {
-            if (stripos($r, 'Content-Type:') === 0) {
-                list($headername, $contentType) = explode(':', $r, 2);
+            if (0 === stripos($r, 'Content-Type:')) {
+                [$headername, $contentType] = explode(':', $r, 2);
             }
         }
         // grab multipart boundary from content type header
@@ -256,7 +227,7 @@ class DynamicsApi extends CrmApi
         $a_blocks = preg_split("/-+$boundary/", $input);
         array_pop($a_blocks);
         // loop data blocks
-        foreach ($a_blocks as $id => $block) {
+        foreach ($a_blocks as $block) {
             if (empty($block)) {
                 continue;
             }

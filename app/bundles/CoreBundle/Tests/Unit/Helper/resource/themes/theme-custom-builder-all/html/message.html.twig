@@ -1,0 +1,10 @@
+{% extends ":"~template~":base.html.twig" %}
+
+{% block content %}
+    <div class="well text-center">
+        {{ message|raw }}
+        {% if content is defined %}
+        <div class="text-left">{{ content|raw }}</div>
+        {% endif %}
+    </div>
+{% endblock %}

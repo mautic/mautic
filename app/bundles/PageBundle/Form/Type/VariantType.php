@@ -1,85 +1,73 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class VariantType.
+ * @extends AbstractType<mixed>
  */
 class VariantType extends AbstractType
 {
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
+    public function __construct(
+        private PageModel $pageModel
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('weight', 'integer', [
-            'label'      => 'mautic.core.ab_test.form.traffic_weight',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
-            ],
-            'constraints' => [
-                new NotBlank(
-                    ['message' => 'mautic.page.variant.weight.notblank']
-                ),
-            ],
-        ]);
+        $builder->add(
+            'weight',
+            IntegerType::class, [
+                'label'      => 'mautic.core.ab_test.form.traffic_weight',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.page.variant.weight.notblank']
+                    ),
+                ],
+            ]
+        );
 
-        $abTestWinnerCriteria = $this->factory->getModel('page.page')->getBuilderComponents(null, 'abTestWinnerCriteria');
+        $abTestWinnerCriteria = $this->pageModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
         if (!empty($abTestWinnerCriteria)) {
             $criteria = $abTestWinnerCriteria['criteria'];
             $choices  = $abTestWinnerCriteria['choices'];
 
-            $builder->add('winnerCriteria', 'choice', [
-                'label'      => 'mautic.core.ab_test.form.winner',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'    => 'form-control',
-                    'onchange' => 'Mautic.getAbTestWinnerForm(\'page\', \'page\', this);',
-                ],
-                'expanded'    => false,
-                'multiple'    => false,
-                'choices'     => $choices,
-                'empty_value' => 'mautic.core.form.chooseone',
-                'constraints' => [
-                    new NotBlank(
-                        ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
-                    ),
-                ],
-            ]);
+            $builder->add(
+                'winnerCriteria',
+                ChoiceType::class, [
+                    'label'      => 'mautic.core.ab_test.form.winner',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'onchange' => 'Mautic.getAbTestWinnerForm(\'page\', \'page\', this);',
+                    ],
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'choices'     => $choices,
+                    'placeholder' => 'mautic.core.form.chooseone',
+                    'constraints' => [
+                        new NotBlank(
+                            ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                        ),
+                    ],
+                ]
+            );
 
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $criteria) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria): void {
                 $form = $event->getForm();
                 $data = $event->getData();
                 if (isset($data['winnerCriteria'])) {
@@ -98,10 +86,7 @@ class VariantType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pagevariant';
     }

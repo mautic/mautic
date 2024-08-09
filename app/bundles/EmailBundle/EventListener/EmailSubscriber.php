@@ -1,83 +1,49 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\QueueBundle\Event\QueueConsumerEvent;
-use Mautic\QueueBundle\Queue\QueueConsumerResults;
-use Mautic\QueueBundle\QueueEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
+    public const PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
+    public const PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
+    public const PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
+    public const PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    private const RETRY_COUNT = 3;
 
-    /**
-     * @var EmailModel
-     */
-    protected $emailModel;
-
-    /**
-     * EmailSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     * @param EmailModel     $emailModel
-     */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->emailModel     = $emailModel;
+    public function __construct(
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private EmailModel $emailModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],
-            EmailEvents::EMAIL_POST_DELETE => ['onEmailDelete', 0],
-            EmailEvents::EMAIL_FAILED      => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_ON_SEND     => ['onEmailSend', 0],
-            EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
-            EmailEvents::EMAIL_PARSE       => ['onEmailParse', 0],
-            QueueEvents::EMAIL_HIT         => ['onEmailHit', 0],
+            EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
+            EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
+            EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
+            EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
+            EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
+            EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\EmailEvent $event
      */
-    public function onEmailPostSave(Events\EmailEvent $event)
+    public function onEmailPostSave(Events\EmailEvent $event): void
     {
         $email = $event->getEmail();
         if ($details = $event->getChanges()) {
@@ -94,11 +60,29 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a delete entry to the audit log.
-     *
-     * @param Events\EmailEvent $event
+     * Add preheader text to email body.
      */
-    public function onEmailDelete(Events\EmailEvent $event)
+    public function onEmailSendAddPreheaderText(Events\EmailSendEvent $event): void
+    {
+        $email = $event->getEmail();
+        $html  = $event->getContent();
+
+        if ($email && $email->getPreheaderText()) {
+            $preheaderTextElement = self::PREHEADER_HTML_ELEMENT_BEFORE.$email->getPreheaderText().self::PREHEADER_HTML_ELEMENT_AFTER;
+            $preheaderExists      = preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $html, $preheaderMatches);
+            if ($preheaderExists) {
+                $html = preg_replace(self::PREHEADER_HTML_REPLACE_PATTERN, $preheaderTextElement, $html);
+            } elseif (preg_match('/(<body[^\>]*>)/i', $html, $contentMatches)) {
+                $html = str_ireplace($contentMatches[0], $contentMatches[0]."\n".$preheaderTextElement, $html);
+            }
+            $event->setContent($html);
+        }
+    }
+
+    /**
+     * Add a delete entry to the audit log.
+     */
+    public function onEmailDelete(Events\EmailEvent $event): void
     {
         $email = $event->getEmail();
         $log   = [
@@ -114,17 +98,16 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * Process if an email has failed.
-     *
-     * @param Events\QueueEmailEvent $event
      */
-    public function onEmailFailed(Events\QueueEmailEvent $event)
+    public function onEmailFailed(Events\QueueEmailEvent $event): void
     {
-        $message = $event->getMessage();
+        $message    = $event->getMessage();
+        $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+        if (isset($leadIdHash)) {
+            $stat = $this->emailModel->getEmailStatus($leadIdHash);
 
-            if ($stat !== null) {
+            if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
                     '%subject%' => EmojiHelper::toShort($message->getSubject()),
                 ]);
@@ -134,86 +117,35 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an unsubscribe email to the List-Unsubscribe header if applicable.
-     *
-     * @param Events\EmailSendEvent $event
-     */
-    public function onEmailSend(Events\EmailSendEvent $event)
-    {
-        $helper = $event->getHelper();
-        if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
-            $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
-            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
-            $updatedHeader    = ($existing) ? $unsubscribeEmail.', '.$existing : $unsubscribeEmail;
-
-            $event->addTextHeader('List-Unsubscribe', $updatedHeader);
-        }
-    }
-
-    /**
      * Process if an email is resent.
-     *
-     * @param Events\QueueEmailEvent $event
      */
-    public function onEmailResend(Events\QueueEmailEvent $event)
+    public function onEmailResend(Events\QueueEmailEvent $event): void
     {
         $message = $event->getMessage();
 
-        if (isset($message->leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
-            if ($stat !== null) {
-                $stat->upRetryCount();
-
-                $retries = $stat->getRetryCount();
-                if (true || $retries > 3) {
-                    //tried too many times so just fail
-                    $reason = $this->translator->trans('mautic.email.dnc.retries', [
-                        '%subject%' => EmojiHelper::toShort($message->getSubject()),
-                    ]);
-                    $this->emailModel->setDoNotContact($stat, $reason);
-                } else {
-                    //set it to try again
-                    $event->tryAgain();
-                }
-
-                $this->em->persist($stat);
-                $this->em->flush();
-            }
+        if (empty($message->getLeadIdHash())) {
+            return;
         }
-    }
 
-    /**
-     * @param Events\ParseEmailEvent $event
-     */
-    public function onEmailParse(Events\ParseEmailEvent $event)
-    {
-        // Listening for bounce_folder and unsubscribe_folder
-        $isBounce      = $event->isApplicable('EmailBundle', 'bounces');
-        $isUnsubscribe = $event->isApplicable('EmailBundle', 'unsubscribes');
+        $stat = $this->emailModel->getEmailStatus($message->getLeadIdHash());
 
-        if ($isBounce || $isUnsubscribe) {
-            // Process the messages
-
-            /** @var \Mautic\EmailBundle\Helper\MessageHelper $messageHelper */
-            $messageHelper = $this->factory->getHelper('message');
-
-            $messages = $event->getMessages();
-            foreach ($messages as $message) {
-                $messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
-            }
+        if (!$stat) {
+            return;
         }
-    }
 
-    /**
-     * @param QueueConsumerEvent $event
-     */
-    public function onEmailHit(QueueConsumerEvent $event)
-    {
-        $payload = $event->getPayload();
-        $request = $payload['request'];
-        $idHash  = $payload['idHash'];
-        $this->emailModel->hitEmail($idHash, $request, false, false);
-        $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
+        $stat->upRetryCount();
+
+        if ($stat->getRetryCount() > self::RETRY_COUNT) {
+            // tried too many times so just fail
+            $reason = $this->translator->trans('mautic.email.dnc.retries', [
+                '%subject%' => EmojiHelper::toShort($message->getSubject()),
+            ]);
+            $this->emailModel->setDoNotContact($stat, $reason);
+        } else {
+            // set it to try again
+            $event->tryAgain();
+        }
+
+        $this->emailModel->saveEmailStat($stat);
     }
 }

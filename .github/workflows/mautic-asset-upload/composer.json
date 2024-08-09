@@ -1,0 +1,8 @@
+{
+    "name": "mautic/upload-release-asset",
+    "description": "Updates the release asset (x.x.x.zip) to the m.mautic.org instance",
+    "type": "project",
+    "require": {
+        "mautic/api-library": "^2.16"
+    }
+}

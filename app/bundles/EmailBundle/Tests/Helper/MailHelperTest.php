@@ -1,29 +1,90 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
-use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Header\HeaderInterface;
+use Symfony\Component\Mime\Header\MailboxListHeader;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-class MailHelperTest extends \PHPUnit_Framework_TestCase
+class MailHelperTest extends TestCase
 {
+    private const MINIFY_HTML = '<!doctype html>
+    <html lang=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml" xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-microsoft-com:office:office">
+      <head>
+        <title>Test</title>
+        <body style=3D"word-spacing:normal;background-color:#FFFFFF;">
+            <div  style=3D"background:#FFFFFF;background-color:#FFFFFF;margin:0pxauto;max-width:600px;">
+        </body>
+    </html>';
+
+    /**
+     * @var array<array<string|null>>
+     */
+    private $defaultParams = [
+        ['mailer_from_email', null, 'nobody@nowhere.com'],
+        ['mailer_from_name', null, 'No Body'],
+    ];
+
+    private FromEmailHelper $fromEmailHelper;
+
+    /**
+     * @var MauticFactory&MockObject
+     */
+    private MockObject $mockFactory;
+
+    /**
+     * @var CoreParametersHelper&MockObject
+     */
+    private MockObject $coreParametersHelper;
+
+    /**
+     * @var Mailbox&MockObject
+     */
+    private MockObject $mailbox;
+
+    /**
+     * @var LeadRepository&MockObject
+     */
+    private MockObject $contactRepository;
+
+    /**
+     * @var LoggerInterface&MockObject
+     */
+    private MockObject $logger;
+
+    /**
+     * @var RouterInterface&MockObject
+     */
+    private MockObject $router;
+
+    private MailHashHelper $mailHashHelper;
+
+    /**
+     * @var array<array<string,string|int>>
+     */
     protected $contacts = [
         [
             'id'        => 1,
@@ -55,20 +116,25 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        $this->contactRepository    = $this->createMock(LeadRepository::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->fromEmailHelper      = new FromEmailHelper($this->coreParametersHelper, $this->contactRepository);
+        $this->mockFactory          = $this->createMock(MauticFactory::class);
+        $this->mailbox              = $this->createMock(Mailbox::class);
+        $this->logger               = $this->createMock(LoggerInterface::class);
+        $this->router               = $this->createMock(RouterInterface::class);
+        $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
     }
 
-    /**
-     * @expectedException \Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException
-     */
-    public function testQueueModeThrowsExceptionWhenBatchLimitHit()
+    public function testQueueModeThrowsExceptionWhenBatchLimitHit(): void
     {
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockFactory->method('getParameter')
+        $this->expectException(BatchQueueMaxException::class);
+
+        $this->mockFactory->method('getParameter')
             ->will(
                 $this->returnValueMap(
                     [
@@ -78,25 +144,18 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
-
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-
-        // Enable queue mode
-        $mailer->enableQueue();
-        $mailer->addTo('somebody@somewhere.com');
-        $mailer->addTo('somebodyelse@somewhere.com');
-        $mailer->addTo('somebodyelse2@somewhere.com');
-        $mailer->addTo('somebodyelse3@somewhere.com');
-        $mailer->addTo('somebodyelse4@somewhere.com');
+        $batchMailHelper = new MailHelper($this->mockFactory, new Mailer(new BatchTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $batchMailHelper->enableQueue();
+        $batchMailHelper->addTo('somebody@somewhere.com');
+        $batchMailHelper->addTo('somebodyelse@somewhere.com');
+        $batchMailHelper->addTo('somebodyelse2@somewhere.com');
+        $batchMailHelper->addTo('somebodyelse3@somewhere.com');
+        $batchMailHelper->addTo('somebodyelse4@somewhere.com');
     }
 
-    public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit()
+    public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit(): void
     {
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockFactory->method('getParameter')
+        $this->mockFactory->method('getParameter')
             ->will(
                 $this->returnValueMap(
                     [
@@ -106,105 +165,106 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $swiftMailer = new \Swift_Mailer(new BatchTransport());
+        $singleMailHelper = new MailHelper($this->mockFactory, new Mailer(new BcInterfaceTokenTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-
-        // Enable queue mode
         try {
-            $mailer->addTo('somebody@somewhere.com');
-            $mailer->addTo('somebodyelse@somewhere.com');
-        } catch (BatchQueueMaxException $exception) {
+            $singleMailHelper->addTo('somebody@somewhere.com');
+            $singleMailHelper->addTo('somebodyelse@somewhere.com');
+        } catch (BatchQueueMaxException) {
             $this->fail('BatchQueueMaxException thrown');
         }
 
         // Otherwise success
-        $this->assertTrue(true);
+        self::expectNotToPerformAssertions();
     }
 
-    public function testQueuedEmailFromOverride()
+    public function testQueuedEmailFromOverride(): void
     {
-        $mockFactory = $this->getMockFactory(false);
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
 
-        $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
-
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-        $mailer->enableQueue();
+        $singleMailHelper = new MailHelper($this->mockFactory, new Mailer(new BcInterfaceTokenTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $singleMailHelper->enableQueue();
 
         $email = new Email();
         $email->setFromAddress('override@nowhere.com');
         $email->setFromName('Test');
+        $email->setUseOwnerAsMailer(false);
+        $email->setSubject('Test');
 
-        $mailer->setEmail($email);
+        $singleMailHelper->setEmail($email);
 
         foreach ($this->contacts as $contact) {
-            $mailer->addTo($contact['email']);
-            $mailer->setLead($contact);
-            $mailer->queue();
+            $singleMailHelper->addTo($contact['email']);
+            $singleMailHelper->setLead($contact);
+            $singleMailHelper->queue();
         }
 
-        $mailer->flushQueue();
-        $from = $mailer->message->getFrom();
+        $singleMailHelper->flushQueue();
+        $from = $singleMailHelper->message->getFrom();
 
-        $this->assertTrue(array_key_exists('override@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
+        $this->assertSame('override@nowhere.com', $from[0]->getAddress());
 
-        $mailer->reset();
+        $singleMailHelper->reset();
         foreach ($this->contacts as $contact) {
-            $mailer->addTo($contact['email']);
-            $mailer->setLead($contact);
-            $mailer->queue();
+            $singleMailHelper->addTo($contact['email']);
+            $singleMailHelper->setLead($contact);
+            $singleMailHelper->queue();
         }
-        $mailer->flushQueue();
-        $from = $mailer->message->getFrom();
+        $singleMailHelper->flushQueue();
+        $from = $singleMailHelper->message->getFrom();
 
-        $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
+        $this->assertSame('nobody@nowhere.com', $from[0]->getAddress());
     }
 
-    public function testBatchMode()
+    public function testBatchMode(): void
     {
-        $mockFactory = $this->getMockFactory(false);
-
-        $transport   = new BatchTransport(true);
-        $swiftMailer = new \Swift_Mailer($transport);
-
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
-        $mailer->enableQueue();
+        $singleMailHelper = new MailHelper($this->mockFactory, new Mailer(new BcInterfaceTokenTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $singleMailHelper->enableQueue();
 
         $email = new Email();
         $email->setSubject('Hello');
-        $mailer->setEmail($email);
+        $singleMailHelper->setEmail($email);
 
-        $mailer->addTo($this->contacts[0]['email']);
-        $mailer->setLead($this->contacts[0]);
-        $mailer->queue();
-        $mailer->flushQueue();
-        $errors = $mailer->getErrors();
-        $this->assertEmpty($errors['failures'], var_export($errors, true));
+        $singleMailHelper->addTo($this->contacts[0]['email']);
+        $singleMailHelper->setLead($this->contacts[0]);
+        $singleMailHelper->queue();
+        $singleMailHelper->flushQueue();
+        $errors = $singleMailHelper->getErrors();
+        $this->assertTrue(empty($errors['failures']), var_export($errors, true));
 
-        $mailer->reset(false);
-        $mailer->setEmail($email);
-        $mailer->addTo($this->contacts[1]['email']);
-        $mailer->setLead($this->contacts[1]);
-        $mailer->queue();
-        $mailer->flushQueue();
-        $errors = $mailer->getErrors();
-        $this->assertEmpty($errors['failures'], var_export($errors, true));
+        $singleMailHelper->reset(false);
+        $singleMailHelper->setEmail($email);
+        $singleMailHelper->addTo($this->contacts[1]['email']);
+        $singleMailHelper->setLead($this->contacts[1]);
+        $singleMailHelper->queue();
+        $singleMailHelper->flushQueue();
+        $errors = $singleMailHelper->getErrors();
+        $this->assertTrue(empty($errors['failures']), var_export($errors, true));
     }
 
-    public function testQueuedOwnerAsMailer()
+    public function testQueuedOwnerAsMailer(): void
     {
-        $mockFactory = $this->getMockFactory();
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
 
-        $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $this->contactRepository->method('getLeadOwner')
+            ->willReturnOnConsecutiveCalls(
+                ['email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => null, 'signature' => 'owner 1'],
+                ['email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => null, 'signature' => 'owner 2'],
+            );
+        $transport     = new BatchTransport();
+        $symfonyMailer = new Mailer($transport);
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+
+        $mailer->setEmail($email);
         $mailer->enableQueue();
-
-        $mailer->setSubject('Hello');
 
         foreach ($this->contacts as $contact) {
             $mailer->addTo($contact['email']);
@@ -214,7 +274,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         $mailer->flushQueue([]);
 
-        $this->assertEmpty($mailer->getErrors()['failures']);
+        $this->assertTrue(empty($mailer->getErrors()['failures']));
 
         $fromAddresses = $transport->getFromAddresses();
         $metadatas     = $transport->getMetadatas();
@@ -236,8 +296,8 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
             // Check that signatures are valid
             if (1 === $key) {
-                // There should not be a signature token because owner was not set and token events have not been dispatched
-                $this->assertFalse(isset($metadata['tokens']['{signature}']));
+                // signature should be empty
+                $this->assertEquals('', $metadata['contact2@somewhere.com']['tokens']['{signature}']);
             } else {
                 $this->assertEquals($metadata[$this->contacts[$key]['email']]['tokens']['{signature}'], 'owner '.$this->contacts[$key]['owner_id']);
 
@@ -249,19 +309,106 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         }
 
         // Validate that the message object only has the contacts for the last "from" group to ensure we aren't sending duplicates
-        $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
+        $this->assertEquals('contact3@somewhere.com', $mailer->message->getTo()[0]->getAddress());
     }
 
-    public function testGlobalFromThatAllFromAddressesAreTheSame()
+    public function testMailAsOwnerWithEncodedCharactersInName(): void
     {
-        $mockFactory = $this->getMockFactory();
+        $this->coreParametersHelper->method('get')
+            ->will($this->returnValueMap(
+                [
+                    ['mailer_from_email', null, 'nobody@nowhere.com'],
+                    ['mailer_from_name', null, 'No Body&#39;s Business'],
+                ]
+            ));
 
-        $transport   = new BatchTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $this->contactRepository->method('getLeadOwner')
+            ->willReturnOnConsecutiveCalls(
+                ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => '', 'signature' => 'owner 1'],
+                ['id' => 2, 'email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => '', 'signature' => 'owner 2'],
+            );
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $transport     = new BatchTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email  = new Email();
+        $email->setUseOwnerAsMailer(true);
+
+        $mailer->setEmail($email);
         $mailer->enableQueue();
+        $mailer->setSubject('Hello');
 
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $fromAddresses = $transport->getFromAddresses();
+        $fromNames     = $transport->getFromNames();
+
+        $this->assertEquals(3, count($fromAddresses)); // 3, not 4, because the last contact has the same owner as the first contact.
+        $this->assertEquals(3, count($fromNames));
+        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
+        $this->assertEquals(['owner 1', 'No Body\'s Business', 'owner 2'], $fromNames);
+    }
+
+    public function testBatchIsEnabledWithBcTokenInterface(): void
+    {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
+        $this->contactRepository->method('getLeadOwner')
+            ->willReturnOnConsecutiveCalls(
+                ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => '', 'signature' => 'owner 1'],
+                ['id' => 2, 'email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => '', 'signature' => 'owner 2'],
+            );
+        $transport = new BatchTransport();
+        $mailer    = new MailHelper($this->mockFactory, new Mailer($transport), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email     = new Email();
+
+        $email->setUseOwnerAsMailer(true);
+
+        $mailer->setEmail($email);
+        $mailer->enableQueue();
+        $mailer->setSubject('Hello');
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        self::assertTrue(empty($mailer->getErrors()['failures']));
+
+        $fromAddresses = $transport->getFromAddresses();
+        $metadatas     = $transport->getMetadatas();
+
+        $this->assertEquals(3, count($fromAddresses));
+        $this->assertEquals(3, count($metadatas));
+        self::assertSame(
+            ['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'],
+            $fromAddresses
+        );
+    }
+
+    public function testGlobalFromThatAllFromAddressesAreTheSame(): void
+    {
+        $this->contactRepository->method('getLeadOwner')
+            ->willReturnOnConsecutiveCalls(
+                ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => '', 'signature' => 'owner 1'],
+                ['id' => 2, 'email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => '', 'signature' => 'owner 2'],
+            );
+
+        $transport     = new BcInterfaceTokenTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        $mailer = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $mailer->enableQueue();
         $mailer->setSubject('Hello');
         $mailer->setFrom('override@owner.com');
 
@@ -271,44 +418,161 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
             $mailer->queue();
         }
 
-        $mailer->flushQueue();
-
-        $this->assertEmpty($mailer->getErrors()['failures']);
+        $this->assertEmpty($mailer->getErrors());
 
         $fromAddresses = $transport->getFromAddresses();
 
         $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
 
-    public function testStandardOwnerAsMailer()
+    public function testStandardEmailFrom(): void
     {
-        $mockFactory = $this->getMockFactory();
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email         = new Email();
 
-        $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
+        $email->setUseOwnerAsMailer(false);
+        $email->setFromAddress('override@nowhere.com');
+        $email->setFromName('Test');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+        $mailer->setEmail($email);
 
-        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->setBody('{signature}');
+            $mailer->send();
+            $address = $mailer->message->getFrom() ? $mailer->message->getFrom()[0]->getAddress() : null;
+            $this->assertEquals('override@nowhere.com', $address);
+        }
+    }
+
+    public function testStandardEmailReplyTo(): void
+    {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email         = new Email();
+
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+
+        $mailer->setEmail($email);
+        $mailer->send();
+        $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
+        $this->assertEquals('nobody@nowhere.com', $replyTo);
+
+        $email->setReplyToAddress('replytooverride@nowhere.com');
+        $mailer->setEmail($email);
+        $mailer->send();
+        $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
+        $this->assertEquals('replytooverride@nowhere.com', $replyTo);
+    }
+
+    public function testEmailReplyToWithFromEmail(): void
+    {
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($this->defaultParams));
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email         = new Email();
+
+        // From address is set
+        $email->setFromAddress('from@nowhere.com');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+        $mailer->setEmail($email);
+        $mailer->send();
+        $replyTo = $mailer->message->getReplyTo()[0]->getAddress();
+        // Expect from address in reply to
+        $this->assertEquals('from@nowhere.com', $replyTo);
+    }
+
+    public function testEmailReplyToWithFromAndGlobalEmail(): void
+    {
+        $params = [
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_reply_to_email', null, 'admin@mautic.com'],
+        ];
+
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email         = new Email();
+
+        // From address is set
+        $email->setFromAddress('from@nowhere.com');
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+        $mailer->setEmail($email);
+        $mailer->send();
+        $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
+        // Expect from address in reply to
+        $this->assertEquals('admin@mautic.com', $replyTo);
+    }
+
+    public function testStandardOwnerAsMailer(): void
+    {
+        $params = [
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $this->contactRepository->method('getLeadOwner')
+            ->willReturnOnConsecutiveCalls(
+                ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => 'owner 1', 'last_name' => '', 'signature' => 'owner 1'],
+                ['id' => 2, 'email' => 'owner2@owner.com', 'first_name' => 'owner 2', 'last_name' => '', 'signature' => 'owner 2'],
+            );
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+        $mailer->setEmail($email);
+
         $mailer->setBody('{signature}');
 
-        foreach ($this->contacts as $key => $contact) {
+        foreach ($this->contacts as $contact) {
             $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
             $mailer->send();
 
-            $body = $mailer->message->getBody();
-            $from = key($mailer->message->getFrom());
+            $body = $mailer->message->getHtmlBody();
+            $from = $mailer->message->getFrom() ? $mailer->message->getFrom()[0]->getAddress() : null;
 
             if ($contact['owner_id']) {
                 $this->assertEquals('owner'.$contact['owner_id'].'@owner.com', $from);
                 $this->assertEquals('owner '.$contact['owner_id'], $body);
             } else {
                 $this->assertEquals('nobody@nowhere.com', $from);
-                $this->assertEquals('{signature}', $body);
+                $this->assertEquals('{signature}', $body); // The {signature} token is replaced in a subscriber with the current user's signature. But this is a unit test, so the subscriber doesn't run.
             }
         }
     }
 
-    public function testValidateValidEmails()
+    /**
+     * @dataProvider provideEmails
+     */
+    public function testValidateEmails(string $email, bool $isValid): void
+    {
+        $helper = $this->mockEmptyMailHelper();
+        if (!$isValid) {
+            $this->expectException(InvalidEmailException::class);
+        }
+        $this->assertNull($helper::validateEmail($email)); /** @phpstan-ignore-line as it's testing a deprecated method */
+    }
+
+    public function testValidateValidEmails(): void
     {
         $helper    = $this->mockEmptyMailHelper();
         $addresses = [
@@ -320,81 +584,304 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ];
 
         foreach ($addresses as $address) {
-            // will throw Swift_RfcComplianceException if it will find the address invalid
-            $helper::validateEmail($address);
+            // will throw InvalidEmailException if it will find the address invalid
+            $this->assertNull($helper::validateEmail($address)); /** @phpstan-ignore-line as it's testing a deprecated method */
         }
     }
 
-    public function testValidateEmailWithoutTld()
+    /**
+     * @return mixed[]
+     */
+    public function provideEmails(): array
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('john@doe');
+        return [
+            ['john@doe.com', true],
+            ['john@doe.email', true],
+            ['john@doe.whatevertldtheycomewithinthefuture', true],
+            ['john.doe@email.com', true],
+            ['john+doe@email.com', true],
+            ['john@doe', false],
+            ['jo hn@doe.email', false],
+            ['jo^hn@doe.email', false],
+            ['jo\'hn@doe.email', false],
+            ['jo;hn@doe.email', false],
+            ['jo&hn@doe.email', false],
+            ['jo*hn@doe.email', false],
+            ['jo%hn@doe.email', false],
+        ];
     }
 
-    public function testValidateEmailWithSpaceInIt()
+    public function testValidateEmailWithoutTld(): void
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('john@doe'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    public function testValidateEmailWithCaretInIt()
+    public function testValidateEmailWithSpaceInIt(): void
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo^hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    public function testValidateEmailWithApostropheInIt()
+    public function testValidateEmailWithCaretInIt(): void
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo\'hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo^hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    public function testValidateEmailWithSemicolonInIt()
+    public function testValidateEmailWithApostropheInIt(): void
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo;hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo\'hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    public function testValidateEmailWithAmpersandInIt()
+    public function testValidateEmailWithSemicolonInIt(): void
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo&hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo;hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    public function testValidateEmailWithStarInIt()
+    public function testValidateEmailWithAmpersandInIt(): void
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo*hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo&hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    public function testValidateEmailWithPercentInIt()
+    public function testValidateEmailWithStarInIt(): void
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo%hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo*hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    protected function mockEmptyMailHelper()
+    public function testValidateEmailWithPercentInIt(): void
     {
-        $mockFactory = $this->getMockFactory();
-        $transport   = new SmtpTransport();
-        $swiftMailer = new \Swift_Mailer($transport);
-
-        return new MailHelper($mockFactory, $swiftMailer);
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(InvalidEmailException::class);
+        $helper::validateEmail('jo%hn@doe.email'); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
-    protected function getMockFactory($mailIsOwner = true)
+    public function testGlobalHeadersAreSet(): void
     {
-        $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $params = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $mailer->setBody('{signature}');
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->send();
+
+        $customHeadersFounds = [];
+
+        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
+        $headers = $mailer->message->getHeaders()->all();
+        foreach ($headers as $header) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
+                $customHeadersFounds[] = $header->getName();
+
+                $this->assertEquals('test', $header->getBody());
+            }
+        }
+
+        $this->assertCount(2, $customHeadersFounds);
+    }
+
+    public function testGlobalHeadersAreMergedIfEmailEntityIsSet(): void
+    {
+        $params = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('{signature}');
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        /** @var array<HeaderInterface> $headers */
+        $headers = iterator_to_array($mailer->message->getHeaders()->all());
+
+        foreach ($headers as $header) {
+            if (str_contains($header->getName(), 'X-Mautic-Test')) {
+                $this->assertEquals('test', $header->getBody());
+            }
+        }
+
+        $this->assertSame('test', $headers['x-mautic-test']->getBody());
+        $this->assertSame('test', $headers['x-mautic-test2']->getBody());
+    }
+
+    public function testEmailHeadersAreSet(): void
+    {
+        $params = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test', 'custom-mautic-header' => '{contactfield=email}', 'Reply-to' => '{contactfield=email}']],
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->setTokens([
+            '{contactfield=email}' => $this->contacts[0]['email'],
+        ]);
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('{signature}');
+        $email->setHeaders(['X-Mautic-Test3' => 'test2', 'X-Mautic-Test4' => 'test2']);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        $customHeadersFounds = [];
+
+        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
+        $headers = $mailer->message->getHeaders()->all();
+
+        foreach ($headers as $header) {
+            if ('X-Mautic-Test' === $header->getName() || 'X-Mautic-Test2' === $header->getName()) {
+                $customHeadersFounds[] = $header->getName();
+                $this->assertEquals('test', $header->getBody());
+            }
+            if ('X-Mautic-Test3' === $header->getName() || 'X-Mautic-Test4' === $header->getName()) {
+                $customHeadersFounds[] = $header->getName();
+                $this->assertEquals('test2', $header->getBody());
+            }
+            if ('custom-mautic-header' === $header->getName()) {
+                $customHeadersFounds[] = $header->getName();
+                $this->assertEquals($this->contacts[0]['email'], $header->getBody());
+            }
+
+            if ('Reply-To' === $header->getName()) {
+                $customHeadersFounds[] = $header->getName();
+                $this->assertCount(1, $header->getBody());
+            }
+        }
+
+        $this->assertCount(6, $customHeadersFounds);
+    }
+
+    public function testUnsubscribeHeader(): void
+    {
+        $params = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+            ['secret_key', null, 'secret'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_email_unsubscribe',
+                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
+                UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $mailer->setIdHash('hash');
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html></html>');
+        $lead = new Lead();
+        $lead->setEmail('someemail@email.test');
+        $mailer->setIdHash('hash');
+        $mailer->setEmail($email);
+        $mailer->setLead($lead);
+
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
+        $headers = $mailer->getCustomHeaders();
+
+        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>', $headers['List-Unsubscribe']);
+        $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
+
+        // There are no unsubscribe headers in transactional emails.
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_TRANSACTIONAL);
+        $headers = $mailer->getCustomHeaders();
+        $this->assertNull($headers['List-Unsubscribe'] ?? null);
+        $this->assertNull($headers['List-Unsubscribe-Post'] ?? null);
+    }
+
+    public function testUnsubscribeHeaderParameterOrder(): void
+    {
+        $params = [
+            ['mailer_custom_headers', [],
+                [
+                    'X-Mautic-Test'    => 'test',
+                    'X-Mautic-Test2'   => 'test',
+                    'List-Unsubscribe' => '<mailto:list@host.com?subject=unsubscribe>',
+                ]],
+            ['secret_key', null, 'secret'],
+        ];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+
+        $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_email_unsubscribe',
+                ['idHash' => 'hash', 'urlEmail' => 'someemail@email.test', 'secretHash' => $emailSecret],
+                UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $mailer->setIdHash('hash');
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('<html></html>');
+        $lead = new Lead();
+        $lead->setEmail('someemail@email.test');
+        $mailer->setIdHash('hash');
+        $mailer->setEmail($email);
+        $mailer->setLead($lead);
+
+        $mailer->setEmailType(MailHelper::EMAIL_TYPE_MARKETING);
+        $headers = $mailer->getCustomHeaders();
+
+        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
+        $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
+    }
+
+    protected function mockEmptyMailHelper(): MailHelper
+    {
+        $transport     = new SmtpTransport();
+        $symfonyMailer = new Mailer($transport);
+
+        return new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+    }
+
+    /**
+     * @param mixed[] $parameterMap
+     *
+     * @phpstan-ignore-next-line as it's using a deprecated class
+     *
+     * @return MauticFactory&MockObject
+     */
+    protected function getMockFactory(bool $mailIsOwner = true, array $parameterMap = []): MauticFactory
+    {
+        $mockLeadRepository = $this->createMock(LeadRepository::class);
 
         $mockLeadRepository->method('getLeadOwner')
             ->will(
@@ -402,38 +889,30 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                     [
                         [1, ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 1']],
                         [2, ['id' => 2, 'email' => 'owner2@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 2']],
+                        [3, ['id' => 3, 'email' => 'owner3@owner.com', 'first_name' => 'John', 'last_name' => 'S&#39;mith', 'signature' => 'owner 2']],
                     ]
                 )
             );
 
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockLeadModel = $this->createMock(LeadModel::class);
 
-        $mockLeadModel->method('getRepository')
-            ->willReturn($mockLeadRepository);
+        $mockLeadModel->method('getRepository')->willReturn($mockLeadRepository);
 
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockFactory->method('getParameter')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['mailer_return_path', false, null],
-                        ['mailer_spool_type', false, 'memory'],
-                        ['mailer_is_owner', false, $mailIsOwner],
-                    ]
-                )
-            );
-        $mockFactory->method('getModel')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['lead', $mockLeadModel],
-                    ]
-                )
-            );
+        $mockFactory = $this->mockFactory;
+
+        $parameterMap = array_merge(
+            [
+                ['mailer_return_path', false, null],
+                ['mailer_is_owner', false, $mailIsOwner],
+            ],
+            $parameterMap
+        );
+
+        $fromEmailHelper = new FromEmailHelper($this->createMock(CoreParametersHelper::class), $mockLeadRepository);
+
+        $mockFactory->method('getParameter')->will($this->returnValueMap($parameterMap));
+        $mockFactory->method('getModel')->will($this->returnValueMap([['lead', $mockLeadModel]]));
+        $mockFactory->method('get')->will($this->returnValueMap([['mautic.helper.from_email_helper', $fromEmailHelper]]));
 
         $mockLogger = $this->getMockBuilder(Logger::class)
             ->disableOriginalConstructor()
@@ -457,5 +936,210 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
             );
 
         return $mockFactory;
+    }
+
+    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
+    {
+        $mockFactory = $this->mockFactory;
+        $mockFactory->method('getParameter')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_return_path', false, null],
+                    ]
+                )
+            );
+
+        $symfonyMailer = new Mailer(new SmtpTransport());
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $mailer->setTo(['sombody@somewhere.com', 'sombodyelse@somewhere.com'], 'test');
+
+        $emailsTo = [];
+
+        foreach ($mailer->message->getTo() as $address) {
+            $emailsTo[$address->getAddress()] = $address->getName();
+        }
+        $this->assertEquals(
+            [
+                'sombody@somewhere.com'     => 'test',
+                'sombodyelse@somewhere.com' => 'test',
+            ],
+            $emailsTo
+        );
+    }
+
+    /**
+     * @dataProvider minifyHtmlDataProvider
+     */
+    public function testMinifyHtml(bool $minifyHtml, string $html, string $expectedHtml): void
+    {
+        $params = [
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+        ];
+        $params[] = ['minify_email_html', null, $minifyHtml];
+        $params[] = ['mailer_is_owner', null, false];
+        $params[] = ['mailer_append_tracking_pixel', null, false];
+        $this->coreParametersHelper->method('get')->will($this->returnValueMap($params));
+        $symfonyMailer = new Mailer(new SmtpTransport());
+        $mailer        = new MailHelper($this->mockFactory, $symfonyMailer, $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setCustomHtml($html);
+        $email->setSubject('Subject');
+        $mailer->setEmail($email);
+        $this->assertSame($expectedHtml, $mailer->getBody(), $mailer->getBody());
+    }
+
+    /**
+     * @return array<array<bool|int|string>>
+     */
+    public static function minifyHtmlDataProvider(): array
+    {
+        return [
+            [false, self::MINIFY_HTML, self::MINIFY_HTML],
+            [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)],
+        ];
+    }
+
+    public function testHeadersAreTokenized(): void
+    {
+        $this->coreParametersHelper->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_custom_headers', [], ['X-Mautic-Test-1' => '{tracking_pixel}']],
+                        ['mailer_reply_to_email', false, '{tracking_pixel}'],
+                        ['mailer_from_email', null, 'nobody@nowhere.com'],
+                        ['mailer_from_name', null, 'No Body'],
+                    ]
+                )
+            );
+
+        $smtpMailHelper = new MailHelper($this->mockFactory, new Mailer(new SmtpTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $smtpMailHelper->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('content');
+        $email->setHeaders(['X-Mautic-Test-2' => '{tracking_pixel}']);
+        $smtpMailHelper->setEmail($email);
+        $smtpMailHelper->send();
+
+        /** @var iterable<MailboxListHeader> $headers */
+        $headers = $smtpMailHelper->message->getHeaders()->all();
+
+        $realHeaders = [];
+        foreach ($headers as $header) {
+            $realHeaders[$header->getName()] = $header->getBodyAsString();
+        }
+
+        self::assertSame(
+            $realHeaders,
+            [
+                'To'                    => 'contact1@somewhere.com',
+                'From'                  => 'No Body <nobody@nowhere.com>',
+                'Reply-To'              => 'nobody@nowhere.com',
+                'Subject'               => 'Test',
+                'X-Mautic-Test-2'       => MailHelper::getBlankPixel(),
+                'X-Mautic-Test-1'       => MailHelper::getBlankPixel(),
+                'List-Unsubscribe'      => '<{unsubscribe_url}>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+            ]
+        );
+    }
+
+    public function testThatHtmlIsCorrectlyProcessedWhenTheAreEmbeddedImages(): void
+    {
+        $this->coreParametersHelper->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_from_email', null, 'nobody@nowhere.com'],
+                        ['mailer_convert_embed_images', null, true],
+                        ['mailer_append_tracking_pixel', null, true],
+                        ['mailer_from_name', null, 'Test'],
+                        ['mailer_append_tracking_pixel', null, true],
+                        ['secret_key', null, 'secret'],
+                        ['site_url', null, 'https://mautic.url'],
+                    ]
+                )
+            );
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+
+        $mailer = new MailHelper($this->mockFactory, new Mailer(new BatchTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email  = new Email();
+
+        // We should use a local image to avoid network requests.
+        $sampleImagePath = __DIR__.'/../../../../assets/images/avatar.svg';
+
+        $mailer->setIdHash('IDHASH');
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="'.$sampleImagePath.'"> <img src="'.$sampleImagePath.'">');
+        $mailer->setEmail($email);
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->send();
+        }
+
+        $mailer->send();
+        $reflectionMailerObject = new \ReflectionObject($mailer);
+        $messageProperty        = $reflectionMailerObject->getProperty('message');
+        $mauticMessage          = $messageProperty->getValue($mailer);
+        \assert($mauticMessage instanceof MauticMessage);
+
+        $body = $mauticMessage->getHtmlBody();
+
+        $this->assertStringContainsString('<img height="1" width="1" src="http://tracking.url" alt="" />', $body);
+        $this->assertSame(2, substr_count($body, 'cid:'));
+    }
+
+    public function testThatWeDontEmbedAlreadyEmbeddedImages(): void
+    {
+        $this->coreParametersHelper->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_from_email', null, 'nobody@nowhere.com'],
+                        ['mailer_convert_embed_images', null, true],
+                        ['mailer_append_tracking_pixel', null, true],
+                        ['mailer_from_name', null, 'Test'],
+                        ['mailer_append_tracking_pixel', null, true],
+                        ['secret_key', null, 'secret'],
+                    ]
+                )
+            );
+
+        $this->router->method('generate')->willReturn('http://tracking.url');
+
+        $mailer = new MailHelper($this->mockFactory, new Mailer(new BatchTransport()), $this->fromEmailHelper, $this->coreParametersHelper, $this->mailbox, $this->logger, $this->mailHashHelper, $this->router);
+        $email  = new Email();
+
+        $email->setUseOwnerAsMailer(false);
+        $email->setFromName('Test');
+        $email->setSubject('Test');
+        $email->setCustomHtml('<img src="cid:abcdefg">');
+        $mailer->setEmail($email);
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->send();
+        }
+
+        $mailer->send();
+        $reflectionMailerObject = new \ReflectionObject($mailer);
+        $messageProperty        = $reflectionMailerObject->getProperty('message');
+        $mauticMessage          = $messageProperty->getValue($mailer);
+        \assert($mauticMessage instanceof MauticMessage);
+
+        $body = $mauticMessage->getHtmlBody();
+
+        $this->assertStringContainsString('<img src="cid:abcdefg">', $body);
     }
 }

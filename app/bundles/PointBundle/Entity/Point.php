@@ -1,27 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\IntHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Point.
- */
 class Point extends FormEntity
 {
     /**
@@ -35,7 +25,7 @@ class Point extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -45,12 +35,17 @@ class Point extends FormEntity
     private $type;
 
     /**
-     * @var \DateTime
+     * @var bool
+     */
+    private $repeatable = false;
+
+    /**
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -65,14 +60,16 @@ class Point extends FormEntity
     private $properties = [];
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,\Mautic\PointBundle\Entity\LeadPointLog>
      */
     private $log;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var Category|null
      **/
     private $category;
+
+    private ?Group $group = null;
 
     public function __clone()
     {
@@ -81,23 +78,17 @@ class Point extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->log = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('points')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\PointRepository')
+            ->setCustomRepositoryClass(PointRepository::class)
             ->addIndex(['type'], 'point_type_search');
 
         $builder->addIdColumns();
@@ -107,6 +98,9 @@ class Point extends FormEntity
             ->build();
 
         $builder->addPublishDates();
+
+        $builder->createField('repeatable', 'boolean')
+            ->build();
 
         $builder->addField('delta', 'integer');
 
@@ -120,12 +114,13 @@ class Point extends FormEntity
             ->build();
 
         $builder->addCategory();
+
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
+            ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -138,14 +133,17 @@ class Point extends FormEntity
         $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
             'message' => 'mautic.point.delta.notblank',
         ]));
+
+        $metadata->addPropertyConstraint('delta', new Assert\Range([
+            'min' => IntHelper::MIN_INTEGER_VALUE,
+            'max' => IntHelper::MAX_INTEGER_VALUE,
+        ]));
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('point')
             ->addListProperties(
@@ -163,14 +161,13 @@ class Point extends FormEntity
                     'publishDown',
                     'delta',
                     'properties',
+                    'repeatable',
                 ]
             )
             ->build();
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -179,11 +176,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
      *
-     * @return Action
+     * @return self
      */
     public function setProperties($properties)
     {
@@ -195,8 +190,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -205,11 +198,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      *
-     * @return Action
+     * @return self
      */
     public function setType($type)
     {
@@ -220,8 +211,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -229,20 +218,15 @@ class Point extends FormEntity
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
-     * @return Action
+     * @return self
      */
     public function setDescription($description)
     {
@@ -253,8 +237,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -263,11 +245,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
-     * @return Action
+     * @return self
      */
     public function setName($name)
     {
@@ -278,8 +258,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -288,11 +266,7 @@ class Point extends FormEntity
     }
 
     /**
-     * Add log.
-     *
-     * @param LeadPointLog $log
-     *
-     * @return Log
+     * @return self
      */
     public function addLog(LeadPointLog $log)
     {
@@ -301,19 +275,12 @@ class Point extends FormEntity
         return $this;
     }
 
-    /**
-     * Remove log.
-     *
-     * @param LeadPointLog $log
-     */
-    public function removeLog(LeadPointLog $log)
+    public function removeLog(LeadPointLog $log): void
     {
         $this->log->removeElement($log);
     }
 
     /**
-     * Get log.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getLog()
@@ -322,8 +289,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      *
      * @return Point
@@ -337,9 +302,7 @@ class Point extends FormEntity
     }
 
     /**
-     * Get publishUp.
-     *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -347,8 +310,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      *
      * @return Point
@@ -362,9 +323,7 @@ class Point extends FormEntity
     }
 
     /**
-     * Get publishDown.
-     *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -382,7 +341,7 @@ class Point extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -398,8 +357,39 @@ class Point extends FormEntity
     /**
      * @param mixed $delta
      */
-    public function setDelta($delta)
+    public function setDelta($delta): void
     {
         $this->delta = (int) $delta;
+    }
+
+    /**
+     * @param bool $repeatable
+     *
+     * @return Point
+     */
+    public function setRepeatable($repeatable)
+    {
+        $this->isChanged('repeatable', $repeatable);
+        $this->repeatable = $repeatable;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRepeatable()
+    {
+        return $this->repeatable;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?Group $group): void
+    {
+        $this->group = $group;
     }
 }

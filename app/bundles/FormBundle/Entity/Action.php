@@ -1,23 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Action.
- */
 class Action
 {
     /**
@@ -31,7 +21,7 @@ class Action
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -51,7 +41,7 @@ class Action
     private $properties = [];
 
     /**
-     * @var Form
+     * @var Form|null
      */
     private $form;
 
@@ -69,15 +59,12 @@ class Action
         $this->form = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_actions')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\ActionRepository')
+            ->setCustomRepositoryClass(ActionRepository::class)
             ->addIndex(['type'], 'form_action_type_search');
 
         $builder->addIdColumns();
@@ -100,10 +87,8 @@ class Action
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('form')
             ->addProperties(
@@ -119,10 +104,7 @@ class Action
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('type', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -130,11 +112,7 @@ class Action
         ]));
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
-    private function isChanged($prop, $val)
+    private function isChanged($prop, $val): void
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = [$this->$prop, $val];
@@ -214,8 +192,6 @@ class Action
     /**
      * Set form.
      *
-     * @param Form $form
-     *
      * @return Action
      */
     public function setForm(Form $form)
@@ -228,7 +204,7 @@ class Action
     /**
      * Get form.
      *
-     * @return Form
+     * @return Form|null
      */
     public function getForm()
     {
@@ -260,10 +236,7 @@ class Action
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function convertToArray()
+    public function convertToArray(): array
     {
         return get_object_vars($this);
     }

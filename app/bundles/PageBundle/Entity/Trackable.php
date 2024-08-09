@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Trackable.
- */
 class Trackable
 {
     /**
@@ -45,18 +33,15 @@ class Trackable
      */
     private $uniqueHits = 0;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('channel_url_trackables')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\TrackableRepository')
+            ->setCustomRepositoryClass(TrackableRepository::class)
             ->addIndex(['channel', 'channel_id'], 'channel_url_trackable_search');
 
-        $builder->createManyToOne('redirect', 'Mautic\PageBundle\Entity\Redirect')
+        $builder->createManyToOne('redirect', Redirect::class)
             ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')
             ->cascadePersist()
             ->inversedBy('trackables')
@@ -65,7 +50,7 @@ class Trackable
 
         $builder->createField('channelId', 'integer')
             ->columnName('channel_id')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->build();
 
         $builder->addField('channel', 'string');
@@ -77,10 +62,8 @@ class Trackable
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('trackable')
             ->addListProperties(
@@ -104,8 +87,6 @@ class Trackable
     }
 
     /**
-     * @param Redirect $redirect
-     *
      * @return Trackable
      */
     public function setRedirect(Redirect $redirect)

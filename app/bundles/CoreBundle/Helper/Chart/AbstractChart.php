@@ -1,23 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
 
-/**
- * Class AbstractChart.
- */
 abstract class AbstractChart
 {
+    use DateRangeUnitTrait;
+
     /**
      * Datasets of the chart.
      *
@@ -35,21 +25,21 @@ abstract class AbstractChart
     /**
      * Date from.
      *
-     * @var \DateTime
+     * @var \DateTimeInterface|\DateTime
      */
     protected $dateFrom;
 
     /**
      * Date to.
      *
-     * @var \DateTime
+     * @var \DateTimeInterface|\DateTime
      */
     protected $dateTo;
 
     /**
      * Timezone data is requested to be in.
      *
-     * @var
+     * @var \DateTimeZone
      */
     protected $timezone;
 
@@ -82,6 +72,16 @@ abstract class AbstractChart
     public $colors = ['#4E5D9D', '#00B49C', '#FD9572', '#FDB933', '#757575', '#9C4E5C', '#694535', '#596935'];
 
     /**
+     * Get chart time unit.
+     *
+     * @return string
+     */
+    public function getUnit()
+    {
+        return $this->unit;
+    }
+
+    /**
      * Create a DateInterval time unit.
      *
      * @param string $unit
@@ -93,10 +93,10 @@ abstract class AbstractChart
         if (!$unit) {
             $unit = $this->unit;
         }
-        $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
-        $toUpper = ['d', 'i'];
 
-        if ($unit == 'i') {
+        $isTime = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
+
+        if ('i' == $unit) {
             $unit = 'M';
         }
 
@@ -127,13 +127,13 @@ abstract class AbstractChart
 
     /**
      * Sets the clones of the date range and validates it.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      */
-    public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
+    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): void
     {
+        $this->timezone = $dateFrom->getTimezone();
+        /** @var \DateTime $dateFrom */
         $this->dateFrom = clone $dateFrom;
+        /** @var \DateTime $dateTo */
         $this->dateTo   = clone $dateTo;
 
         // a diff of two identical dates returns 0, but we expect 24 hours
@@ -142,23 +142,24 @@ abstract class AbstractChart
         }
 
         // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
-        $now = new \DateTime();
-        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && !$this->isTimeUnit) {
-            $this->dateTo = $now;
-        } elseif (!$this->isTimeUnit) {
+        if (!$this->isTimeUnit) {
             $this->dateTo->setTime(23, 59, 59);
+
+            return;
         }
 
-        $this->timezone = $dateFrom->getTimezone();
+        // If time aware and the to date is today, set the stats to the current hour to avoid empty future hours in graphs
+        $now = new \DateTime();
+        if ($now->format('Y-m-d') === $this->dateTo->format('Y-m-d')) {
+            $this->dateTo = $now;
+        }
     }
 
     /**
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
-     *
-     * @param \DateTime $date
      */
-    public function addOneUnitMinusOneSec(\DateTime &$date)
+    public function addOneUnitMinusOneSec(\DateTime &$date): void
     {
         $date->add($this->getUnitInterval())->modify('-1 sec');
     }
@@ -172,11 +173,11 @@ abstract class AbstractChart
     {
         switch ($this->unit) {
             case 's':
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%s'));
+                $amount = $this->dateTo->diff($this->dateFrom)->format('%s');
                 ++$amount;
                 break;
             case 'i':
-                $amount = ($this->dateTo->diff($this->dateFrom)->format('%i'));
+                $amount = $this->dateTo->diff($this->dateFrom)->format('%i');
                 ++$amount;
                 break;
             case 'd':
@@ -210,44 +211,6 @@ abstract class AbstractChart
         }
 
         return $amount;
-    }
-
-    /**
-     * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty.
-     *
-     * @param $dateFrom
-     * @param $dateTo
-     *
-     * @return string
-     */
-    public function getTimeUnitFromDateRange($dateFrom, $dateTo)
-    {
-        $dayDiff = $dateTo->diff($dateFrom)->format('%a');
-        $unit    = 'd';
-
-        if ($dayDiff <= 1) {
-            $unit = 'H';
-
-            $minuteDiff = $dateTo->diff($dateFrom)->format('%i');
-            if ($minuteDiff <= 60) {
-                $unit = 'i';
-            }
-            $secondDiff = $dateTo->diff($dateFrom)->format('%s');
-            if ($minuteDiff < 1 && $secondDiff <= 60) {
-                $unit = 's';
-            }
-        }
-        if ($dayDiff > 31) {
-            $unit = 'W';
-        }
-        if ($dayDiff > 100) {
-            $unit = 'm';
-        }
-        if ($dayDiff > 1000) {
-            $unit = 'Y';
-        }
-
-        return $unit;
     }
 
     /**

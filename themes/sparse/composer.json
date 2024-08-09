@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-sparse",
+  "description": "Mautic Sparse Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "sparse"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

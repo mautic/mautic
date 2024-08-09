@@ -1,77 +1,93 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
+use Mautic\CoreBundle\Form\Type\ThemeListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class FormType.
+ * @extends AbstractType<Form>
  */
 class FormType extends AbstractType
 {
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
-
-    /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    private $security;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
+    public function __construct(
+        private CorePermissions $security,
+        private LanguageHelper $langHelper,
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
 
-        //details
-        $builder->add('name', 'text', [
+        // details
+        $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
-        $builder->add('description', 'textarea', [
+        $builder->add(
+            'language',
+            ChoiceType::class,
+            [
+                'choices'           => $this->langHelper->getLanguageChoices(),
+                'label'             => 'mautic.core.config.form.locale',
+                'required'          => false,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.form.locale.tooltip',
+                ],
+                'placeholder'       => '',
+            ]
+        );
+
+        $builder->add('formAttributes', TextType::class, [
+            'label'      => 'mautic.form.field.form.form_attr',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
+            ],
+            'required'   => false,
+        ]);
+
+        $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
             'required'   => false,
         ]);
 
-        //add category
-        $builder->add('category', 'category', [
-            'bundle' => 'form',
-        ]);
+        // add category
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'form',
+            ]
+        );
 
-        $builder->add('template', 'theme_list', [
+        $builder->add('template', ThemeListType::class, [
             'feature'     => 'form',
-            'empty_value' => ' ',
+            'placeholder' => ' ',
             'attr'        => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.form.template.help',
@@ -94,111 +110,113 @@ class FormType extends AbstractType
             $data     = true;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', [
-            'read_only' => $readonly,
-            'data'      => $data,
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+            'data'  => $data,
+            'attr'  => [
+                'readonly' => $readonly,
+            ],
         ]);
 
-        $builder->add('inKioskMode', 'yesno_button_group', [
+        $builder->add('inKioskMode', YesNoButtonGroupType::class, [
             'label' => 'mautic.form.form.kioskmode',
             'attr'  => [
                 'tooltip' => 'mautic.form.form.kioskmode.tooltip',
             ],
         ]);
 
+        $builder->add(
+            'noIndex',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.form.no_index',
+                'data'  => $options['data']->getNoIndex() ?: false,
+            ]
+        );
+
+        $builder->add(
+            'progressiveProfilingLimit',
+            TextType::class,
+            [
+                'label' => 'mautic.form.form.progressive_profiling_limit.max_fields',
+                'attr'  => [
+                    'style'       => 'width:100px;',
+                    'class'       => 'form-control',
+                    'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
+                    'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
+                ],
+                'data'  => $options['data']->getProgressiveProfilingLimit() ?: '',
+            ]
+        );
+
         // Render style for new form by default
-        if ($options['data']->getId() === null) {
+        if (null === $options['data']->getId()) {
             $options['data']->setRenderStyle(true);
         }
 
-        $builder->add('renderStyle', 'yesno_button_group', [
+        $builder->add('renderStyle', YesNoButtonGroupType::class, [
             'label'      => 'mautic.form.form.renderstyle',
-            'data'       => ($options['data']->getRenderStyle() === null) ? true : $options['data']->getRenderStyle(),
-            'empty_data' => true,
+            'data'       => $options['data']->getRenderStyle() ?? true,
             'attr'       => [
                 'tooltip' => 'mautic.form.form.renderstyle.tooltip',
             ],
         ]);
 
-        $builder->add('publishUp', 'datetime', [
-            'widget'     => 'single_text',
-            'label'      => 'mautic.core.form.publishup',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'       => 'form-control',
-                'data-toggle' => 'datetime',
-            ],
-            'format'   => 'yyyy-MM-dd HH:mm',
-            'required' => false,
-        ]);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
-        $builder->add('publishDown', 'datetime', [
-            'widget'     => 'single_text',
-            'label'      => 'mautic.core.form.publishdown',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'       => 'form-control',
-                'data-toggle' => 'datetime',
-            ],
-            'format'   => 'yyyy-MM-dd HH:mm',
-            'required' => false,
-        ]);
-
-        $builder->add('postAction', 'choice', [
+        $builder->add('postAction', ChoiceType::class, [
             'choices' => [
-                'return'   => 'mautic.form.form.postaction.return',
-                'redirect' => 'mautic.form.form.postaction.redirect',
-                'message'  => 'mautic.form.form.postaction.message',
+                'mautic.form.form.postaction.message'  => 'message',
+                'mautic.form.form.postaction.redirect' => 'redirect',
+                'mautic.form.form.postaction.return'   => 'return',
             ],
-            'label'      => 'mautic.form.form.postaction',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
+            'label'             => 'mautic.form.form.postaction',
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
             ],
             'required'    => false,
-            'empty_value' => false,
+            'placeholder' => false,
         ]);
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
         $required   = (in_array($postAction, ['redirect', 'message'])) ? true : false;
-        $builder->add('postActionProperty', 'text', [
+        $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
+            'attr'       => [
+                'class'         => 'form-control',
+                'data-hide-on'  => '{"mauticform_postAction":"return"}',
+            ],
             'required'   => $required,
         ]);
 
-        $builder->add('sessionId', 'hidden', [
+        $builder->add('sessionId', HiddenType::class, [
             'mapped' => false,
         ]);
 
-        $builder->add('buttons', 'form_buttons');
-        $builder->add('formType', 'hidden', ['empty_data' => 'standalone']);
+        $builder->add('buttons', FormButtonsType::class);
+        $builder->add('formType', HiddenType::class, ['empty_data' => 'standalone']);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class'        => 'Mautic\FormBundle\Entity\Form',
+            'data_class'        => Form::class,
             'validation_groups' => [
-                'Mautic\FormBundle\Entity\Form',
+                Form::class,
                 'determineValidationGroups',
             ],
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'mauticform';
     }

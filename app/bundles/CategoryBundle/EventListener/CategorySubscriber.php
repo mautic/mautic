@@ -1,62 +1,25 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\EventListener;
 
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event as Events;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CategorySubscriber.
- */
-class CategorySubscriber extends CommonSubscriber
+class CategorySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var BundleHelper
-     */
-    protected $bundleHelper;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * CategorySubscriber constructor.
-     *
-     * @param BundleHelper   $bundleHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
-    public function __construct(BundleHelper $bundleHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->bundleHelper   = $bundleHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    public function __construct(
+        private BundleHelper $bundleHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD => ['onCategoryBundleListBuild', 0],
@@ -67,10 +30,8 @@ class CategorySubscriber extends CommonSubscriber
 
     /**
      * Add bundle to the category.
-     *
-     * @param CategoryTypesEvent $event
      */
-    public function onCategoryBundleListBuild(CategoryTypesEvent $event)
+    public function onCategoryBundleListBuild(CategoryTypesEvent $event): void
     {
         $bundles = $this->bundleHelper->getMauticBundles(true);
 
@@ -85,10 +46,8 @@ class CategorySubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\CategoryEvent $event
      */
-    public function onCategoryPostSave(Events\CategoryEvent $event)
+    public function onCategoryPostSave(Events\CategoryEvent $event): void
     {
         $category = $event->getCategory();
         if ($details = $event->getChanges()) {
@@ -106,10 +65,8 @@ class CategorySubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\CategoryEvent $event
      */
-    public function onCategoryDelete(Events\CategoryEvent $event)
+    public function onCategoryDelete(Events\CategoryEvent $event): void
     {
         $category = $event->getCategory();
         $log      = [

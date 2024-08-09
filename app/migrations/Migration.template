@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+namespace <namespace>;
+
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+
+final class <className> extends PreUpAssertionMigration
+{
+    protected const TABLE_NAME = 'table_name';
+
+    protected function preUpAssertions(): void
+    {
+        // Please add an assertion for every SQL you define in the `up()` method.
+        // The order does matter! Examples:
+
+        /*
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->hasTable($this->getPrefixedTableName()),
+            "Table {$this->getPrefixedTableName()} already exists"
+        );
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName())->hasIndex('index_name'),
+            'Index index_name already exists'
+        );
+        */
+    }
+
+    public function up(Schema $schema): void
+    {
+        // Add queries to modify the database schema. Examples:
+
+        /**
+        $table = $schema->getTable($this->getPrefixedTableName());
+        $table->addColumn('column_a', Types::DATETIME_IMMUTABLE)->setNotnull(false);
+        */
+
+        /**
+        $this->addSql("CREATE INDEX index_a ON {$this->getPrefixedTableName()} (column_a, column_b);");
+        */
+    }
+
+    public function down(Schema $schema): void
+    {
+        // If it makes sense for your migration, undo what was done in the up() method here.
+    }
+}

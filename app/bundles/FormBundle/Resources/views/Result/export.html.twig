@@ -1,0 +1,42 @@
+{% set contentOnly = true %}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
+{% block headerTitle %}
+  {{ 'mautic.form.result.header.index'|trans({'%name%': form.name}) }}
+{% endblock %}
+
+{% block content %}
+  <div class="formresults">
+      <table class="table table-hover formresult-list">
+          <thead>
+            <tr>
+                <th class="col-formresult-id">{{ 'mautic.form.report.submission.id'|trans }}</th>
+                <th class="col-formresult-id">{{ 'mautic.lead.report.contact_id'|trans }}</th>
+                <th class="col-formresult-date">{{ 'mautic.form.result.thead.date'|trans }}</th>
+                <th class="col-formresult-ip">{{ 'mautic.core.ipaddress'|trans }}</th>
+                {% set fields = form.fields %}
+                {% for f in fields %}
+                  {% if f.type not in viewOnlyFields and true == f.saveResult %}
+                    <th class="col-formresult-field col-formresult-{{ f.type }} col-formresult-field{{ f.id }}">{{ f.label }}</th>
+                  {% endif %}
+                {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+          {% for item in results %}
+              <tr>
+                  <td>{{ item['id'] }}</td>
+                  <td>{{ item['leadId'] }}</td>
+                  <td>{{ dateToFull(item['dateSubmitted'], 'UTC') }}</td>
+                  <td>{{ item['ipAddress'] }}</td>
+                  {% for r in item.results %}
+                      <td>{{ r['value'] }}</td>
+                  {% endfor %}
+              </tr>
+          {% endfor %}
+          </tbody>
+      </table>
+  </div>
+{% endblock %}

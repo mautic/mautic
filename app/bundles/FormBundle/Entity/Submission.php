@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -18,13 +9,12 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class Submission.
- */
 class Submission
 {
+    public const TABLE_NAME = 'form_submissions';
+
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -34,22 +24,22 @@ class Submission
     private $form;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSubmitted;
 
@@ -59,7 +49,7 @@ class Submission
     private $referer;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var Page|null
      */
     private $page;
 
@@ -68,26 +58,23 @@ class Submission
      */
     private $results = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('form_submissions')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\SubmissionRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(SubmissionRepository::class)
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('submissions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addIpAddress();
+        $builder->addIpAddress(true);
 
         $builder->addLead(true, 'SET NULL');
 
@@ -102,7 +89,7 @@ class Submission
 
         $builder->addField('referer', 'text');
 
-        $builder->createManyToOne('page', 'Mautic\PageBundle\Entity\Page')
+        $builder->createManyToOne('page', Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
             ->fetchExtraLazy()
             ->build();
@@ -110,10 +97,8 @@ class Submission
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('submission')
             ->addProperties(
@@ -147,12 +132,10 @@ class Submission
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -172,7 +155,7 @@ class Submission
     /**
      * Get dateSubmitted.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSubmitted()
     {
@@ -206,8 +189,6 @@ class Submission
     /**
      * Set form.
      *
-     * @param Form $form
-     *
      * @return Submission
      */
     public function setForm(Form $form)
@@ -230,8 +211,6 @@ class Submission
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return Submission
      */
     public function setIpAddress(IpAddress $ipAddress = null)
@@ -242,9 +221,7 @@ class Submission
     }
 
     /**
-     * Get ipAddress.
-     *
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {
@@ -264,8 +241,6 @@ class Submission
     /**
      * Get results.
      *
-     * @param $results
-     *
      * @return Submission
      */
     public function setResults($results)
@@ -277,8 +252,6 @@ class Submission
 
     /**
      * Set page.
-     *
-     * @param \Mautic\PageBundle\Entity\Page $page
      *
      * @return Submission
      */
@@ -292,7 +265,7 @@ class Submission
     /**
      * Get page.
      *
-     * @return \Mautic\PageBundle\Entity\Page
+     * @return Page
      */
     public function getPage()
     {
@@ -308,8 +281,6 @@ class Submission
     }
 
     /**
-     * @param Lead|null $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead = null)
@@ -328,15 +299,13 @@ class Submission
     }
 
     /**
-     * @param $trackingId
-     *
      * @return $this
      */
     public function setTrackingId($trackingId)
     {
         $this->trackingId = $trackingId;
 
-        return  $this;
+        return $this;
     }
 
     /**

@@ -1,26 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class AuditLog.
- */
 class AuditLog
 {
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -45,7 +33,7 @@ class AuditLog
     protected $object;
 
     /**
-     * @var int
+     * @var string
      */
     protected $objectId;
 
@@ -60,7 +48,7 @@ class AuditLog
     protected $details = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateAdded;
 
@@ -69,20 +57,17 @@ class AuditLog
      */
     protected $ipAddress;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('audit_log')
-            ->setCustomRepositoryClass('Mautic\CoreBundle\Entity\AuditLogRepository')
+            ->setCustomRepositoryClass(AuditLogRepository::class)
             ->addIndex(['object', 'object_id'], 'object_search')
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search')
             ->addIndex(['date_added'], 'date_added_index');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('userId', 'integer')
             ->columnName('user_id')
@@ -100,9 +85,7 @@ class AuditLog
             ->length(50)
             ->build();
 
-        $builder->createField('objectId', 'integer')
-            ->columnName('object_id')
-            ->build();
+        $builder->addBigIntIdField('objectId', 'object_id', false);
 
         $builder->createField('action', 'string')
             ->length(50)
@@ -122,12 +105,10 @@ class AuditLog
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -187,19 +168,17 @@ class AuditLog
      */
     public function setObjectId($objectId)
     {
-        $this->objectId = $objectId;
+        $this->objectId = (string) $objectId;
 
         return $this;
     }
 
     /**
      * Get objectId.
-     *
-     * @return int
      */
-    public function getObjectId()
+    public function getObjectId(): int
     {
-        return $this->objectId;
+        return (int) $this->objectId;
     }
 
     /**
@@ -228,8 +207,6 @@ class AuditLog
 
     /**
      * Set details.
-     *
-     * @param array $details
      *
      * @return AuditLog
      */
@@ -267,7 +244,7 @@ class AuditLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

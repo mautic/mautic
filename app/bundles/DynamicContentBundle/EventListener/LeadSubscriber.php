@@ -1,30 +1,25 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public function __construct(
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+        private StatRepository $statRepository
+    ) {
+    }
+
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
@@ -34,14 +29,12 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
         $eventTypeKey      = 'dynamic.content.sent';
-        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.sent');
+        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.triggered');
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
         $event->addSerializerGroup('dwcList');
 
@@ -49,15 +42,12 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository */
-        $statRepository = $this->em->getRepository('MauticDynamicContentBundle:Stat');
-        $stats          = $statRepository->getLeadStats($event->getLeadId(), $event->getQueryOptions());
+        $stats = $this->statRepository->getLeadStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $stats);
 
         if (!$event->isEngagementCount()) {
-
             // Add the events to the event array
             foreach ($stats['results'] as $stat) {
                 $contactId = $stat['lead_id'];
@@ -80,8 +70,8 @@ class LeadSubscriber extends CommonSubscriber
                                 'stat' => $stat,
                                 'type' => 'sent',
                             ],
-                            'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                            'icon'            => 'fa-envelope',
+                            'contentTemplate' => '@MauticDynamicContent/SubscribedEvents/Timeline/index.html.twig',
+                            'icon'            => 'ri-puzzle-2-line',
                             'contactId'       => $contactId,
                         ]
                     );
@@ -90,12 +80,9 @@ class LeadSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
-    public function onLeadMerge(LeadMergeEvent $event)
+    public function onLeadMerge(LeadMergeEvent $event): void
     {
-        $this->em->getRepository('MauticDynamicContentBundle:Stat')->updateLead(
+        $this->statRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

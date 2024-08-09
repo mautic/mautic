@@ -1,167 +1,93 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
+use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\LeadBundle\Tracker\ContactTracker;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
 /**
- * Class FormModel.
+ * @extends CommonFormModel<Form>
  */
 class FormModel extends CommonFormModel
 {
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @var TemplatingHelper
-     */
-    protected $templatingHelper;
-
-    /**
-     * @var ThemeHelper
-     */
-    protected $themeHelper;
-
-    /**
-     * @var SchemaHelperFactory
-     */
-    protected $schemaHelperFactory;
-
-    /**
-     * @var ActionModel
-     */
-    protected $formActionModel;
-
-    /**
-     * @var FieldModel
-     */
-    protected $formFieldModel;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fieldHelper;
-
-    /**
-     * @var LeadFieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
-     * @var FormUploader
-     */
-    private $formUploader;
-
-    /**
-     * @var SubmissionResultLoader
-     */
-    private $submissionResultLoader;
-
-    /**
-     * FormModel constructor.
-     *
-     * @param RequestStack           $requestStack
-     * @param TemplatingHelper       $templatingHelper
-     * @param ThemeHelper            $themeHelper
-     * @param SchemaHelperFactory    $schemaHelperFactory
-     * @param ActionModel            $formActionModel
-     * @param FieldModel             $formFieldModel
-     * @param LeadModel              $leadModel
-     * @param FormFieldHelper        $fieldHelper
-     * @param LeadFieldModel         $leadFieldModel
-     * @param FormUploader           $formUploader
-     * @param SubmissionResultLoader $submissionResultLoader
-     */
     public function __construct(
-        RequestStack $requestStack,
-        TemplatingHelper $templatingHelper,
-        ThemeHelper $themeHelper,
-        SchemaHelperFactory $schemaHelperFactory,
-        ActionModel $formActionModel,
-        FieldModel $formFieldModel,
-        LeadModel $leadModel,
-        FormFieldHelper $fieldHelper,
-        LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader,
-        SubmissionResultLoader $submissionResultLoader
+        protected RequestStack $requestStack,
+        protected Environment $twig,
+        protected ThemeHelperInterface $themeHelper,
+        protected ActionModel $formActionModel,
+        protected FieldModel $formFieldModel,
+        protected FormFieldHelper $fieldHelper,
+        private PrimaryCompanyHelper $primaryCompanyHelper,
+        protected LeadFieldModel $leadFieldModel,
+        private FormUploader $formUploader,
+        private ContactTracker $contactTracker,
+        private ColumnSchemaHelper $columnSchemaHelper,
+        private TableSchemaHelper $tableSchemaHelper,
+        private MappedObjectCollectorInterface $mappedObjectCollector,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->request                = $requestStack->getCurrentRequest();
-        $this->templatingHelper       = $templatingHelper;
-        $this->themeHelper            = $themeHelper;
-        $this->schemaHelperFactory    = $schemaHelperFactory;
-        $this->formActionModel        = $formActionModel;
-        $this->formFieldModel         = $formFieldModel;
-        $this->leadModel              = $leadModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->formUploader           = $formUploader;
-        $this->submissionResultLoader = $submissionResultLoader;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\FormBundle\Entity\FormRepository
+     * @return FormRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Form');
+        return $this->em->getRepository(Form::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getNameGetter()
+    public function getNameGetter(): string
     {
         return 'getName';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -171,31 +97,33 @@ class FormModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('mauticform', $entity, $options);
+        return $formFactory->create(FormType::class, $entity, $options);
     }
 
     /**
-     * @param null $id
-     *
-     * @return Form
+     * @param string|int|null $id
      */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?Form
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Form();
         }
 
-        return parent::getEntity($id);
+        $entity = parent::getEntity($id);
+
+        if ($entity && $entity->getFields()) {
+            foreach ($entity->getFields() as $field) {
+                $this->addMappedFieldOptions($field);
+            }
+        }
+
+        return $entity;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return bool|FormEvent|void
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -224,7 +152,7 @@ class FormModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -232,11 +160,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param Form $entity
-     * @param      $sessionFields
-     */
-    public function setFields(Form $entity, $sessionFields)
+    public function setFields(Form $entity, $sessionFields): void
     {
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
@@ -271,8 +195,16 @@ class FormModel extends CommonFormModel
             }
             $field->setForm($entity);
             $field->setSessionId($key);
-            $field->setOrder($order);
-            ++$order;
+            if (!$field->getParent()) {
+                $field->setOrder($order);
+                ++$order;
+            } else {
+                if (isset($sessionFields[$field->getParent()]['order'])) {
+                    $field->setOrder($sessionFields[$field->getParent()]['order']);
+                } else {
+                    $field->setOrder($order);
+                }
+            }
             $entity->addField($properties['id'], $field);
         }
 
@@ -282,11 +214,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param Form $entity
-     * @param      $sessionFields
-     */
-    public function deleteFields(Form $entity, $sessionFields)
+    public function deleteFields(Form $entity, $sessionFields): void
     {
         if (empty($sessionFields)) {
             return;
@@ -309,7 +237,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    private function handleFilesDelete(Field $field)
+    private function handleFilesDelete(Field $field): void
     {
         if (!$field->isFileType()) {
             return;
@@ -318,19 +246,15 @@ class FormModel extends CommonFormModel
         $this->formUploader->deleteAllFilesOfFormField($field);
     }
 
-    /**
-     * @param Form $entity
-     * @param      $sessionActions
-     */
-    public function setActions(Form $entity, $sessionActions)
+    public function setActions(Form $entity, $sessionActions): void
     {
         $order           = 1;
         $existingActions = $entity->getActions()->toArray();
         $savedFields     = $entity->getFields()->toArray();
 
-        //match sessionId with field Id to update mapped fields
+        // match sessionId with field Id to update mapped fields
         $fieldIds = [];
-        foreach ($savedFields as $id => $field) {
+        foreach ($savedFields as $field) {
             $fieldIds[$field->getSessionId()] = $field->getId();
         }
 
@@ -345,10 +269,10 @@ class FormModel extends CommonFormModel
 
                 $func = 'set'.ucfirst($f);
 
-                if ($f == 'properties') {
+                if ('properties' == $f) {
                     if (isset($v['mappedFields'])) {
                         foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (strpos($pv, 'new') !== false) {
+                            if (str_contains($pv, 'new')) {
                                 $v['mappedFields'][$pk] = $fieldIds[$pv];
                             }
                         }
@@ -372,10 +296,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form  $entity
      * @param array $actions
      */
-    public function deleteActions(Form $entity, $actions)
+    public function deleteActions(Form $entity, $actions): void
     {
         if (empty($actions)) {
             return;
@@ -385,7 +308,7 @@ class FormModel extends CommonFormModel
         $deleteActions   = [];
         foreach ($actions as $actionId) {
             if (isset($existingActions[$actionId])) {
-                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $actionEntity = $this->em->getReference(Action::class, (int) $actionId);
                 $entity->removeAction($actionEntity);
                 $deleteActions[] = $actionId;
             }
@@ -397,10 +320,7 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         $isNew = ($entity->getId()) ? false : true;
 
@@ -409,10 +329,12 @@ class FormModel extends CommonFormModel
             $entity->setAlias($alias);
         }
 
-        //save the form so that the ID is available for the form html
+        $this->backfillReplacedPropertiesForBc($entity);
+
+        // save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
 
-        //now build the form table
+        // now build the form table
         if ($entity->getId()) {
             $this->createTableSchema($entity, $isNew);
         }
@@ -421,15 +343,32 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Obtains the content.
+     *
+     * @param bool|true $withScript
+     * @param bool|true $useCache
+     */
+    public function getContent(Form $form, $withScript = true, $useCache = true): string
+    {
+        $html = $this->getFormHtml($form, $useCache);
+
+        if ($withScript) {
+            $html = $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
+        } else {
+            $html = $this->removeScriptTag($html);
+        }
+
+        return $html;
+    }
+
+    /**
      * Obtains the cached HTML of a form and generates it if missing.
      *
-     * @param Form      $form
-     * @param bool|true $withScript
      * @param bool|true $useCache
      *
      * @return string
      */
-    public function getContent(Form $form, $withScript = true, $useCache = true)
+    public function getFormHtml(Form $form, $useCache = true)
     {
         if ($useCache && !$form->usesProgressiveProfiling()) {
             $cachedHtml = $form->getCachedHtml();
@@ -443,23 +382,16 @@ class FormModel extends CommonFormModel
             $this->populateValuesWithLead($form, $cachedHtml);
         }
 
-        if ($withScript) {
-            $cachedHtml = $this->getFormScript($form)."\n\n".$cachedHtml;
-        }
-
         return $cachedHtml;
     }
 
     /**
      * Get results for a form and lead.
      *
-     * @param Form $form
-     * @param int  $leadId
-     * @param int  $limit
-     *
-     * @return array
+     * @param int $leadId
+     * @param int $limit
      */
-    public function getLeadSubmissions(Form $form, $leadId, $limit = 200)
+    public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
     {
         return $this->getRepository()->getFormResults(
             $form,
@@ -473,49 +405,80 @@ class FormModel extends CommonFormModel
     /**
      * Generate the form's html.
      *
-     * @param Form $entity
      * @param bool $persist
-     *
-     * @return string
      */
-    public function generateHtml(Form $entity, $persist = true)
+    public function generateHtml(Form $entity, $persist = true): string
     {
-        //generate cached HTML
-        $theme       = $entity->getTemplate();
-        $submissions = null;
-        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
-        $style       = '';
+        // Use specific template or system-wide default theme
+        $theme         = $entity->getTemplate() ?? $this->coreParametersHelper->get('theme');
+        $submissions   = null;
+        $lead          = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
+        $style         = '';
+        $styleToRender = '@MauticForm/Builder/_style.html.twig';
+        $formToRender  = '@MauticForm/Builder/form.html.twig';
 
-        if (!empty($theme)) {
-            $theme .= '|';
+        if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
+            $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
+        }
+        if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
+            $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
         }
 
-        if ($lead && $entity->usesProgressiveProfiling()) {
+        if ($lead instanceof Lead && $lead->getId() && $entity->usesProgressiveProfiling()) {
             $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
         if ($entity->getRenderStyle()) {
-            $templating = $this->templatingHelper->getTemplating();
-            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
-            $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+            $styleTheme = $styleToRender;
+            $style      = $this->twig->render($this->themeHelper->checkForTwigTemplate($styleTheme));
         }
 
         // Determine pages
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, function ($a, $b) {
-            if ($a->getOrder() === $b->getOrder()) {
-                return 0;
+        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
+
+        $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
+        $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
+        [$pages, $lastPage] = $this->getPages($fields);
+        $html               = $this->twig->render(
+            $formToRender,
+            [
+                'fieldSettings'          => $this->getCustomComponents()['fields'],
+                'viewOnlyFields'         => $viewOnlyFields,
+                'fields'                 => $fields,
+                'mappedFields'           => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                'form'                   => $entity,
+                'theme'                  => '@themes/'.$entity->getTemplate().'/Field/',
+                'submissions'            => $submissions,
+                'lead'                   => $lead,
+                'formPages'              => $pages,
+                'lastFormPage'           => $lastPage,
+                'style'                  => $style,
+                'inBuilder'              => false,
+                'displayManager'         => $displayManager,
+                'successfulSubmitAction' => $this->coreParametersHelper->get('successful_submit_action'),
+            ]
+        );
+
+        if (!$entity->usesProgressiveProfiling()) {
+            $entity->setCachedHtml($html);
+
+            if ($persist) {
+                // bypass model function as events aren't needed for this
+                $this->getRepository()->saveEntity($entity);
             }
+        }
 
-            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
-        });
+        return $html;
+    }
 
+    public function getPages(array $fields): array
+    {
         $pages = ['open' => [], 'close' => []];
 
         $openFieldId  =
-        $closeFieldId =
         $previousId   =
         $lastPage     = false;
         $pageCount    = 1;
@@ -542,59 +505,29 @@ class FormModel extends CommonFormModel
             $previousId = $fieldId;
         }
 
-        if (!empty($pages)) {
-            if ($openFieldId) {
-                $pages['open'][$openFieldId] = $pageCount;
-            }
-            if ($previousId !== $lastPage) {
-                $pages['close'][$previousId] = $pageCount;
-            }
+        if ($openFieldId) {
+            $pages['open'][$openFieldId] = $pageCount;
+        }
+        if ($previousId !== $lastPage) {
+            $pages['close'][$previousId] = $pageCount;
         }
 
-        $html = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.php',
-            [
-                'fieldSettings' => $this->getCustomComponents()['fields'],
-                'fields'        => $fields,
-                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'form'          => $entity,
-                'theme'         => $theme,
-                'submissions'   => $submissions,
-                'lead'          => $lead,
-                'formPages'     => $pages,
-                'lastFormPage'  => $lastPage,
-                'style'         => $style,
-                'inBuilder'     => false,
-            ]
-        );
-        if (!$entity->usesProgressiveProfiling()) {
-            $entity->setCachedHtml($html);
-
-            if ($persist) {
-                //bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
-            }
-        }
-
-        return $html;
+        return [$pages, $lastPage];
     }
 
     /**
      * Creates the table structure for form results.
      *
-     * @param Form $entity
      * @param bool $isNew
      * @param bool $dropExisting
      */
-    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false)
+    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false): void
     {
-        //create the field as its own column in the leads table
-        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
+        // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
-            $schemaHelper->addTable([
+        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+            $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
                 'options' => [
@@ -602,68 +535,60 @@ class FormModel extends CommonFormModel
                     'uniqueIndex' => ['submission_id', 'form_id'],
                 ],
             ], true, $dropExisting);
-            $schemaHelper->executeChanges();
+            $this->tableSchemaHelper->executeChanges();
         } else {
-            //check to make sure columns exist
-            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('column', $name);
+            // check to make sure columns exist
+            $columnSchemaHelper = $this->columnSchemaHelper->setName($name);
             foreach ($columns as $c) {
-                if (!$schemaHelper->checkColumnExists($c['name'])) {
-                    $schemaHelper->addColumn($c, false);
+                if (!$columnSchemaHelper->checkColumnExists($c['name'])) {
+                    $columnSchemaHelper->addColumn($c, false);
                 }
             }
-            $schemaHelper->executeChanges();
+            $columnSchemaHelper->executeChanges();
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         /* @var Form $entity */
-        //parent::deleteEntity($entity);
-
         $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
-            //delete the associated results table
-            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
-            $schemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
-            $schemaHelper->executeChanges();
+            // delete the associated results table
+            $this->tableSchemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
+            $this->tableSchemaHelper->executeChanges();
         }
+        parent::deleteEntity($entity);
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed[] $ids
+     *
+     * @return mixed[]
      */
-    public function deleteEntities($ids)
+    public function deleteEntities($ids): array
     {
         $entities     = parent::deleteEntities($ids);
-        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
             /* @var Form $entity */
-            //delete the associated results table
-            $schemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
+            // delete the associated results table
+            $this->tableSchemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
             $this->deleteFormFiles($entity);
         }
-        $schemaHelper->executeChanges();
+        $this->tableSchemaHelper->executeChanges();
 
         return $entities;
     }
 
-    private function deleteFormFiles(Form $form)
+    private function deleteFormFiles(Form $form): void
     {
         $this->formUploader->deleteFilesOfForm($form);
     }
 
     /**
      * Generate an array of columns from fields.
-     *
-     * @param Form $form
-     *
-     * @return array
      */
-    public function generateFieldColumns(Form $form)
+    public function generateFieldColumns(Form $form): array
     {
         $fields = $form->getFields()->toArray();
 
@@ -679,7 +604,7 @@ class FormModel extends CommonFormModel
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
+            if (!in_array($f->getType(), $ignoreTypes)) {
                 $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
@@ -703,9 +628,9 @@ class FormModel extends CommonFormModel
         static $customComponents;
 
         if (empty($customComponents)) {
-            //build them
+            // build them
             $event = new FormBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
             $customComponents['fields']     = $event->getFormFields();
             $customComponents['actions']    = $event->getSubmitActions();
             $customComponents['choices']    = $event->getSubmitActionGroups();
@@ -726,63 +651,78 @@ class FormModel extends CommonFormModel
 
     /**
      * Get the document write javascript for the form.
-     *
-     * @param Form $form
-     *
-     * @return string
      */
-    public function getAutomaticJavascript(Form $form)
+    public function getAutomaticJavascript(Form $form): string
     {
-        $html = $this->getContent($form);
+        $html       = $this->getContent($form, false);
+        $formScript = $this->getFormScript($form);
 
-        //replace line breaks with literal symbol and escape quotations
-        $search  = ["\r\n", "\n", '"'];
-        $replace = ['', '', '\"'];
-        $html    = str_replace($search, $replace, $html);
+        // replace line breaks with literal symbol and escape quotations
+        $search        = ["\r\n", "\n", '"'];
+        $replace       = ['', '', '\"'];
+        $html          = str_replace($search, $replace, $html);
+        $oldFormScript = str_replace($search, $replace, $formScript);
+        $newFormScript = $this->generateJsScript($formScript);
 
-        return 'document.write("'.$html.'");';
+        // Write html for all browser and fallback for IE
+        $script = '
+            var scr  = document.currentScript;
+            var html = "'.$html.'";
+
+            if (scr !== undefined) {
+                scr.insertAdjacentHTML("afterend", html);
+                '.$newFormScript.'
+            } else {
+                document.write("'.$oldFormScript.'"+html);
+            }
+        ';
+
+        return $script;
     }
 
-    /**
-     * @param Form $form
-     *
-     * @return string
-     */
-    public function getFormScript(Form $form)
+    public function getFormScript(Form $form): string
     {
-        $theme = $form->getTemplate();
+        $theme          = $form->getTemplate();
+        $scriptToRender = '@MauticForm/Builder/_script.html.twig';
 
         if (!empty($theme)) {
-            $theme .= '|';
+            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/MauticForm/Builder/_script.html.twig')) {
+                $scriptToRender = '@themes/'.$theme.'/MauticForm/Builder/_script.html.twig';
+            }
         }
 
-        $script = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:script.html.php',
+        $script = $this->twig->render(
+            $scriptToRender,
             [
                 'form'  => $form,
                 'theme' => $theme,
             ]
         );
 
+        $html    = $this->getFormHtml($form);
+        $scripts = $this->extractScriptTag($html);
+
+        foreach ($scripts as $item) {
+            $script .= $item."\n";
+        }
+
         return $script;
     }
 
     /**
      * Writes in form values from get parameters.
-     *
-     * @param $form
-     * @param $formHtml
      */
-    public function populateValuesWithGetParameters(Form $form, &$formHtml)
+    public function populateValuesWithGetParameters(Form $form, &$formHtml): void
     {
         $formName = $form->generateFormName();
+        $request  = $this->requestStack->getCurrentRequest();
 
         $fields = $form->getFields()->toArray();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
+        /** @var Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();
-            if ($this->request->query->has($alias)) {
-                $value = $this->request->query->get($alias);
+            if ($request->query->has($alias)) {
+                $value = urlencode($request->query->get($alias));
 
                 $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }
@@ -790,40 +730,53 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $form
-     * @param      $formHtml
+     * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml)
+    public function populateValuesWithLead(Form $form, &$formHtml): void
     {
-        $formName = $form->generateFormName();
-        $lead     = $this->leadModel->getCurrentLead();
+        $formName          = $form->generateFormName();
+        $fields            = $form->getFields();
+        $autoFillFields    = [];
+        $objectsToAutoFill = ['contact', 'company'];
 
+        /** @var Field $field */
+        foreach ($fields as $key => $field) {
+            // we want work just with matched autofill fields
+            if (
+                $field->getMappedField()
+                && $field->getIsAutoFill()
+                && in_array($field->getMappedObject(), $objectsToAutoFill)
+            ) {
+                $autoFillFields[$key] = $field;
+            }
+        }
+
+        // no fields for populate
+        if (!count($autoFillFields)) {
+            return;
+        }
+
+        $lead = $this->contactTracker->getContact();
         if (!$lead instanceof Lead) {
             return;
         }
 
-        $fields = $form->getFields();
-        /** @var \Mautic\FormBundle\Entity\Field $f */
-        foreach ($fields as $f) {
-            $leadField  = $f->getLeadField();
-            $isAutoFill = $f->getIsAutoFill();
+        // get the contact (lead) and primary company field values
+        $leadArray = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+        if (!is_array($leadArray) || count($leadArray) <= 0) {
+            return;
+        }
 
-            if (isset($leadField) && $isAutoFill) {
-                $value = $lead->getFieldValue($leadField);
-
-                if (!empty($value)) {
-                    $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
-                }
+        foreach ($autoFillFields as $field) {
+            $value = $leadArray[$field->getMappedField()] ?? '';
+            // just skip string empty field
+            if ('' !== $value) {
+                $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
     }
 
-    /**
-     * @param null $operator
-     *
-     * @return array
-     */
-    public function getFilterExpressionFunctions($operator = null)
+    public function getFilterExpressionFunctions($operator = null): array
     {
         $operatorOptions = [
             '=' => [
@@ -866,19 +819,32 @@ class FormModel extends CommonFormModel
                 'expr'        => 'notLike',
                 'negate_expr' => 'like',
             ],
+            'startsWith' => [
+                'label'       => 'mautic.core.operator.starts.with',
+                'expr'        => 'startsWith',
+                'negate_expr' => 'startsWith',
+            ],
+            'endsWith' => [
+                'label'       => 'mautic.core.operator.ends.with',
+                'expr'        => 'endsWith',
+                'negate_expr' => 'endsWith',
+            ],
+            'contains' => [
+                'label'       => 'mautic.core.operator.contains',
+                'expr'        => 'contains',
+                'negate_expr' => 'contains',
+            ],
         ];
 
-        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+        return (null === $operator) ? $operatorOptions : $operatorOptions[$operator];
     }
 
     /**
      * Get a list of assets in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param array     $options
+     * @param int   $limit
+     * @param array $filters
+     * @param array $options
      *
      * @return array
      */
@@ -898,8 +864,206 @@ class FormModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
+    }
 
-        return $results;
+    /**
+     * Load HTML consider Libxml < 2.7.8.
+     */
+    private function loadHTML(&$dom, $html): void
+    {
+        if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
+            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        } else {
+            $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'));
+        }
+    }
+
+    /**
+     * Save HTML consider Libxml < 2.7.8.
+     *
+     * @return string
+     */
+    private function saveHTML($dom, $html)
+    {
+        if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
+            return $dom->saveHTML($html);
+        } else {
+            // remove DOCTYPE, <html>, and <body> tags for old libxml
+            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
+        }
+    }
+
+    /**
+     * Extract script from html.
+     */
+    private function extractScriptTag($html): array
+    {
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $this->loadHTML($dom, $html);
+        $items = $dom->getElementsByTagName('script');
+
+        $scripts = [];
+        foreach ($items as $script) {
+            $scripts[] = $this->saveHTML($dom, $script);
+        }
+
+        return $scripts;
+    }
+
+    /**
+     * Remove script from html.
+     */
+    private function removeScriptTag($html): string
+    {
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $this->loadHTML($dom, '<div>'.$html.'</div>');
+        $items = $dom->getElementsByTagName('script');
+
+        $remove = [];
+        foreach ($items as $item) {
+            $remove[] = $item;
+        }
+
+        foreach ($remove as $item) {
+            $item->parentNode->removeChild($item);
+        }
+
+        $root   = $dom->documentElement;
+        $result = '';
+        foreach ($root->childNodes as $childNode) {
+            $result .= $this->saveHTML($dom, $childNode);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate dom manipulation javascript to include all script.
+     */
+    private function generateJsScript($html): string
+    {
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $this->loadHTML($dom, '<div>'.$html.'</div>');
+        $items = $dom->getElementsByTagName('script');
+
+        $javascript = '';
+        foreach ($items as $key => $script) {
+            if ($script->hasAttribute('src')) {
+                $javascript .= "
+                var script$key = document.createElement('script');
+                script$key.src = '".$script->getAttribute('src')."';
+                document.getElementsByTagName('head')[0].appendChild(script$key);";
+            } else {
+                $scriptContent = $script->nodeValue;
+                $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
+
+                $javascript .= "
+                var inlineScript$key = document.createTextNode(\"$scriptContent\");
+                var script$key       = document.createElement('script');
+                script$key.appendChild(inlineScript$key);
+                document.getElementsByTagName('head')[0].appendChild(script$key);";
+            }
+        }
+
+        return $javascript;
+    }
+
+    /**
+     * Finds out whether the.
+     */
+    private function addMappedFieldOptions(Field $formField): void
+    {
+        $formFieldProps   = $formField->getProperties();
+        $mappedFieldAlias = $formField->getMappedField();
+
+        if (empty($formFieldProps['syncList']) || empty($mappedFieldAlias) || 'contact' !== $formField->getMappedObject()) {
+            return;
+        }
+
+        $list = $this->getContactFieldPropertiesList($mappedFieldAlias);
+
+        if (!empty($list)) {
+            $formFieldProps['list'] = ['list' => $list];
+            if (array_key_exists('optionlist', $formFieldProps)) {
+                $formFieldProps['optionlist'] = ['list' => $list];
+            }
+            $formField->setProperties($formFieldProps);
+        }
+    }
+
+    /**
+     * @return mixed[]|null
+     */
+    public function getContactFieldPropertiesList(string $contactFieldAlias): ?array
+    {
+        $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias); // @todo this must use all objects as well. Not just contact.
+
+        if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
+            return null;
+        }
+
+        $contactFieldProps = $contactField->getProperties();
+
+        switch ($contactField->getType()) {
+            case 'select':
+            case 'multiselect':
+            case 'lookup':
+                $list = $contactFieldProps['list'] ?? [];
+                break;
+            case 'boolean':
+                $list = [$contactFieldProps['no'], $contactFieldProps['yes']];
+                break;
+            case 'country':
+                $list = ContactFieldHelper::getCountryChoices();
+                break;
+            case 'region':
+                $list = ContactFieldHelper::getRegionChoices();
+                break;
+            case 'timezone':
+                $list = ContactFieldHelper::getTimezonesChoices();
+                break;
+            case 'locale':
+                $list = ContactFieldHelper::getLocaleChoices();
+                break;
+            default:
+                return null;
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param string $fieldAlias
+     *
+     * @return Field|null
+     */
+    public function findFormFieldByAlias(Form $form, $fieldAlias)
+    {
+        foreach ($form->getFields() as $field) {
+            if ($field->getAlias() === $fieldAlias) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    private function backfillReplacedPropertiesForBc(Form $entity): void
+    {
+        /** @var Field $field */
+        foreach ($entity->getFields() as $field) {
+            if (!$field->getLeadField() && $field->getMappedField()) {
+                $field->setLeadField($field->getMappedField());
+            } elseif ($field->getLeadField() && !$field->getMappedField()) {
+                $field->setMappedField($field->getLeadField());
+                $field->setMappedObject(
+                    str_starts_with($field->getLeadField(), 'company') && 'company' !== $field->getLeadField() ? 'company' : 'contact'
+                );
+            }
+        }
     }
 }

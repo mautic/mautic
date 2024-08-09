@@ -1,15 +1,6 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\CoreBundle\Tests\Validator;
+namespace Mautic\FormBundle\Tests\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
@@ -21,14 +12,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class UploadFieldValidatorTest extends \PHPUnit_Framework_TestCase
+class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox No Files given
      *
      * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
-    public function testNoFilesGiven()
+    public function testNoFilesGiven(): void
     {
         $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
             ->disableOriginalConstructor()
@@ -63,7 +54,7 @@ class UploadFieldValidatorTest extends \PHPUnit_Framework_TestCase
      *
      * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
-    public function testValidationFailed()
+    public function testValidationFailed(): void
     {
         $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
             ->disableOriginalConstructor()
@@ -113,7 +104,7 @@ class UploadFieldValidatorTest extends \PHPUnit_Framework_TestCase
      *
      * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
-    public function testFileIsValid()
+    public function testFileIsValid(): void
     {
         $fileUploadValidatorMock = $this->getMockBuilder(FileUploadValidator::class)
             ->disableOriginalConstructor()

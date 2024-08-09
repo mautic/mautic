@@ -1,107 +1,66 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * FrequecyRuleRepository.
+ * @extends CommonRepository<FrequencyRule>
  */
 class FrequencyRuleRepository extends CommonRepository
 {
     /**
-     * @param        $channel
-     * @param        $leadIds
-     * @param        $defaultFrequencyNumber
-     * @param        $defaultFrequencyTime
-     * @param string $statTable
-     * @param string $statSentColumn
-     * @param string $statContactColumn
-     *
-     * @return array
+     * @param string      $channel
+     * @param array       $leadIds
+     * @param string|null $defaultFrequencyNumber
+     * @param string|null $defaultFrequencyTime
+     * @param string      $statTable
+     * @param string      $statSentColumn
+     * @param string      $statContactColumn
      */
-    public function getAppliedFrequencyRules($channel, $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime, $statTable = 'email_stats', $statContactColumn = 'lead_id', $statSentColumn = 'date_sent')
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder();
-
-        $selectFrequency = ($defaultFrequencyNumber) ? 'IFNULL(fr.frequency_number,:defaultNumber) as frequency_number' : 'fr.frequency_number';
-        $selectNumber    = ($defaultFrequencyTime) ? 'IFNULL(fr.frequency_time,:frequencyTime) as frequency_time' : 'fr.frequency_time';
-
-        $q->select("ch.$statContactColumn, $selectFrequency, $selectNumber")
-            ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
-            ->leftJoin('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
-
-        if ($channel) {
-            $q->andWhere('fr.channel = :channel or fr.channel is null')
-                ->setParameter('channel', $channel);
-        }
-
-        if (!empty($defaultFrequencyTime)) {
-            $q->andWhere('ch.'.$statSentColumn.' >= case fr.frequency_time 
-                    when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH) 
-                    when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY) 
-                    when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
-                    else DATE_SUB(NOW(),INTERVAL 1 '.$defaultFrequencyTime.')
-                    end')
-                ->setParameter('frequencyTime', $defaultFrequencyTime);
-        } else {
-            $q->andWhere('(ch.'.$statSentColumn.' >= case fr.frequency_time
-                     when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH)
-                     when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY)
-                     when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
-                    end)');
-        }
-
+    public function getAppliedFrequencyRules(
+        $channel,
+        $leadIds,
+        $defaultFrequencyNumber,
+        $defaultFrequencyTime,
+        $statTable = 'email_stats',
+        $statContactColumn = 'lead_id',
+        $statSentColumn = 'date_sent'
+    ): array {
         if (empty($leadIds)) {
-            // Preventative for fetching every single email stat
-            $leadIds = [0];
-        }
-        $q->andWhere(
-            $q->expr()->in("ch.$statContactColumn", $leadIds)
-        );
-
-        $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
-
-        $havingAnd = 'AND '.$q->expr()->in("ch.$statContactColumn", $leadIds);
-        if ($defaultFrequencyNumber != null) {
-            $q->having("(count(ch.$statContactColumn) >= IFNULL(fr.frequency_number,:defaultNumber) $havingAnd)")
-                ->setParameter('defaultNumber', $defaultFrequencyNumber);
-        } else {
-            $q->having("(count(ch.$statContactColumn) >= fr.frequency_number $havingAnd)");
+            return [];
         }
 
-        $results = $q->execute()->fetchAll();
+        $frequencyRuleViolations = $this->getCustomFrequencyRuleViolations($channel, $leadIds, $statTable, $statContactColumn, $statSentColumn);
 
-        return $results;
+        if (!$this->validateDefaultParameters($defaultFrequencyNumber, $defaultFrequencyTime)) {
+            // It makes no sense to calculate default rule violations
+            // if default parameters are not valid
+            return $frequencyRuleViolations;
+        }
+
+        $defaultRuleViolations = $this->getDefaultFrequencyRuleViolations($leadIds, $defaultFrequencyNumber, $defaultFrequencyTime, $statTable, $statContactColumn, $statSentColumn);
+
+        return array_merge($frequencyRuleViolations, $defaultRuleViolations);
     }
 
-    /**
-     * @param null $channel
-     * @param null $leadIds
-     *
-     * @return array
-     */
-    public function getFrequencyRules($channel = null, $leadIds = null)
+    private function validateDefaultParameters(mixed $number, mixed $time): bool
+    {
+        return $number && $time;
+    }
+
+    public function getFrequencyRules($channel = null, $leadIds = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select(
             'fr.id, fr.frequency_time, fr.frequency_number, fr.channel, fr.preferred_channel, fr.pause_from_date, fr.pause_to_date, fr.lead_id'
         )
-          ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr');
+            ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr');
 
         if ($channel) {
             $q->andWhere('fr.channel = :channel')
-              ->setParameter('channel', $channel);
+                ->setParameter('channel', $channel);
         }
 
         $groupByLeads = is_array($leadIds);
@@ -112,11 +71,11 @@ class FrequencyRuleRepository extends CommonRepository
                 );
             } else {
                 $q->andWhere('fr.lead_id = :leadId')
-                  ->setParameter('leadId', (int) $leadIds);
+                    ->setParameter('leadId', (int) $leadIds);
             }
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         $frequencyRules = [];
 
@@ -135,12 +94,7 @@ class FrequencyRuleRepository extends CommonRepository
         return $frequencyRules;
     }
 
-    /**
-     * @param $leadId
-     *
-     * @return array
-     */
-    public function getPreferredChannel($leadId)
+    public function getPreferredChannel($leadId): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -153,7 +107,119 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('leadId', $leadId);
         }
 
-        $results = $q->execute()->fetchAll();
+        return $q->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @param string $channel
+     * @param string $statTable
+     * @param string $statContactColumn
+     * @param string $statSentColumn
+     */
+    private function getCustomFrequencyRuleViolations($channel, array $leadIds, $statTable, $statContactColumn, $statSentColumn): array
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select("ch.$statContactColumn, fr.frequency_number, fr.frequency_time")
+            ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
+            ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
+
+        if ($channel) {
+            $q->andWhere('fr.channel = :channel')
+                ->setParameter('channel', $channel);
+        }
+
+        // Preferred channel is stored in this table so they may not have a frequency rule defined but just a preference so exclude them
+        $q->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
+
+        // Calculate the rule timeframe
+        $q->andWhere(
+            '(ch.'.$statSentColumn.' >= case fr.frequency_time
+                 when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH)
+                 when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY)
+                 when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
+                end)'
+        );
+
+        $q->andWhere(
+            $q->expr()->in("ch.$statContactColumn", $leadIds)
+        );
+
+        $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
+
+        $q->having("count(ch.$statContactColumn) >= fr.frequency_number");
+
+        return $q->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @param string $defaultFrequencyNumber
+     * @param string $defaultFrequencyTime
+     * @param string $statTable
+     * @param string $statContactColumn
+     * @param string $statSentColumn
+     *
+     * @return array
+     */
+    private function getDefaultFrequencyRuleViolations(
+        array $leadIds,
+        $defaultFrequencyNumber,
+        $defaultFrequencyTime,
+        $statTable,
+        $statContactColumn,
+        $statSentColumn
+    ) {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $query->select("ch.$statContactColumn")
+            ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch');
+
+        switch ($defaultFrequencyTime) {
+            case 'MONTH':
+                $since = new \DateTime('-1 month', new \DateTimeZone('UTC'));
+                break;
+            case 'WEEK':
+                $since = new \DateTime('-1 week', new \DateTimeZone('UTC'));
+                break;
+            case 'DAY':
+                $since = new \DateTime('-1 day', new \DateTimeZone('UTC'));
+                break;
+            default:
+                return [];
+        }
+
+        $query->andWhere('ch.'.$statSentColumn.' >= :frequencyTime')
+            ->setParameter('frequencyTime', $since->format('Y-m-d H:i:s'));
+
+        $query->andWhere(
+            $query->expr()->in("ch.$statContactColumn", $leadIds)
+        );
+
+        $hasCustomRules = $this->tableHasRows(MAUTIC_TABLE_PREFIX.'lead_frequencyrules');
+        // We don't need to check if users have custom rules if there are no records inside that table
+        if ($hasCustomRules) {
+            // Exclude contacts with custom rules defined
+            $subQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $subQuery->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr')
+                ->where("fr.lead_id = ch.{$statContactColumn}")
+                ->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
+            $query->andWhere(
+                sprintf('NOT EXISTS (%s)', $subQuery->getSQL())
+            );
+        }
+
+        $query->groupBy("ch.$statContactColumn");
+
+        $query->having("count(ch.$statContactColumn) >= :defaultNumber")
+            ->setParameter('defaultNumber', $defaultFrequencyNumber);
+
+        $results = $query->executeQuery()->fetchAllAssociative();
+
+        foreach ($results as $key => $result) {
+            $results[$key]['frequency_number'] = $defaultFrequencyNumber;
+            $results[$key]['frequency_time']   = $defaultFrequencyTime;
+        }
 
         return $results;
     }

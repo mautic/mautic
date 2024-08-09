@@ -1,0 +1,9 @@
+{
+  "version": "3.0.1-alpha",
+  "stability": "alpha",
+  "minimum_php_version": "7.2.21",
+  "maximum_php_version": "7.3.99",
+  "show_php_version_warning_if_under": "7.3.0",
+  "minimum_mautic_version": "3.0.0-alpha",
+  "announcement_url": ""
+}

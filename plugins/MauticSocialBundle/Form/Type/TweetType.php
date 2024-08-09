@@ -1,47 +1,38 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Form\Type\AssetListType;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\PageBundle\Form\Type\PageListType;
+use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<Tweet>
+ */
 class TweetType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @param EntityManager $em
-     */
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        protected EntityManager $em
+    ) {
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.name',
                 'required'   => true,
@@ -62,7 +53,7 @@ class TweetType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.description',
                 'required'   => false,
@@ -76,7 +67,7 @@ class TweetType extends AbstractType
 
         $builder->add(
             'text',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.text',
                 'required'   => true,
@@ -95,14 +86,14 @@ class TweetType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticAssetBundle:Asset', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\AssetBundle\Entity\Asset::class, 'id');
         $builder->add(
-                $builder->create(
+            $builder->create(
                 'asset',
-                'asset_list',
+                AssetListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
@@ -113,14 +104,14 @@ class TweetType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
         $builder->add(
             $builder->create(
                 'page',
-                'page_list',
+                PageListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
@@ -133,7 +124,7 @@ class TweetType extends AbstractType
 
         $builder->add(
             'handle',
-            'button',
+            ButtonType::class,
             [
                 'label' => 'mautic.social.twitter.handle',
                 'attr'  => [
@@ -142,22 +133,22 @@ class TweetType extends AbstractType
             ]
         );
 
-        //add category
-        $builder->add('category', 'category', [
+        // add category
+        $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);
 
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                 ]
             );
             $builder->add(
                 'updateSelect',
-                'hidden',
+                HiddenType::class,
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
@@ -166,7 +157,7 @@ class TweetType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons'
+                FormButtonsType::class
             );
         }
 
@@ -175,15 +166,12 @@ class TweetType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setOptional(['update_select']);
+        $resolver->setDefined(['update_select']);
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'twitter_tweet';
     }

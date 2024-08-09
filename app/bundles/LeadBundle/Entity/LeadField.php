@@ -1,29 +1,23 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
+use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadField.
- */
-class LeadField extends FormEntity
+class LeadField extends FormEntity implements CacheInvalidateInterface
 {
+    public const CACHE_NAMESPACE    = 'LeadField';
+
     /**
      * @var int
      */
@@ -45,12 +39,12 @@ class LeadField extends FormEntity
     private $type = 'text';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $group = 'core';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $defaultValue;
 
@@ -85,7 +79,7 @@ class LeadField extends FormEntity
     private $isPubliclyUpdatable = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isUniqueIdentifer = false;
 
@@ -96,13 +90,15 @@ class LeadField extends FormEntity
      */
     private $isUniqueIdentifier = false;
 
+    private ?int $charLengthLimit = 64;
+
     /**
-     * @var int
+     * @var int|null
      */
     private $order = 1;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $object = 'lead';
 
@@ -111,6 +107,29 @@ class LeadField extends FormEntity
      */
     private $properties = [];
 
+    private ?bool $isIndex = false;
+
+    /**
+     * The column in lead_fields table was not created yet if this property is true.
+     * Entity cannot be published and we cannot work with it until column is created.
+     *
+     * @var bool
+     */
+    private $columnIsNotCreated = false;
+
+    /**
+     * This property contains an original value for $isPublished.
+     * $isPublished is always set on false if $columnIsNotCreated is true.
+     *
+     * @var bool
+     */
+    private $originalIsPublishedValue = false;
+
+    /**
+     * @var CustomFieldObject
+     */
+    private $customFieldObject;
+
     public function __clone()
     {
         $this->id = null;
@@ -118,17 +137,14 @@ class LeadField extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addLifecycleEvent('identifierWorkaround', 'postLoad');
 
         $builder->setTable('lead_fields')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadFieldRepository')
-            ->addIndex(['object'], 'search_by_object');
+            ->setCustomRepositoryClass(LeadFieldRepository::class)
+            ->addIndex(['object', 'field_order', 'is_published'], 'idx_object_field_order_is_published');
 
         $builder->addId();
 
@@ -175,6 +191,12 @@ class LeadField extends FormEntity
             ->build();
 
         $builder->addNullableField('isUniqueIdentifer', 'boolean', 'is_unique_identifer');
+        $builder->addNullableField('isIndex', 'boolean', 'is_index');
+
+        $builder->createField('charLengthLimit', 'integer')
+            ->columnName('char_length_limit')
+            ->nullable()
+            ->build();
 
         $builder->createField('order', 'integer')
             ->columnName('field_order')
@@ -188,29 +210,51 @@ class LeadField extends FormEntity
         $builder->createField('properties', 'array')
             ->nullable()
             ->build();
+
+        $builder->createField('columnIsNotCreated', 'boolean')
+            ->columnName('column_is_not_created')
+            ->option('default', false)
+            ->build();
+
+        $builder->createField('originalIsPublishedValue', 'boolean')
+            ->columnName('original_is_published_value')
+            ->option('default', false)
+            ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank(
             ['message' => 'mautic.lead.field.label.notblank']
         ));
 
+        $metadata->addPropertyConstraint('label', new Assert\Length([
+            'max'        => 191,
+            'maxMessage' => 'mautic.lead.field.label.maxlength',
+        ]));
+
         $metadata->addConstraint(new UniqueEntity([
             'fields'  => ['alias'],
             'message' => 'mautic.lead.field.alias.unique',
+        ]));
+
+        $metadata->addConstraint(new Assert\Callback([
+            'callback' => function (LeadField $field, ExecutionContextInterface $context): void {
+                $violations = $context->getValidator()->validate($field, [new FieldAliasKeyword()]);
+
+                if ($violations->count() > 0) {
+                    $context->buildViolation($violations->get(0)->getMessage())
+                        ->atPath('alias')
+                        ->addViolation();
+                }
+            },
         ]));
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('leadField')
             ->addListProperties(
@@ -228,12 +272,22 @@ class LeadField extends FormEntity
                 [
                     'defaultValue',
                     'isRequired',
-                    'isPubliclyUpdatable',
+                    'isFixed',
+                    'isListable',
+                    'isVisible',
+                    'isVisible',
+                    'isShortVisible',
                     'isUniqueIdentifier',
+                    'isPubliclyUpdatable',
                     'properties',
                 ]
             )
             ->build();
+    }
+
+    public function setId(?int $id = null): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -323,12 +377,13 @@ class LeadField extends FormEntity
     /**
      * Set defaultValue.
      *
-     * @param string $defaultValue
+     * @param string|array<string> $defaultValue
      *
      * @return LeadField
      */
     public function setDefaultValue($defaultValue)
     {
+        $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
 
@@ -415,9 +470,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set properties.
-     *
-     * @param string $properties
+     * @param mixed[] $properties
      *
      * @return LeadField
      */
@@ -430,9 +483,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get properties.
-     *
-     * @return string
+     * @return mixed[]
      */
     public function getProperties()
     {
@@ -463,10 +514,33 @@ class LeadField extends FormEntity
     {
         return $this->object;
     }
+
+    public function setCharLengthLimit(?int $charLengthLimit): LeadField
+    {
+        $this->isChanged('charLengthLimit', $charLengthLimit);
+        $this->charLengthLimit = $charLengthLimit;
+
+        return $this;
+    }
+
+    public function getCharLengthLimit(): ?int
+    {
+        return $this->charLengthLimit;
+    }
+
+    public function getCustomFieldObject(): string
+    {
+        if (!$this->customFieldObject) {
+            $this->customFieldObject = new CustomFieldObject($this);
+        }
+
+        return $this->customFieldObject->getObject();
+    }
+
     /**
      * Set object.
      *
-     * @param int $object
+     * @param string $object
      *
      * @return LeadField
      */
@@ -487,6 +561,7 @@ class LeadField extends FormEntity
     {
         return $this->order;
     }
+
     /**
      * Set isVisible.
      *
@@ -576,6 +651,10 @@ class LeadField extends FormEntity
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
     {
+        if ($isUniqueIdentifer) {
+            $this->isIndex = true;
+        }
+
         $this->isUniqueIdentifer = $this->isUniqueIdentifier = $isUniqueIdentifer;
 
         return $this;
@@ -674,7 +753,7 @@ class LeadField extends FormEntity
     /**
      * @param mixed $group
      */
-    public function setGroup($group)
+    public function setGroup($group): void
     {
         $this->group = $group;
     }
@@ -690,7 +769,7 @@ class LeadField extends FormEntity
     /**
      * @param mixed $isPubliclyUpdatable
      */
-    public function setIsPubliclyUpdatable($isPubliclyUpdatable)
+    public function setIsPubliclyUpdatable($isPubliclyUpdatable): void
     {
         $this->isPubliclyUpdatable = (bool) $isPubliclyUpdatable;
     }
@@ -698,8 +777,59 @@ class LeadField extends FormEntity
     /**
      * Workaround for mispelled isUniqueIdentifer.
      */
-    public function identifierWorkaround()
+    public function identifierWorkaround(): void
     {
         $this->isUniqueIdentifier = $this->isUniqueIdentifer;
+    }
+
+    public function isNew(): bool
+    {
+        return $this->getId() ? false : true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getColumnIsNotCreated()
+    {
+        return $this->columnIsNotCreated;
+    }
+
+    public function setColumnIsNotCreated(): void
+    {
+        $this->columnIsNotCreated       = true;
+        $this->originalIsPublishedValue = $this->getIsPublished();
+        $this->setIsPublished(false);
+    }
+
+    public function setColumnWasCreated(): void
+    {
+        $this->columnIsNotCreated = false;
+        $this->setIsPublished($this->getOriginalIsPublishedValue());
+    }
+
+    public function disablePublishChange(): bool
+    {
+        return 'email' === $this->getAlias() || $this->getColumnIsNotCreated();
+    }
+
+    public function getOriginalIsPublishedValue(): bool
+    {
+        return (bool) $this->originalIsPublishedValue;
+    }
+
+    public function getCacheNamespacesToDelete(): array
+    {
+        return [self::CACHE_NAMESPACE];
+    }
+
+    public function isIsIndex(): bool
+    {
+        return $this->isIndex;
+    }
+
+    public function setIsIndex(bool $indexable): void
+    {
+        $this->isIndex = $indexable;
     }
 }

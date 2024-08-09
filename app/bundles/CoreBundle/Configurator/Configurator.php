@@ -1,39 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Configurator;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Configurator.
- *
- * @author Marc Weistroff <marc.weistroff@gmail.com>
  * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Configurator
  */
 class Configurator
 {
     /**
      * Configuration filename.
-     *
-     * @var string
      */
-    protected $filename;
+    protected string $filename;
 
     /**
      * Array containing the steps.
      *
-     * @var StepInterface[]
+     * @var array<int, StepInterface[]>
      */
     protected $steps = [];
 
@@ -47,27 +34,20 @@ class Configurator
     /**
      * Configuration parameters.
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $parameters;
+    protected array $parameters;
 
-    /**
-     * Configurator constructor.
-     *
-     * @param PathsHelper $pathsHelper
-     */
     public function __construct(PathsHelper $pathsHelper)
     {
-        $this->filename   = $pathsHelper->getSystemPath('local_config');
+        $this->filename   = ParameterLoader::getLocalConfigFile($pathsHelper->getSystemPath('root').'/app');
         $this->parameters = $this->read();
     }
 
     /**
      * Check if the configuration path is writable.
-     *
-     * @return bool
      */
-    public function isFileWritable()
+    public function isFileWritable(): bool
     {
         // If there's already a file, check it
         if (file_exists($this->filename)) {
@@ -81,10 +61,9 @@ class Configurator
     /**
      * Add a step to the configurator.
      *
-     * @param StepInterface $step
-     * @param int           $priority
+     * @param int $priority
      */
-    public function addStep(StepInterface $step, $priority = 0)
+    public function addStep(StepInterface $step, $priority = 0): void
     {
         if (!isset($this->steps[$priority])) {
             $this->steps[$priority] = [];
@@ -99,7 +78,7 @@ class Configurator
      *
      * @param int $index
      *
-     * @return StepInterface
+     * @return StepInterface[]
      *
      * @throws \InvalidArgumentException
      */
@@ -115,11 +94,11 @@ class Configurator
     /**
      * Retrieves the loaded steps in sorted order.
      *
-     * @return array
+     * @return StepInterface[]
      */
     public function getSteps()
     {
-        if ($this->sortedSteps === []) {
+        if ([] === $this->sortedSteps) {
             $this->sortedSteps = $this->getSortedSteps();
         }
 
@@ -132,7 +111,7 @@ class Configurator
      *
      * @return StepInterface[]
      */
-    private function getSortedSteps()
+    private function getSortedSteps(): array
     {
         $sortedSteps = [];
         krsort($this->steps);
@@ -147,19 +126,17 @@ class Configurator
     /**
      * Retrieves the configuration parameters.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
     /**
      * Return the number of steps in the configurator.
-     *
-     * @return int
      */
-    public function getStepCount()
+    public function getStepCount(): int
     {
         return count($this->getSteps());
     }
@@ -167,9 +144,9 @@ class Configurator
     /**
      * Merges parameters to the main configuration.
      *
-     * @param array $parameters
+     * @param array<string, mixed> $parameters
      */
-    public function mergeParameters($parameters)
+    public function mergeParameters(array $parameters): void
     {
         $this->parameters = array_merge($this->parameters, $parameters);
     }
@@ -177,9 +154,9 @@ class Configurator
     /**
      * Fetches the requirements from the defined steps.
      *
-     * @return array
+     * @return array<string>
      */
-    public function getRequirements()
+    public function getRequirements(): array
     {
         $majors = [];
 
@@ -195,9 +172,9 @@ class Configurator
     /**
      * Fetches the optional settings from the defined steps.
      *
-     * @return array
+     * @return array<string>
      */
-    public function getOptionalSettings()
+    public function getOptionalSettings(): array
     {
         $minors = [];
 
@@ -212,16 +189,14 @@ class Configurator
 
     /**
      * Renders parameters as a string.
-     *
-     * @return string
      */
-    public function render()
+    public function render(): string
     {
         $string = "<?php\n";
         $string .= "\$parameters = array(\n";
 
         foreach ($this->parameters as $key => $value) {
-            if ($value !== '') {
+            if ('' !== $value) {
                 if (is_string($value)) {
                     $value = "'".addcslashes($value, '\\\'')."'";
                 } elseif (is_bool($value)) {
@@ -236,54 +211,45 @@ class Configurator
             }
         }
 
-        $string .= ");\n";
-
-        return $string;
+        return $string.");\n";
     }
 
     /**
-     * @param     $array
-     * @param int $level
-     *
-     * @return string
+     * @param array<mixed> $array
+     * @param int          $level
      */
-    protected function renderArray($array, $level = 1)
+    protected function renderArray($array, $level = 1): string
     {
         $string = "array(\n";
 
         $count = $counter = count($array);
         foreach ($array as $key => $value) {
-            if (is_string($key) or is_numeric($key)) {
-                if ($counter === $count) {
-                    $string .= str_repeat("\t", $level + 1);
-                }
-                $string .= '"'.$key.'" => ';
+            if ($counter === $count) {
+                $string .= str_repeat("\t", $level + 1);
             }
+            $string .= '\''.$key.'\' => ';
 
             if (is_array($value)) {
                 $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= '"'.addcslashes($value, '\\"').'"';
+                $string .= '\''.addcslashes((string) $value, '\\\'').'\'';
             }
 
             --$counter;
             if ($counter > 0) {
-                $string .= ", \n".str_repeat("\t", $level + 1);
+                $string .= ",\n".str_repeat("\t", $level + 1);
             }
         }
-        $string .= "\n".str_repeat("\t", $level).')';
 
-        return $string;
+        return $string.("\n".str_repeat("\t", $level).')');
     }
 
     /**
      * Writes parameters to file.
      *
-     * @return int
-     *
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws RuntimeException
      */
-    public function write()
+    public function write(): int
     {
         if (!$this->isFileWritable()) {
             throw new RuntimeException('Cannot write the config file, the destination is unwritable.');
@@ -291,7 +257,7 @@ class Configurator
 
         $return = file_put_contents($this->filename, $this->render());
 
-        if ($return === false) {
+        if (false === $return) {
             throw new RuntimeException('An error occurred while attempting to write the config file to the filesystem.');
         }
 
@@ -301,17 +267,18 @@ class Configurator
     /**
      * Reads parameters from file.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function read()
+    protected function read(): array
     {
         if (!file_exists($this->filename)) {
             return [];
         }
 
+        $parameters = [];
         include $this->filename;
 
         // Return the $parameters array defined in the file
-        return isset($parameters) ? $parameters : [];
+        return $parameters;
     }
 }

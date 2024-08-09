@@ -1,49 +1,34 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Form;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * User Form Type.
+ * @extends AbstractType<mixed>
  */
 class UserStepType extends AbstractType
 {
-    /**
-     * @var
-     */
-    private $session;
-
-    /**
-     * @param Session $session
-     */
-    public function __construct(Session $session)
-    {
-        $this->session = $session;
+    public function __construct(
+        private SessionInterface $session
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $storedData = $this->session->get('mautic.installer.user', new \stdClass());
 
         $builder->add(
             'firstname',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.core.firstname',
                 'label_attr'  => ['class' => 'control-label'],
@@ -62,7 +47,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'lastname',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.core.lastname',
                 'label_attr'  => ['class' => 'control-label'],
@@ -81,13 +66,13 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'email',
-            'email',
+            EmailType::class,
             [
                 'label'      => 'mautic.install.form.user.email',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    'preaddon' => 'fa fa-envelope',
+                    'preaddon' => 'ri-mail-line',
                 ],
                 'required'    => true,
                 'data'        => (!empty($storedData->email)) ? $storedData->email : '',
@@ -108,7 +93,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'username',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.user.username',
                 'label_attr' => ['class' => 'control-label'],
@@ -129,14 +114,14 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'password',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.install.form.user.password',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.user.user.form.help.passwordrequirements',
-                    'preaddon' => 'fa fa-lock',
+                    'preaddon' => 'ri-lock-fill',
                 ],
                 'required'    => true,
                 'constraints' => [
@@ -151,13 +136,16 @@ class UserStepType extends AbstractType
                             'minMessage' => 'mautic.install.password.minlength',
                         ]
                     ),
+                    new NotWeak([
+                        'message' => 'mautic.user.user.password.weak',
+                    ]),
                 ],
             ]
         );
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'pre_extra_buttons' => [
                     [
@@ -166,7 +154,7 @@ class UserStepType extends AbstractType
                         'type'  => 'submit',
                         'attr'  => [
                             'class'   => 'btn btn-success pull-right btn-next',
-                            'icon'    => 'fa fa-arrow-circle-right',
+                            'icon'    => 'ri-arrow-right-circle-line',
                             'onclick' => 'MauticInstaller.showWaitMessage(event);',
                         ],
                     ],
@@ -182,10 +170,7 @@ class UserStepType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'install_user_step';
     }

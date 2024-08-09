@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ImportRepository.
+ * @extends CommonRepository<Import>
  */
 class ImportRepository extends CommonRepository
 {
@@ -33,7 +24,7 @@ class ImportRepository extends CommonRepository
             ->andWhere($q->expr()->lt($this->getTableAlias().'.dateModified', ':delay'))
             ->setParameter('delay', (new \DateTime())->modify('-'.$ghostDelay.' hours'));
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
         }
@@ -44,8 +35,7 @@ class ImportRepository extends CommonRepository
     /**
      * Count how many imports with the status is there.
      *
-     * @param array $statuses
-     * @param int   $limit
+     * @param int $limit
      *
      * @return array
      */
@@ -56,7 +46,7 @@ class ImportRepository extends CommonRepository
             ->orderBy($this->getTableAlias().'.priority', 'ASC')
             ->addOrderBy($this->getTableAlias().'.dateAdded', 'DESC');
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
         }
@@ -66,12 +56,8 @@ class ImportRepository extends CommonRepository
 
     /**
      * Count how many imports with the status is there.
-     *
-     * @param array $statuses
-     *
-     * @return int
      */
-    public function countImportsWithStatuses(array $statuses)
+    public function countImportsWithStatuses(array $statuses): int
     {
         $q = $this->getQueryForStatuses($statuses);
         $q->select('COUNT(DISTINCT '.$this->getTableAlias().'.id) as theCount');
@@ -85,10 +71,7 @@ class ImportRepository extends CommonRepository
         return 0;
     }
 
-    /**
-     * @return int
-     */
-    public function countImportsInProgress()
+    public function countImportsInProgress(): int
     {
         return $this->countImportsWithStatuses([Import::IN_PROGRESS]);
     }
@@ -100,12 +83,7 @@ class ImportRepository extends CommonRepository
         return $q->where($q->expr()->in($this->getTableAlias().'.status', $statuses));
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'i';
     }

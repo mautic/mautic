@@ -1,0 +1,48 @@
+{#
+some stats: need more input on what type of form data to show.
+delete if it is not require
+#}
+<!-- some stats -->
+<div class="pa-md">
+    <div class="row">
+        <div class="col-sm-12">
+            {% if showVariants %}
+            <div class="text-right small">
+                <span>
+                    {% if isVariant %}
+                        <span data-chart="variant">{{ 'mautic.notification.variant.graph.variant'|trans }}</span>
+                    {% else %}
+                        <a data-chart="variant" href="javascript:void(0)">{{ 'mautic.notification.variant.graph.variant'|trans }}</a>
+                    {% endif %}
+                </span>
+                </span> | </span>
+                <span>
+                    {% if isVariant %}
+                        <a data-chart="all" href="javascript:void(0)">{{ 'mautic.notification.variant.graph.all'|trans }}</a>
+                    {% else %}
+                        <span data-chart="all">{{ 'mautic.notification.variant.graph.all'|trans }}</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+            <div class="panel">
+                <div class="panel-body box-layout">
+                    <div class="col-xs-4 va-m">
+                        <h5 class="text-white dark-md fw-sb mb-xs">
+                            <span class="ri-mail-line"></span>
+                            {{ 'mautic.notification.lead.list.comparison'|trans }}
+                        </h5>
+                    </div>
+                    <div class="col-xs-8 va-m" id="legend"></div>
+                </div>
+                <div class="pt-0 pl-15 pb-10 pr-15">
+                    <div>
+                        <canvas id="list-compare-chart" height="300"></canvas>
+                    </div>
+                </div>
+                <div id="list-compare-chart-data" class="hide">{{ stats|json_encode|raw }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ some stats -->

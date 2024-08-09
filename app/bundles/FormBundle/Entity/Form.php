@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -20,9 +13,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Form.
- */
 class Form extends FormEntity
 {
     /**
@@ -30,13 +20,20 @@ class Form extends FormEntity
      */
     private $id;
 
+    private ?string $language = null;
+
     /**
      * @var string
      */
     private $name;
 
     /**
-     * @var string
+     * @var string|null
+     */
+    private $formAttributes;
+
+    /**
+     * @var string|null
      */
     private $description;
 
@@ -46,67 +43,66 @@ class Form extends FormEntity
     private $alias;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cachedHtml;
 
     /**
      * @var string
      */
-    private $postAction = 'return';
+    private $postAction = 'message';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $postActionProperty;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     private $actions;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $inKioskMode = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $renderStyle = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateSubmitted" = "DESC"})
-     *
-     * @var ArrayCollection
+     * @var Collection<int, Submission>
      */
-    private $submissions;
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
+    private Collection $submissions;
 
     /**
      * @var int
@@ -114,16 +110,26 @@ class Form extends FormEntity
     public $submissionCount;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $formType;
+
+    /**
+     * @var bool|null
+     */
+    private $noIndex;
+
+    /**
+     * @var int|null
+     */
+    private $progressiveProfilingLimit;
 
     /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
      */
-    private $usesProgressiveProfiling = null;
+    private $usesProgressiveProfiling;
 
     public function __clone()
     {
@@ -132,9 +138,6 @@ class Form extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->fields      = new ArrayCollection();
@@ -142,19 +145,23 @@ class Form extends FormEntity
         $this->submissions = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('forms')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FormRepository');
+            ->setCustomRepositoryClass(FormRepository::class);
 
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->nullable()
+            ->build();
+
+        $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
         $builder->addCategory();
 
@@ -167,7 +174,7 @@ class Form extends FormEntity
             ->columnName('post_action')
             ->build();
 
-        $builder->createField('postActionProperty', 'string')
+        $builder->createField('postActionProperty', Types::TEXT)
             ->columnName('post_action_property')
             ->nullable()
             ->build();
@@ -211,12 +218,16 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
+
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
+
+        $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -241,24 +252,29 @@ class Form extends FormEntity
         $metadata->addPropertyConstraint('formType', new Assert\Choice([
             'choices' => ['standalone', 'campaign'],
         ]));
+
+        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
+            'value'   => 0,
+            'message' => 'mautic.form.form.progressive_profiling_limit.error',
+            'groups'  => ['progressiveProfilingLimit'],
+        ]));
     }
 
-    /**
-     * @param \Symfony\Component\Form\Form $form
-     *
-     * @return array
-     */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
     {
         $data   = $form->getData();
         $groups = ['form'];
 
         $postAction = $data->getPostAction();
 
-        if ($postAction == 'message') {
+        if ('message' == $postAction) {
             $groups[] = 'messageRequired';
-        } elseif ($postAction == 'redirect') {
+        } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        }
+
+        if ('' != $data->getProgressiveProfilingLimit()) {
+            $groups[] = 'progressiveProfilingLimit';
         }
 
         return $groups;
@@ -266,10 +282,8 @@ class Form extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('form')
             ->addListProperties(
@@ -294,19 +308,18 @@ class Form extends FormEntity
                     'formType',
                     'postAction',
                     'postActionProperty',
+                    'noIndex',
+                    'formAttributes',
+                    'language',
                 ]
             )
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
-        if ($prop == 'actions' || $prop == 'fields') {
-            //changes are already computed so just add them
+        if ('actions' == $prop || 'fields' == $prop) {
+            // changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {
             parent::isChanged($prop, $val);
@@ -314,8 +327,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -324,8 +335,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Form
@@ -339,8 +348,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -349,8 +356,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return Form
@@ -364,8 +369,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription($truncate = false, $length = 45)
@@ -380,8 +383,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Set cachedHtml.
-     *
      * @param string $cachedHtml
      *
      * @return Form
@@ -394,8 +395,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Get cachedHtml.
-     *
      * @return string
      */
     public function getCachedHtml()
@@ -404,9 +403,7 @@ class Form extends FormEntity
     }
 
     /**
-     * Get render style.
-     *
-     * @return string
+     * @return bool|null
      */
     public function getRenderStyle()
     {
@@ -414,8 +411,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Set postAction.
-     *
      * @param string $postAction
      *
      * @return Form
@@ -429,8 +424,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Get postAction.
-     *
      * @return string
      */
     public function getPostAction()
@@ -439,8 +432,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Set postActionProperty.
-     *
      * @param string $postActionProperty
      *
      * @return Form
@@ -453,27 +444,21 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * Get postActionProperty.
-     *
-     * @return string
-     */
-    public function getPostActionProperty()
+    public function getPostActionProperty(): ?string
     {
+        if ('return' === $this->getPostAction()) {
+            return null;
+        }
+
         return $this->postActionProperty;
     }
 
-    /**
-     * Get result count.
-     */
-    public function getResultCount()
+    public function getResultCount(): int
     {
         return count($this->submissions);
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      *
      * @return Form
@@ -487,9 +472,7 @@ class Form extends FormEntity
     }
 
     /**
-     * Get publishUp.
-     *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -497,8 +480,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      *
      * @return Form
@@ -512,9 +493,7 @@ class Form extends FormEntity
     }
 
     /**
-     * Get publishDown.
-     *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -522,10 +501,7 @@ class Form extends FormEntity
     }
 
     /**
-     * Add a field.
-     *
-     * @param       $key
-     * @param Field $field
+     * @param int|string $key
      *
      * @return Form
      */
@@ -540,12 +516,9 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove a field.
-     *
-     * @param       $key
-     * @param Field $field
+     * @param int|string $key
      */
-    public function removeField($key, Field $field)
+    public function removeField($key, Field $field): void
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -554,21 +527,14 @@ class Form extends FormEntity
     }
 
     /**
-     * Get fields.
-     *
-     * @return \Doctrine\Common\Collections\Collection|Field[]
+     * @return ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     public function getFields()
     {
         return $this->fields;
     }
 
-    /**
-     * Get array of field aliases.
-     *
-     * @return array
-     */
-    public function getFieldAliases()
+    public function getFieldAliases(): array
     {
         $aliases = [];
         $fields  = $this->getFields();
@@ -583,8 +549,45 @@ class Form extends FormEntity
     }
 
     /**
-     * Set alias.
+     * Loops through the form fields and returns an array of fields with mapped data.
      *
+     * @return array<int, array<string, int|string>>
+     */
+    public function getMappedFieldValues(): array
+    {
+        return array_filter(
+            array_map(
+                fn (Field $field): array => [
+                    'formFieldId'  => $field->getId(),
+                    'mappedObject' => $field->getMappedObject(),
+                    'mappedField'  => $field->getMappedField(),
+                ],
+                $this->getFields()->getValues()
+            ),
+            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
+        );
+    }
+
+    /**
+     * Set alias.
+     * Loops trough the form fields and returns a simple array of mapped object keys if any.
+     *
+     * @return string[]
+     */
+    public function getMappedFieldObjects(): array
+    {
+        return array_values(
+            array_filter(
+                array_unique(
+                    $this->getFields()->map(
+                        fn (Field $field) => $field->getMappedObject()
+                    )->toArray()
+                )
+            )
+        );
+    }
+
+    /**
      * @param string $alias
      *
      * @return Form
@@ -598,8 +601,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Get alias.
-     *
      * @return string
      */
     public function getAlias()
@@ -608,10 +609,6 @@ class Form extends FormEntity
     }
 
     /**
-     * Add submissions.
-     *
-     * @param Submission $submissions
-     *
      * @return Form
      */
     public function addSubmission(Submission $submissions)
@@ -621,20 +618,13 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * Remove submissions.
-     *
-     * @param Submission $submissions
-     */
-    public function removeSubmission(Submission $submissions)
+    public function removeSubmission(Submission $submissions): void
     {
         $this->submissions->removeElement($submissions);
     }
 
     /**
-     * Get submissions.
-     *
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return Collection|Submission[]
      */
     public function getSubmissions()
     {
@@ -642,10 +632,7 @@ class Form extends FormEntity
     }
 
     /**
-     * Add actions.
-     *
-     * @param        $key
-     * @param Action $action
+     * @param int|string $key
      *
      * @return Form
      */
@@ -659,12 +646,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * Remove action.
-     *
-     * @param Action $action
-     */
-    public function removeAction(Action $action)
+    public function removeAction(Action $action): void
     {
         $this->actions->removeElement($action);
     }
@@ -672,15 +654,13 @@ class Form extends FormEntity
     /**
      * Removes all actions.
      */
-    public function clearActions()
+    public function clearActions(): void
     {
         $this->actions = new ArrayCollection();
     }
 
     /**
-     * Get actions.
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     public function getActions()
     {
@@ -698,7 +678,7 @@ class Form extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -714,7 +694,7 @@ class Form extends FormEntity
     /**
      * @param mixed $template
      */
-    public function setTemplate($template)
+    public function setTemplate($template): void
     {
         $this->template = $template;
     }
@@ -730,7 +710,7 @@ class Form extends FormEntity
     /**
      * @param mixed $inKioskMode
      */
-    public function setInKioskMode($inKioskMode)
+    public function setInKioskMode($inKioskMode): void
     {
         $this->inKioskMode = $inKioskMode;
     }
@@ -738,7 +718,7 @@ class Form extends FormEntity
     /**
      * @param mixed $renderStyle
      */
-    public function setRenderStyle($renderStyle)
+    public function setRenderStyle($renderStyle): void
     {
         $this->renderStyle = $renderStyle;
     }
@@ -772,27 +752,68 @@ class Form extends FormEntity
     }
 
     /**
-     * @return bool
+     * @param bool|null $noIndex
      */
-    public function isStandalone()
+    public function setNoIndex($noIndex): void
     {
-        return $this->formType != 'campaign';
+        $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
+        $this->isChanged('noIndex', $sanitizedNoIndex);
+        $this->noIndex = $sanitizedNoIndex;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param string $formAttributes
+     *
+     * @return Form
+     */
+    public function setFormAttributes($formAttributes)
+    {
+        $this->isChanged('formAttributes', $formAttributes);
+        $this->formAttributes = $formAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormAttributes()
+    {
+        return $this->formAttributes;
+    }
+
+    public function setLanguage(?string $language): self
+    {
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
+    }
+
+    public function isStandalone(): bool
+    {
+        return 'campaign' != $this->formType;
     }
 
     /**
      * Generate a form name for HTML attributes.
      */
-    public function generateFormName()
+    public function generateFormName(): string
     {
-        $name = strtolower(
-            InputHelper::alphanum(
-                InputHelper::transliterate(
-                    $this->name
-                )
-            )
-        );
-
-        return (empty($name)) ? 'form-'.$this->id : $name;
+        return $this->name ? strtolower(InputHelper::alphanum(InputHelper::transliterate($this->name))) : 'form-'.$this->id;
     }
 
     /**
@@ -802,15 +823,21 @@ class Form extends FormEntity
      */
     public function usesProgressiveProfiling()
     {
-        if ($this->usesProgressiveProfiling !== null) {
+        if (null !== $this->usesProgressiveProfiling) {
             return $this->usesProgressiveProfiling;
         }
 
         // Progressive profiling must be turned off in the kiosk mode
-        if ($this->getInKioskMode() === false) {
+        if (false === $this->getInKioskMode()) {
+            if ('' != $this->getProgressiveProfilingLimit()) {
+                $this->usesProgressiveProfiling = true;
+
+                return $this->usesProgressiveProfiling;
+            }
+
             // Search for a field with a progressive profiling setting on
             foreach ($this->fields->toArray() as $field) {
-                if ($field->getShowWhenValueExists() === false || $field->getShowAfterXSubmissions() > 0) {
+                if (false === $field->getShowWhenValueExists() || $field->getShowAfterXSubmissions() > 0) {
                     $this->usesProgressiveProfiling = true;
 
                     return $this->usesProgressiveProfiling;
@@ -821,5 +848,26 @@ class Form extends FormEntity
         $this->usesProgressiveProfiling = false;
 
         return $this->usesProgressiveProfiling;
+    }
+
+    /**
+     * @param int $progressiveProfilingLimit
+     *
+     * @return Form
+     */
+    public function setProgressiveProfilingLimit($progressiveProfilingLimit)
+    {
+        $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
+        $this->progressiveProfilingLimit = $progressiveProfilingLimit;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProgressiveProfilingLimit()
+    {
+        return $this->progressiveProfilingLimit;
     }
 }

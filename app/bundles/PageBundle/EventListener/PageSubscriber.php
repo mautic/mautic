@@ -1,91 +1,36 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Event as Events;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
-use Mautic\QueueBundle\Event\QueueConsumerEvent;
-use Mautic\QueueBundle\Queue\QueueConsumerResults;
-use Mautic\QueueBundle\QueueEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AssetsHelper
-     */
-    protected $assetsHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
-
-    /**
-     * PageSubscriber constructor.
-     *
-     * @param AssetsHelper   $assetsHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     * @param PageModel      $pageModel
-     */
     public function __construct(
-        AssetsHelper $assetsHelper,
-        IpLookupHelper $ipLookupHelper,
-        AuditLogModel $auditLogModel,
-        PageModel $pageModel
+        private AssetsHelper $assetsHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
     ) {
-        $this->assetsHelper   = $assetsHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->pageModel      = $pageModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_POST_SAVE   => ['onPagePostSave', 0],
             PageEvents::PAGE_POST_DELETE => ['onPageDelete', 0],
             PageEvents::PAGE_ON_DISPLAY  => ['onPageDisplay', -255], // We want this to run last
-            QueueEvents::PAGE_HIT        => ['onPageHit', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\PageEvent $event
      */
-    public function onPagePostSave(Events\PageEvent $event)
+    public function onPagePostSave(Events\PageEvent $event): void
     {
         $page = $event->getPage();
         if ($details = $event->getChanges()) {
@@ -103,10 +48,8 @@ class PageSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\PageEvent $event
      */
-    public function onPageDelete(Events\PageEvent $event)
+    public function onPageDelete(Events\PageEvent $event): void
     {
         $page = $event->getPage();
         $log  = [
@@ -125,10 +68,8 @@ class PageSubscriber extends CommonSubscriber
      * - </head> : onPageDisplay_headClose
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
-     *
-     * @param Events\PageDisplayEvent $event
      */
-    public function onPageDisplay(Events\PageDisplayEvent $event)
+    public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         $content = $event->getContent();
 
@@ -147,7 +88,7 @@ class PageSubscriber extends CommonSubscriber
         $bodyOpenScripts = ob_get_clean();
 
         if ($bodyOpenScripts) {
-            preg_match('/(<body[a-z=\s\-_:"\']*>)/i', $content, $matches);
+            preg_match('/(<body[^>]*>)/i', $content, $matches);
 
             $content = str_ireplace($matches[0], $matches[0]."\n".$bodyOpenScripts, $content);
         }
@@ -176,26 +117,5 @@ class PageSubscriber extends CommonSubscriber
         }
 
         $event->setContent($content);
-    }
-
-    /**
-     * @param QueueConsumerEvent $event
-     */
-    public function onPageHit(QueueConsumerEvent $event)
-    {
-        $payload                = $event->getPayload();
-        $request                = $payload['request'];
-        $trackingNewlyGenerated = $payload['isNew'];
-        $pageId                 = $payload['pageId'];
-        $leadId                 = $payload['leadId'];
-        $hitRepo                = $this->em->getRepository('MauticPageBundle:Hit');
-        $pageRepo               = $this->em->getRepository('MauticPageBundle:Page');
-        $leadRepo               = $this->em->getRepository('MauticLeadBundle:Lead');
-        $hit                    = $hitRepo->find((int) $payload['hitId']);
-        $page                   = $pageId ? $pageRepo->find((int) $pageId) : null;
-        $lead                   = $leadId ? $leadRepo->find((int) $leadId) : null;
-
-        $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
-        $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }
 }

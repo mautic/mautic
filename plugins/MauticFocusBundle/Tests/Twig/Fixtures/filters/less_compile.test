@@ -1,0 +1,13 @@
+--TEST--
+compile LESS
+--TEMPLATE--
+{{ less|less_compile }}
+--DATA--
+return ['less' => "@primarycolor: #FF7F50;@color:#800080;h2{color: @primarycolor;}h3{color: @color;}"]
+--EXPECT--
+h2 {
+  color: #ff7f50;
+}
+h3 {
+  color: #800080;
+}

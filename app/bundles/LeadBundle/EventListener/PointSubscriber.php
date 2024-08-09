@@ -1,56 +1,83 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Form\Type\ListActionType;
+use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
+use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public function __construct(
+        private LeadModel $leadModel
+    ) {
+    }
+
+    public static function getSubscribedEvents(): array
     {
         return [
-            PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
+            PointEvents::TRIGGER_ON_BUILD                => ['onTriggerBuild', 0],
+            PointEvents::TRIGGER_ON_EVENT_EXECUTE        => ['onTriggerExecute', 0],
+            PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
         ];
     }
 
-    /**
-     * @param TriggerBuilderEvent $event
-     */
-    public function onTriggerBuild(TriggerBuilderEvent $event)
+    public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
-        $changeLists = [
-            'group'    => 'mautic.lead.point.trigger',
-            'label'    => 'mautic.lead.point.trigger.changelists',
-            'callback' => ['\\Mautic\\LeadBundle\\Helper\\PointEventHelper', 'changeLists'],
-            'formType' => 'leadlist_action',
-        ];
+        $event->addEvent(
+            'lead.changelists',
+            [
+                'group'       => 'mautic.lead.point.trigger',
+                'label'       => 'mautic.lead.point.trigger.changelists',
+                'eventName'   => PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE,
+                'formType'    => ListActionType::class,
+            ]
+        );
 
-        $event->addEvent('lead.changelists', $changeLists);
+        $event->addEvent(
+            'lead.changetags',
+            [
+                'group'     => 'mautic.lead.point.trigger',
+                'label'     => 'mautic.lead.lead.events.changetags',
+                'formType'  => ModifyLeadTagsType::class,
+                'eventName' => PointEvents::TRIGGER_ON_EVENT_EXECUTE,
+            ]
+        );
+    }
 
-        // modify tags
-        $action = [
-            'group'    => 'mautic.lead.point.trigger',
-            'label'    => 'mautic.lead.lead.events.changetags',
-            'formType' => 'modify_lead_tags',
-            'callback' => '\Mautic\LeadBundle\Helper\EventHelper::updateTags',
-        ];
-        $event->addEvent('lead.changetags', $action);
+    public function onTriggerExecute(TriggerExecutedEvent $event): void
+    {
+        if ('lead.changetags' !== $event->getTriggerEvent()->getType()) {
+            return;
+        }
+
+        $properties = $event->getTriggerEvent()->getProperties();
+        $addTags    = $properties['add_tags'] ?: [];
+        $removeTags = $properties['remove_tags'] ?: [];
+
+        if ($this->leadModel->modifyTags($event->getLead(), $addTags, $removeTags)) {
+            $event->setSucceded();
+        }
+    }
+
+    public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
+    {
+        $lead = $event->getLead();
+
+        $properties = $event->getTriggerEvent()->getProperties();
+        $addTo      = $properties['addToLists'];
+        $removeFrom = $properties['removeFromLists'];
+
+        if (!empty($addTo)) {
+            $this->leadModel->addToLists($lead, $addTo);
+        }
+
+        if (!empty($removeFrom)) {
+            $this->leadModel->removeFromLists($lead, $removeFrom);
+        }
     }
 }

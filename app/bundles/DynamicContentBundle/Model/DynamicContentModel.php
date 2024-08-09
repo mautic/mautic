@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -23,10 +14,18 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
+use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<DynamicContent>
+ *
+ * @implements AjaxLookupModelInterface<DynamicContent>
+ */
 class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
@@ -34,23 +33,19 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Retrieve the permissions base.
-     *
-     * @return string
      */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'dynamiccontent:dynamiccontents';
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return DynamicContentRepository
      */
     public function getRepository()
     {
         /** @var DynamicContentRepository $repo */
-        $repo = $this->em->getRepository('MauticDynamicContentBundle:DynamicContent');
+        $repo = $this->em->getRepository(DynamicContent::class);
 
         $repo->setTranslator($this->translator);
 
@@ -62,32 +57,23 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticDynamicContentBundle:Stat');
+        return $this->em->getRepository(Stat::class);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object $entity
      * @param bool   $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
         $this->postTranslationEntitySave($entity);
     }
 
-    /**
-     * Here just so PHPStorm calms down about type hinting.
-     *
-     * @param null $id
-     *
-     * @return null|DynamicContent
-     */
-    public function getEntity($id = null)
+    public function getEntity($id = null): ?DynamicContent
     {
-        if ($id === null) {
+        if (null === $id) {
             return new DynamicContent();
         }
 
@@ -95,18 +81,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
-     *
-     * @return mixed
+     * @param string|null $action
+     * @param array       $options
      *
      * @throws \InvalidArgumentException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof DynamicContent) {
             throw new \InvalidArgumentException('Entity must be of class DynamicContent');
@@ -116,15 +96,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('dwc', $entity, $options);
+        return $formFactory->create(DynamicContentType::class, $entity, $options);
     }
 
-    /**
-     * @param DynamicContent $dwc
-     * @param Lead           $lead
-     * @param                $slot
-     */
-    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
+    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot): void
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
@@ -136,14 +111,14 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                 'date_added'         => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s')),
             ])->setParameter('slot', $slot);
 
-        $qb->execute();
+        $qb->executeStatement();
     }
 
     /**
-     * @param            $slot
+     * @param string     $slot
      * @param Lead|array $lead
      *
-     * @return DynamicContent
+     * @return array<string, mixed>|false
      */
     public function getSlotContentForLead($slot, $lead)
     {
@@ -160,23 +135,37 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
             ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
             ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
+            ->andWhere($qb->expr()->eq('dc.is_published', 1))
             ->setParameter('slot', $slot)
             ->setParameter('lead_id', $id)
             ->orderBy('dcld.date_added', 'DESC')
             ->addOrderBy('dcld.id', 'DESC');
 
-        return $qb->execute()->fetch();
+        return $qb->executeQuery()->fetchAssociative();
     }
 
     /**
-     * @param DynamicContent $dynamicContent
-     * @param Lead|array     $lead
-     * @param string         $source
+     * @param Lead|array $lead
+     * @param string     $source
+     *
+     * @return Stat|null
      */
     public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
+        if (empty($lead)) {
+            return null;
+        }
+
+        if ($lead instanceof Lead && !$lead->getId()) {
+            return null;
+        }
+
         if (is_array($lead)) {
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+            if (empty($lead['id'])) {
+                return null;
+            }
+
+            $lead = $this->em->getReference(Lead::class, $lead['id']);
         }
 
         $stat = new Stat();
@@ -186,19 +175,14 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $stat->setSource($source);
 
         $this->getStatRepository()->saveEntity($stat);
+
+        return $stat;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $action
-     * @param $entity
-     * @param $isNew
-     * @param $event
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);
@@ -227,7 +211,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -237,10 +221,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
-    public function limitQueryToCreator(QueryBuilder &$q)
+    public function limitQueryToCreator(QueryBuilder &$q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
             ->andWhere('d.created_by = :userId')
@@ -250,16 +232,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
-     *
-     * @return array
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -271,7 +249,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag === 'total_and_unique') {
+        if (!$flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
@@ -282,7 +260,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.dynamicContent.show.total.views'), $data);
         }
 
-        if ($flag === 'unique' || $flag === 'total_and_unique') {
+        if ('unique' === $flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
             $q->groupBy('t.lead_id, t.date_sent');
 
@@ -298,13 +276,14 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
      * @param array  $options
+     *
+     * @return mixed[]
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
     {
         $results = [];
         switch ($type) {
@@ -314,16 +293,16 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['top_level']) ? $options['top_level'] : false,
-                    isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
-                    isset($options['where']) ? $options['where'] : ''
+                    $options['top_level'] ?? false,
+                    $options['ignore_ids'] ?? [],
+                    $options['where'] ?? ''
                 );
 
                 foreach ($entities as $entity) {
                     $results[$entity['language']][$entity['id']] = $entity['name'];
                 }
 
-                //sort by language
+                // sort by language
                 ksort($results);
 
                 break;

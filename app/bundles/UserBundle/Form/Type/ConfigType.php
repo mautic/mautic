@@ -1,59 +1,48 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Type\ConfigFileType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class ConfigType.
+ * @extends AbstractType<array<mixed>>
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $parameters;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * ConfigType constructor.
-     *
-     * @param CoreParametersHelper $parametersHelper
-     */
-    public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
-    {
-        $this->parameters = $parametersHelper;
-        $this->translator = $translator;
+    public function __construct(
+        protected CoreParametersHelper $parameters,
+        protected TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $samlEntityIdChoices = ['', $this->parameters->get('mautic.site_url')];
+        if (!empty($this->parameters->get('mautic.subdomain_url'))) {
+            $samlEntityIdChoices[] = $this->parameters->get('mautic.subdomain_url');
+        }
+        $builder->add('saml_idp_entity_id', ChoiceType::class,
+            [
+                'choices'    => array_combine($samlEntityIdChoices, $samlEntityIdChoices),
+                'label'      => 'mautic.user.config.form.saml.idp_entity_id_label',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => true,
+                'multiple'   => false,
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]);
+
         $builder->add(
             'saml_idp_metadata',
             ConfigFileType::class,
@@ -189,7 +178,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'saml_idp_default_role',
-            'role_list',
+            RoleListType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.default_role',
                 'label_attr' => ['class' => 'control-label'],
@@ -199,25 +188,17 @@ class ConfigType extends AbstractType
                     'tooltip'          => 'mautic.user.config.form.saml.idp.default_role.tooltip',
                 ],
                 'required'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
             ]
         );
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $view->vars['entityId'] = $this->parameters->getParameter('mautic.saml_idp_entity_id');
+        $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'userconfig';
     }

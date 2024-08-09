@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;
@@ -16,14 +7,12 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class SmsRepository.
+ * @extends CommonRepository<Sms>
  */
 class SmsRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -32,15 +21,77 @@ class SmsRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias())
-            ->from('MauticSmsBundle:Sms', $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
-        if (empty($args['iterator_mode'])) {
+        if (empty($args['iterator_mode']) && empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
         $args['qb'] = $q;
 
         return parent::getEntities($args);
+    }
+
+    /**
+     * @depreacated The method is replaced by getPublishedBroadcastsIterable
+     *
+     * @param numeric|null $id
+     *
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult<Sms>
+     */
+    public function getPublishedBroadcasts($id = null): \Doctrine\ORM\Internal\Hydration\IterableResult
+    {
+        return $this->getPublishedBroadcastsQuery($id)->iterate();
+    }
+
+    /**
+     * @return iterable<Sms>
+     */
+    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    {
+        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+    }
+
+    private function getPublishedBroadcastsQuery(?int $id = null): Query
+    {
+        $qb   = $this->createQueryBuilder($this->getTableAlias());
+        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+
+        $expr->add(
+            $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
+        );
+
+        if (null !== $id && 0 !== $id) {
+            $expr->add(
+                $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
+            );
+        }
+        $qb->where($expr);
+
+        return $qb->getQuery();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function getSegmentsContactsQuery(int $smsId)
+    {
+        // Main query
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->from(MAUTIC_TABLE_PREFIX.'sms_message_list_xref', 'sml')
+            ->join('sml', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = sml.leadlist_id and ll.is_published = 1')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = sml.leadlist_id and lll.manually_removed = 0')
+            ->join('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lll.lead_id = l.id')
+            ->where(
+                $q->expr()->and(
+                    $q->expr()->eq('sml.sms_id', ':smsId')
+                )
+            )
+            ->setParameter('smsId', $smsId)
+            // Order by ID so we can query by greater than X contact ID when batching
+            ->orderBy('lll.lead_id');
+
+        return $q;
     }
 
     /**
@@ -52,7 +103,7 @@ class SmsRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count')
-            ->from('MauticSmsBundle:Sms', 'e');
+            ->from(Sms::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
@@ -64,20 +115,17 @@ class SmsRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -110,9 +158,9 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         $commands = [
             'mautic.core.searchcommand.ispublished',
@@ -127,19 +175,16 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
-    protected function getDefaultOrder()
+    protected function getDefaultOrder(): array
     {
         return [
             ['e.name', 'ASC'],
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
@@ -147,11 +192,10 @@ class SmsRepository extends CommonRepository
     /**
      * Up the click/sent counts.
      *
-     * @param        $id
      * @param string $type
      * @param int    $increaseBy
      */
-    public function upCount($id, $type = 'sent', $increaseBy = 1)
+    public function upCount($id, $type = 'sent', $increaseBy = 1): void
     {
         try {
             $q = $this->_em->getConnection()->createQueryBuilder();
@@ -160,8 +204,8 @@ class SmsRepository extends CommonRepository
                 ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
                 ->where('id = '.(int) $id);
 
-            $q->execute();
-        } catch (\Exception $exception) {
+            $q->executeStatement();
+        } catch (\Exception) {
             // not important
         }
     }

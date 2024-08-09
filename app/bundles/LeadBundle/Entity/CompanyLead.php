@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class CompanyLead.
- */
 class CompanyLead
 {
     /**
@@ -30,41 +18,24 @@ class CompanyLead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $primary = false;
 
-    /**
-     * @deprecated 2.9 to be removed in 3.0
-     *
-     * @var bool
-     */
-    private $manuallyRemoved = false;
-
-    /**
-     * @deprecated 2.9 to be removed in 3.0
-     *
-     * @var bool
-     */
-    private $manuallyAdded = false;
-
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('companies_leads')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyLeadRepository');
+            ->setCustomRepositoryClass(CompanyLeadRepository::class);
 
         $builder->createManyToOne('company', 'Company')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->build();
 
@@ -76,19 +47,10 @@ class CompanyLead
             ->columnName('is_primary')
             ->nullable()
             ->build();
-
-        // @deprecated 2.9 to be removed in 3.0
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
-            ->build();
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -98,7 +60,7 @@ class CompanyLead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date)
+    public function setDateAdded($date): void
     {
         $this->dateAdded = $date;
     }
@@ -114,7 +76,7 @@ class CompanyLead
     /**
      * @param mixed $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
@@ -138,7 +100,7 @@ class CompanyLead
     /**
      * @param Company $company
      */
-    public function setCompany($company)
+    public function setCompany($company): void
     {
         $this->company = $company;
     }
@@ -146,7 +108,7 @@ class CompanyLead
     /**
      * @param bool $primary
      */
-    public function setPrimary($primary)
+    public function setPrimary($primary): void
     {
         $this->primary = $primary;
     }
@@ -157,65 +119,5 @@ class CompanyLead
     public function getPrimary()
     {
         return $this->primary;
-    }
-
-    /**
-     * @deprecatd 2.9 to be removed in 3.0
-     *
-     * @return bool
-     */
-    public function getManuallyRemoved()
-    {
-        return $this->manuallyRemoved;
-    }
-
-    /**
-     * @deprecatd 2.9 to be removed in 3.0
-     *
-     * @param bool $manuallyRemoved
-     */
-    public function setManuallyRemoved($manuallyRemoved)
-    {
-        $this->manuallyRemoved = $manuallyRemoved;
-    }
-
-    /**
-     * @deprecatd 2.9 to be removed in 3.0
-     *
-     * @return bool
-     */
-    public function wasManuallyRemoved()
-    {
-        return $this->manuallyRemoved;
-    }
-
-    /**
-     * @deprecatd 2.9 to be removed in 3.0
-     *
-     * @return bool
-     */
-    public function getManuallyAdded()
-    {
-        return $this->manuallyAdded;
-    }
-
-    /**
-     * @deprecatd 2.9 to be removed in 3.0
-     *
-     * @param bool $manuallyAdded
-     */
-    public function setManuallyAdded($manuallyAdded)
-    {
-        $this->manuallyAdded = $manuallyAdded;
-    }
-
-    /**
-     * @deprecatd 2.9 to be removed in 3.0
-     *
-     * @return bool
-     */
-    public function wasManuallyAdded()
-    {
-        return $this->manuallyAdded;
     }
 }

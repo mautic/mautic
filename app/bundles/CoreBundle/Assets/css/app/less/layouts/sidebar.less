@@ -59,11 +59,16 @@
       > .mautic-brand > .mautic-logo-text {
         opacity: 1;
         margin-left: 3px;
-        .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
-        .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+        position: absolute;
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
       }
       > .mautic-brand {
         .transition(padding-left .3s ease);
+      }
+      &.minimized {
+        padding-left: 3px;
+        padding-right: 3px;
       }
     }
 
@@ -211,7 +216,7 @@
           padding: 12px 20px;
           .transition(all .15s ease);
           .text {
-            .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+            .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
             opacity: 1;
             margin-left: 0;
             position: relative;
@@ -226,7 +231,7 @@
             display: block;
           }
           .arrow {
-            .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+            .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
             opacity: 1;
             margin-left: 0;
             font-family: 'FontAwesome';
@@ -315,14 +320,15 @@
     .sidebar-minimizer {
       > .direction {
         &:after {
-          font-family: 'FontAwesome';
-          content: '\f053';
+          font-family: 'remixicon';
+          font-size: 18px;
+          content: '\EA64';
         }
       }
       &.active {
         .direction {
           &:after {
-            content: '\f054';
+            content: '\EA6E';
           }
         }
       }

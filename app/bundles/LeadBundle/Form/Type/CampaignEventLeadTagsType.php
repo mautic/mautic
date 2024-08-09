@@ -1,39 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class CampaignEventLeadTagsType.
+ * @extends AbstractType<mixed>
  */
 class CampaignEventLeadTagsType extends AbstractType
 {
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private TranslatorInterface $translator
+    ) {
     }
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'tags',
-            'lead_tag',
+            TagType::class,
             [
                 'add_transformer' => true,
                 'by_reference'    => false,
@@ -47,10 +34,7 @@ class CampaignEventLeadTagsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_tags';
     }

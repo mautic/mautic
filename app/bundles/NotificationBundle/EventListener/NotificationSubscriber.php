@@ -1,19 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -22,52 +12,19 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class NotificationSubscriber.
- */
-class NotificationSubscriber extends CommonSubscriber
+class NotificationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TrackableModel
-     */
-    protected $trackableModel;
-
-    /**
-     * @var PageTokenHelper
-     */
-    protected $pageTokenHelper;
-
-    /**
-     * @var AssetTokenHelper
-     */
-    protected $assetTokenHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * NotificationSubscriber constructor.
-     *
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     */
-    public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
-    {
-        $this->auditLogModel    = $auditLogModel;
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
+    public function __construct(
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             NotificationEvents::NOTIFICATION_POST_SAVE   => ['onPostSave', 0],
@@ -78,10 +35,8 @@ class NotificationSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param NotificationEvent $event
      */
-    public function onPostSave(NotificationEvent $event)
+    public function onPostSave(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
         if ($details = $event->getChanges()) {
@@ -98,10 +53,8 @@ class NotificationSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param NotificationEvent $event
      */
-    public function onDelete(NotificationEvent $event)
+    public function onDelete(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
         $log    = [
@@ -114,10 +67,7 @@ class NotificationSubscriber extends CommonSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param TokenReplacementEvent $event
-     */
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();
@@ -131,7 +81,7 @@ class NotificationSubscriber extends CommonSubscriber
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
             );
 
-            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
                 'notification',
@@ -139,7 +89,7 @@ class NotificationSubscriber extends CommonSubscriber
             );
 
             /**
-             * @var string
+             * @var string    $token
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {

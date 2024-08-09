@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_config_action' => [
                 'path'       => '/config/{objectAction}/{objectId}',
-                'controller' => 'MauticConfigBundle:Config:execute',
+                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',
             ],
             'mautic_sysinfo_index' => [
                 'path'       => '/sysinfo',
-                'controller' => 'MauticConfigBundle:Sysinfo:index',
+                'controller' => 'Mautic\ConfigBundle\Controller\SysinfoController::indexAction',
             ],
         ],
     ],
@@ -28,52 +19,32 @@ return [
             'mautic.config.menu.index' => [
                 'route'           => 'mautic_config_action',
                 'routeParameters' => ['objectAction' => 'edit'],
-                'iconClass'       => 'fa-cogs',
+                'iconClass'       => 'ri-settings-5-fill',
                 'id'              => 'mautic_config_index',
+                'parent'          => 'mautic.core.general',
                 'access'          => 'admin',
+                'priority'        => 16,
             ],
             'mautic.sysinfo.menu.index' => [
                 'route'     => 'mautic_sysinfo_index',
-                'iconClass' => 'fa-life-ring',
+                'iconClass' => 'ri-information-2-fill',
                 'id'        => 'mautic_sysinfo_index',
+                'parent'    => 'mautic.core.general',
                 'access'    => 'admin',
+                'priority'  => 04,
                 'checks'    => [
-                   'parameters' => [
-                       'sysinfo_disabled' => false,
-                   ],
+                    'parameters' => [
+                        'sysinfo_disabled' => false,
+                    ],
                 ],
             ],
         ],
     ],
 
-    'services' => [
-        'events' => [
-            'mautic.config.subscriber' => [
-                'class'     => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-        ],
-
-        'forms' => [
-            'mautic.form.type.config' => [
-                'class'     => 'Mautic\ConfigBundle\Form\Type\ConfigType',
-                'arguments' => 'translator',
-                'alias'     => 'config',
-            ],
-        ],
-        'models' => [
-            'mautic.config.model.config' => [
-                'class' => 'Mautic\ConfigBundle\Model\ConfigModel',
-            ],
-            'mautic.config.model.sysinfo' => [
-                'class'     => 'Mautic\ConfigBundle\Model\SysinfoModel',
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
+    'parameters' => [
+        'config_allowed_parameters' => [
+            'kernel.project_dir',
+            'kernel.logs_dir',
         ],
     ],
 ];

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -16,65 +7,45 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class TableSchemaHelper.
- *
- * Used to manipulate creation/removal of tables
+ * Used to manipulate creation/removal of tables.
  */
 class TableSchemaHelper
 {
     /**
-     * @var Connection
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected $db;
+    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    protected $sm;
-
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
-     * @var ColumnSchemaHelper
-     */
-    protected $columnHelper;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\Schema
+     * @var Schema
      */
     protected $schema;
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $dropTables;
+    protected array $dropTables = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $addTables;
+    protected array $addTables = [];
 
     /**
-     * @param Connection         $db
-     * @param                    $prefix
-     * @param ColumnSchemaHelper $columnHelper
+     * @param string $prefix
      */
-    public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
-    {
-        $this->db           = $db;
-        $this->sm           = $db->getSchemaManager();
-        $this->prefix       = $prefix;
-        $this->columnHelper = $columnHelper;
-        $this->schema       = new Schema([], [], $this->sm->createSchemaConfig());
+    public function __construct(
+        protected Connection $db,
+        protected $prefix,
+        protected ColumnSchemaHelper $columnHelper
+    ) {
+        $this->sm = $db->createSchemaManager();
     }
 
     /**
      * Get the SchemaManager.
      *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
+     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
     public function getSchemaManager()
     {
@@ -84,13 +55,13 @@ class TableSchemaHelper
     /**
      * Add an array of tables to db.
      *
-     * @param array $tables
+     * @return $this
      *
      * @throws SchemaException
      */
     public function addTables(array $tables)
     {
-        //ensure none of the tables exist before manipulating the schema
+        // ensure none of the tables exist before manipulating the schema
         foreach ($tables as $table) {
             if (empty($table['name'])) {
                 throw new SchemaException('Table is missing required name key.');
@@ -99,17 +70,18 @@ class TableSchemaHelper
             $this->checkTableExists($table['name'], true);
         }
 
-        //now add the tables
+        // now add the tables
         foreach ($tables as $table) {
             $this->addTables[] = $table;
             $this->addTable($table, false);
         }
+
+        return $this;
     }
 
     /**
      * Add a table to the db.
      *
-     * @param array $table
      *                     ['name']    string (required) unique name of table; cannot already exist
      *                     ['columns'] array  (optional) Array of columns to add in the format of
      *                     array(
@@ -125,8 +97,8 @@ class TableSchemaHelper
      *                     'primaryKey' => array(),
      *                     'uniqueIndex' => array()
      *                     )
-     * @param $checkExists
-     * @param $dropExisting
+     *
+     * @return $this
      *
      * @throws SchemaException
      */
@@ -145,13 +117,13 @@ class TableSchemaHelper
 
         $this->addTables[] = $table;
 
-        $options = (isset($table['options'])) ? $table['options'] : [];
-        $columns = (isset($table['columns'])) ? $table['columns'] : [];
+        $options = $table['options'] ?? [];
+        $columns = $table['columns'] ?? [];
 
-        $newTable = $this->schema->createTable($this->prefix.$table['name']);
+        $newTable = $this->getSchema()->createTable($this->prefix.$table['name']);
 
         if (!empty($columns)) {
-            //just to make sure a same name column is not added
+            // just to make sure a same name column is not added
             $columnsAdded = [];
             foreach ($columns as $column) {
                 if (empty($column['name'])) {
@@ -159,8 +131,8 @@ class TableSchemaHelper
                 }
 
                 if (!isset($columns[$column['name']])) {
-                    $type       = (isset($column['type'])) ? $column['type'] : 'text';
-                    $colOptions = (isset($column['options'])) ? $column['options'] : [];
+                    $type       = $column['type'] ?? 'text';
+                    $colOptions = $column['options'] ?? [];
 
                     $newTable->addColumn($column['name'], $type, $colOptions);
                     $columnsAdded[] = $column['name'];
@@ -170,44 +142,46 @@ class TableSchemaHelper
 
         if (!empty($options)) {
             foreach ($options as $option => $value) {
-                $func = ($option == 'uniqueIndex' ? 'add' : 'set').ucfirst($option);
+                $func = ('uniqueIndex' == $option ? 'add' : 'set').ucfirst($option);
                 $newTable->$func($value);
             }
         }
+
+        return $this;
     }
 
     /**
-     * @param string $table
+     * @return $this
+     *
+     * @throws SchemaException
      */
     public function deleteTable($table)
     {
         if ($this->checkTableExists($table)) {
             $this->dropTables[] = $table;
         }
+
+        return $this;
     }
 
     /**
      * Executes the changes.
      */
-    public function executeChanges()
+    public function executeChanges(): void
     {
         $platform = $this->db->getDatabasePlatform();
 
-        if (!empty($this->dropTables)) {
-            foreach ($this->dropTables as $t) {
-                $this->sm->dropTable($this->prefix.$t);
-            }
+        foreach ($this->dropTables as $t) {
+            $this->sm->dropTable($this->prefix.$t);
         }
 
-        $sql = $this->schema->toSql($platform);
+        $sql = $this->getSchema()->toSql($platform);
 
-        if (!empty($sql)) {
-            foreach ($sql as $s) {
-                $this->db->executeUpdate($s);
-            }
+        foreach ($sql as $s) {
+            $this->db->executeStatement($s);
         }
 
-        //reset schema
+        // reset schema
         $this->schema     = new Schema([], [], $this->sm->createSchemaConfig());
         $this->dropTables = $this->addTables = [];
     }
@@ -218,11 +192,9 @@ class TableSchemaHelper
      * @param string $table
      * @param bool   $throwException
      *
-     * @return bool
-     *
      * @throws SchemaException
      */
-    public function checkTableExists($table, $throwException = false)
+    public function checkTableExists($table, $throwException = false): bool
     {
         if ($this->sm->tablesExist($this->prefix.$table)) {
             if ($throwException) {
@@ -233,5 +205,23 @@ class TableSchemaHelper
         }
 
         return false;
+    }
+
+    private function getSchema(): Schema
+    {
+        if ($this->schema) {
+            return $this->schema;
+        }
+
+        if ($this->db instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+            $params       = $this->db->getParams();
+            $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
+            $schemaConfig->setName($params['master']['dbname']);
+            $this->schema = new Schema([], [], $schemaConfig);
+        } else {
+            $this->schema = new Schema([], [], $this->sm->createSchemaConfig());
+        }
+
+        return $this->schema;
     }
 }

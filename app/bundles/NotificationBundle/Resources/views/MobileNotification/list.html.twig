@@ -1,0 +1,48 @@
+{#
+  Variables
+    - searchValue
+    - items
+    - totalItems
+    - page
+    - limit
+    - tmpl
+    - permissions
+    - model
+    - security
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}mobile_notification{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.notification.mobile_notifications'|trans }}{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
+            'templateButtons': {
+                'new': permissions['notification:mobile_notifications:create'],
+            },
+            'routeBase': 'mobile_notification',
+    }) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': 'mautic.notification.help.searchcommands',
+                'searchId': 'mobile-notification-search',
+                'action': currentRoute,
+        }) }}
+        <div class="page-list">
+  {% endif %}
+
+  {{ include('@MauticNotification/MobileNotification/_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

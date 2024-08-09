@@ -1,22 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\EmailBundle\Test\OptionsAccessor;
+namespace Mautic\EmailBundle\Tests\OptionsAccessor;
 
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\UserBundle\Entity\User;
 
-class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
+class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testTransformToUserIds()
+    public function testTransformToUserIds(): void
     {
         $config            = [];
         $config['user_id'] = [4, 6];
@@ -31,7 +22,7 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend());
     }
 
-    public function testTransformToUserIdsWithOwnerEntityButNoOwnerSetting()
+    public function testTransformToUserIdsWithOwnerEntityButNoOwnerSetting(): void
     {
         $config            = [];
         $config['user_id'] = [4, 6];
@@ -46,14 +37,14 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
         $mockOwner = $this->getMockBuilder(User::class)
             ->getMock();
 
-        $mockOwner->expects($this->never()) //$config['to_owner'] is not set
+        $mockOwner->expects($this->never()) // $config['to_owner'] is not set
             ->method('getId')
             ->will($this->returnValue(5));
 
         $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
-    public function testTransformToUserIdsWithDifferentOwnerId()
+    public function testTransformToUserIdsWithDifferentOwnerId(): void
     {
         $config             = [];
         $config['user_id']  = [4, 6];
@@ -77,7 +68,7 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
-    public function testTransformToUserIdsWithSameOwnerId()
+    public function testTransformToUserIdsWithSameOwnerId(): void
     {
         $config             = [];
         $config['user_id']  = [4, 6];
@@ -100,7 +91,7 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
-    public function testFormatToAddressOneEmail()
+    public function testFormatToAddressOneEmail(): void
     {
         $config       = [];
         $config['to'] = 'john@doe.com';
@@ -112,7 +103,7 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $emailToUserAccessor->getToFormatted());
     }
 
-    public function testFormatToAddressMoreEmails()
+    public function testFormatToAddressMoreEmails(): void
     {
         $config       = [];
         $config['to'] = 'john@doe.com, peter@doe.com,doe@mark.com';

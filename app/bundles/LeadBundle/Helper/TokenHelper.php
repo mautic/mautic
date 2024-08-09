@@ -1,21 +1,17 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
-/**
- * Class TokenHelper.
- */
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
+
 class TokenHelper
 {
+    /**
+     * @var array
+     */
+    private static $parameters;
+
     /**
      * @param string $content
      * @param array  $lead
@@ -26,52 +22,133 @@ class TokenHelper
      */
     public static function findLeadTokens($content, $lead, $replace = false)
     {
+        if (!$lead) {
+            return $replace ? $content : [];
+        }
+
         // Search for bracket or bracket encoded
-        // @deprecated BC support for leadfield
-        $tokenRegex = [
-            '/({|%7B)leadfield=(.*?)(}|%7D)/',
-            '/({|%7B)contactfield=(.*?)(}|%7D)/',
-        ];
-        $tokenList = [];
+        $tokenList    = [];
+        $foundMatches = preg_match_all('/({|%7B)contactfield=(.*?)(}|%7D)/', $content, $matches);
 
-        foreach ($tokenRegex as $regex) {
-            $foundMatches = preg_match_all($regex, $content, $matches);
-            if ($foundMatches) {
-                foreach ($matches[2] as $key => $match) {
-                    $token = $matches[0][$key];
+        if ($foundMatches) {
+            foreach ($matches[2] as $key => $match) {
+                $token = $matches[0][$key];
 
-                    if (isset($tokenList[$token])) {
-                        continue;
-                    }
-
-                    $fallbackCheck = explode('|', $match);
-                    $urlencode     = false;
-                    $fallback      = '';
-
-                    if (isset($fallbackCheck[1])) {
-                        // There is a fallback or to be urlencoded
-                        $alias = $fallbackCheck[0];
-
-                        if ($fallbackCheck[1] === 'true') {
-                            $urlencode = true;
-                            $fallback  = '';
-                        } else {
-                            $fallback = $fallbackCheck[1];
-                        }
-                    } else {
-                        $alias = $match;
-                    }
-
-                    $value             = (!empty($lead[$alias])) ? $lead[$alias] : $fallback;
-                    $tokenList[$token] = ($urlencode) ? urlencode($value) : $value;
+                if (isset($tokenList[$token])) {
+                    continue;
                 }
 
-                if ($replace) {
-                    $content = str_replace(array_keys($tokenList), $tokenList, $content);
-                }
+                $alias             = self::getFieldAlias($match);
+                $defaultValue      = self::getTokenDefaultValue($match);
+                $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue);
+            }
+
+            if ($replace) {
+                $content = str_replace(array_keys($tokenList), $tokenList, $content);
             }
         }
 
         return $replace ? $content : $tokenList;
+    }
+
+    /**
+     * Returns correct token value from provided list of tokens and the concrete token.
+     *
+     * @param array  $tokens like ['{contactfield=website}' => 'https://mautic.org']
+     * @param string $token  like '{contactfield=website|https://default.url}'
+     *
+     * @return string empty string if no match
+     */
+    public static function getValueFromTokens(array $tokens, $token)
+    {
+        $token   = str_replace(['{', '}'], '', $token);
+        $alias   = self::getFieldAlias($token);
+        $default = self::getTokenDefaultValue($token);
+
+        return empty($tokens["{{$alias}}"]) ? $default : $tokens["{{$alias}}"];
+    }
+
+    /**
+     * @return mixed
+     */
+    private static function getTokenValue(array $lead, $alias, $defaultValue)
+    {
+        $value = '';
+        if (isset($lead[$alias])) {
+            $value = $lead[$alias];
+        } elseif (!empty($lead['companies'])) {
+            foreach ($lead['companies'] as $company) {
+                if (isset($company['is_primary'], $company[$alias]) && 1 === (int) $company['is_primary']) {
+                    $value = $company[$alias];
+                    break;
+                }
+            }
+        }
+
+        if ('' !== $value) {
+            switch ($defaultValue) {
+                case 'true':
+                    $value = urlencode($value);
+                    break;
+                case 'datetime':
+                case 'date':
+                case 'time':
+                    $dt   = new DateTimeHelper($value);
+                    $date = $dt->getDateTime()->format(
+                        self::getParameter('date_format_dateonly')
+                    );
+                    $time = $dt->getDateTime()->format(
+                        self::getParameter('date_format_timeonly')
+                    );
+                    switch ($defaultValue) {
+                        case 'datetime':
+                            $value = $date.' '.$time;
+                            break;
+                        case 'date':
+                            $value = $date;
+                            break;
+                        case 'time':
+                            $value = $time;
+                            break;
+                    }
+                    break;
+            }
+        }
+        if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
+            return $value;
+        } else {
+            return '' !== $value ? $value : $defaultValue;
+        }
+    }
+
+    private static function getTokenDefaultValue($match): string
+    {
+        $fallbackCheck = explode('|', $match);
+        if (!isset($fallbackCheck[1])) {
+            return '';
+        }
+
+        return $fallbackCheck[1];
+    }
+
+    private static function getFieldAlias($match): string
+    {
+        $fallbackCheck = explode('|', $match);
+
+        return $fallbackCheck[0];
+    }
+
+    /**
+     * @param string $parameter
+     *
+     * @return mixed
+     */
+    private static function getParameter($parameter)
+    {
+        if (null === self::$parameters) {
+            self::$parameters = (new ParamsLoaderHelper())->getParameters();
+        }
+
+        return self::$parameters[$parameter];
     }
 }

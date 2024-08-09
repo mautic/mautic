@@ -1,64 +1,30 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Helper;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class TrackinHelper.
- */
 class TrackingHelper
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var RequestStack
-     */
-    protected $request;
-
-    /**
-     * BuildJsSubscriber constructor.
-     *
-     * @param LeadModel            $leadModel
-     * @param Session              $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param RequestStack         $request
-     */
-    public function __construct(LeadModel $leadModel, Session $session, CoreParametersHelper $coreParametersHelper, RequestStack $request)
-    {
-        $this->leadModel            = $leadModel;
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->request              = $request;
+    public function __construct(
+        protected ContactTracker $contactTracker,
+        protected CacheProvider $cache,
+        protected CoreParametersHelper $coreParametersHelper,
+        protected RequestStack $requestStack,
+    ) {
     }
 
-    public function getEnabledServices()
+    /**
+     * @return array<string, 'facebook_pixel'|'google_analytics'>
+     */
+    public function getEnabledServices(): array
     {
         $keys = [
             'google_analytics' => 'Google Analytics',
@@ -66,62 +32,77 @@ class TrackingHelper
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if (($id = $this->coreParametersHelper->getParameter($key.'_id'))) {
-                $result[$key] = $service;
+            if ($id = $this->coreParametersHelper->get($key.'_id')) {
+                $result[$service] = $key;
             }
         }
 
         return $result;
     }
 
-    public function getSessionName()
+    /**
+     * @return string|null
+     */
+    private function getCacheKey()
     {
-        $lead = $this->leadModel->getCurrentLead();
-        if ($lead instanceof Lead) {
-            return 'mtc-tracking-pixel-events-'.$lead->getId();
+        $lead = $this->contactTracker->getContact();
+
+        return $lead instanceof Lead ? 'mtc-tracking-pixel-events-'.$lead->getId() : null;
+    }
+
+    /**
+     * @param mixed[] $values
+     *
+     * @throws InvalidArgumentException
+     */
+    public function updateCacheItem(array $values): void
+    {
+        $cacheKey = $this->getCacheKey();
+        if (null !== $cacheKey) {
+            /** @var CacheItemInterface $item */
+            $item = $this->cache->getItem($cacheKey);
+            $item->set(serialize(array_merge($values, $this->getCacheItem())));
+            $item->expiresAfter(86400); // one day in seconds
+
+            $this->cache->save($item);
         }
     }
 
     /**
-     * @param array $values
+     * @return mixed[]
      *
-     * @return array
+     * @throws InvalidArgumentException
      */
-    public function updateSession($values)
+    public function getCacheItem(bool $remove = false): array
     {
-        $sessionName = $this->getSessionName();
-        $this->session->set($sessionName, serialize(array_merge($values, $this->getSession())));
+        $cacheKey   = $this->getCacheKey();
+        $cacheValue = [];
 
-        return (array) $values;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSession($remove = false)
-    {
-        $sessionName = $this->getSessionName();
-        $sesionValue = unserialize($this->session->get($sessionName));
-        if ($remove) {
-            $this->session->remove($sessionName);
+        /* @var CacheItemInterface $item */
+        if (null !== $cacheKey) {
+            $item = $this->cache->getItem($cacheKey);
+            if ($item->isHit()) {
+                $cacheValue = Serializer::decode($item->get(), ['allowed_classes' => false]);
+                if ($remove) {
+                    $this->cache->deleteItem($cacheKey);
+                }
+            }
         }
 
-        return (array) $sesionValue;
+        return (array) $cacheValue;
     }
 
     /**
-     * @param $service
-     *
      * @return bool|mixed
      */
     public function displayInitCode($service)
     {
-        $pixelId = $this->coreParametersHelper->getParameter($service.'_id');
+        $pixelId = $this->coreParametersHelper->get($service.'_id');
 
-        if ($pixelId && $this->coreParametersHelper->getParameter($service.'_landingpage_enabled') && $this->isLandingPage()) {
+        if ($pixelId && $this->coreParametersHelper->get($service.'_landingpage_enabled') && $this->isLandingPage()) {
             return $pixelId;
         }
-        if ($pixelId && $this->coreParametersHelper->getParameter($service.'_trackingpage_enabled') && !$this->isLandingPage()) {
+        if ($pixelId && $this->coreParametersHelper->get($service.'_trackingpage_enabled') && !$this->isLandingPage()) {
             return $pixelId;
         }
 
@@ -129,23 +110,55 @@ class TrackingHelper
     }
 
     /**
-     * @return array|Lead|null
+     * @return Lead|null
      */
     public function getLead()
     {
-        return $this->leadModel->getCurrentLead();
+        return $this->contactTracker->getContact();
     }
 
-    /**
-     * @return bool
-     */
-    protected function isLandingPage()
+    public function getAnonymizeIp()
     {
-        $server = $this->request->getCurrentRequest()->server;
-        if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
+        return $this->coreParametersHelper->get('google_analytics_anonymize_ip');
+    }
+
+    protected function isLandingPage(): bool
+    {
+        $server = $this->requestStack->getCurrentRequest()->server;
+        if (!str_contains((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @deprecated No session for anonymous users. Use getCacheKey.
+     */
+    public function getSessionName(): ?string
+    {
+        return $this->getCacheKey();
+    }
+
+    /**
+     * @deprecated No session for anonymous users. Use updateCacheItem.
+     *
+     * @param mixed[] $values
+     *
+     * @return mixed[]
+     */
+    public function updateSession(array $values): array
+    {
+        $this->updateCacheItem($values);
+
+        return (array) $values;
+    }
+
+    /**
+     * @deprecated No session for anonymous users. Use getCacheItem.
+     */
+    public function getSession(bool $remove = false): array
+    {
+        return $this->getCacheItem($remove);
     }
 }

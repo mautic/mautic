@@ -1,24 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -50,39 +39,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'form:forms:viewother',
     ];
 
-    /**
-     * @var SubmissionModel
-     */
-    protected $formSubmissionModel;
-
-    /**
-     * @var FormModel
-     */
-    protected $formModel;
-
-    /**
-     * DashboardSubscriber constructor.
-     *
-     * @param SubmissionModel $formSubmissionModel
-     * @param FormModel       $formModel
-     */
-    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel)
-    {
-        $this->formModel           = $formModel;
-        $this->formSubmissionModel = $formSubmissionModel;
+    public function __construct(
+        protected SubmissionModel $formSubmissionModel,
+        protected FormModel $formModel,
+        private RouterInterface $router
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('form:forms:viewother');
 
-        if ($event->getType() == 'submissions.in.time') {
+        if ('submissions.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -100,11 +72,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'top.submission.referrers') {
+        if ('top.submission.referrers' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -119,38 +91,36 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items     = [];
 
                 // Build table rows with links
-                if ($referrers) {
-                    foreach ($referrers as &$referrer) {
-                        $row = [
-                            [
-                                'value'    => $referrer['referer'],
-                                'type'     => 'link',
-                                'external' => true,
-                                'link'     => $referrer['referer'],
-                            ],
-                            [
-                                'value' => $referrer['submissions'],
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($referrers as &$referrer) {
+                    $row = [
+                        [
+                            'value'    => $referrer['referer'],
+                            'type'     => 'link',
+                            'external' => true,
+                            'link'     => $referrer['referer'],
+                        ],
+                        [
+                            'value' => $referrer['submissions'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.form.result.thead.referrer'),
-                        $event->getTranslator()->trans('mautic.form.graph.line.submissions'),
+                        'mautic.form.result.thead.referrer',
+                        'mautic.form.graph.line.submissions',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $referrers,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'top.submitters') {
+        if ('top.submitters' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -165,45 +135,43 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items      = [];
 
                 // Build table rows with links
-                if ($submitters) {
-                    foreach ($submitters as &$submitter) {
-                        $name    = $submitter['lead_id'];
-                        $leadUrl = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $submitter['lead_id']]);
-                        if ($submitter['firstname'] || $submitter['lastname']) {
-                            $name = trim($submitter['firstname'].' '.$submitter['lastname']);
-                        } elseif ($submitter['email']) {
-                            $name = $submitter['email'];
-                        }
-
-                        $row = [
-                            [
-                                'value' => $name,
-                                'type'  => 'link',
-                                'link'  => $leadUrl,
-                            ],
-                            [
-                                'value' => $submitter['submissions'],
-                            ],
-                        ];
-                        $items[] = $row;
+                foreach ($submitters as &$submitter) {
+                    $name    = $submitter['lead_id'];
+                    $leadUrl = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $submitter['lead_id']]);
+                    if ($submitter['firstname'] || $submitter['lastname']) {
+                        $name = trim($submitter['firstname'].' '.$submitter['lastname']);
+                    } elseif ($submitter['email']) {
+                        $name = $submitter['email'];
                     }
+
+                    $row = [
+                        [
+                            'value' => $name,
+                            'type'  => 'link',
+                            'link'  => $leadUrl,
+                        ],
+                        [
+                            'value' => $submitter['submissions'],
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.form.lead'),
-                        $event->getTranslator()->trans('mautic.form.graph.line.submissions'),
+                        'mautic.form.lead',
+                        'mautic.form.graph.line.submissions',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $submitters,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.forms') {
+        if ('created.forms' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -218,30 +186,28 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                if ($forms) {
-                    foreach ($forms as &$form) {
-                        $formUrl = $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form['id']]);
-                        $row     = [
-                            [
-                                'value' => $form['name'],
-                                'type'  => 'link',
-                                'link'  => $formUrl,
-                            ],
-                        ];
-                        $items[] = $row;
-                    }
+                foreach ($forms as &$form) {
+                    $formUrl = $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form['id']]);
+                    $row     = [
+                        [
+                            'value' => $form['name'],
+                            'type'  => 'link',
+                            'link'  => $formUrl,
+                        ],
+                    ];
+                    $items[] = $row;
                 }
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $forms,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
     }

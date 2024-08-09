@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-class CommonEntity
+class CommonEntity implements \Stringable
 {
     /**
      * @var array
@@ -25,31 +18,34 @@ class CommonEntity
      */
     protected $pastChanges = [];
 
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setMappedSuperClass();
+    }
+
     /**
      * Wrapper function for isProperty methods.
      *
      * @param string $name
-     * @param        $arguments
      *
      * @throws \InvalidArgumentException
      */
     public function __call($name, $arguments)
     {
-        if (strpos($name, 'is') === 0 && method_exists($this, 'get'.ucfirst($name))) {
+        if (str_starts_with($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
             return $this->{'get'.ucfirst($name)}();
-        } elseif ($name == 'getName' && method_exists($this, 'getTitle')) {
+        } elseif ('getName' == $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 
         throw new \InvalidArgumentException('Method '.$name.' not exists');
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
-        $string = get_called_class();
+        $string = static::class;
         if (method_exists($this, 'getId')) {
             $string .= ' with ID #'.$this->getId();
         }
@@ -60,12 +56,14 @@ class CommonEntity
     /**
      * @param string $prop
      * @param mixed  $val
+     *
+     * @return void
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
+        $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -108,10 +106,6 @@ class CommonEntity
         }
     }
 
-    /**
-     * @param $key
-     * @param $value
-     */
     protected function addChange($key, $value)
     {
         if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0, 1] !== array_keys($this->changes[$key])) {
@@ -122,7 +116,9 @@ class CommonEntity
     }
 
     /**
-     * @return array
+     * @param bool $includePast
+     *
+     * @return mixed[]
      */
     public function getChanges($includePast = false)
     {
@@ -133,19 +129,13 @@ class CommonEntity
         return $this->changes;
     }
 
-    /**
-     * Reset changes.
-     */
-    public function resetChanges()
+    public function resetChanges(): void
     {
         $this->pastChanges = $this->changes;
         $this->changes     = [];
     }
 
-    /**
-     * @param array $changes
-     */
-    public function setChanges(array $changes)
+    public function setChanges(array $changes): void
     {
         $this->changes = $changes;
     }

@@ -1,86 +1,56 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\Persistence\Mapping\MappingException;
+use Mautic\CoreBundle\Form\Type\SlotButtonType;
+use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
+use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
+use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
+use Mautic\CoreBundle\Form\Type\SlotImageCardType;
+use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
+use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var EmailModel
-     */
-    protected $emailModel;
-
-    /**
-     * @var TrackableModel
-     */
-    protected $pageTrackableModel;
-
-    /**
-     * @var RedirectModel
-     */
-    protected $pageRedirectModel;
-
-    /**
-     * BuilderSubscriber constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param EmailModel           $emailModel
-     * @param TrackableModel       $trackableModel
-     * @param RedirectModel        $redirectModel
-     */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        EmailModel $emailModel,
-        TrackableModel $trackableModel,
-        RedirectModel $redirectModel
+        private CoreParametersHelper $coreParametersHelper,
+        private EmailModel $emailModel,
+        private TrackableModel $pageTrackableModel,
+        private RedirectModel $pageRedirectModel,
+        private TranslatorInterface $translator,
+        private MailHashHelper $mailHash
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailModel           = $emailModel;
-        $this->pageTrackableModel   = $trackableModel;
-        $this->pageRedirectModel    = $redirectModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND  => [
+                ['fixEmailAccessibility', 10000],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
             ],
             EmailEvents::EMAIL_ON_DISPLAY => [
+                ['fixEmailAccessibility', 10000],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
@@ -88,24 +58,21 @@ class BuilderSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
-            //add AB Test Winner Criteria
+            // add AB Test Winner Criteria
             $openRate = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.open',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner',
+                'event'    => EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
             $clickThrough = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.clickthrough',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner',
+                'event'    => EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }
@@ -119,8 +86,7 @@ class BuilderSubscriber extends CommonSubscriber
 
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
-                $event->filterTokens($tokens),
-                true
+                $event->filterTokens($tokens)
             );
         }
 
@@ -140,7 +106,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'text',
                 $this->translator->trans('mautic.core.slot.label.text'),
                 'font',
-                'MauticCoreBundle:Slots:text.html.php',
+                '@MauticCore/Slots/text.html.twig',
                 SlotTextType::class,
                 1000
             );
@@ -148,56 +114,56 @@ class BuilderSubscriber extends CommonSubscriber
                 'image',
                 $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
-                'MauticCoreBundle:Slots:image.html.php',
-                'slot_image',
+                '@MauticCore/Slots/image.html.twig',
+                SlotImageCardType::class,
                 900
             );
             $event->addSlotType(
                 'imagecard',
                 $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
-                'MauticCoreBundle:Slots:imagecard.html.php',
-                'slot_imagecard',
+                '@MauticCore/Slots/imagecard.html.twig',
+                SlotImageCardType::class,
                 870
             );
             $event->addSlotType(
                 'imagecaption',
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
-                'MauticCoreBundle:Slots:imagecaption.html.php',
-                'slot_imagecaption',
+                '@MauticCore/Slots/imagecaption.html.twig',
+                SlotImageCaptionType::class,
                 850
             );
             $event->addSlotType(
                 'button',
                 $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
-                'MauticCoreBundle:Slots:button.html.php',
-                'slot_button',
+                '@MauticCore/Slots/button.html.twig',
+                SlotButtonType::class,
                 800
             );
             $event->addSlotType(
                 'socialfollow',
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
-                'MauticCoreBundle:Slots:socialfollow.html.php',
-                'slot_socialfollow',
+                '@MauticCore/Slots/socialfollow.html.twig',
+                SlotSocialFollowType::class,
                 600
             );
             $event->addSlotType(
                 'codemode',
                 $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
-                'MauticCoreBundle:Slots:codemode.html.php',
-                'slot_codemode',
+                '@MauticCore/Slots/codemode.html.twig',
+                SlotCodeModeType::class,
                 500
             );
             $event->addSlotType(
                 'separator',
                 $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
-                'MauticCoreBundle:Slots:separator.html.php',
-                'slot_separator',
+                '@MauticCore/Slots/separator.html.twig',
+                SlotSeparatorType::class,
                 400
             );
 
@@ -205,8 +171,8 @@ class BuilderSubscriber extends CommonSubscriber
                 'dynamicContent',
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'tag',
-                'MauticCoreBundle:Slots:dynamiccontent.html.php',
-                'slot_dynamiccontent',
+                '@MauticCore/Slots/dynamiccontent.html.twig',
+                SlotDynamicContentType::class,
                 300
             );
         }
@@ -216,7 +182,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'one-column',
                 $this->translator->trans('mautic.core.slot.label.onecolumn'),
                 'file-text-o',
-                'MauticCoreBundle:Sections:one-column.html.php',
+                '@MauticCore/Sections/one-column.html.twig',
                 null,
                 1000
             );
@@ -224,7 +190,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'two-column',
                 $this->translator->trans('mautic.core.slot.label.twocolumns'),
                 'columns',
-                'MauticCoreBundle:Sections:two-column.html.php',
+                '@MauticCore/Sections/two-column.html.twig',
                 null,
                 900
             );
@@ -232,37 +198,88 @@ class BuilderSubscriber extends CommonSubscriber
                 'three-column',
                 $this->translator->trans('mautic.core.slot.label.threecolumns'),
                 'th',
-                'MauticCoreBundle:Sections:three-column.html.php',
+                '@MauticCore/Sections/three-column.html.twig',
                 null,
                 800
             );
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function fixEmailAccessibility(EmailSendEvent $event): void
+    {
+        if ($event->isDynamicContentParsing() || !$event->getEmail() instanceof Email) {
+            // prevent a loop
+            return;
+        }
+
+        $content = $event->getContent();
+        $subject = $event->getEmail()->getSubject();
+
+        // Add the empty <head/> tag if it's missing.
+        if (empty(preg_match('#<\s*?head\b[^>]*>(.*?)</head\b[^>]*>#s', $content, $matches))) {
+            $content = str_replace('<body', '<head></head><body', $content);
+        }
+
+        // Add the <title/> tag with email subject value into the <head/> tag if it's missing.
+        $content = preg_replace_callback(
+            "/<title>(.*?)<\/title>/is",
+            fn ($matches) => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
+            $content,
+            -1,
+            $fixed
+        );
+
+        if (!$fixed) {
+            $content = str_replace('</head>', "<title>{$subject}</title></head>", $content);
+        }
+
+        // Add the lang attribute to the <html/> tag if it's missing.
+        $locale = empty($event->getEmail()->getLanguage()) ? $this->coreParametersHelper->get('locale') : $event->getEmail()->getLanguage();
+        preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", $content, $matches);
+        if (empty($matches[1])) {
+            $content = str_replace('<html', '<html lang="'.$locale.'"', $content);
+        }
+
+        $event->setContent($content);
+    }
+
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $idHash = $event->getIdHash();
         $lead   = $event->getLead();
         $email  = $event->getEmail();
 
-        if ($idHash == null) {
+        // Get email
+        $toEmail = null;
+        if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
+            $toEmail = $lead['email'];
+        } elseif ($lead instanceof Lead && is_string($lead->getEmail())) {
+            $toEmail = $lead->getEmail();
+        }
+
+        // Get email hash
+        $unsubscribeHash = null;
+        if ($toEmail) {
+            $unsubscribeHash = $this->mailHash->getEmailHash($toEmail);
+        }
+
+        if (null == $idHash) {
             // Generate a bogus idHash to prevent errors for routes that may include it
             $idHash = uniqid();
         }
 
-        $unsubscribeText = $this->coreParametersHelper->getParameter('unsubscribe_text');
+        $unsubscribeText = $this->coreParametersHelper->get('unsubscribe_text');
         if (!$unsubscribeText) {
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
-        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
+
+        // We will replace tokens in unsubscribe text too
+        $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
+        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
+        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
 
-        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
-
-        $webviewText = $this->coreParametersHelper->getParameter('webview_text');
+        $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
@@ -276,46 +293,38 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]));
         }
 
-        $signatureText = $this->coreParametersHelper->getParameter('default_signature_text');
-        $fromName      = $this->coreParametersHelper->getParameter('mailer_from_name');
+        $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
+        $fromName      = $this->coreParametersHelper->get('mailer_from_name');
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
     }
 
-    /**
-     * @param EmailSendEvent $event
-     *
-     * @return array
-     */
-    public function convertUrlsToTokens(EmailSendEvent $event)
+    public function convertUrlsToTokens(EmailSendEvent $event): void
     {
-        if ($event->isInternalSend() || $this->coreParametersHelper->getParameter('disable_trackable_urls')) {
+        if ($event->isInternalSend() || $this->coreParametersHelper->get('disable_trackable_urls')) {
             // Don't convert urls
             return;
         }
 
-        $email   = $event->getEmail();
-        $emailId = ($email) ? $email->getId() : null;
-        if (!$email instanceof Email) {
-            $email = $this->emailModel->getEntity($emailId);
-        }
+        $shortenEnabled = $this->coreParametersHelper->get('shortener_email_enable', false);
+        $email          = $event->getEmail();
+        $emailId        = $email instanceof Email ? $email->getId() : null;
+        $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 
-        $utmTags      = $email->getUtmTags();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
         /**
-         * @var string
-         * @var Trackable $trackable
+         * @var Trackable|Redirect $trackable
          */
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, $shortenEnabled, $utmTags)
                 :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, false, $utmTags);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, $shortenEnabled, $utmTags);
 
             $event->addToken($token, $url);
         }
@@ -324,12 +333,13 @@ class BuilderSubscriber extends CommonSubscriber
     /**
      * Parses content for URLs and tokens.
      *
-     * @param EmailSendEvent $event
-     * @param                $emailId
+     * @param int|null $emailId
      *
-     * @return mixed
+     * @return array<mixed>
+     *
+     * @throws MappingException
      */
-    protected function parseContentForUrls(EmailSendEvent $event, $emailId)
+    private function parseContentForUrls(EmailSendEvent $event, $emailId): array
     {
         static $convertedContent = [];
 
@@ -340,14 +350,14 @@ class BuilderSubscriber extends CommonSubscriber
 
             $contentTokens = $event->getTokens();
 
-            list($content, $trackables) = $this->pageTrackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->pageTrackableModel->parseContentForTrackables(
                 [$html, $text],
                 $contentTokens,
                 ($emailId) ? 'email' : null,
                 $emailId
             );
 
-            list($html, $text) = $content;
+            [$html, $text] = $content;
             unset($content);
 
             if ($html) {
@@ -359,9 +369,19 @@ class BuilderSubscriber extends CommonSubscriber
 
             $convertedContent[$event->getContentHash()] = $trackables;
 
-            // Don't need to preserve Trackable or Redirect entities in memory
-            $this->em->clear('Mautic\PageBundle\Entity\Redirect');
-            $this->em->clear('Mautic\PageBundle\Entity\Trackable');
+            foreach ($trackables as $trackable) {
+                $trackableRepository = $this->pageTrackableModel->getRepository();
+                $redirectRepository  = $this->pageRedirectModel->getRepository();
+
+                if ($trackable instanceof Trackable) {
+                    $trackableRepository->detachEntity($trackable);
+                    $redirectRepository->detachEntity($trackable->getRedirect());
+                    $trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
+                } else {
+                    $redirectRepository->detachEntity($trackable);
+                    $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
+                }
+            }
 
             unset($html, $text, $trackables);
         }

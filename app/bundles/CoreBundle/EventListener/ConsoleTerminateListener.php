@@ -1,46 +1,23 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
-/**
- * Class ConsoleTerminateListener.
- */
 class ConsoleTerminateListener
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @param ConsoleTerminateEvent $event
-     */
-    public function onConsoleTerminate(ConsoleTerminateEvent $event)
+    public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         $statusCode = $event->getExitCode();
         $command    = $event->getCommand();
 
-        if ($statusCode === 0) {
+        if (0 === $statusCode) {
             return;
         }
 

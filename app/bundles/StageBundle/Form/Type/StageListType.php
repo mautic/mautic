@@ -1,33 +1,54 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class UserListType.
+ * @extends AbstractType<Stage>
  */
 class StageListType extends AbstractType
 {
-    private $choices = [];
+    /**
+     * @var array<string,int>
+     */
+    private array $choices = [];
+
+    public function __construct(private StageModel $stageModel)
+    {
+        $this->stageModel = $stageModel;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'choices'           => $this->getStageChoices(),
+            'expanded'          => false,
+            'multiple'          => true,
+            'required'          => false,
+            'placeholder'       => 'mautic.core.form.chooseone',
+        ]);
+    }
+
+    public function getParent()
+    {
+        return ChoiceType::class;
+    }
 
     /**
-     * @param MauticFactory $factory
+     * @return array<string,int>
      */
-    public function __construct(MauticFactory $factory)
+    private function getStageChoices(): array
     {
-        $choices = $factory->getModel('stage')->getRepository()->getEntities([
+        if ($this->choices) {
+            return $this->choices;
+        }
+
+        $stages = $this->stageModel->getRepository()->getEntities([
             'filter' => [
                 'force' => [
                     [
@@ -39,39 +60,14 @@ class StageListType extends AbstractType
             ],
         ]);
 
-        foreach ($choices as $choice) {
-            $this->choices[$choice->getId()] = $choice->getName(true);
+        /** @var Stage $stage */
+        foreach ($stages as $stage) {
+            $this->choices[$stage->getName()] = $stage->getId();
         }
 
-        //sort by language
+        // sort by language
         ksort($this->choices);
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults([
-            'choices'     => $this->choices,
-            'empty_value' => false,
-            'expanded'    => false,
-            'multiple'    => true,
-            'required'    => false,
-            'empty_value' => 'mautic.core.form.chooseone',
-        ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'stage_list';
-    }
-
-    public function getParent()
-    {
-        return 'choice';
+        return $this->choices;
     }
 }

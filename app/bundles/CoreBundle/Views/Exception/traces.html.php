@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $formatArgs = function ($args) use (&$formatArgs) {
     $result = [];
     foreach ($args as $key => $item) {
-        if (is_array($item) && isset($item[0]) && is_string($item[0]) && count($item) === 2) {
+        if (is_array($item) && isset($item[0]) && is_string($item[0]) && 2 === count($item)) {
             if ('object' === $item[0]) {
                 $parts          = explode('\\', $item[1]);
                 $short          = array_pop($parts);

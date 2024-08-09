@@ -1,0 +1,12 @@
+{% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
+
+{% block content %}
+    <div class="alert alert-warning">{% trans %}mautic.user.user.passwordreset.info{% endtrans %}</div>
+        {{ form_start(form) }}
+        {{ form_row(form.identifier) }}
+        {{ form_widget(form.submit) }}
+        {{ form_end(form) }}
+    <div class="mt-sm">
+        <a href="{{ path('login') }}">{% trans %}mautic.user.user.passwordreset.back{% endtrans %}</a>
+    </div>
+{% endblock %}

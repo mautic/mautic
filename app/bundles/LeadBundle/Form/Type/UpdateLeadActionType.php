@@ -1,45 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class UpdateLeadActionType.
+ * @extends AbstractType<mixed>
  */
 class UpdateLeadActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
+    public function __construct(
+        private FieldModel $fieldModel
+    ) {
     }
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->factory->getModel('lead.field');
-        $leadFields = $fieldModel->getEntities(
+        $leadFields = $this->fieldModel->getEntities(
             [
                 'force' => [
                     [
@@ -49,11 +32,13 @@ class UpdateLeadActionType extends AbstractType
                     ],
                 ],
                 'hydration_mode' => 'HYDRATE_ARRAY',
+                'result_cache'   => new ResultCacheOptions(LeadField::CACHE_NAMESPACE),
             ]
         );
 
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
+        $options['ignore_date_type']            = true;
 
         $this->getFormFields($builder, $options);
     }
@@ -61,7 +46,7 @@ class UpdateLeadActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'updatelead_action';
     }

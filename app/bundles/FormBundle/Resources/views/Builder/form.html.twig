@@ -1,0 +1,136 @@
+{#
+  Variables
+    - form (\Mautic\FormBundle\Entity\Form)
+    - fieldSettings
+    - viewOnlyFields
+    - fields
+    - theme
+    - submissions
+    - lead
+    - formPages
+    - lastFormPage
+    - style
+    - inBuilder
+    - displayManager
+    - mappedFields (optional)
+#}
+{% set formName = '_' ~ form.generateFormName() ~ suffix|default('') %}
+{% set fields = fields|default(form.fields) %}
+{% set pageCount = 1 %}
+{% set inBuilder = inBuilder|default(false) %}
+{% set action = action|default(url('mautic_form_postresults', {'formId': form.id})) %}
+{% set theme = theme|default('') %}
+{% set mappedFields = mappedFields|default([]) %}
+{% set style = style|default('') %}
+{% set isAjax = isAjax|default(true) %}
+{% set submissions = submissions|default(null) %}
+{% set lead = lead|default(null) %}
+{% set successfulSubmitAction = successfulSubmitAction|default('') %}
+
+{{ style|raw }}
+<style type="text/css" scoped>
+    .mauticform-field-hidden { display:none }
+</style>
+<div id="mauticform_wrapper{{ formName }}" class="mauticform_wrapper">
+    <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes|raw }}>
+        {%- if successfulSubmitAction == 'top' -%}
+            <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
+            <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
+        {%- endif -%}
+        <div class="mauticform-innerform">
+            {# @var \Mautic\FormBundle\Entity\Field $f #}
+            {%- for fieldId, f in fields -%}
+              {%- if formPages['open'][fieldId] is defined -%}
+                  {# Start a new page #}
+                  {%- set lastFieldAttribute = lastFormPage == fieldId ? 'data-mautic-form-pagebreak-lastpage="true"' : '' -%}
+                  <div class="mauticform-page-wrapper mauticform-page-{{ pageCount }}" data-mautic-form-page="{{ pageCount }}" {{ lastFieldAttribute }}>
+              {%- endif -%}
+              {%- if not f.parent and f.showForContact(submissions, lead, form, displayManager) -%}
+                  {%- if f.isCustom -%}
+                      {%- set params = fieldSettings[f.type] -%}
+                      {%- do f.setCustomParameters(params) -%}
+                      {%- set template = params.template -%}
+                  {%- else -%}
+                      {%- if
+                            not f.isAlwaysDisplay and
+                            not f.showWhenValueExists and
+                            f.mappedField is not empty and
+                            'contact' is same as f.mappedObject and
+                            f.isAutoFill and
+                            (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
+                      -%}
+                          {%- do f.setType('hidden') -%}
+                      {%- else -%}
+                          {%- do displayManager.increaseDisplayedFields(f) -%}
+                      {%- endif -%}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
+                  {%- endif %}
+
+                  {# render theme specific form type template file or built-in template #}
+                  {{- include([theme ~ f.type ~ '.html.twig', template], {
+                        'theme': theme,
+                        'field': f.convertToArray,
+                        'id': f.alias,
+                        'formName': formName,
+                        'fieldPage': (pageCount - 1),
+                        'mappedFields': mappedFields,
+                        'inBuilder': inBuilder,
+                        'fields': fields,
+                        'language': form.getLanguage()
+                  }) -}}
+              {%- endif -%}
+
+              {%- set parentField = f -%}
+              {%- for fieldId2, f in fields -%}
+                {%- if 'hidden' != parentField.type and f.parent == parentField.id -%}
+                  {%- if f.isCustom -%}
+                      {%- set params = fieldSettings[f.type] -%}
+                      {%- do f.setCustomParameters(params) -%}
+                      {%- set template = params.template -%}
+                  {%- else -%}
+                      {% if
+                            not f.showWhenValueExists and
+                            f.mappedField is not empty and
+                            'contact' is same as f.mappedObject and
+                            f.isAutoFill and
+                            (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
+                      %}
+                          {%- do f.setType('hidden') -%}
+                      {% endif %}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
+                  {%- endif -%}
+
+                  <!-- start: "{{ theme }}{{ template }}" -->
+                  {{- include([theme ~ f.type ~ '.html.twig', template], {
+                          'field': f.convertToArray,
+                          'id': f.alias,
+                          'formName': formName,
+                          'fieldPage': (pageCount - 1),
+                          'mappedFields': mappedFields,
+                          'inBuilder': inBuilder,
+                          'fields': fields,
+                          'language': form.getLanguage()
+                  }) -}}
+                  <!-- end: "{{ theme }}{{ template }}" -->
+                {%- endif -%}
+              {%- endfor -%}
+
+              {%- if formPages is defined and formPages['close'][fieldId] is defined -%}
+                  {# Close the page #}
+                  </div>
+                  {%- set pageCount = pageCount + 1 -%}
+              {%- endif -%}
+            {%- endfor -%}
+        </div>
+
+        {%- if successfulSubmitAction == 'bottom' -%}
+            <div class="mauticform-error" id="mauticform{{ formName }}_error"></div>
+            <div class="mauticform-message" id="mauticform{{ formName }}_message"></div>
+        {%- endif -%}
+
+        <input type="hidden" name="mauticform[formId]" id="mauticform{{ formName }}_id" value="{{ form.id|e }}"/>
+        <input type="hidden" name="mauticform[return]" id="mauticform{{ formName }}_return" value=""/>
+        <input type="hidden" name="mauticform[formName]" id="mauticform{{ formName }}_name" value="{{ formName|trim('_', 'left')|e }}"/>
+        {{ formExtra|default('') }}
+    </form>
+</div>

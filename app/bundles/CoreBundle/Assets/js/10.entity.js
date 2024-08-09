@@ -63,7 +63,16 @@ Mautic.filterTableData = function (name, filterby, filterValue, tmpl, target, ba
         baseUrl = baseUrl + "?tmpl=" + tmpl
     }
 
-    var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + "&value=" + encodeURIComponent(filterValue)
+    var value = '';
+    if (mQuery.isArray(filterValue)) {
+        for (var i = 0; i < filterValue.length; i++) {
+            value += '&value[]=' + encodeURIComponent(filterValue[i]);
+        }
+    } else {
+        value = "&value=" + encodeURIComponent(filterValue)
+    }
+
+    var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + value
     Mautic.loadContent(route, '', 'POST', target);
 };
 
@@ -127,8 +136,9 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             }
 
             if (typeof Mautic.liveSearchXhr !== 'undefined') {
-                //ensure current search request is aborted
-                Mautic['liveSearchXhr'].abort();
+                // ensure current search request is aborted
+                // with different statusText.
+                Mautic['liveSearchXhr'].abort('searchCompleted');
             }
 
             var btn = "button[data-livesearch-parent='" + elId + "']";
@@ -174,10 +184,10 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     if (mQuery(btn).length) {
                         if (action == 'clear') {
                             mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('fa-eraser').addClass('fa-search');
+                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
                         } else {
                             mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('fa-search').addClass('fa-eraser');
+                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
                         }
                     }
 
@@ -196,10 +206,10 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     if (mQuery(btn).length) {
                         if (action == 'clear') {
                             mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('fa-eraser').addClass('fa-search');
+                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
                         } else {
                             mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('fa-search').addClass('fa-eraser');
+                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
                         }
                     }
                 },
@@ -270,12 +280,13 @@ Mautic.unlockEntity = function (model, id, parameter) {
 Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     event.preventDefault();
 
-    var wasPublished = mQuery(el).hasClass('fa-toggle-on');
+    var wasPublished = mQuery(el).hasClass('ri-toggle-fill');
+    var element = mQuery(el);
 
-    mQuery(el).removeClass('fa-toggle-on fa-toggle-off').addClass('fa-spin fa-spinner');
+    element.removeClass('fa-toggle-on fa-toggle-off').addClass('ri-spin ri-loader-3-line');
 
     //destroy tooltips so it can be regenerated
-    mQuery(el).tooltip('destroy');
+    element.tooltip('destroy');
     //clear the lookup cache
     MauticVars.liveCache = new Array();
 
@@ -286,7 +297,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     if (extra) {
         extra = '&' + extra;
     }
-    mQuery(el).tooltip('destroy');
+    element.tooltip('destroy');
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",
@@ -296,13 +307,13 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
             if (response.reload) {
                 Mautic.redirectWithBackdrop(window.location);
             } else if (response.statusHtml) {
-                mQuery(el).replaceWith(response.statusHtml);
-                mQuery(el).tooltip({html: true, container: 'body'});
+                element.replaceWith(response.statusHtml);
+                element.tooltip({html: true, container: 'body'});
             }
         },
         error: function (request, textStatus, errorThrown) {
-            var addClass = (wasPublished) ? 'fa-toggle-on' : 'fa-toggle-off';
-            mQuery(el).removeClass('fa-spin fa-spinner').addClass(addClass);
+            var addClass = (wasPublished) ? 'ri-toggle-fill' : 'ri-toggle-line';
+            element.removeClass('ri-spin ri-loader-3-line').addClass(addClass);
 
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }

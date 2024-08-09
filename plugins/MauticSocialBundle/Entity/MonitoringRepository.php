@@ -1,36 +1,15 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class MonitoringRepository.
+ * @extends CommonRepository<Monitoring>
  */
 class MonitoringRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @param array $args
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
-    {
-        return parent::getEntities($args);
-    }
-
     /**
      * @param array $args
      *
@@ -47,26 +26,20 @@ class MonitoringRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @return float|int
-     */
-    public function getPublishedEntitiesCount()
+    public function getPublishedEntitiesCount(): int
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
         $q->where($expr);
         $args['qb'] = $q;
 
-        return parent::getEntities($args)->count();
+        return count(parent::getEntities($args));
     }
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addCatchAllWhereClause($q, $filter)
+    protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -80,27 +53,21 @@ class MonitoringRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
      */
-    protected function addSearchCommandWhereClause($q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 'e';
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getSearchCommands()
+    public function getSearchCommands(): array
     {
         return $this->getStandardSearchCommands();
     }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -16,9 +7,6 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -48,39 +36,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'campaign:campaigns:viewother',
     ];
 
-    /**
-     * @var EventModel
-     */
-    protected $campaignEventModel;
-
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
-
-    /**
-     * DashboardSubscriber constructor.
-     *
-     * @param CampaignModel $campaignModel
-     * @param EventModel    $campaignEventModel
-     */
-    public function __construct(CampaignModel $campaignModel, EventModel $campaignEventModel)
-    {
-        $this->campaignModel      = $campaignModel;
-        $this->campaignEventModel = $campaignEventModel;
+    public function __construct(
+        protected CampaignModel $campaignModel,
+        protected EventModel $campaignEventModel
+    ) {
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('campaign:campaigns:viewother');
 
-        if ($event->getType() == 'events.in.time') {
+        if ('events.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -99,11 +69,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'leads.added.in.time') {
+        if ('leads.added.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -122,7 +92,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
         }
     }

@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class PostCount.
- */
 class PostCount
 {
     /**
@@ -25,12 +13,12 @@ class PostCount
     private $id;
 
     /**
-     * @var Monitoring
+     * @var Monitoring|null
      */
     private $monitor;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $postDate;
 
@@ -39,15 +27,12 @@ class PostCount
      */
     private $postCount;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('monitor_post_count')
-            ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\PostCountRepository');
+            ->setCustomRepositoryClass(PostCountRepository::class);
 
         $builder->addId();
 
@@ -69,7 +54,7 @@ class PostCount
     }
 
     /**
-     * @return \MauticPlugin\MauticSocialBundle\Entity\Monitoring
+     * @return Monitoring
      */
     public function getMonitor()
     {
@@ -109,7 +94,7 @@ class PostCount
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPostDate()
     {
@@ -117,8 +102,6 @@ class PostCount
     }
 
     /**
-     * @param $postDate
-     *
      * @return $this
      */
     public function setPostDate($postDate)

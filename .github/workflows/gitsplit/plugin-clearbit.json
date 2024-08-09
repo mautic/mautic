@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "MauticClearbitBundle",
+            "directory": "plugins/MauticClearbitBundle",
+            "target": "git@github.com:mautic/plugin-clearbit.git"
+        }
+    ]
+}

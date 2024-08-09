@@ -1,40 +1,38 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\NotificationBundle\Entity\Notification;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class NotificationType.
+ * @extends AbstractType<Notification>
  */
 class MobileNotificationType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('notification.notification', $options));
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.notification.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -44,7 +42,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.notification.form.internal.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -55,7 +53,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->add(
             'heading',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.notification.form.mobile.heading',
                 'label_attr' => ['class' => 'control-label'],
@@ -65,7 +63,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->add(
             'message',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.notification.form.message',
                 'label_attr' => ['class' => 'control-label'],
@@ -78,7 +76,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->add(
             'url',
-            'url',
+            UrlType::class,
             [
                 'label'      => 'mautic.notification.form.mobile.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -92,7 +90,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],
@@ -104,44 +102,14 @@ class MobileNotificationType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
-        $builder->add(
-            'publishUp',
-            'datetime',
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'publishDown',
-            'datetime',
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
-        );
-
-        //add category
+        // add category
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             [
                 'bundle' => 'notification',
             ]
@@ -149,7 +117,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->add(
             'language',
-            'locale',
+            LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
@@ -160,19 +128,19 @@ class MobileNotificationType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                 ]
             );
             $builder->add(
                 'updateSelect',
-                'hidden',
+                HiddenType::class,
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
@@ -181,7 +149,7 @@ class MobileNotificationType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons'
+                FormButtonsType::class
             );
         }
 
@@ -203,25 +171,14 @@ class MobileNotificationType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\NotificationBundle\Entity\Notification',
+                'data_class' => Notification::class,
             ]
         );
 
-        $resolver->setOptional(['update_select']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'mobile_notification';
+        $resolver->setDefined(['update_select']);
     }
 }

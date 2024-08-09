@@ -1,34 +1,18 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+
+trigger_deprecation('mautic/core', '4.3', 'The "%s" class is deprecated, will be removed in 5.0', CustomFormEvent::class);
 
 /**
- * Class CustomFormEvent.
+ * @deprecated since M4, will be removed in M5 because it's not used
  */
 class CustomFormEvent extends Event
 {
-    /**
-     * @var
-     */
-    protected $formName;
-
-    /**
-     * @var
-     */
-    protected $formType;
-
     /**
      * @var array
      */
@@ -40,18 +24,18 @@ class CustomFormEvent extends Event
     protected $subscribers = [];
 
     /**
-     * CustomFormEvent constructor.
-     *
-     * @param $formName
+     * @param string $formName
+     * @param string $formType
      */
-    public function __construct($formName, $formType)
-    {
-        $this->formName = $formName;
-        $this->formType = $formType;
+    public function __construct(
+        protected $formName,
+        protected $formType,
+        private FormBuilderInterface $formBuilder
+    ) {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getFormName()
     {
@@ -59,11 +43,19 @@ class CustomFormEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getFormType()
     {
         return $this->formType;
+    }
+
+    /**
+     * @return FormBuilderInterface
+     */
+    public function getFormBuilder()
+    {
+        return $this->formBuilder;
     }
 
     /**
@@ -82,11 +74,7 @@ class CustomFormEvent extends Event
         return $this->subscribers;
     }
 
-    /**
-     * @param $eventName
-     * @param $listener
-     */
-    public function addListener($eventName, $listener)
+    public function addListener($eventName, $listener): void
     {
         if (!is_callable($listener)) {
             throw new \InvalidArgumentException('$listener must be callable');
@@ -95,10 +83,7 @@ class CustomFormEvent extends Event
         $this->listeners[$eventName][] = $listener;
     }
 
-    /**
-     * @param EventSubscriberInterface $subscriber
-     */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         $this->subscribers[] = $subscriber;
     }

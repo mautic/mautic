@@ -1,26 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class DashboardSubscriber.
- */
-class DashboardSubscriber extends CommonSubscriber
+class DashboardSubscriber implements EventSubscriberInterface
 {
     /**
      * Define the name of the bundle/category of the widget(s).
@@ -43,24 +31,31 @@ class DashboardSubscriber extends CommonSubscriber
      */
     protected $permissions = [];
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE   => ['onWidgetListGenerate', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE   => ['onWidgetFormGenerate', 0],
+            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD => ['onWidgetDetailPreLoad', 0],
             DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => ['onWidgetDetailGenerate', 0],
         ];
     }
 
     /**
-     * Adds widget new widget types to the list of available widget types.
+     * Generates widget preview without data.
      *
-     * @param WidgetTypeListEvent $event
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function onWidgetListGenerate(WidgetTypeListEvent $event)
+    public function onWidgetDetailPreLoad(WidgetDetailEvent $event): void
+    {
+        $event->setTemplate('@MauticCore/Helper/chart.html.twig');
+        $event->stopPropagation();
+    }
+
+    /**
+     * Adds widget new widget types to the list of available widget types.
+     */
+    public function onWidgetListGenerate(WidgetTypeListEvent $event): void
     {
         if ($this->permissions && !$event->hasPermissions($this->permissions)) {
             return;
@@ -75,10 +70,8 @@ class DashboardSubscriber extends CommonSubscriber
 
     /**
      * Set a widget edit form when needed.
-     *
-     * @param WidgetFormEvent $event
      */
-    public function onWidgetFormGenerate(WidgetFormEvent $event)
+    public function onWidgetFormGenerate(WidgetFormEvent $event): void
     {
         if (isset($this->types[$event->getType()])) {
             $event->setForm($this->types[$event->getType()]);
@@ -88,19 +81,15 @@ class DashboardSubscriber extends CommonSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
-    public function onWidgetDetailGenerate(WidgetDetailEvent $event)
+    public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
-    public function checkPermissions(WidgetDetailEvent $event)
+    public function checkPermissions(WidgetDetailEvent $event): void
     {
         $widgetTypes = array_keys($this->types);
         if ($this->permissions && !$event->hasPermissions($this->permissions) && in_array($event->getType(), $widgetTypes)) {

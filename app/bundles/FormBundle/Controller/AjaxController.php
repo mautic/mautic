@@ -1,32 +1,48 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\FieldCollectorInterface;
+use Mautic\FormBundle\Crate\FieldCrate;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
+    public function __construct(
+        private FieldCollectorInterface $fieldCollector,
+        private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
+        ManagerRegistry $doctrine,
+        MauticFactory $factory,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security
+    ) {
+        parent::__construct($doctrine, $factory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    }
+
     /**
-     * @param Request $request
-     * @param string  $name
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @param string $name
      */
-    protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
+    public function reorderFieldsAction(Request $request, $bundle, $name = 'fields'): JsonResponse
     {
         if ('form' === $name) {
             $name = 'fields';
@@ -34,8 +50,8 @@ class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
-        $session     = $this->get('session');
-        $orderName   = ($name == 'fields') ? 'mauticform' : 'mauticform_action';
+        $session     = $request->getSession();
+        $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
         $order       = InputHelper::clean($request->request->get($orderName));
         $components  = $session->get($sessionName);
 
@@ -48,49 +64,62 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function reorderActionsAction(Request $request)
+    public function getFieldsForObjectAction(Request $request): JsonResponse
+    {
+        $formId       = $request->get('formId');
+        $mappedObject = $request->get('mappedObject');
+        $mappedField  = $request->get('mappedField');
+        $mappedFields = $this->mappedFieldCollector->getFields($formId, $mappedObject);
+        $fields       = $this->fieldCollector->getFields($mappedObject);
+        $fields       = $fields->removeFieldsWithKeys($mappedFields, $mappedField);
+
+        return $this->sendJsonResponse(
+            [
+                'fields' => array_map(
+                    fn (FieldCrate $field): array => [
+                        'label'      => $field->getName(),
+                        'value'      => $field->getKey(),
+                        'isListType' => $field->isListType(),
+                    ],
+                    $fields->getArrayCopy()
+                ),
+            ]
+        );
+    }
+
+    public function reorderActionsAction(Request $request): JsonResponse
     {
         return $this->reorderFieldsAction($request, 'actions');
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function updateFormFieldsAction(Request $request)
+    public function updateFormFieldsAction(Request $request): JsonResponse
     {
-        $formId     = InputHelper::int($request->request->get('formId'));
+        $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
         $model      = $this->getModel('form');
         $entity     = $model->getEntity($formId);
-        $formFields = $entity->getFields();
+        $formFields = empty($entity) ? [] : $entity->getFields();
         $fields     = [];
 
         foreach ($formFields as $field) {
-            if ($field->getType() != 'button') {
+            if ('button' != $field->getType()) {
                 $properties = $field->getProperties();
                 $options    = [];
 
                 if (!empty($properties['list']['list'])) {
-                    //If the field is a SELECT field then the data gets stored in [list][list]
+                    // If the field is a SELECT field then the data gets stored in [list][list]
                     $optionList = $properties['list']['list'];
                 } elseif (!empty($properties['optionlist']['list'])) {
-                    //If the field is a radio or a checkbox then it will be stored in [optionlist][list]
+                    // If the field is a radio or a checkbox then it will be stored in [optionlist][list]
                     $optionList = $properties['optionlist']['list'];
                 }
                 if (!empty($optionList)) {
                     foreach ($optionList as $listItem) {
                         if (is_array($listItem) && isset($listItem['value']) && isset($listItem['label'])) {
-                            //The select box needs values to be [value] => label format so make sure we have that style then put it in
+                            // The select box needs values to be [value] => label format so make sure we have that style then put it in
                             $options[$listItem['value']] = $listItem['label'];
                         } elseif (!is_array($listItem)) {
-                            //Keeping for BC
+                            // Keeping for BC
                             $options[] = $listItem;
                         }
                     }
@@ -103,6 +132,9 @@ class AjaxController extends CommonAjaxController
                     'type'    => $field->getType(),
                     'options' => $options,
                 ];
+
+                // Be sure to not pollute the symbol table.
+                unset($optionList);
             }
         }
 
@@ -114,12 +146,10 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Ajax submit for forms.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function submitAction()
+    public function submitAction(Request $request): JsonResponse
     {
-        $response     = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all(), [], ['ajax' => true]);
+        $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $request->request->all(), [], ['ajax' => true]);
         $responseData = json_decode($response->getContent(), true);
         $success      = (!in_array($response->getStatusCode(), [404, 500]) && empty($responseData['errorMessage'])
             && empty($responseData['validationErrors']));

@@ -1,204 +1,147 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
+
+use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait OperatorListTrait
 {
+    /**
+     * @var array<string, array<string, array<int, string>>>
+     */
     protected $typeOperators = [
         'text' => [
             'include' => [
-                '=',
-                '!=',
-                'empty',
-                '!empty',
-                'like',
-                '!like',
-                'regexp',
-                '!regexp',
-                'startsWith',
-                'endsWith',
-                'contains',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
             ],
         ],
         'select' => [
             'include' => [
-                '=',
-                '!=',
-                'empty',
-                '!empty',
-                'regexp',
-                '!regexp',
-                'in',
-                '!in',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::IN,
+                OperatorOptions::NOT_IN,
             ],
         ],
         'bool' => [
             'include' => [
-                '=',
-                '!=',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
             ],
         ],
         'default' => [
-            'exclude' => [
-                'in',
-                '!in',
-                'date',
+            'include' => [
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::GREATER_THAN,
+                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                OperatorOptions::LESS_THAN,
+                OperatorOptions::LESS_THAN_OR_EQUAL,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::BETWEEN,
+                OperatorOptions::NOT_BETWEEN,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
             ],
         ],
         'multiselect' => [
             'include' => [
-                'in',
-                '!in',
+                OperatorOptions::IN,
+                OperatorOptions::NOT_IN,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
             ],
         ],
         'date' => [
-            'exclude' => [
-                'in',
-                '!in',
+            'include' => [
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::GREATER_THAN,
+                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                OperatorOptions::LESS_THAN,
+                OperatorOptions::LESS_THAN_OR_EQUAL,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::BETWEEN,
+                OperatorOptions::NOT_BETWEEN,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::DATE,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
             ],
         ],
         'lookup_id' => [
             'include' => [
-                '=',
-                '!=',
-                'empty',
-                '!empty',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+            ],
+        ],
+        'number' => [
+            'include' => [
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::GREATER_THAN,
+                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                OperatorOptions::LESS_THAN,
+                OperatorOptions::LESS_THAN_OR_EQUAL,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
             ],
         ],
     ];
 
-    protected $operatorOptions = [
-        '=' => [
-            'label'       => 'mautic.lead.list.form.operator.equals',
-            'expr'        => 'eq',
-            'negate_expr' => 'neq',
-        ],
-        '!=' => [
-            'label'       => 'mautic.lead.list.form.operator.notequals',
-            'expr'        => 'neq',
-            'negate_expr' => 'eq',
-        ],
-        'gt' => [
-            'label'       => 'mautic.lead.list.form.operator.greaterthan',
-            'expr'        => 'gt',
-            'negate_expr' => 'lt',
-        ],
-        'gte' => [
-            'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
-            'expr'        => 'gte',
-            'negate_expr' => 'lt',
-        ],
-        'lt' => [
-            'label'       => 'mautic.lead.list.form.operator.lessthan',
-            'expr'        => 'lt',
-            'negate_expr' => 'gt',
-        ],
-        'lte' => [
-            'label'       => 'mautic.lead.list.form.operator.lessthanequals',
-            'expr'        => 'lte',
-            'negate_expr' => 'gt',
-        ],
-        'empty' => [
-            'label'       => 'mautic.lead.list.form.operator.isempty',
-            'expr'        => 'empty', //special case
-            'negate_expr' => 'notEmpty',
-        ],
-        '!empty' => [
-            'label'       => 'mautic.lead.list.form.operator.isnotempty',
-            'expr'        => 'notEmpty', //special case
-            'negate_expr' => 'empty',
-        ],
-        'like' => [
-            'label'       => 'mautic.lead.list.form.operator.islike',
-            'expr'        => 'like',
-            'negate_expr' => 'notLike',
-        ],
-        '!like' => [
-            'label'       => 'mautic.lead.list.form.operator.isnotlike',
-            'expr'        => 'notLike',
-            'negate_expr' => 'like',
-        ],
-        'between' => [
-            'label'       => 'mautic.lead.list.form.operator.between',
-            'expr'        => 'between', //special case
-            'negate_expr' => 'notBetween',
-            // @todo implement in list UI
-            'hide' => true,
-        ],
-        '!between' => [
-            'label'       => 'mautic.lead.list.form.operator.notbetween',
-            'expr'        => 'notBetween', //special case
-            'negate_expr' => 'between',
-            // @todo implement in list UI
-            'hide' => true,
-        ],
-        'in' => [
-            'label'       => 'mautic.lead.list.form.operator.in',
-            'expr'        => 'in',
-            'negate_expr' => 'notIn',
-        ],
-        '!in' => [
-            'label'       => 'mautic.lead.list.form.operator.notin',
-            'expr'        => 'notIn',
-            'negate_expr' => 'in',
-        ],
-        'regexp' => [
-            'label'       => 'mautic.lead.list.form.operator.regexp',
-            'expr'        => 'regexp', //special case
-            'negate_expr' => 'notRegexp',
-        ],
-        '!regexp' => [
-            'label'       => 'mautic.lead.list.form.operator.notregexp',
-            'expr'        => 'notRegexp', //special case
-            'negate_expr' => 'regexp',
-        ],
-        'date' => [
-            'label'       => 'mautic.lead.list.form.operator.date',
-            'expr'        => 'date', //special case
-            'negate_expr' => 'date',
-            'hide'        => true,
-        ],
-        'startsWith' => [
-            'label'       => 'mautic.core.operator.starts.with',
-            'expr'        => 'startsWith',
-            'negate_expr' => 'startsWith',
-        ],
-        'endsWith' => [
-            'label'       => 'mautic.core.operator.ends.with',
-            'expr'        => 'endsWith',
-            'negate_expr' => 'endsWith',
-        ],
-        'contains' => [
-            'label'       => 'mautic.core.operator.contains',
-            'expr'        => 'contains',
-            'negate_expr' => 'contains',
-        ],
-    ];
-
     /**
-     * @param null $operator
+     * @deprecated to be removed in Mautic 3. Use FilterOperatorProvider::getAllOperators() instead.
      *
-     * @return array
+     * @param string|null $operator
+     *
+     * @return array<string,array<string,string>>|array<string,string>
      */
     public function getFilterExpressionFunctions($operator = null)
     {
-        return (null === $operator) ? $this->operatorOptions : $this->operatorOptions[$operator];
+        $operatorOption = OperatorOptions::getFilterExpressionFunctions();
+
+        return (null === $operator) ? $operatorOption : $operatorOption[$operator];
     }
 
     /**
-     * @param null|string|array $type
-     * @param array             $overrideHiddenTypes
+     * @param string|mixed[]|null $type
+     * @param mixed[]             $overrideHiddenTypes
      *
-     * @return array
+     * @return mixed[]
      */
     public function getOperatorsForFieldType($type = null, $overrideHiddenTypes = [])
     {
@@ -210,7 +153,7 @@ trait OperatorListTrait
             return $processedTypes[$type];
         }
 
-        $this->normalizeType($type);
+        $type = $this->normalizeType($type);
 
         if (null === $type) {
             foreach ($this->typeOperators as $type => $def) {
@@ -228,12 +171,12 @@ trait OperatorListTrait
     }
 
     /**
-     * @param       $definition
-     * @param array $overrideHiddenOperators
+     * @param mixed[] $definition
+     * @param mixed[] $overrideHiddenOperators
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getOperatorChoiceList($definition, $overrideHiddenOperators = [])
+    public function getOperatorChoiceList($definition, $overrideHiddenOperators = []): array
     {
         static $operatorChoices = [];
         if (empty($operatorChoices)) {
@@ -255,36 +198,44 @@ trait OperatorListTrait
             $choices = array_diff_key($choices, array_flip($definition['exclude']));
         }
 
-        if (isset($this->translator)) {
+        if (property_exists($this, 'translator')) {
             foreach ($choices as $value => $label) {
                 $choices[$value] = $this->translator->trans($label);
             }
         }
 
-        return $choices;
+        return array_flip($choices);
     }
 
     /**
-     * Normalize type operator.
-     *
-     * @param $type
+     * @deprecated These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary. To be removed in next Mautic version.
      */
-    protected function normalizeType(&$type)
+    protected function normalizeType(mixed $type): mixed
     {
         if (null === $type) {
-            return;
+            return $type;
         }
 
-        if ($type === 'boolean') {
-            $type = 'bool';
-        } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
-            $type = 'select';
-        } elseif (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
-            $type = 'text';
-        } elseif ($type === 'datetime') {
-            $type = 'date';
-        } elseif (!array_key_exists($type, $this->typeOperators)) {
-            $type = 'default';
+        if ('boolean' === $type) {
+            return 'bool';
         }
+
+        if (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
+            return 'select';
+        }
+
+        if (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
+            return 'text';
+        }
+
+        if ('datetime' === $type) {
+            return 'date';
+        }
+
+        if (!array_key_exists($type, $this->typeOperators)) {
+            return 'default';
+        }
+
+        return $type;
     }
 }

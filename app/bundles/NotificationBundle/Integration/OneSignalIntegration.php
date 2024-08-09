@@ -1,15 +1,5 @@
 <?php
 
-
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -17,32 +7,21 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 
-/**
- * Class OneSignalIntegration.
- */
 class OneSignalIntegration extends AbstractIntegration
 {
-    /**
-     * @var bool
-     */
-    protected $coreIntegration = true;
+    protected bool $coreIntegration = true;
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'OneSignal';
     }
 
-    public function getIcon()
+    public function getIcon(): string
     {
         return 'app/bundles/NotificationBundle/Assets/img/OneSignal.png';
     }
 
-    public function getSupportedFeatures()
+    public function getSupportedFeatures(): array
     {
         return [
             'mobile',
@@ -52,7 +31,7 @@ class OneSignalIntegration extends AbstractIntegration
         ];
     }
 
-    public function getSupportedFeatureTooltips()
+    public function getSupportedFeatureTooltips(): array
     {
         return [
             'landing_page_enabled'  => 'mautic.integration.form.features.landing_page_enabled.tooltip',
@@ -61,11 +40,9 @@ class OneSignalIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return array
+     * @return array<string, string>
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'app_id'        => 'mautic.notification.config.form.notification.app_id',
@@ -75,22 +52,7 @@ class OneSignalIntegration extends AbstractIntegration
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => false,
-        ];
-    }
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
+    public function getAuthenticationType(): string
     {
         return 'none';
     }
@@ -100,9 +62,9 @@ class OneSignalIntegration extends AbstractIntegration
      * @param array                                             $data
      * @param string                                            $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea)
+    public function appendToForm(&$builder, $data, $formArea): void
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             /* @var FormBuilder $builder */
             $builder->add(
                 'subdomain_name',
@@ -121,17 +83,17 @@ class OneSignalIntegration extends AbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'ios'     => 'mautic.integration.form.platforms.ios',
-                        'android' => 'mautic.integration.form.platforms.android',
+                        'mautic.integration.form.platforms.ios'     => 'ios',
+                        'mautic.integration.form.platforms.android' => 'android',
                     ],
-                    'attr' => [
+                    'attr'              => [
                         'tooltip'      => 'mautic.integration.form.platforms.tooltip',
                         'data-show-on' => '{"integration_details_supportedFeatures_0":"checked"}',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.integration.form.platforms',
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                 ]
             );

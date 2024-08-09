@@ -1,48 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class FormSubmitActionAddUtmTagType.
+ * @extends AbstractType<mixed>
  */
 class AddToCompanyActionType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @param RouterInterface $router
-     */
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'company',
-            'company_list',
+            CompanyListType::class,
             [
                 'multiple'    => false,
                 'required'    => true,
@@ -66,12 +46,12 @@ class AddToCompanyActionType extends AbstractType
 
         $builder->add(
             'newCompanyButton',
-            'button',
+            ButtonType::class,
             [
                 'attr' => [
                     'class'   => 'btn btn-primary btn-nospin',
                     'onclick' => 'Mautic.loadNewWindow({"windowUrl": "'.$windowUrl.'"})',
-                    'icon'    => 'fa fa-plus',
+                    'icon'    => 'ri-add-line',
                 ],
                 'label' => 'mautic.company.new.company',
             ]
@@ -81,7 +61,7 @@ class AddToCompanyActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'addtocompany_action';
     }

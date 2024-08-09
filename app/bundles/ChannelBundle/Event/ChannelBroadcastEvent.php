@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class ChannelBroadcastEvent.
- */
 class ChannelBroadcastEvent extends Event
 {
     /**
@@ -36,26 +24,45 @@ class ChannelBroadcastEvent extends Event
     /**
      * Number of contacts successfully processed and/or failed per channel.
      *
-     * @var int
+     * @var array
      */
     protected $results = [];
 
     /**
-     * @var OutputInterface
+     * Min contact ID filter can be used for process parallelization.
+     *
+     * @var int
      */
-    protected $output;
+    private $minContactIdFilter;
 
     /**
-     * MaintenanceEvent constructor.
+     * Max contact ID filter can be used for process parallelization.
      *
-     * @param int  $daysOld
-     * @param bool $dryRun
+     * @var int
      */
-    public function __construct($channel, $channelId, OutputInterface $output)
-    {
+    private $maxContactIdFilter;
+
+    /**
+     * How many contacts to load from the database.
+     */
+    private int $limit = 100;
+
+    /**
+     * How big batches to use to actually send.
+     */
+    private int $batch = 50;
+
+    private ?int $maxThreads = null;
+
+    private ?int $threadId = null;
+
+    public function __construct(
+        $channel,
+        $channelId,
+        protected OutputInterface $output
+    ) {
         $this->channel = $channel;
         $this->id      = $channelId;
-        $this->output  = $output;
     }
 
     /**
@@ -75,32 +82,28 @@ class ChannelBroadcastEvent extends Event
     }
 
     /**
-     * @param     $channelLabel
-     * @param int $successCount
-     * @param int $failedCount
+     * @param string $channelLabel
+     * @param int    $successCount
+     * @param int    $failedCount
      */
-    public function setResults($channelLabel, $successCount, $failedCount = 0)
+    public function setResults($channelLabel, $successCount, $failedCount = 0, array $failedRecipientsByList = []): void
     {
         $this->results[$channelLabel] = [
-            'success' => (int) $successCount,
-            'failed'  => (int) $failedCount,
+            'success'                => (int) $successCount,
+            'failed'                 => (int) $failedCount,
+            'failedRecipientsByList' => $failedRecipientsByList,
         ];
     }
 
     /**
-     * @return int
+     * @return array
      */
     public function getResults()
     {
         return $this->results;
     }
 
-    /**
-     * @param $channel
-     *
-     * @return bool
-     */
-    public function checkContext($channel)
+    public function checkContext($channel): bool
     {
         if ($this->channel && $this->channel !== $channel) {
             return false;
@@ -115,5 +118,83 @@ class ChannelBroadcastEvent extends Event
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * @param int $minContactIdFilter
+     */
+    public function setMinContactIdFilter($minContactIdFilter): void
+    {
+        $this->minContactIdFilter = $minContactIdFilter;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getMinContactIdFilter()
+    {
+        return $this->minContactIdFilter;
+    }
+
+    /**
+     * @param int $maxContactIdFilter
+     */
+    public function setMaxContactIdFilter($maxContactIdFilter): void
+    {
+        $this->maxContactIdFilter = $maxContactIdFilter;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getMaxContactIdFilter()
+    {
+        return $this->maxContactIdFilter;
+    }
+
+    /**
+     * @param int $limit
+     */
+    public function setLimit($limit): void
+    {
+        $this->limit = $limit;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @param int $batch
+     */
+    public function setBatch($batch): void
+    {
+        $this->batch = $batch;
+    }
+
+    public function getBatch(): int
+    {
+        return $this->batch;
+    }
+
+    public function getMaxThreads(): ?int
+    {
+        return $this->maxThreads;
+    }
+
+    public function setMaxThreads(?int $maxThreads): void
+    {
+        $this->maxThreads = $maxThreads;
+    }
+
+    public function getThreadId(): ?int
+    {
+        return $this->threadId;
+    }
+
+    public function setThreadId(?int $threadId): void
+    {
+        $this->threadId = $threadId;
     }
 }

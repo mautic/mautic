@@ -1,48 +1,24 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EventModel
-     */
-    protected $campaignEventModel;
-
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param EventModel $campaignEventModel
-     */
-    public function __construct(EventModel $campaignEventModel)
-    {
-        $this->campaignEventModel = $campaignEventModel;
+    public function __construct(
+        private RealTimeExecutioner $realTimeExecutioner
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
@@ -51,16 +27,13 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $trigger = [
             'label'          => 'mautic.asset.campaign.event.download',
             'description'    => 'mautic.asset.campaign.event.download_descr',
             'eventName'      => AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-            'formType'       => 'campaignevent_assetdownload',
+            'formType'       => CampaignEventAssetDownloadType::class,
             'channel'        => 'asset',
             'channelIdField' => 'assets',
         ];
@@ -70,26 +43,21 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for asset download.
-     *
-     * @param AssetLoadEvent $event
      */
-    public function onAssetDownload(AssetLoadEvent $event)
+    public function onAssetDownload(AssetLoadEvent $event): void
     {
         $asset = $event->getRecord()->getAsset();
 
-        if ($asset !== null) {
-            $this->campaignEventModel->triggerEvent('asset.download', $asset, 'asset', $asset->getId());
+        if (null !== $asset) {
+            $this->realTimeExecutioner->execute('asset.download', $asset, 'asset', $asset->getId());
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
 
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return $event->setResult(true);
         }
 
@@ -97,7 +65,7 @@ class CampaignSubscriber extends CommonSubscriber
         $limitToAssets = $event->getConfig()['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
-            //no points change
+            // no points change
             return $event->setResult(false);
         }
 

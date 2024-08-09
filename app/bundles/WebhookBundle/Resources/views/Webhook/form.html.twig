@@ -1,0 +1,50 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}{{ entity.getId() ? 
+    'mautic.webhook.webhook.header.edit'|trans({'%name%': entity.getName()|trans}) :
+    'mautic.webhook.webhook.header.new'|trans }}{% endblock %}
+{% block mauticContent %}mauticWebhook{% endblock %}
+
+{% block content %}
+{{ form_start(form) }}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 height-auto">
+        <div class="pa-md">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.description) }}
+                    {{ form_row(form.secret) }}
+                    {{ form_row(form.webhookUrl) }}
+                    <div class="row">
+                        <div class="col-md-5">
+                            {{ form_row(form.sendTest) }}
+                        </div>
+                        <div class="col-md-2">
+                            <span id="spinner" class="ri-loader-3-line ri-spin hide"></span>
+                        </div>
+                        <div class="col-md-5">
+                            <div id="tester" class="text-right"></div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-6" id="event-types">
+                    {{ form_row(form.events) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 height-auto bdr-l">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {{ form_row(form.category) }}
+            {{ form_row(form.eventsOrderbyDir) }}
+            {{ form_row(form.isPublished) }}
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+
+{% endblock %}

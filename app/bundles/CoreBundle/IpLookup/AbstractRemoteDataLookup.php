@@ -1,19 +1,9 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
-/**
- * Class AbstractRemoteDataLookup.
- */
+use GuzzleHttp\Exception\GuzzleException;
+
 abstract class AbstractRemoteDataLookup extends AbstractLookup
 {
     /**
@@ -31,8 +21,6 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     abstract protected function getUrl();
 
     /**
-     * @param $response
-     *
      * @return mixed
      */
     abstract protected function parseResponse($response);
@@ -62,11 +50,18 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
 
         try {
             $response = ('post' == $this->method) ?
-                $this->connector->post($url, $this->getParameters(), $this->getHeaders(), 10) :
-                $this->connector->get($url, $this->getHeaders(), 10);
+                $this->client->post($url, [
+                    \GuzzleHttp\RequestOptions::BODY    => $this->getParameters(),
+                    \GuzzleHttp\RequestOptions::HEADERS => $this->getHeaders(),
+                    \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                ]) :
+                $this->client->get($url, [
+                    \GuzzleHttp\RequestOptions::HEADERS => $this->getHeaders(),
+                    \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                ]);
 
-            $this->parseResponse($response->body);
-        } catch (\Exception $exception) {
+            $this->parseResponse($response->getBody());
+        } catch (GuzzleException $exception) {
             if ($this->logger) {
                 $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
             }

@@ -1,42 +1,30 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class LeadListAccessValidator extends ConstraintValidator
 {
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
+    public function __construct(
+        private ListModel $segmentModel
+    ) {
     }
 
     /**
-     * @param mixed      $value
-     * @param Constraint $constraint
+     * @param mixed $value
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
-        $listModel = $this->factory->getModel('lead.list');
-        $lists     = $listModel->getUserLists();
+        if (!$constraint instanceof LeadListAccess) {
+            throw new UnexpectedTypeException($constraint, LeadListAccess::class);
+        }
 
         if (count($value)) {
+            $lists = $this->segmentModel->getUserLists();
             foreach ($value as $l) {
                 if (!isset($lists[$l->getId()])) {
                     $this->context->addViolation(
@@ -46,7 +34,7 @@ class LeadListAccessValidator extends ConstraintValidator
                     break;
                 }
             }
-        } else {
+        } elseif (!$constraint->allowEmpty) {
             $this->context->addViolation($constraint->message);
         }
     }

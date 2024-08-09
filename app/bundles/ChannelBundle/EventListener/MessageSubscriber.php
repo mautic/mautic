@@ -1,46 +1,20 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\MessageEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class MessageSubscriber.
- */
-class MessageSubscriber extends CommonSubscriber
+class MessageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
-     * DynamicContentSubscriber constructor.
-     *
-     * @param AuditLogModel $auditLogModel
-     */
     public function __construct(
-        AuditLogModel $auditLogModel
+        private AuditLogModel $auditLogModel
     ) {
-        $this->auditLogModel = $auditLogModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ChannelEvents::MESSAGE_POST_SAVE   => ['onPostSave', 0],
@@ -50,10 +24,8 @@ class MessageSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param MessageEvent $event
      */
-    public function onPostSave(MessageEvent $event)
+    public function onPostSave(MessageEvent $event): void
     {
         $entity = $event->getMessage();
         if ($details = $event->getChanges()) {
@@ -70,10 +42,8 @@ class MessageSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param MessageEvent $event
      */
-    public function onDelete(MessageEvent $event)
+    public function onDelete(MessageEvent $event): void
     {
         $entity = $event->getMessage();
         $log    = [

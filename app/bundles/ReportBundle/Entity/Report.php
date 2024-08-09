@@ -1,27 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\EmailBundle\Validator as EmailAssert;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
+use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
+use Mautic\ReportBundle\Scheduler\SchedulerInterface;
+use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Report.
- */
-class Report extends FormEntity
+class Report extends FormEntity implements SchedulerInterface
 {
     /**
      * @var int
@@ -34,7 +28,7 @@ class Report extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -79,9 +73,35 @@ class Report extends FormEntity
     private $aggregators = [];
 
     /**
-     * @var array
+     * @var array|null
      */
     private $settings = [];
+
+    /**
+     * @var bool
+     */
+    private $isScheduled = false;
+
+    /**
+     * @var string|null
+     */
+    private $toAddress;
+
+    /**
+     * @var string|null
+     */
+    private $scheduleUnit;
+
+    /**
+     * @var string|null
+     */
+    private $scheduleDay;
+
+    /**
+     * @var string|null
+     */
+    private $scheduleMonthFrequency;
+    private bool $hasScheduleChanged = false;
 
     public function __clone()
     {
@@ -90,71 +110,76 @@ class Report extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('reports')
-            ->setCustomRepositoryClass('Mautic\ReportBundle\Entity\ReportRepository');
+            ->setCustomRepositoryClass(ReportRepository::class);
 
         $builder->addIdColumns();
 
-        $builder->addField('system', 'boolean');
+        $builder->addField('system', Types::BOOLEAN, ['columnName'=>'`system`']);
 
-        $builder->addField('source', 'string');
+        $builder->addField('source', Types::STRING);
 
-        $builder->createField('columns', 'array')
+        $builder->createField('columns', Types::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('filters', 'array')
+        $builder->createField('filters', Types::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('tableOrder', 'array')
+        $builder->createField('tableOrder', Types::ARRAY)
             ->columnName('table_order')
             ->nullable()
             ->build();
 
-        $builder->createField('graphs', 'array')
+        $builder->createField('graphs', Types::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('groupBy', 'array')
+        $builder->createField('groupBy', Types::ARRAY)
             ->columnName('group_by')
             ->nullable()
             ->build();
 
-        $builder->createField('aggregators', 'array')
+        $builder->createField('aggregators', Types::ARRAY)
             ->columnName('aggregators')
             ->nullable()
             ->build();
 
-        $builder->createField('settings', 'json_array')
+        $builder->createField('settings', Types::JSON)
             ->columnName('settings')
             ->nullable()
             ->build();
+
+        $builder->createField('isScheduled', Types::BOOLEAN)
+            ->columnName('is_scheduled')
+            ->build();
+
+        $builder->addNullableField('scheduleUnit', Types::STRING, 'schedule_unit');
+        $builder->addNullableField('toAddress', Types::STRING, 'to_address');
+        $builder->addNullableField('scheduleDay', Types::STRING, 'schedule_day');
+        $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new NotBlank([
             'message' => 'mautic.core.name.required',
         ]));
+
+        $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
+
+        $metadata->addConstraint(new ReportAssert\ScheduleIsValid());
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('report')
             ->addListProperties(
@@ -163,6 +188,7 @@ class Report extends FormEntity
                     'name',
                     'description',
                     'system',
+                    'isScheduled',
                 ]
             )
             ->addProperties(
@@ -174,14 +200,17 @@ class Report extends FormEntity
                     'graphs',
                     'groupBy',
                     'settings',
+                    'aggregators',
+                    'scheduleUnit',
+                    'toAddress',
+                    'scheduleDay',
+                    'scheduleMonthFrequency',
                 ]
             )
             ->build();
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -189,9 +218,12 @@ class Report extends FormEntity
         return $this->id;
     }
 
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Report
@@ -215,8 +247,6 @@ class Report extends FormEntity
     }
 
     /**
-     * Set system.
-     *
      * @param string $system
      *
      * @return Report
@@ -230,8 +260,6 @@ class Report extends FormEntity
     }
 
     /**
-     * Get system.
-     *
      * @return int
      */
     public function getSystem()
@@ -255,8 +283,6 @@ class Report extends FormEntity
     }
 
     /**
-     * Get source.
-     *
      * @return string
      */
     public function getSource()
@@ -265,9 +291,7 @@ class Report extends FormEntity
     }
 
     /**
-     * Set columns.
-     *
-     * @param string $columns
+     * @param mixed[] $columns
      *
      * @return Report
      */
@@ -280,8 +304,6 @@ class Report extends FormEntity
     }
 
     /**
-     * Get columns.
-     *
      * @return array
      */
     public function getColumns()
@@ -290,9 +312,7 @@ class Report extends FormEntity
     }
 
     /**
-     * Set filters.
-     *
-     * @param string $filters
+     * @param mixed[] $filters
      *
      * @return Report
      */
@@ -305,13 +325,54 @@ class Report extends FormEntity
     }
 
     /**
-     * Get filters.
-     *
      * @return array
      */
     public function getFilters()
     {
         return $this->filters;
+    }
+
+    /**
+     * Get filter value from a specific filter.
+     *
+     * @param string $column
+     *
+     * @return mixed
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getFilterValue($column)
+    {
+        foreach ($this->getFilters() as $field) {
+            if ($column === $field['column']) {
+                return $field['value'];
+            }
+        }
+
+        throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
+    }
+
+    /**
+     * Get filter values from a specific filter.
+     *
+     * @param string $column
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getFilterValues($column): array
+    {
+        $values = [];
+        foreach ($this->getFilters() as $field) {
+            if ($column === $field['column']) {
+                $values[] = $field['value'];
+            }
+        }
+
+        if (empty($values)) {
+            throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
+        }
+
+        return $values;
     }
 
     /**
@@ -325,7 +386,7 @@ class Report extends FormEntity
     /**
      * @param mixed $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -338,11 +399,10 @@ class Report extends FormEntity
         return $this->tableOrder;
     }
 
-    /**
-     * @param array $tableOrder
-     */
-    public function setTableOrder(array $tableOrder)
+    public function setTableOrder(array $tableOrder): void
     {
+        $this->isChanged('tableOrder', $tableOrder);
+
         $this->tableOrder = $tableOrder;
     }
 
@@ -354,11 +414,10 @@ class Report extends FormEntity
         return $this->graphs;
     }
 
-    /**
-     * @param array $graphs
-     */
-    public function setGraphs(array $graphs)
+    public function setGraphs(array $graphs): void
     {
+        $this->isChanged('graphs', $graphs);
+
         $this->graphs = $graphs;
     }
 
@@ -370,11 +429,10 @@ class Report extends FormEntity
         return $this->groupBy;
     }
 
-    /**
-     * @param array $graphs
-     */
-    public function setGroupBy(array $groupBy)
+    public function setGroupBy(array $groupBy): void
     {
+        $this->isChanged('groupBy', $groupBy);
+
         $this->groupBy = $groupBy;
     }
 
@@ -386,19 +444,37 @@ class Report extends FormEntity
         return $this->aggregators;
     }
 
-    /**
-     * @param array $aggregator
-     */
-    public function setAggregators(array $aggregators)
+    public function getAggregatorColumns(): array
     {
+        return array_map(fn ($aggregator) => $aggregator['column'], $this->getAggregators());
+    }
+
+    public function getOrderColumns(): array
+    {
+        return array_map(fn ($order) => $order['column'], $this->getTableOrder());
+    }
+
+    public function getSelectAndAggregatorAndOrderAndGroupByColumns(): array
+    {
+        return array_merge($this->getSelectAndAggregatorColumns(), $this->getOrderColumns(), $this->getGroupBy());
+    }
+
+    public function getSelectAndAggregatorColumns(): array
+    {
+        return array_merge($this->getColumns(), $this->getAggregatorColumns());
+    }
+
+    public function setAggregators(array $aggregators): void
+    {
+        $this->isChanged('aggregators', $aggregators);
+
         $this->aggregators = $aggregators;
     }
 
-    /**
-     * @param array $settings
-     */
-    public function setSettings(array $settings)
+    public function setSettings(array $settings): void
     {
+        $this->isChanged('settings', $settings);
+
         $this->settings = $settings;
     }
 
@@ -408,5 +484,193 @@ class Report extends FormEntity
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isScheduled()
+    {
+        return $this->isScheduled;
+    }
+
+    /**
+     * @param bool $isScheduled
+     */
+    public function setIsScheduled($isScheduled): void
+    {
+        $this->isChanged('isScheduled', $isScheduled);
+
+        $this->isScheduled = $isScheduled;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getToAddress()
+    {
+        return $this->toAddress;
+    }
+
+    /**
+     * @param string|null $toAddress
+     */
+    public function setToAddress($toAddress): void
+    {
+        $this->isChanged('toAddress', $toAddress);
+
+        $this->toAddress = $toAddress;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getScheduleUnit()
+    {
+        return $this->scheduleUnit;
+    }
+
+    /**
+     * @param string|null $scheduleUnit
+     */
+    public function setScheduleUnit($scheduleUnit): void
+    {
+        $this->isChanged('scheduleUnit', $scheduleUnit);
+
+        $this->scheduleUnit = $scheduleUnit;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getScheduleDay()
+    {
+        return $this->scheduleDay;
+    }
+
+    /**
+     * @param string|null $scheduleDay
+     */
+    public function setScheduleDay($scheduleDay): void
+    {
+        $this->isChanged('scheduleDay', $scheduleDay);
+
+        $this->scheduleDay = $scheduleDay;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getScheduleMonthFrequency()
+    {
+        return $this->scheduleMonthFrequency;
+    }
+
+    /**
+     * @param string|null $scheduleMonthFrequency
+     */
+    public function setScheduleMonthFrequency($scheduleMonthFrequency): void
+    {
+        $this->scheduleMonthFrequency = $scheduleMonthFrequency;
+    }
+
+    public function setAsNotScheduled(): void
+    {
+        $this->setIsScheduled(false);
+        $this->setToAddress(null);
+        $this->setScheduleUnit(null);
+        $this->setScheduleDay(null);
+        $this->setScheduleMonthFrequency(null);
+    }
+
+    public function setAsScheduledNow(string $email): void
+    {
+        $this->setIsScheduled(true);
+        $this->setToAddress($email);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_NOW);
+    }
+
+    public function ensureIsDailyScheduled(): void
+    {
+        $this->setIsScheduled(true);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_DAILY);
+        $this->setScheduleDay(null);
+        $this->setScheduleMonthFrequency(null);
+    }
+
+    /**
+     * @throws ScheduleNotValidException
+     */
+    public function ensureIsMonthlyScheduled(): void
+    {
+        if (
+            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect())
+            || !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
+        ) {
+            throw new ScheduleNotValidException();
+        }
+        $this->setIsScheduled(true);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_MONTHLY);
+    }
+
+    /**
+     * @throws ScheduleNotValidException
+     */
+    public function ensureIsWeeklyScheduled(): void
+    {
+        if (!in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())) {
+            throw new ScheduleNotValidException();
+        }
+        $this->setIsScheduled(true);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_WEEKLY);
+        $this->setScheduleMonthFrequency(null);
+    }
+
+    public function isScheduledNow(): bool
+    {
+        return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
+    }
+
+    public function isScheduledDaily(): bool
+    {
+        return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
+    }
+
+    public function isScheduledWeekly(): bool
+    {
+        return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
+    }
+
+    public function isScheduledMonthly(): bool
+    {
+        return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
+    }
+
+    public function isScheduledWeekDays(): bool
+    {
+        return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
+    }
+
+    public function getHasScheduleChanged(): bool
+    {
+        return $this->hasScheduleChanged;
+    }
+
+    public function setHasScheduleChanged(bool $hasScheduleChanged): void
+    {
+        $this->hasScheduleChanged = $hasScheduleChanged;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getSchedule(): array
+    {
+        $schedule                             = [];
+        $schedule['schedule_unit']            = $this->getScheduleUnit();
+        $schedule['schedule_day']             = $this->getScheduleDay();
+        $schedule['schedule_month_frequency'] = $this->getScheduleMonthFrequency();
+
+        return $schedule;
     }
 }

@@ -28,3 +28,9 @@
 
 .clickable-stat a { color: #fff; }
 .clickable-stat a:hover { color: #fff; }
+
+#emailGraphStats .spinner,
+#reads-map-container .spinner{
+    text-align: center;
+    font-size: 32px;
+}

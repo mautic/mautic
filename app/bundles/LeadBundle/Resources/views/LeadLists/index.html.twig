@@ -1,0 +1,16 @@
+{#
+  Variables
+    - lists
+    - leadsLists
+    - lead
+#}
+<ul class="list-group">
+    {% for l in lists %}
+        <li class="list-group-item">
+            <i class="ri-lg ri-fw {% if leadLists[l.id] is defined %}ri-toggle-fill text-success{% else %}ri-toggle-line text-danger{% endif %}"
+               id="leadListToggle{{ l.id }}"
+               onclick="Mautic.toggleLeadList('leadListToggle{{ l.id }}', {{ lead.id }}, {{ l.id }});"></i>
+            <span>{{ l.name }} ({{ l.alias }})</span>
+        </li>
+    {% endfor %}
+</ul>

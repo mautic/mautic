@@ -1,41 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\WebhookBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'WebhookBundle',
             'formAlias'  => 'webhookconfig',
-            'formTheme'  => 'MauticWebhookBundle:FormTheme\Config',
+            'formType'   => ConfigType::class,
+            'formTheme'  => '@MauticWebhook/FormTheme/Config/_config_webhookconfig_widget.html.twig',
             'parameters' => $event->getParametersFromConfig('MauticWebhookBundle'),
         ]);
     }

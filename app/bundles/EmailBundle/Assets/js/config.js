@@ -27,14 +27,14 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
         return;
     }
 
-    mQuery('#' + mailbox + 'TestButtonContainer .fa-spinner').removeClass('hide');
+    mQuery('#' + mailbox + 'TestButtonContainer .ri-loader-3-line').removeClass('hide');
 
     Mautic.ajaxActionRequest('email:testMonitoredEmailServerConnection', data, function(response) {
         var theClass = (response.success) ? 'has-success' : 'has-error';
         var theMessage = response.message;
         mQuery('#' + mailbox + 'TestButtonContainer').removeClass('has-success has-error').addClass(theClass);
         mQuery('#' + mailbox + 'TestButtonContainer .help-block').html(theMessage);
-        mQuery('#' + mailbox + 'TestButtonContainer .fa-spinner').addClass('hide');
+        mQuery('#' + mailbox + 'TestButtonContainer .ri-loader-3-line').addClass('hide');
 
         if (response.folders) {
             if (mailbox == 'general') {
@@ -63,29 +63,6 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
     });
 };
 
-Mautic.testEmailServerConnection = function(sendEmail) {
-    var data = {
-        amazon_region: mQuery('#config_emailconfig_mailer_amazon_region').val(),
-        api_key:       mQuery('#config_emailconfig_mailer_api_key').val(),
-        authMode:      mQuery('#config_emailconfig_mailer_auth_mode').val(),
-        encryption:    mQuery('#config_emailconfig_mailer_encryption').val(),
-        from_email:    mQuery('#config_emailconfig_mailer_from_email').val(),
-        from_name:     mQuery('#config_emailconfig_mailer_from_name').val(),
-        host:          mQuery('#config_emailconfig_mailer_host').val(),
-        password:      mQuery('#config_emailconfig_mailer_password').val(),
-        port:          mQuery('#config_emailconfig_mailer_port').val(),
-        send_test:     (typeof sendEmail !== 'undefined') ? sendEmail : false,
-        transport:     mQuery('#config_emailconfig_mailer_transport').val(),
-        user:          mQuery('#config_emailconfig_mailer_user').val()
-    };
-
-    mQuery('#mailerTestButtonContainer .fa-spinner').removeClass('hide');
-
-    Mautic.ajaxActionRequest('email:testEmailServerConnection', data, function(response) {
-        var theClass = (response.success) ? 'has-success' : 'has-error';
-        var theMessage = response.message;
-        mQuery('#mailerTestButtonContainer').removeClass('has-success has-error').addClass(theClass);
-        mQuery('#mailerTestButtonContainer .help-block').html(theMessage);
-        mQuery('#mailerTestButtonContainer .fa-spinner').addClass('hide');
-    });
+Mautic.disableSendTestEmailButton = function(element) {
+    mQuery(element).closest('.tab-pane').find('.config-dsn-test-container').each(function () {Mautic.configDsnTestDisable(this)});
 };

@@ -2,13 +2,13 @@ Mautic.downloadIpLookupDataStore = function() {
     var ipService = mQuery('#config_coreconfig_ip_lookup_service').val();
     var ipAuth = mQuery('#config_coreconfig_ip_lookup_auth').val();
 
-    mQuery('#iplookup_fetch_button_container .fa-spinner').removeClass('hide');
+    mQuery('#iplookup_fetch_button_container .ri-loader-3-line').removeClass('hide');
 
     Mautic.ajaxActionRequest('downloadIpLookupDataStore', {
         service: ipService,
         auth: ipAuth
     }, function (response) {
-        mQuery('#iplookup_fetch_button_container .fa-spinner').addClass('hide');
+        mQuery('#iplookup_fetch_button_container .ri-loader-3-line').addClass('hide');
 
         if (response.message) {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-error').addClass('has-success');
@@ -17,7 +17,7 @@ Mautic.downloadIpLookupDataStore = function() {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-success').addClass('has-error');
             mQuery('#iplookup_fetch_button_container').next('.help-block').html(response.error);
         }
-    });
+    }, false, false, 'GET');
 };
 
 Mautic.getIpLookupFormConfig = function() {
@@ -32,5 +32,5 @@ Mautic.getIpLookupFormConfig = function() {
 
         mQuery('#ip_lookup_config_container').html(response.html);
         mQuery('#ip_lookup_attribution').html(response.attribution);
-    });
+    }, false, false, "GET");
 };

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
@@ -17,53 +8,29 @@ use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
- * Class FieldInclusionStrategy.
- *
- * Include specific fields at a specific level
+ * Include specific fields at a specific level.
  */
 class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
-    /**
-     * @var array
-     */
-    private $fields = [];
+    private int $level;
 
     /**
-     * @var int
+     * @param int $level
      */
-    private $level;
-
-    /**
-     * @var
-     */
-    private $path;
-
-    /**
-     * FieldInclusionStrategy constructor.
-     *
-     * @param array $fields
-     * @param int   $level
-     * @param null  $path
-     */
-    public function __construct(array $fields, $level = 3, $path = null)
-    {
-        $this->fields = $fields;
+    public function __construct(
+        private array $fields,
+        $level = 3,
+        private $path = null
+    ) {
         $this->level  = (int) $level;
-        $this->path   = $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext)
+    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext)
+    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {
             $path = implode('.', $navigatorContext->getCurrentPath());

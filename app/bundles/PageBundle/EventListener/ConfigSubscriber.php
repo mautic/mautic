@@ -1,30 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
+use Mautic\PageBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => [
@@ -35,27 +22,48 @@ class ConfigSubscriber extends CommonSubscriber
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
-            'formTheme'  => 'MauticPageBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
+            'formType'   => ConfigType::class,
+            'formTheme'  => '@MauticPage/FormTheme/Config/_config_pageconfig_widget.html.twig',
+            // parameters must be defined directly in case there are 2 config forms per bundle.
+            // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
+            // and trackingconfig form would overwrote values in the pageconfig form. See #5559.
+            'parameters' => [
+                'cat_in_page_url'  => false,
+                'google_analytics' => false,
+            ],
         ]);
     }
 
-    public function onConfigGenerateTracking(ConfigBuilderEvent $event)
+    public function onConfigGenerateTracking(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'trackingconfig',
-            'formTheme'  => 'MauticPageBundle:FormTheme\Config',
-            'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
+            'formType'   => ConfigTrackingPageType::class,
+            'formTheme'  => '@MauticPage/FormTheme/Config/_config_trackingconfig_widget.html.twig',
+            // parameters defined this way because of the reason as above.
+            'parameters' => [
+                'anonymize_ip'                          => false,
+                'track_contact_by_ip'                   => false,
+                'track_by_tracking_url'                 => false,
+                'facebook_pixel_id'                     => null,
+                'facebook_pixel_trackingpage_enabled'   => false,
+                'facebook_pixel_landingpage_enabled'    => false,
+                'google_analytics_id'                   => null,
+                'google_analytics_trackingpage_enabled' => false,
+                'google_analytics_landingpage_enabled'  => false,
+                'google_analytics_anonymize_ip'         => false,
+                'do_not_track_404_anonymous'            => false,
+            ],
         ]);
     }
 
-    public function onConfigSave(ConfigEvent $event)
+    public function onConfigSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();
 

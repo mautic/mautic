@@ -1,52 +1,24 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Helper;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
-    private $regex = '{focus=(.*?)}';
+    private string $regex = '{focus=(.*?)}';
 
-    /**
-     * @var FocusModel
-     */
-    protected $model;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-    /**
-     * TokenHelper constructor.
-     *
-     * @param FormModel $model
-     */
-    public function __construct(FocusModel $model, RouterInterface $router)
-    {
-        $this->router = $router;
-        $this->model  = $model;
+    public function __construct(
+        protected FocusModel $model,
+        protected RouterInterface $router,
+        protected CorePermissions $security
+    ) {
     }
 
-    /**
-     * @param $content
-     *
-     * @return array
-     */
-    public function findFocusTokens($content)
+    public function findFocusTokens($content): array
     {
         $regex = '/'.$this->regex.'/i';
 
@@ -55,21 +27,26 @@ class TokenHelper
         $tokens = [];
 
         if (count($matches[0])) {
-            foreach ($matches[1] as $k => $id) {
+            foreach ($matches[1] as $id) {
                 $token = '{focus='.$id.'}';
                 $focus = $this->model->getEntity($id);
-                if ($focus !== null
+                if (null !== $focus
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(
-                            'plugin:focus:items:viewown',
-                            'plugin:focus:items:viewother',
+                            'focus:items:viewown',
+                            'focus:items:viewother',
                             $focus->getCreatedBy()
                         )
                     )
                 ) {
-                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], true)
-                        .'" type="text/javascript" charset="utf-8" async="async"></script>';
+                    $script = '<script src="'.
+                        $this->router->generate(
+                            'mautic_focus_generate',
+                            ['id' => $id],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ).
+                    '" type="text/javascript" charset="utf-8" async="async"></script>';
                     $tokens[$token] = $script;
                 } else {
                     $tokens[$token] = '';

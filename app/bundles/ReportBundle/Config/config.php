@@ -1,31 +1,29 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_report_index' => [
                 'path'       => '/reports/{page}',
-                'controller' => 'MauticReportBundle:Report:index',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
             ],
             'mautic_report_export' => [
                 'path'       => '/reports/view/{objectId}/export/{format}',
-                'controller' => 'MauticReportBundle:Report:export',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::exportAction',
+                'defaults'   => [
+                    'format' => 'csv',
+                ],
+            ],
+            'mautic_report_download' => [
+                'path'       => '/reports/download/{reportId}/{format}',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::downloadAction',
                 'defaults'   => [
                     'format' => 'csv',
                 ],
             ],
             'mautic_report_view' => [
                 'path'       => '/reports/view/{objectId}/{reportPage}',
-                'controller' => 'MauticReportBundle:Report:view',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::viewAction',
                 'defaults'   => [
                     'reportPage' => 1,
                 ],
@@ -33,19 +31,31 @@ return [
                     'reportPage' => '\d+',
                 ],
             ],
+            'mautic_report_schedule_preview' => [
+                'path'       => '/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
+                'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::indexAction',
+                'defaults'   => [
+                    'isScheduled'            => 0,
+                    'scheduleUnit'           => '',
+                    'scheduleDay'            => '',
+                    'scheduleMonthFrequency' => '',
+                ],
+            ],
+            'mautic_report_schedule' => [
+                'path'       => '/reports/schedule/{reportId}/now',
+                'controller' => 'Mautic\ReportBundle\Controller\ScheduleController::nowAction',
+            ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
-                'controller' => 'MauticReportBundle:Report:execute',
+                'controller' => 'Mautic\ReportBundle\Controller\ReportController::executeAction',
             ],
         ],
         'api' => [
-            'mautic_api_getreports' => [
-                'path'       => '/reports',
-                'controller' => 'MauticReportBundle:Api\ReportApi:getEntities',
-            ],
-            'mautic_api_getreport' => [
-                'path'       => '/reports/{id}',
-                'controller' => 'MauticReportBundle:Api\ReportApi:getReport',
+            'mautic_api_reportsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'reports',
+                'path'            => '/reports',
+                'controller'      => 'Mautic\ReportBundle\Controller\Api\ReportApiController',
             ],
         ],
     ],
@@ -54,7 +64,7 @@ return [
         'main' => [
             'mautic.report.reports' => [
                 'route'     => 'mautic_report_index',
-                'iconClass' => 'fa-line-chart',
+                'iconClass' => 'ri-file-chart-2-fill',
                 'access'    => [
                     'report:reports:viewown',
                     'report:reports:viewother',
@@ -65,87 +75,87 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.report.search.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\SearchSubscriber',
-                'arguments' => [
-                    'mautic.helper.user',
-                    'mautic.report.model.report',
-                ],
-            ],
-            'mautic.report.report.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\ReportSubscriber',
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.report.dashboard.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\DashboardSubscriber',
-                'arguments' => [
-                    'mautic.report.model.report',
-                    'mautic.security',
-                ],
-
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.report' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'report',
-            ],
-            'mautic.form.type.filter_selector' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\FilterSelectorType',
-                'alias' => 'filter_selector',
-            ],
-            'mautic.form.type.table_order' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\TableOrderType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'table_order',
-            ],
-            'mautic.form.type.report_filters' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'report_filters',
-            ],
-            'mautic.form.type.report_dynamic_filters' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\DynamicFiltersType',
-                'alias' => 'report_dynamicfilters',
-            ],
-            'mautic.form.type.report_widget' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportWidgetType',
-                'alias'     => 'report_widget',
-                'arguments' => 'mautic.report.model.report',
-            ],
-            'mautic.form.type.aggregator' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\AggregatorType',
-                'alias'     => 'aggregator',
-                'arguments' => 'translator',
-            ],
-            'mautic.form.type.report.settings' => [
-                'class' => \Mautic\ReportBundle\Form\Type\ReportSettingsType::class,
-                'alias' => 'report_settings',
-            ],
-        ],
         'helpers' => [
             'mautic.report.helper.report' => [
-                'class' => \Mautic\ReportBundle\Helper\ReportHelper::class,
-                'alias' => 'report',
-            ],
-        ],
-        'models' => [
-            'mautic.report.model.report' => [
-                'class'     => 'Mautic\ReportBundle\Model\ReportModel',
+                'class'     => Mautic\ReportBundle\Helper\ReportHelper::class,
+                'alias'     => 'report',
                 'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.template.formatter',
-                    'mautic.helper.templating',
-                    'mautic.channel.helper.channel_list',
-                    'mautic.lead.model.field',
-                    'mautic.report.helper.report',
+                    'event_dispatcher',
                 ],
             ],
         ],
+        'validator' => [
+            'mautic.report.validator.schedule_is_valid_validator' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_builder',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+        ],
+        'other' => [
+            'mautic.report.model.scheduler_builder' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_template_factory',
+                ],
+            ],
+            'mautic.report.model.scheduler_template_factory' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory::class,
+                'arguments' => [],
+            ],
+            'mautic.report.model.scheduler_date_builder' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Date\DateBuilder::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_builder',
+                ],
+            ],
+            'mautic.report.model.scheduler_planner' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_date_builder',
+                    'doctrine.orm.default_entity_manager',
+                ],
+            ],
+            'mautic.report.model.send_schedule' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Model\SendSchedule::class,
+                'arguments' => [
+                    'mautic.helper.mailer',
+                    'mautic.report.model.message_schedule',
+                    'mautic.report.model.file_handler',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.report.model.file_handler' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Model\FileHandler::class,
+                'arguments' => [
+                    'mautic.helper.file_path_resolver',
+                    'mautic.helper.file_properties',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.report.model.message_schedule' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Model\MessageSchedule::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.file_properties',
+                    'mautic.helper.core_parameters',
+                    'router',
+                ],
+            ],
+            'mautic.report.model.report_data_adapter' => [
+                'class'     => Mautic\ReportBundle\Adapter\ReportDataAdapter::class,
+                'arguments' => [
+                    'mautic.report.model.report',
+                ],
+            ],
+        ],
+    ],
+
+    'parameters' => [
+        'report_temp_dir'                     => '%mautic.application_dir%/media/files/temp',
+        'report_export_batch_size'            => 1000,
+        'report_export_max_filesize_in_bytes' => 5_000_000,
+        'csv_always_enclose'                  => false,
     ],
 ];

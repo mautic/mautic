@@ -1,38 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class CustomContentEvent.
- */
 class CustomContentEvent extends Event
 {
-    /**
-     * @var
-     */
-    protected $viewName;
-
-    /**
-     * @var
-     */
-    protected $context;
-
-    /**
-     * @var
-     */
-    protected $vars;
-
     /**
      * @var array
      */
@@ -44,47 +17,44 @@ class CustomContentEvent extends Event
     protected $templates = [];
 
     /**
-     * CustomContentEvent constructor.
-     *
-     * @param       $viewName
-     * @param       $context
-     * @param array $vars
+     * @param string      $viewName
+     * @param string|null $context
      */
-    public function __construct($viewName, $context = null, array $vars = [])
-    {
-        $this->viewName = $viewName;
-        $this->context  = $context;
-        $this->vars     = $vars;
+    public function __construct(
+        protected $viewName,
+        protected $context = null,
+        protected array $vars = []
+    ) {
     }
 
     /**
      * Check if the context is applicable.
      *
-     * @param $viewName
-     * @param $context
-     *
-     * @return bool
+     * @param string      $viewName
+     * @param string|null $context
      */
-    public function checkContext($viewName, $context)
+    public function checkContext($viewName, $context): bool
     {
         return $viewName === $this->viewName && $context === $this->context;
     }
 
     /**
-     * @param $content
+     * @param string $content
      */
-    public function addContent($content)
+    public function addContent($content): void
     {
         $this->content[] = $content;
     }
 
     /**
-     * @param       $template
-     * @param array $vars
+     * @param string $template
      */
-    public function addTemplate($template, array $vars = [])
+    public function addTemplate($template, array $vars = []): void
     {
-        $this->templates[$template] = $vars;
+        $this->templates[] = [
+            'template' => $template,
+            'vars'     => $vars,
+        ];
     }
 
     /**
@@ -96,7 +66,7 @@ class CustomContentEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getContext()
     {
@@ -104,7 +74,7 @@ class CustomContentEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getVars()
     {

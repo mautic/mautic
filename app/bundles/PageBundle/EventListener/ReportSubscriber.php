@@ -1,34 +1,35 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public const CONTEXT_PAGES      = 'pages';
+
+    public const CONTEXT_PAGE_HITS  = 'page.hits';
+
+    public const CONTEXT_VIDEO_HITS = 'video.hits';
+
+    public function __construct(
+        private CompanyReportData $companyReportData,
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator
+    ) {
+    }
+
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -39,230 +40,325 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
-        if ($event->checkContext(['pages', 'page.hits'])) {
-            $prefix            = 'p.';
-            $translationPrefix = 'tp.';
-            $variantPrefix     = 'vp.';
+        if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS, self::CONTEXT_VIDEO_HITS])) {
+            return;
+        }
 
-            $columns = [
-                $prefix.'title' => [
-                    'label' => 'mautic.core.title',
-                    'type'  => 'string',
-                ],
-                $prefix.'alias' => [
-                    'label' => 'mautic.core.alias',
-                    'type'  => 'string',
-                ],
-                $prefix.'revision' => [
-                    'label' => 'mautic.page.report.revision',
-                    'type'  => 'string',
-                ],
-                $prefix.'hits' => [
-                    'label' => 'mautic.page.field.hits',
+        $prefix            = 'p.';
+        $translationPrefix = 'tp.';
+        $variantPrefix     = 'vp.';
+
+        $columns = [
+            $prefix.'title' => [
+                'label' => 'mautic.core.title',
+                'type'  => 'string',
+            ],
+            $prefix.'alias' => [
+                'label' => 'mautic.core.alias',
+                'type'  => 'string',
+            ],
+            $prefix.'revision' => [
+                'label' => 'mautic.page.report.revision',
+                'type'  => 'string',
+            ],
+            $prefix.'hits' => [
+                'label' => 'mautic.page.field.hits',
+                'type'  => 'int',
+            ],
+            $prefix.'unique_hits' => [
+                'label' => 'mautic.page.field.unique_hits',
+                'type'  => 'int',
+            ],
+            $translationPrefix.'id' => [
+                'label' => 'mautic.page.report.translation_parent_id',
+                'type'  => 'int',
+            ],
+            $translationPrefix.'title' => [
+                'label' => 'mautic.page.report.translation_parent_title',
+                'type'  => 'string',
+            ],
+            $variantPrefix.'id' => [
+                'label' => 'mautic.page.report.variant_parent_id',
+                'type'  => 'string',
+            ],
+            $variantPrefix.'title' => [
+                'label' => 'mautic.page.report.variant_parent_title',
+                'type'  => 'string',
+            ],
+            $prefix.'lang' => [
+                'label' => 'mautic.core.language',
+                'type'  => 'string',
+            ],
+            $prefix.'variant_start_date' => [
+                'label'          => 'mautic.page.report.variant_start_date',
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE('.$prefix.'variant_start_date)',
+            ],
+            $prefix.'variant_hits' => [
+                'label' => 'mautic.page.report.variant_hits',
+                'type'  => 'int',
+            ],
+        ];
+        $columns = array_merge(
+            $columns,
+            $event->getStandardColumns('p.', ['name', 'description'], 'mautic_page_action'),
+            $event->getCategoryColumns()
+        );
+        $data = [
+            'display_name' => 'mautic.page.pages',
+            'columns'      => $columns,
+        ];
+        $event->addTable(self::CONTEXT_PAGES, $data);
+
+        if ($event->checkContext(self::CONTEXT_PAGE_HITS)) {
+            $hitPrefix   = 'ph.';
+            $redirectHit = 'r.';
+            $hitColumns  = [
+                $hitPrefix.'id' => [
+                    'label' => 'mautic.page.report.hits.id',
                     'type'  => 'int',
                 ],
-                $prefix.'unique_hits' => [
-                    'label' => 'mautic.page.field.unique_hits',
-                    'type'  => 'int',
-                ],
-                $translationPrefix.'id' => [
-                    'label' => 'mautic.page.report.translation_parent_id',
-                    'type'  => 'int',
-                ],
-                $translationPrefix.'title' => [
-                    'label' => 'mautic.page.report.translation_parent_title',
-                    'type'  => 'string',
-                ],
-                $variantPrefix.'id' => [
-                    'label' => 'mautic.page.report.variant_parent_id',
-                    'type'  => 'string',
-                ],
-                $variantPrefix.'title' => [
-                    'label' => 'mautic.page.report.variant_parent_title',
-                    'type'  => 'string',
-                ],
-                $prefix.'lang' => [
-                    'label' => 'mautic.core.language',
-                    'type'  => 'string',
-                ],
-                $prefix.'variant_start_date' => [
-                    'label'          => 'mautic.page.report.variant_start_date',
+                $hitPrefix.'date_hit' => [
+                    'label'          => 'mautic.page.report.hits.date_hit',
                     'type'           => 'datetime',
-                    'groupByFormula' => 'DATE('.$prefix.'variant_start_date)',
+                    'groupByFormula' => 'DATE('.$hitPrefix.'date_hit)',
                 ],
-                $prefix.'variant_hits' => [
-                    'label' => 'mautic.page.report.variant_hits',
+                $hitPrefix.'date_left' => [
+                    'label'          => 'mautic.page.report.hits.date_left',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$hitPrefix.'date_left)',
+                ],
+                $hitPrefix.'country' => [
+                    'label' => 'mautic.page.report.hits.country',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'region' => [
+                    'label' => 'mautic.page.report.hits.region',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'city' => [
+                    'label' => 'mautic.page.report.hits.city',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'isp' => [
+                    'label' => 'mautic.page.report.hits.isp',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'organization' => [
+                    'label' => 'mautic.page.report.hits.organization',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'code' => [
+                    'label' => 'mautic.page.report.hits.code',
                     'type'  => 'int',
                 ],
+                $hitPrefix.'referer' => [
+                    'label' => 'mautic.page.report.hits.referer',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'url' => [
+                    'label' => 'mautic.page.report.hits.url',
+                    'type'  => 'url',
+                ],
+                $hitPrefix.'url_title' => [
+                    'label' => 'mautic.page.report.hits.url_title',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'user_agent' => [
+                    'label' => 'mautic.page.report.hits.user_agent',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'remote_host' => [
+                    'label' => 'mautic.page.report.hits.remote_host',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'browser_languages' => [
+                    'label' => 'mautic.page.report.hits.browser_languages',
+                    'type'  => 'array',
+                ],
+                $hitPrefix.'source' => [
+                    'label' => 'mautic.report.field.source',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'source_id' => [
+                    'label' => 'mautic.report.field.source_id',
+                    'type'  => 'int',
+                ],
+                $redirectHit.'url' => [
+                    'label' => 'mautic.page.report.hits.redirect_url',
+                    'type'  => 'url',
+                ],
+                $redirectHit.'hits' => [
+                    'label' => 'mautic.page.report.hits.redirect_hit_count',
+                    'type'  => 'int',
+                ],
+                $redirectHit.'unique_hits' => [
+                    'label' => 'mautic.page.report.hits.redirect_unique_hits',
+                    'type'  => 'string',
+                ],
+                'ds.device' => [
+                    'label' => 'mautic.lead.device',
+                    'type'  => 'string',
+                ],
+                'ds.device_brand' => [
+                    'label' => 'mautic.lead.device_brand',
+                    'type'  => 'string',
+                ],
+                'ds.device_model' => [
+                    'label' => 'mautic.lead.device_model',
+                    'type'  => 'string',
+                ],
+                'ds.device_os_name' => [
+                    'label' => 'mautic.lead.device_os_name',
+                    'type'  => 'string',
+                ],
+                'ds.device_os_shortname' => [
+                    'label' => 'mautic.lead.device_os_shortname',
+                    'type'  => 'string',
+                ],
+                'ds.device_os_version' => [
+                    'label' => 'mautic.lead.device_os_version',
+                    'type'  => 'string',
+                ],
+                'ds.device_os_platform' => [
+                    'label' => 'mautic.lead.device_os_platform',
+                    'type'  => 'string',
+                ],
             ];
-            $columns = array_merge(
+
+            $companyColumns = $this->companyReportData->getCompanyData();
+
+            $pageHitsColumns = array_merge(
                 $columns,
-                $event->getStandardColumns('p.', ['name', 'description'], 'mautic_page_action'),
-                $event->getCategoryColumns(),
-                $event->getCampaignByChannelColumns()
+                $hitColumns,
+                $event->getCampaignByChannelColumns(),
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $companyColumns
             );
+
             $data = [
-                'display_name' => 'mautic.page.pages',
-                'columns'      => $columns,
+                'display_name' => 'mautic.page.hits',
+                'columns'      => $pageHitsColumns,
             ];
-            $event->addTable('pages', $data);
+            $event->addTable(self::CONTEXT_PAGE_HITS, $data, self::CONTEXT_PAGES);
 
-            if ($event->checkContext('page.hits')) {
-                $hitPrefix   = 'ph.';
-                $redirectHit = 'r.';
-                $hitColumns  = [
-                    $hitPrefix.'date_hit' => [
-                        'label'          => 'mautic.page.report.hits.date_hit',
-                        'type'           => 'datetime',
-                        'groupByFormula' => 'DATE('.$hitPrefix.'date_hit)',
-                    ],
-                    $hitPrefix.'date_left' => [
-                        'label'          => 'mautic.page.report.hits.date_left',
-                        'type'           => 'datetime',
-                        'groupByFormula' => 'DATE('.$hitPrefix.'date_left)',
-                    ],
-                    $hitPrefix.'country' => [
-                        'label' => 'mautic.page.report.hits.country',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'region' => [
-                        'label' => 'mautic.page.report.hits.region',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'city' => [
-                        'label' => 'mautic.page.report.hits.city',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'isp' => [
-                        'label' => 'mautic.page.report.hits.isp',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'organization' => [
-                        'label' => 'mautic.page.report.hits.organization',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'code' => [
-                        'label' => 'mautic.page.report.hits.code',
-                        'type'  => 'int',
-                    ],
-                    $hitPrefix.'referer' => [
-                        'label' => 'mautic.page.report.hits.referer',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'url' => [
-                        'label' => 'mautic.page.report.hits.url',
-                        'type'  => 'url',
-                    ],
-                    $hitPrefix.'url_title' => [
-                        'label' => 'mautic.page.report.hits.url_title',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'user_agent' => [
-                        'label' => 'mautic.page.report.hits.user_agent',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'remote_host' => [
-                        'label' => 'mautic.page.report.hits.remote_host',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'browser_languages' => [
-                        'label' => 'mautic.page.report.hits.browser_languages',
-                        'type'  => 'array',
-                    ],
-                    $hitPrefix.'source' => [
-                        'label' => 'mautic.report.field.source',
-                        'type'  => 'string',
-                    ],
-                    $hitPrefix.'source_id' => [
-                        'label' => 'mautic.report.field.source_id',
-                        'type'  => 'int',
-                    ],
-                    $redirectHit.'url' => [
-                        'label' => 'mautic.page.report.hits.redirect_url',
-                        'type'  => 'url',
-                    ],
-                    $redirectHit.'hits' => [
-                        'label' => 'mautic.page.report.hits.redirect_hit_count',
-                        'type'  => 'int',
-                    ],
-                    $redirectHit.'unique_hits' => [
-                        'label' => 'mautic.page.report.hits.redirect_unique_hits',
-                        'type'  => 'string',
-                    ],
-                    'ds.device' => [
-                        'label' => 'mautic.lead.device',
-                        'type'  => 'string',
-                    ],
-                    'ds.device_brand' => [
-                        'label' => 'mautic.lead.device_brand',
-                        'type'  => 'string',
-                    ],
-                    'ds.device_model' => [
-                        'label' => 'mautic.lead.device_model',
-                        'type'  => 'string',
-                    ],
-                    'ds.device_os_name' => [
-                        'label' => 'mautic.lead.device_os_name',
-                        'type'  => 'string',
-                    ],
-                    'ds.device_os_shortname' => [
-                        'label' => 'mautic.lead.device_os_shortname',
-                        'type'  => 'string',
-                    ],
-                    'ds.device_os_version' => [
-                        'label' => 'mautic.lead.device_os_version',
-                        'type'  => 'string',
-                    ],
-                    'ds.device_os_platform' => [
-                        'label' => 'mautic.lead.device_os_platform',
-                        'type'  => 'string',
-                    ],
+            // Register graphs
+            $context = self::CONTEXT_PAGE_HITS;
+            $event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
+            $event->addGraph($context, 'line', 'mautic.page.graph.line.time.on.site');
+            $event->addGraph($context, 'pie', 'mautic.page.graph.pie.time.on.site', ['translate' => false]);
+            $event->addGraph($context, 'pie', 'mautic.page.graph.pie.new.vs.returning');
+            $event->addGraph($context, 'pie', 'mautic.page.graph.pie.devices');
+            $event->addGraph($context, 'pie', 'mautic.page.graph.pie.languages', ['translate' => false]);
+            $event->addGraph($context, 'table', 'mautic.page.table.referrers');
+            $event->addGraph($context, 'table', 'mautic.page.table.most.visited');
+            $event->addGraph($context, 'table', 'mautic.page.table.most.visited.unique');
+        }
+        if ($event->checkContext(self::CONTEXT_VIDEO_HITS)) {
+            $hitPrefix  = 'vh.';
+            $hitColumns = [
+                $hitPrefix.'id' => [
+                    'label' => 'mautic.core.id',
+                    'type'  => 'int',
+                ],
+                $hitPrefix.'date_hit' => [
+                    'label'          => 'mautic.page.report.hits.date_hit',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$hitPrefix.'date_hit)',
+                ],
+                $hitPrefix.'country' => [
+                    'label' => 'mautic.page.report.hits.country',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'region' => [
+                    'label' => 'mautic.page.report.hits.region',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'city' => [
+                    'label' => 'mautic.page.report.hits.city',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'isp' => [
+                    'label' => 'mautic.page.report.hits.isp',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'organization' => [
+                    'label' => 'mautic.page.report.hits.organization',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'code' => [
+                    'label' => 'mautic.page.report.hits.code',
+                    'type'  => 'int',
+                ],
+                $hitPrefix.'referer' => [
+                    'label' => 'mautic.page.report.hits.referer',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'url' => [
+                    'label' => 'mautic.page.report.hits.url',
+                    'type'  => 'url',
+                ],
+                $hitPrefix.'user_agent' => [
+                    'label' => 'mautic.page.report.hits.user_agent',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'remote_host' => [
+                    'label' => 'mautic.page.report.hits.remote_host',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'browser_languages' => [
+                    'label' => 'mautic.page.report.hits.browser_languages',
+                    'type'  => 'array',
+                ],
+                $hitPrefix.'channel' => [
+                    'label' => 'mautic.report.field.source',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'channel_id' => [
+                    'label' => 'mautic.report.field.source_id',
+                    'type'  => 'int',
+                ],
+                'time_watched' => [
+                    'label'   => 'mautic.page.report.hits.time_watched',
+                    'type'    => 'string',
+                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'time_watched))',
+                ],
+                'duration' => [
+                    'label'   => 'mautic.page.report.hits.duration',
+                    'type'    => 'string',
+                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'duration))',
+                ],
+            ];
 
-                ];
-                $data = [
-                    'display_name' => 'mautic.page.hits',
-                    'columns'      => array_merge($columns, $hitColumns, $event->getLeadColumns(), $event->getIpColumn()),
-                ];
-                $event->addTable('page.hits', $data, 'pages');
-
-                // Register graphs
-                $context = 'page.hits';
-                $event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
-                $event->addGraph($context, 'line', 'mautic.page.graph.line.time.on.site');
-                $event->addGraph($context, 'pie', 'mautic.page.graph.pie.time.on.site', ['translate' => false]);
-                $event->addGraph($context, 'pie', 'mautic.page.graph.pie.new.vs.returning');
-                $event->addGraph($context, 'pie', 'mautic.page.graph.pie.devices');
-                $event->addGraph($context, 'pie', 'mautic.page.graph.pie.languages', ['translate' => false]);
-                $event->addGraph($context, 'table', 'mautic.page.table.referrers');
-                $event->addGraph($context, 'table', 'mautic.page.table.most.visited');
-                $event->addGraph($context, 'table', 'mautic.page.table.most.visited.unique');
-            }
+            $data = [
+                'display_name' => 'mautic.'.self::CONTEXT_VIDEO_HITS,
+                'columns'      => array_merge($hitColumns, $event->getLeadColumns(), $event->getIpColumn()),
+            ];
+            $event->addTable(self::CONTEXT_VIDEO_HITS, $data, 'videos');
         }
     }
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
-        $context = $event->getContext();
-        $qb      = $event->getQueryBuilder();
+        $context    = $event->getContext();
+        $qb         = $event->getQueryBuilder();
+        $hasGroupBy = $event->hasGroupBy();
 
         switch ($context) {
-            case 'pages':
+            case self::CONTEXT_PAGES:
                 $qb->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id');
                 $event->addCategoryLeftJoin($qb, 'p');
                 break;
-            case 'page.hits':
+            case self::CONTEXT_PAGE_HITS:
                 $event->applyDateFilters($qb, 'date_hit', 'ph');
 
                 $qb->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
@@ -276,27 +372,39 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addCategoryLeftJoin($qb, 'p');
                 $event->addLeadLeftJoin($qb, 'ph');
                 $event->addCampaignByChannelJoin($qb, 'p', 'page');
+
+                if ($this->companyReportData->eventHasCompanyColumns($event)) {
+                    $event->addCompanyLeftJoin($qb);
+                }
+
+                break;
+            case 'video.hits':
+                if (!$hasGroupBy) {
+                    $qb->groupBy('vh.id');
+                }
+                $event->applyDateFilters($qb, 'date_hit', 'vh');
+
+                $qb->from(MAUTIC_TABLE_PREFIX.'video_hits', 'vh');
+
+                $event->addIpAddressLeftJoin($qb, 'vh');
+                $event->addLeadLeftJoin($qb, 'vh');
                 break;
         }
-
         $event->setQueryBuilder($qb);
     }
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
-        if (!$event->checkContext('page.hits')) {
+        if (!$event->checkContext(self::CONTEXT_PAGE_HITS)) {
             return;
         }
 
-        $graphs  = $event->getRequestedGraphs();
-        $qb      = $event->getQueryBuilder();
-        $hitRepo = $this->em->getRepository('MauticPageBundle:Hit');
+        $graphs = $event->getRequestedGraphs();
+        $qb     = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -332,7 +440,7 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.page.graph.pie.time.on.site':
-                    $timesOnSite = $hitRepo->getDwellTimeLabels();
+                    $timesOnSite = $this->hitRepository->getDwellTimeLabels();
                     $chart       = new PieChart();
 
                     foreach ($timesOnSite as $time) {
@@ -347,7 +455,7 @@ class ReportSubscriber extends CommonSubscriber
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-clock-o',
+                            'iconClass' => 'ri-time-line',
                         ]
                     );
                     break;
@@ -369,7 +477,7 @@ class ReportSubscriber extends CommonSubscriber
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-bookmark-o',
+                            'iconClass' => 'ri-information-2-line',
                         ]
                     );
                     break;
@@ -378,7 +486,7 @@ class ReportSubscriber extends CommonSubscriber
                     $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ph.page_language')
                         ->andWhere($qb->expr()->isNotNull('ph.page_language'));
-                    $data  = $queryBuilder->execute()->fetchAll();
+                    $data  = $queryBuilder->execute()->fetchAllAssociative();
                     $chart = new PieChart();
 
                     foreach ($data as $lang) {
@@ -390,15 +498,15 @@ class ReportSubscriber extends CommonSubscriber
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ds.device');
-                    $data  = $queryBuilder->execute()->fetchAll();
-                    $chart = new PieChart();
+                    $data     = $queryBuilder->execute()->fetchAllAssociative();
+                    $chart    = new PieChart();
 
                     foreach ($data as $device) {
                         $label = substr(empty($device['device']) ? $this->translator->trans('mautic.core.no.info') : $device['device'], 0, 12);
@@ -410,29 +518,29 @@ class ReportSubscriber extends CommonSubscriber
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
                 case 'mautic.page.table.referrers':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $hitRepo->getReferers($queryBuilder, $limit, $offset);
+                    $items                  = $this->hitRepository->getReferers($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-sign-in';
+                    $graphData['iconClass'] = 'ri-login-box-line';
                     $event->setGraph($g, $graphData);
                     break;
 
                 case 'mautic.page.table.most.visited':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset);
+                    $items                  = $this->hitRepository->getMostVisited($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -440,11 +548,11 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.page.table.most.visited.unique':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset, 'p.unique_hits', 'sessions');
+                    $items                  = $this->hitRepository->getMostVisited($queryBuilder, $limit, $offset, 'p.unique_hits', 'sessions');
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
                     break;

@@ -1,49 +1,29 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class SmsSendType.
+ * @extends AbstractType<array<mixed>>
  */
 class SmsSendType extends AbstractType
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @param RouterInterface $router
-     */
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
+    public function __construct(
+        protected RouterInterface $router
+    ) {
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'sms',
-            'sms_list',
+            SmsListType::class,
             [
                 'label'      => 'mautic.sms.send.selectsmss',
                 'label_attr' => ['class' => 'control-label'],
@@ -74,20 +54,18 @@ class SmsSendType extends AbstractType
 
             $builder->add(
                 'newSmsButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
                         'onclick' => 'Mautic.loadNewWindow({
                         "windowUrl": "'.$windowUrl.'"
                     })',
-                        'icon' => 'fa fa-plus',
+                        'icon' => 'ri-add-line',
                     ],
                     'label' => 'mautic.sms.send.new.sms',
                 ]
             );
-
-            $sms = $options['data']['sms'];
 
             // create button edit sms
             $windowUrlEdit = $this->router->generate(
@@ -102,13 +80,13 @@ class SmsSendType extends AbstractType
 
             $builder->add(
                 'editSmsButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
                         'onclick'  => 'Mautic.loadNewWindow(Mautic.standardSmsUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
-                        'disabled' => !isset($sms),
-                        'icon'     => 'fa fa-edit',
+                        'disabled' => !isset($options['data']['sms']),
+                        'icon'     => 'ri-edit-line',
                     ],
                     'label' => 'mautic.sms.send.edit.sms',
                 ]
@@ -116,18 +94,15 @@ class SmsSendType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setOptional(['update_select']);
+        $resolver->setDefined(['update_select']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'smssend_list';
     }

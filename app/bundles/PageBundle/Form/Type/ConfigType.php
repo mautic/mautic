@@ -1,33 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class ConfigType.
+ * @extends AbstractType<array<mixed>>
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'cat_in_page_url',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.cat.in.url',
                 'data'  => (bool) $options['data']['cat_in_page_url'],
@@ -39,10 +28,11 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'google_analytics',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.page.config.form.google.analytics',
                 'label_attr' => ['class' => 'control-label'],
+                'data'       => htmlspecialchars_decode((string) $options['data']['google_analytics']),
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.config.form.google.analytics.tooltip',
@@ -53,10 +43,7 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pageconfig';
     }

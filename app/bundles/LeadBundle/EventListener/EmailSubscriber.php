@@ -1,87 +1,58 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @deprecated - to be removed in 3.0
-     *
-     * @var string
-     */
-    private static $leadFieldRegex = '{leadfield=(.*?)}';
+    private static string $contactFieldRegex = '{contactfield=(.*?)}';
 
-    /**
-     * @var string
-     */
-    private static $contactFieldRegex = '{contactfield=(.*?)}';
+    public function __construct(
+        private BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
+    }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
-            EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailDisplay', 0],
+            EmailEvents::EMAIL_ON_BUILD                     => ['onEmailBuild', 0],
+            EmailEvents::EMAIL_ON_SEND                      => ['onEmailGenerate', 0],
+            EmailEvents::EMAIL_ON_DISPLAY                   => ['onEmailDisplay', 0],
+            EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT => ['onEmailAddressReplacement', 0],
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
+        $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
         // the permissions are for viewing contact data, not for managing contact fields
         $tokenHelper->setPermissionSet(['lead:leads:viewown', 'lead:leads:viewother']);
 
-        if ($event->tokensRequested(self::$leadFieldRegex)) {
-            $event->addTokensFromHelper($tokenHelper, self::$leadFieldRegex, 'label', 'alias', true);
-        }
-
         if ($event->tokensRequested(self::$contactFieldRegex)) {
-            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias', true);
+            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias');
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         // Combine all possible content to find tokens across them
         $content = $event->getSubject();
         $content .= $event->getContent();
         $content .= $event->getPlainText();
+        $content .= implode(' ', $event->getTextHeaders());
+
         $lead = $event->getLead();
 
         $tokenList = TokenHelper::findLeadTokens($content, $lead);
@@ -89,5 +60,10 @@ class EmailSubscriber extends CommonSubscriber
             $event->addTokens($tokenList);
             unset($tokenList);
         }
+    }
+
+    public function onEmailAddressReplacement(TokenReplacementEvent $event): void
+    {
+        $event->setContent(TokenHelper::findLeadTokens($event->getContent(), $event->getLead()->getProfileFields(), true));
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -16,33 +7,30 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var DynamicContent
+     * @var DynamicContent|null
      */
     private $dynamicContent;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sentCount;
 
@@ -57,12 +45,12 @@ class Stat
     private $sentDetails = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -71,19 +59,16 @@ class Stat
      */
     private $tokens = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content_stats')
-            ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\StatRepository')
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
             ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('dynamicContent', 'DynamicContent')
             ->inversedBy('stats')
@@ -118,10 +103,8 @@ class Stat
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -139,10 +122,7 @@ class Stat
             ->build();
     }
 
-    /**
-     * @param $details
-     */
-    public function addSentDetails($details)
+    public function addSentDetails($details): void
     {
         $this->sentDetails[] = $details;
 
@@ -162,20 +142,17 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
-        $this->id = $id;
+        $this->id = (string) $id;
     }
 
     /**
@@ -186,10 +163,7 @@ class Stat
         return $this->dynamicContent;
     }
 
-    /**
-     * @param DynamicContent $dynamicContent
-     */
-    public function setDynamicContent(DynamicContent $dynamicContent)
+    public function setDynamicContent(DynamicContent $dynamicContent): void
     {
         $this->dynamicContent = $dynamicContent;
     }
@@ -205,13 +179,13 @@ class Stat
     /**
      * @param Lead $lead
      */
-    public function setLead($lead)
+    public function setLead($lead): void
     {
         $this->lead = $lead;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {
@@ -221,7 +195,7 @@ class Stat
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -237,7 +211,7 @@ class Stat
     /**
      * @param int $sentCount
      */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): void
     {
         $this->sentCount = $sentCount;
     }
@@ -253,7 +227,7 @@ class Stat
     /**
      * @param int $lastSent
      */
-    public function setLastSent($lastSent)
+    public function setLastSent($lastSent): void
     {
         $this->lastSent = $lastSent;
     }
@@ -269,7 +243,7 @@ class Stat
     /**
      * @param array $sentDetails
      */
-    public function setSentDetails($sentDetails)
+    public function setSentDetails($sentDetails): void
     {
         $this->sentDetails = $sentDetails;
     }
@@ -285,7 +259,7 @@ class Stat
     /**
      * @param string $source
      */
-    public function setSource($source)
+    public function setSource($source): void
     {
         $this->source = $source;
     }
@@ -301,7 +275,7 @@ class Stat
     /**
      * @param int $sourceId
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): void
     {
         $this->sourceId = $sourceId;
     }
@@ -317,7 +291,7 @@ class Stat
     /**
      * @param array $tokens
      */
-    public function setTokens($tokens)
+    public function setTokens($tokens): void
     {
         $this->tokens = $tokens;
     }

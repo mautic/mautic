@@ -1,0 +1,42 @@
+{#
+  Variables
+    - form
+#}
+<div class="ml-lg mr-lg mt-md pa-lg">
+    {{ form_start(form) }}
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="panel-title">{{ 'mautic.lead.import.default.owner'|trans }}</div>
+        </div>
+        <div class="panel-body">
+            <div class="col-xs-4">
+                {% if form.owner is defined %}{{ form_row(form.owner) }}{% endif %}
+            </div>
+            <div class="col-xs-4">
+                {% if form.list is defined %}{{ form_row(form.list) }}{% endif %}
+            </div>
+            <div class="col-xs-4">
+                {% if form.tags is defined %}{{ form_row(form.tags) }}{% endif %}
+            </div>
+            <div class="col-xs-4">
+                {% if form.skip_if_exists is defined %}{{ form_row(form.skip_if_exists) }}{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="panel-title">{{ 'mautic.lead.import.fields'|trans }}</div>
+        </div>
+        <div class="panel-body">
+            {{ form_errors(form) }}
+            {% for key, child in form.children %}
+                {% if 'properties' != key and not child.isRendered %}
+                    <div class="col-sm-4">
+                        {{ form_row(child) }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>

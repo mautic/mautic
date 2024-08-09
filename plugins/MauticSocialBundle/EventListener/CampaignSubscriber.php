@@ -1,52 +1,27 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CampaignEventHelper
-     */
-    protected $campaignEventHelper;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param CampaignEventHelper $campaignEventHelper
-     * @param IntegrationHelper   $helper
-     */
-    public function __construct(CampaignEventHelper $campaignEventHelper, IntegrationHelper $integrationHelper)
-    {
-        $this->campaignEventHelper = $campaignEventHelper;
-        $this->integrationHelper   = $integrationHelper;
+    public function __construct(
+        private CampaignEventHelper $campaignEventHelper,
+        private IntegrationHelper $integrationHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
@@ -54,10 +29,7 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('Twitter');
         if ($integration && $integration->getIntegrationSettings()->isPublished()) {
@@ -66,7 +38,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'description'     => 'mautic.social.twitter.tweet.event.open_desc',
                 'eventName'       => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_channelId'],
-                'formType'        => 'tweetsend_list',
+                'formType'        => TweetSendType::class,
                 'channel'         => 'social.tweet',
                 'channelIdField'  => 'channelId',
             ];
@@ -75,9 +47,6 @@ class CampaignSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignAction(CampaignExecutionEvent $event)
     {
         $event->setChannel('social.twitter');

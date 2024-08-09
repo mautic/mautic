@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo "Removing cache to ensure clean state after git checkout..."
+
+rm -rf var/cache

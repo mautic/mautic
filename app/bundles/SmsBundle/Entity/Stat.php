@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -18,53 +10,52 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
-/**
- * Class Stat.
- */
 class Stat
 {
+    public const TABLE_NAME = 'sms_message_stats';
+
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var Sms
+     * @var Sms|null
      */
     private $sms;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList
+     * @var LeadList|null
      */
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingHash;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -74,19 +65,27 @@ class Stat
     private $tokens = [];
 
     /**
-     * @param ORM\ClassMetadata $metadata
+     * @var array
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    private $details = [];
+
+    /**
+     * @var bool|null
+     */
+    private $isFailed = false;
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('sms_message_stats')
-            ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\StatRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
             ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_sms_source_search');
+            ->addIndex(['source', 'source_id'], 'stat_sms_source_search')
+            ->addIndex(['is_failed'], 'stat_sms_failed_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('sms', 'Sms')
             ->inversedBy('stats')
@@ -95,7 +94,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToOne('list', LeadList::class)
             ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
@@ -103,6 +102,11 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->build();
+
+        $builder->createField('isFailed', 'boolean')
+            ->columnName('is_failed')
+            ->nullable()
             ->build();
 
         $builder->createField('trackingHash', 'string')
@@ -122,14 +126,14 @@ class Stat
         $builder->createField('tokens', 'array')
             ->nullable()
             ->build();
+
+        $builder->addField('details', Types::JSON);
     }
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('stat')
             ->addProperties(
@@ -137,22 +141,21 @@ class Stat
                     'id',
                     'ipAddress',
                     'dateSent',
+                    'isFailed',
                     'source',
                     'sourceId',
                     'trackingHash',
                     'lead',
                     'sms',
+                    'details',
                 ]
             )
             ->build();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -164,8 +167,6 @@ class Stat
     }
 
     /**
-     * @param Sms $sms
-     *
      * @return Stat
      */
     public function setSms(Sms $sms)
@@ -184,8 +185,6 @@ class Stat
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return Stat
      */
     public function setLead(Lead $lead)
@@ -204,8 +203,6 @@ class Stat
     }
 
     /**
-     * @param LeadList $list
-     *
      * @return Stat
      */
     public function setList(LeadList $list)
@@ -224,8 +221,6 @@ class Stat
     }
 
     /**
-     * @param IpAddress $ipAddress
-     *
      * @return Stat
      */
     public function setIpAddress(IpAddress $ipAddress)
@@ -236,7 +231,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {
@@ -324,13 +319,64 @@ class Stat
     }
 
     /**
-     * @param array $tokens
-     *
      * @return Stat
      */
     public function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isFailed
+     *
+     * @return Stat
+     */
+    public function setIsFailed($isFailed)
+    {
+        $this->isFailed = $isFailed;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->isFailed;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
+    /**
+     * @param array $details
+     *
+     * @return Stat
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     * @param string $detail
+     *
+     * @return Stat
+     */
+    public function addDetail($type, $detail)
+    {
+        $this->details[$type][] = $detail;
 
         return $this;
     }

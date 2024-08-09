@@ -1,32 +1,17 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use GeoIp2\Database\Reader;
 
 class MaxmindDownloadLookup extends AbstractLocalDataLookup
 {
-    /**
-     * @return string
-     */
-    public function getAttribution()
+    public function getAttribution(): string
     {
         return 'Free lookup that leverages GeoLite2 data created by MaxMind, available from <a href="https://maxmind.com" target="_blank">maxmind.com</a>. Databases must be downloaded and periodically updated.';
     }
 
-    /**
-     * @return string
-     */
-    public function getLocalDataStoreFilepath()
+    public function getLocalDataStoreFilepath(): string
     {
         return $this->getDataDir().'/GeoLite2-City.mmdb';
     }
@@ -36,7 +21,27 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
      */
     public function getRemoteDateStoreDownloadUrl()
     {
-        return 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
+        if (!empty($this->getLicenceKey())) {
+            $data                = [];
+            $data['license_key'] = $this->getLicenceKey();
+            $data['edition_id']  = 'GeoLite2-City';
+            $data['suffix']      = 'tar.gz';
+            $queryString         = http_build_query($data);
+
+            return 'https://download.maxmind.com/app/geoip_download?'.$queryString;
+        } else {
+            $this->logger->warning('MaxMind license key is required.');
+        }
+    }
+
+    private function getLicenceKey(): string
+    {
+        $auth = explode(':', $this->auth, 2);
+        if (array_key_exists(1, $auth)) {
+            return $auth[1];
+        }
+
+        return '';
     }
 
     /**
@@ -65,10 +70,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $this->longitude = $record->location->longitude;
             $this->timezone  = $record->location->timeZone;
             $this->zipcode   = $record->location->postalCode;
-        } catch (\Exception $exception) {
-            if ($this->logger) {
-                $this->logger->warn('IP LOOKUP: '.$exception->getMessage());
-            }
+        } catch (\Exception) {
         }
     }
 }

@@ -1,32 +1,29 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+namespace Mautic\EmailBundle\Tests\EventListener;
 
-namespace Mautic\EmailBundle\Test\EventListener;
-
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
+class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $config = [
         'useremail' => [
-            'email' => 33,
+            'email' => 0,
         ],
         'user_id'  => [6, 7],
         'to_owner' => true,
@@ -34,147 +31,165 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         'bcc'      => 'hidden@translation.in',
     ];
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
+    /**
+     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
+
+    /**
+     * @var RealTimeExecutioner|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
+
+    /**
+     * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
+
+    /**
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
+
+    private CampaignSubscriber $subscriber;
+
+    protected function setUp(): void
     {
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->emailModel          = $this->createMock(EmailModel::class);
+        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
+        $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
+        $this->translator          = $this->createMock(TranslatorInterface::class);
+        $leadModel                 = $this->createMock(LeadModel::class);
 
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser);
-
-        $args = [
-            'lead'  => 64,
-            'event' => [
-                'type'       => 'email.send',
-                'properties' => $this->config,
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
-        $event = new CampaignExecutionEvent($args, false);
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
-
-        $this->assertFalse($event->getResult());
+        $this->subscriber = new CampaignSubscriber(
+            $this->emailModel,
+            $this->realTimeExecutioner,
+            $this->sendEmailToUser,
+            $this->translator,
+            $leadModel
+        );
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
+    public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType(): void
     {
-        $lead = new Lead();
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $event         = new Event();
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
 
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event->setType(Event::TYPE_ACTION);
 
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(6);
 
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $logs = new ArrayCollection([$leadEventLog]);
 
-        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);
 
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser);
-
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'email.send.to.user',
-                'properties' => $this->config,
-            ],
-            'eventDetails' => [
-            ],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
-
-        $mockSendEmailToUser->expects($this->once())
-            ->method('sendEmailToUsers')
-            ->with($this->config, $lead);
-
-        $event = new CampaignExecutionEvent($args, false);
-
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
-
-        $this->assertTrue($event->getResult());
+        $this->assertCount(0, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
     }
 
-    public function testOnCampaignTriggerActionSendEmailToUserWithError()
+    public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
-        $lead = new Lead();
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $event         = (new Event())->setType('email.send.to.user');
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
 
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(0);
+        $leadEventLog
+            ->method('setIsScheduled')
+            ->with(false)
+            ->willReturn($leadEventLog);
 
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $logs = new ArrayCollection([$leadEventLog]);
 
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);
 
-        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
+    }
 
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+    public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
+    {
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $event         = (new Event())->setType('email.send.to.user');
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
 
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser);
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(0);
+        $leadEventLog
+            ->method('setIsScheduled')
+            ->with(false)
+            ->willReturn($leadEventLog);
+        $leadEventLog
+            ->method('getMetadata')
+            ->willReturn([]);
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'email.send.to.user',
-                'properties' => $this->config,
-            ],
-            'eventDetails' => [
-            ],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        $logs = new ArrayCollection([$leadEventLog]);
 
-        $mockSendEmailToUser->expects($this->once())
+        $this->sendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
-            ->with($this->config, $lead)
-            ->will($this->throwException(new EmailCouldNotBeSentException('Something happenned')));
+            ->with([], $lead)
+            ->will($this->throwException(new EmailCouldNotBeSentException('Something happened')));
 
-        $event = new CampaignExecutionEvent($args, false);
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);
 
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
+        $this->assertCount(0, $pendingEvent->getSuccessful());
 
-        $expected = [
-            'failed' => 1,
-            'reason' => 'Something happenned',
-        ];
+        $failures = $pendingEvent->getFailures();
+        $this->assertCount(1, $failures);
+        /** @var LeadEventLog $failure */
+        $failure    = $failures->first();
+        $failedLead = $failure->getLead();
 
-        $this->assertSame($expected, $event->getResult());
+        $this->assertSame('tester@mautic.org', $failedLead->getEmail());
+    }
+
+    /**
+     * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function testOnCampaignTriggerActionSendEmailToContactWithWrongEventType(): void
+    {
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $event         = new Event();
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
+
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(6);
+
+        $logs = new ArrayCollection([$leadEventLog]);
+
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToContact($pendingEvent);
+
+        $this->assertCount(0, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
     }
 }

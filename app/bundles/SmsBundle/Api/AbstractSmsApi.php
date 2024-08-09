@@ -1,50 +1,32 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Api;
 
-use Joomla\Http\Http;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\SmsBundle\Sms\TransportInterface;
 
-abstract class AbstractSmsApi
+/**
+ * @deprecated use TransportInterface instead
+ */
+abstract class AbstractSmsApi implements TransportInterface
 {
-    /**
-     * @var MauticFactory
-     */
-    protected $pageTrackableModel;
-
-    /**
-     * AbstractSmsApi constructor.
-     *
-     * @param TrackableModel $pageTrackableModel
-     */
-    public function __construct(TrackableModel $pageTrackableModel)
-    {
-        $this->pageTrackableModel = $pageTrackableModel;
+    public function __construct(
+        protected TrackableModel $pageTrackableModel
+    ) {
     }
 
     /**
-     * @param string $number
      * @param string $content
      *
      * @return mixed
      */
-    abstract public function sendSms($number, $content);
+    abstract public function sendSms(Lead $lead, $content);
 
     /**
      * Convert a non-tracked url to a tracked url.
      *
      * @param string $url
-     * @param array  $clickthrough
      *
      * @return string
      */

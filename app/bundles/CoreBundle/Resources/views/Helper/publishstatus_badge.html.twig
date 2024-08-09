@@ -1,0 +1,20 @@
+{% set labelColor %}
+    {%- if entity.getPublishStatus() is same as('published') -%}
+        success
+    {%- elseif entity.getPublishStatus() is same as('unpublished') or entity.getPublishStatus() is same as('expired') -%}
+        danger
+    {%- elseif entity.getPublishStatus() is same as('pending') -%}
+        warning
+    {%- endif -%}
+{% endset %}
+{% set icon %}
+    {%- if entity.getPublishStatus() is same as('published') -%}
+        check
+    {%- elseif entity.getPublishStatus() is same as('unpublished') or entity.getPublishStatus() is same as('expired') -%}
+        close
+    {%- elseif entity.getPublishStatus() is same as('pending') -%}
+        more
+    {%- endif -%}
+{% endset %}
+{% set labelText = ('mautic.core.form.' ~ (entity.getPublishStatus() == 'published' ? 'active' : 'inactive'))|trans %}
+<span title="{{ labelText }}" aria-label="{{ labelText }}" class="bg-{{ labelColor }} publishstatus_pulse"> </span>

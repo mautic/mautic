@@ -1,45 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Model\PluginModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PluginModel
-     */
-    protected $pluginModel;
+    private const FEATURE_PUSH_LEAD = 'push_lead';
 
-    /**
-     * LeadSubscriber constructor.
-     *
-     * @param PluginModel $pluginModel
-     */
-    public function __construct(PluginModel $pluginModel)
-    {
-        $this->pluginModel = $pluginModel;
+    public function __construct(
+        private PluginModel $pluginModel,
+        private IntegrationRepository $integrationRepository
+    ) {
     }
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LEAD_PRE_DELETE    => ['onLeadDelete', 0],
@@ -51,39 +33,54 @@ class LeadSubscriber extends CommonSubscriber
     /*
      * Delete lead event
      */
-    public function onLeadDelete(LeadEvent $event)
+    public function onLeadDelete(LeadEvent $event): bool
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
-        $success = false;
 
-        return $success;
+        return false;
     }
 
     /*
      * Delete company event
      */
-    public function onCompanyDelete(CompanyEvent $event)
+    public function onCompanyDelete(CompanyEvent $event): bool
     {
         /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company               = $event->getCompany();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('company%', $company->getId());
-        $success = false;
 
-        return $success;
+        return false;
     }
 
     /*
     * Change lead event
     */
-    public function onLeadSave(LeadEvent $event)
+    public function onLeadSave(LeadEvent $event): void
     {
-        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
-        $integrationEntityRepo->updateErrorLeads('lead-error', $lead->getId());
+        if ($this->isAnyIntegrationEnabled()) {
+            $integrationEntityRepo->updateErrorLeads('lead-error', $lead->getId());
+        }
+    }
+
+    private function isAnyIntegrationEnabled(): bool
+    {
+        $integrations = $this->integrationRepository->getIntegrations();
+        foreach ($integrations as $integration) {
+            /** @var Integration $integration */
+            $supportedFeatures = $integration->getSupportedFeatures();
+
+            if ($integration->getIsPublished() && !empty($integration->getApiKeys()) && in_array(self::FEATURE_PUSH_LEAD, $supportedFeatures)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
