@@ -2,42 +2,47 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Shortener\Shortener;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\PageEvents;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @extends FormModel<Redirect>
  */
 class RedirectModel extends FormModel
 {
-    /**
-     * @var UrlHelper
-     */
-    protected $urlHelper;
-
-    /**
-     * RedirectModel constructor.
-     */
-    public function __construct(UrlHelper $urlHelper)
-    {
-        $this->urlHelper = $urlHelper;
+    public function __construct(
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private Shortener $shortener
+    ) {
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): RedirectRepository
     {
-        $result = $this->em->getRepository(Redirect::class);
-        \assert($result instanceof RedirectRepository);
-
-        return $result;
+        return $this->em->getRepository(Redirect::class);
     }
 
     /**
-     * @param $identifier
-     *
      * @return Redirect|null
      */
     public function getRedirectById($identifier)
@@ -77,7 +82,7 @@ class RedirectModel extends FormModel
         }
 
         if ($shortenUrl) {
-            $url = $this->urlHelper->buildShortUrl($url);
+            $url = $this->shortener->shortenUrl($url);
         }
 
         return $url;
@@ -85,10 +90,8 @@ class RedirectModel extends FormModel
 
     /**
      * Generate UTMs params for url.
-     *
-     * @return array
      */
-    public function getUtmTagsForUrl($rawUtmTags)
+    public function getUtmTagsForUrl($rawUtmTags): array
     {
         $utmTags = [];
         foreach ($rawUtmTags as $utmTag => $value) {
@@ -102,8 +105,6 @@ class RedirectModel extends FormModel
      * Get a Redirect entity by URL.
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
-     *
-     * @param $url
      *
      * @return Redirect|null
      */
@@ -125,14 +126,19 @@ class RedirectModel extends FormModel
     /**
      * Get Redirect entities by an array of URLs.
      *
-     * @return array
+     * @return array<Redirect>
      */
     public function getRedirectsByUrls(array $urls)
     {
+        /** @var array<Redirect> $redirects */
         $redirects   = $this->getRepository()->findByUrls(array_values($urls));
         $newEntities = [];
-        $return      = [];
-        $byUrl       = [];
+
+        /** @var array<string, Redirect> $return */
+        $return = [];
+
+        /** @var array<string, Redirect> $byUrl */
+        $byUrl = [];
 
         foreach ($redirects as $redirect) {
             $byUrl[$redirect->getUrl()] = $redirect;
@@ -164,8 +170,6 @@ class RedirectModel extends FormModel
 
     /**
      * Create a Redirect entity for URL.
-     *
-     * @param $url
      *
      * @return Redirect
      */

@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Tests\CommonMocks;
 
 class ConfigBuilderEventTest extends CommonMocks
 {
-    public function testAddForm()
+    public function testAddForm(): void
     {
         $event  = $this->initEvent();
         $form   = ['formAlias' => 'testform'];
@@ -20,7 +20,7 @@ class ConfigBuilderEventTest extends CommonMocks
         $this->assertEquals($form, $forms[$form['formAlias']]);
     }
 
-    public function testRemoveForm()
+    public function testRemoveForm(): void
     {
         $event = $this->initEvent();
         $form  = ['formAlias' => 'testform'];

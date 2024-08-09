@@ -51,13 +51,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getreports' => [
-                'path'       => '/reports',
-                'controller' => 'Mautic\ReportBundle\Controller\Api\ReportApiController::getEntitiesAction',
-            ],
-            'mautic_api_getreport' => [
-                'path'       => '/reports/{id}',
-                'controller' => 'Mautic\ReportBundle\Controller\Api\ReportApiController::getReportAction',
+            'mautic_api_reportsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'reports',
+                'path'            => '/reports',
+                'controller'      => 'Mautic\ReportBundle\Controller\Api\ReportApiController',
             ],
         ],
     ],
@@ -66,7 +64,7 @@ return [
         'main' => [
             'mautic.report.reports' => [
                 'route'     => 'mautic_report_index',
-                'iconClass' => 'fa-line-chart',
+                'iconClass' => 'ri-file-chart-2-fill',
                 'access'    => [
                     'report:reports:viewown',
                     'report:reports:viewother',
@@ -79,69 +77,57 @@ return [
     'services' => [
         'helpers' => [
             'mautic.report.helper.report' => [
-                'class' => \Mautic\ReportBundle\Helper\ReportHelper::class,
-                'alias' => 'report',
+                'class'     => Mautic\ReportBundle\Helper\ReportHelper::class,
+                'alias'     => 'report',
+                'arguments' => [
+                    'event_dispatcher',
+                ],
             ],
         ],
-        'models' => [
-            'mautic.report.model.report' => [
-                'class'     => \Mautic\ReportBundle\Model\ReportModel::class,
+        'validator' => [
+            'mautic.report.validator.schedule_is_valid_validator' => [
+                'class'     => Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator::class,
                 'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'twig',
-                    'mautic.channel.helper.channel_list',
-                    'mautic.lead.model.field',
-                    'mautic.report.helper.report',
-                    'mautic.report.model.csv_exporter',
-                    'mautic.report.model.excel_exporter',
+                    'mautic.report.model.scheduler_builder',
                 ],
+                'tag' => 'validator.constraint_validator',
             ],
-            'mautic.report.model.csv_exporter' => [
-                'class'     => \Mautic\ReportBundle\Model\CsvExporter::class,
-                'arguments' => [
-                    'mautic.helper.twig.formatter',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.report.model.excel_exporter' => [
-                'class'     => \Mautic\ReportBundle\Model\ExcelExporter::class,
-                'arguments' => [
-                    'mautic.helper.twig.formatter',
-                ],
-            ],
+        ],
+        'other' => [
             'mautic.report.model.scheduler_builder' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder::class,
+                'class'     => Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_template_factory',
                 ],
             ],
             'mautic.report.model.scheduler_template_factory' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory::class,
+                'class'     => Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory::class,
                 'arguments' => [],
             ],
             'mautic.report.model.scheduler_date_builder' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Date\DateBuilder::class,
+                'class'     => Mautic\ReportBundle\Scheduler\Date\DateBuilder::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_builder',
                 ],
             ],
             'mautic.report.model.scheduler_planner' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner::class,
+                'class'     => Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_date_builder',
                     'doctrine.orm.default_entity_manager',
                 ],
             ],
             'mautic.report.model.send_schedule' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Model\SendSchedule::class,
+                'class'     => Mautic\ReportBundle\Scheduler\Model\SendSchedule::class,
                 'arguments' => [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
                     'mautic.report.model.file_handler',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.report.model.file_handler' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Model\FileHandler::class,
+                'class'     => Mautic\ReportBundle\Scheduler\Model\FileHandler::class,
                 'arguments' => [
                     'mautic.helper.file_path_resolver',
                     'mautic.helper.file_properties',
@@ -149,7 +135,7 @@ return [
                 ],
             ],
             'mautic.report.model.message_schedule' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Model\MessageSchedule::class,
+                'class'     => Mautic\ReportBundle\Scheduler\Model\MessageSchedule::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.file_properties',
@@ -157,65 +143,19 @@ return [
                     'router',
                 ],
             ],
-            'mautic.report.model.report_exporter' => [
-                'class'     => \Mautic\ReportBundle\Model\ReportExporter::class,
-                'arguments' => [
-                    'mautic.report.model.schedule_model',
-                    'mautic.report.model.report_data_adapter',
-                    'mautic.report.model.report_export_options',
-                    'mautic.report.model.report_file_writer',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.report.model.schedule_model' => [
-                'class'     => \Mautic\ReportBundle\Model\ScheduleModel::class,
-                'arguments' => [
-                    'doctrine.orm.default_entity_manager',
-                    'mautic.report.model.scheduler_planner',
-                ],
-            ],
             'mautic.report.model.report_data_adapter' => [
-                'class'     => \Mautic\ReportBundle\Adapter\ReportDataAdapter::class,
+                'class'     => Mautic\ReportBundle\Adapter\ReportDataAdapter::class,
                 'arguments' => [
                     'mautic.report.model.report',
                 ],
-            ],
-            'mautic.report.model.report_export_options' => [
-                'class'     => \Mautic\ReportBundle\Model\ReportExportOptions::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.report.model.report_file_writer' => [
-                'class'     => \Mautic\ReportBundle\Model\ReportFileWriter::class,
-                'arguments' => [
-                    'mautic.report.model.csv_exporter',
-                    'mautic.report.model.export_handler',
-                ],
-            ],
-            'mautic.report.model.export_handler' => [
-                'class'     => \Mautic\ReportBundle\Model\ExportHandler::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.file_path_resolver',
-                ],
-            ],
-        ],
-        'validator' => [
-            'mautic.report.validator.schedule_is_valid_validator' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator::class,
-                'arguments' => [
-                    'mautic.report.model.scheduler_builder',
-                ],
-                'tag' => 'validator.constraint_validator',
             ],
         ],
     ],
 
     'parameters' => [
-        'report_temp_dir'                     => '%kernel.project_dir%/media/files/temp',
+        'report_temp_dir'                     => '%mautic.application_dir%/media/files/temp',
         'report_export_batch_size'            => 1000,
-        'report_export_max_filesize_in_bytes' => 5000000,
+        'report_export_max_filesize_in_bytes' => 5_000_000,
         'csv_always_enclose'                  => false,
     ],
 ];

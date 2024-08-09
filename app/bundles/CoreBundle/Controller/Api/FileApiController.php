@@ -2,13 +2,24 @@
 
 namespace Mautic\CoreBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<object>
@@ -22,19 +33,19 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, MauticFactory $factory)
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
-        $this->allowedExtensions = $this->coreParametersHelper->get('allowed_extensions');
+        $this->allowedExtensions = $coreParametersHelper->get('allowed_extensions');
 
-        parent::initialize($event);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper, $factory);
     }
 
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function createAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
     {
@@ -47,12 +58,12 @@ class FileApiController extends CommonApiController
         $response = [$this->entityNameOne => []];
         if ($request->files) {
             foreach ($request->files as $file) {
-                $extension = $file->guessExtension() ? $file->guessExtension() : $file->getClientOriginalExtension();
+                $extension = $file->guessExtension() ?: $file->getClientOriginalExtension();
                 if (in_array($extension, $this->allowedExtensions)) {
                     $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
-                    if ('images' === substr($dir, 0, 6)) {
+                    if (str_starts_with($dir, 'images')) {
                         $response[$this->entityNameOne]['link'] = $this->getMediaUrl($request).'/'.$fileName;
                     }
 
@@ -73,7 +84,7 @@ class FileApiController extends CommonApiController
     /**
      * List the files in /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function listAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
     {
@@ -88,7 +99,7 @@ class FileApiController extends CommonApiController
         if (is_array($fnames)) {
             foreach ($fnames as $key => $name) {
                 // remove hidden files
-                if ('.' === substr($name, 0, 1)) {
+                if (str_starts_with($name, '.')) {
                     unset($fnames[$key]);
                 }
             }
@@ -104,7 +115,7 @@ class FileApiController extends CommonApiController
     /**
      * Delete a file from /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function deleteAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $file)
     {
@@ -141,12 +152,12 @@ class FileApiController extends CommonApiController
     protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false)
     {
         try {
-            $possibleDirs = ['assets', 'images'];
-            $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
-            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, false, ['/']));
+            $possibleDirs = ['media', 'images'];
+            $dir          = InputHelper::alphanum($dir, true, null, ['_', '.']);
+            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, null, ['/']));
 
             // Dots in the dir name are slashes
-            if (false !== strpos($dir, '.') && !$subdir) {
+            if (str_contains($dir, '.') && !$subdir) {
                 $dirs = explode('.', $dir);
                 $dir  = $dirs[0];
                 unset($dirs[0]);
@@ -159,7 +170,7 @@ class FileApiController extends CommonApiController
 
             if ('images' === $dir) {
                 $absoluteDir = realpath($pathsHelper->getSystemPath($dir, true));
-            } elseif ('assets' === $dir) {
+            } elseif ('media' === $dir) {
                 $absoluteDir = realpath($this->coreParametersHelper->get('upload_dir'));
             }
 
@@ -193,10 +204,8 @@ class FileApiController extends CommonApiController
 
     /**
      * Get the Media directory full file system path.
-     *
-     * @return string
      */
-    protected function getMediaUrl(Request $request)
+    protected function getMediaUrl(Request $request): string
     {
         return $request->getScheme().'://'
             .$request->getHttpHost()

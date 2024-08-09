@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 class Redirect extends FormEntity
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -33,24 +33,21 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, Trackable>
      */
     private $trackables;
 
-    /**
-     * Redirect constructor.
-     */
     public function __construct()
     {
         $this->trackables = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('page_redirects')
-            ->setCustomRepositoryClass('Mautic\PageBundle\Entity\RedirectRepository');
+            ->setCustomRepositoryClass(RedirectRepository::class);
 
         $builder->addBigIntIdField();
 
@@ -75,10 +72,8 @@ class Redirect extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('redirect')
             ->addListProperties(
@@ -97,12 +92,9 @@ class Redirect extends FormEntity
             ->build();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -116,7 +108,7 @@ class Redirect extends FormEntity
     /**
      * @param string $redirectId
      */
-    public function setRedirectId($redirectId = null)
+    public function setRedirectId($redirectId = null): void
     {
         if (null === $redirectId) {
             $redirectId = substr(hash('sha1', uniqid(mt_rand())), 0, 25);
@@ -135,7 +127,7 @@ class Redirect extends FormEntity
     /**
      * @param string $url
      */
-    public function setUrl($url)
+    public function setUrl($url): void
     {
         $this->url = $url;
     }

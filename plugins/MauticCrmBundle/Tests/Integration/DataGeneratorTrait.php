@@ -22,8 +22,6 @@ trait DataGeneratorTrait
     protected $generatedRecords = [];
 
     /**
-     * @param $maxPages
-     *
      * @return array
      */
     protected function generateData($maxPages)

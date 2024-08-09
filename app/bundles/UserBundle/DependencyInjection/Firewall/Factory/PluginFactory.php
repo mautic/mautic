@@ -10,15 +10,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class PluginFactory implements SecurityFactoryInterface
 {
-    /**
-     * @param $id
-     * @param $config
-     * @param $userProvider
-     * @param $defaultEntryPoint
-     *
-     * @return array
-     */
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
         $providerId = 'security.authentication.provider.mautic.'.$id;
         $container->setDefinition($providerId, new ChildDefinition('mautic.user.preauth_authenticator'))
@@ -48,7 +40,7 @@ class PluginFactory implements SecurityFactoryInterface
         return 'mautic_plugin_auth';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
     }
 }

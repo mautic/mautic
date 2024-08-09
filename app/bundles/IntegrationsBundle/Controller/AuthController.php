@@ -22,12 +22,12 @@ class AuthController extends CommonController
         } catch (UnauthorizedException $exception) {
             $message             = $exception->getMessage();
             $authenticationError = true;
-        } catch (IntegrationNotFoundException $exception) {
+        } catch (IntegrationNotFoundException) {
             return $this->notFound();
         }
 
         return $this->render(
-            'Integrations/Auth/authenticated.html.twig',
+            '@Integrations/Auth/authenticated.html.twig',
             [
                 'message'             => $message,
                 'authenticationError' => $authenticationError,

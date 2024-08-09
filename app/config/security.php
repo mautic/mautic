@@ -54,7 +54,7 @@ $firewalls = [
         'http_basic'         => true,
     ],
     'main' => [
-        'pattern'       => '^/s/',
+        'pattern'       => '^/(s/|elfinder|efconnect)',
         'light_saml_sp' => [
             'provider'        => 'user_provider',
             'success_handler' => 'mautic.security.authentication_handler',
@@ -74,9 +74,6 @@ $firewalls = [
             'check_path'           => '/s/login_check',
         ],
         'logout' => [
-            'handlers' => [
-                'mautic.security.logout_handler',
-            ],
             'path'   => '/s/logout',
             'target' => '/s/login',
         ],
@@ -115,11 +112,11 @@ $container->loadFromExtension(
             ],
         ],
         'encoders' => [
-            \Symfony\Component\Security\Core\User\User::class => [
+            Symfony\Component\Security\Core\User\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
-            \Mautic\UserBundle\Entity\User::class => [
+            Mautic\UserBundle\Entity\User::class => [
                 'algorithm'  => 'bcrypt',
                 'iterations' => 12,
             ],
@@ -130,8 +127,6 @@ $container->loadFromExtension(
         'firewalls'      => $firewalls,
         'access_control' => [
             ['path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY'],
-            ['path' => '^/efconnect', 'roles' => 'IS_AUTHENTICATED_FULLY'],
-            ['path' => '^/elfinder', 'roles' => 'IS_AUTHENTICATED_FULLY'],
         ],
     ]
 );
@@ -170,7 +165,7 @@ if ('prod' == $container->getParameter('kernel.environment')) {
 }
 
 $container->setParameter('mautic.security.restrictedConfigFields', $restrictedConfigFields);
-$container->setParameter('mautic.security.restrictedConfigFields.displayMode', \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::MODE_REMOVE);
+$container->setParameter('mautic.security.restrictedConfigFields.displayMode', Mautic\ConfigBundle\Form\Helper\RestrictionHelper::MODE_REMOVE);
 
 /*
  * Optional security parameters

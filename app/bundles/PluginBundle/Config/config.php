@@ -49,9 +49,10 @@ return [
             'items'    => [
                 'mautic.plugin.plugins' => [
                     'id'        => 'mautic_plugin_root',
-                    'iconClass' => 'fa-plus-circle',
                     'access'    => 'plugin:plugins:manage',
                     'route'     => 'mautic_plugin_index',
+                    'parent'    => 'mautic.core.integrations',
+                    'iconClass' => 'ri-plug-fill',
                 ],
             ],
         ],
@@ -60,7 +61,7 @@ return [
     'services' => [
         'other' => [
             'mautic.helper.integration' => [
-                'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
+                'class'     => Mautic\PluginBundle\Helper\IntegrationHelper::class,
                 'arguments' => [
                     'service_container',
                     'doctrine.orm.entity_manager',
@@ -72,7 +73,7 @@ return [
                 ],
             ],
             'mautic.plugin.helper.reload' => [
-                'class'     => \Mautic\PluginBundle\Helper\ReloadHelper::class,
+                'class'     => Mautic\PluginBundle\Helper\ReloadHelper::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.factory',
@@ -81,26 +82,12 @@ return [
         ],
         'facades' => [
             'mautic.plugin.facade.reload' => [
-                'class'     => \Mautic\PluginBundle\Facade\ReloadFacade::class,
+                'class'     => Mautic\PluginBundle\Facade\ReloadFacade::class,
                 'arguments' => [
                     'mautic.plugin.model.plugin',
                     'mautic.plugin.helper.reload',
                     'translator',
                 ],
-            ],
-        ],
-        'models' => [
-            'mautic.plugin.model.plugin' => [
-                'class'     => \Mautic\PluginBundle\Model\PluginModel::class,
-                'arguments' => [
-                    'mautic.lead.model.field',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.bundle',
-                ],
-            ],
-
-            'mautic.plugin.model.integration_entity' => [
-                'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
             ],
         ],
     ],

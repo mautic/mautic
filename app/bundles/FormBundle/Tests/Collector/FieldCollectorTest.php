@@ -17,7 +17,7 @@ final class FieldCollectorTest extends \PHPUnit\Framework\TestCase
         $dispatcher                               = new class() extends EventDispatcher {
             public int $dispatchMethodCallCounter = 0;
 
-            public function dispatch($event)
+            public function dispatch(object $event, string $eventName = null): object
             {
                 ++$this->dispatchMethodCallCounter;
 

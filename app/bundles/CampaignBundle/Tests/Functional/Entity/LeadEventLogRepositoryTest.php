@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Functional\Entity;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
@@ -15,20 +16,20 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         $eventId    = random_int(200, 2000);
         $connection = $this->em->getConnection();
 
-        /** @var LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
 
         $insertStatement = $connection->prepare('INSERT INTO `'.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log` (`event_id`, `lead_id`, `rotation`, `is_scheduled`, `system_triggered`) VALUES (?, ?, ?, ?, ?);');
 
-        $connection->query('SET FOREIGN_KEY_CHECKS=0;');
+        $connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
         foreach ($this->getLeadCampaignEventData($eventId) as $row) {
-            $insertStatement->execute($row);
+            $insertStatement->executeQuery($row);
         }
-        $connection->query('SET FOREIGN_KEY_CHECKS=1;');
+        $connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
 
         Assert::assertCount(3, $leadEventLogRepository->findAll());
 
-        $leadEventLogRepository->removeEventLogs($eventId);
+        $leadEventLogRepository->removeEventLogs([(string) $eventId]);
 
         Assert::assertCount(0, $leadEventLogRepository->findAll());
     }

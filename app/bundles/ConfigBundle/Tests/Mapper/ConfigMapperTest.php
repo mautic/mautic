@@ -14,28 +14,14 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             'formAlias'  => 'emailconfig',
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
-                'mailer_api_key'                        => null,
                 'mailer_from_name'                      => 'Mautic',
                 'mailer_from_email'                     => 'email@yoursite.com',
                 'mailer_return_path'                    => null,
                 'mailer_transport'                      => 'mail',
                 'mailer_append_tracking_pixel'          => true,
                 'mailer_convert_embed_images'           => false,
-                'mailer_host'                           => '',
-                'mailer_port'                           => null,
-                'mailer_user'                           => null,
-                'mailer_password'                       => null,
-                'mailer_encryption'                     => null,
-                'mailer_auth_mode'                      => null,
-                'mailer_amazon_region'                  => 'email-smtp.us-east-1.amazonaws.com',
-                'mailer_spool_type'                     => 'memory',
-                'mailer_spool_path'                     => '%kernel.project_dir%/var/spool',
-                'mailer_spool_msg_limit'                => null,
-                'mailer_spool_time_limit'               => null,
-                'mailer_spool_recover_timeout'          => 900,
-                'mailer_spool_clear_timeout'            => 1800,
-                'messenger_type'                        => 'async',
-                'messenger_dsn'                         => 'doctrine://default',
+                'mailer_dsn'                            => 'smtp://null:25',
+                'messenger_dsn_email'                   => 'doctrine://default',
                 'messenger_retry_strategy_max_retries'  => 3,
                 'messenger_retry_strategy_delay'        => 1000,
                 'messenger_retry_strategy_multiplier'   => 2,
@@ -150,9 +136,9 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
      * @testdox Exception should be thrown if parameters key is not found in a form config
      *
      * @covers  \Mautic\ConfigBundle\Exception\BadFormConfigException
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
      */
-    public function testExceptionIsThrownOnBadFormConfig()
+    public function testExceptionIsThrownOnBadFormConfig(): void
     {
         $this->expectException(BadFormConfigException::class);
 
@@ -176,10 +162,10 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Defaults should be bound when local config has no values
      *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
      */
-    public function testParametersAreBoundToDefaults()
+    public function testParametersAreBoundToDefaults(): void
     {
         $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
@@ -195,10 +181,10 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Defaults should be merged with local config values
      *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
      */
-    public function testParametersAreBoundToDefaultsWithLocalConfig()
+    public function testParametersAreBoundToDefaultsWithLocalConfig(): void
     {
         $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
@@ -206,9 +192,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 
         $parameterHelper->method('get')
             ->willReturnCallback(
-                function ($param, $defaultValue) {
-                    return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;
-                }
+                fn ($param, $defaultValue) => array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue
             );
 
         $mapper = new ConfigMapper($parameterHelper, []);
@@ -264,10 +248,10 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @testdox Defaults should be merged with local config values but restricted fields should be removed
      *
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues()
-     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters()
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::bindFormConfigsWithRealValues
+     * @covers  \Mautic\ConfigBundle\Mapper\ConfigMapper::mergeWithLocalParameters
      */
-    public function testParametersAreBoundToDefaultsWithLocalConfigAndRestrictionsAppied()
+    public function testParametersAreBoundToDefaultsWithLocalConfigAndRestrictionsAppied(): void
     {
         $parameterHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
@@ -275,9 +259,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 
         $parameterHelper->method('get')
             ->willReturnCallback(
-                function ($param, $defaultValue) {
-                    return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;
-                }
+                fn ($param, $defaultValue) => array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue
             );
 
         $mapper = new ConfigMapper($parameterHelper, ['monitored_email']);

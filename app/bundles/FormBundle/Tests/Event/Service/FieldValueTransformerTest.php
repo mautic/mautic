@@ -43,7 +43,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+            public function generate(string $name, mixed $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
             {
                 Assert::assertSame('mautic_form_file_download', $name);
                 Assert::assertSame([
@@ -58,7 +58,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
         };
         $transformer = new FieldValueTransformer($router);
         $submission  = new class() extends Submission {
-            public function getId()
+            public function getId(): int
             {
                 return 456;
             }

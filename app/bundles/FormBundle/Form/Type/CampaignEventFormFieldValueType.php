@@ -12,24 +12,16 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CampaignEventFormSubmitType.
+ * @extends AbstractType<mixed>
  */
 class CampaignEventFormFieldValueType extends AbstractType
 {
-    /**
-     * @var FormModel
-     */
-    private $model;
-
-    public function __construct(FormModel $model)
-    {
-        $this->model = $model;
+    public function __construct(
+        private FormModel $model
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'form',
@@ -65,11 +57,11 @@ class CampaignEventFormFieldValueType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $choices,
-                ]
+            ]
         );
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) {
+        $func = function (FormEvent $e): void {
             $data    = $e->getData();
             $form    = $e->getForm();
             $fields  = [];
@@ -101,14 +93,14 @@ class CampaignEventFormFieldValueType extends AbstractType
                             $options[$field->getAlias()] = [];
                             foreach ($list as $option) {
                                 if (is_array($option) && isset($option['value']) && isset($option['label'])) {
-                                    //The select box needs values to be [value] => label format so make sure we have that style then put it in
+                                    // The select box needs values to be [value] => label format so make sure we have that style then put it in
                                     $options[$field->getAlias()][$option['value']] = $option['label'];
                                 } elseif (is_array($option)) {
                                     foreach ($option as $opt) {
                                         $options[$field->getAlias()][$opt] = $opt;
                                     }
                                 } elseif (!is_array($option)) {
-                                    //Kept here for BC
+                                    // Kept here for BC
                                     $options[$field->getAlias()][$option] = $option;
                                 }
                             }
@@ -181,9 +173,6 @@ class CampaignEventFormFieldValueType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'campaignevent_form_field_value';

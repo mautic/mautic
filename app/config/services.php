@@ -3,17 +3,16 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 // This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire services
 // if the bundle do not cover it itself by their own *Extension and services.php which is prefered.
-return function (ContainerConfigurator $configurator, ContainerInterface $container) {
+return function (ContainerConfigurator $configurator, ContainerBuilder $container) {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
         ->autoconfigure()
-        ->public()
-    ;
+        ->public();
 
     $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 

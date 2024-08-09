@@ -5,9 +5,6 @@ namespace Mautic\PageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class PageEvent.
- */
 class PageEvent extends CommonEvent
 {
     /**
@@ -32,7 +29,7 @@ class PageEvent extends CommonEvent
     /**
      * Sets the Page entity.
      */
-    public function setPage(Page $page)
+    public function setPage(Page $page): void
     {
         $this->entity = $page;
     }

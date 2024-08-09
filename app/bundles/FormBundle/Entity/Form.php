@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -20,18 +20,20 @@ class Form extends FormEntity
      */
     private $id;
 
+    private ?string $language = null;
+
     /**
      * @var string
      */
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $formAttributes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -41,67 +43,66 @@ class Form extends FormEntity
     private $alias;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cachedHtml;
 
     /**
      * @var string
      */
-    private $postAction = 'return';
+    private $postAction = 'message';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $postActionProperty;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     private $actions;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $inKioskMode = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $renderStyle = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateSubmitted" = "DESC"})
-     *
-     * @var ArrayCollection
+     * @var Collection<int, Submission>
      */
-    private $submissions;
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['dateSubmitted' => \Doctrine\Common\Collections\Criteria::DESC])]
+    private Collection $submissions;
 
     /**
      * @var int
@@ -109,17 +110,17 @@ class Form extends FormEntity
     public $submissionCount;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $formType;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $noIndex;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $progressiveProfilingLimit;
 
@@ -144,16 +145,21 @@ class Form extends FormEntity
         $this->submissions = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('forms')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FormRepository');
+            ->setCustomRepositoryClass(FormRepository::class);
 
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->createField('language', 'string')
+            ->columnName('lang')
+            ->nullable()
+            ->build();
 
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
@@ -218,10 +224,10 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->addNullableField('progressiveProfilingLimit', Type::INTEGER, 'progressive_profiling_limit');
+        $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -254,10 +260,7 @@ class Form extends FormEntity
         ]));
     }
 
-    /**
-     * @return array
-     */
-    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
     {
         $data   = $form->getData();
         $groups = ['form'];
@@ -279,10 +282,8 @@ class Form extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('form')
             ->addListProperties(
@@ -309,19 +310,16 @@ class Form extends FormEntity
                     'postActionProperty',
                     'noIndex',
                     'formAttributes',
+                    'language',
                 ]
             )
             ->build();
     }
 
-    /**
-     * @param $prop
-     * @param $val
-     */
     protected function isChanged($prop, $val)
     {
         if ('actions' == $prop || 'fields' == $prop) {
-            //changes are already computed so just add them
+            // changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {
             parent::isChanged($prop, $val);
@@ -405,7 +403,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return string
+     * @return bool|null
      */
     public function getRenderStyle()
     {
@@ -446,15 +444,16 @@ class Form extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPostActionProperty()
+    public function getPostActionProperty(): ?string
     {
+        if ('return' === $this->getPostAction()) {
+            return null;
+        }
+
         return $this->postActionProperty;
     }
 
-    public function getResultCount()
+    public function getResultCount(): int
     {
         return count($this->submissions);
     }
@@ -473,7 +472,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -494,7 +493,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -519,7 +518,7 @@ class Form extends FormEntity
     /**
      * @param int|string $key
      */
-    public function removeField($key, Field $field)
+    public function removeField($key, Field $field): void
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -528,17 +527,14 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Field[]
+     * @return ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     public function getFields()
     {
         return $this->fields;
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldAliases()
+    public function getFieldAliases(): array
     {
         $aliases = [];
         $fields  = $this->getFields();
@@ -553,6 +549,27 @@ class Form extends FormEntity
     }
 
     /**
+     * Loops through the form fields and returns an array of fields with mapped data.
+     *
+     * @return array<int, array<string, int|string>>
+     */
+    public function getMappedFieldValues(): array
+    {
+        return array_filter(
+            array_map(
+                fn (Field $field): array => [
+                    'formFieldId'  => $field->getId(),
+                    'mappedObject' => $field->getMappedObject(),
+                    'mappedField'  => $field->getMappedField(),
+                ],
+                $this->getFields()->getValues()
+            ),
+            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
+        );
+    }
+
+    /**
+     * Set alias.
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
      *
      * @return string[]
@@ -563,9 +580,7 @@ class Form extends FormEntity
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        function (Field $field) {
-                            return $field->getMappedObject();
-                        }
+                        fn (Field $field) => $field->getMappedObject()
                     )->toArray()
                 )
             )
@@ -603,13 +618,13 @@ class Form extends FormEntity
         return $this;
     }
 
-    public function removeSubmission(Submission $submissions)
+    public function removeSubmission(Submission $submissions): void
     {
         $this->submissions->removeElement($submissions);
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return Collection|Submission[]
      */
     public function getSubmissions()
     {
@@ -631,7 +646,7 @@ class Form extends FormEntity
         return $this;
     }
 
-    public function removeAction(Action $action)
+    public function removeAction(Action $action): void
     {
         $this->actions->removeElement($action);
     }
@@ -639,13 +654,13 @@ class Form extends FormEntity
     /**
      * Removes all actions.
      */
-    public function clearActions()
+    public function clearActions(): void
     {
         $this->actions = new ArrayCollection();
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Action[]
+     * @return ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     public function getActions()
     {
@@ -663,7 +678,7 @@ class Form extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -679,7 +694,7 @@ class Form extends FormEntity
     /**
      * @param mixed $template
      */
-    public function setTemplate($template)
+    public function setTemplate($template): void
     {
         $this->template = $template;
     }
@@ -695,7 +710,7 @@ class Form extends FormEntity
     /**
      * @param mixed $inKioskMode
      */
-    public function setInKioskMode($inKioskMode)
+    public function setInKioskMode($inKioskMode): void
     {
         $this->inKioskMode = $inKioskMode;
     }
@@ -703,7 +718,7 @@ class Form extends FormEntity
     /**
      * @param mixed $renderStyle
      */
-    public function setRenderStyle($renderStyle)
+    public function setRenderStyle($renderStyle): void
     {
         $this->renderStyle = $renderStyle;
     }
@@ -739,7 +754,7 @@ class Form extends FormEntity
     /**
      * @param bool|null $noIndex
      */
-    public function setNoIndex($noIndex)
+    public function setNoIndex($noIndex): void
     {
         $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
         $this->isChanged('noIndex', $sanitizedNoIndex);
@@ -775,10 +790,20 @@ class Form extends FormEntity
         return $this->formAttributes;
     }
 
-    /**
-     * @return bool
-     */
-    public function isStandalone()
+    public function setLanguage(?string $language): self
+    {
+        $this->isChanged('language', $language);
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
+    }
+
+    public function isStandalone(): bool
     {
         return 'campaign' != $this->formType;
     }
@@ -786,17 +811,9 @@ class Form extends FormEntity
     /**
      * Generate a form name for HTML attributes.
      */
-    public function generateFormName()
+    public function generateFormName(): string
     {
-        $name = strtolower(
-            InputHelper::alphanum(
-                InputHelper::transliterate(
-                    $this->name
-                )
-            )
-        );
-
-        return (empty($name)) ? 'form-'.$this->id : $name;
+        return $this->name ? strtolower(InputHelper::alphanum(InputHelper::transliterate($this->name))) : 'form-'.$this->id;
     }
 
     /**
@@ -851,10 +868,6 @@ class Form extends FormEntity
      */
     public function getProgressiveProfilingLimit()
     {
-        if (0 === $this->progressiveProfilingLimit) {
-            $this->progressiveProfilingLimit = '';
-        }
-
         return $this->progressiveProfilingLimit;
     }
 }

@@ -17,27 +17,24 @@ class ApiSubscriberTest extends CommonMocks
     /**
      * @var CoreParametersHelper|MockObject
      */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var Translator&MockObject
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var Request&MockObject
      */
-    private $request;
+    private MockObject $request;
 
     /**
      * @var RequestEvent&MockObject
      */
-    private $event;
+    private MockObject $event;
 
-    /**
-     * @var ApiSubscriber
-     */
-    private $subscriber;
+    private ApiSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -57,19 +54,19 @@ class ApiSubscriberTest extends CommonMocks
     public function testOnKernelRequestWhenNotMasterRequest(): void
     {
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->never())
             ->method('get');
 
-        $this->assertNull($this->subscriber->onKernelRequest($this->event));
+        $this->subscriber->onKernelRequest($this->event);
     }
 
     public function testOnKernelRequestOnApiRequestWhenApiDisabled(): void
     {
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
         $this->event->expects($this->once())
@@ -89,7 +86,7 @@ class ApiSubscriberTest extends CommonMocks
             ->method('setResponse')
             ->with($this->isInstanceOf(JsonResponse::class))
             ->willReturnCallback(
-                function (JsonResponse $response) {
+                function (JsonResponse $response): void {
                     $this->assertEquals(403, $response->getStatusCode());
                 }
             );
@@ -100,7 +97,7 @@ class ApiSubscriberTest extends CommonMocks
     public function testOnKernelRequestOnApiRequestWhenApiEnabled(): void
     {
         $this->event->expects($this->once())
-            ->method('isMasterRequest')
+            ->method('isMainRequest')
             ->willReturn(true);
 
         $this->event->expects($this->once())

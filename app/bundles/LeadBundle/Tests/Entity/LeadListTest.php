@@ -165,7 +165,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $segment->getChanges());
     }
 
-    public function setIsGlobalDataProvider(): iterable
+    public static function setIsGlobalDataProvider(): iterable
     {
         yield [null, false, ['isGlobal' => [true, false]]];
         yield [true, true, []];
@@ -187,7 +187,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $segment->getChanges());
     }
 
-    public function setIsPreferenceCenterDataProvider(): iterable
+    public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, false, []];
         yield [true, true, ['isPreferenceCenter' => [false, true]]];
@@ -195,5 +195,63 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         yield ['', false, []];
         yield [0, false, []];
         yield ['string', true, ['isPreferenceCenter' => [false, true]]];
+    }
+
+    public function testFirstFilterGlueIsAlwaysAnd(): void
+    {
+        $entity = new LeadList();
+        $entity->setFilters([
+            [
+                'object'     => 'lead',
+                'glue'       => 'or',
+                'field'      => 'owner_id',
+                'type'       => 'lookup_id',
+                'operator'   => '=',
+                'properties' => [
+                    'display' => 'John Doe',
+                    'filter'  => '4',
+                ],
+            ],
+            [
+                'object'     => 'lead',
+                'glue'       => 'and',
+                'field'      => 'city',
+                'type'       => 'text',
+                'operator'   => '=',
+                'properties' => [
+                    'filter'  => 'Prague',
+                ],
+            ],
+        ]);
+
+        $this->assertSame(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
+                    'filter'  => '4',
+                    'display' => 'John Doe',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'operator'   => '=',
+                    'properties' => [
+                        'filter'  => 'Prague',
+                    ],
+                    'filter'  => 'Prague',
+                    'display' => null,
+                ],
+            ],
+            $entity->getFilters(), 'The first filter glue must be "and".');
     }
 }

@@ -5,17 +5,9 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 
-/**
- * Class CampaignEventHelper.
- */
 class CampaignEventHelper
 {
-    /**
-     * @param $event
-     *
-     * @return bool
-     */
-    public static function validatePointChange($event, Lead $lead)
+    public static function validatePointChange($event, Lead $lead): bool
     {
         $properties  = $event['properties'];
         $checkPoints = $properties['points'];
@@ -30,12 +22,7 @@ class CampaignEventHelper
         return true;
     }
 
-    /**
-     * @param $event
-     *
-     * @return bool
-     */
-    public static function validateListChange(ListChangeEvent $eventDetails, $event)
+    public static function validateListChange(ListChangeEvent $eventDetails, $event): bool
     {
         $limitAddTo      = $event['properties']['addedTo'];
         $limitRemoveFrom = $event['properties']['removedFrom'];

@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Tests\Helper;
 
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -24,42 +23,36 @@ class InactiveHelperTest extends TestCase
     /**
      * @var EventScheduler|MockObject
      */
-    private $scheduler;
+    private MockObject $scheduler;
 
     /**
      * @var InactiveContactFinder|MockObject
      */
-    private $inactiveContactFinder;
+    private MockObject $inactiveContactFinder;
 
     /**
      * @var LeadEventLogRepository|MockObject
      */
-    private $eventLogRepository;
+    private MockObject $eventLogRepository;
 
     /**
      * @var EventRepository|MockObject
      */
-    private $eventRepository;
+    private MockObject $eventRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
-    private $leadRepository;
+    private MockObject $leadRepository;
 
     /**
      * @var LoggerInterface|MockObject
      */
-    private $logger;
+    private MockObject $logger;
 
-    /**
-     * @var InactiveHelper
-     */
-    private $inactiveHelper;
+    private InactiveHelper $inactiveHelper;
 
-    /**
-     * @var DecisionHelper
-     */
-    private $decisionHelper;
+    private DecisionHelper $decisionHelper;
 
     protected function setUp(): void
     {
@@ -102,12 +95,12 @@ class InactiveHelperTest extends TestCase
 
         $this->eventLogRepository->expects($this->once())
             ->method('getDatesExecuted')
-            ->willReturn(new ArrayCollection([
-                $leadNegative->getId()  => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-                $leadNegative2->getId() => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-                $leadPositive->getId()  => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-                $leadNegative3->getId() => DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
-            ]));
+            ->willReturn([
+                $leadNegative->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadNegative2->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadPositive->getId()  => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+                $leadNegative3->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
+            ]);
 
         /** @var LeadEventLog&MockObject */
         $log = $this->createMock(LeadEventLog::class);
@@ -147,9 +140,9 @@ class InactiveHelperTest extends TestCase
 
         $this->scheduler->expects($this->any())
             ->method('getExecutionDateTime')
-            ->willReturn(DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-30 12:00:00'));
+            ->willReturn(\DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-30 12:00:00'));
 
-        $now      = DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-31 12:00:00');
+        $now      = \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-31 12:00:00');
         $contacts = new ArrayCollection([
             $leadNegative->getId()  => $leadNegative,
             $leadNegative2->getId() => $leadNegative2,

@@ -23,12 +23,9 @@ class SyncCommandTest extends TestCase
     /**
      * @var SyncServiceInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $syncService;
+    private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
-    /**
-     * @var CommandTester
-     */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     public function setUp(): void
     {
@@ -62,6 +59,7 @@ class SyncCommandTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testExecuteWithSomeOptions(): void
@@ -89,6 +87,7 @@ class SyncCommandTest extends TestCase
 
     /**
      * @runInSeparateProcess
+     *
      * @preserveGlobalState disabled
      */
     public function testExecuteWhenSyncThrowsException(): void

@@ -1,3 +1,4 @@
+const ckEditors = new Map();
 /**
  * Takes a given route, retrieves the HTML, and then updates the content
  *
@@ -189,18 +190,18 @@ Mautic.generatePageTitle = function(route){
 
     if (-1 !== route.indexOf('timeline')) {
         return
-    } else if (-1 !== route.indexOf('view')) {
+    } else if (-1 !== route.indexOf('/view')) {
         //loading view of module title
         var currentModule = route.split('/')[3];
 
         //check if we find spans
-        var titleWithHTML = mQuery('.page-header h3').find('span.span-block');
+        var titleWithHTML = mQuery('.page-header h1').find('span.span-block');
         var currentModuleItem = '';
 
         if( 1 < titleWithHTML.length ){
             currentModuleItem = titleWithHTML.eq(0).text() + ' - ' + titleWithHTML.eq(1).text();
         } else {
-            currentModuleItem = mQuery('.page-header h3').text();
+            currentModuleItem = mQuery('.page-header h1').text();
         }
 
         // Encoded entites are decoded by this process and can cause a XSS
@@ -209,7 +210,7 @@ Mautic.generatePageTitle = function(route){
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title
-        mQuery('title').html( mQuery('.page-header h3').html() + ' | Mautic' );
+        mQuery('title').html( mQuery('.page-header h1').text() + ' | Mautic' );
     }
 };
 
@@ -246,14 +247,9 @@ Mautic.processPageContent = function (response) {
             Mautic.setNotifications(response.notifications);
         }
 
-        if (response.browserNotifications) {
-            Mautic.setBrowserNotifications(response.browserNotifications);
-        }
-
         if (response.route) {
             //update URL in address bar
-            MauticVars.manualStateChange = false;
-            History.pushState(null, "Mautic", response.route);
+            history.pushState(null, "Mautic", response.route);
 
             //update Title
             Mautic.generatePageTitle( response.route );
@@ -357,7 +353,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         var elementParent = thisTooltip.parent();
 
         if (elementParent.get(0).tagName === 'LABEL') {
-            elementParent.append('<i class="fa fa-question-circle"></i>');
+            elementParent.append('<i class="ri-question-line"></i>');
 
             elementParent.hover(function () {
                 thisTooltip.tooltip('show')
@@ -587,25 +583,26 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     // This turns all textarea elements with class "editor" into CKEditor ones, except for Dynamic Content elements, which can be initialized with Mautic.setDynamicContentEditors().
-    if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
+    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             mQuery(this).froalaEditor();
         });
     } else if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
         mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
             const textarea = mQuery(this);
-            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
-            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
+
+            const maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'TokenPlugin', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
+            let minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'sourceEditing'];
             }
 
             let ckEditorToolbar = minButtons;
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                 ckEditorToolbar = maxButtons;
             }
-            
+
             Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
         });
     }
@@ -711,18 +708,39 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     Mautic.renderCharts(container);
-    Mautic.renderMaps(container);
     Mautic.stopIconSpinPostEvent();
 
     //stop loading bar
     if ((response && typeof response.stopPageLoading != 'undefined' && response.stopPageLoading) || container == '#app-content' || container == '.page-list') {
         Mautic.stopPageLoadingBar();
     }
+
+    const maps= mQuery(container).find('[data-load="map"]');
+    if(maps.length) {
+        maps.each((index,map) => map.addEventListener('click', () => {
+            const scopeId = event.target.getAttribute('href');
+            const scope = mQuery(scopeId);
+
+            if (scope.length) {
+                // Check if map is not already rendered
+                if (scope.children('.map-rendered').length) {
+                    return;
+                }
+
+                // Loaded via AJAX not to block loading a whole page
+                const mapUrl = scope.attr('data-map-url');
+
+                scope.load(mapUrl, '', () => {
+                    const map = Mautic.initMap(scope, 'regions');
+                });
+            }
+        }, false));
+    }
 };
 
 Mautic.setDynamicContentEditors = function(container) {
     // The editor for dynamic content should only be initialized when the modal is opened due to conflicts and not being able to edit content otherwise
-    if (mQuery(container + ' textarea.editor-dynamic-content').length && Mautic.getActiveBuilderName() === 'legacy') {
+    if (mauticFroalaEnabled && mQuery(container + ' textarea.editor-dynamic-content').length && Mautic.getActiveBuilderName() === 'legacy') {
         console.log('[Builder] Using Froala for the Dynamic Content editor (legacy)');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             mQuery(this).froalaEditor();
@@ -731,11 +749,11 @@ Mautic.setDynamicContentEditors = function(container) {
         console.log('[Builder] Using CKEditor for the Dynamic Content editor');
         mQuery(container + ' textarea.editor-dynamic-content').each(function () {
             const textarea = mQuery(this);
-            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
-            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
+            const maxButtons = [ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']
+            let minButtons = ['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
+                minButtons = ['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize'];
             }
 
             let ckEditorToolbar = minButtons;
@@ -816,12 +834,14 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        if (Mautic.getActiveBuilderName() === 'legacy') {
+        if (mauticFroalaEnabled && Mautic.getActiveBuilderName() === 'legacy') {
             mQuery('textarea').froalaEditor('destroy');
         } else {
-            for(name in CKEDITOR.instances)
-            {
-                CKEDITOR.instances[name].destroy(false);
+            if (ckEditors.size > 0) {
+                ckEditors.forEach(function(value, key, map){
+                    map.get(key).destroy()
+                })
+                ckEditors.clear();
             }
         }
 
@@ -853,8 +873,8 @@ Mautic.onPageUnload = function (container, response) {
 
         // trash created map objects to save some memory
         if (typeof Mautic.mapObjects !== 'undefined') {
-            mQuery.each(Mautic.mapObjects, function (i, map) {
-                Mautic.destroyMap(map);
+            mQuery.each(Mautic.mapObjects, (i, map) => {
+                map.destroyMap();
             });
             Mautic.mapObjects = [];
         }
@@ -1449,10 +1469,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
         if (mQuery(el).val()) {
             mQuery(btn).attr('data-livesearch-action', 'clear');
-            mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
+            mQuery(btn + ' i').removeClass('ri-search-line').addClass('ri-eraser-line');
         } else {
             mQuery(btn).attr('data-livesearch-action', 'search');
-            mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
+            mQuery(btn + ' i').removeClass('ri-eraser-line').addClass('ri-search-line');
         }
     }
 };
@@ -1521,12 +1541,13 @@ Mautic.activateListFilterSelect = function(el) {
  * @param el
  */
 Mautic.activateColorPicker = function(el, options) {
-    var pickerOptions = mQuery(el).data('color-options');
+    let input = mQuery(el);
+    var pickerOptions = input.data('color-options');
     if (!pickerOptions) {
         pickerOptions = {
             theme: 'bootstrap',
-            change: function (hex, opacity) {
-                mQuery(el).trigger('change.minicolors', hex);
+            change: function (hex) {
+                input.trigger('change.minicolors', hex);
             }
         };
     }
@@ -1535,7 +1556,14 @@ Mautic.activateColorPicker = function(el, options) {
         pickerOptions = mQuery.extend(pickerOptions, options);
     }
 
-    mQuery(el).minicolors(pickerOptions);
+    input.minicolors(pickerOptions);
+
+    // The previous version of the Minicolors library did not use the # in the value. This is for backwards compatibility.
+    input.val(input.val().replace('#', ''));
+
+    input.on('blur', function() {
+        input.val(input.val().replace('#', ''));
+    });
 };
 
 /**
@@ -1615,7 +1643,8 @@ Mautic.activateTypeahead = function (el, options) {
         if (options.remote) {
             sourceOptions.remote = {
                 url: mauticAjaxUrl + "?action=" + options.action + "&filter=%QUERY",
-                filter: filterClosure
+                filter: filterClosure,
+                wildcard: '%QUERY',
             };
         }
 

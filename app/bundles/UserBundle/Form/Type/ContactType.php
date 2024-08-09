@@ -11,12 +11,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * @extends AbstractType<array<mixed>>
+ */
 class ContactType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add(
@@ -77,7 +77,7 @@ class ContactType extends AbstractType
             )
             ->add('buttons', FormButtonsType::class, [
                 'save_text'  => 'mautic.user.user.contact.send',
-                'save_icon'  => 'fa fa-send',
+                'save_icon'  => 'ri-send-plane-line',
                 'apply_text' => false,
             ]);
 

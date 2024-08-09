@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,11 +24,15 @@ class MonitoringController extends FormController
      */
     public function indexAction(Request $request, MonitoringModel $model, $page = 1)
     {
+        if (!$this->security->isGranted('mauticSocial:monitoring:view')) {
+            return $this->accessDenied();
+        }
+
         $session = $request->getSession();
 
         $this->setListFilters();
 
-        //set limits
+        // set limits
         $limit = $session->get('mautic.social.monitoring.limit', $this->getParameter('mautic.default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
@@ -54,7 +59,7 @@ class MonitoringController extends FormController
 
         $count = count($monitoringList);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current asset so redirect to the last asset
+            // the number of entities are now less then the current asset so redirect to the last asset
             if (1 === $count) {
                 $lastPage = 1;
             } else {
@@ -76,7 +81,7 @@ class MonitoringController extends FormController
             );
         }
 
-        //set what asset currently on so that we can return here after form submission/cancellation
+        // set what asset currently on so that we can return here after form submission/cancellation
         $session->set('mautic.social.monitoring.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -104,7 +109,7 @@ class MonitoringController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function newAction(Request $request, MonitoringModel $model, IpLookupHelper $ipLookupHelper)
     {
@@ -123,7 +128,7 @@ class MonitoringController extends FormController
 
         // get the network type from the request on submit. helpful for validation error
         // rebuilds structure of the form when it gets updated on submit
-        $monitoring  = $request->request->get('monitoring', []);
+        $monitoring  = $request->request->get('monitoring') ?? [];
         $networkType = 'POST' === $method ? ($monitoring['networkType'] ?? '') : '';
 
         // build the form
@@ -140,14 +145,14 @@ class MonitoringController extends FormController
 
         // Set the page we came from
         $page = $session->get('mautic.social.monitoring.page', 1);
-        ///Check for a submitted form and process it
+        // /Check for a submitted form and process it
         if ('POST' === $method) {
             $viewParameters = ['page' => $page];
             $template       = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction';
             $valid          = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
+                    // form is valid so process the data
                     $model->saveEntity($entity);
 
                     // update the audit log
@@ -169,8 +174,8 @@ class MonitoringController extends FormController
                     );
 
                     if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                        //return edit view so that all the session stuff is loaded
-                        return $this->editAction($request, $ipLookupHelper, $entity->getId());
+                        // return edit view so that all the session stuff is loaded
+                        return $this->editAction($request, $ipLookupHelper, $entity->getId(), true);
                     }
 
                     $viewParameters = [
@@ -182,7 +187,10 @@ class MonitoringController extends FormController
             }
             $returnUrl = $this->generateUrl('mautic_social_index', $viewParameters);
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            /** @var SubmitButton $saveSubmitButton */
+            $saveSubmitButton = $form->get('buttons')->get('save');
+
+            if ($cancelled || ($valid && $saveSubmitButton->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -221,11 +229,9 @@ class MonitoringController extends FormController
     }
 
     /**
-     * @param $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId)
+    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false)
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:edit')) {
             return $this->accessDenied();
@@ -242,7 +248,7 @@ class MonitoringController extends FormController
         // Set the page we came from
         $page = $session->get('mautic.social.monitoring.page', 1);
 
-        //set the return URL
+        // set the return URL
         $returnUrl = $this->generateUrl('mautic_social_index', ['page' => $page]);
 
         $postActionVars = [
@@ -255,7 +261,7 @@ class MonitoringController extends FormController
             ],
         ];
 
-        //not found
+        // not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -279,7 +285,7 @@ class MonitoringController extends FormController
         // get the network type from the request on submit. helpful for validation error
         // rebuilds structure of the form when it gets updated on submit
         $method      = $request->getMethod();
-        $monitoring  = $request->request->get('monitoring', []);
+        $monitoring  = $request->request->get('monitoring') ?? [];
         $networkType = 'POST' === $method ? ($monitoring['networkType'] ?? '') : $entity->getNetworkType();
 
         // build the form
@@ -294,14 +300,17 @@ class MonitoringController extends FormController
             ]
         );
 
-        ///Check for a submitted form and process it
-        if ('POST' === $method) {
+        // /Check for a submitted form and process it
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
+
+            /** @var SubmitButton $saveSubmitButton */
+            $saveSubmitButton = $form->get('buttons')->get('save');
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    // form is valid so process the data
+                    $model->saveEntity($entity, $saveSubmitButton->isClicked());
 
                     // update the audit log
                     $this->updateAuditLog($entity, $ipLookupHelper, 'update');
@@ -326,7 +335,7 @@ class MonitoringController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $saveSubmitButton->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -344,7 +353,7 @@ class MonitoringController extends FormController
                 );
             }
         } else {
-            //lock the entity
+            // lock the entity
             $model->lockEntity($entity);
         }
 
@@ -376,7 +385,7 @@ class MonitoringController extends FormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function viewAction(Request $request, $objectId)
     {
@@ -395,13 +404,13 @@ class MonitoringController extends FormController
         $security         = $this->security;
         $monitoringEntity = $model->getEntity($objectId);
 
-        //set the asset we came from
+        // set the asset we came from
         $page = $session->get('mautic.social.monitoring.page', 1);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'details') : 'details';
 
         if (null === $monitoringEntity) {
-            //set the return URL
+            // set the return URL
             $returnUrl = $this->generateUrl('mautic_social_index', ['page' => $page]);
 
             return $this->postActionRedirect(
@@ -457,7 +466,7 @@ class MonitoringController extends FormController
                 'viewParameters' => [
                     'activeMonitoring' => $monitoringEntity,
                     'logs'             => $logs,
-                    'isEmbedded'       => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
+                    'isEmbedded'       => $request->get('isEmbedded') ?: false,
                     'tmpl'             => $tmpl,
                     'security'         => $security,
                     'leadStats'        => $chart->render(),
@@ -471,7 +480,7 @@ class MonitoringController extends FormController
                     )->getContent(),
                     'dateRangeForm' => $dateRangeForm->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:'.$tmpl.'.html.twig',
+                'contentTemplate' => '@MauticSocial/Monitoring/'.$tmpl.'.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -537,7 +546,7 @@ class MonitoringController extends FormController
                     '%id%'   => $objectId,
                 ],
             ];
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -611,7 +620,7 @@ class MonitoringController extends FormController
                     ],
                 ];
             }
-        } //else don't do anything
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge(
@@ -624,7 +633,6 @@ class MonitoringController extends FormController
     }
 
     /**
-     * @param     $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
@@ -651,7 +659,7 @@ class MonitoringController extends FormController
     /*
      * Update the audit log
      */
-    public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action)
+    public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action): void
     {
         $log = [
             'bundle'    => 'plugin.mauticSocial',

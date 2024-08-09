@@ -22,7 +22,7 @@ $vars = [
 
 foreach ($vars as $id => $var) {
     if (empty($_SERVER['argv'][$id])) {
-        echo "Argument ${id} (${var}) is missing. Run this script as \"php upload.php ".implode(' ', $vars)."\"\n";
+        echo "Argument {$id} ({$var}) is missing. Run this script as \"php upload.php ".implode(' ', $vars)."\"\n";
         exit(1);
     }
 
@@ -40,10 +40,10 @@ $initAuth = new ApiAuth();
 $auth     = $initAuth->newAuth($settings, 'BasicAuth');
 $api      = new MauticApi();
 
-/** @var \Mautic\Api\Files */
+/** @var Mautic\Api\Files */
 $filesApi = $api->newApi('files', $auth, $instanceUrl);
 
-/** @var \Mautic\Api\Assets */
+/** @var Mautic\Api\Assets */
 $assetApi = $api->newApi('assets', $auth, $instanceUrl);
 
 /**
@@ -72,7 +72,7 @@ if (!isset($response['file']) || !isset($response['file']['name'])) {
  * Create the actual asset based on the file we just uploaded.
  */
 $data = [
-    'title'           => "Mautic ${mauticVersion}",
+    'title'           => "Mautic {$mauticVersion}",
     'storageLocation' => 'local',
     'file'            => $response['file']['name'],
     'category'        => $assetCategoryId,

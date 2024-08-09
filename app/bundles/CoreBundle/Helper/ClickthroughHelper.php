@@ -8,10 +8,8 @@ class ClickthroughHelper
 {
     /**
      * Encode an array to append to a URL.
-     *
-     * @return string
      */
-    public static function encodeArrayForUrl(array $array)
+    public static function encodeArrayForUrl(array $array): string
     {
         return urlencode(base64_encode(serialize($array)));
     }
@@ -19,7 +17,6 @@ class ClickthroughHelper
     /**
      * Decode a string appended to URL into an array.
      *
-     * @param      $string
      * @param bool $urlDecode
      *
      * @return array

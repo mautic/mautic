@@ -17,38 +17,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_PAGES      = 'pages';
+
     public const CONTEXT_PAGE_HITS  = 'page.hits';
+
     public const CONTEXT_VIDEO_HITS = 'video.hits';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var HitRepository
-     */
-    private $hitRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        CompanyReportData $companyReportData,
-        HitRepository $hitRepository,
-        TranslatorInterface $translator
+        private CompanyReportData $companyReportData,
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator
     ) {
-        $this->companyReportData = $companyReportData;
-        $this->hitRepository     = $hitRepository;
-        $this->translator        = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
@@ -60,7 +41,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS, self::CONTEXT_VIDEO_HITS])) {
             return;
@@ -364,7 +345,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
         $qb         = $event->getQueryBuilder();
@@ -415,7 +396,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGraphGenerate(ReportGraphEvent $event)
+    public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
         if (!$event->checkContext(self::CONTEXT_PAGE_HITS)) {
@@ -474,7 +455,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-clock-o',
+                            'iconClass' => 'ri-time-line',
                         ]
                     );
                     break;
@@ -496,7 +477,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-bookmark-o',
+                            'iconClass' => 'ri-information-2-line',
                         ]
                     );
                     break;
@@ -505,7 +486,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ph.page_language')
                         ->andWhere($qb->expr()->isNotNull('ph.page_language'));
-                    $data  = $queryBuilder->execute()->fetchAll();
+                    $data  = $queryBuilder->execute()->fetchAllAssociative();
                     $chart = new PieChart();
 
                     foreach ($data as $lang) {
@@ -517,15 +498,15 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
                 case 'mautic.page.graph.pie.devices':
                     $queryBuilder->select('ds.device, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ds.device');
-                    $data  = $queryBuilder->execute()->fetchAll();
-                    $chart = new PieChart();
+                    $data     = $queryBuilder->execute()->fetchAllAssociative();
+                    $chart    = new PieChart();
 
                     foreach ($data as $device) {
                         $label = substr(empty($device['device']) ? $this->translator->trans('mautic.core.no.info') : $device['device'], 0, 12);
@@ -537,7 +518,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         [
                             'data'      => $chart->render(),
                             'name'      => $g,
-                            'iconClass' => 'fa-globe',
+                            'iconClass' => 'ri-earth-line',
                         ]
                     );
                     break;
@@ -548,7 +529,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-sign-in';
+                    $graphData['iconClass'] = 'ri-login-box-line';
                     $event->setGraph($g, $graphData);
                     break;
 
@@ -559,7 +540,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
                     break;
@@ -571,7 +552,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-eye';
+                    $graphData['iconClass'] = 'ri-eye-line';
                     $graphData['link']      = 'mautic_page_action';
                     $event->setGraph($g, $graphData);
                     break;

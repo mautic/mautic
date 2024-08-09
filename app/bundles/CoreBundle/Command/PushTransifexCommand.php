@@ -13,7 +13,6 @@ use Mautic\Transifex\Exception\ResponseException;
 use Mautic\Transifex\Exception\TransifexException;
 use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
-use SplQueue;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,26 +26,17 @@ class PushTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:push';
 
-    private TransifexFactory $transifexFactory;
-    private TranslatorInterface $translator;
-    private LanguageHelper $languageHelper;
-
     public function __construct(
-        TransifexFactory $transifexFactory,
-        TranslatorInterface $translator,
-        LanguageHelper $languageHelper
+        private TransifexFactory $transifexFactory,
+        private TranslatorInterface $translator,
+        private LanguageHelper $languageHelper
     ) {
-        $this->transifexFactory = $transifexFactory;
-        $this->translator       = $translator;
-        $this->languageHelper   = $languageHelper;
-
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this->setName(self::NAME)
-            ->setDescription('Pushes Mautic translation resources to Transifex')
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
@@ -57,29 +47,29 @@ You can optionally choose to update resources for one bundle only with the --bun
 
 <info>php %command.full_name% --bundle AssetBundle</info>
 EOT
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $bundleFilter = $input->getOption('bundle');
-        $files        = $this->languageHelper->getLanguageFiles([$bundleFilter]);
+        $files        = $this->languageHelper->getLanguageFiles($bundleFilter ? [$bundleFilter] : []);
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
-        } catch (InvalidConfigurationException $e) {
+        } catch (InvalidConfigurationException) {
             $output->writeln($this->translator->trans(
                 'mautic.core.command.transifex_no_credentials')
             );
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $resources = $transifex->getConnector(Resources::class);
         \assert($resources instanceof Resources);
 
         $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
-        $promises          = new SplQueue();
+        $promises          = new \SplQueue();
 
         foreach ($files as $bundle => $stringFiles) {
             foreach ($stringFiles as $file) {
@@ -106,7 +96,7 @@ EOT
                     }
 
                     $promise = $transifex->getApiConnector()->createPromise(
-                        $resources->uploadContent($alias, $content)
+                        $resources->uploadContent($alias, $content, true)
                     );
                     $promise->setFilePath($file);
                     $promises->enqueue($promise);
@@ -123,7 +113,7 @@ EOT
 
         $transifex->getApiConnector()->fulfillPromises(
             $promises,
-            function (ResponseInterface $response, Promise $promise) use ($output) {
+            function (ResponseInterface $response, Promise $promise) use ($output): void {
                 $output->writeln(
                     $this->translator->trans(
                         'mautic.core.command.transifex_resource_updated',
@@ -131,12 +121,14 @@ EOT
                     )
                 );
             },
-            function (ResponseException $exception, Promise $promise) use ($output) {
+            function (ResponseException $exception, Promise $promise) use ($output): void {
                 $output->writeln($promise->getFilePath());
                 $output->writeln($exception->getMessage());
             }
         );
 
-        return 0;
+        return Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Pushes Mautic translation resources to Transifex';
 }

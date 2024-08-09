@@ -9,36 +9,16 @@ use Symfony\Component\Routing\RouterInterface;
 
 class TokenHelper
 {
-    private $regex = '{focus=(.*?)}';
+    private string $regex = '{focus=(.*?)}';
 
-    /**
-     * @var FocusModel
-     */
-    protected $model;
-
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
-
-    public function __construct(FocusModel $model, RouterInterface $router, CorePermissions $security)
-    {
-        $this->router   = $router;
-        $this->model    = $model;
-        $this->security = $security;
+    public function __construct(
+        protected FocusModel $model,
+        protected RouterInterface $router,
+        protected CorePermissions $security
+    ) {
     }
 
-    /**
-     * @param $content
-     *
-     * @return array
-     */
-    public function findFocusTokens($content)
+    public function findFocusTokens($content): array
     {
         $regex = '/'.$this->regex.'/i';
 
@@ -62,10 +42,10 @@ class TokenHelper
                 ) {
                     $script = '<script src="'.
                         $this->router->generate(
-                        'mautic_focus_generate',
-                        ['id' => $id],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ).
+                            'mautic_focus_generate',
+                            ['id' => $id],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ).
                     '" type="text/javascript" charset="utf-8" async="async"></script>';
                     $tokens[$token] = $script;
                 } else {

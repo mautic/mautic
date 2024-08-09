@@ -7,8 +7,8 @@ image:
 tasks:
   - name: Startup 
   - command: |
-      bash .ddev/gitpod-setup-ddev.sh 
-      gp ports await 8080 && gp preview $(gp url 8080)/index_dev.php 
+      bash .ddev/gitpod-setup-ddev.sh
+      gp ports await 8080 && gp preview $(gp url 8080) 
 
 # VScode xdebug extension
 vscode:

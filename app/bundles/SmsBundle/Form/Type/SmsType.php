@@ -21,19 +21,17 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Sms>
+ */
 class SmsType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        private EntityManager $em
+    ) {
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('sms.sms', $options));
@@ -66,16 +64,20 @@ class SmsType extends AbstractType
                 'label'      => 'mautic.sms.form.message',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows'  => 6,
+                    'class'                => 'form-control',
+                    'data-token-activator' => '{',
+                    'data-token-visual'    => 'false',
+                    'rows'                 => 6,
                 ],
             ]
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'label' => 'mautic.core.form.available',
+        ]);
 
-        //add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        // add lead lists
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -97,14 +99,14 @@ class SmsType extends AbstractType
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
-        //add category
+        // add category
         $builder->add(
-             'category',
-             CategoryListType::class,
-             [
-                 'bundle' => 'sms',
-             ]
-         );
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'sms',
+            ]
+        );
 
         $builder->add(
             'language',
@@ -149,7 +151,7 @@ class SmsType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

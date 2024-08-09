@@ -4,16 +4,11 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- */
+#[\Attribute]
 class EmailAddress extends Constraint
 {
-    /**
-     * {@inheritdoc}
-     */
     public function validatedBy()
     {
-        return \get_class($this).'Validator';
+        return static::class.'Validator';
     }
 }

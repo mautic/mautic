@@ -19,7 +19,7 @@ class Message extends FormEntity
     private $id;
 
     /**
-     * @var ?string
+     * @var string
      */
     private $name;
 
@@ -29,12 +29,12 @@ class Message extends FormEntity
     private $description;
 
     /**
-     * @var ?\DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var ?\DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishDown;
 
@@ -160,7 +160,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return ?\DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -181,7 +181,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return ?\DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -243,10 +243,7 @@ class Message extends FormEntity
         return $this;
     }
 
-    /**
-     * @return void
-     */
-    public function addChannel(Channel $channel)
+    public function addChannel(Channel $channel): void
     {
         if (!$this->channels->contains($channel)) {
             $channel->setMessage($this);
@@ -256,10 +253,7 @@ class Message extends FormEntity
         }
     }
 
-    /**
-     * @return void
-     */
-    public function removeChannel(Channel $channel)
+    public function removeChannel(Channel $channel): void
     {
         if ($channel->getId()) {
             $this->isChanged('channels', $channel->getId());

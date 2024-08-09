@@ -6,10 +6,18 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -75,6 +83,35 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         Assert::assertSame(404, $response->getStatusCode());
         Assert::assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
+    }
+
+    public function testCompanyLookupWithNoCompanySelected(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=unicorn');
+        $response = $this->client->getResponse();
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertSame('[]', $response->getContent());
+    }
+
+    public function testCompanyLookupWithCompanySelected(): void
+    {
+        $company = new Company();
+        $company->setName('SaaS Company');
+        $this->em->persist($company);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=sa');
+        $response = $this->client->getResponse();
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertSame('[{"text":"SaaS Company","value":"'.$company->getId().'"}]', $response->getContent());
+    }
+
+    public function testCompanyLookupWithNoModelSet(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn', [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        Assert::assertSame(400, $response->getStatusCode());
+        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
     }
 
     public function testSegmentDependencyTree(): void
@@ -315,13 +352,175 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testRemoveTagFromLeadAction(): void
+    {
+        // Create a lead
+        $lead = $this->createContact('test@email.com');
+        // ... set other properties as needed
+
+        // Create a tag
+        $tag = new Tag();
+        $tag->setTag('Test Tag');
+        // ... set other properties as needed
+
+        // Link the lead and tag
+        $lead->addTag($tag);
+
+        // Persist the lead and tag
+        $this->em->persist($lead);
+        $this->em->persist($tag);
+        $this->em->flush();
+
+        // Call the removeTagFromLeadAction
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=lead:removeTagFromLead', [
+            'leadId' => $lead->getId(),
+            'tagId'  => $tag->getId(),
+        ]);
+        $clientResponse = $this->client->getResponse();
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+
+        // Assert the tag is removed from the lead
+        $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        $this->assertFalse(in_array($tag, $updatedLead->getTags()->toArray()));
+    }
+
+    public function testContactListActionSuggestionsByAdminUser(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->em->getRepository(User::class);
+
+        /** @var User $adminUser */
+        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+        self::assertInstanceOf(User::class, $adminUser);
+
+        $salesUser = $userRepository->findOneBy(['username' => 'sales']);
+        self::assertInstanceOf(User::class, $salesUser);
+
+        $leads = [];
+
+        // Create 4 leads with two owned by admin and sales users respectively.
+        for ($i = 1; $i <= 4; ++$i) {
+            $owner = $adminUser;
+
+            if ($i > 2) {
+                $owner = $salesUser;
+            }
+
+            $lead = new Lead();
+            $lead->setFirstname("User $i");
+            $lead->setOwner($owner);
+            $leads[] = $lead;
+        }
+
+        /** @var LeadRepository $leadRepository */
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository->saveEntities($leads);
+        $this->em->clear();
+
+        // Check suggestions for admin user.
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk());
+
+        $data       = json_decode($response->getContent(), true);
+        $foundNames = array_column($data, 'value');
+
+        self::assertCount(4, $foundNames);
+
+        foreach ($foundNames as $key => $name) {
+            self::assertSame('User '.($key + 1), $name);
+        }
+    }
+
+    public function testContactListActionSuggestionsByNonAdminUser(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->em->getRepository(User::class);
+
+        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+        self::assertInstanceOf(User::class, $adminUser);
+
+        $leads = [];
+
+        // Create 2 leads with owned by admin user.
+        for ($i = 1; $i <= 2; ++$i) {
+            $lead = new Lead();
+            $lead->setFirstname("User $i");
+            $lead->setOwner($adminUser);
+            $leads[] = $lead;
+        }
+
+        /** @var LeadRepository $leadRepository */
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository->saveEntities($leads);
+        $this->em->clear();
+
+        $role = new Role();
+        $role->setName('Role');
+        $role->setIsAdmin(false);
+        $role->setRawPermissions(['lead:leads' => ['viewown']]);
+
+        /** @var RoleRepository $roleRepository */
+        $roleRepository = $this->em->getRepository(Role::class);
+        $roleRepository->saveEntity($role);
+
+        // Create a non admin user with view own contacts permission.
+        $user = new User();
+        $user->setFirstName('Non');
+        $user->setLastName('Admin');
+        $user->setEmail('non-admin-user@test.com');
+        $user->setUsername('non-admin-user');
+        $user->setRole($role);
+
+        /** @var PasswordEncoderInterface $encoder */
+        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($user);
+
+        $user->setPassword($encoder->encodePassword('mautic', null));
+        $userRepository->saveEntity($user);
+
+        /** @var User $nonAdminUser */
+        $nonAdminUser = $userRepository->findOneBy(['email' => 'non-admin-user@test.com']);
+
+        $nonAdminLeads = [];
+
+        // Create 2 leads with owned by non-admin user.
+        for ($i = 3; $i <= 4; ++$i) {
+            $lead = new Lead();
+            $lead->setFirstname("User $i");
+            $lead->setOwner($nonAdminUser);
+            $nonAdminLeads[] = $lead;
+        }
+
+        $leadRepository->saveEntities($nonAdminLeads);
+        $this->em->clear();
+
+        // Logout admin.
+        $this->client->request(Request::METHOD_GET, '/s/logout');
+
+        // Check suggestions for a non admin user.
+        $this->loginUser('non-admin-user');
+        $this->client->setServerParameter('PHP_AUTH_USER', 'non-admin-user');
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
+        $response = $this->client->getResponse();
+        self::assertTrue($response->isOk());
+
+        $data       = json_decode($response->getContent(), true);
+        $foundNames = array_column($data, 'value');
+
+        self::assertCount(2, $foundNames);
+        self::assertSame('User 3', $foundNames[0]);
+        self::assertSame('User 4', $foundNames[1]);
+    }
+
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
     }
 

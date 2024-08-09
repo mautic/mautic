@@ -2,14 +2,8 @@
 
 namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
-/**
- * Class ConditionAccessor.
- */
 class ConditionAccessor extends AbstractEventAccessor
 {
-    /**
-     * ConditionAccessor constructor.
-     */
     public function __construct(array $config)
     {
         $this->systemProperties[] = 'eventName';

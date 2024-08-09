@@ -23,17 +23,17 @@ class Trigger extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -53,14 +53,16 @@ class Trigger extends FormEntity
     private $triggerExistingLeads = false;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\PointBundle\Entity\TriggerEvent>
      */
     private $events;
+
+    private ?Group $group = null;
 
     public function __clone()
     {
@@ -69,20 +71,17 @@ class Trigger extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->events = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_triggers')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\TriggerRepository');
+            ->setCustomRepositoryClass(TriggerRepository::class);
 
         $builder->addIdColumns();
 
@@ -107,9 +106,13 @@ class Trigger extends FormEntity
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createManyToOne('group', Group::class)
+            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
+            ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',
@@ -118,10 +121,8 @@ class Trigger extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('trigger')
             ->addListProperties(
@@ -152,7 +153,7 @@ class Trigger extends FormEntity
     protected function isChanged($prop, $val)
     {
         if ('events' == $prop) {
-            //changes are already computed so just add them
+            // changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {
             parent::isChanged($prop, $val);
@@ -222,8 +223,6 @@ class Trigger extends FormEntity
     /**
      * Add events.
      *
-     * @param $key
-     *
      * @return Point
      */
     public function addTriggerEvent($key, TriggerEvent $event)
@@ -239,7 +238,7 @@ class Trigger extends FormEntity
     /**
      * Remove events.
      */
-    public function removeTriggerEvent(TriggerEvent $event)
+    public function removeTriggerEvent(TriggerEvent $event): void
     {
         $this->events->removeElement($event);
     }
@@ -272,7 +271,7 @@ class Trigger extends FormEntity
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -297,7 +296,7 @@ class Trigger extends FormEntity
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -315,7 +314,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $points
      */
-    public function setPoints($points)
+    public function setPoints($points): void
     {
         $this->isChanged('points', $points);
         $this->points = $points;
@@ -332,7 +331,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $color
      */
-    public function setColor($color)
+    public function setColor($color): void
     {
         $this->color = $color;
     }
@@ -348,7 +347,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $triggerExistingLeads
      */
-    public function setTriggerExistingLeads($triggerExistingLeads)
+    public function setTriggerExistingLeads($triggerExistingLeads): void
     {
         $this->triggerExistingLeads = $triggerExistingLeads;
     }
@@ -364,8 +363,18 @@ class Trigger extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
+    }
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(Group $group): void
+    {
+        $this->group = $group;
     }
 }

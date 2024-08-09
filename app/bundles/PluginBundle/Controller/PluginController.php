@@ -19,9 +19,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PluginController.
- */
 class PluginController extends FormController
 {
     /**
@@ -33,7 +30,7 @@ class PluginController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
+        /** @var PluginModel $pluginModel */
         $pluginModel = $this->getModel('plugin');
 
         // List of plugins for filter and to show as a single integration
@@ -93,12 +90,10 @@ class PluginController extends FormController
             ];
         }
 
-        //sort by name
+        // sort by name
         uksort(
             $integrations,
-            function ($a, $b) {
-                return strnatcasecmp($a, $b);
-            }
+            fn ($a, $b): int => strnatcasecmp($a, $b)
         );
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -147,7 +142,7 @@ class PluginController extends FormController
 
         $session   = $request->getSession();
 
-        $integrationDetailsPost = $request->request->get('integration_details', [], true);
+        $integrationDetailsPost = $request->request->get('integration_details') ?? [];
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
@@ -173,7 +168,7 @@ class PluginController extends FormController
         $pluginModel   = $this->getModel('plugin');
         $leadFields    = $pluginModel->getLeadFields();
         $companyFields = $pluginModel->getCompanyFields();
-        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+        /** @var AbstractIntegration $integrationObject */
         $entity = $integrationObject->getIntegrationSettings();
 
         $form = $this->createForm(
@@ -250,7 +245,7 @@ class PluginController extends FormController
                             }
                         }
                     } else {
-                        //make sure they aren't overwritten because of API connection issues
+                        // make sure they aren't overwritten because of API connection issues
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
@@ -271,8 +266,8 @@ class PluginController extends FormController
                     }
 
                     if ($authorize) {
-                        //redirect to the oauth URL
-                        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+                        // redirect to the oauth URL
+                        /** @var AbstractIntegration $integrationObject */
                         $event = $this->dispatcher->dispatch(
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
@@ -329,7 +324,7 @@ class PluginController extends FormController
             if ('custom' === $section) {
                 $formNotes[$section] = $integrationObject->getFormNotes($section);
             } else {
-                list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+                [$specialInstructions, $alertType] = $integrationObject->getFormNotes($section);
 
                 if (!empty($specialInstructions)) {
                     $formNotes[$section] = [
@@ -363,8 +358,6 @@ class PluginController extends FormController
     }
 
     /**
-     * @param $name
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function infoAction($name)
@@ -373,7 +366,7 @@ class PluginController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\PluginBundle\Model\PluginModel $pluginModel */
+        /** @var PluginModel $pluginModel */
         $pluginModel = $this->getModel('plugin');
 
         $bundle = $pluginModel->getRepository()->findOneBy(

@@ -7,11 +7,9 @@ trait RegexTrait
     /**
      * Ensure that special characters are escaped correctly.
      *
-     * @param $regex
-     *
-     * @return mixed
+     * @return string|string[]
      */
-    protected function prepareRegex($regex)
+    protected function prepareRegex($regex): string|array
     {
         $search = [
             '\\\\',

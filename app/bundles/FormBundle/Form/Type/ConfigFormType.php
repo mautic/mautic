@@ -5,12 +5,16 @@ namespace Mautic\FormBundle\Form\Type;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ConfigFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
         $builder->add(
@@ -43,11 +47,25 @@ class ConfigFormType extends AbstractType
                 'data'       => isset($options['data']['form_results_data_sources']) && (bool) $options['data']['form_results_data_sources'],
             ]
         );
+
+        $builder->add(
+            'successful_submit_action',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.form.config.form.successful_submit_action_at_the_top'    => 'top',
+                    'mautic.form.config.form.successful_submit_action_at_the_bottom' => 'bottom',
+                ],
+                'label'             => 'mautic.form.config.form.successful_submit_action',
+                'required'          => true,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.config.form.successful_submit_action.tooltip',
+                ],
+            ]
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'formconfig';

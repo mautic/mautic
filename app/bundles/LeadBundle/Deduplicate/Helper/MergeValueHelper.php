@@ -40,12 +40,7 @@ class MergeValueHelper
         throw new ValueNotMergeableException($newerValue, $olderValue);
     }
 
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
-    public static function isNotEmpty($value)
+    public static function isNotEmpty($value): bool
     {
         return null !== $value && '' !== $value;
     }

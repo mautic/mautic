@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
-use DateTime;
-use DateTimeInterface;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Exception\UnexpectedValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
@@ -14,89 +12,63 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 class OrderDAO
 {
     /**
-     * @var DateTimeInterface
+     * @var ObjectChangeDAO[][]
      */
-    private $syncDateTime;
-
-    /**
-     * @var bool
-     */
-    private $isFirstTimeSync;
-
-    /**
-     * @var string
-     */
-    private $integration;
+    private array $identifiedObjects = [];
 
     /**
      * @var ObjectChangeDAO[][]
      */
-    private $identifiedObjects = [];
-
-    /**
-     * @var ObjectChangeDAO[][]
-     */
-    private $unidentifiedObjects = [];
+    private array $unidentifiedObjects = [];
 
     /**
      * Array of all changed objects.
      *
      * @var ObjectChangeDAO[][]
      */
-    private $changedObjects = [];
+    private array $changedObjects = [];
 
     /**
-     * @var array|ObjectMapping
+     * @var ObjectMapping[]
      */
-    private $objectMappings = [];
+    private array $objectMappings = [];
 
     /**
      * @var UpdatedObjectMappingDAO[]
      */
-    private $updatedObjectMappings = [];
+    private array $updatedObjectMappings = [];
 
     /**
      * @var RemappedObjectDAO[]
      */
-    private $remappedObjects = [];
+    private array $remappedObjects = [];
 
     /**
      * @var ObjectChangeDAO[]
      */
-    private $deleteTheseObjects = [];
+    private array $deleteTheseObjects = [];
 
-    /**
-     * @var array
-     */
-    private $retryTheseLater = [];
+    private array $retryTheseLater = [];
 
-    /**
-     * @var int
-     */
-    private $objectCounter = 0;
+    private int $objectCounter = 0;
 
     /**
      * @var NotificationDAO[]
      */
-    private $notifications = [];
-
-    private array $options;
+    private array $notifications = [];
 
     /**
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
-    {
-        $this->syncDateTime    = $syncDateTime;
-        $this->isFirstTimeSync = $isFirstTimeSync;
-        $this->integration     = $integration;
-        $this->options         = $options;
+    public function __construct(
+        private \DateTimeInterface $syncDateTime,
+        private $isFirstTimeSync,
+        private $integration,
+        private array $options = []
+    ) {
     }
 
-    /**
-     * @return OrderDAO
-     */
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
@@ -158,10 +130,10 @@ class OrderDAO
         ObjectChangeDAO $objectChangeDAO,
         $integrationObjectName,
         $integrationObjectId,
-        ?DateTimeInterface $objectModifiedDate = null
+        ?\DateTimeInterface $objectModifiedDate = null
     ): void {
         if (null === $objectModifiedDate) {
-            $objectModifiedDate = new DateTime();
+            $objectModifiedDate = new \DateTime();
         }
 
         $objectMapping = new ObjectMapping();
@@ -195,10 +167,10 @@ class OrderDAO
     /**
      * Update the last sync date of an existing mapping.
      */
-    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?DateTimeInterface $objectModifiedDate = null): void
+    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
     {
         if (null === $objectModifiedDate) {
-            $objectModifiedDate = new DateTime();
+            $objectModifiedDate = new \DateTime();
         }
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
@@ -278,7 +250,7 @@ class OrderDAO
     /**
      * @return ObjectChangeDAO[]
      */
-    public function getSuccessfullySyncedObjects()
+    public function getSuccessfullySyncedObjects(): array
     {
         $synced = [];
         foreach ($this->changedObjects as $objectChanges) {
@@ -304,9 +276,9 @@ class OrderDAO
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
-    public function getSyncDateTime(): DateTimeInterface
+    public function getSyncDateTime(): \DateTimeInterface
     {
         return $this->syncDateTime;
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CampaignBundle\Tests\Controller\Api;
+namespace Mautic\CampaignBundle\Tests\Command\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -71,7 +71,15 @@ final class EventLogApiControllerTest extends MauticMysqlTestCase
         $this->em->persist($campaignMember1);
         $this->em->persist($campaignMember2);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($contact1);
+        $this->em->detach($contact2);
+        $this->em->detach($contact3);
+        $this->em->detach($event1);
+        $this->em->detach($event2);
+        $this->em->detach($event3);
+        $this->em->detach($campaign);
+        $this->em->detach($campaignMember1);
+        $this->em->detach($campaignMember2);
 
         $payload = [
             // This will fail because it already has dateTriggered.

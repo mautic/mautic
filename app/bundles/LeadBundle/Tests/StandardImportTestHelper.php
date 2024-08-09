@@ -2,8 +2,11 @@
 
 namespace Mautic\LeadBundle\Tests;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
@@ -12,13 +15,27 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class StandardImportTestHelper extends CommonMocks
 {
     protected $eventEntities = [];
+
     protected static $csvPath;
+
     protected static $largeCsvPath;
+
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
+    protected MockObject $dispatcher;
+
+    /**
+     * @var MockObject&EntityManagerInterface
+     */
+    protected MockObject $entityManager;
 
     protected static $initialList = [
         ['email', 'firstname', 'lastname'],
@@ -50,7 +67,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         parent::tearDownAfterClass();
     }
 
-    public static function generateSmallCSV()
+    public static function generateSmallCSV(): void
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_test_');
         $file    = fopen($tmpFile, 'w');
@@ -63,7 +80,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         self::$csvPath = $tmpFile;
     }
 
-    public static function generateLargeCSV()
+    public static function generateLargeCSV(): void
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_large_test_');
         $file    = fopen($tmpFile, 'w');
@@ -93,7 +110,7 @@ abstract class StandardImportTestHelper extends CommonMocks
     {
         /** @var Import&MockObject $entity */
         $entity = $this->getMockBuilder(Import::class)
-            ->setMethods($methods)
+            ->onlyMethods($methods ?? [])
             ->getMock();
 
         $entity->setFilePath(self::$csvPath)
@@ -116,11 +133,11 @@ abstract class StandardImportTestHelper extends CommonMocks
      *
      * @return ImportModel
      */
-    protected function initImportModel()
+    protected function initImportModel(bool $entityManagerOpen = true)
     {
         $translator           = $this->getTranslatorMock();
         $pathsHelper          = $this->getPathsHelperMock();
-        $entityManager        = $this->getEntityManagerMock();
+        $this->entityManager  = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
         /** @var MockObject&UserHelper */
@@ -135,45 +152,60 @@ abstract class StandardImportTestHelper extends CommonMocks
         $importRepository->method('getValue')
             ->willReturn(true);
 
-        $entityManager->expects($this->any())
+        $this->entityManager->expects($this->any())
             ->method('getRepository')
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:LeadEventLog', $logRepository],
-                        ['MauticLeadBundle:Import', $importRepository],
+                        [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
+                        [Import::class, $importRepository],
                     ]
                 )
             );
 
-        $entityManager->expects($this->any())
+        $this->entityManager->expects($this->any())
             ->method('isOpen')
-            ->willReturn(true);
+            ->willReturn($entityManagerOpen);
 
-        /** @var MockObject&LeadModel */
-        $leadModel = $this->createMock(LeadModel::class);
-
-        $leadModel->setEntityManager($entityManager);
+        /** @var MockObject&LeadModel $leadModel */
+        $leadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->setConstructorArgs([16 => $this->entityManager])
+            ->getMock();
 
         $leadModel->expects($this->any())
             ->method('getEventLogRepository')
-            ->will($this->returnValue($logRepository));
+            ->willReturn($logRepository);
 
-        /** @var MockObject&CompanyModel */
-        $companyModel = $this->createMock(CompanyModel::class);
+        /** @var MockObject&CompanyModel $companyModel */
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->setConstructorArgs([3 => $this->entityManager])
+            ->getMock();
 
-        $companyModel->setEntityManager($entityManager);
+        /** @var MockObject&NotificationModel $notificationModel */
+        $notificationModel = $this->getMockBuilder(NotificationModel::class)
+            ->disableOriginalConstructor()
+            ->setConstructorArgs([3 => $this->entityManager])
+            ->getMock();
 
-        /** @var MockObject&NotificationModel */
-        $notificationModel = $this->createMock(NotificationModel::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $notificationModel->setEntityManager($entityManager);
-
-        $importModel = new ImportModel($pathsHelper, $leadModel, $notificationModel, $coreParametersHelper, $companyModel);
-        $importModel->setEntityManager($entityManager);
-        $importModel->setTranslator($translator);
-        $importModel->setUserHelper($userHelper);
-        $importModel->setDispatcher(new EventDispatcher());
+        $importModel = new ImportModel(
+            $pathsHelper,
+            $leadModel,
+            $notificationModel,
+            $coreParametersHelper,
+            $companyModel,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $translator,
+            $userHelper,
+            $this->createMock(LoggerInterface::class),
+            new ProcessSignalService()
+        );
 
         return $importModel;
     }

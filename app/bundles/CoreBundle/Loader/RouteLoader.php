@@ -9,34 +9,18 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * Class RouteLoader.
- */
 class RouteLoader extends Loader
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParameters;
-
-    /**
-     * RouteLoader constructor.
-     */
-    public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
-    {
-        $this->dispatcher     = $dispatcher;
-        $this->coreParameters = $parametersHelper;
+    public function __construct(
+        private EventDispatcherInterface $dispatcher,
+        private CoreParametersHelper $coreParameters
+    ) {
     }
 
     /**
      * Load each bundles routing.php file.
      *
      * @param mixed $resource
-     * @param null  $type
      *
      * @return RouteCollection
      *
@@ -72,7 +56,7 @@ class RouteLoader extends Loader
         // Elfinder file manager
         $collection->addCollection($this->import('@FMElfinderBundle/Resources/config/routing.yaml'));
 
-        //API
+        // API
         $event = new RouteEvent($this, 'api');
         $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
         $apiCollection = $event->getCollection();
@@ -106,11 +90,8 @@ class RouteLoader extends Loader
 
     /**
      * @param mixed $resource
-     * @param null  $type
-     *
-     * @return bool
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return 'mautic' === $type;
     }

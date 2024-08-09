@@ -8,7 +8,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
@@ -21,12 +24,14 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 class FormModelTest extends \PHPUnit\Framework\TestCase
@@ -34,87 +39,89 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&RequestStack
      */
-    private $requestStack;
+    private MockObject $requestStack;
 
     /**
      * @var MockObject&Environment
      */
-    private $twigMock;
+    private MockObject $twigMock;
 
     /**
      * @var MockObject&ThemeHelper
      */
-    private $themeHelper;
+    private MockObject $themeHelper;
 
     /**
      * @var MockObject&ActionModel
      */
-    private $formActionModel;
+    private MockObject $formActionModel;
 
     /**
      * @var MockObject&FieldModel
      */
-    private $formFieldModel;
+    private MockObject $formFieldModel;
 
     /**
      * @var MockObject&EventDispatcher
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject&Translator
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject&EntityManager
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
      * @var MockObject&FormUploader
      */
-    private $formUploaderMock;
+    private MockObject $formUploaderMock;
 
     /**
      * @var MockObject&ColumnSchemaHelper
      */
-    private $columnSchemaHelper;
+    private MockObject $columnSchemaHelper;
 
     /**
      * @var MockObject&TableSchemaHelper
      */
-    private $tableSchemaHelper;
+    private MockObject $tableSchemaHelper;
 
     /**
      * @var MockObject&FormRepository
      */
-    private $formRepository;
+    private MockObject $formRepository;
 
     /**
      * @var MockObject&LeadFieldModel
      */
-    private $leadFieldModel;
+    private MockObject $leadFieldModel;
 
     /**
      * @var MockObject&ContactTracker
      */
-    private $contactTracker;
+    private MockObject $contactTracker;
 
     /**
      * @var MockObject&FormFieldHelper
      */
-    private $fieldHelper;
+    private MockObject $fieldHelper;
+
+    /**
+     * @var MockObject&PrimaryCompanyHelper
+     */
+    private MockObject $primaryCompanyHelper;
 
     /**
      * @var MockObject&MappedObjectCollectorInterface
      */
-    private $mappedObjectCollector;
+    private MockObject $mappedObjectCollector;
 
-    /**
-     * @var FormModel
-     */
-    private $formModel;
+    private FormModel $formModel;
 
     protected function setUp(): void
     {
@@ -125,6 +132,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formFieldModel        = $this->createMock(FieldModel::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
+        $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $this->dispatcher            = $this->createMock(EventDispatcher::class);
         $this->translator            = $this->createMock(Translator::class);
         $this->entityManager         = $this->createMock(EntityManager::class);
@@ -141,7 +149,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticFormBundle:Form', $this->formRepository],
+                        [Form::class, $this->formRepository],
                     ]
                 )
             );
@@ -153,17 +161,22 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->formActionModel,
             $this->formFieldModel,
             $this->fieldHelper,
+            $this->primaryCompanyHelper,
             $this->leadFieldModel,
             $this->formUploaderMock,
             $this->contactTracker,
             $this->columnSchemaHelper,
             $this->tableSchemaHelper,
-            $this->mappedObjectCollector
+            $this->mappedObjectCollector,
+            $this->entityManager,
+            $this->createMock(CorePermissions::class),
+            $this->dispatcher,
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->translator,
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class)
         );
-
-        $this->formModel->setDispatcher($this->dispatcher);
-        $this->formModel->setTranslator($this->translator);
-        $this->formModel->setEntityManager($this->entityManager);
     }
 
     public function testSetFields(): void
@@ -400,7 +413,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<string[]>
      */
-    public function fieldTypeProvider(): array
+    public static function fieldTypeProvider(): array
     {
         return [
             ['select'],
@@ -591,14 +604,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formHtml   = '<html>';
         $form       = new Form();
         $emailField = new Field();
-        $contact    = new class() extends Lead {
-            public function getFieldValue($field, $group = null)
-            {
-                Assert::assertSame('email', $field);
-
-                return '';
-            }
-        };
+        $contact    = new Lead();
         $emailField->setMappedField('email');
         $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(true);
@@ -618,25 +624,84 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formHtml   = '<html>';
         $form       = new Form();
         $emailField = new Field();
-        $contact    = new class() extends Lead {
-            public function getFieldValue($field, $group = null)
-            {
-                Assert::assertSame('email', $field);
+        $contact    = new Lead();
 
-                return 'john@doe.email';
-            }
-        };
         $emailField->setMappedField('email');
         $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
+        $contactCompanyData = [
+            'email' => 'john@doe.email',
+        ];
+
         $this->contactTracker->method('getContact')
             ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
 
         $this->fieldHelper->expects($this->once())
             ->method('populateField')
             ->with($emailField, 'john@doe.email', 'form-', $formHtml);
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWithSuffixEMail(): void
+    {
+        $formHtml   = '<html>';
+        $form       = new Form();
+        $emailField = new Field();
+        $contact    = new Lead();
+
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('contact');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $contactCompanyData = [
+            'email' => 'john+test@doe.email',
+        ];
+
+        $this->contactTracker->method('getContact')
+            ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
+
+        $this->fieldHelper->expects($this->once())
+            ->method('populateField')
+            ->with($emailField, 'john+test@doe.email', 'form-', $formHtml);
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithCompany(): void
+    {
+        $formHtml    = '<html>';
+        $form        = new Form();
+        $companyname = new Field();
+        $contact     = new Lead();
+
+        $companyname->setMappedField('companyname');
+        $companyname->setMappedObject('company');
+        $companyname->setIsAutoFill(true);
+        $form->addField(123, $companyname);
+
+        $contactCompanyData = [
+            'companyname' => 'Mautic',
+        ];
+
+        $this->contactTracker->method('getContact')
+            ->willReturn($contact);
+
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn($contactCompanyData);
+
+        $this->fieldHelper->expects($this->once())
+            ->method('populateField')
+            ->with($companyname, 'Mautic', 'form-', $formHtml);
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
     }

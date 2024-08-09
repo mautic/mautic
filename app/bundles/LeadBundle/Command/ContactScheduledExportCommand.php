@@ -17,21 +17,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ContactScheduledExportCommand extends Command
 {
     private const PICK_SCHEDULED_EXPORTS_LIMIT = 10;
+
     public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
 
-    private ContactExportSchedulerModel $contactExportSchedulerModel;
-    private EventDispatcherInterface $eventDispatcher;
-    private FormatterHelper $formatterHelper;
-
     public function __construct(
-        ContactExportSchedulerModel $contactExportSchedulerModel,
-        EventDispatcherInterface $eventDispatcher,
-        FormatterHelper $formatterHelper
+        private ContactExportSchedulerModel $contactExportSchedulerModel,
+        private EventDispatcherInterface $eventDispatcher,
+        private FormatterHelper $formatterHelper
     ) {
-        $this->contactExportSchedulerModel = $contactExportSchedulerModel;
-        $this->eventDispatcher             = $eventDispatcher;
-        $this->formatterHelper             = $formatterHelper;
-
         parent::__construct();
     }
 
@@ -39,7 +32,6 @@ class ContactScheduledExportCommand extends Command
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Export contacts which are scheduled in `contact_export_scheduler` table.')
             ->addOption(
                 '--ids',
                 null,
@@ -73,6 +65,8 @@ class ContactScheduledExportCommand extends Command
 
         $output->writeln('Contact export email(s) sent: '.$count);
 
-        return 0;
+        return Command::SUCCESS;
     }
+
+    protected static $defaultDescription = 'Export contacts which are scheduled in `contact_export_scheduler` table.';
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -31,12 +32,12 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('executeQuery')
             ->with(
                 $expectedQuery,
-                [':contacts' => [6, 8]],
-                [':contacts' => 101]
+                ['contacts' => [6, 8]],
+                ['contacts' => 101]
             )
-            ->willReturn($this->resultStatement);
+            ->willReturn($this->result);
 
-        $this->resultStatement->method('fetchAll')
+        $this->result->method('fetchAllAssociative')
             ->willReturn([
                 [
                     'lead_id'               => '6',
@@ -73,5 +74,31 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
             $this->statRepository->getStatsSummaryForContacts([6, 8])
         );
+    }
+
+    public function testGetReadCount(): void
+    {
+        $expectedQuery = 'SELECT count(s.id) as count FROM test_email_stats s WHERE (s.email_id IN (1)) AND (is_read = :true) AND (s.date_read BETWEEN :dateFrom AND :dateTo)';
+        $this->connection->expects($this->once())
+            ->method('executeQuery')
+            ->with(
+                $expectedQuery,
+                [
+                    'true'     => true,
+                    'dateFrom' => '2023-01-01 00:00:00',
+                    'dateTo'   => '2023-01-31 23:59:59',
+                ]
+            )
+            ->willReturn($this->result);
+
+        $this->result->method('fetchAllAssociative')
+            ->willReturn([
+                [
+                    'count' => 1,
+                ],
+            ]);
+        $query = new ChartQuery($this->connection, new \DateTime('2023-01-01'), new \DateTime('2023-01-31'));
+
+        $this->assertSame(1, $this->statRepository->getReadCount(1, null, $query));
     }
 }

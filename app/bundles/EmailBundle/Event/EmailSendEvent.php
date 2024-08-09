@@ -11,29 +11,15 @@ use Mautic\LeadBundle\Entity\Lead;
 class EmailSendEvent extends CommonEvent
 {
     /**
-     * @var MailHelper
-     */
-    private $helper;
-
-    /**
      * @var Email|null
      */
     private $email;
 
-    /**
-     * @var string
-     */
-    private $content = '';
+    private string $content = '';
 
-    /**
-     * @var string
-     */
-    private $plainText = '';
+    private string $plainText = '';
 
-    /**
-     * @var string
-     */
-    private $subject = '';
+    private string $subject = '';
 
     /**
      * @var string|null
@@ -50,33 +36,33 @@ class EmailSendEvent extends CommonEvent
      */
     private $source;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    private array $tokens = [];
 
     /**
      * @var bool
      */
     private $internalSend = false;
 
-    /**
-     * @var array
-     */
-    private $textHeaders = [];
+    private array $textHeaders = [];
+
+    private bool $fatal = false;
+
+    private bool $skip = false;
 
     /**
-     * @var bool
+     * @var array<string>
      */
-    private $isDynamicContentParsing;
+    private array $errors = [];
 
     /**
      * @param array $args
      * @param bool  $isDynamicContentParsing
      */
-    public function __construct(MailHelper $helper = null, $args = [], $isDynamicContentParsing = false)
-    {
-        $this->helper      = $helper;
+    public function __construct(
+        private ?MailHelper $helper = null,
+        $args = [],
+        private $isDynamicContentParsing = false
+    ) {
         $this->content     = $args['content'] ?? '';
         $this->plainText   = $args['plainText'] ?? '';
         $this->subject     = $args['subject'] ?? '';
@@ -86,9 +72,12 @@ class EmailSendEvent extends CommonEvent
         $this->source      = $args['source'] ?? [];
         $this->tokens      = $args['tokens'] ?? [];
         $this->textHeaders = $args['textHeaders'] ?? [];
+        $this->errors      = $args['errors'] ?? [];
+        $this->fatal       = $args['fatal'] ?? false;
+        $this->skip        = $args['skip'] ?? false;
 
         if (!$this->subject && $this->email instanceof Email) {
-            $this->subject = $args['email']->getSubject();
+            $this->subject = (string) $args['email']->getSubject();
         }
 
         if (isset($args['internalSend'])) {
@@ -96,8 +85,6 @@ class EmailSendEvent extends CommonEvent
         } elseif (null !== $helper) {
             $this->internalSend = $helper->isInternalSend();
         }
-
-        $this->isDynamicContentParsing = $isDynamicContentParsing;
     }
 
     /**
@@ -112,18 +99,16 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Return if the transport and mailer is in batch mode (tokenized emails).
-     *
-     * @return bool
      */
-    public function inTokenizationMode()
+    public function inTokenizationMode(): bool
     {
-        return (null !== $this->helper) ? $this->helper->inTokenizationMode() : false;
+        return null !== $this->helper && $this->helper->inTokenizationMode();
     }
 
     /**
      * Returns the Email entity.
      *
-     * @return Email|null
+     * @return ?Email
      */
     public function getEmail()
     {
@@ -132,8 +117,6 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get email content.
-     *
-     * @param $replaceTokens
      *
      * @return string
      */
@@ -150,10 +133,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Set email content.
-     *
-     * @param $content
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         if (null !== $this->helper) {
             $this->helper->setBody($content, 'text/html', null, true);
@@ -177,10 +158,7 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-    /**
-     * @param $content
-     */
-    public function setPlainText($content)
+    public function setPlainText($content): void
     {
         if (null !== $this->helper) {
             $this->helper->setPlainText($content);
@@ -193,7 +171,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Check if plain text is empty. If yes, generate it.
      */
-    private function setGeneratedPlainText()
+    private function setGeneratedPlainText(): void
     {
         $htmlContent = $this->getContent();
         if ('' === $this->getPlainText() && '' !== $htmlContent) {
@@ -219,10 +197,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * @param string $subject
-     *
-     * @return EmailSendEvent
      */
-    public function setSubject($subject)
+    public function setSubject($subject): void
     {
         if (null !== $this->helper) {
             $this->helper->setSubject($subject);
@@ -242,7 +218,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return array|object|null
+     * @return array|Lead|null
      */
     public function getLead()
     {
@@ -265,26 +241,20 @@ class EmailSendEvent extends CommonEvent
         return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
     }
 
-    public function addTokens(array $tokens)
+    public function addTokens(array $tokens): void
     {
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    /**
-     * @param $key
-     * @param $value
-     */
-    public function addToken($key, $value)
+    public function addToken($key, $value): void
     {
         $this->tokens[$key] = $value;
     }
 
     /**
      * Get token array.
-     *
-     * @return array
      */
-    public function getTokens($includeGlobal = true)
+    public function getTokens($includeGlobal = true): array
     {
         $tokens = $this->tokens;
 
@@ -295,11 +265,7 @@ class EmailSendEvent extends CommonEvent
         return $tokens;
     }
 
-    /**
-     * @param $name
-     * @param $value
-     */
-    public function addTextHeader($name, $value)
+    public function addTextHeader($name, $value): void
     {
         if (null !== $this->helper) {
             $this->helper->addCustomHeader($name, $value);
@@ -308,37 +274,30 @@ class EmailSendEvent extends CommonEvent
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getTextHeaders()
+    public function getTextHeaders(): array
     {
         return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }
 
     /**
      * Check if the listener should append it's own clickthrough in URLs or if the email tracking URL conversion process should take care of it.
-     *
-     * @return bool
      */
-    public function shouldAppendClickthrough()
+    public function shouldAppendClickthrough(): bool
     {
         return !$this->isInternalSend() && null === $this->getEmail();
     }
 
     /**
      * Generate a clickthrough array for URLs.
-     *
-     * @return array
      */
-    public function generateClickthrough()
+    public function generateClickthrough(): array
     {
         $source       = $this->getSource();
         $email        = $this->getEmail();
         $clickthrough = [
-            //what entity is sending the email?
+            // what entity is sending the email?
             'source' => $source,
-            //the email being sent to be logged in page hit if applicable
+            // the email being sent to be logged in page hit if applicable
             'email' => (null != $email) ? $email->getId() : null,
             'stat'  => $this->getIdHash(),
         ];
@@ -370,5 +329,58 @@ class EmailSendEvent extends CommonEvent
     public function isDynamicContentParsing()
     {
         return $this->isDynamicContentParsing;
+    }
+
+    public function getCombinedContent(): string
+    {
+        $content = $this->getSubject();
+        $content .= $this->getContent();
+        $content .= $this->getPlainText();
+        $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
+
+        return $content.implode(' ', $this->getTextHeaders());
+    }
+
+    public function disableSkip(): void
+    {
+        $this->skip = false;
+    }
+
+    public function enableSkip(): void
+    {
+        $this->skip = true;
+    }
+
+    public function isSkip(): bool
+    {
+        return $this->skip;
+    }
+
+    public function enableFatal(): void
+    {
+        $this->fatal = true;
+    }
+
+    public function disableFatal(): void
+    {
+        $this->fatal = false;
+    }
+
+    public function isFatal(): bool
+    {
+        return $this->fatal;
+    }
+
+    public function addError(string $error): void
+    {
+        $this->errors[] = $error;
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }

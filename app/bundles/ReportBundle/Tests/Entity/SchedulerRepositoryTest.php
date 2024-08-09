@@ -64,7 +64,7 @@ class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('setParameter')
             ->with('scheduleDate', $this->callback(function ($date) {
                 $today = new \DateTime();
-                $today->modify('+1 seconds'); //make sure our date is bigger
+                $today->modify('+1 seconds'); // make sure our date is bigger
 
                 return $date instanceof \DateTime && $date < $today;
             }))

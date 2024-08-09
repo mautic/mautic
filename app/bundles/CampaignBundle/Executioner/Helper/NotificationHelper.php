@@ -14,46 +14,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
-        UserModel $userModel,
-        NotificationModel $notificationModel,
-        TranslatorInterface $translator,
-        Router $router,
-        CoreParametersHelper $coreParametersHelper
+        private UserModel $userModel,
+        private NotificationModel $notificationModel,
+        private TranslatorInterface $translator,
+        private Router $router,
+        private CoreParametersHelper $coreParametersHelper
     ) {
-        $this->userModel            = $userModel;
-        $this->notificationModel    = $notificationModel;
-        $this->translator           = $translator;
-        $this->router               = $router;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function notifyOfFailure(Lead $contact, Event $event)
+    public function notifyOfFailure(Lead $contact, Event $event): void
     {
         $user = $this->getUser($contact, $event);
         if (!$user || !$user->getId()) {
@@ -68,9 +38,9 @@ class NotificationHelper
                 'mautic.campaign.event.failed',
                 [
                     '%contact%' => '<a href="'.$this->router->generate(
-                            'mautic_contact_action',
-                            ['objectAction' => 'view', 'objectId' => $contact->getId()]
-                        ).'" data-toggle="ajax">'.$contact->getPrimaryIdentifier().'</a>',
+                        'mautic_contact_action',
+                        ['objectAction' => 'view', 'objectId' => $contact->getId()]
+                    ).'" data-toggle="ajax">'.$contact->getPrimaryIdentifier().'</a>',
                 ]
             ),
             null,
@@ -92,11 +62,6 @@ class NotificationHelper
 
         $campaign = $event->getCampaign();
 
-        // Campaign is already unpublished, do not trigger further notification/email
-        if (!$campaign->isPublished()) {
-            return;
-        }
-
         $this->notificationModel->addNotification(
             $campaign->getName().' / '.$event->getName(),
             'error',
@@ -105,9 +70,13 @@ class NotificationHelper
                 'mautic.campaign.event.failed.campaign.unpublished',
                 [
                     '%campaign%' => '<a href="'.$this->router->generate(
-                            'mautic_campaign_action',
-                            ['objectAction' => 'view', 'objectId' => $campaign->getId()]
-                        ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                        'mautic_campaign_action',
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $campaign->getId(),
+                        ],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
                     '%event%' => $event->getName(),
                 ]
             ),
@@ -127,13 +96,13 @@ class NotificationHelper
             'mautic.campaign.event.failed.campaign.unpublished',
             [
                 '%campaign%' => '<a href="'.$this->router->generate(
-                        'mautic_campaign_action',
-                        [
-                            'objectAction' => 'view',
-                            'objectId'     => $campaign->getId(),
-                        ],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                    'mautic_campaign_action',
+                    [
+                        'objectAction' => 'view',
+                        'objectId'     => $campaign->getId(),
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
                 '%event%' => $event->getName(),
             ]
         );

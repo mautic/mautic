@@ -2,17 +2,12 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
-/**
- * Trait MatchFilterForLeadTrait.
- */
 trait MatchFilterForLeadTrait
 {
-    /**
-     * @return bool
-     */
-    protected function matchFilterForLead(array $filter, array $lead)
+    protected function matchFilterForLead(array $filter, array $lead): bool
     {
         if (empty($lead['id'])) {
             // Lead in generated for preview with faked data
@@ -22,8 +17,12 @@ trait MatchFilterForLeadTrait
         $groupNum = 0;
 
         foreach ($filter as $data) {
-            $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
+            $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
+
+            if ('leadlist' === $data['type'] && isset($this->segmentRepository) && $this->segmentRepository instanceof LeadListRepository) {
+                return $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
+            }
 
             if ($isCompanyField) {
                 if (empty($primaryCompany)) {
@@ -102,12 +101,6 @@ trait MatchFilterForLeadTrait
                         $filterVal = explode('|', $filterVal);
                     }
                     break;
-                default:
-                    if (is_numeric($leadVal)) {
-                        $leadVal   = (int) $leadVal;
-                        $filterVal = (int) $filterVal;
-                    }
-                    break;
             }
 
             switch ($data['operator']) {
@@ -166,14 +159,14 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                     break;
                 case 'startsWith':
-                    $groups[$groupNum] = 0 === strncmp($leadVal, $filterVal, strlen($filterVal));
+                    $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
                     break;
                 case 'endsWith':
                     $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
                     $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
                     break;
                 case 'contains':
-                    $groups[$groupNum] = false !== strpos((string) $leadVal, (string) $filterVal);
+                    $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
                     break;
             }
         }
@@ -199,5 +192,24 @@ trait MatchFilterForLeadTrait
         }
 
         return $retFlag;
+    }
+
+    /**
+     * Duplicate method. Needs refactoring.
+     *
+     * @see \Mautic\LeadBundle\EventListener\DynamicContentSubscriber::isContactSegmentRelationshipValid
+     *
+     * @param string $operator   empty, !empty, in, !in
+     * @param int[]  $segmentIds
+     */
+    private function isContactSegmentRelationshipValid(LeadListRepository $segmentRepository, int $contactId, string $operator, array $segmentIds = null): bool
+    {
+        return match ($operator) {
+            OperatorOptions::EMPTY     => $segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY => $segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::IN        => $segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::NOT_IN    => $segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+        };
     }
 }

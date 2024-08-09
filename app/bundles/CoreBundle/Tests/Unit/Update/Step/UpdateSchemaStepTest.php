@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
-use Doctrine\Bundle\MigrationsBundle\Command\MigrationsMigrateDoctrineCommand;
+use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -20,27 +20,24 @@ class UpdateSchemaStepTest extends AbstractStepTest
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
     /**
      * @var MockObject|KernelInterface
      */
-    private $kernel;
+    private MockObject $kernel;
 
     /**
-     * @var MockObject|MigrationsMigrateDoctrineCommand
+     * @var MockObject|MigrateCommand
      */
-    private $migrateCommand;
+    private MockObject $migrateCommand;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private MockObject $eventDispatcher;
 
-    /**
-     * @var UpdateSchemaStep
-     */
-    private $step;
+    private UpdateSchemaStep $step;
 
     protected function setUp(): void
     {
@@ -53,7 +50,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
             ->method('getBundles')
             ->willReturn([]);
 
-        $this->migrateCommand = $this->createMock(MigrationsMigrateDoctrineCommand::class);
+        $this->migrateCommand = $this->createMock(MigrateCommand::class);
         $this->migrateCommand->method('isEnabled')
             ->willReturn(true);
         $this->migrateCommand->method('getName')
@@ -104,7 +101,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step = new UpdateSchemaStep($this->translator, $container);
     }
 
-    public function testUpdateFailedExceptionThrownIfMigrationsFailed()
+    public function testUpdateFailedExceptionThrownIfMigrationsFailed(): void
     {
         $this->expectException(UpdateFailedException::class);
 
@@ -119,6 +116,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 
@@ -129,7 +128,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
-    public function testExceptionNotThrownIfMigrationsWereSuccessful()
+    public function testExceptionNotThrownIfMigrationsWereSuccessful(): void
     {
         $this->migrateCommand->method('run')
             ->willReturn(0);
@@ -142,6 +141,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 
@@ -152,7 +153,7 @@ class UpdateSchemaStepTest extends AbstractStepTest
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);
             $this->assertTrue(true);
-        } catch (UpdateFailedException $exception) {
+        } catch (UpdateFailedException) {
             $this->fail('UpdateFailedException should not have been thrown');
         }
     }

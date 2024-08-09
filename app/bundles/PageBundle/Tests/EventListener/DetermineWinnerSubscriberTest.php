@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -19,17 +18,14 @@ class DetermineWinnerSubscriberTest extends TestCase
     /**
      * @var MockObject|HitRepository
      */
-    private $hitRepository;
+    private MockObject $hitRepository;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private MockObject $translator;
 
-    /**
-     * @var DetermineWinnerSubscriber
-     */
-    private $subscriber;
+    private DetermineWinnerSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -49,7 +45,7 @@ class DetermineWinnerSubscriberTest extends TestCase
         $ids           = [1, 3];
         $parameters    = ['parent' => $parentMock, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);
-        $startDate     = new DateTime();
+        $startDate     = new \DateTime();
         $translation   = 'bounces';
 
         $bounces = [
@@ -58,13 +54,13 @@ class DetermineWinnerSubscriberTest extends TestCase
                 'bounces'   => 5,
                 'rate'      => 25,
                 'title'     => 'Page 1.1',
-                ],
+            ],
             2 => [
                 'totalHits' => 10,
                 'bounces'   => 1,
                 'rate'      => 10,
                 'title'     => 'Page 1.2',
-                ],
+            ],
             3 => [
                 'totalHits' => 30,
                 'bounces'   => 15,
@@ -85,11 +81,11 @@ class DetermineWinnerSubscriberTest extends TestCase
 
         $parentMock
             ->method('hasTranslations')
-            ->willReturn(true);
+            ->willReturn(1);
 
         $childMock
             ->method('hasTranslations')
-            ->willReturn(true);
+            ->willReturn(1);
 
         $transChildren->method('getKeys')
             ->willReturnOnConsecutiveCalls([2], [4]);
@@ -134,13 +130,13 @@ class DetermineWinnerSubscriberTest extends TestCase
         self::assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
     }
 
-    public function testOnDetermineDwellTimeWinner()
+    public function testOnDetermineDwellTimeWinner(): void
     {
         $parentMock  = $this->createMock(Page::class);
         $ids         = [1, 2];
         $parameters  = ['parent' => $parentMock];
         $event       = new DetermineWinnerEvent($parameters);
-        $startDate   = new DateTime();
+        $startDate   = new \DateTime();
         $translation = 'dewlltime';
 
         $counts = [

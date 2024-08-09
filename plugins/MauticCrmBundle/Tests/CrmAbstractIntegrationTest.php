@@ -4,13 +4,13 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
+use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
 class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
-    public function testFieldMatchingPriority()
+    public function testFieldMatchingPriority(): void
     {
         $config = [
             'update_mautic' => [
@@ -52,7 +52,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         );
     }
 
-    public function testCompanyDataIsMappedForNewCompanies()
+    public function testCompanyDataIsMappedForNewCompanies(): void
     {
         $data = [
             'custom_company_name' => 'Some Business',
@@ -65,10 +65,14 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
-        $companyModel = $this->getMockBuilder(CompanyModel::class)
-            ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator, $companyDeduper])
+        $companyModel = $this->getMockBuilder(CompanyModelStub::class)
+            ->onlyMethods(['fetchCompanyFields', 'organizeFieldsByGroup', 'saveEntity'])
+            ->disableOriginalConstructor()
             ->getMock();
+        $companyModel->setFieldModel($this->fieldModel);
+        $companyModel->setEmailValidator($emailValidator);
+        $companyModel->setCompanyDeduper($companyDeduper);
+
         $companyModel->expects($this->any())
             ->method('fetchCompanyFields')
             ->willReturn([]);
@@ -110,7 +114,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->integrationEntityModel,
                 $this->doNotContact,
             ])
-            ->setMethodsExcept(['getMauticCompany', 'setCompanyModel', 'setFieldModel', 'hydrateCompanyName'])
+            ->onlyMethods(['populateMauticLeadData', 'mergeConfigToFeatureSettings'])
             ->getMock();
 
         $integration->expects($this->once())
@@ -124,11 +128,10 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $this->assertEquals('some value', $company->getFieldValue('some_custom_field'));
     }
 
-    public function testLimitString()
+    public function testLimitString(): void
     {
         $integration = $this->getMockBuilder(StubIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['limitString'])
             ->getMock();
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
