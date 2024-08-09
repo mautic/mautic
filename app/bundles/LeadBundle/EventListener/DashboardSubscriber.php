@@ -168,6 +168,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $highPerformancePercentage = round(($highPerformanceDays / $totalDays) * 100, 1);
 
+                // Best day of the month calculation
+                $bestDayIndex = 0;
+                $bestDayValue = 0;
+                $labels       = $chartData['labels'];
+
+                foreach ($data as $index => $value) {
+                    if ($value > $bestDayValue) {
+                        $bestDayIndex = $index;
+                        $bestDayValue = $value;
+                    }
+                }
+
+                $bestDate       = $bestDayValue > 0 ? $labels[$bestDayIndex] : null;
+                $bestDayOfMonth = $bestDate ? date('d', strtotime($bestDate)) : null;
+
                 $event->setTemplateData([
                     'chartType'                 => 'line',
                     'chartHeight'               => $widget->getHeight() - 80,
@@ -190,6 +205,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'bestDayAvg'                => $bestDayAvg,
                     'highPerformanceDays'       => $highPerformanceDays,
                     'highPerformancePercentage' => $highPerformancePercentage,
+                    'bestDayOfMonth'            => $bestDayOfMonth,
+                    'bestDayValue'              => $bestDayValue,
                 ]);
             }
 

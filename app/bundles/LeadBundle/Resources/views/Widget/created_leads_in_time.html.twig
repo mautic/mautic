@@ -72,27 +72,16 @@ is defined %}
             <div class="text-muted mb-sm">{{ 'mautic.widget.created_leads_in_time.mi_explained'|trans }}</div>
             <div class="h2 mb-sm">{{ 'mautic.widget.created_leads_in_time.lead_generation_analysis'|trans }}</div>
 
-            {% if dateRange=='month' %} <div class="text-muted mb-sm">
-                {% if chartData.datasets[0].data is defined and chartData.labels is defined %}
-                {% set bestDayIndex = 0 %}
-                {% set bestDayValue = 0 %}
-                {% for index, value in chartData.datasets[0].data %}
-                {% if value > bestDayValue %}
-                {% set bestDayIndex = index %}
-                {% set bestDayValue = value %}
-                {% endif %}
-                {% endfor %}
-
-                {% if bestDayValue > 0 %}
-                {% set bestDate = chartData.labels[bestDayIndex] %}
-                {% set bestDay = bestDate|date('d') %}
+            {% if dateRange=='month' %}
+            <!-- Best day of the month -->
+            <div class="text-muted mb-sm">
+                {% if bestDayOfMonth is not null %}
                 <div class="tip">
                     {{ 'mautic.widget.created_leads_in_time.best_day'|trans({
-                    '%day%': bestDay,
+                    '%day%': bestDayOfMonth,
                     '%leads%': bestDayValue|round(0)
                     }) }}
                 </div>
-                {% endif %}
                 {% endif %}
             </div>
             <hr>
