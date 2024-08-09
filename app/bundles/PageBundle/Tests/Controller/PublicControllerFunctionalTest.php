@@ -56,7 +56,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @return array<string, array<int, string|null>>
      */
-    public function xssPayloadsProvider(): array
+    public static function xssPayloadsProvider(): array
     {
         return [
             'Basic script tag' => [
