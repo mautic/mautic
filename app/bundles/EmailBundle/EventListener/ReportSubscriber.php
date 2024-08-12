@@ -542,16 +542,17 @@ class ReportSubscriber implements EventSubscriberInterface
                 case 'mautic.email.graph.bar.read.clicked.unsubscribed.bounced':
                     $this->addTrackableTablesForEmailStats($queryBuilder);
                     $queryBuilder->select('e.id, e.name, e.sent_count, e.read_count, tr.unique_hits as `unique_clicks`,
-                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
-                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = :unsubscribed THEN 1 ELSE null END) as unsubscribed,
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = :bounced THEN 1 ELSE null END) as bounced'
                     )
-                    ->groupBy('e.id');
+                    ->groupBy('e.id')
+                    ->setParameter('unsubscribed', DoNotContact::UNSUBSCRIBED)
+                    ->setParameter('bounced', DoNotContact::BOUNCED);
 
                     $this->addDNCTableForEmails($queryBuilder);
 
-                    $data = $queryBuilder->execute()->fetchAllAssociative();
+                    $data = $queryBuilder->executeQuery()->fetchAllAssociative();
 
-                    dump($data);
                     if (is_array($data)) {
                         $names        = array_column($data, 'name');
                         $sentCount    = array_column($data, 'sent_count');
