@@ -193,6 +193,14 @@
                                       <td>{{ email.bccAddress }}</td>
                                   </tr>
                               {% endif %}
+                              {% if email.getPreheaderText() %}
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b">{{ 'mautic.email.preheader_text'|trans }}</span>
+                                    </td>
+                                    <td>{{ email.getPreheaderText() }}</td>
+                                </tr>
+                              {% endif %}
                               {% if email.headers %}
                                   <tr>
                                       <td width="20%">
