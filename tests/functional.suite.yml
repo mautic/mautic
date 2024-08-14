@@ -1,0 +1,5 @@
+actor: FunctionalTester
+modules:
+  enabled:
+    - \Helper\Functional
+  step_decorators: ~
