@@ -303,31 +303,38 @@
     }
 
     .search-choice {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       -webkit-background-clip: padding-box;
       -moz-background-clip: padding;
       background-clip: padding-box;
-      background-color: @gray-lighter;
-      border: @chosen-border;
-      .border-top-radius(@chosen-border-radius);
-      .border-bottom-radius(@chosen-border-radius);
-      .box-shadow(@chosen-box-shadow);
-      color: @gray-dark;
+      background-color: transparent;
+      outline: 1px solid var(--background-inverse);
+      .border-top-radius(100px);
+      .border-bottom-radius(100px);
+      color: var(--text-primary);
       cursor: default;
-      line-height: 13px;
+      line-height: 16px;
       margin: 6px 0 3px 5px;
-      padding: 3px 20px 3px 5px;
+      padding: 3px 9px 3px 9px;
       position: relative;
 
       .search-choice-close {
-        background: url("@{chosen-sprite-path}") right top no-repeat;
         display: block;
         font-size: 1px;
         height: 10px;
-        position: absolute;
-        right: 4px;
-        top: 5px;
         width: 12px;
         cursor: pointer;
+        line-height: 10px;
+        color: var(--text-primary);
+
+        &::before {
+          content: "\eb98";
+          font-family: 'remixicon' !important;
+          font-size: 14px;
+          color: var(--tag-color-warm-gray);
+        }
 
         &:hover {
           background-position: right -11px;
