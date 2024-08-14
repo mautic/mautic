@@ -29,19 +29,22 @@
               'g+c': 'mautic.core.keyboard.load_contacts',
               'g+e': 'mautic.core.keyboard.load_emails',
               'g+f': 'mautic.core.keyboard.load_forms',
-              '[': 'mautic.core.keyboard.activate_right_menu',
-              'g+n': 'mautic.core.keyboard.show_notifications',
-              'g+s': 'mautic.core.keyboard.global_search',
+              'g+s': 'mautic.core.keyboard.load_segments',
+              'g+p': 'mautic.core.keyboard.load_landing_pages',
+            },
+            'functions': {
               '/' : 'mautic.core.keyboard.list_search',
+              'f+/': 'mautic.core.keyboard.global_search',
+              'f+n': 'mautic.core.keyboard.show_notifications',
+              'f+m': 'mautic.core.keyboard.open_settings',
             },
             'actions': {
               '⌘+z': 'mautic.core.keyboard.undo_change',
               '⌘+⇧+z': 'mautic.core.keyboard.redo_change',
               'e' : 'mautic.core.keyboard.edit',
-              's' : 'mautic.core.keyboard.send_example',
               'c' : 'mautic.core.keyboard.create',
               '⌘+Enter' : 'mautic.core.keyboard.save',
-              'Esc' : 'mautic.core.keyboard.cancel',
+              'g+i' : 'mautic.core.keyboard.back',
               'Del' : 'mautic.core.keyboard.delete',
             } } %}
           <h4 class="fw-sb">
@@ -74,7 +77,11 @@
             'contacts': {
               'a': 'mautic.core.keyboard.quick_add_contact',
               'v': 'mautic.core.keyboard.toggle_view',
-            } } %}
+            },
+            'emails': {
+              's' : 'mautic.core.keyboard.send_example',
+            },
+          } %}
           <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
             {% for section, shortcut_list in shortcuts %}
               <li class="panel">

@@ -170,15 +170,23 @@ var Mautic = {
             mQuery('#mautic_form_index').click();
         });
 
-        Mautic.addKeyboardShortcut('[', 'Toggle Sidebar', function (e) {
-            mQuery(".navbar-right a[data-toggle='sidebar']").click();
+        Mautic.addKeyboardShortcut('g s', 'Load Segments', function (e) {
+            mQuery('#mautic_segment_index').click();
         });
 
-        Mautic.addKeyboardShortcut('g n', 'Show Notifications', function (e) {
+        Mautic.addKeyboardShortcut('g p', 'Load Segments', function (e) {
+            mQuery('#mautic_page_index').click();
+        });
+
+        Mautic.addKeyboardShortcut('f m', 'Toggle Admin Menu', function (e) {
+            mQuery("#admin-menu").click();
+        });
+
+        Mautic.addKeyboardShortcut('f n', 'Show Notifications', function (e) {
             mQuery('.dropdown-notification').click();
         });
 
-        Mautic.addKeyboardShortcut('g s', 'Global Search', function (e) {
+        Mautic.addKeyboardShortcut('f /', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
         });
 
@@ -223,8 +231,8 @@ var Mautic = {
         Mautic.addKeyboardShortcut('ctrl+enter', 'Save changes', function(e) {
             mQuery('[id*="buttons_save"]').click();
         });
-        
-        Mautic.addKeyboardShortcut('esc', 'Close/Cancel without saving', function(e) {
+
+        Mautic.addKeyboardShortcut('g i', 'Back to index (list)', function(e) {
             mQuery('[id*="buttons_cancel"]').click();
             mQuery('#close').click();
         });
