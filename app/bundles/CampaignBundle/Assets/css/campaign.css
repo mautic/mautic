@@ -189,7 +189,7 @@
     padding: 0;
     font-weight: normal;
     line-height: 20px;
-    transition: var(--all-productive);
+    transition: var(--transition-all-productive);
 }
 
 .campaign-event-buttons .btn:hover {
@@ -222,7 +222,7 @@
     border-radius: 10px;
     height: 20px;
     margin-left: -10px;
-    transition: var(--all-productive);
+    transition: var(--transition-all-productive);
     line-height: 16px;
 }
 
@@ -235,19 +235,11 @@
     white-space: nowrap;
 }
 
-.list-campaign-event .label {
-    color: var(--text-inverse);
-}
-
 .list-campaign-decision {
     background-color: var(--background);
     border-style: solid;
     border-width: 0 0 0 6px;
     border-color: var(--support-info);
-}
-
-.list-campaign-decision .label {
-    background-color: var(--support-info);
 }
 
 .list-campaign-decision, 
@@ -263,20 +255,15 @@
     border-color: var(--support-warning);
 }
 
-.list-campaign-condition .label {
-    background-color: var(--support-warning);
-    color: #161616;
-}
-
 .list-campaign-action { border-radius: clamp(4px, var(--border-radius-md), 8px); }
 
 .list-campaign-action .campaign-event-content {
-    background-color: var(--interactive);
-    border: solid 2px var(--interactive);
+    background-color: var(--background-brand-primary);
+    border: solid 2px var(--background-brand-primary);
     border-radius: clamp(4px, var(--border-radius-md), 8px);
     overflow: hidden;
     padding: 0 var(--spacing-05) 0 0;
-    /*color: #fff;*/
+    color: var(--text-on-color);
 }
 .list-campaign-action .campaign-event-icon { 
     background-color: var(--background);
@@ -302,9 +289,6 @@
 .list-campaign-decision .campaign-event-icon { 
     color: var(--support-info);
 }
-
-.list-campaign-action .campaign-event-type { color: var(--text-inverse); }
-
 
 #CampaignEventSelector_chosen .list-campaign-action,
 #CampaignEventSelector_chosen .list-campaign-condition,

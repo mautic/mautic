@@ -31,27 +31,21 @@
     <td class="visible-md visible-lg">{{ item.progressPercentage }}%</td>
     <td class="visible-md visible-lg">
         {% if objectRoute is not null %}
-            <span class="mt-xs label label-primary has-click-event clickable-stat">
-                <a href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id}) }}">{{ item.lineCount }}</a>
-            </span>
+            <a size="sm" class="mt-xs label label-gray" href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id}) }}">{{ item.lineCount }}</a>
         {% else %}
             {{ item.lineCount }}
         {% endif %}
     </td>
     <td class="visible-md visible-lg">
         {% if objectRoute is not null %}
-            <span class="mt-xs label label-primary has-click-event clickable-stat">
-                <a href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':inserted'}) }}">{{ item.insertedCount }}</a>
-            </span>
+            <a size="sm" class="mt-xs label label-gray" href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':inserted'}) }}">{{ item.insertedCount }}</a>
         {% else %}
             {{ item.insertedCount }}
         {% endif %}
     </td>
     <td class="visible-md visible-lg">
         {% if objectRoute is not null %}
-            <span class="mt-xs label label-primary has-click-event clickable-stat">
-                <a href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':updated'}) }}">{{ item.updatedCount }}</a>
-            </span>
+            <a size="sm" class="mt-xs label label-gray" href="{{ path(objectRoute, {'search': 'mautic.lead.lead.searchcommand.import_id'|trans~':'~item.id~' '~'mautic.lead.lead.searchcommand.import_action'|trans~':updated'}) }}">{{ item.updatedCount }}</a>
         {% else %}
             {{ item.updatedCount }}
         {% endif %}
