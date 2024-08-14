@@ -924,4 +924,44 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Company B', $content);
         Assert::assertStringNotContainsString('Company A', $content);
     }
+
+    public function testAuditLogBatchExportContact(): void
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals(true, strlen($content) > 10000);
+
+        /** @var AuditLog $auditLog */
+        $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([
+            'object' => 'ContactExports',
+            'bundle' => 'lead',
+            'userId' => 1,
+            'action' => 'create',
+        ]);
+        $this->assertNotNull($auditLog);
+        Assert::assertTrue(isset($auditLog->getDetails()['args']), json_encode($auditLog, JSON_PRETTY_PRINT));
+        Assert::assertSame(
+            [
+                'start'  => 0,
+                'limit'  => 200,
+                'filter' => [
+                    'string' => '',
+                    'force'  => ' !is:anonymous',
+                ],
+                'orderBy'        => 'l.last_active, l.id',
+                'orderByDir'     => 'DESC',
+                'withTotalCount' => true,
+            ],
+            $auditLog->getDetails()['args']
+        );
+    }
 }
