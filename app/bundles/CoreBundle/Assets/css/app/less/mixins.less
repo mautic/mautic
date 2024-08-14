@@ -260,6 +260,14 @@
   }
 }
 
+.outline() {
+  outline: 2px solid transparent !important;
+  outline-offset: -2px;
+  &:hover { outline: 2px solid transparent; }
+  &:active,
+  &:focus { outline: 2px solid var(--focus) !important; }
+}
+
 // Alerts
 
 .alert-variant(@background; @border; @text-color) {

@@ -961,7 +961,7 @@ class Asset extends FormEntity
         // Search for icon name by file extension.
         foreach ($fileTypes as $icon => $extensions) {
             if (in_array($fileType, $extensions)) {
-                return 'fa fa-file-'.$icon.'-o';
+                return 'ri-file-'.$icon.'-fill';
             }
         }
 
