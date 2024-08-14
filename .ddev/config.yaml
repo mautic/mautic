@@ -1,3 +1,4 @@
+name: mautic-5
 type: php
 docroot: ""
 php_version: "8.3"
@@ -7,8 +8,8 @@ router_https_port: "443"
 xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []
-mariadb_version: "10.3"
-mysql_version: ""
+mariadb_version: ""
+mysql_version: "8.0"
 provider: default
 upload_dir: "media/files, media/images" # Specify the directories containing user-generated uploads
 use_dns_when_possible: true
