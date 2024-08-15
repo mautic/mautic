@@ -1663,4 +1663,20 @@ class EmailController extends FormController
     {
         return 'DESC';
     }
+
+    public function batchRecategorizeAction(Request $request): Response
+    {
+        $emailModel    = $this->getModel('email');
+        $emailIds      = $request->query->get('emailIds');
+        $newCategoryId = $request->query->get('newCategoryId');
+        $categoryModel = $this->getModel('category');
+        $newCategory   = $categoryModel->getEntity($newCategoryId);
+        foreach ($emailIds as $emailId) {
+            $email = $emailModel->getEntity($emailId);
+            $email->setCategory($newCategory);
+            $emailModel->saveEntity($email);
+        }
+
+        return new Response();
+    }
 }

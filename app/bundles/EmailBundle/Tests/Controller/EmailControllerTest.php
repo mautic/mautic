@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -20,6 +22,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -30,12 +33,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
 
-class EmailControllerTest extends \PHPUnit\Framework\TestCase
+class EmailControllerTest extends TestCase
 {
-    /**
-     * @var MockObject|Translator
-     */
-    private MockObject $translatorMock;
+    public const NEW_CATEGORY_TITLE = 'New category';
+    private MockObject|Translator $translatorMock;
 
     /**
      * @var MockObject|Session
@@ -45,7 +46,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|ModelFactory<EmailModel>
      */
-    private MockObject $modelFactoryMock;
+    private MockObject|ModelFactory $modelFactoryMock;
 
     /**
      * @var MockObject|Container
@@ -270,5 +271,69 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         $this->requestStack->push($request);
         $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FieldModel::class));
+    }
+
+    public function testBatchRecategorizePost(): void
+    {
+        $categoryModelMock = $this->createMock(CategoryModel::class);
+
+        $this
+            ->modelFactoryMock
+            ->expects($this->exactly(2))
+            ->method('getModel')
+            ->withConsecutive(
+                ['email'],
+                ['category']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->modelMock,
+                $categoryModelMock
+            );
+
+        $newCategory = new Category();
+        $newCategory->setTitle(self::NEW_CATEGORY_TITLE);
+
+        $categoryModelMock
+            ->expects($this->once())
+            ->method('getEntity')
+            ->with($newCategory->getId())
+            ->willReturn($newCategory);
+        $emails = [
+            1 => new Email(),
+            2 => new Email(),
+            3 => new Email(),
+        ];
+
+        $oldCategory = new Category();
+        $oldCategory->setTitle('Old category');
+
+        foreach ($emails as $email) {
+            $email->setCategory($oldCategory);
+        }
+
+        $emailIds = array_keys($emails);
+        $this
+            ->modelMock
+            ->expects($this->exactly(count($emails)))
+            ->method('getEntity')
+            ->withConsecutive(...array_chunk($emailIds, 1))
+            ->willReturnOnConsecutiveCalls(...$emails);
+
+        $this
+            ->modelMock
+            ->expects($this->exactly(count($emails)))
+            ->method('saveEntity')
+            ->withConsecutive(...array_chunk($emails, 1));
+
+        $request = new Request();
+        $request->setMethod(Request::METHOD_POST);
+        $request->query->set('emailIds', $emailIds);
+        $request->query->set('newCategoryId', $newCategory->getId());
+        $this->requestStack->push($request);
+        $this->controller->batchRecategorizeAction($request);
+
+        foreach ($emails as $email) {
+            $this->assertEquals(self::NEW_CATEGORY_TITLE, $email->getCategory()->getTitle());
+        }
     }
 }
