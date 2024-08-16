@@ -1664,7 +1664,7 @@ class EmailController extends FormController
         return 'DESC';
     }
 
-    public function batchRecategorizeAction(Request $request): Response
+    public function batchCategoriesAction(Request $request): Response
     {
         $emailModel    = $this->getModel('email');
         $emailIds      = $request->query->get('emailIds');

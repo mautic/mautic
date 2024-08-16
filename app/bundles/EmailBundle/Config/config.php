@@ -23,6 +23,10 @@ return [
                 'path'       => '/emails/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
+            'mautic_email_batch_categories' => [
+                'path'       => '/emails-batch-categories/',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::batchCategoriesAction',
+            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [
