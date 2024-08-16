@@ -207,60 +207,6 @@ class ContactManagementCest
         $I->dontSeeInDatabase('test_leads', ['firstname' => $contactName2]);
     }
 
-    public function importCSV(
-        AcceptanceTester $I,
-        ContactStep $contact
-    ): void {
-        $I->amOnPage(ContactPage::$URL);
-
-        // Get initial contact count
-        $initialContactCount = $I->grabNumRecords('test_leads');
-
-        // Click on the import button
-        $contact->selectOptionFromDropDownContactsPage(3);
-
-        // Wait for the import page to load
-        $I->waitForText('Import Contacts', 30, 'h1.page-header-title');
-        $I->seeElement(ContactPage::$importModal);
-
-        // Click 'Choose file' and select a file
-        $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
-
-        // Click the upload button
-        $I->click(ContactPage::$uploadButton);
-
-        // Wait for the new form to open
-        $I->waitForElement(ContactPage::$importForm, 30);
-
-        // Fill in the form
-        $I->seeElement(ContactPage::$importFormFields);
-        $contact->fillImportFormFields();
-
-        // Click 'import in browser'
-        $I->click(ContactPage::$importInBrowser);
-
-        // Wait for import completion message
-        $I->waitForElement(ContactPage::$importProgressComplete, 30);
-        $I->see('Success!', 'h4');
-
-        // Extract the number of contacts created from the progress message
-        $importProgress = $I->grabTextFrom('#leadImportProgressComplete > div > div > div.panel-body > h4');
-
-        // Use a regular expression to extract the number of contacts created
-        preg_match('/(\d+) created/', $importProgress, $matches);
-        $expectedContactsAdded = isset($matches[1]) ? (int) $matches[1] : 0;
-
-        // Get the count of contacts after import
-        $finalContactCount = $I->grabNumRecords('test_leads');
-
-        // Calculate the expected final contact count
-        $expectedContactCount = $initialContactCount + $expectedContactsAdded;
-
-        // Assert the expected number of contacts
-        Codeception\Util\Fixtures::add('finalContactCount', $finalContactCount);
-        Assert::assertEquals($expectedContactCount, $finalContactCount);
-    }
-
     public function batchAddToCampaign(
         AcceptanceTester $I,
         ContactStep $contact,
@@ -358,15 +304,15 @@ class ContactManagementCest
         ContactStep $contact,
     ): void {
         // Check the current owner of the first and second contacts, it should be the sales user
-        $contact->checkOwner(7);
-        $contact->checkOwner(8);
+        $contact->checkOwner(1);
+        $contact->checkOwner(2);
 
         // Navigate back to contacts page
         $I->amOnPage(ContactPage::$URL);
 
         // Select the first and second contacts from the list
-        $contact->selectContactFromList(7);
-        $contact->selectContactFromList(8);
+        $contact->selectContactFromList(1);
+        $contact->selectContactFromList(2);
 
         // Select change owner option from dropdown for multiple selections
         $contact->selectOptionFromDropDownForMultipleSelections(4);
@@ -380,8 +326,8 @@ class ContactManagementCest
         $I->click(ContactPage::$changeOwnerModalSaveButton);
 
         // Verify that the owner of the first and second contacts has been changed
-        $contact->verifyOwner(7);
-        $contact->verifyOwner(8);
+        $contact->verifyOwner(1);
+        $contact->verifyOwner(2);
     }
 
     public function batchAddAndRemoveSegment(
@@ -489,5 +435,59 @@ class ContactManagementCest
 
         $I->seeElement(ContactPage::$firstContactDoNotContact);
         $I->seeElement(ContactPage::$secondContactDoNotContact);
+    }
+
+    public function importCSV(
+        AcceptanceTester $I,
+        ContactStep $contact
+    ): void {
+        $I->amOnPage(ContactPage::$URL);
+
+        // Get initial contact count
+        $initialContactCount = $I->grabNumRecords('test_leads');
+
+        // Click on the import button
+        $contact->selectOptionFromDropDownContactsPage(3);
+
+        // Wait for the import page to load
+        $I->waitForText('Import Contacts', 30, 'h1.page-header-title');
+        $I->seeElement(ContactPage::$importModal);
+
+        // Click 'Choose file' and select a file
+        $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
+
+        // Click the upload button
+        $I->click(ContactPage::$uploadButton);
+
+        // Wait for the new form to open
+        $I->waitForElement(ContactPage::$importForm, 30);
+
+        // Fill in the form
+        $I->seeElement(ContactPage::$importFormFields);
+        $contact->fillImportFormFields();
+
+        // Click 'import in browser'
+        $I->click(ContactPage::$importInBrowser);
+
+        // Wait for import completion message
+        $I->waitForElement(ContactPage::$importProgressComplete, 30);
+        $I->see('Success!', 'h4');
+
+        // Extract the number of contacts created from the progress message
+        $importProgress = $I->grabTextFrom('#leadImportProgressComplete > div > div > div.panel-body > h4');
+
+        // Use a regular expression to extract the number of contacts created
+        preg_match('/(\d+) created/', $importProgress, $matches);
+        $expectedContactsAdded = isset($matches[1]) ? (int) $matches[1] : 0;
+
+        // Get the count of contacts after import
+        $finalContactCount = $I->grabNumRecords('test_leads');
+
+        // Calculate the expected final contact count
+        $expectedContactCount = $initialContactCount + $expectedContactsAdded;
+
+        // Assert the expected number of contacts
+        Codeception\Util\Fixtures::add('finalContactCount', $finalContactCount);
+        Assert::assertEquals($expectedContactCount, $finalContactCount);
     }
 }
