@@ -198,11 +198,13 @@ class ContactManagementCest
         // Wait for the modal to become visible and click on the button to confirm delete
         $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
         $I->click(ContactPage::$ConfirmDelete);
-        $I->reloadPage(); // Wait for delete to be completed
+        $I->wait(5);
 
-        // Confirm the contacts are no longer visible
+        // Confirm the contacts are deleted
         $I->dontSee($contactName1);
         $I->dontSee($contactName2);
+        $I->dontSeeInDatabase('test_leads', ['firstname' => $contactName1]);
+        $I->dontSeeInDatabase('test_leads', ['firstname' => $contactName2]);
     }
 
     public function importCSV(
@@ -356,15 +358,15 @@ class ContactManagementCest
         ContactStep $contact,
     ): void {
         // Check the current owner of the first and second contacts, it should be the sales user
-        $contact->checkOwner(1);
-        $contact->checkOwner(2);
+        $contact->checkOwner(7);
+        $contact->checkOwner(8);
 
         // Navigate back to contacts page
         $I->amOnPage(ContactPage::$URL);
 
         // Select the first and second contacts from the list
-        $contact->selectContactFromList(1);
-        $contact->selectContactFromList(2);
+        $contact->selectContactFromList(7);
+        $contact->selectContactFromList(8);
 
         // Select change owner option from dropdown for multiple selections
         $contact->selectOptionFromDropDownForMultipleSelections(4);
@@ -378,8 +380,8 @@ class ContactManagementCest
         $I->click(ContactPage::$changeOwnerModalSaveButton);
 
         // Verify that the owner of the first and second contacts has been changed
-        $contact->verifyOwner(1);
-        $contact->verifyOwner(2);
+        $contact->verifyOwner(7);
+        $contact->verifyOwner(8);
     }
 
     public function batchAddAndRemoveSegment(
