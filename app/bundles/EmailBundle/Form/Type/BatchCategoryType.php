@@ -20,7 +20,7 @@ class BatchCategoryType extends AbstractType
             'add',
             ChoiceType::class,
             [
-                'label'             => 'mautic.email.category.batch.add_to',
+                'label'             => 'mautic.email.category.batch.set',
                 'multiple'          => false,
                 'choices'           => $options['items'],
                 'required'          => false,
