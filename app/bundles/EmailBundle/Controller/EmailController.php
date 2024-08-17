@@ -1405,6 +1405,8 @@ class EmailController extends FormController
      * Deletes a group of entities.
      *
      * @return Response
+     *
+     * @todo Move this to BatchEmailController
      */
     public function batchDeleteAction(Request $request)
     {
@@ -1662,21 +1664,5 @@ class EmailController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
-    }
-
-    public function batchCategoriesAction(Request $request): Response
-    {
-        $emailModel    = $this->getModel('email');
-        $emailIds      = $request->query->get('emailIds');
-        $newCategoryId = $request->query->get('newCategoryId');
-        $categoryModel = $this->getModel('category');
-        $newCategory   = $categoryModel->getEntity($newCategoryId);
-        foreach ($emailIds as $emailId) {
-            $email = $emailModel->getEntity($emailId);
-            $email->setCategory($newCategory);
-            $emailModel->saveEntity($email);
-        }
-
-        return new Response();
     }
 }
