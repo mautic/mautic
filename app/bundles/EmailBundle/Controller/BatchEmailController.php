@@ -70,6 +70,8 @@ class BatchEmailController extends AbstractFormController
 
     /**
      * View the modal form for adding contacts into categories in batches.
+     *
+     * @todo Inject the selected email ids into the view
      */
     public function indexAction(): Response
     {
@@ -96,7 +98,7 @@ class BatchEmailController extends AbstractFormController
                 'contentTemplate' => '@MauticEmail/Batch/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_email_index',
-                    'mauticContent' => 'leadBatch',
+                    'mauticContent' => 'emailBatch',
                     'route'         => $route,
                 ],
             ]
