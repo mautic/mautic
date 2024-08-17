@@ -14,8 +14,9 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Controller\EmailController;
+use Mautic\EmailBundle\Controller\BatchEmailController;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Model\EmailActionModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Entity\User;
@@ -52,26 +53,16 @@ class BatchEmailControllerTest extends TestCase
     private MockObject $containerMock;
 
     /**
-     * @var MockObject|Router
-     */
-    private MockObject $routerMock;
-
-    /**
      * @var MockObject|EmailModel
      */
     private MockObject $modelMock;
-
-    /**
-     * @var MockObject|Email
-     */
-    private MockObject $emailMock;
 
     /**
      * @var MockObject|FlashBag
      */
     private MockObject $flashBagMock;
 
-    private EmailController $controller;
+    private BatchEmailController $controller;
 
     /**
      * @var MockObject|CorePermissions
@@ -83,17 +74,9 @@ class BatchEmailControllerTest extends TestCase
      */
     private MockObject $formFactoryMock;
 
-    /**
-     * @var MockObject|Form
-     */
-    private MockObject $formMock;
-
-    /**
-     * @var MockObject|Environment
-     */
-    private MockObject $twigMock;
-
     private RequestStack $requestStack;
+    private EmailActionModel $actionModel;
+    private CategoryModel $categoryModel;
 
     protected function setUp(): void
     {
@@ -120,12 +103,15 @@ class BatchEmailControllerTest extends TestCase
         $this->requestStack         = new RequestStack();
         $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
 
+        $this->actionModel            = $this->createMock(EmailActionModel::class);
+        $this->categoryModel          = $this->createMock(CategoryModel::class);
+
         $helperUserMock->method('getUser')
             ->willReturn(new User(false));
 
-        $this->controller = new EmailController(
-            $this->formFactoryMock,
-            $formFieldHelper,
+        $this->controller = new BatchEmailController(
+            $this->actionModel,
+            $this->categoryModel,
             $doctrine,
             $factory,
             $this->modelFactoryMock,
@@ -142,7 +128,7 @@ class BatchEmailControllerTest extends TestCase
     }
 
     // @todo Change this to use the action
-    public function testBatchRecategorizePost(): void
+    public function testExecBatchChangeCategory(): void
     {
         $categoryModelMock = $this->createMock(CategoryModel::class);
 
@@ -199,7 +185,7 @@ class BatchEmailControllerTest extends TestCase
         $request->query->set('emailIds', $emailIds);
         $request->query->set('newCategoryId', $newCategory->getId());
         $this->requestStack->push($request);
-        $this->controller->batchRecategorizeAction($request);
+        $this->controller->execAction($request);
 
         foreach ($emails as $email) {
             $this->assertEquals(self::NEW_CATEGORY_TITLE, $email->getCategory()->getTitle());

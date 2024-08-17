@@ -2,40 +2,27 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\CategoryBundle\Entity\Category;
 
-class EmailActionModel
+readonly class EmailActionModel
 {
     public function __construct(
-        private LeadModel $contactModel
+        private EmailModel $emailModel
     ) {
     }
 
-    public function addEmailsToCategories(array $contactIds, array $categoryIds): void
+    public function setEmailsCategory(array $emailsIds, Category $newCategory): void
     {
-        $contacts = $this->contactModel->getLeadsByIds($contactIds);
+        $emails = $this->emailModel->getEmailsByIds($emailsIds);
 
-        foreach ($contacts as $contact) {
-            if (!$this->contactModel->canEditContact($contact)) {
+        foreach ($emails as $email) {
+            if (!$this->emailModel->canEditEmail($email)) {
                 continue;
             }
 
-            $this->contactModel->addToCategory($contact, $categoryIds);
+            $email->setCategory($newCategory);
         }
-    }
 
-    public function removeEmailsFromCategories(array $contactIds, array $categoryIds): void
-    {
-        $contacts = $this->contactModel->getLeadsByIds($contactIds);
-
-        foreach ($contacts as $contact) {
-            if (!$this->contactModel->canEditContact($contact)) {
-                continue;
-            }
-
-            $contactCategoryRelations = $this->contactModel->getLeadCategories($contact);
-            $relationsToDelete        = array_intersect($contactCategoryRelations, $categoryIds);
-            $this->contactModel->removeFromCategories($relationsToDelete);
-        }
+        $this->emailModel->saveEntities($emails);
     }
 }

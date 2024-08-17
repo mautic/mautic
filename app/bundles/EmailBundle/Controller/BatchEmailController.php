@@ -23,8 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
 class BatchEmailController extends AbstractFormController
 {
     public function __construct(
-        private EmailActionModel $actionModel,
-        private CategoryModel $categoryModel,
+        private readonly EmailActionModel $actionModel,
+        private readonly CategoryModel $categoryModel,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
@@ -48,14 +48,12 @@ class BatchEmailController extends AbstractFormController
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $categoriesToAdd    = $params['add'] ?? [];
-            $categoriesToRemove = $params['remove'] ?? [];
+            $newCategory        = json_decode($params['add']);
             $emailIds           = json_decode($params['ids']);
 
-            $this->actionModel->addEmailsToCategories($emailIds, $categoriesToAdd);
-            $this->actionModel->removeEmailsFromCategories($emailIds, $categoriesToRemove);
+            $this->actionModel->setEmailsCategory($emailIds, $this->categoryModel->getEntity($newCategory));
 
-            $this->addFlashMessage('mautic.lead.batch_emails_affected', [
+            $this->addFlashMessage('mautic.email.batch_emails_affected', [
                 '%count%'     => count($ids),
             ]);
         } else {
