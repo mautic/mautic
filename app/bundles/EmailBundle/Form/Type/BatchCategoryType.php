@@ -21,26 +21,13 @@ class BatchCategoryType extends AbstractType
             ChoiceType::class,
             [
                 'label'             => 'mautic.email.category.batch.add_to',
-                'multiple'          => true,
+                'multiple'          => false,
                 'choices'           => $options['items'],
                 'required'          => false,
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );
-
-        //        $builder->add(
-        //            'remove',
-        //            ChoiceType::class,
-        //            [
-        //                'label'             => 'mautic.lead.batch.remove_from',
-        //                'multiple'          => true,
-        //                'choices'           => $options['items'],
-        //                'required'          => false,
-        //                'label_attr'        => ['class' => 'control-label'],
-        //                'attr'              => ['class' => 'form-control'],
-        //            ]
-        //        );
 
         $builder->add('ids', HiddenType::class);
 
