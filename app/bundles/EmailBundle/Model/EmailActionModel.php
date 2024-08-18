@@ -4,9 +4,6 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\CategoryBundle\Entity\Category;
 
-/**
- * @todo add tests
- */
 readonly class EmailActionModel
 {
     public function __construct(
@@ -14,9 +11,11 @@ readonly class EmailActionModel
     ) {
     }
 
-    public function setCategory(array $emailsIds, Category $newCategory): void
+    public function setCategory(array $emailsIds, Category $newCategory): array
     {
         $emails = $this->emailModel->getByIds($emailsIds);
+
+        $affected = [];
 
         foreach ($emails as $email) {
             if (!$this->emailModel->canEdit($email)) {
@@ -24,8 +23,13 @@ readonly class EmailActionModel
             }
 
             $email->setCategory($newCategory);
+            $affected[] = $email;
         }
 
-        $this->emailModel->saveEntities($emails);
+        if ($affected) {
+            $this->emailModel->saveEntities($emails);
+        }
+
+        return $affected;
     }
 }
