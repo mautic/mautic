@@ -49,10 +49,12 @@ class BatchEmailController extends AbstractFormController
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $newCategory = json_decode($params['add']);
-            $emailIds    = json_decode($params['ids']);
+            $newCategoryId = $params['newCategory'];
+            $emailIds      = json_decode($params['ids']);
 
-            $affected = $this->actionModel->setCategory($emailIds, $this->categoryModel->getEntity($newCategory));
+            $affected = $this->actionModel->setCategory($emailIds, $this->categoryModel->getEntity($newCategoryId));
+
+            $newCategory = current($affected)?->getCategory();
 
             $this->addFlashMessage('mautic.email.batch_emails_affected', [
                 '%count%' => count($affected),
@@ -61,13 +63,11 @@ class BatchEmailController extends AbstractFormController
             $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
-        $title = current($affected)->getCategory()->getTitle();
-
         return new JsonResponse([
             'closeModal'  => true,
             'flashes'     => $this->getFlashContent(),
-            'affected'    => $affected ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
-            'newCategory' => $affected ? $title : null,
+            'affected'    => !empty($affected) ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
+            'newCategory' => !empty($newCategory) ? $newCategory->getTitle() : null,
         ]);
     }
 

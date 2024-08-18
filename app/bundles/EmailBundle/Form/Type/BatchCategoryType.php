@@ -17,7 +17,7 @@ class BatchCategoryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
-            'add',
+            'newCategory',
             ChoiceType::class,
             [
                 'label'             => 'mautic.email.category.batch.set',
