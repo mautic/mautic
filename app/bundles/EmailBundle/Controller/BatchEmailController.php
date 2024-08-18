@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchCategoryType as BatchType;
 use Mautic\EmailBundle\Model\EmailActionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -48,21 +49,25 @@ class BatchEmailController extends AbstractFormController
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($ids && is_array($ids)) {
-            $newCategory        = json_decode($params['add']);
-            $emailIds           = json_decode($params['ids']);
+            $newCategory = json_decode($params['add']);
+            $emailIds    = json_decode($params['ids']);
 
-            $this->actionModel->setCategory($emailIds, $this->categoryModel->getEntity($newCategory));
+            $affected = $this->actionModel->setCategory($emailIds, $this->categoryModel->getEntity($newCategory));
 
             $this->addFlashMessage('mautic.email.batch_emails_affected', [
-                '%count%'     => count($ids),
+                '%count%' => count($affected),
             ]);
         } else {
             $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
+        $title = current($affected)->getCategory()->getTitle();
+
         return new JsonResponse([
-            'closeModal' => true,
-            'flashes'    => $this->getFlashContent(),
+            'closeModal'  => true,
+            'flashes'     => $this->getFlashContent(),
+            'affected'    => $affected ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
+            'newCategory' => $affected ? $title : null,
         ]);
     }
 
