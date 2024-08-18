@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -119,10 +120,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\EmailBundle\Entity\EmailRepository
-     */
-    public function getRepository()
+    public function getRepository(): EmailRepository
     {
         return $this->em->getRepository(Email::class);
     }
@@ -1333,7 +1331,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
         }
 
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        /** @var EmailRepository $emailRepo */
         $emailRepo = $this->getRepository();
 
         // get email settings such as templates, weights, etc
@@ -2320,7 +2318,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $url;
     }
 
-    public function getEmailsByIds(array $ids)
+    /**
+     * @return array<Email>
+     */
+    public function getByIds(array $ids): array
     {
         return $this->getEntities([
             'filter' => [
@@ -2335,7 +2336,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ]);
     }
 
-    public function canEditEmail(Email $email): bool
+    public function canEdit(Email $email): bool
     {
         return $this->security->hasEntityAccess('email:emails:editown', 'email:emails:editother', $email->getCreatedBy());
     }
