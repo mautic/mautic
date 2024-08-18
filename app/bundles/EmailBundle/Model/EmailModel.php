@@ -2321,7 +2321,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @return array<Email>
      */
-    public function getByIds(array $ids): array
+    public function getByIds(array $ids): iterable
     {
         return $this->getEntities([
             'filter' => [
