@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Event\ContactExportEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
@@ -1433,32 +1434,47 @@ class LeadController extends FormController
 
                     $bodyCheck = trim(strip_tags($email['body']));
                     if (!empty($bodyCheck)) {
-                        $mailer = $mailHelper->getMailer();
+                        $mailer      = $mailHelper->getMailer();
+                        $emailEntity = null;
+                        $subject     = $email['subject'];
 
+                        // Set the email entity template so the email configuration like preheader would apply.
+                        if ($email['templates']) {
+                            $emailEntity = $this->doctrine->getManager()->getRepository(Email::class)->find($email['templates']);
+                        }
+
+                        // Overwrite the mailer with the values from the form.
                         $mailer->addTo($leadEmail, $leadName);
 
                         if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
-                            // The reply to address must be set into an email entity in order to take an effect. Otherwise it's overridden.
-                            $emailEntity = new Email();
-                            $emailEntity->setSubject($email['subject']);
+                            $emailEntity = $emailEntity ?? new Email();
                             $emailEntity->setReplyToAddress($email[EmailType::REPLY_TO_ADDRESS]);
+                        }
+
+                        if (!empty($email['from'])) {
+                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity->setFromAddress($email['from']);
+                        }
+
+                        if (!empty($email['fromname'])) {
+                            $emailEntity = $emailEntity ?? new Email();
+                            $emailEntity->setFromName($email['fromname']);
+                        }
+
+                        if ($emailEntity) {
+                            $emailEntity->setSubject($subject);
                             $mailer->setEmail($emailEntity);
                         }
 
-                        $mailer->setFrom(
-                            $email['from'],
-                            empty($email['fromname']) ? null : $email['fromname']
-                        );
-
                         // Set Content
+                        $mailer->setReplyTo($email['from']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-                        $mailer->setSubject($email['subject']);
+                        $mailer->setSubject($subject);
 
                         // Ensure safe emoji for notification
-                        $subject = $email['subject'];
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
                             $this->addFlashMessage(
@@ -1968,6 +1984,8 @@ class LeadController extends FormController
 
     /**
      * Bulk export contacts.
+     *
+     * @throws \Exception
      */
     public function batchExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher): Response
     {
@@ -2044,13 +2062,23 @@ class LeadController extends FormController
 
         $iterator = new IteratorExportDataModel($model, $args, fn ($contact) => $exportHelper->parseLeadToExport($contact));
 
-        return $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+        $response              = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
+
+        $details['total'] = $iterator->getTotal();
+        $details['args']  = $iterator->getArgs();
+
+        $dispatcher->dispatch(
+            new ContactExportEvent($details, 'ContactExports'),
+            LeadEvents::POST_CONTACT_EXPORT
+        );
+
+        return $response;
     }
 
     /**
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, $contactId)
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId)
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2077,6 +2105,11 @@ class LeadController extends FormController
         }
 
         $contactFields = $lead->getProfileFields();
+        $args[]        = [
+            'lead'          => $contactId,
+            'dataType'      => $dataType,
+        ];
+
         $export        = [];
         foreach ($contactFields as $alias => $contactField) {
             $export[] = [
@@ -2084,6 +2117,11 @@ class LeadController extends FormController
                 'value' => $contactField,
             ];
         }
+
+        $dispatcher->dispatch(
+            new ContactExportEvent($args, 'ContactExport'),
+            LeadEvents::POST_CONTACT_EXPORT
+        );
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
     }

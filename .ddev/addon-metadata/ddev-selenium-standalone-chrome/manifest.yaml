@@ -1,0 +1,9 @@
+name: ddev-selenium-standalone-chrome
+repository: ddev/ddev-selenium-standalone-chrome
+version: 1.0.5
+install_date: "2024-06-12T23:18:04+05:30"
+project_files:
+  - docker-compose.selenium-chrome.yaml
+  - config.selenium-standalone-chrome.yaml
+global_files: []
+removal_actions: []

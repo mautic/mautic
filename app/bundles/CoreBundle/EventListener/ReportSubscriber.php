@@ -64,6 +64,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     'dynamicContent'         => 'dynamicContent',
                     'form'                   => 'form',
                     'ContactExportScheduler' => 'ContactExportScheduler',
+                    'ContactExports'         => 'ContactExports',
                     'import'                 => 'import',
                     'field'                  => 'field',
                     'note'                   => 'note',
