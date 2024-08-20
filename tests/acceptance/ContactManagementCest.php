@@ -198,65 +198,13 @@ class ContactManagementCest
         // Wait for the modal to become visible and click on the button to confirm delete
         $I->waitForElementVisible(ContactPage::$ConfirmDelete, 5);
         $I->click(ContactPage::$ConfirmDelete);
-        $I->reloadPage(); // Wait for delete to be completed
+        $I->wait(5);
 
-        // Confirm the contacts are no longer visible
+        // Confirm the contacts are deleted
         $I->dontSee($contactName1);
         $I->dontSee($contactName2);
-    }
-
-    public function importCSV(
-        AcceptanceTester $I,
-        ContactStep $contact
-    ): void {
-        $I->amOnPage(ContactPage::$URL);
-
-        // Get initial contact count
-        $initialContactCount = $I->grabNumRecords('test_leads');
-
-        // Click on the import button
-        $contact->selectOptionFromDropDownContactsPage(3);
-
-        // Wait for the import page to load
-        $I->waitForText('Import Contacts', 30, 'h1.page-header-title');
-        $I->seeElement(ContactPage::$importModal);
-
-        // Click 'Choose file' and select a file
-        $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
-
-        // Click the upload button
-        $I->click(ContactPage::$uploadButton);
-
-        // Wait for the new form to open
-        $I->waitForElement(ContactPage::$importForm, 30);
-
-        // Fill in the form
-        $I->seeElement(ContactPage::$importFormFields);
-        $contact->fillImportFormFields();
-
-        // Click 'import in browser'
-        $I->click(ContactPage::$importInBrowser);
-
-        // Wait for import completion message
-        $I->waitForElement(ContactPage::$importProgressComplete, 30);
-        $I->see('Success!', 'h4');
-
-        // Extract the number of contacts created from the progress message
-        $importProgress = $I->grabTextFrom('#leadImportProgressComplete > div > div > div.panel-body > h4');
-
-        // Use a regular expression to extract the number of contacts created
-        preg_match('/(\d+) created/', $importProgress, $matches);
-        $expectedContactsAdded = isset($matches[1]) ? (int) $matches[1] : 0;
-
-        // Get the count of contacts after import
-        $finalContactCount = $I->grabNumRecords('test_leads');
-
-        // Calculate the expected final contact count
-        $expectedContactCount = $initialContactCount + $expectedContactsAdded;
-
-        // Assert the expected number of contacts
-        Codeception\Util\Fixtures::add('finalContactCount', $finalContactCount);
-        Assert::assertEquals($expectedContactCount, $finalContactCount);
+        $I->dontSeeInDatabase('test_leads', ['firstname' => $contactName1]);
+        $I->dontSeeInDatabase('test_leads', ['firstname' => $contactName2]);
     }
 
     public function batchAddToCampaign(
@@ -487,5 +435,59 @@ class ContactManagementCest
 
         $I->seeElement(ContactPage::$firstContactDoNotContact);
         $I->seeElement(ContactPage::$secondContactDoNotContact);
+    }
+
+    public function importCSV(
+        AcceptanceTester $I,
+        ContactStep $contact
+    ): void {
+        $I->amOnPage(ContactPage::$URL);
+
+        // Get initial contact count
+        $initialContactCount = $I->grabNumRecords('test_leads');
+
+        // Click on the import button
+        $contact->selectOptionFromDropDownContactsPage(3);
+
+        // Wait for the import page to load
+        $I->waitForText('Import Contacts', 30, 'h1.page-header-title');
+        $I->seeElement(ContactPage::$importModal);
+
+        // Click 'Choose file' and select a file
+        $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
+
+        // Click the upload button
+        $I->click(ContactPage::$uploadButton);
+
+        // Wait for the new form to open
+        $I->waitForElement(ContactPage::$importForm, 30);
+
+        // Fill in the form
+        $I->seeElement(ContactPage::$importFormFields);
+        $contact->fillImportFormFields();
+
+        // Click 'import in browser'
+        $I->click(ContactPage::$importInBrowser);
+
+        // Wait for import completion message
+        $I->waitForElement(ContactPage::$importProgressComplete, 30);
+        $I->see('Success!', 'h4');
+
+        // Extract the number of contacts created from the progress message
+        $importProgress = $I->grabTextFrom('#leadImportProgressComplete > div > div > div.panel-body > h4');
+
+        // Use a regular expression to extract the number of contacts created
+        preg_match('/(\d+) created/', $importProgress, $matches);
+        $expectedContactsAdded = isset($matches[1]) ? (int) $matches[1] : 0;
+
+        // Get the count of contacts after import
+        $finalContactCount = $I->grabNumRecords('test_leads');
+
+        // Calculate the expected final contact count
+        $expectedContactCount = $initialContactCount + $expectedContactsAdded;
+
+        // Assert the expected number of contacts
+        Codeception\Util\Fixtures::add('finalContactCount', $finalContactCount);
+        Assert::assertEquals($expectedContactCount, $finalContactCount);
     }
 }
