@@ -34,7 +34,7 @@ body:
         - 3.3.x series (not supported)
     validations:
       required: true
-    - type: input
+  - type: input
     id: mautic_actual_version
     attributes:
       label: Mautic installed version
