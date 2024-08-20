@@ -86,6 +86,7 @@ body {
 }
 body {
   overflow-y: scroll;
+  background-color: var(--background);
 }
 body > #app-wrapper {
   overflow: hidden;
