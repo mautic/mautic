@@ -375,7 +375,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @dataProvider dateFieldProvider
      */
-    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = '='): void
+    public function testWarningOnInvalidDateField(?string $filter, bool $shouldContainError, string $operator = 'like'): void
     {
         $segment = $this->saveSegment(
             'Date Segment',
@@ -399,11 +399,14 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
         $this->assertTrue($this->client->getResponse()->isOk());
+        $responseContent = $this->client->getResponse()->getContent();
 
         if ($shouldContainError) {
-            $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', $this->client->getResponse()->getContent());
+            $errorPattern = '/does not work correctly with the &quot;'.$operator.'&quot; operator|Date field filter value &quot;'.$filter.'&quot; is invalid/';
+            $this->assertMatchesRegularExpression($errorPattern, $responseContent);
         } else {
-            $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+            $this->assertStringNotContainsString('Date field filter value', $responseContent);
+            $this->assertStringNotContainsString('Date on format YYYY-MM-DD does not work', $responseContent);
         }
     }
 
@@ -413,13 +416,13 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     public static function dateFieldProvider(): array
     {
         return [
-            ['Today', true],
+            ['Today', true, '='],
             ['birthday', false],
-            ['2023-01-01 11:00', false],
-            ['2023-01-01 11:00:00', false],
-            ['2023-01-01', false],
+            ['2023-01-01 11:00', true, '!='],
+            ['2023-01-01 11:00:00', true, '='],
+            ['2023-01-01%', false],
             ['next week', false],
-            [null, false],
+            [null, false, '='],
             ['\b\d{4}-(10|11|12)-\d{2}\b', false, 'regexp'],
         ];
     }
