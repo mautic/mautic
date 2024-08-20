@@ -33,7 +33,6 @@ class EmailManagementCest
         $I->click(EmailsPage::$changeCategoryAction);
 
         $I->waitForElementClickable(EmailsPage::$newCategoryDropdown);
-        $I->click(EmailsPage::$newCategoryDropdown);
 
         // Click the dropdown menu
         $I->click('#email_batch_newCategory_chosen > a > span');

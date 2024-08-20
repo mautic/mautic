@@ -15,6 +15,7 @@ services:
       - VIRTUAL_HOST=$DDEV_HOSTNAME
       - HTTPS_EXPOSE=7900:7900
       - HTTP_EXPOSE=7910:7900
+      - VNC_NO_PASSWORD=1
     external_links:
       - ddev-router:${DDEV_SITENAME}.${DDEV_TLD}
     # To enable VNC access for traditional VNC clients like macOS "Screen Sharing",
