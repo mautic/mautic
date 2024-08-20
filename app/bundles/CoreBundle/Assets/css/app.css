@@ -1409,10 +1409,10 @@ code {
   width: 43px;
 }
 .btn.btn-circle.btn-sm {
-  width: 27px;
+  width: 28px;
 }
 .btn.btn-circle.btn-xs {
-  width: 19px;
+  width: 20px;
 }
 .btn.btn-outline {
   background-color: transparent;
@@ -3447,12 +3447,12 @@ label {
   width: 42px;
 }
 .form-control-icon .form-control.input-sm {
-  padding-left: 28px;
+  padding-left: 29px;
 }
 .form-control-icon .form-control.input-sm + .the-icon {
-  font-size: 11px;
-  line-height: 28px;
-  width: 28px;
+  font-size: 12px;
+  line-height: 29px;
+  width: 29px;
 }
 .form-control-icon .the-icon {
   position: absolute;
@@ -3477,7 +3477,7 @@ label {
 }
 .form-control-icon.form-control-icon-right .form-control.input-sm {
   padding-left: 10px;
-  padding-right: 28px;
+  padding-right: 29px;
 }
 input[type=file].form-control {
   padding: 6px;
@@ -7252,6 +7252,9 @@ ul.media-list.media-list-feed div.media-body {
     transform: scale(1);
     opacity: 0;
   }
+}
+.tooltip-inner {
+  padding: 12px;
 }
 :root {
   --background: #ffffff;
