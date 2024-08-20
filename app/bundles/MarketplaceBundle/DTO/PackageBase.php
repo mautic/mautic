@@ -28,7 +28,7 @@ final class PackageBase
     {
         return new self(
             $array['name'],
-            $array['url'],
+            $array['url'] ?? '',
             $array['repository'],
             $array['description'],
             (int) $array['downloads'],

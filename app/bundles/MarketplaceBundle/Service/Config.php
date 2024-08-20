@@ -13,6 +13,8 @@ class Config
     public const MARKETPLACE_ALLOWLIST_URL               = 'marketplace_allowlist_url';
 
     public const MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS = 'marketplace_allowlist_cache_ttl_seconds';
+    public const MARKETPLACE_SUPABASE_URL                = 'marketplace_supabase_url';
+    public const MARKETPLACE_SUPABASE_API_KEYS           = 'marketplace_supabase_api_keys';
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper
@@ -37,5 +39,15 @@ class Config
     public function isComposerEnabled(): bool
     {
         return $this->coreParametersHelper->get('composer_updates', false);
+    }
+
+    public function getSupabaseUrl(): string
+    {
+        return $this->coreParametersHelper->get(self::MARKETPLACE_SUPABASE_URL);
+    }
+
+    public function getSupabaseApiKey(): string
+    {
+        return $this->coreParametersHelper->get(self::MARKETPLACE_SUPABASE_API_KEYS);
     }
 }

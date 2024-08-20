@@ -8,13 +8,15 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Mautic\MarketplaceBundle\Exception\ApiException;
+use Mautic\MarketplaceBundle\Service\Config;
 use Psr\Log\LoggerInterface;
 
 class Connection
 {
     public function __construct(
         private ClientInterface $httpClient,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private Config $config
     ) {
     }
 
@@ -23,7 +25,13 @@ class Connection
      */
     public function getPlugins(int $page, int $limit, string $query = ''): array
     {
-        return $this->makeRequest("https://packagist.org/search.json?page={$page}&per_page={$limit}&type=mautic-plugin&q={$query}");
+        return $this->makeRequest(sprintf('%s/rest/v1/rpc/get_data_with_total?apikey=%s&_limit=%s&_offset=%s&_type=mautic-plugin&_query=%s',
+            $this->config->getSupabaseUrl(),
+            $this->config->getSupabaseApiKey(),
+            $limit,
+            ($page - 1) * $limit,
+            $query
+        ));
     }
 
     /**
@@ -31,7 +39,11 @@ class Connection
      */
     public function getPackage(string $pluginName): array
     {
-        return $this->makeRequest("https://packagist.org/packages/{$pluginName}.json");
+        return $this->makeRequest(sprintf('%s/rest/v1/rpc/get_pack?apikey=%s&packag_name=%s',
+            $this->config->getSupabaseUrl(),
+            $this->config->getSupabaseApiKey(),
+            $pluginName,
+        ));
     }
 
     public function makeRequest(string $url): array

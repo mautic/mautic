@@ -52,6 +52,7 @@ return [
                 'arguments' => [
                     'mautic.http.client',
                     'monolog.logger.mautic',
+                    'marketplace.service.config',
                 ],
             ],
         ],
@@ -88,5 +89,7 @@ return [
         Config::MARKETPLACE_ENABLED                     => true,
         Config::MARKETPLACE_ALLOWLIST_URL               => 'https://raw.githubusercontent.com/mautic/marketplace-allowlist/main/allowlist.json',
         Config::MARKETPLACE_ALLOWLIST_CACHE_TTL_SECONDS => 3600,
+        Config::MARKETPLACE_SUPABASE_URL                => '%env(MARKETPLACE_SUPABASE_URL)%',
+        Config::MARKETPLACE_SUPABASE_API_KEYS           => '%env(MARKETPLACE_SUPABASE_API_KEYS)%',
     ],
 ];
