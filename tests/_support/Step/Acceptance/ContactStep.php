@@ -134,8 +134,10 @@ class ContactStep extends \AcceptanceTester
         // Grab the contact's name and navigate to their details page
         $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
         $I->click(['link' => $contactName]);
+        // Wait for the contact's name to appear on the details page
         $I->waitForText($contactName, 10, '#app-content');
-        // Wait for the contact's name to appear on the details page and verify the owner is "Sales User"
+        // Verify the owner is "Sales User"
+        $I->waitForElement('//*[@id="app-content"]/div/div[2]/div[2]/div[1]/div[4]/p[1]', 15);
         $I->see('Sales User', '//*[@id="app-content"]/div/div[2]/div[2]/div[1]/div[4]/p[1]');
     }
 
@@ -152,8 +154,10 @@ class ContactStep extends \AcceptanceTester
         // Grab the contact's name and navigate to their details page
         $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
         $I->click(['link' => $contactName]);
-        // Wait for the contact's name to appear on the details page and verify the owner has changed to "Admin User"
+        // Wait for the contact's name to appear on the details page
         $I->waitForText($contactName, 10, '#app-content');
+        // Verify the owner is "Admin User"
+        $I->waitForElement('//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]', 15);
         $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]');
     }
 }
