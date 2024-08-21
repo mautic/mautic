@@ -108,7 +108,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Returns the Email entity.
      *
-     * @return Email|null
+     * @return ?Email
      */
     public function getEmail()
     {

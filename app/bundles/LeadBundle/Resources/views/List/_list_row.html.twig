@@ -71,7 +71,7 @@
         {% endif %}
     </td>
     <td class="visible-md visible-lg">
-        <a class="label label-primary col-count"
+        <a size="sm" class="label label-gray col-count"
            data-id="{{ item.id }}"
            href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.list'|trans ~ ':' ~ item.alias}) }}"
            data-toggle="ajax">{{ 'mautic.lead.list.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}</a>
