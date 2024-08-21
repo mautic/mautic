@@ -541,20 +541,23 @@
             <div class="clearfix"></div>
         </div>
         {% if lists[lead.id] is defined %}
-          <div class="pa-sm panel-segments">
-            <div class="panel-title">
-              {{ 'mautic.lead.lead.lists'|trans }}
+            <div class="pa-sm panel-segments">
+                <div class="panel-title">
+                    {{ 'mautic.lead.lead.lists'|trans }}
+                </div>
+                {% set classes = ['label-gray', 'label-red', 'label-magenta', 'label-purple', 'label-blue', 'label-cyan', 'label-teal', 'label-green'] %}
+                {% for key, list in lists[lead.id] %}
+                    <h5 class="pull-left mt-xs mr-xs">
+                        <span class="label {{ cycle(classes, key) }} has-click-event">
+                            <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">
+                                {{ list.name|purify }}
+                            </a>
+                        </span>
+                    </h5>
+                {% endfor %}
             </div>
-            {% for key, list in lists[lead.id] %}
-              <h5 class="pull-left mt-xs mr-xs">
-                  <span class="label label-success">
-                      <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax" style="color: white;">
-                          {{ list.name|purify }}
-                      </a>
-                  </span>
-              </h5>
-            {% endfor %}
-          {% endif %}
+        {% endif %}
+
           <div class="clearfix"></div>
         </div>
     </div>
