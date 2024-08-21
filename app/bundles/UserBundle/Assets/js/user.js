@@ -19,6 +19,7 @@ Mautic.roleOnLoad = function (container, response) {
     if (response && response.permissionList) {
         MauticVars.permissionList = response.permissionList;
     }
+    Mautic.togglePermissionVisibility();
 };
 
 /**
