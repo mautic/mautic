@@ -7,7 +7,7 @@
 
 {% block content %}
     {% if isIndex %}
-        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div id="page-list-wrapper">
             <div class="page-list">
                 {{ block('mainContent') }}        
             </div>
@@ -29,7 +29,7 @@
                 <ul class="list-group list-group-tabs">
                     {% for integration in integrations %}
                         <li class="list-group-item{% if loop.index0 is same as(0) %} active{% endif %}" id="tab{{ integration.getName() }}">
-                            <a href="javascript: void(0);" class="steps" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}');">
+                            <a href="javascript: void(0);" class="list-group-item-text steps" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}');">
                                 {{ integration.getDisplayName() }}
                             </a>
                         </li>
