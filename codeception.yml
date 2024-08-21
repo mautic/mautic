@@ -10,3 +10,5 @@ extensions:
     - Codeception\Extension\RunFailed
 params:
   - .env.test.local
+settings:
+    error_level: "E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED"
