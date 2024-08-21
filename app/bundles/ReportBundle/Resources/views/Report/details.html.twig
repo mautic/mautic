@@ -6,7 +6,12 @@
 
 {% block headerTitle 'mautic.report.report.header.view'|trans({'%name%': report.name|trans}) %}
 
-{% block publishStatus include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': report}) %}
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': report,
+        'status': 'available'
+    }) -}}
+{% endblock %}
 
 {% block actions %}
   {%- set buttons = [] -%}

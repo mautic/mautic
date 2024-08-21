@@ -67,6 +67,10 @@
       line-height: 0;
       padding-left: var(--spacing-01);
     }
+
+    &:focus {
+      outline: 2px solid var(--focus);
+    }
   }
 }
 
@@ -115,4 +119,16 @@ ul.dropdown-menu-form {
   padding: 0 5px 0 30px;
   max-height: 300px;
   overflow-y: auto;
+}
+
+.dropdown-toggle {
+  .outline();
+}
+
+.dropdown-header {
+  margin: 32px 16px 8px 16px;
+  border-bottom: 1px solid var(--border-strong);
+  padding: 0 0 4px;
+  color: var(--text-secondary);
+  font-size: var(--typography-utility-productive);
 }
