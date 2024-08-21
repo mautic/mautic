@@ -3109,6 +3109,9 @@ a.label:focus,
 .label-outline {
   background-color: transparent;
   color: var(--text-primary);
+}
+.label-outline,
+.label-outline:hover {
   outline: 1px solid var(--background-inverse);
 }
 .label-high-contrast {
