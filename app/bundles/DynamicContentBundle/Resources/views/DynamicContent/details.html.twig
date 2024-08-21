@@ -6,7 +6,12 @@
 
 {% block headerTitle entity.name %}
 
-{% block publishStatus include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': entity}) %}
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': entity,
+        'status': 'available'
+    }) -}}
+{% endblock %}
 
 {% block actions include('@MauticCore/Helper/page_actions.html.twig', {
     'item': entity,

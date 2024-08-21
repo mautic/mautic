@@ -2,14 +2,18 @@
 // Panels
 // --------------------------------------------------
 
-.panel {
+.panel, .panel2 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
   border: 1px solid @panel-default-border;
+  background-color: var(--background);
+  transition: var(--transition-all-productive);
   .box-shadow(0px 1px 1px darken(@body-bg, 2%));
   //background-clip: padding-box;
+
+  &:hover { border-color: var(--border-subtle-alternate); }
 }
 
 // Panel heading
@@ -51,7 +55,8 @@
 // Panel footer
 .panel-footer {
   overflow: hidden;
-  background-color: #fbfbfb;
+  background-color: transparent;
+  border-top: none;
 }
 
 .panel-toolbar-wrapper {
