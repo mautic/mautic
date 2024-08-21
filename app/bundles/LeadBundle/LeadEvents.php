@@ -782,6 +782,8 @@ final class LeadEvents
      */
     public const POST_CONTACT_EXPORT_SCHEDULED = 'mautic.post_contact_export_scheduled';
 
+    public const POST_CONTACT_EXPORT = 'mautic.post_contact_export';
+
     /**
      * The mautic.contact_export_prepare_file event is dispatched when a contact export is being processed.
      *
