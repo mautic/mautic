@@ -121,6 +121,8 @@
 !/plugins/index.html
 !/plugins/.gitkeep
 
+tests/**/*.sql
+
 /themes/*
 !/themes/aurora
 !/themes/blank
