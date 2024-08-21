@@ -1312,6 +1312,9 @@ a.text-google:hover,
 a.text-google:focus {
   color: #c23321;
 }
+.text-disabled {
+  color: var(--text-disabled);
+}
 blockquote {
   padding-left: 40px;
   border-width: 0px;
