@@ -387,12 +387,16 @@ Mautic.selectFormType = function(formType) {
 };
 
 /**
- * Toggles theme selection field visibility
+ * Toggles theme selection field visibility and manages theme selection
  */
 Mautic.toggleThemeSelectorVisibility = function () {
+    var selectField = mQuery('#mauticform_template');
+    var chosenContainer = mQuery('#mauticform_template_chosen');
+
     if (mQuery('#mauticform_renderStyle_0').prop('checked')) {
-        mQuery('#theme-selector').addClass('hide');
+        selectField.val('').trigger('chosen:updated');
+        chosenContainer.addClass('chosen-disabled');
     } else {
-        mQuery('#theme-selector').removeClass('hide');
+        chosenContainer.removeClass('chosen-disabled');
     }
-}; 
+};
