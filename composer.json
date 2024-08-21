@@ -25,6 +25,10 @@
     "mautic/core-lib": "^5.0"
   },
   "require-dev": {
+    "codeception/codeception": "^4.2",
+    "codeception/module-asserts": "^2.0",
+    "codeception/module-db": "^2.1",
+    "codeception/module-webdriver": "^2.0",
     "friendsofphp/php-cs-fixer": "^3.14",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
