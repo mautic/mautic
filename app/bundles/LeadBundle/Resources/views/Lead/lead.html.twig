@@ -341,7 +341,7 @@ lead.permissionUser
                 <div class="row-no-gutters mb-sm">
                     <div class="col-lg-12" id="lead-stats"
                         data-target-url="{{ path('mautic_contact_stats', {'objectId': lead.id}) }}">
-                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                        <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
                     </div>
                 </div>
                 <!--/ End second row -->
@@ -421,7 +421,7 @@ lead.permissionUser
                     <div class="col-xs-12">
                         <div class="tile">
                             <div class="row-no-gutters fw-nowrap ai-center mb-lg">
-                                <span class="label label-primary mr-sm" id="TimelineCount">{{ events.total }}</span>
+                                <span size="sm" class="label label-primary mr-sm" id="TimelineCount">{{ events.total }}</span>
                                 <div class="fw-b">{{ 'mautic.lead.lead.tab.history'|trans }}</div>
                             </div>
                             {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
@@ -434,7 +434,7 @@ lead.permissionUser
                     <div class="col-xs-12">
                         <div class="tile">
                             <div class="row-no-gutters fw-nowrap ai-center mb-lg">
-                                <span class="label label-primary mr-sm" id="TimelineCount">{{ auditlog.total }}</span>
+                                <span size="sm" class="label label-primary mr-sm" id="TimelineCount">{{ auditlog.total }}</span>
                                 <div class="fw-b">{{ 'mautic.lead.lead.tab.auditlog'|trans }}</div>
                             </div>
                             {{ include('@MauticLead/Auditlog/_list.html.twig', { 'lead': lead, 'events': auditlog, }) }}
@@ -462,7 +462,7 @@ lead.permissionUser
                             <span class="accordion-title">
                                 {{ ('mautic.lead.field.group.'~group)|trans }}
                                 {% if 'social' == group %}
-                                <span class="label label-primary ml-xs" id="SocialCount">{{ socialProfiles|length
+                                <span size="sm" class="label label-primary ml-xs" id="SocialCount">{{ socialProfiles|length
                                     }}</span>
                                 {% endif %}
                             </span>
@@ -561,7 +561,7 @@ lead.permissionUser
                             <i class="ri-arrow-down-s-line accordion-arrow"></i>
                             <span class="accordion-title">
                                 {{'mautic.lead.lead.tab.integration'|trans}}
-                                <span class="label label-primary ml-xs" id="IntegrationCount">{{ integrations|length
+                                <span size="sm" class="label label-primary ml-xs" id="IntegrationCount">{{ integrations|length
                                     }}</span>
                             </span>
                         </a>

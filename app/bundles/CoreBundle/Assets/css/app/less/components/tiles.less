@@ -3,7 +3,7 @@
     position: relative;
     display: flex;
     flex-grow: 1;
-    padding: var(--layout-density-padding-inline-local);
+    padding: var(--layout-density-padding-inline-local) !important;
     background-color: var(--layer);
     min-block-size: 4rem;
     min-inline-size: 8rem;
@@ -56,7 +56,7 @@
 
     * { box-sizing: inherit; }
 
-    .alert { 
+    .alert {
         background-color: var(--layer-alternate);
         margin-left: calc(-1 * var(--layout-density-padding-inline-local));
         margin-right: calc(-1 * var(--layout-density-padding-inline-local));
