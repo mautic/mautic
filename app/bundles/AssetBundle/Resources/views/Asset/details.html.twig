@@ -30,7 +30,10 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : activeAsset}) -}}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activeAsset,
+        'status': 'available'
+    }) -}}
 {% endblock %}
 {% block content %}
 
