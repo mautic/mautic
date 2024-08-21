@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
-use DateTime;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
@@ -192,6 +191,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setAlias($alias);
+        $segment->setPublicName($alias);
         $segment->setName($alias);
         $segment->setFilters($filters);
         $this->em->persist($segment);
@@ -213,6 +213,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
                 $customField['group'] => [
                     $customField['alias'] => [
                         'value' => '',
+                        'alias' => $customField['alias'],
                         'type'  => $customField['type'],
                     ],
                 ],
@@ -234,7 +235,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         $segmentMember = new ListLead();
         $segmentMember->setLead($lead);
         $segmentMember->setList($segment);
-        $segmentMember->setDateAdded(new DateTime());
+        $segmentMember->setDateAdded(new \DateTime());
         $this->em->persist($segmentMember);
     }
 
@@ -313,7 +314,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
         $companyLead = new CompanyLead();
         $companyLead->setCompany($company);
         $companyLead->setLead($lead);
-        $companyLead->setDateAdded(new DateTime());
+        $companyLead->setDateAdded(new \DateTime());
 
         $this->em->persist($companyLead);
     }
