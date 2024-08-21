@@ -114,10 +114,6 @@ body > #app-wrapper {
     overflow: auto;
   }
 }
-.csstransforms3d.sidebar-open-ltr #app-header.navbar {
-  -webkit-transform: translate3d(230px, 0, 0);
-  transform: translate3d(230px, 0, 0);
-}
 .no-csstransforms3d.sidebar-open-ltr #app-header.navbar {
   left: 230px;
 }
@@ -185,6 +181,21 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav {
   float: left;
   margin: 0;
+  display: flex;
+  align-items: center;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > .mautic-brand > .mautic-logo-text {
+  opacity: 1;
+  margin-left: 3px;
+  position: absolute;
+  -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
+  -o-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
+  transition: opacity .3s ease .1s, margin-left 0s ease .2s;
+}
+#app-header.navbar .navbar-nocollapse .navbar-nav > .mautic-brand {
+  -webkit-transition: padding-left 0.3s ease;
+  -o-transition: padding-left 0.3s ease;
+  transition: padding-left 0.3s ease;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li {
   float: left;
@@ -451,23 +462,6 @@ body > #app-wrapper {
   width: 230px;
   background-color: #4e5e9e;
 }
-.app-sidebar.sidebar-left .sidebar-header > .mautic-brand > .mautic-logo-text {
-  opacity: 1;
-  margin-left: 3px;
-  position: absolute;
-  -webkit-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
-  -o-transition: opacity .3s ease .1s, margin-left 0s ease .2s;
-  transition: opacity .3s ease .1s, margin-left 0s ease .2s;
-}
-.app-sidebar.sidebar-left .sidebar-header > .mautic-brand {
-  -webkit-transition: padding-left 0.3s ease;
-  -o-transition: padding-left 0.3s ease;
-  transition: padding-left 0.3s ease;
-}
-.app-sidebar.sidebar-left .sidebar-header.minimized {
-  padding-left: 3px;
-  padding-right: 3px;
-}
 .app-sidebar.sidebar-left .sidebar-content {
   padding-right: 1px;
 }
@@ -631,6 +625,7 @@ body > #app-wrapper {
   top: 0;
   bottom: 0;
   width: 100%;
+  margin-top: 50px;
 }
 .app-sidebar .sidebar-content .nav.nav-tabs {
   border-bottom: 1px solid #1b2128;
@@ -773,9 +768,6 @@ body > #app-wrapper {
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {
     left: 0;
-  }
-  .app-sidebar.sidebar-left ~ #app-header.navbar {
-    left: 230px;
   }
   .app-sidebar.sidebar-left ~ #app-content {
     margin-left: 230px;
@@ -3280,7 +3272,7 @@ a.label:focus,
   height: 48px;
 }
 .mautic-brand > svg.mautic-logo-figure .circle {
-  fill: #ffffff;
+  fill: #4e5e9e;
 }
 .mautic-brand > svg.mautic-logo-figure .m,
 .mautic-brand > svg.mautic-logo-figure .m-arrow {
@@ -3296,7 +3288,12 @@ a.label:focus,
 .mautic-brand > svg.mautic-logo-text .t,
 .mautic-brand > svg.mautic-logo-text .i,
 .mautic-brand > svg.mautic-logo-text .c {
-  fill: #ffffff;
+  fill: #4e5e9e;
+}
+@media (max-width: 768px) {
+  svg.mautic-logo-text {
+    display: none;
+  }
 }
 label {
   font-weight: normal;
@@ -3354,21 +3351,19 @@ label {
   padding: var(--spacing-01) var(--spacing-04);
 }
 .search-container {
-  position: relative;
-  line-height: 60px;
+  display: flex;
+  align-items: center;
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 .search-container .search {
-  border: 1px solid #fff;
-  background-color: transparent;
-  position: absolute;
+  border: none;
+  background-color: transparent !important;
   left: 0px;
   width: 24px;
   height: 34px;
   padding: 0 0 0 32px;
-  margin: 12px 0 0 5px;
   z-index: 1;
   -webkit-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -3377,6 +3372,7 @@ label {
 .search-container a.search-button {
   color: var(--icon-secondary);
   position: absolute;
+  display: inline-flex;
   left: 12px;
   z-index: 5;
   transition: var(--transition-all-productive);
