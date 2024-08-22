@@ -442,7 +442,7 @@ class EmailRepository extends CommonRepository
             $results['read_count'] = (int) $results['read_count'];
             $results['not_read']   = $results['sent_count'] - $results['read_count'];
         } else {
-            $results['not_read'] = $results['sent'] = $results['read'] = 0;
+            $results['not_read'] = $results['sent_count'] = $results['read_count'] = 0;
         }
 
         return $results;

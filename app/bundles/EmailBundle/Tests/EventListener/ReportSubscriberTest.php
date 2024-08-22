@@ -279,6 +279,52 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGraphGenerate($eventMock);
     }
 
+    public function testOnReportGraphGenerateForEmailContextWithEmailMultiSieriesPieGraph(): void
+    {
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
+
+        $eventMock
+            ->method('checkContext')
+            ->withConsecutive(
+                [['email.stats', 'emails']],
+                ['emails']
+            )
+            ->willReturn(true);
+
+        $eventMock->expects($this->once())
+            ->method('getRequestedGraphs')
+            ->willReturn(['mautic.email.graph.pie.sent.read.clicked.unsubscribed']);
+
+        $eventMock->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilderMock);
+
+        $eventMock->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['chartQuery' => $chartQueryMock, 'translator' => $translatorMock]);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getSentReadNotReadCount')
+            ->willReturn([
+                'sent_count'=> 10,
+                'read_count'=> 4,
+                'not_read'  => 6,
+            ]);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getUniqueCliks')
+            ->willReturn(5);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getUnsubscribedCount')
+            ->willReturn(1);
+
+        $this->subscriber->onReportGraphGenerate($eventMock);
+    }
+
     public function testOnReportGraphGenerateForEmailContextWithEmailGraph1(): void
     {
         $eventMock         = $this->createMock(ReportGraphEvent::class);
