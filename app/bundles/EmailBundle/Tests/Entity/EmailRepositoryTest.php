@@ -222,7 +222,7 @@ class EmailRepositoryTest extends TestCase
         ], $result);
     }
 
-    public function testGetSentReadNotReadCountEmptyResults()
+    public function testGetSentReadNotReadCountEmptyResults(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
