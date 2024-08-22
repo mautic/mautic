@@ -538,4 +538,22 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         return $entities;
     }
+
+    /**
+     * @return array<string[]>
+     */
+    public function getCompanyLookupData(string $filterVal): array
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('id, companyname, companycity, companystate')
+            ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
+            ->where($q->expr()->eq('is_published', true))
+            ->andWhere($q->expr()->like('companyname', ':filterVar'))
+            ->setParameter('filterVar', '%'.$filterVal.'%')
+            ->orderBy('companyname')
+            ->setMaxResults(50);
+
+        return $q->executeQuery()->fetchAllAssociative();
+    }
 }

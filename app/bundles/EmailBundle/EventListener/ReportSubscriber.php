@@ -698,7 +698,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-external-link-square';
+                    $graphData['iconClass'] = 'ri-external-link-line';
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
