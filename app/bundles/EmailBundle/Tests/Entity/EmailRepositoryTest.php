@@ -182,6 +182,83 @@ class EmailRepositoryTest extends TestCase
         $this->assertEquals(5, $result);
     }
 
+    public function testGetSentReadNotReadCount(): void
+    {
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('resetQueryPart')
+            ->with('groupBy')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('resetQueryParts')
+            ->with(['join'])
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count')
+            ->willReturnSelf();
+
+        $resultMock = $this->createMock(Result::class);
+        $queryBuilder->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($resultMock);
+
+        $resultMock->expects($this->once())
+            ->method('fetchAssociative')
+            ->willReturn([
+                'sent_count' => '100',
+                'read_count' => '60',
+            ]);
+
+        $result = $this->repo->getSentReadNotReadCount($queryBuilder);
+
+        $this->assertEquals([
+            'sent_count' => 100,
+            'read_count' => 60,
+            'not_read'   => 40,
+        ], $result);
+    }
+
+    public function testGetSentReadNotReadCountEmptyResults()
+    {
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('resetQueryPart')
+            ->with('groupBy')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('resetQueryParts')
+            ->with(['join'])
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count')
+            ->willReturnSelf();
+
+        $resultMock = $this->createMock(Result::class);
+        $queryBuilder->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($resultMock);
+
+        $resultMock->expects($this->once())
+            ->method('fetchAssociative')
+            ->willReturn(false);
+
+        $result = $this->repo->getSentReadNotReadCount($queryBuilder);
+
+        $this->assertEquals([
+            'sent_count' => 0,
+            'read_count' => 0,
+            'not_read'   => 0,
+        ], $result);
+    }
+
     /**
      * @param int[] $excludedListIds
      */
