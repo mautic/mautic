@@ -970,7 +970,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Ensure the dateModified is still empty. Meaning the lead record was not updated which is correct.
         Assert::assertNull($fetchedContact->getDateModified());
     }
-  
+
     public function testAuditLogBatchExportContact(): void
     {
         $this->loadFixtures([LoadLeadData::class]);
