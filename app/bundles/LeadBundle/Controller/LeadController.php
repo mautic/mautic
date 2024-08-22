@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -64,7 +65,7 @@ class LeadController extends FormController
      */
     public function indexAction(
         Request $request,
-        \Mautic\LeadBundle\Model\DoNotContact $leadDNCModel,
+        DoNotContactModel $leadDNCModel,
         ContactColumnsDictionary $contactColumnsDictionary,
         $page = 1
     ) {
@@ -204,7 +205,7 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        \assert($leadDNCModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
+        \assert($leadDNCModel instanceof DoNotContactModel);
         $dncRepository = $leadDNCModel->getDncRepo();
 
         return $this->delegateView(
@@ -1692,16 +1693,11 @@ class LeadController extends FormController
     /**
      * Bulk add leads to the DNC list.
      *
-     * @param int $objectId
-     *
      * @return JsonResponse|Response
      */
-    public function batchDncAction(Request $request, \Mautic\LeadBundle\Model\DoNotContact $doNotContact, $objectId = 0)
+    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model)
     {
-        if ('POST' === $request->getMethod()) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead');
-
+        if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
             $ids  = json_decode($data['ids'], true);
 
@@ -1723,7 +1719,9 @@ class LeadController extends FormController
                 );
             }
 
-            if ($count = count($entities)) {
+            $count = count($entities);
+
+            if ($count) {
                 foreach ($entities as $lead) {
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                         $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
@@ -1744,34 +1742,34 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchDnc',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            DncType::class,
-                            [],
-                            [
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchDnc',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        DncType::class,
+                        [],
+                        [
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**
