@@ -271,6 +271,85 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGraphGenerate($eventMock);
     }
 
+    public function testOnReportGraphGenerateForEmailContextWithEmailBarGraph(): void
+    {
+        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $resultMock        = $this->createMock(Result::class);
+        $eventMock         = $this->createMock(ReportGraphEvent::class);
+        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $translatorMock    = $this->createMock(TranslatorInterface::class);
+
+        $data = [
+            [
+                'name'          => 'Email 1',
+                'sent_count'    => '100',
+                'read_count'    => '80',
+                'unique_clicks' => '60',
+                'unsubscribed'  => '10',
+                'bounced'       => '5',
+            ],
+            [
+                'name'          => 'Email 2',
+                'sent_count'    => '150',
+                'read_count'    => '120',
+                'unique_clicks' => '90',
+                'unsubscribed'  => '15',
+                'bounced'       => '10',
+            ],
+        ];
+
+        $eventMock->method('checkContext')
+                    ->withConsecutive(
+                        [['email.stats', 'emails']],
+                        ['emails']
+                    )
+                    ->willReturn(true);
+
+        $eventMock->expects($this->once())
+            ->method('getRequestedGraphs')
+            ->willReturn(['mautic.email.graph.bar.read.clicked.unsubscribed.bounced']);
+
+        $eventMock->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilderMock);
+
+        $queryBuilderMock->expects($this->once())
+            ->method('select')
+            ->with($this->stringContains('e.id, e.name, e.sent_count, e.read_count, tr.unique_hits as `unique_clicks`'))
+            ->willReturn($queryBuilderMock);
+
+        $eventMock->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['chartQuery' => $chartQueryMock, 'translator' => $translatorMock]);
+
+        $queryBuilderMock->expects($this->any())
+            ->method('getQueryParts')
+            ->willReturn(['join' => []]);
+
+        $queryBuilderMock->expects($this->exactly(2))
+            ->method('setParameter')
+            ->withConsecutive(
+                ['unsubscribed', DoNotContact::UNSUBSCRIBED],
+                ['bounced', DoNotContact::BOUNCED]
+            )
+            ->willReturnSelf();
+
+        $queryBuilderMock->expects($this->once())
+            ->method('groupBy')
+            ->with('e.id')
+            ->willReturnSelf();
+
+        $queryBuilderMock->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($resultMock);
+
+        $resultMock->expects($this->once())
+            ->method('fetchAllAssociative')
+            ->willReturn($data);
+
+        $this->subscriber->onReportGraphGenerate($eventMock);
+    }
+
     public function testOnReportGraphGenerateForEmailContextWithEmailGraph1(): void
     {
         $eventMock         = $this->createMock(ReportGraphEvent::class);
