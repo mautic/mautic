@@ -31,9 +31,6 @@ class EmailActionModelTest extends TestCase
         $this->emailActionModel = new EmailActionModel($this->emailModel);
     }
 
-    /**
-     * @test
-     */
     public function testSetsNewCategoryForEditableEmails(): void
     {
         $oldCategory = new Category();
