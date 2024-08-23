@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Form\Type\BatchCategoryType as BatchType;
+use Mautic\EmailBundle\Form\Type\BatchCategoryType;
 use Mautic\EmailBundle\Model\EmailActionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -52,11 +52,9 @@ class BatchEmailController extends AbstractFormController
 
         if ($ids && is_array($ids)) {
             $newCategoryId = $params['newCategory'];
-            $emailIds      = json_decode($params['ids']);
 
-            $affected = $this->actionModel->setCategory($emailIds, $this->categoryModel->getEntity($newCategoryId));
-
-            $newCategory = current($affected)?->getCategory();
+            $newCategory = $this->categoryModel->getEntity($newCategoryId);
+            $affected    = $this->actionModel->setCategory($ids, $newCategory);
 
             $this->addFlashMessage('mautic.email.batch_emails_affected', [
                 '%count%' => count($affected),
@@ -92,7 +90,7 @@ class BatchEmailController extends AbstractFormController
             [
                 'viewParameters' => [
                     'form' => $this->createForm(
-                        BatchType::class,
+                        BatchCategoryType::class,
                         [],
                         [
                             'items'  => $items,
