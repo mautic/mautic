@@ -13,7 +13,7 @@ readonly class EmailActionModel
 
     public function setCategory(array $emailsIds, Category $newCategory): array
     {
-        $emails = $this->emailModel->getByIds($emailsIds);
+        $emails = $this->emailModel->getRepository->findBy(['id' => $emailsIds]);
 
         $affected = [];
 
