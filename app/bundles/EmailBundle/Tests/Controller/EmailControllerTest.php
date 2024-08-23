@@ -33,8 +33,11 @@ use Twig\Environment;
 
 class EmailControllerTest extends TestCase
 {
+    /**
+     * @var MockObject|Translator
+     */
     public const NEW_CATEGORY_TITLE = 'New category';
-    private MockObject|Translator $translatorMock;
+    private MockObject $translatorMock;
 
     /**
      * @var MockObject|Session
@@ -44,7 +47,7 @@ class EmailControllerTest extends TestCase
     /**
      * @var MockObject|ModelFactory<EmailModel>
      */
-    private MockObject|ModelFactory $modelFactoryMock;
+    private MockObject $modelFactoryMock;
 
     /**
      * @var MockObject|Container
