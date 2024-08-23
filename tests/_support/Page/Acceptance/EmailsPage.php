@@ -28,9 +28,6 @@ class EmailsPage
         return static::$URL.$param;
     }
 
-    /**
-     * @var AcceptanceTester;
-     */
     protected \AcceptanceTester $acceptanceTester;
 
     public function __construct(\AcceptanceTester $I)
