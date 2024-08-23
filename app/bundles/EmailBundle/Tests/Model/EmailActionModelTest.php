@@ -17,7 +17,7 @@ class EmailActionModelTest extends TestCase
     public const OLD_CATEGORY_TITLE = 'Old category';
 
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
     private MockObject $emailModel;
 
