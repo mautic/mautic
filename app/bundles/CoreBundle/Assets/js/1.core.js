@@ -895,33 +895,3 @@ var Mautic = {
         }
     }
 };
-
-/**
- * Allow us to have disabled state for tabs
- */
-function toggleLinkAttributes() {
-    mQuery('li.disabled a').each(function() {
-        var $this = mQuery(this);
-        // Store the attributes in data attributes before removing them
-        if (!$this.data('original-href')) {
-            $this.data('original-href', $this.attr('href'));
-        }
-        if (!$this.data('original-toggle')) {
-            $this.data('original-toggle', $this.attr('data-toggle'));
-        }
-        $this.removeAttr('href data-toggle');
-    });
-
-    mQuery('li:not(.disabled) a').each(function() {
-        var $this = mQuery(this);
-        // Restore the attributes from data attributes
-        if ($this.data('original-href')) {
-            $this.attr('href', $this.data('original-href'));
-            $this.removeData('original-href');
-        }
-        if ($this.data('original-toggle')) {
-            $this.attr('data-toggle', $this.data('original-toggle'));
-            $this.removeData('original-toggle');
-        }
-    });
-}

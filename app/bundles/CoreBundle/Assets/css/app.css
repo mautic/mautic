@@ -2925,10 +2925,12 @@ ul.dropdown-menu-form {
   background-color: var(--layer);
 }
 .nav-tabs.nav-tabs-contained > li.disabled {
+  cursor: not-allowed;
   color: var(--text-disabled);
 }
 .nav-tabs.nav-tabs-contained > li.disabled > a {
   background-color: var(--button-disabled);
+  pointer-events: none;
 }
 @media (min-width: 1200px) {
   .nav-tabs {

@@ -38,7 +38,6 @@ Mautic.togglePermissionVisibility = function () {
             mQuery('#isAdminMessage').removeClass('hide');
             mQuery('#permissions-tab').addClass('disabled');
         }
-        toggleLinkAttributes();
     }, 10);
 };
 
