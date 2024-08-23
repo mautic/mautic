@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\SeriesPieChart;
