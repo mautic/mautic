@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper\Chart;
 
 class SeriesPieChart extends AbstractChart implements ChartInterface
 {
-    /**
-     * Holds the suma of the all dataset values.
-     */
     protected int|float $totalCount = 0;
 
     /**
@@ -15,11 +14,16 @@ class SeriesPieChart extends AbstractChart implements ChartInterface
     protected $datasets = [];
 
     /**
+     * @var string[]
+     */
+    protected $labels = [];
+
+    /**
      * @return array{labels: mixed[], datasets: mixed[]}
      */
     public function render(bool $withCounts = true): array
     {
-        $dataset   = [];
+        $dataset = [];
 
         foreach ($this->datasets as $datasetId => $value) {
             $data        = ['data' => [], 'backgroundColor' => [], 'hoverBackgroundColor' => []];
@@ -88,7 +92,7 @@ class SeriesPieChart extends AbstractChart implements ChartInterface
     /**
      * @param string[] $labels
      */
-    public function setLabes(array $labels): void
+    public function setLabels(array $labels): void
     {
         $this->labels = $labels;
     }

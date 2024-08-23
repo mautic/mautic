@@ -41,7 +41,7 @@ class SeriesPieChartTest extends TestCase
 
     public function testRender(): void
     {
-        $this->chart->setLabes(['Label 1', 'Label 2']);
+        $this->chart->setLabels(['Label 1', 'Label 2']);
         $this->chart->setDataset([10, 20]);
 
         $result = $this->chart->render();

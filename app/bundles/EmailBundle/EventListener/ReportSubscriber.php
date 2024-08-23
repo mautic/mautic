@@ -551,7 +551,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
                     $chart  = new SeriesPieChart();
                     $chart->setTotalCount($counts['sent_count']);
-                    $chart->setLabes([
+                    $chart->setLabels([
                         $chart->buildFullLabel($options['translator']->trans('mautic.email.report.unsubscribed'), $unsubCount['unsubscribed']),
                         $chart->buildFullLabel($options['translator']->trans('mautic.email.clicked'), $clicked),
                         $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']),
