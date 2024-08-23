@@ -25,14 +25,14 @@
 
             <ul class="list-group list-group-tabs">
                 <li class="list-group-item active">
-                    <a href="#profile" class="steps" data-toggle="tab">
+                    <a href="#profile" class="list-group-item-text steps" data-toggle="tab">
                         {% trans %}mautic.user.account.header.details{% endtrans %}
                     </a>
                 </li>
 
                 {% if permissions['apiAccess'] %}
                 <li class="list-group-item">
-                    <a href="#clients" class="steps" data-toggle="tab">
+                    <a href="#clients" class="list-group-item-text steps" data-toggle="tab">
                         {% trans %}mautic.user.account.header.authorizedclients{% endtrans %}
                     </a>
                 </li>
