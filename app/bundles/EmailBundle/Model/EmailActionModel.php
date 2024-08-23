@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Mautic\CategoryBundle\Entity\Category;
 
-readonly class EmailActionModel
+class EmailActionModel
 {
     public function __construct(
         private EmailModel $emailModel

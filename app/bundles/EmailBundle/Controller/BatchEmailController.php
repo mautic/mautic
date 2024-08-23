@@ -26,8 +26,8 @@ use Symfony\Component\HttpFoundation\Response;
 class BatchEmailController extends AbstractFormController
 {
     public function __construct(
-        private readonly EmailActionModel $actionModel,
-        private readonly CategoryModel $categoryModel,
+        private EmailActionModel $actionModel,
+        private CategoryModel $categoryModel,
         ManagerRegistry $doctrine,
         MauticFactory $factory,
         ModelFactory $modelFactory,
