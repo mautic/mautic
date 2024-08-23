@@ -895,13 +895,3 @@ var Mautic = {
         }
     }
 };
-
-function listQuickFilter(element) {
-    const filterValue = element.dataset.filter;
-    const searchInput = document.getElementById('list-search');
-    searchInput.value = filterValue;
-    const enterKeyEvent = new KeyboardEvent('keyup', {
-        keyCode: 13
-    });
-    searchInput.dispatchEvent(enterKeyEvent);
-}
