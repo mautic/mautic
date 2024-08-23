@@ -228,10 +228,6 @@ var Mautic = {
             mQuery('#sendEmailButton').click();
         });
 
-        Mautic.addKeyboardShortcut('ctrl+enter', 'Save changes', function(e) {
-            mQuery('[id*="buttons_save"]').click();
-        });
-
         Mautic.addKeyboardShortcut('g i', 'Back to index (list)', function(e) {
             mQuery('[id*="buttons_cancel"]').click();
             mQuery('#close').click();
