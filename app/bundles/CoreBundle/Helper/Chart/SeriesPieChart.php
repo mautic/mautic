@@ -6,10 +6,13 @@ class SeriesPieChart extends AbstractChart implements ChartInterface
 {
     /**
      * Holds the suma of the all dataset values.
-     *
-     * @var float
      */
-    protected $totalCount = 0;
+    protected int|float $totalCount = 0;
+
+    /**
+     * @var int[][]
+     */
+    protected $datasets = [];
 
     /**
      * @return array{labels: mixed[], datasets: mixed[]}
@@ -88,5 +91,18 @@ class SeriesPieChart extends AbstractChart implements ChartInterface
     public function setLabes(array $labels): void
     {
         $this->labels = $labels;
+    }
+
+    /**
+     * @return int[][]
+     */
+    public function getDatasets(): array
+    {
+        return $this->datasets;
+    }
+
+    public function getTotalCount(): float|int
+    {
+        return $this->totalCount;
     }
 }
