@@ -81,11 +81,6 @@ class BatchEmailController extends AbstractFormController
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_email_batch_categories_set');
-        $items = [];
-
-        foreach ($this->getEmailCategories(300) as $category) {
-            $items[$category['title']] = $category['id'];
-        }
 
         return $this->delegateView(
             [
@@ -94,7 +89,6 @@ class BatchEmailController extends AbstractFormController
                         BatchCategoryType::class,
                         [],
                         [
-                            'items'  => $items,
                             'action' => $route,
                         ]
                     )->createView(),
@@ -107,10 +101,5 @@ class BatchEmailController extends AbstractFormController
                 ],
             ]
         );
-    }
-
-    protected function getEmailCategories(int $limit): array
-    {
-        return $this->categoryModel->getLookupResults('email', '', $limit);
     }
 }
