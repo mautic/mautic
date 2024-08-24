@@ -81,7 +81,7 @@
                 {% set hasTranslations  = item.isTranslation() %}
                 {% set type = item.getEmailType() %}
                 {% set mauticTemplateVars = _context|merge({'item' : item}) %}
-                <tr>
+                <tr id="row_email_{{ item.id }}">
                     <td>
                         {% set edit = securityHasEntityAccess(
                             permissions['email:emails:editown'],
