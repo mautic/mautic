@@ -64,11 +64,12 @@ class BatchEmailController extends AbstractFormController
         }
 
         return new JsonResponse([
-            'closeModal'  => true,
-            'flashes'     => $this->getFlashContent(),
-            'affected'    => !empty($affected) ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
-            'newCategory' => !empty($newCategory) ? $newCategory->getTitle() : null,
-            'callback'    => 'emailBatchSubmitCallback',
+            'closeModal'       => true,
+            'flashes'          => $this->getFlashContent(),
+            'affected'         => !empty($affected) ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
+            'newCategoryName'  => !empty($newCategory) ? $newCategory->getTitle() : null,
+            'newCategoryColor' => !empty($newCategory) ? $newCategory->getColor() : null,
+            'callback'         => 'emailBatchSubmitCallback',
         ]);
     }
 

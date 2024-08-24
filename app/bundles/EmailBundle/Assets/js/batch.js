@@ -15,14 +15,21 @@ Mautic.emailBatchSubmit = function() {
     return false;
 };
 
-function setCategory(id, newCategory) {
-    document.evaluate('//td[3]/div/text()', document.querySelector(".list-checkbox[value='" + id + "']").parentElement.parentElement.parentElement.parentElement.querySelector('.d-flex.ai-center.gap-xs')).iterateNext().textContent = newCategory;
+function setCategory(id, newName, newColor) {
+    const tr = document.querySelector("input[type='checkbox'][value='" + id + "']").parentElement.parentElement.parentElement.parentElement;
+    const div = tr.querySelector("div.d-flex.ai-center.gap-xs");
+    const span = div.querySelector("span");
+
+    div.textContent = newName;
+    span.style = "background: #" + newColor + ";"
+
+    div.prepend(span);
 }
 
 Mautic.emailBatchSubmitCallback = function( response ) {
-    console.log('Response: ' + JSON.stringify(response));
     mQuery('#MauticSharedModal').modal('hide');
+    console.log("Received: " + JSON.stringify(response));
     response.affected.forEach( function(id){
-        setCategory(id, response.newCategory);
+        setCategory(id, response.newCategoryName, response.newCategoryColor);
     });
 }
