@@ -68,6 +68,7 @@ class BatchEmailController extends AbstractFormController
             'flashes'     => $this->getFlashContent(),
             'affected'    => !empty($affected) ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
             'newCategory' => !empty($newCategory) ? $newCategory->getTitle() : null,
+            'callback'    => 'emailBatchSubmitCallback',
         ]);
     }
 
@@ -77,10 +78,9 @@ class BatchEmailController extends AbstractFormController
     public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_email_batch_categories_set');
-        $rows  = $this->categoryModel->getLookupResults('email', '', 300);
         $items = [];
 
-        foreach ($rows as $category) {
+        foreach ($this->getEmailCategories(300) as $category) {
             $items[$category['title']] = $category['id'];
         }
 
@@ -104,5 +104,10 @@ class BatchEmailController extends AbstractFormController
                 ],
             ]
         );
+    }
+
+    protected function getEmailCategories(int $limit): array
+    {
+        return $this->categoryModel->getLookupResults('email', '', $limit);
     }
 }

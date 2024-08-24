@@ -14,3 +14,15 @@ Mautic.emailBatchSubmit = function() {
 
     return false;
 };
+
+function setCategory(id, newCategory) {
+    document.evaluate('//td[3]/div/text()', document.querySelector(".list-checkbox[value='" + id + "']").parentElement.parentElement.parentElement.parentElement.querySelector('.d-flex.ai-center.gap-xs')).iterateNext().textContent = newCategory;
+}
+
+Mautic.emailBatchSubmitCallback = function( response ) {
+    console.log('Response: ' + JSON.stringify(response));
+    mQuery('#MauticSharedModal').modal('hide');
+    response.affected.forEach( function(id){
+        setCategory(id, response.newCategory);
+    });
+}
