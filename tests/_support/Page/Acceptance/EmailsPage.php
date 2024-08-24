@@ -19,26 +19,4 @@ class EmailsPage
     public const CONTACT_SEGMENT_DROPDOWN  = '#emailform_lists_chosen';
     public const CONTACT_SEGMENT_OPTION    = '#emailform_lists_chosen > div > ul > li';
     public const SAVE_AND_CLOSE            = '#emailform_buttons_save_toolbar';
-
-    /**
-     * Basic route example for your current URL
-     * You can append any additional parameter to URL
-     * and use it in tests like: Page\Edit::route('/123-post');.
-     */
-    public static function route($param)
-    {
-        return static::$URL.$param;
-    }
-
-    protected \AcceptanceTester $acceptanceTester;
-
-    public function __construct(\AcceptanceTester $I)
-    {
-        $this->acceptanceTester = $I;
-    }
-
-    public static function buildSelectorForCategory(int $number): string
-    {
-        return '#email_batch_add_chosen > div.chosen-drop > ul.chosen-results > li.active-result';
-    }
 }
