@@ -15,13 +15,13 @@ Mautic.emailBatchSubmit = function() {
     return false;
 };
 
-function setCategory(id, newName, newColor) {
+function setCategory(id, newCategory) {
     const tr = document.querySelector("#row_email_" + id);
     const div = tr.querySelector("div.d-flex.ai-center.gap-xs");
     const span = div.querySelector("span");
 
-    div.textContent = newName;
-    span.style = "background: #" + newColor + ";"
+    div.textContent = newCategory.name;
+    span.style = "background: #" + newCategory.color + ";"
 
     div.prepend(span);
 }
@@ -30,6 +30,6 @@ Mautic.emailBatchSubmitCallback = function( response ) {
     mQuery('#MauticSharedModal').modal('hide');
     console.log("Received: " + JSON.stringify(response));
     response.affected.forEach( function(id){
-        setCategory(id, response.newCategoryName, response.newCategoryColor);
+        setCategory(id, response.newCategory);
     });
 }
