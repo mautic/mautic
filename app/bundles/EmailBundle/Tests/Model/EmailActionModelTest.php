@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailActionModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,7 +21,17 @@ class EmailActionModelTest extends TestCase
     /**
      * @var MockObject&EmailModel
      */
-    private MockObject $emailModel;
+    private MockObject $emailModelMock;
+
+    /**
+     * @var MockObject&EmailRepository
+     */
+    private MockObject $emailRepositoryMock;
+
+    /**
+     * @var MockObject&CorePermissions
+     */
+    private MockObject $corePermissionsMock;
 
     private EmailActionModel $emailActionModel;
 
@@ -27,8 +39,15 @@ class EmailActionModelTest extends TestCase
     {
         parent::setUp();
 
-        $this->emailModel       = $this->createMock(EmailModel::class);
-        $this->emailActionModel = new EmailActionModel($this->emailModel);
+        $this->emailModelMock            = $this->createMock(EmailModel::class);
+        $this->emailRepositoryMock       = $this->createMock(EmailRepository::class);
+        $this->corePermissionsMock       = $this->createMock(CorePermissions::class);
+
+        $this->emailActionModel = new EmailActionModel(
+            $this->emailModelMock,
+            $this->emailRepositoryMock,
+            $this->corePermissionsMock
+        );
     }
 
     public function testSetsNewCategoryForEditableEmails(): void
@@ -40,12 +59,16 @@ class EmailActionModelTest extends TestCase
         $newCategory->setTitle(self::NEW_CATEGORY_TITLE);
 
         $emails = $this->buildEmailsWithCategory($oldCategory, 3);
-        $this->configureEmailModelToEdit($emails);
+        $this->configureRepositoryToReturn($emails);
+        $this->configurePermissionToAllowEdition(true);
+        $this->configureModelToSave($emails);
 
-        $this->emailActionModel->setCategory(
-            array_map(fn (Email $email) => $email->getId(), $emails),
-            $newCategory
-        );
+        $this
+            ->emailActionModel
+            ->setCategory(
+                array_map(fn (Email $email) => $email->getId(), $emails),
+                $newCategory
+            );
 
         foreach ($emails as $email) {
             $this->assertEquals($email->getCategory(), $newCategory);
@@ -64,12 +87,15 @@ class EmailActionModelTest extends TestCase
         $newCategory->setTitle(self::NEW_CATEGORY_TITLE);
 
         $emails = $this->buildEmailsWithCategory($oldCategory, 5);
-        $this->configureEmailModelToNotEdit($emails);
+        $this->configureRepositoryToReturn($emails);
+        $this->configurePermissionToAllowEdition(false);
 
-        $this->emailActionModel->setCategory(
-            array_map(fn (Email $email) => $email->getId(), $emails),
-            $newCategory
-        );
+        $this
+            ->emailActionModel
+            ->setCategory(
+                array_map(fn (Email $email) => $email->getId(), $emails),
+                $newCategory
+            );
 
         foreach ($emails as $email) {
             $this->assertEquals($email->getCategory(), $oldCategory);
@@ -93,41 +119,31 @@ class EmailActionModelTest extends TestCase
         return $emails;
     }
 
-    private function configureEmailModelToEdit(array $emails): void
+    private function configurePermissionToAllowEdition(bool $allow): void
     {
         $this
-            ->emailModel
-            ->method('getByIds')
+            ->corePermissionsMock
+            ->method('hasEntityAccess')
+            ->willReturn($allow);
+    }
+
+    protected function configureRepositoryToReturn(array $emails): void
+    {
+        $this
+            ->emailRepositoryMock
+            ->method('findBy')
             ->with(
-                array_map(fn (Email $email) => $email->getId(), $emails)
+                ['id' => array_map(fn (Email $email) => $email->getId(), $emails)]
             )
             ->willReturn($emails);
+    }
 
+    protected function configureModelToSave(array $emails): void
+    {
         $this
-            ->emailModel
-            ->method('canEdit')
-            ->willReturn(true);
-
-        $this
-            ->emailModel
+            ->emailModelMock
             ->expects($this->once())
             ->method('saveEntities')
             ->with($emails);
-    }
-
-    private function configureEmailModelToNotEdit(array $emails): void
-    {
-        $this
-            ->emailModel
-            ->method('getByIds')
-            ->with(
-                array_map(fn (Email $email) => $email->getId(), $emails)
-            )
-            ->willReturn($emails);
-
-        $this
-            ->emailModel
-            ->method('canEdit')
-            ->willReturn(false);
     }
 }

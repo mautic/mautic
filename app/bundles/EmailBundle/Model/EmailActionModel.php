@@ -5,22 +5,27 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 
 class EmailActionModel
 {
     public function __construct(
-        private EmailModel $emailModel
+        private EmailModel $emailModel,
+        private EmailRepository $emailRepository,
+        private CorePermissions $corePermissions,
     ) {
     }
 
     public function setCategory(array $emailsIds, Category $newCategory): array
     {
-        $emails = $this->emailModel->getRepository()->findBy(['id' => $emailsIds]);
+        $emails = $this->emailRepository->findBy(['id' => $emailsIds]);
 
         $affected = [];
 
         foreach ($emails as $email) {
-            if (!$this->emailModel->canEdit($email)) {
+            if (!$this->canEdit($email)) {
                 continue;
             }
 
@@ -29,9 +34,22 @@ class EmailActionModel
         }
 
         if ($affected) {
-            $this->emailModel->saveEntities($emails);
+            $this->saveEntities($emails);
         }
 
         return $affected;
+    }
+
+    private function canEdit(Email $email): bool
+    {
+        return $this->corePermissions->hasEntityAccess('email:emails:editown', 'email:emails:editother', $email->getCreatedBy());
+    }
+
+    /**
+     * @param array<Email> $emails
+     */
+    private function saveEntities(array $emails): void
+    {
+        $this->emailModel->saveEntities($emails);
     }
 }

@@ -55,7 +55,7 @@ class EmailManagementCest
         $I->click(EmailsPage::CHANGE_CATEGORY_ACTION);
     }
 
-    protected function verifyAllEmailsBelongTo(mixed $firstCategoryName): void
+    protected function verifyAllEmailsBelongTo(string $firstCategoryName): void
     {
         $I = $this->I;
 
