@@ -9,7 +9,7 @@ class EmailsPage
     public const URL                       = '/s/emails';
     public const NEW                       = '#new';
     public const SUBJECT_FIELD             = 'emailform[subject]';
-    public const NEW_CATEGORY_OPTION       = '#email_batch_newCategory_chosen > div > ul > li.active-result:nth-child(1)';
+    public const NEW_CATEGORY_OPTION       = '#email_batch_newCategory_chosen > div > ul > li.active-result:nth-child(2)';
     public const NEW_CATEGORY_DROPDOWN     = '#email_batch_newCategory_chosen';
     public const CHANGE_CATEGORY_ACTION    = "a[href='/s/emails/batch/categories/view']";
     public const SELECTED_ACTIONS_DROPDOWN = '#app-content > div > div.panel.panel-default.bdr-t-wdh-0.mb-0 > div.page-list > div.table-responsive > table > thead > tr > th.col-actions > div > div > button > i';
