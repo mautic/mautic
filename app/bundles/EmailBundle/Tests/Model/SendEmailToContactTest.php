@@ -117,42 +117,42 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     private $emailStatModel;
 
     /**
-     * @var MockObject&PathsHelper $pathsHelper
+     * @var MockObject&PathsHelper
      */
     private $pathsHelper;
 
     /**
-     * @var MockObject&Environment $environment
+     * @var MockObject&Environment
      */
     private $environment;
 
     /**
-     * @var MockObject&AssetModel $assetModel
+     * @var MockObject&AssetModel
      */
     private $assetModel;
 
     /**
-     * @var MockObject&ThemeHelper $themeHelper
+     * @var MockObject&ThemeHelper
      */
     private $themeHelper;
 
     /**
-     * @var MockObject&TrackableModel $trackableModel
+     * @var MockObject&TrackableModel
      */
     private $trackableModel;
 
     /**
-     * @var MockObject&RedirectModel $redirectModel
+     * @var MockObject&RedirectModel
      */
     private $redirectModel;
 
     /**
-     * @var MockObject&EntityManagerInterface $entityManager
+     * @var MockObject&EntityManagerInterface
      */
     private $entityManager;
 
     /**
-     * @var MockObject&RequestStack $requestStack
+     * @var MockObject&RequestStack
      */
     private $requestStack;
 
@@ -171,14 +171,14 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->loggerMock           = $this->createMock(LoggerInterface::class);
         $this->mailHashHelper       = new MailHashHelper($this->coreParametersHelper);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
-        $this->environment = $this->createMock(Environment::class);
-        $this->assetModel = $this->createMock(AssetModel::class);
-        $this->themeHelper = $this->createMock(ThemeHelper::class);
-        $this->trackableModel = $this->createMock(TrackableModel::class);
-        $this->redirectModel = $this->createMock(RedirectModel::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->environment          = $this->createMock(Environment::class);
+        $this->assetModel           = $this->createMock(AssetModel::class);
+        $this->themeHelper          = $this->createMock(ThemeHelper::class);
+        $this->trackableModel       = $this->createMock(TrackableModel::class);
+        $this->redirectModel        = $this->createMock(RedirectModel::class);
+        $this->entityManager        = $this->createMock(EntityManagerInterface::class);
+        $this->requestStack         = $this->createMock(RequestStack::class);
     }
 
     /**
@@ -281,8 +281,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
-        $transport = new BatchTransport(false, 1);
-        $mailer    = new Mailer($transport);
+        $transport  = new BatchTransport(false, 1);
+        $mailer     = new Mailer($transport);
         $routerMock = $this->createMock(Router::class);
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')

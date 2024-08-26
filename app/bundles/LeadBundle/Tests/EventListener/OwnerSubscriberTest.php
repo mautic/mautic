@@ -241,7 +241,6 @@ class OwnerSubscriberTest extends TestCase
                 )
             );
 
-
         $mockLeadModel->method('getRepository')->willReturn($mockLeadRepository);
 
         return $mockLeadModel;
