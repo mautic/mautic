@@ -4,7 +4,7 @@
     - integrations
 #}
 {% if integrations is empty %}
-  {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.lead.integrations.header'|trans}) }}
+  {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.lead.integrations.header'}) }}
 {% else %}
   <div class="row">
     {% for details in integrations %}
