@@ -481,7 +481,7 @@
                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                 </div>
                 {% if not upcomingEvents %}
-                    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.upcoming'|trans}) }}
+                    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.upcoming'}) }}
                 {% endif %}
                 <div class="panel-body pt-sm">
                     <ul class="media-list media-list-feed">
