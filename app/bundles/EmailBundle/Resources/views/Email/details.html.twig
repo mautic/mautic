@@ -83,7 +83,10 @@
 
 {% block publishStatus %}
   {% if not isEmbedded %}
-    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : email}) -}}
+  {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+    'entity': email,
+    'status': 'available'
+}) -}}
   {% endif %}
 {% endblock %}
 

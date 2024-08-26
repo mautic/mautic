@@ -14,7 +14,10 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -923,6 +926,49 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         Assert::assertStringContainsString('Company B', $content);
         Assert::assertStringNotContainsString('Company A', $content);
+    }
+
+    public function testBatchDncIsNotUpdatingLeadEntities(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $this->em->persist($contact);
+        $this->em->flush();
+        $this->em->clear();
+
+        $payload = [
+            'lead_batch_dnc' => [
+                'reason' => 'Test Reason',
+                'ids'    => json_encode([$contact->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDnc', $payload, [], $this->createAjaxHeaders());
+
+        $clientResponse = $this->client->getResponse();
+
+        Assert::assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        Assert::assertStringContainsString('1 contact affected', $clientResponse->getContent());
+
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        \assert($dncRepository instanceof DoNotContactRepository);
+
+        $contactRepository = $this->em->getRepository(Lead::class);
+        \assert($contactRepository instanceof LeadRepository);
+
+        $dnc = $dncRepository->findOneBy(['lead' => $contact]);
+        \assert($dnc instanceof DoNotContact);
+
+        $fetchedContact = $contactRepository->find($contact->getId());
+        \assert($fetchedContact instanceof Lead);
+
+        // Ensure the DNC recored was created.
+        Assert::assertSame(DoNotContact::MANUAL, $dnc->getReason());
+        Assert::assertSame('Test Reason', $dnc->getComments());
+        Assert::assertSame($contact->getId(), $dnc->getLead()->getId());
+
+        // Ensure the dateModified is still empty. Meaning the lead record was not updated which is correct.
+        Assert::assertNull($fetchedContact->getDateModified());
     }
 
     public function testAuditLogBatchExportContact(): void
