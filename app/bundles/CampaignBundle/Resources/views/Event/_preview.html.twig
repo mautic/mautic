@@ -26,7 +26,7 @@ data-event-id="{{ event['id'] }}">
     <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-        <span class="campaign-event-name label ml-5 mr-lg ellipsis">
+        <span class="campaign-event-name label label-info ml-5 mr-lg ellipsis">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
         </span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ml-a campaign-event-icon event-type-color"></i>
@@ -37,7 +37,7 @@ data-event-id="{{ event['id'] }}">
             <div class="campaign-event-icon pa-sm mr-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
             <div class="d-flex fd-column ai-start">
                 <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-                <span class="campaign-event-name label label-primary ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span>
+                <span class="campaign-event-name ellipsis">{% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}</span>
             </div>
         </div>
 
@@ -45,7 +45,7 @@ data-event-id="{{ event['id'] }}">
     <div class="campaign-event-content fw-nowrap gap-xs ai-center fd-row d-flex fg-1">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
-            <span class="campaign-event-name label ml-5 mr-lg ellipsis">
+            <span class="campaign-event-name label label-warning ml-5 mr-lg ellipsis">
             {% if ('dev' == constant('MAUTIC_ENV')) %}<small>{{ event['id'] }}</small> {% endif %}{{ event['name'] }}
             </span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ml-a campaign-event-icon event-type-color"></i>

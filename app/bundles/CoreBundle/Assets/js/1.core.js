@@ -57,9 +57,10 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
+    initializeCodeBlocks();
 });
 
-mQuery( document ).ready(function() {
+mQuery(document).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -82,7 +83,32 @@ mQuery( document ).ready(function() {
                 });
         }
     }, mauticSessionLifetime * 1000 / 2);
+
+    // Copy code block on click
+    mQuery(document).on('click', 'code', function() {
+        var $codeBlock = mQuery(this);
+        var $icon = $codeBlock.find('.copy-icon');
+        var $temp = mQuery('<textarea>');
+        mQuery('body').append($temp);
+        $temp.val($codeBlock.text()).select();
+        document.execCommand('copy');
+        $temp.remove();
+        $icon.removeClass('ri-clipboard-fill').addClass('ri-check-line');
+        setTimeout(function() {
+            $icon.removeClass('ri-check-line').addClass('ri-clipboard-fill');
+        }, 2000);
+    });
+    initializeCodeBlocks();
 });
+
+function initializeCodeBlocks() {
+    mQuery('code').each(function() {
+        var $codeBlock = mQuery(this);
+        if (!$codeBlock.find('.copy-icon').length) {
+            $codeBlock.append('<i class="ri-clipboard-fill ml-xs copy-icon"></i>');
+        }
+    });
+}
 
 if (typeof history != 'undefined') {
     //back/forward button pressed
@@ -164,7 +190,7 @@ var Mautic = {
             var modalWindow = mQuery('#keyboardShortcutsModal');
             modalWindow.modal();
         });
-        
+
     },
 
     /**
@@ -257,7 +283,7 @@ var Mautic = {
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
         if (!button.find('.ri-loader-3-line.ri-spin').length) {
-            button.append(mQuery('<i class="ri-loader-3-line ri-spin"></i>'));
+            button.append(mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>'));
         }
     },
 
@@ -278,7 +304,7 @@ var Mautic = {
      */
     activateLabelLoadingIndicator: function (el) {
         var labelSpinner = mQuery("label[for='" + el + "']");
-        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin"></i>');
+        Mautic.labelSpinner = mQuery('<i class="ri-loader-3-line ri-spin ri-fw"></i>');
         labelSpinner.append(Mautic.labelSpinner);
     },
 
