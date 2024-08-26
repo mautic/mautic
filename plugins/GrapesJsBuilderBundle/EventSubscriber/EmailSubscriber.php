@@ -46,7 +46,7 @@ class EmailSubscriber implements EventSubscriberInterface
 
         $email = $event->getEmail();
 
-        $this->existingHtml = $email->getCustomHtml();
+        $this->existingHtml = $email->getCustomHtml() ?? '';
 
         if ($grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $email])) {
             $this->existingMjml = $grapesJsBuilder->getCustomMjml();
