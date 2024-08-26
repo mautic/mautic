@@ -1451,9 +1451,8 @@ class MailHelper
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $parser  = new PlainTextHelper([
-            'base_url' => $request->getSchemeAndHttpHost().$request->getBasePath(),
-        ]);
+        $baseUrl = $request ? $request->getSchemeAndHttpHost().$request->getBasePath() : $this->coreParametersHelper->get('site_url');
+        $parser  = new PlainTextHelper(['base_url' => $baseUrl]);
 
         $this->plainText = $parser->setHtml($content)->getText();
     }
