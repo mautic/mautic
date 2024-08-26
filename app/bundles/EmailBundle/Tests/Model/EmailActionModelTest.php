@@ -63,12 +63,7 @@ class EmailActionModelTest extends TestCase
         $this->configurePermissionToAllowEdition(true);
         $this->configureModelToSave($emails);
 
-        $this
-            ->emailActionModel
-            ->setCategory(
-                array_map(fn (Email $email) => $email->getId(), $emails),
-                $newCategory
-            );
+        $this->tryToSetCategory($emails, $newCategory);
 
         foreach ($emails as $email) {
             $this->assertEquals($email->getCategory(), $newCategory);
@@ -89,13 +84,7 @@ class EmailActionModelTest extends TestCase
         $emails = $this->buildEmailsWithCategory($oldCategory, 5);
         $this->configureRepositoryToReturn($emails);
         $this->configurePermissionToAllowEdition(false);
-
-        $this
-            ->emailActionModel
-            ->setCategory(
-                array_map(fn (Email $email) => $email->getId(), $emails),
-                $newCategory
-            );
+        $this->tryToSetCategory($emails, $newCategory);
 
         foreach ($emails as $email) {
             $this->assertEquals($email->getCategory(), $oldCategory);
@@ -145,5 +134,15 @@ class EmailActionModelTest extends TestCase
             ->expects($this->once())
             ->method('saveEntities')
             ->with($emails);
+    }
+
+    protected function tryToSetCategory(array $emails, Category $newCategory): void
+    {
+        $this
+            ->emailActionModel
+            ->setCategory(
+                array_map(fn (Email $email) => $email->getId(), $emails),
+                $newCategory
+            );
     }
 }
