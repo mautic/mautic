@@ -86,6 +86,7 @@ body {
 }
 body {
   overflow-y: scroll;
+  cursor: default;
   background-color: var(--background);
 }
 body > #app-wrapper {
