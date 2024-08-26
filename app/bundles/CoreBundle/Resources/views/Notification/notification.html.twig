@@ -11,5 +11,11 @@
         {% endif %}
         <div class="text-muted">{{ format(n.message, 'html') }}</div>
     </div>
-    <a href="javascript:void(0);" class="btn btn-ghost btn-icon btn-sm close btn-nospin pull-right do-not-close" data-toggle="tooltip" title="{% trans %}mautic.core.notifications.clear{% endtrans %}" onclick="Mautic.clearNotification({{ n.id }});"><i class="ri-close-line do-not-close"></i></a>
+    <a href="javascript:void(0);" 
+       class="btn btn-ghost btn-icon btn-sm close btn-nospin pull-right do-not-close" 
+       data-toggle="tooltip" 
+       title="{{ 'mautic.core.notifications.clear'|trans }}" 
+       onclick="Mautic.clearNotification({{ n.id }});">
+        <i class="ri-close-line do-not-close"></i>
+    </a>
 </div>
