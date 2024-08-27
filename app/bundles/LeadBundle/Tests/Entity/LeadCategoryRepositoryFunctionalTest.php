@@ -23,7 +23,7 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @var array<string, bool>
      */
-    private $categoryFlags = [
+    private array $categoryFlags = [
         'one'   => true,
         'two'   => false,
         'three' => true,
@@ -197,6 +197,7 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->em->flush();
+        $this->em->clear();
     }
 
     private function getContactFrequencyCrawler(Lead $lead): Crawler
