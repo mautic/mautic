@@ -72,7 +72,12 @@
                                 <select class="chosen form-control" id="available_segment_filters">
                                     <option value=""></option>
                                     {% for object, field in form.vars.fields %}
-                                      {% set icon = 'company' == object ? 'building' : 'user' %}
+                                      {% set icon = '' %}
+                                      {% if object == 'company' %}
+                                        {% set icon = 'building' %}
+                                      {% elseif object == 'lead' %}
+                                        {% set icon = 'user' %}
+                                      {% endif %}
                                       {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
                                       <optgroup label="{{ header }}">
                                           {% for value, params in field %}
