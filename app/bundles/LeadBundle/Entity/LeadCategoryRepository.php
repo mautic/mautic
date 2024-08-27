@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -94,7 +96,7 @@ class LeadCategoryRepository extends CommonRepository
         $parentQ->where('c.isPublished = :isPublished');
         $parentQ->setParameter('isPublished', 1);
         $parentQ->andWhere($parentQ->expr()->in('c.bundle', ':bundles'));
-        $parentQ->setParameter('bundles', $types, Connection::PARAM_STR_ARRAY);
+        $parentQ->setParameter('bundles', $types, ArrayParameterType::STRING);
 
         // Get the category ids for particular lead
         $subQ = $this->getEntityManager()->getRepository(LeadCategory::class)->createQueryBuilder('lc');
