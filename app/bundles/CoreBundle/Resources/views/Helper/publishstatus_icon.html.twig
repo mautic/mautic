@@ -92,7 +92,7 @@
 
 {%- set dataAttributes = allDataAttrs|map((v, k) => '%s="%s"'|format(k, v))|join(' ') %}
 
-<i class="fa fa-fw {{ size }} {{ icon }} {{ clickAction }} {{ idClass }} toggle-publish-status"
+<i class="ri-fw {{ size }} {{ icon }} {{ clickAction }} {{ idClass }} toggle-publish-status"
    title="{{ text }}"
    {{ dataAttributes|raw }}
    {% if disableToggle is not defined or (disableToggle is defined and disableToggle is empty) %}onclick="{{ onclick|raw }}"{% endif %}></i>

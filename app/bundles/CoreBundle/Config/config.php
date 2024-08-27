@@ -121,16 +121,20 @@ return [
             ],
         ],
         'admin' => [
+            'mautic.core.general' => [
+                'id'        => 'mautic_general_root',
+                'priority'  => 15,
+            ],
             'mautic.theme.menu.index' => [
                 'route'     => 'mautic_themes_index',
-                'iconClass' => 'ri-pantone-fill',
+                'iconClass' => 'ri-pantone-line',
                 'id'        => 'mautic_themes_index',
                 'access'    => 'core:themes:view',
+                'parent'    => 'mautic.core.general',
                 'priority'  => 18,
             ],
             'mautic.core.integrations' => [
                 'id'        => 'mautic_integrations_root',
-                'iconClass' => 'ri-plug-fill',
                 'priority'  => 15,
             ],
         ],

@@ -38,7 +38,12 @@
     }) }}
 {% endblock %}
 
-{% block publishStatus %}{{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activePage}) }}{% endblock %}
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activePage,
+        'status': 'available'
+    }) -}}
+{% endblock %}
 
 {% block content %}
   {% set variantContent = include('@MauticCore/Variant/index.html.twig', {

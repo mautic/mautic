@@ -216,11 +216,11 @@
                     </td>
                     <td class="text-center">
                         {% if contact.stage %}
-                          <span class="label label-default" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.stage.name|purify }}</span>
+                          <span size="sm" class="label label-gray" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.stage.name|purify }}</span>
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg text-center">
-                        <span class="label label-default" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.points }}</span>
+                        <span size="sm" class="label label-gray" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.points }}</span>
                     </td>
                     <td class="visible-md visible-lg">
                         <abbr title="{{ dateToFull(contact.lastActive)|e }}">

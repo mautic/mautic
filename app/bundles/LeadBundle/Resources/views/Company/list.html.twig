@@ -45,7 +45,7 @@
 
 {% block content %}
   {% if isIndex %}
-    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <div id="page-list-wrapper">
         {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'searchHelp': 'mautic.core.help.searchcommands',
@@ -134,9 +134,7 @@
                       </td>
                       <td>
                           {% if fields.core.companyemail is defined %}
-                            <div class="text-muted mt-4">
-                                <small>{{ fields.core.companyemail.value|purify }}</small>
-                            </div>
+                            {{ fields.core.companyemail.value|purify }}
                           {% endif %}
                       </td>
 
@@ -146,10 +144,10 @@
                           {% endif %}
                       </td>
                       <td class="visible-md visible-lg">
-                          {{ item.score }}
+                          <span size="sm" class="label label-gray">{{ item.score }}</span>
                       </td>
                       <td class="visible-md visible-lg">
-                          <a class="label label-primary"
+                          <a size="sm" class="label label-gray"
                              href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans~':'~item.id}) }}"
                              data-toggle="ajax"
                              {% if 0 == leadCounts[item.id] %}disabled="disabled"{% endif %}>
