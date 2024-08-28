@@ -16,16 +16,16 @@ class SegmentFilterExtension extends AbstractExtension
         ];
     }
 
-    public function getSegmentFilterIcon(string $filterType, string $objectType = ''): string
+    public function getSegmentFilterIcon(string $filterType): string
     {
-        $icon = match ($filterType) {
+        return match ($filterType) {
             // lead
             'address1'               => 'ri-home-2-line',
             'address2'               => 'ri-home-3-line',
             'attribution'            => 'ri-cash-line',
             'attribution_date'       => 'ri-calendar-event-line',
             'dnc_bounced'            => 'ri-mail-close-line',
-            'dnc_bounced_sms'        => 'chat-delete-line',
+            'dnc_bounced_sms'        => 'ri-chat-delete-line',
             'campaign'               => 'ri-megaphone-line',
             'city'                   => 'ri-building-2-line',
             'country'                => 'ri-earth-line',
@@ -114,16 +114,6 @@ class SegmentFilterExtension extends AbstractExtension
             'url_title'               => 'ri-external-link-line',
             'lead_email_sent'         => 'ri-mail-send-line',
             default                   => 'ri-shapes-line',
-        };
-
-        if ($icon) {
-            return $icon;
-        }
-
-        return match ($objectType) {
-            'company'  => 'ri-building-2-line',
-            'lead'     => 'ri-user-6-fill',
-            default    => '',
         };
     }
 }
