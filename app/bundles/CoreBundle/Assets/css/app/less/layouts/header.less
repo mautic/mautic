@@ -3,11 +3,6 @@
 // --------------------------------------------------
 
 // animate `app-header` on sidebar-left opened
-.csstransforms3d.sidebar-open-ltr {
-  #app-header.navbar {
-    .translate3d(@sidebar-left-width, 0, 0);
-  }
-}
 .no-csstransforms3d.sidebar-open-ltr {
   #app-header.navbar {
     left: @sidebar-left-width;
@@ -92,6 +87,19 @@
       //position: relative;
       float: left;
       margin: 0;
+      display: flex;
+      align-items: center;
+
+      > .mautic-brand > .mautic-logo-text {
+        opacity: 1;
+        margin-left: 3px;
+        position: absolute;
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+      }
+      > .mautic-brand {
+        .transition(padding-left .3s ease);
+      }
 
       > li {
         float: left;
