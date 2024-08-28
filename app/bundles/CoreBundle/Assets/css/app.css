@@ -1482,6 +1482,13 @@ kbd {
   line-height: 0.5em;
   top: 0.15em;
 }
+.alert:has(.btn) {
+  align-items: center;
+}
+.nav-tabs-contained + .tab-content .alert,
+.nav-tabs-contained + * > .tab-content .alert {
+  background-color: var(--layer-alternate);
+}
 .alert-success {
   border-color: var(--support-success);
 }
@@ -5321,8 +5328,22 @@ lesshat-selector { -lh-property: 0 ;
 .csr-move {
   cursor: move !important;
 }
-.ma-0,
-.nm {
+.ma-a {
+  margin: auto !important;
+}
+.mr-a {
+  margin-right: auto !important;
+}
+.mt-a {
+  margin-top: auto !important;
+}
+.mb-a {
+  margin-bottom: auto !important;
+}
+.ml-a {
+  margin-left: auto !important;
+}
+.ma-0 {
   margin: 0px !important;
 }
 .mr-0 {
