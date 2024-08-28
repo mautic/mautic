@@ -660,11 +660,6 @@ Mautic.addLeadListFilter = function (elId, elObj) {
         prototype.find(".panel-heading").addClass('hide');
     }
 
-    if (fieldObject === 'company') {
-        prototype.find(".object-icon").removeClass('ri-user-6-fill').addClass('ri-building-2-line');
-    } else if (fieldObject === 'lead') {
-        prototype.find(".object-icon").removeClass('ri-building-2-line').addClass('ri-user-6-fill');
-    }
     prototype.find(".inline-spacer").append(fieldObject);
 
     prototype.find("a.remove-selected").on('click', function() {

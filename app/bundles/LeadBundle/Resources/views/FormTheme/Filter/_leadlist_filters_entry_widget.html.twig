@@ -10,19 +10,10 @@
   {% set inGroup = form.vars.data is defined and form.vars.data.glue is defined and 'and' == form.vars.data.glue %}
   {% set isBehavior = fields.behaviors[filterType].label is defined %}
 
-  {% set class = '' %}
-  {% if form.vars.data.object is defined %}
-    {% if form.vars.data.object == 'company' %}
-      {% set class = 'ri-building-2-line' %}
-    {% elseif form.vars.data.object == 'lead' %}
-      {% set class = 'ri-user-6-fill' %}
-    {% endif %}
-  {% endif %}
-
   {% if isBehavior %}
       {% set object = 'behaviors' %}
   {% else %}
-      {% set object = (form.vars.data.object is defined) ? form.vars.data.object : 'lead' %}
+      {% set object = form.vars.data.object|default('lead') %}
   {% endif %}
 
   {% if isPrototype or fields[object][filterType].label is defined %}
@@ -34,7 +25,7 @@
         </div>
         <div class="panel-body">
             <div class="col-xs-6 col-sm-3 field-name">
-                <span><i class="object-icon {{ class }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+                <span><i class="object-icon {{ getSegmentFilterIcon(filterType, object) }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
             </div>
 
             <div class="col-xs-6 col-sm-3 padding-none">
