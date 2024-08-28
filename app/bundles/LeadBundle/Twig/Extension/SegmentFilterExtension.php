@@ -18,7 +18,7 @@ class SegmentFilterExtension extends AbstractExtension
 
     public function getSegmentFilterIcon(string $filterType, string $objectType = ''): string
     {
-        $icon =  match ($filterType) {
+        $icon = match ($filterType) {
             // lead
             'address1'               => '',
             'address2'               => '',
@@ -116,7 +116,7 @@ class SegmentFilterExtension extends AbstractExtension
             default                   => '',
         };
 
-        if (!empty($icon)) {
+        if ('' !== $icon) {
             return $icon;
         }
 
