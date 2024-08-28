@@ -34,6 +34,11 @@ return [
                 'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
                 'method'     => 'GET',
             ],
+            RouteProvider::ROUTE_RATE_PACKAGE => [
+                'path'       => '/marketplace/rate/package',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\RatingController::rateAction',
+                'method'     => 'GET',
+            ],
         ],
     ],
     'services' => [
