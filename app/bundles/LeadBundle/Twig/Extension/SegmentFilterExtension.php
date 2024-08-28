@@ -116,7 +116,7 @@ class SegmentFilterExtension extends AbstractExtension
             default                   => '',
         };
 
-        if ('' !== $icon) {
+        if ($icon) {
             return $icon;
         }
 
