@@ -4,7 +4,6 @@
         <div class="chart-wrapper">
             <div class="pt-sd pr-md pb-md pl-md">
                 <div {% if chartHeight is defined %} style="height: calc({{ chartHeight }}px - 15px)" {% endif %}>
-                    {% if  chartType is defined %}" {% endif %}>
                     <canvas class="chart {{ chartType }}-chart" {{ disableLegend is defined ? 'data-disable-legend' : '' }}>
                         {{ chartData|json_encode }}
                     </canvas>
