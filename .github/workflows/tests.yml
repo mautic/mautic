@@ -135,31 +135,14 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Install PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 8.1
-        extensions: curl, mbstring, openssl, pdo, pdo_sqlite
-        ini-values: memory_limit=-1, date.timezone='UTC'
-        coverage: xdebug
-        tools: composer:v2
-
-    - name: Validate composer.json and composer.lock
-      run: composer validate
+    - name: Set up environment variables for test mode
+      run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
 
     - name: Setup DDEV
       uses: ddev/github-action-setup-ddev@v1
 
-    - name: Install Dependencies
-      run: ddev composer install
 
-    - name: Set up environment variables for test mode
-      run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
-
-    - name: Start DDEV
-      run: ddev start
-
-    - name: Run E2E tests as non-root user
+    - name: Run E2E tests
       run: ddev exec bin/codecept run acceptance
 
   misc:
