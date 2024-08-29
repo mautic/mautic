@@ -18,5 +18,7 @@
     {% endfor %}
 </ul>
 {% else %}
-    {{ 'mautic.campaign.lead.notfound'|trans }}
+{{ include('@MauticCore/Helper/no_information.html.twig', {
+    'tip': 'mautic.campaign.lead.notfound'
+}) }}
 {% endif %}

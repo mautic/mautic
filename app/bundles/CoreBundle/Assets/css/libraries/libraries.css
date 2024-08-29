@@ -17568,6 +17568,7 @@ a > .fa {
 .chosen-disabled {
   cursor: default;
   opacity: 0.5 !important;
+  pointer-events: none;
 }
 .chosen-disabled .chosen-single {
   cursor: default;

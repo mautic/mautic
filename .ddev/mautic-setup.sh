@@ -26,6 +26,7 @@ setup_mautic() {
     printf "🌐 To open PHPMyAdmin for managing the database, go to ${PHPMYADMIN_URL} in your browser.\n"
     printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to ${MAILHOG_URL} in your browser.\n"
     printf "🚀 Run \"ddev exec composer test\" to run PHPUnit tests.\n"
+    printf "🚀 Run \"ddev exec composer e2e-test\" to run End-to-End Test Suite.\n"
     printf "🚀 Run \"ddev exec bin/console COMMAND\" (like mautic:segments:update) to use the Mautic CLI. For an overview of all available CLI commands, go to https://mau.tc/cli\n"
     printf "🔴 If you want to stop the instance, simply run \"ddev stop\".\n"
     tput sgr0
