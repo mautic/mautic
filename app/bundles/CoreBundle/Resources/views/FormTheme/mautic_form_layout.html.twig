@@ -500,7 +500,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {% endif %}
 
 {% set attr = attr|merge({'style' : 'width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;'}) %}
-<div class="btn-group btn-block" data-toggle="buttons">
+<div class="btn-group btn-block" data-toggle="buttons" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
     {% for child in form %}
         {% set class =
             (child.vars.checked is not empty ? ' active' : '') ~

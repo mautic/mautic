@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -18,15 +22,21 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -286,6 +296,36 @@ CONTENT,
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+        /** @var MockObject&EventDispatcherInterface $dispatcher */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        /** @var MockObject&PathsHelper $pathsHelper */
+        $pathsHelper = $this->createMock(PathsHelper::class);
+
+        /** @var MockObject&Environment $environment */
+        $environment = $this->createMock(Environment::class);
+
+        /** @var MockObject&AssetModel $assetModel */
+        $assetModel = $this->createMock(AssetModel::class);
+
+        /** @var MockObject&ThemeHelper $themeHelper */
+        $themeHelper = $this->createMock(ThemeHelper::class);
+
+        /** @var MockObject&TrackableModel $trackableModel */
+        $trackableModel = $this->createMock(TrackableModel::class);
+
+        /** @var MockObject&RedirectModel $redirectModel */
+        $redirectModel = $this->createMock(RedirectModel::class);
+
+        /** @var MockObject&EntityManagerInterface $entityManager */
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+
+        /** @var MockObject&RequestStack $requestStack */
+        $requestStack = $this->createMock(RequestStack::class);
+
+        /** @var MockObject&EmailStatModel $emailStatModel */
+        $emailStatModel = $this->createMock(EmailStatModel::class);
+
         $coreParametersHelper->method('get')
             ->willReturnMap(
                 [
@@ -293,9 +333,8 @@ CONTENT,
                     ['mailer_from_name', null, 'No Body'],
                 ]
             );
-        $mockFactory = $this->createMock(MauticFactory::class); /** @phpstan-ignore-line MauticFactory is deprecated */
         $mailer      = new Mailer(new BatchTransport());
-        $mailHelper  = new MailHelper($mockFactory, $mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, new NullLogger(), new MailHashHelper($coreParametersHelper), $router);
+        $mailHelper  = new MailHelper($mailer, $fromEmailHelper, $coreParametersHelper, $mailbox, new NullLogger(), new MailHashHelper($coreParametersHelper), $router, $dispatcher, $pathsHelper, $environment, $assetModel, $themeHelper, $trackableModel, $redirectModel, $entityManager, $requestStack, $emailStatModel, new SlotsHelper());
 
         $email = new Email();
         $email->setCustomHtml($html);

@@ -27,6 +27,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -121,25 +122,14 @@ class PublicController extends CommonFormController
         $session               = $request->getSession();
         $isOneClickUnsubscribe = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
 
-        if (!empty($stat)) {
-            if ($isOneClickUnsubscribe) {
-                // RFC 8058 One-Click unsubscribe
-                $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
-                $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
-
-                return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
-            }
-
-            $email = $stat->getEmail();
+        if ($request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe')) {
+            return $this->oneClickUnsubscribe($model, $stat);
         }
 
-        $isCorrectHash = $secretHash && $urlEmail && $mailHash->getEmailHash($urlEmail) === $secretHash;
-
-        if ($email) {
+        if (!empty($stat) && $email = $stat->getEmail()) {
             $template = $email->getTemplate();
             if ('mautic_code_mode' === $template) {
-                // Use system default
-                $template = null;
+                $template = null; // Use system default
             }
 
             /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
@@ -165,9 +155,9 @@ class PublicController extends CommonFormController
             $template = $theme->getTheme();
         }
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
+        $isCorrectHash   = $secretHash && $urlEmail && $mailHash->getEmailHash($urlEmail) === $secretHash;
         if (!empty($stat) || $isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
-
             if (!empty($stat) && $lead = $stat->getLead()) {
                 // Set the lead as current lead
                 $contactTracker->setTrackedContact($lead);
@@ -204,22 +194,14 @@ class PublicController extends CommonFormController
                     $params['secretHash'] = $mailHash->getEmailHash($urlEmail);
                 }
 
-                $action         = $this->generateUrl('mautic_email_unsubscribe', $params);
-                $viewParameters = [
-                    'lead'                         => $lead,
-                    'idHash'                       => $idHash,
-                    'showContactFrequency'         => $this->coreParametersHelper->get('show_contact_frequency'),
-                    'showContactPauseDates'        => $this->coreParametersHelper->get('show_contact_pause_dates'),
-                    'showContactPreferredChannels' => $this->coreParametersHelper->get('show_contact_preferred_channels'),
-                    'showContactCategories'        => $this->coreParametersHelper->get('show_contact_categories'),
-                    'showContactSegments'          => $this->coreParametersHelper->get('show_contact_segments'),
-                ];
+                $action          = $this->generateUrl('mautic_email_unsubscribe', $params);
+                $viewParameters  = $this->getViewParams($lead, $idHash);
+                $form            = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
 
                 if ($session->get($successSessionName)) {
                     $viewParameters['successMessage'] = $this->translator->trans('mautic.email.preferences_center_success_message.text');
                 }
 
-                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
                 if (true === $form) {
                     $session->set($successSessionName, 1);
 
@@ -236,6 +218,7 @@ class PublicController extends CommonFormController
                 }
 
                 $formView = $form->createView();
+
                 /** @var Page $prefCenter */
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
                     $html = $prefCenter->getCustomHtml();
@@ -269,11 +252,7 @@ class PublicController extends CommonFormController
                             foreach ($successMessageDataSlots as $successMessageDataSlot) {
                                 $successMessageDataSlotsHidden[] = $successMessageDataSlot.' style=display:none';
                             }
-                            $html = str_replace(
-                                $successMessageDataSlots,
-                                $successMessageDataSlotsHidden,
-                                $html
-                            );
+                            $html = str_replace($successMessageDataSlots, $successMessageDataSlotsHidden, $html);
                         } else {
                             $session->remove($successSessionName);
                         }
@@ -289,22 +268,7 @@ class PublicController extends CommonFormController
                 }
 
                 if (empty($html)) {
-                    $html = $this->render(
-                        '@MauticEmail/Lead/preference_options.html.twig',
-                        array_merge(
-                            $viewParameters,
-                            [
-                                'form'         => $formView,
-                                'currentRoute' => $this->generateUrl(
-                                    'mautic_contact_action',
-                                    [
-                                        'objectAction' => 'contactFrequency',
-                                        'objectId'     => $lead->getId(),
-                                    ]
-                                ),
-                            ]
-                        )
-                    )->getContent();
+                    $html = $this->getHtml($formView, $lead, $viewParameters);
                 }
                 $message = $html;
             }
@@ -805,5 +769,59 @@ class PublicController extends CommonFormController
         $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
 
         return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
+    }
+
+    private function oneClickUnsubscribe(EmailModel $model, ?Stat $stat): Response
+    {
+        if (!$stat) {
+            $statsNotFount = $this->translator->trans('mautic.email.stat_record.not_found');
+
+            return new Response($statsNotFount, Response::HTTP_NOT_FOUND);
+        }
+
+        // RFC 8058 One-Click unsubscribe
+        $unsubscribeComment = $this->translator->trans('mautic.email.dnc.unsubscribed');
+        $model->setDoNotContact($stat, $unsubscribeComment, DoNotContact::UNSUBSCRIBED);
+
+        return new Response($this->translator->trans('mautic.lead.do.not.contact_unsubscribed'));
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getViewParams(Lead $lead, string $idHash): array
+    {
+        return [
+            'lead'                         => $lead,
+            'idHash'                       => $idHash,
+            'showContactFrequency'         => $this->coreParametersHelper->get('show_contact_frequency'),
+            'showContactPauseDates'        => $this->coreParametersHelper->get('show_contact_pause_dates'),
+            'showContactPreferredChannels' => $this->coreParametersHelper->get('show_contact_preferred_channels'),
+            'showContactCategories'        => $this->coreParametersHelper->get('show_contact_categories'),
+            'showContactSegments'          => $this->coreParametersHelper->get('show_contact_segments'),
+        ];
+    }
+
+    /**
+     * @param array<mixed> $viewParameters
+     */
+    private function getHtml(FormView $formView, Lead $lead, array $viewParameters): string
+    {
+        return $this->render(
+            '@MauticEmail/Lead/preference_options.html.twig',
+            array_merge(
+                $viewParameters,
+                [
+                    'form'         => $formView,
+                    'currentRoute' => $this->generateUrl(
+                        'mautic_contact_action',
+                        [
+                            'objectAction' => 'contactFrequency',
+                            'objectId'     => $lead->getId(),
+                        ]
+                    ),
+                ]
+            )
+        )->getContent();
     }
 }

@@ -31,6 +31,7 @@
             </div>
             <div class="row">
                 {{ _self.row_if_exists(fields, 'mailer_is_owner') }}
+                {{ _self.row_if_exists(fields, 'disable_unsubscribe_link_header') }}
                 {{ _self.row_if_exists(fields, 'mailer_custom_headers') }}
             </div>
         </div>

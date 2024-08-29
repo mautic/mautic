@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -14,12 +15,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Unsubscribe
+     * @var MockObject&Unsubscribe
      */
     private MockObject $unsubscribe;
 
     /**
-     * @var MockObject|FeedbackLoop
+     * @var MockObject&FeedbackLoop
      */
     private MockObject $feedbackLoop;
 
@@ -31,7 +32,7 @@ final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->unsubscribe      = $this->createMock(Unsubscribe::class);
         $this->feedbackLoop     = $this->createMock(FeedbackLoop::class);
-        $this->subscriber       = new ProcessUnsubscribeSubscriber($this->unsubscribe, $this->feedbackLoop);
+        $this->subscriber       = new ProcessUnsubscribeSubscriber($this->unsubscribe, $this->feedbackLoop, $this->createMock(CoreParametersHelper::class));
     }
 
     public function testOnEmailSend(): void
@@ -43,9 +44,12 @@ final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
             'List-Unsubscribe'      => '<https://example.com/email/unsubscribe/65cf64d8cb367903848157>',
         ]);
 
-        $helper->expects($this->once())
+        $helper->expects($this->exactly(2))
             ->method('addCustomHeader')
-            ->with('List-Unsubscribe', '<https://example.com/email/unsubscribe/65cf64d8cb367903848157>, <mailto:unsubscribe@example.com>');
+            ->withConsecutive(
+                ['List-Unsubscribe', '<https://example.com/email/unsubscribe/65cf64d8cb367903848157>, <mailto:unsubscribe@example.com>'],
+                ['List-Unsubscribe-Post', 'List-Unsubscribe=One-Click']
+            );
 
         $event = new EmailSendEvent($helper);
         $this->subscriber->onEmailSend($event);
