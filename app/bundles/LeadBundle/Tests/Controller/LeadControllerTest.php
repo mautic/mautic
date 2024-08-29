@@ -936,14 +936,18 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $payload = [
-            'lead_batch_dnc' => [
-                'reason' => 'Test Reason',
-                'ids'    => json_encode([$contact->getId()]),
-            ],
-        ];
-
-        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDnc', $payload, [], $this->createAjaxHeaders());
+        $this->client->request(Request::METHOD_GET, '/s/contacts/batchDnc', [], [], $this->createAjaxHeaders());
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
+        $form    = $crawler->selectButton('Save')->form();
+        $form->setValues(
+            [
+                'lead_batch_dnc[reason]' => 'Test Reason',
+                'lead_batch_dnc[ids]'    => json_encode([$contact->getId()]),
+            ]
+        );
+        $crawler = $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $clientResponse = $this->client->getResponse();
 

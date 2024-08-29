@@ -5,10 +5,12 @@
     - socialProfileUrls
 #}
 {% if socialProfiles is empty %}
-  <div class="alert alert-warning col-md-6 col-md-offset-3 mt-md">
-      <h4>{{ 'mautic.lead.socialprofiles.header'|trans }}</h4>
-      <p><a href="javascript: void(0);" onclick="Mautic.refreshLeadSocialProfile('', {{ lead.id }}, event);">{{ 'mautic.lead.socialprofiles.noresults'|trans }}</a></p>
-  </div>
+{{ include('@MauticCore/Helper/no_information.html.twig', {
+    'tip': 'mautic.lead.socialprofiles.header',
+    'link': 'mautic.lead.socialprofiles.noresults',
+    'href': 'javascript: void(0);',
+    'onclick': "Mautic.refreshLeadSocialProfile('', {{ lead.id }}, event);"
+}) }}
 {% else %}
   <div class="row">
   {% for integrationName, details in socialProfiles %}

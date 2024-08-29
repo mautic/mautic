@@ -48,7 +48,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
     // Create the defaults once
     // ================================
     var pluginName  = "Core",
-        isMinimize  = false,
         isScreenlg  = false,
         isScreenmd  = false,
         isScreensm  = false,
@@ -134,9 +133,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = false;
                     isScreensm  = false;
                     isScreenxs  = false;
-
-                    // reset sidebar minimize
-                    isMinimize = !!$(element).hasClass("sidebar-minimized");
                 }
 
                 // screen-md
@@ -145,9 +141,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = true;
                     isScreensm  = false;
                     isScreenxs  = false;
-
-                    // reset sidebar minimize
-                    isMinimize = !!$(element).hasClass("sidebar-minimized");
                 }
 
                 // screen-sm
@@ -156,9 +149,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = false;
                     isScreensm  = true;
                     isScreenxs  = false;
-
-                    // reset sidebar minimize
-                    isMinimize = false;
                 }
 
                 // screen-xs
@@ -167,9 +157,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     isScreenmd  = false;
                     isScreensm  = false;
                     isScreenxs  = true;
-
-                    // reset sidebar minimize
-                    isMinimize = false;
                 }
             });
         },
@@ -613,51 +600,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 MAIN.prototype.HELPER.Console(settings.eventPrefix+".panelremove.remove");
             })();
 
-            // @PLUGIN: SidebarMinimize
-            // Self invoking
-            // ================================
-            (function () {
-                // define variable
-                var minimizeHandler = "[data-toggle~=minimize]";
-
-                // core minimize function
-                function toggleMinimize (e) {
-                    var backgroundImage = /^url\(.+$/.test($('.mautic-brand').css('background-image'));
-
-                    // toggle class
-                    if($(element).hasClass("sidebar-minimized")) {
-                        isMinimize = false;
-                        $(element).removeClass("sidebar-minimized");
-                        $(this).removeClass("active");
-                        if (backgroundImage) {
-                            $('.mautic-brand, .sidebar-header').removeClass('minimized');
-                        }
-
-                        // publish event
-                        $(element).trigger(settings.eventPrefix+".sidebar.maximize", { "element": $(element) });
-                    } else {
-                        isMinimize = true;
-                        $(element).addClass("sidebar-minimized");
-                        $(this).addClass("active");
-                        if (backgroundImage) {
-                            $('.mautic-brand, .sidebar-header').addClass('minimized');
-                        }
-
-                        // publish event
-                        $(element).trigger(settings.eventPrefix+".sidebar.minimize", { "element": $(element) });
-                    }
-
-                    // prevent default
-                    e.preventDefault();
-                }
-
-                $(element).on("click", minimizeHandler, toggleMinimize);
-
-                // Event console
-                MAIN.prototype.HELPER.Console(settings.eventPrefix+".sidebar.minimize");
-                MAIN.prototype.HELPER.Console(settings.eventPrefix+".sidebar.maximize");
-            })();
-
             // @PLUGIN: SidebarMenu
             // Self invoking
             // utilize bootstrap collapse
@@ -694,37 +636,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                             $this.parent().addClass("open");
                         }
                     }
-
-                    // run only on tablet view and sidebar-menu collapse
-                    if((isScreensm) || (isMinimize)) {
-                        // if have target
-                        if(!!target === true) {
-                            // touch devices
-                            if($(element).hasClass("touch")) {
-                                // click event handler
-                                if(e.type === "click") {
-                                    if($this.parent().hasClass("hover")) {
-                                        // remove hover class and clear the `top` css attr val
-                                        $this.parent().removeClass("hover");
-                                        $(target).css("top", "");
-                                    } else {
-                                        // remove other opened submenus
-                                        if(!!parent) {
-                                            $(parent+" .hover").each(function (index, elem) {
-                                                $(elem).removeClass("hover");
-                                            });
-                                        }
-
-                                        // add hover class and calculate submenu offset
-                                        $this.parent().addClass("hover");
-                                        if($(target)[0].getBoundingClientRect().bottom >= Response.viewportH()) {
-                                            $(target).css("top", "-"+($(target)[0].getBoundingClientRect().bottom-Response.viewportH()+2)+"px");
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
 
                 // core preserveSubmenu function
@@ -732,33 +643,6 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     var $this       = $(this),
                         parent      = $this.children(submenuHandler).data("parent"),
                         target      = $this.children(submenuHandler).data("target");
-
-                    // run only on tablet view and sidebar-menu collapse
-                    if((isScreensm) || (isMinimize)) {
-                        // if have target
-                        if(!!target === true) {
-                            // touch devices
-                            if(!$(element).hasClass("touch")) {
-
-                                // mouseenter event handler
-                                if(e.type === "mouseenter") {
-                                    // add hover class and calculate submenu offset
-                                    $this.addClass("hover");
-                                    if($(target)[0].getBoundingClientRect().bottom >= Response.viewportH()) {
-                                        $(target).css("top", "-"+($(target)[0].getBoundingClientRect().bottom-Response.viewportH()+2)+"px");
-                                    }
-                                }
-
-                                // mouseleave event handler
-                                if(e.type === "mouseleave") {
-                                    // remove hover class and clear the `top` css attr val
-                                    $this.removeClass("hover");
-                                    $(target).css("top", "");
-                                }
-
-                            }
-                        }
-                    }
                 }
 
                 $(document)
