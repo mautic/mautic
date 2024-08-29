@@ -1732,7 +1732,7 @@ class LeadController extends FormController
             $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
@@ -1754,15 +1754,9 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $this->createForm(
-                        DncType::class,
-                        [],
-                        [
-                            'action' => $route,
-                        ]
-                    )->createView(),
+                    'form' => $this->createForm(DncType::class, [], ['action' => $route])->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadBatch',
