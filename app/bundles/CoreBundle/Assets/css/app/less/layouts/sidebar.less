@@ -14,17 +14,11 @@
   }
 }
 .csstransforms3d.sidebar-open-rtl {
-  .app-sidebar.sidebar-right {
-    .translate3d(-@sidebar-right-width, 0, 0);
-  }
   .app-sidebar.sidebar-left {
     .translate3d(-@sidebar-right-width, 0, 0);
   }
 }
 .no-csstransforms3d.sidebar-open-rtl {
-  .app-sidebar.sidebar-right {
-    right: 0;
-  }
   .app-sidebar.sidebar-left {
     left: -@sidebar-right-width;
   }
@@ -72,37 +66,6 @@
     }
   }
 
-  // sidebar right
-  // -------------------------
-  &.sidebar-right {
-    width: @sidebar-right-width;
-    right: -@sidebar-right-width;
-    background-color: var(--layer);
-    box-shadow:inset 1px 0 0 0 rgba(0,0,0,0.05);
-    color: var(--text-secondary);
-    .transition(all .3s ease);
-
-    // sidebar header & footer
-    .sidebar-header,
-    .sidebar-footer {
-      width: @sidebar-right-width;
-      background-color: var(--layer);
-    }
-
-    // sidebar content
-    .sidebar-content {
-      padding-left: 1px;
-      top: @header-height;
-    }
-
-    // nav-sidebar color variants
-    .nav-sidebar {
-      > .nav {
-        .nav-sidebar-variants(@sidebar-right-bg);
-      }
-    }
-  }
-
   // sidebar header
   .sidebar-header {
     z-index: 100;
@@ -114,7 +77,7 @@
     .header-fixed & {
       position: absolute;
       top: 0;
-      
+
       //box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
     }
 
@@ -248,7 +211,7 @@
         > .nav-submenu {
           position: relative;
           padding-left: 50px;
-          
+
 
           // the line
           &:after {
@@ -305,25 +268,6 @@
         }
       }
     }
-
-    // Sidebar minimizer
-    // -------------------------
-    .sidebar-minimizer {
-      > .direction {
-        &:after {
-          font-family: 'remixicon';
-          font-size: 18px;
-          content: '\EA64';
-        }
-      }
-      &.active {
-        .direction {
-          &:after {
-            content: '\EA6E';
-          }
-        }
-      }
-    }
   }
 }
 
@@ -354,98 +298,6 @@
         // reset app-footer on sidebar collapse
         .sidebar-left-collapse & {
           margin-left: @sidebar-left-collapse-width;
-        }
-      }
-
-      // minimized state
-      .sidebar-minimized & {
-        width: @sidebar-left-collapse-width;
-
-        // reset `nav-sidebar` style
-        .nav-sidebar {
-          margin-top: 10px;
-          > .nav > li {
-            > a {
-              padding: 12px 22px;
-            }
-            &.nav-heading,
-            > a .arrow,
-            > a .badge,
-            > a .text,
-            > a .label {
-              /* override default margin-left transition as any delay throws Chrome off */
-              .transition(none); 
-              /* hide everything but the icon; using margin and opacity since display can't be transitioned */
-              margin-left: -500px;
-              opacity: 0;
-              line-height: 0px;
-            }
-
-            > a .icon {
-              min-width: 0;
-              width: 100%;
-              font-size: 17px;
-              
-            }
-            > .nav-submenu {
-              display: none;
-              height: auto !important;
-              position: absolute;
-              z-index: -1;
-              top: 0;
-              padding-top: 10px;
-              padding-bottom: 10px;
-              padding-left: 30px;
-              min-width: 180px;
-              border-top-right-radius: @border-radius-base;
-              border-bottom-right-radius: @border-radius-base;
-
-              // the line
-              &:after {
-                left: 16px;
-              }
-
-              // the dot
-              > li:after {
-                left: -17px;
-              }
-            }
-
-            // Open and hover state
-            &.hover {
-              // Open `nav-submenu` if in `hover` state
-              > .nav-submenu {
-                display: block;
-                left: @sidebar-left-collapse-width;
-              }
-            }
-          }
-        }
-
-        // reset sidebar-content
-        .sidebar-content {
-          > .scroll-wrapper,
-          > .scroll-wrapper > .scroll-content {
-            overflow: visible !important;
-          }
-          > .scroll-wrapper > .scroll-bar {
-            display: none !important;
-          }
-        }
-
-        // reset sidebar-header
-        .sidebar-header {
-          /* padding: 0; */
-          width: @sidebar-left-collapse-width;
-          > .mautic-brand > .mautic-logo-text {
-            opacity: 0;
-            margin-left: -500px;
-            /* override default margin-left transition as any delay throws Chrome off */
-            .transition(none);
-          }
-          > .mautic-brand {
-            padding: 0;
-          }
         }
       }
     }
