@@ -660,6 +660,16 @@ Mautic.addLeadListFilter = function (elId, elObj) {
         prototype.find(".panel-heading").addClass('hide');
     }
 
+    Mautic.ajaxActionRequest(
+        'lead:getSegmentFilterIcon',
+        { filterType: elId },
+        function (response) {
+            if (response.iconClass) {
+                prototype.find('.object-icon').removeClass('ri-shapes-line').addClass(response.iconClass);
+            }
+        }
+    );
+
     prototype.find(".inline-spacer").append(fieldObject);
 
     prototype.find("a.remove-selected").on('click', function() {

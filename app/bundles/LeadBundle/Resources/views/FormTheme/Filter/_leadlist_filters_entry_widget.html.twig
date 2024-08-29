@@ -15,6 +15,11 @@
   {% else %}
       {% set object = form.vars.data.object|default('lead') %}
   {% endif %}
+  
+  {% set iconClass = '' %}
+  {% if not isPrototype %}
+    {% set iconClass = getSegmentFilterIcon(filterType) %}
+  {% endif %}
 
   {% if isPrototype or fields[object][filterType].label is defined %}
     <div class="panel {% if inGroup and false == first %}in-group{% endif %}" id="{{ id }}">
@@ -25,7 +30,7 @@
         </div>
         <div class="panel-body">
             <div class="col-xs-6 col-sm-3 field-name">
-                <span><i class="object-icon {{ getSegmentFilterIcon(filterType) }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+                <span><i class="object-icon {{ iconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
             </div>
 
             <div class="col-xs-6 col-sm-3 padding-none">
