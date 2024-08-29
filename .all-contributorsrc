@@ -1261,7 +1261,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/95358802?v=4",
       "profile": "https://github.com/nox1134",
       "contributions": [
-        "code"
+        "code",
+        "test"
       ]
     },
     {
@@ -1338,6 +1339,33 @@
       "contributions": [
         "review",
         "userTesting"
+      ]
+    },
+    {
+      "login": "vinzent",
+      "name": "Thomas Mueller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/296297?v=4",
+      "profile": "https://github.com/vinzent",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Bastian2718",
+      "name": "Bastian2718",
+      "avatar_url": "https://avatars.githubusercontent.com/u/177823038?v=4",
+      "profile": "https://github.com/Bastian2718",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "cjavad",
+      "name": "Javad Shafique",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22474016?v=4",
+      "profile": "http://javad.sh",
+      "contributions": [
+        "code"
       ]
     }
   ],
