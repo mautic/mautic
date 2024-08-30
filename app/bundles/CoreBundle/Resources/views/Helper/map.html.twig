@@ -5,7 +5,7 @@
         {% endif %}
         <div class="map-options__container btn-group btn-block" data-toggle="buttons">
             {% for option in options %}
-            <label class="map-options__item {{ loop.first ? 'active' : '' }} btn btn-default"
+            <label class="map-options__item {{ loop.first ? 'active' : '' }} btn btn-ghost"
                    data-map-option="true"
                    data-map-series="{{ option.data|json_encode }}"
                    data-legend-text="{{ option.legendText }}"
