@@ -20,6 +20,7 @@
   gap: var(--spacing-03);
   justify-content: space-between;
   width: fit-content;
+  &:hover {border: 1px solid var(--border-no-color);}
   &,
   &:active,
   &.active {
@@ -244,7 +245,8 @@
   span {gap: var(--spacing-03);}
 
   //// Ghost Danger
-  &.btn-danger {
+  &.btn-danger,
+  &.btn-danger.btn-icon {
     color: var(--button-danger-secondary);
     .outline();
     i {color: var(--button-danger-secondary);}
@@ -285,6 +287,34 @@
   padding: 0;
   align-items: center;
   aspect-ratio: 1 / 1;
+  border-radius: 20px;
+}
+
+
+
+.btn-group {
+  > .btn {
+    &.btn-yes,
+    &.btn-no {
+      &:first-child:not(:last-child):not(.dropdown-toggle),
+      &:not(:first-child):not(:last-child):not(.dropdown-toggle),
+      &:last-child:not(:first-child),
+      & {
+        padding: 5px;
+        aspect-ratio: 1/1;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+      }
+    }
+
+    &.active {
+      &.btn-yes,
+      &.btn-no {
+        outline-color: transparent;
+      }
+    }
+  }
 }
 
 // Link buttons
@@ -323,6 +353,7 @@
 }
 
 // Standard sizes
+.btn-xs { height: var(--spacing-06); line-height: var(--spacing-06);}
 .btn-sm { height: var(--spacing-07); line-height: var(--spacing-07);}
 .btn-md { height: var(--spacing-08); line-height: var(--spacing-08);}
 .btn-lg { height: var(--spacing-09); line-height: var(--spacing-09);}
