@@ -33,11 +33,13 @@
                     </select>
                 </div>
                 <div class="col-sm-2 mt-lg">
+                    {% if enableExportPermission %}
                     <a class="btn btn-default btn-block mt-lg" href="{{ url('mautic_contact_auditlog_export_action', {'leadId': lead.id}) }}" data-toggle="download">
                         <span>
                             <i class="ri-download-line"></i> <span>{{ 'mautic.core.export'|trans }}</span>
                         </span>
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -104,7 +106,7 @@
               {% endfor %}
               <tr class="timeline-row {{ rowStripe }} {% if event.featured is defined %}timeline-featured{% endif %}">
                 <td class="timeline-icon np">
-                    <span class="fa fa-fw {{ icon }}"></span>
+                    <span class="fa ri-fw {{ icon }}"></span>
                 </td>
                   <td class="table-expand np">
                       <a href="javascript:void(0);"

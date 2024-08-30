@@ -9,17 +9,12 @@
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="keyboardShortcutsModalLabel">
-          {{ "mautic.core.keyboard.shortcuts" | trans }}
-        </h3>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="{{ 'mautic.core.close' | trans }}"
-        >
+        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
           <span aria-hidden="true">&times;</span>
         </button>
+        <h4 class="modal-title" id="keyboardShortcutsModalLabel">
+          {{ "mautic.core.keyboard.shortcuts" | trans }}
+        </h4>
       </div>
       <div class="modal-body row">
         <div class="col-md-12">

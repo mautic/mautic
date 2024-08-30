@@ -55,7 +55,7 @@ h1, h2, h3, h4, h5, h6,
 // -------------------------
 .page-header {
   padding: 15px;
-  margin: 0;
+  margin: 16px 0 0 0;
   border-bottom: 0;
 
   // breadcrumb
@@ -93,6 +93,8 @@ h1, h2, h3, h4, h5, h6,
 
 .tt-u { text-transform: uppercase; }
 
+.lh-1 { line-height: 1; }
+
 // Contextual colors
 // -------------------------
 .text-muted { .text-emphasis-variant(lighten(@text-color, 25%)); }
@@ -105,6 +107,7 @@ h1, h2, h3, h4, h5, h6,
 .text-twitter { .text-emphasis-variant(@brand-twitter); }
 .text-facebook { .text-emphasis-variant(@brand-facebook); }
 .text-google { .text-emphasis-variant(@brand-google); }
+.text-disabled { color: var(--text-disabled); }
 
 // Blockquote
 // -------------------------
@@ -147,6 +150,15 @@ blockquote {
 .help-block {
   font-size: 12px;
 }
-code { 
+code {
   padding: var(--spacing-01) var(--spacing-03);
- }
+  cursor: pointer;
+}
+
+kbd {
+  min-width: 20px;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 #afb8c133;
+  border: 1px solid #afb8c133;
+  border-radius: 5px;
+}
