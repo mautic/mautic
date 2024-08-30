@@ -6068,6 +6068,10 @@ button.close {
   -o-perspective: 2000px;
   perspective: 2000px;
 }
+.modal.in .modal-dialog {
+  top: 45%;
+  transform: translate(0, -50%);
+}
 .modal.in .modal-dialog.aside {
   -webkit-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
   -ms-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
