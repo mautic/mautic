@@ -38,6 +38,13 @@
       top: .15em;
     }
   }
+
+  &:has(.btn) { align-items: center; }
+}
+
+.nav-tabs-contained + .tab-content,
+.nav-tabs-contained + * > .tab-content {
+  .alert { background-color: var(--layer-alternate); }
 }
 
 .alert-success { 
