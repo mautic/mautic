@@ -13,13 +13,10 @@
   {% if isBehavior %}
       {% set object = 'behaviors' %}
   {% else %}
-      {% set object = form.vars.data.object|default('lead') %}
+      {% set object = form.vars.data.object|default('') %}
   {% endif %}
-  
-  {% set iconClass = '' %}
-  {% if not isPrototype %}
-    {% set iconClass = getSegmentFilterIcon(filterType) %}
-  {% endif %}
+  {% set objectIconClass = 'company' == object ? 'ri-building-2-line' : 'ri-user-6-fill' %}
+  {% set filterTypeIconClass = fields[object][filterType]['iconClass']|default('') %}
 
   {% if isPrototype or fields[object][filterType].label is defined %}
     <div class="panel {% if inGroup and false == first %}in-group{% endif %}" id="{{ id }}">
@@ -29,8 +26,12 @@
             </div>
         </div>
         <div class="panel-body">
-            <div class="col-xs-6 col-sm-3 field-name">
-                <span><i class="object-icon {{ iconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
+            <div class="col-xs-2 col-sm-1 ai-center d-flex">
+                <i class="object-icon ma-a fa-2x {{ objectIconClass }}" aria-hidden="true"></i>
+            </div>
+
+            <div class="col-xs-6 col-sm-2 field-name">
+                <span><i class="filter-type-icon {{ filterTypeIconClass }}" aria-hidden="true"></i> {% if isPrototype %}__label__{% else %}{{ fields[object][filterType]['label'] }}{% endif %}</span>
             </div>
 
             <div class="col-xs-6 col-sm-3 padding-none">

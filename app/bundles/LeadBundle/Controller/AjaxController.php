@@ -25,7 +25,6 @@ use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
-use Mautic\LeadBundle\Twig\Extension\SegmentFilterIconTrait;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,7 +35,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
-    use SegmentFilterIconTrait;
 
     public function userListAction(Request $request): JsonResponse
     {
@@ -977,12 +975,5 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse([]);
-    }
-
-    public function getSegmentFilterIconAction(Request $request): JsonResponse
-    {
-        $fieldAlias = $request->request->get('filterType');
-
-        return $this->sendJsonResponse(['iconClass' => $this->getSegmentFilterIcon($fieldAlias)]);
     }
 }

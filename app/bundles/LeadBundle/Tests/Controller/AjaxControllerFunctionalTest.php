@@ -572,32 +572,4 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         return $campaign;
     }
-
-    /**
-     * @dataProvider dataForGetSegmentFilterIconAction
-     */
-    public function testGetSegmentFilterIconAction(string $filterType, string $expectedIcon): void
-    {
-        // Call the removeTagFromLeadAction
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=lead:getSegmentFilterIcon', [
-            'filterType' => $filterType,
-        ]);
-        $clientResponse = $this->client->getResponse();
-
-        $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
-        $this->assertSame($expectedIcon, $response['iconClass']);
-    }
-
-    /**
-     * @return iterable<string, array<int, string>>
-     */
-    public function dataForGetSegmentFilterIconAction(): iterable
-    {
-        yield 'Lead field' => ['address1', 'ri-home-2-line'];
-        yield 'Company field' => ['companyname', 'ri-building-3-line'];
-        yield 'Behavior field' => ['email_id', 'ri-cursor-line'];
-        yield 'Random field' => ['no', 'ri-shapes-line'];
-        yield 'Empty' => ['', 'ri-shapes-line'];
-    }
 }

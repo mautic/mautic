@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\LeadBundle\Twig\Extension;
+namespace Mautic\LeadBundle\Segment;
 
 trait SegmentFilterIconTrait
 {
