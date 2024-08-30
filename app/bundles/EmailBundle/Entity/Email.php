@@ -585,6 +585,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
+        if ('variantSettings' == $prop) {
+            $tmpValue = [];
+            foreach ($this->getSettingsKeys() as $key) {
+                if (array_key_exists($key, $val)) {
+                    $tmpValue[$key] = $val[$key];
+                }
+            }
+            $val = $tmpValue;
+        }
+
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
