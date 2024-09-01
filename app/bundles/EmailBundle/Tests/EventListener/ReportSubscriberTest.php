@@ -315,7 +315,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->emailRepository->expects($this->once())
-            ->method('getUniqueCliks')
+            ->method('getUniqueClicks')
             ->willReturn(5);
 
         $this->emailRepository->expects($this->once())
