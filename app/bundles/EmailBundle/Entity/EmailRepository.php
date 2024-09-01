@@ -449,10 +449,7 @@ class EmailRepository extends CommonRepository
         return $results;
     }
 
-    /**
-     * @return int|array<string, int>
-     */
-    public function getUnsubscribedCount(QueryBuilder $queryBuilder): int|array
+    public function getUnsubscribedCount(QueryBuilder $queryBuilder): int
     {
         $queryBuilder->resetQueryParts(['join']);
         $this->addDNCTableForEmails($queryBuilder);
@@ -462,12 +459,12 @@ class EmailRepository extends CommonRepository
         return $queryBuilder->executeQuery()->rowCount();
     }
 
-    public function getUniqueCliks(QueryBuilder $queryBuilder): int
+    public function getUniqueClicks(QueryBuilder $queryBuilder): int
     {
         $this->addTrackableTablesForEmailStats($queryBuilder);
         $queryBuilder->select('SUM( tr.unique_hits) as `unique_clicks`');
 
-        return $queryBuilder->executeQuery()->fetchOne();
+        return (int) $queryBuilder->executeQuery()->fetchOne();
     }
 
     private function addTrackableTablesForEmailStats(QueryBuilder $qb): void

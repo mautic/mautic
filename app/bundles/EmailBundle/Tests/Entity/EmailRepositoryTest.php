@@ -139,7 +139,7 @@ class EmailRepositoryTest extends TestCase
             ->onlyMethods(['addTrackableTablesForEmailStats'])
             ->getMock();
 
-        $result = $repository->getUniqueCliks($queryBuilder);
+        $result = $repository->getUniqueClicks($queryBuilder);
 
         $this->assertEquals(10, $result);
     }

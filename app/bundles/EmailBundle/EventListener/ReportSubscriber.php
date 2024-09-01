@@ -544,7 +544,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.email.graph.pie.sent.read.clicked.unsubscribed':
                     $counts       = $this->emailRepository->getSentReadNotReadCount($queryBuilder);
-                    $clicked      = $this->emailRepository->getUniqueCliks($queryBuilder);
+                    $clicked      = $this->emailRepository->getUniqueClicks($queryBuilder);
                     $unsubscribed = $this->emailRepository->getUnsubscribedCount($queryBuilder);
                     $unsubCount   = $this->countVsRead($unsubscribed, 'unsubscribed', $counts);
                     $clickedCount = $this->countVsRead($clicked, 'clicked', $counts);
