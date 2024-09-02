@@ -512,7 +512,7 @@ class LeadController extends FormController
                     $this->addFlash(
                         'mautic.core.notice.created',
                         [
-                            '%name%'      => $identifier,
+                            '%name%'      => htmlspecialchars($identifier, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false),
                             '%menu_link%' => 'mautic_contact_index',
                             '%url%'       => $this->generateUrl(
                                 'mautic_contact_action',
@@ -706,7 +706,7 @@ class LeadController extends FormController
                     $this->addFlash(
                         'mautic.core.notice.updated',
                         [
-                            '%name%'      => $identifier,
+                            '%name%'      => htmlspecialchars($identifier, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false),
                             '%menu_link%' => 'mautic_contact_index',
                             '%url%'       => $this->generateUrl(
                                 'mautic_contact_action',
@@ -1114,7 +1114,7 @@ class LeadController extends FormController
                     'type'    => 'notice',
                     'msg'     => 'mautic.core.notice.deleted',
                     'msgVars' => [
-                        '%name%' => $identifier,
+                        '%name%' => htmlspecialchars($identifier, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false),
                         '%id%'   => $objectId,
                     ],
                 ];
