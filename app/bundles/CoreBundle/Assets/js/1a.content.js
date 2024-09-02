@@ -1816,3 +1816,18 @@ Mautic.processCsvContactExport = function (route) {
         }
     });
 };
+
+/**
+ * Applies a quick filter to a list based on the selected element's data-filter attribute
+ *
+ * @param {HTMLElement} element
+ */
+Mautic.listQuickFilter = function (element) {
+    const filterValue = element.dataset.filter;
+    const searchInput = document.getElementById('list-search');
+    searchInput.value = filterValue;
+    const enterKeyEvent = new KeyboardEvent('keyup', {
+        keyCode: 13
+    });
+    searchInput.dispatchEvent(enterKeyEvent);
+}

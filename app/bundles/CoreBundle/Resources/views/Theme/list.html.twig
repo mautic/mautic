@@ -152,11 +152,11 @@
                                 {% endfor %}
                                 {% if item['config']['features'] is defined and item['config']['features'] is not empty %}
                                     {% for feature in item['config']['features'] %}
-                                        
+
                                             <span class="label label-gray">
                                                 {{ ('mautic.core.theme.feature.' ~ feature|e)|trans }}
                                             </span>
-                                        
+
                                     {% endfor %}
                                 {% endif %}
                                 </div>
