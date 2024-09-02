@@ -26,7 +26,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
 
-        $crawler = $this->client->request('GET', sprintf('/s/contacts/edit/%d', $response['id']));
+        $crawler        = $this->client->request('GET', sprintf('/s/contacts/edit/%d', $response['id']));
         $clientResponse = $this->client->getResponse();
         Assert::assertTrue($clientResponse->isOk());
         $content = $clientResponse->getContent();
@@ -34,7 +34,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
 
         $buttonCrawlerNode = $crawler->selectButton('Save & Close');
-        $form = $buttonCrawlerNode->form();
+        $form              = $buttonCrawlerNode->form();
         $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
         Assert::assertTrue($clientResponse->isOk());
